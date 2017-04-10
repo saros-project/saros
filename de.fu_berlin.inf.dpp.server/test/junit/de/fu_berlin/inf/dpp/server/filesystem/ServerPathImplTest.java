@@ -35,7 +35,7 @@ public class ServerPathImplTest {
 
     @Test
     public void equalsComparesTrailingSeparator() {
-        assertFalse(path("foo/bar").equals(path("foo/bar/")));
+        assertEquals(path("foo/bar"), (path("foo/bar/")));
     }
 
     @Test
@@ -200,22 +200,6 @@ public class ServerPathImplTest {
     }
 
     @Test
-    public void hasTrailingSeparator() {
-        assertTrue(path("trailing/sep/").hasTrailingSeparator());
-        assertFalse(path("no/trailing/sep").hasTrailingSeparator());
-    }
-
-    @Test
-    public void hasNativeTrailingSeparator() {
-        assertTrue(nativePath("trailing/").hasTrailingSeparator());
-    }
-
-    @Test
-    public void emptyPathHasNoTrailingSeparator() {
-        assertFalse(path("").hasTrailingSeparator());
-    }
-
-    @Test
     public void isPrefixOf() {
         IPath path = path("foo/bar/baz");
         assertTrue(path("foo").isPrefixOf(path));
@@ -270,14 +254,6 @@ public class ServerPathImplTest {
     }
 
     @Test
-    public void appendTrailingSeparatorPath() {
-        IPath path1 = path("no/trailing/sep");
-        IPath path2 = path("trailing/sep/");
-        assertTrue(path1.append(path2).hasTrailingSeparator());
-        assertFalse(path2.append(path1).hasTrailingSeparator());
-    }
-
-    @Test
     public void appendPathString() {
         assertEquals(path("foo/bar/baz"), path("foo/bar").append("baz"));
     }
@@ -289,7 +265,7 @@ public class ServerPathImplTest {
 
     @Test
     public void toPortableStringWithTrailingSeparator() {
-        assertEquals("foo/bar/baz/", path("foo/bar/baz/").toPortableString());
+        assertEquals("foo/bar/baz", path("foo/bar/baz/").toPortableString());
     }
 
     @Test
@@ -307,7 +283,7 @@ public class ServerPathImplTest {
     @Test
     public void toOSStringWithTrailingSeparator() {
         IPath path = path("foo/bar/");
-        String expected = "foo" + File.separator + "bar" + File.separator;
+        String expected = "foo" + File.separator + "bar";
         assertEquals(expected, path.toOSString());
     }
 

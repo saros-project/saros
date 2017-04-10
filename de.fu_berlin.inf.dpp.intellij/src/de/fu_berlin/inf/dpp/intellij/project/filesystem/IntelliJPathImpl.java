@@ -13,20 +13,17 @@ import java.nio.file.Paths;
  */
 public class IntelliJPathImpl implements IPath {
     private Path delegate;
-    private boolean trailingSeparator;
 
-    public static final IPath EMPTY = new IntelliJPathImpl(Paths.get(""),
-        false);
+    public static final IPath EMPTY = new IntelliJPathImpl(Paths.get(""));
 
     public static IPath fromString(String pathString) {
         if (pathString == null || pathString.isEmpty()) {
             return EMPTY;
         }
-        return new IntelliJPathImpl(Paths.get(pathString),
-            pathString.endsWith("/") || pathString.endsWith(File.separator));
+        return new IntelliJPathImpl(Paths.get(pathString));
     }
 
-    private IntelliJPathImpl(Path delegate, boolean trailingSeparator) {
+    private IntelliJPathImpl(Path delegate) {
         /*
          * OpenJDK 7 on Linux has a bug which causes normalize() to throw an
          * ArrayIndexOutOfBoundsException if called on the empty path.
@@ -34,7 +31,6 @@ public class IntelliJPathImpl implements IPath {
         this.delegate = delegate.equals(Paths.get("")) ?
             delegate :
             delegate.normalize();
-        this.trailingSeparator = trailingSeparator;
     }
 
     @Override
@@ -69,7 +65,7 @@ public class IntelliJPathImpl implements IPath {
             return EMPTY;
         }
         Path newDelegate = delegate.subpath(count, delegate.getNameCount());
-        return new IntelliJPathImpl(newDelegate, hasTrailingSeparator());
+        return new IntelliJPathImpl(newDelegate);
     }
 
     @Override
@@ -91,7 +87,7 @@ public class IntelliJPathImpl implements IPath {
             newDelegate = delegate.getRoot().resolve(newDelegate);
         }
 
-        return new IntelliJPathImpl(newDelegate, hasTrailingSeparator());
+        return new IntelliJPathImpl(newDelegate);
     }
 
     @Override
@@ -106,12 +102,7 @@ public class IntelliJPathImpl implements IPath {
         }
         Path root = delegate.toAbsolutePath().getRoot();
         Path newDelegate = root.resolve(delegate);
-        return new IntelliJPathImpl(newDelegate, hasTrailingSeparator());
-    }
-
-    @Override
-    public boolean hasTrailingSeparator() {
-        return trailingSeparator;
+        return new IntelliJPathImpl(newDelegate);
     }
 
     @Override
@@ -137,7 +128,7 @@ public class IntelliJPathImpl implements IPath {
         }
 
         Path newDelegate = delegate.resolve(other);
-        return new IntelliJPathImpl(newDelegate, path.hasTrailingSeparator());
+        return new IntelliJPathImpl(newDelegate);
     }
 
     @Override
@@ -147,16 +138,12 @@ public class IntelliJPathImpl implements IPath {
 
     @Override
     public String toPortableString() {
-        return toOSString().replace(File.separator, "/");
+        return toOSString().replace(File.separatorChar, '/');
     }
 
     @Override
     public String toOSString() {
-        String pathString = delegate.toString();
-        if (hasTrailingSeparator()) {
-            pathString += File.separator;
-        }
-        return pathString;
+        return delegate.toString();
     }
 
     @Override
@@ -166,17 +153,21 @@ public class IntelliJPathImpl implements IPath {
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return toPortableString();
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof IntelliJPathImpl)) {
+    public boolean equals(Object obj) {
+        
+        if (this == obj)
+            return true;
+        
+        if (!(obj instanceof IntelliJPathImpl)) {
             return false;
         }
-        IntelliJPathImpl other = (IntelliJPathImpl) o;
-        return delegate.equals(other.delegate)
-            && trailingSeparator == other.trailingSeparator;
+        
+        IntelliJPathImpl other = (IntelliJPathImpl) obj;
+        return delegate.equals(other.delegate);        
     }
 
     @Override

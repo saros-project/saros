@@ -25,22 +25,16 @@ public class IntelliJPathImplTest {
         String[] expected = { "home", "user", "saros", "project" };
 
         assertArrayEquals(expected, path.segments());
-        assertEquals(stringPath, path.toPortableString());
     }
 
     @Test
     public void parsesLinuxPathWithTrailingSlashCorrectly() {
-        String stringPath = "/home/user/saros/project/";
+        String stringPath = "/home/user/saros/project";
         IPath path = IntelliJPathImpl.fromString(stringPath);
 
         String[] expected = { "home", "user", "saros", "project" };
 
         assertArrayEquals(expected, path.segments());
-        assertEquals(stringPath, path.toPortableString());
-    }
-
-    private IPath path(String pathString) {
-        return IntelliJPathImpl.fromString(pathString);
     }
 
     private IPath absolutePath(String pathString) {
@@ -67,7 +61,7 @@ public class IntelliJPathImplTest {
 
     @Test
     public void equalsComparesTrailingSeparator() {
-        assertFalse(path("foo/bar").equals(path("foo/bar/")));
+        assertEquals(path("foo/bar"), (path("foo/bar/")));
     }
 
     @Test
@@ -232,22 +226,6 @@ public class IntelliJPathImplTest {
     }
 
     @Test
-    public void hasTrailingSeparator() {
-        assertTrue(path("trailing/sep/").hasTrailingSeparator());
-        assertFalse(path("no/trailing/sep").hasTrailingSeparator());
-    }
-
-    @Test
-    public void hasNativeTrailingSeparator() {
-        assertTrue(nativePath("trailing/").hasTrailingSeparator());
-    }
-
-    @Test
-    public void emptyPathHasNoTrailingSeparator() {
-        assertFalse(path("").hasTrailingSeparator());
-    }
-
-    @Test
     public void isPrefixOf() {
         IPath path = path("foo/bar/baz");
         assertTrue(path("foo").isPrefixOf(path));
@@ -302,14 +280,6 @@ public class IntelliJPathImplTest {
     }
 
     @Test
-    public void appendTrailingSeparatorPath() {
-        IPath path1 = path("no/trailing/sep");
-        IPath path2 = path("trailing/sep/");
-        assertTrue(path1.append(path2).hasTrailingSeparator());
-        assertFalse(path2.append(path1).hasTrailingSeparator());
-    }
-
-    @Test
     public void appendPathString() {
         assertEquals(path("foo/bar/baz"), path("foo/bar").append("baz"));
     }
@@ -321,7 +291,7 @@ public class IntelliJPathImplTest {
 
     @Test
     public void toPortableStringWithTrailingSeparator() {
-        assertEquals("foo/bar/baz/", path("foo/bar/baz/").toPortableString());
+        assertEquals("foo/bar/baz", path("foo/bar/baz/").toPortableString());
     }
 
     @Test
@@ -337,13 +307,6 @@ public class IntelliJPathImplTest {
     }
 
     @Test
-    public void toOSStringWithTrailingSeparator() {
-        IPath path = path("foo/bar/");
-        String expected = "foo" + File.separator + "bar" + File.separator;
-        assertEquals(expected, path.toOSString());
-    }
-
-    @Test
     public void emptyPathToOSString() {
         assertEquals("", path("").toOSString());
     }
@@ -352,6 +315,15 @@ public class IntelliJPathImplTest {
     public void toFile() {
         File file = path("foo/bar").toFile();
         assertEquals("foo" + File.separator + "bar", file.getPath());
+    }
+    
+    @Test
+    public void testToString() {
+        assertEquals("foo/bar", path("foo/bar/").toString());
+    }
+
+    private static IPath path(String pathString) {
+        return IntelliJPathImpl.fromString(pathString);
     }
 
 }

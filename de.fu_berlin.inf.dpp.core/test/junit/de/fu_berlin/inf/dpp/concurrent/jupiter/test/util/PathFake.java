@@ -73,11 +73,6 @@ public class PathFake implements IPath {
     }
 
     @Override
-    public boolean hasTrailingSeparator() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public int segmentCount() {
         throw new UnsupportedOperationException();
     }

@@ -50,11 +50,6 @@ public class EclipsePathImpl implements IPath {
     }
 
     @Override
-    public boolean hasTrailingSeparator() {
-        return delegate.hasTrailingSeparator();
-    }
-
-    @Override
     public int segmentCount() {
         return delegate.segmentCount();
     }
@@ -91,7 +86,7 @@ public class EclipsePathImpl implements IPath {
 
     /**
      * Returns the original {@link org.eclipse.core.runtime.IPath IPath} object.
-     * 
+     *
      * @return
      */
     public org.eclipse.core.runtime.IPath getDelegate() {

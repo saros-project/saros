@@ -36,8 +36,6 @@ public interface IPath {
 
     public String lastSegment();
 
-    public boolean hasTrailingSeparator();
-
     public boolean isPrefixOf(IPath path);
 
     public int segmentCount();

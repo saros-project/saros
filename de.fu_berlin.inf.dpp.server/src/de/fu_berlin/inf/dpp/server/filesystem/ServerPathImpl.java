@@ -9,26 +9,23 @@ import de.fu_berlin.inf.dpp.filesystem.IPath;
 public class ServerPathImpl implements IPath {
 
     private Path delegate;
-    private boolean trailingSeparator;
 
-    public static final IPath EMPTY = new ServerPathImpl(Paths.get(""), false);
+    public static final IPath EMPTY = new ServerPathImpl(Paths.get(""));
 
     public static IPath fromString(String pathString) {
         if (pathString == null || pathString.isEmpty()) {
             return EMPTY;
         }
-        return new ServerPathImpl(Paths.get(pathString),
-            pathString.endsWith("/") || pathString.endsWith(File.separator));
+        return new ServerPathImpl(Paths.get(pathString));
     }
 
-    private ServerPathImpl(Path delegate, boolean trailingSeparator) {
+    private ServerPathImpl(Path delegate) {
         /*
          * OpenJDK 7 on Linux has a bug which causes normalize() to throw an
          * ArrayIndexOutOfBoundsException if called on the empty path.
          */
         this.delegate = delegate.equals(Paths.get("")) ? delegate : delegate
             .normalize();
-        this.trailingSeparator = trailingSeparator;
     }
 
     @Override
@@ -63,7 +60,7 @@ public class ServerPathImpl implements IPath {
             return EMPTY;
         }
         Path newDelegate = delegate.subpath(count, delegate.getNameCount());
-        return new ServerPathImpl(newDelegate, hasTrailingSeparator());
+        return new ServerPathImpl(newDelegate);
     }
 
     @Override
@@ -85,7 +82,7 @@ public class ServerPathImpl implements IPath {
             newDelegate = delegate.getRoot().resolve(newDelegate);
         }
 
-        return new ServerPathImpl(newDelegate, hasTrailingSeparator());
+        return new ServerPathImpl(newDelegate);
     }
 
     @Override
@@ -100,12 +97,7 @@ public class ServerPathImpl implements IPath {
         }
         Path root = delegate.toAbsolutePath().getRoot();
         Path newDelegate = root.resolve(delegate);
-        return new ServerPathImpl(newDelegate, hasTrailingSeparator());
-    }
-
-    @Override
-    public boolean hasTrailingSeparator() {
-        return trailingSeparator;
+        return new ServerPathImpl(newDelegate);
     }
 
     @Override
@@ -131,7 +123,7 @@ public class ServerPathImpl implements IPath {
         }
 
         Path newDelegate = delegate.resolve(other);
-        return new ServerPathImpl(newDelegate, path.hasTrailingSeparator());
+        return new ServerPathImpl(newDelegate);
     }
 
     @Override
@@ -141,16 +133,12 @@ public class ServerPathImpl implements IPath {
 
     @Override
     public String toPortableString() {
-        return toOSString().replace(File.separator, "/");
+        return toOSString().replace(File.separatorChar, '/');
     }
 
     @Override
     public String toOSString() {
-        String pathString = delegate.toString();
-        if (hasTrailingSeparator()) {
-            pathString += File.separator;
-        }
-        return pathString;
+        return delegate.toString();
     }
 
     @Override
@@ -160,17 +148,21 @@ public class ServerPathImpl implements IPath {
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return toPortableString();
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof ServerPathImpl)) {
+    public boolean equals(Object obj) {
+
+        if (this == obj)
+            return true;
+
+        if (!(obj instanceof ServerPathImpl))
             return false;
-        }
-        ServerPathImpl other = (ServerPathImpl) o;
-        return delegate.equals(other.delegate)
-            && trailingSeparator == other.trailingSeparator;
+
+        ServerPathImpl other = (ServerPathImpl) obj;
+        return delegate.equals(other.delegate);
+
     }
 
     @Override
