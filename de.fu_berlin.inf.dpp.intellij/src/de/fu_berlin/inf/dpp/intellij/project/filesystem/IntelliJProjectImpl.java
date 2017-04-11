@@ -356,11 +356,6 @@ public class IntelliJProjectImpl implements IProject {
     }
 
     @Override
-    public void refreshLocal() throws IOException {
-        scan();
-    }
-
-    @Override
     public void delete(int updateFlags) throws IOException {
         FileUtils.deleteDirectory(path);
     }

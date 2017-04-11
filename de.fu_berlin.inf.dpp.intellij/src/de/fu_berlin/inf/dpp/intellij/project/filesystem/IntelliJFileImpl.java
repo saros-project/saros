@@ -81,11 +81,6 @@ public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
     }
 
     @Override
-    public void refreshLocal() throws IOException {
-        getVirtualFile().refresh(false, false);
-    }
-
-    @Override
     public Object getAdapter(Class<? extends IResource> clazz) {
         if (clazz.isInstance(this)) {
             return this;

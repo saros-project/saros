@@ -21,11 +21,6 @@ public class IntelliJResourceImplTest extends AbstractResourceTest {
         }
 
         @Override
-        public void refreshLocal() throws IOException {
-
-        }
-
-        @Override
         public void delete(int updateFlags) throws IOException {
 
         }

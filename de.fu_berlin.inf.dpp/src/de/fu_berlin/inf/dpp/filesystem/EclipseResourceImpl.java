@@ -101,16 +101,6 @@ public class EclipseResourceImpl implements IResource {
     }
 
     @Override
-    public void refreshLocal() throws IOException {
-        try {
-            delegate.refreshLocal(
-                org.eclipse.core.resources.IResource.DEPTH_INFINITE, null);
-        } catch (CoreException e) {
-            throw new IOException(e);
-        }
-    }
-
-    @Override
     public boolean isDerived() {
         return delegate.isDerived();
     }

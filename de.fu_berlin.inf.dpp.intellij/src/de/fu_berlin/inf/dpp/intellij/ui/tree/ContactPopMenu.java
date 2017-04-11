@@ -19,7 +19,6 @@ import javax.swing.JPopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +26,7 @@ import java.util.List;
  * Contact pop-up menu for selecting a project to share. Opened when
  * right-clicking on a contact.
  */
+//TODO this might need fixing after IntelliJProjectImpl rework, seems unfinished
 class ContactPopMenu extends JPopupMenu {
 
     private static final Logger LOG = Logger.getLogger(ContactPopMenu.class);
@@ -99,21 +99,16 @@ class ContactPopMenu extends JPopupMenu {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            try {
-                List<IResource> resources;
+            List<IResource> resources;
 
-                IProject proj = workspace.getProject(dir.getName());
-                proj.refreshLocal();
+            IProject proj = workspace.getProject(dir.getName());
 
-                resources = Arrays.asList((IResource) proj);
+            resources = Arrays.asList((IResource) proj);
 
-                JID user = new JID(contactInfo.getRosterEntry().getUser());
-                List<JID> contacts = Arrays.asList(user);
+            JID user = new JID(contactInfo.getRosterEntry().getUser());
+            List<JID> contacts = Arrays.asList(user);
 
-                CollaborationUtils.startSession(resources, contacts);
-            } catch (IOException exception) {
-                LOG.error("could not share directory due to", exception);
-            }
+            CollaborationUtils.startSession(resources, contacts);
         }
     }
 }

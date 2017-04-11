@@ -84,11 +84,6 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl
     }
 
     @Override
-    public void refreshLocal() throws IOException {
-        getVirtualFile().refresh(false, true);
-    }
-
-    @Override
     public int getType() {
         return FOLDER;
     }

@@ -40,12 +40,6 @@ public interface IResource {
      */
     public boolean isDerived(boolean checkAncestors);
 
-    /**
-     * Equivalent to the Eclipse call
-     * <code>IResource#refreshLocal(IResource#DEPTH_INFINITE, null)</code>
-     */
-    public void refreshLocal() throws IOException;
-
     public boolean isDerived();
 
     /**

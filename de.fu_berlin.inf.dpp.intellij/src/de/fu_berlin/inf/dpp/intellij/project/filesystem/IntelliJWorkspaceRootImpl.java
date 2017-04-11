@@ -85,11 +85,6 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
     }
 
     @Override
-    public void refreshLocal() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean isDerived() {
         return false;
     }

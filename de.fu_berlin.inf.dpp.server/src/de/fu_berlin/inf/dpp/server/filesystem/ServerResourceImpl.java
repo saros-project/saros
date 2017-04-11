@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.server.filesystem;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -88,11 +87,6 @@ public abstract class ServerResourceImpl implements IResource {
     @Override
     public boolean isDerived(boolean checkAncestors) {
         return false;
-    }
-
-    @Override
-    public void refreshLocal() throws IOException {
-        // Nothing to do
     }
 
     @Override
