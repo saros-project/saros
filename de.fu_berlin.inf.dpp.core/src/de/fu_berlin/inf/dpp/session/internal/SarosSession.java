@@ -37,6 +37,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
@@ -745,7 +746,7 @@ public final class SarosSession implements ISarosSession {
 
     /**
      * Must be called to update the project mapper when changes on shared files
-     * oder folders happened.
+     * or shared folders happened.
      *
      * @param activity
      *            {@link IFileSystemModificationActivity} to handle
@@ -809,7 +810,7 @@ public final class SarosSession implements ISarosSession {
                 projectMapper.addResources(project,
                     Collections.singletonList(folder));
             }
-        } else if (activity instanceof FolderCreatedActivity) {
+        } else if (activity instanceof FolderDeletedActivity) {
             IFolder folder = activity.getPath().getFolder();
 
             if (folder == null)
