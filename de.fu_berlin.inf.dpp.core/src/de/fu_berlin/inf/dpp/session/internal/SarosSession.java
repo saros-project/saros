@@ -756,6 +756,17 @@ public final class SarosSession implements ISarosSession {
     private boolean updatePartialSharedResources(
         IFileSystemModificationActivity activity) {
 
+        final IProject project = activity.getPath().getProject();
+
+        /*
+         * The follow 'if check' assumes that move operations where at least one
+         * project is not part of the sharing is announced as create and delete
+         * activities.
+         */
+
+        if (!projectMapper.isPartiallyShared(project))
+            return true;
+
         if (activity instanceof FileActivity) {
             FileActivity fileActivity = ((FileActivity) activity);
             SPath path = fileActivity.getPath();
@@ -764,24 +775,20 @@ public final class SarosSession implements ISarosSession {
             if (file == null)
                 return true;
 
-            IProject project = file.getProject();
-
             switch (fileActivity.getType()) {
             case CREATED:
                 if (!file.exists())
                     return true;
 
-                if (projectMapper.isPartiallyShared(project))
-                    projectMapper.addResources(project,
-                        Collections.singletonList(file));
+                projectMapper.addResources(project,
+                    Collections.singletonList(file));
                 break;
             case REMOVED:
                 if (!isShared(file))
                     return false;
 
-                if (projectMapper.isPartiallyShared(project))
-                    projectMapper.removeResources(project,
-                        Collections.singletonList(file));
+                projectMapper.removeResources(project,
+                    Collections.singletonList(file));
 
                 break;
             case MOVED:
@@ -789,11 +796,9 @@ public final class SarosSession implements ISarosSession {
                 if (oldFile == null || !isShared(oldFile))
                     return false;
 
-                if (projectMapper.isPartiallyShared(project)) {
-                    projectMapper.removeAndAddResources(project,
-                        Collections.singletonList(oldFile),
-                        Collections.singletonList(file));
-                }
+                projectMapper.removeAndAddResources(project,
+                    Collections.singletonList(oldFile),
+                    Collections.singletonList(file));
 
                 break;
             }
@@ -803,10 +808,7 @@ public final class SarosSession implements ISarosSession {
             if (folder == null)
                 return true;
 
-            IProject project = folder.getProject();
-
-            if (projectMapper.isPartiallyShared(project)
-                && isShared(folder.getParent())) {
+            if (isShared(folder.getParent())) {
                 projectMapper.addResources(project,
                     Collections.singletonList(folder));
             }
@@ -816,15 +818,11 @@ public final class SarosSession implements ISarosSession {
             if (folder == null)
                 return true;
 
-            IProject project = folder.getProject();
-
             if (!isShared(folder))
                 return false;
 
-            if (projectMapper.isPartiallyShared(project)) {
-                projectMapper.removeResources(project,
-                    Collections.singletonList(folder));
-            }
+            projectMapper.removeResources(project,
+                Collections.singletonList(folder));
         }
         return true;
     }
