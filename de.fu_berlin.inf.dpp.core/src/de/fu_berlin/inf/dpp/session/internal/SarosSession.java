@@ -42,7 +42,6 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -716,6 +715,7 @@ public final class SarosSession implements ISarosSession {
      */
     private void sendActivity(final List<User> recipients,
         final IActivity activity) {
+
         if (recipients == null)
             throw new IllegalArgumentException();
 
@@ -753,8 +753,23 @@ public final class SarosSession implements ISarosSession {
      * @return <code>true</code> if the activity should be send to the user,
      *         <code>false</code> otherwise
      */
+    /*
+     * TODO This method needs more information, e.g we need to add resources to
+     * the mapper on the receiving side even if there was an I/= error. The
+     * current logic will abort as soon as possible, which might result in an
+     * inconsistent state that cannot be resolved.
+     */
+    /*
+     * TODO move to ProjectMapper
+     */
+    /*
+     * FIXME While it is nice to have this logic here, it should be done in the
+     * component that handles these activities. Drawback would be that we have
+     * to call addSharedResources which would result in broadcasts.
+     */
+
     private boolean updatePartialSharedResources(
-        IFileSystemModificationActivity activity) {
+        final IFileSystemModificationActivity activity) {
 
         final IProject project = activity.getPath().getProject();
 
@@ -769,32 +784,72 @@ public final class SarosSession implements ISarosSession {
 
         if (activity instanceof FileActivity) {
             FileActivity fileActivity = ((FileActivity) activity);
-            SPath path = fileActivity.getPath();
-            IFile file = path.getFile();
-
-            if (file == null)
-                return true;
+            IFile file = fileActivity.getPath().getFile();
 
             switch (fileActivity.getType()) {
             case CREATED:
-                if (!file.exists())
-                    return true;
+                if (!file.exists()) {
+                    log.error("PSFIC -"
+                        + " unable to update partial sharing state"
+                        + ", file does not exist: " + file);
+                    return false;
+                }
 
                 projectMapper.addResources(project,
                     Collections.singletonList(file));
+
                 break;
+
             case REMOVED:
-                if (!isShared(file))
+                if (!isShared(file)) {
+                    log.error("PSFIR -"
+                        + " file removal detected for a non shared file: "
+                        + file);
                     return false;
+                }
+
+                if (file.exists()) {
+                    log.error("PSFIR -"
+                        + " unable to update partial sharing state"
+                        + ", file still exists: " + file);
+                    return false;
+                }
 
                 projectMapper.removeResources(project,
                     Collections.singletonList(file));
 
                 break;
+
             case MOVED:
                 IFile oldFile = fileActivity.getOldPath().getFile();
-                if (oldFile == null || !isShared(oldFile))
+
+                if (!isShared(oldFile)) {
+                    log.error("PSFIM -"
+                        + " file move detected for a non shared file, source file is not shared, src: "
+                        + oldFile + " , dest: " + file);
                     return false;
+                }
+
+                if (oldFile.exists()) {
+                    log.error("PSFIM -"
+                        + " unable to update partial sharing state"
+                        + ", source file still exist: " + oldFile);
+                    return false;
+                }
+
+                if (isShared(file)) {
+                    log.error("PSFIM -"
+                        + " file move detected for shared file, destination file already shared, src: "
+                        + oldFile + " , dest: " + file);
+                    return false;
+                }
+
+                if (!file.exists()) {
+                    log.error("PSFIM -"
+                        + " unable to update partial sharing state"
+                        + ", destination file does not exist: " + file);
+                    return false;
+                }
 
                 projectMapper.removeAndAddResources(project,
                     Collections.singletonList(oldFile),
@@ -805,25 +860,42 @@ public final class SarosSession implements ISarosSession {
         } else if (activity instanceof FolderCreatedActivity) {
             IFolder folder = activity.getPath().getFolder();
 
-            if (folder == null)
-                return true;
-
-            if (isShared(folder.getParent())) {
-                projectMapper.addResources(project,
-                    Collections.singletonList(folder));
+            if (!isShared(folder.getParent())) {
+                log.error("PSFOC -"
+                    + " folder creation detected for a non shared parent: "
+                    + folder);
+                return false;
             }
+
+            if (!folder.exists()) {
+                log.error("PSFOC - unable to update partial sharing state"
+                    + ", folder does not exist: " + folder);
+                return false;
+            }
+
+            projectMapper.addResources(project,
+                Collections.singletonList(folder));
+
         } else if (activity instanceof FolderDeletedActivity) {
             IFolder folder = activity.getPath().getFolder();
 
-            if (folder == null)
-                return true;
-
-            if (!isShared(folder))
+            if (!isShared(folder)) {
+                log.error("PSFOR -"
+                    + " folder removal detected for a non shared folder: "
+                    + folder);
                 return false;
+            }
+
+            if (folder.exists()) {
+                log.error("PSFOR -" + " unable to update partial sharing state"
+                    + ", folder still exists: " + folder);
+                return false;
+            }
 
             projectMapper.removeResources(project,
                 Collections.singletonList(folder));
         }
+
         return true;
     }
 
