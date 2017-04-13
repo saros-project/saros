@@ -198,7 +198,7 @@ public final class SarosSession implements ISarosSession {
             /*
              * TODO depending if we call this before or after the consumer
              * dispatch a consumer may see the resource as shared or not. This
-             * is weird as they is NO guideline currently on how
+             * is weird as there is NO guideline currently on how
              * IFileSystemModificationActivity should be treated when it comes
              * to resource query of the current session, e.g isShared()
              */
@@ -289,7 +289,8 @@ public final class SarosSession implements ISarosSession {
 
         if (resource.getType() == IResource.FOLDER) {
             try {
-                IResource[] members = ((IFolder) resource).members();
+                IResource[] members = ((IFolder) resource
+                    .getAdapter(IFolder.class)).members();
 
                 for (int i = 0; i < members.length; i++)
                     list.addAll(getAllNonSharedChildren(members[i]));
@@ -388,7 +389,7 @@ public final class SarosSession implements ISarosSession {
         }
 
         /*
-         * 
+         *
          * as long as we do not know when something is send to someone this will
          * always produce errors ... swapping synchronizeUserList and userJoined
          * can produce different results
@@ -788,6 +789,15 @@ public final class SarosSession implements ISarosSession {
 
             switch (fileActivity.getType()) {
             case CREATED:
+
+                if (!isShared(file.getParent())) {
+                    log.error("PSFIC -"
+                        + " unable to update partial sharing state"
+                        + ", parent is not shared for file: " + file);
+
+                    return false;
+                }
+
                 if (!file.exists()) {
                     log.error("PSFIC -"
                         + " unable to update partial sharing state"
