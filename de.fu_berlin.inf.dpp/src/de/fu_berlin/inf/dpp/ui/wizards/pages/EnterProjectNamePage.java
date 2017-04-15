@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
-import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -75,8 +74,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     public EnterProjectNamePage(ISarosSession session,
         IConnectionManager connectionManager, Preferences preferences,
-        List<FileList> fileLists, JID peer,
-        List<ProjectNegotiationData> projectNegotiationData) {
+        JID peer, List<ProjectNegotiationData> projectNegotiationData) {
 
         super(Messages.EnterProjectNamePage_title);
         this.session = session;

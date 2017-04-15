@@ -78,7 +78,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private WizardDialogAccessable wizardDialog;
     private IncomingProjectNegotiation negotiation;
     private JID peer;
-    private List<FileList> fileLists;
+
     private boolean isExceptionCancel;
 
     @Inject
@@ -129,7 +129,6 @@ public class AddProjectToSessionWizard extends Wizard {
         this.negotiation = negotiation;
         this.peer = negotiation.getPeer();
 
-        this.fileLists = fileLists;
         setWindowTitle(Messages.AddProjectToSessionWizard_title);
         setHelpAvailable(true);
         setNeedsProgressMonitor(true);
@@ -157,8 +156,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         namePage = new EnterProjectNamePage(session, connectionManager,
-            preferences, fileLists, peer,
-            negotiation.getProjectNegotiationData());
+            preferences, peer, negotiation.getProjectNegotiationData());
 
         addPage(namePage);
     }
@@ -629,8 +627,9 @@ public class AddProjectToSessionWizard extends Wizard {
 
         final Map<String, IProject> result = new HashMap<String, IProject>();
 
-        for (final FileList list : fileLists) {
-            final String projectID = list.getProjectID();
+        for (final ProjectNegotiationData data : negotiation
+            .getProjectNegotiationData()) {
+            final String projectID = data.getProjectID();
 
             result.put(projectID, ResourcesPlugin.getWorkspace().getRoot()
                 .getProject(namePage.getTargetProjectName(projectID)));
