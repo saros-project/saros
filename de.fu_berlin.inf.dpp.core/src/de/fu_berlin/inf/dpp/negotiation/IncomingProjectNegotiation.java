@@ -90,12 +90,20 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     }
 
-    @Override
-    public Map<String, String> getProjectNames() {
+    /**
+     * Returns the remote project mapping. The mapping consists of the project
+     * id for the current session and their corresponding names on the remote
+     * side, i.e. id => name.
+     *
+     * @return the remote project mapping.
+     */
+    public Map<String, String> getRemoteProjectMapping() {
+
         Map<String, String> result = new HashMap<String, String>();
-        for (ProjectNegotiationData data : projectNegotiationData) {
+
+        for (ProjectNegotiationData data : projectNegotiationData)
             result.put(data.getProjectID(), data.getProjectName());
-        }
+
         return result;
     }
 

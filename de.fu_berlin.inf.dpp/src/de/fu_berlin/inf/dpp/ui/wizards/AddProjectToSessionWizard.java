@@ -156,7 +156,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         namePage = new EnterProjectNamePage(session, connectionManager,
-            preferences, fileLists, peer, negotiation.getProjectNames());
+            preferences, fileLists, peer, negotiation.getRemoteProjectMapping());
 
         addPage(namePage);
     }

@@ -120,7 +120,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
                 AddProjectToSessionWizard wizard = new AddProjectToSessionWizard(
                     getWindow(), negotiation, negotiation.getPeer(), fileLists,
-                    negotiation.getProjectNames());
+                    null);
                 wizard.setModal(false);
                 wizard.open();
 

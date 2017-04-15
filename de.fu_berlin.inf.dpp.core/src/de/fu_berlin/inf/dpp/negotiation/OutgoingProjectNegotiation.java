@@ -3,9 +3,7 @@ package de.fu_berlin.inf.dpp.negotiation;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CancellationException;
 
@@ -103,7 +101,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
              * inside a Workspace Runnable with file locks !. There is a small
              * gap between saving editors and entering the file lock but it will
              * almost never matter in a real execution environment.
-             *
+             * 
              * Do not save the editors inside the runnable as this may not work
              * depending on the IEditorManager implementation, i.e this thread
              * holds the lock, but saving editors is performed in another thread
@@ -134,7 +132,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 /*
                  * inform all listeners that the peer has started queuing and
                  * can therefore process IResourceActivities now
-                 *
+                 * 
                  * TODO this needs a review as this is called inside the
                  * "blocked" section and so it is not allowed to send resource
                  * activities at this time. Maybe change the description of the
@@ -249,15 +247,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     @Override
-    public Map<String, String> getProjectNames() {
-        Map<String, String> result = new HashMap<String, String>();
-        for (IProject project : projects)
-            result.put(session.getProjectID(project), project.getName());
-
-        return result;
-    }
-
-    @Override
     protected void executeCancellation() {
         if (session.getRemoteUsers().isEmpty())
             sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
@@ -269,9 +258,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * TODO: Make sure that all users are fully registered when stopping
          * them, otherwise failures might occur while a user is currently
          * joining and has not fully initialized yet.
-         *
+         * 
          * See also OutgoingSessionNegotiation#completeInvitation
-         *
+         * 
          * srossbach: This may already be the case ... just review this
          */
 

@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -88,13 +87,6 @@ public abstract class ProjectNegotiation extends Negotiation {
         if (connection != null)
             fileTransferManager = new FileTransferManager(connection);
     }
-
-    /**
-     *
-     * @return the names of the projects that are shared by the peer. projectID
-     *         => projectName
-     */
-    public abstract Map<String, String> getProjectNames();
 
     /**
      * Returns the {@linkplain ISarosSession session} id this negotiation

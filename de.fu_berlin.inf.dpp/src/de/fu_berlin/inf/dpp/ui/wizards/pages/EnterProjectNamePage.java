@@ -59,7 +59,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     private final ISarosSession session;
 
-    private final Map<String, String> remoteProjectNames;
+    private final Map<String, String> remoteProjectMapping;
     private final Map<String, ProjectOptionComposite> projectOptionComposites = new HashMap<String, ProjectOptionComposite>();
 
     /** Map containing the current error messages for every project id. */
@@ -74,7 +74,7 @@ public class EnterProjectNamePage extends WizardPage {
     private final Set<String> unsupportedCharsets = new HashSet<String>();
 
     /**
-     * @param remoteProjectNames
+     * @param remoteProjectMapping
      *            since the <code>projectID</code> is no longer the name of the
      *            project this mapping is necessary to display the names on
      *            host/inviter side instead of ugly random numbers projectID =>
@@ -83,14 +83,14 @@ public class EnterProjectNamePage extends WizardPage {
     public EnterProjectNamePage(ISarosSession session,
         IConnectionManager connectionManager, Preferences preferences,
         List<FileList> fileLists, JID peer,
-        Map<String, String> remoteProjectNames) {
+        Map<String, String> remoteProjectMapping) {
 
         super(Messages.EnterProjectNamePage_title);
         this.session = session;
         this.connectionManager = connectionManager;
         this.preferences = preferences;
         this.peer = peer;
-        this.remoteProjectNames = remoteProjectNames;
+        this.remoteProjectMapping = remoteProjectMapping;
 
         // TODO show per project
         for (FileList fileList : fileLists)
@@ -162,7 +162,7 @@ public class EnterProjectNamePage extends WizardPage {
             final String projectID = fileList.getProjectID();
 
             TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
-            tabItem.setText(remoteProjectNames.get(projectID));
+            tabItem.setText(remoteProjectMapping.get(projectID));
 
             ProjectOptionComposite tabComposite = new ProjectOptionComposite(
                 tabFolder, projectID);
@@ -195,7 +195,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     /**
      * Checks if the project options for the given project id are valid.
-     * 
+     *
      * @return an error message if the options are not valid, otherwise the
      *         error message is <code>null</code>
      */
@@ -208,7 +208,7 @@ public class EnterProjectNamePage extends WizardPage {
 
         if (projectName.isEmpty())
             return Messages.EnterProjectNamePage_set_project_name
-                + " for remote project " + remoteProjectNames.get(projectID);
+                + " for remote project " + remoteProjectMapping.get(projectID);
 
         IStatus status = ResourcesPlugin.getWorkspace().validateName(
             projectName, IResource.PROJECT);
@@ -328,7 +328,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     /**
      * Scans the current Eclipse Workspace for project artifacts.
-     * 
+     *
      * @return string containing a warning message if artifacts are found,
      *         <code>null</code> otherwise
      */
@@ -415,7 +415,7 @@ public class EnterProjectNamePage extends WizardPage {
                 continue;
 
             String projectNameProposal = findProjectNameProposal(
-                remoteProjectNames.get(projectID),
+                remoteProjectMapping.get(projectID),
                 reservedProjectNames.toArray(new String[0]));
 
             projectOptionComposite.setProjectName(false, projectNameProposal);
@@ -528,7 +528,7 @@ public class EnterProjectNamePage extends WizardPage {
     /**
      * Tests if the given project name does not already exist in the current
      * workspace.
-     * 
+     *
      * @param projectName
      *            the name of the project
      * @param reservedProjectNames
@@ -564,7 +564,7 @@ public class EnterProjectNamePage extends WizardPage {
     /**
      * Proposes a project name based on the existing project names in the
      * current workspace. The proposed project name is unique.
-     * 
+     *
      * @param projectName
      *            project name which shall be checked
      * @param reservedProjectNames
