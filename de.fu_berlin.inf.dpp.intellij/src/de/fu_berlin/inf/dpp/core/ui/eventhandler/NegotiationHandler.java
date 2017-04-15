@@ -107,20 +107,13 @@ public class NegotiationHandler implements INegotiationHandler {
     private void showIncomingProjectUI(
         final IncomingProjectNegotiation negotiation) {
 
-        List<ProjectNegotiationData> pInfos = negotiation.getProjectInfos();
-        final List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
-
-        for (ProjectNegotiationData pInfo : pInfos) {
-            fileLists.add(pInfo.getFileList());
-        }
-
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
 
                 AddProjectToSessionWizard wizard = new AddProjectToSessionWizard(
-                    getWindow(), negotiation, negotiation.getPeer(), fileLists,
-                    null);
+                    getWindow(), negotiation);
+
                 wizard.setModal(false);
                 wizard.open();
 

@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.eventhandler;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -14,13 +12,11 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -41,7 +37,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
  * This handler is responsible for presenting and running the session and
  * project negotiations that are received by the Saros Session Manager
  * component.
- * 
+ *
  * @author srossbach
  */
 public class NegotiationHandler implements INegotiationHandler {
@@ -50,14 +46,14 @@ public class NegotiationHandler implements INegotiationHandler {
         .getLogger(NegotiationHandler.class);
 
     /**
-     * 
+     *
      * OutgoingInvitationJob wraps the instance of
      * {@link OutgoingSessionNegotiation} and cares about handling the
      * exceptions like local or remote cancellation.
-     * 
+     *
      * It notifies the user about the progress using the Eclipse Jobs API and
      * interrupts the negotiation if the session closes.
-     * 
+     *
      */
     private class OutgoingInvitationJob extends Job {
 
@@ -273,7 +269,7 @@ public class NegotiationHandler implements INegotiationHandler {
             public void run() {
                 /**
                  * @JTourBusStop 7, Invitation Process:
-                 * 
+                 *
                  *               (4a) The SessionManager then hands over the
                  *               control to the NegotiationHandler (this class)
                  *               which works on a newly started
@@ -300,18 +296,13 @@ public class NegotiationHandler implements INegotiationHandler {
 
     private void showIncomingProjectUI(
         final IncomingProjectNegotiation negotiation) {
-        List<ProjectNegotiationData> pInfos = negotiation.getProjectInfos();
-        final List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
-
-        for (ProjectNegotiationData pInfo : pInfos)
-            fileLists.add(pInfo.getFileList());
 
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
             @Override
             public void run() {
                 AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
-                    negotiation, negotiation.getPeer(), fileLists);
+                    negotiation);
 
                 final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
                     SWTUtils.getShell(), projectWizard, SWT.MIN | SWT.MAX,
@@ -321,10 +312,10 @@ public class NegotiationHandler implements INegotiationHandler {
                 /*
                  * IMPORTANT: as the dialog is non modal it MUST NOT block on
                  * open or there is a good chance to crash the whole GUI
-                 * 
+                 *
                  * Scenario: A modal dialog is currently open with
                  * setBlockOnOpen(true) (as most input dialogs are).
-                 * 
+                 *
                  * When we now open this wizard with setBlockOnOpen(true) this
                  * wizard will become the main dispatcher for the SWT Thread. As
                  * this wizard is non modal you cannot close it because you

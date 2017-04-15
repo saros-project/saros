@@ -49,7 +49,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     private static int MONITOR_WORK_SCALE = 1000;
 
-    private final List<ProjectNegotiationData> projectNegotiationData;
+    private final Map<String, ProjectNegotiationData> projectNegotiationData;
 
     private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
@@ -84,43 +84,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         super(negotiationID, peer, sessionManager, session, workspace,
             checksumCache, connectionService, transmitter, receiver);
 
-        this.projectNegotiationData = projectNegotiationData;
+        this.projectNegotiationData = new HashMap<String, ProjectNegotiationData>();
+
+        for (final ProjectNegotiationData data : projectNegotiationData)
+            this.projectNegotiationData.put(data.getProjectID(), data);
+
         this.localProjectMapping = new HashMap<String, IProject>();
 
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
-    }
-
-    /**
-     * Returns the remote project mapping. The mapping consists of the project
-     * id for the current session and their corresponding names on the remote
-     * side, i.e. id => name.
-     *
-     * @return the remote project mapping.
-     */
-    public Map<String, String> getRemoteProjectMapping() {
-
-        Map<String, String> result = new HashMap<String, String>();
-
-        for (ProjectNegotiationData data : projectNegotiationData)
-            result.put(data.getProjectID(), data.getProjectName());
-
-        return result;
-    }
-
-    /**
-     *
-     * @param projectID
-     * @return The {@link FileList fileList} which belongs to the project with
-     *         the ID <code>projectID</code> from inviter <br />
-     *         <code><b>null<b></code> if there isn't such a {@link FileList
-     *         fileList}
-     */
-    public FileList getRemoteFileList(String projectID) {
-        for (ProjectNegotiationData data : projectNegotiationData) {
-            if (data.getProjectID().equals(projectID))
-                return data.getFileList();
-        }
-        return null;
     }
 
     /**
@@ -224,12 +195,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 final String projectID = entry.getKey();
                 final IProject project = entry.getValue();
 
+                final boolean isPartialRemoteProject = getProjectNegotiationData(
+                    projectID).isPartial();
+
+                final FileList remoteFileList = getProjectNegotiationData(
+                    projectID).getFileList();
+
                 List<IResource> resources = null;
 
-                if (isPartialRemoteProject(projectID)) {
+                if (isPartialRemoteProject) {
 
-                    final List<String> paths = getRemoteFileList(projectID)
-                        .getPaths();
+                    final List<String> paths = remoteFileList.getPaths();
 
                     resources = new ArrayList<IResource>(paths.size());
 
@@ -262,12 +238,27 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         return terminate(exception);
     }
 
-    public boolean isPartialRemoteProject(String projectID) {
-        for (ProjectNegotiationData data : projectNegotiationData) {
-            if (data.getProjectID().equals(projectID))
-                return data.isPartial();
-        }
-        return false;
+    /**
+     * Returns the {@link ProjectNegotiationData negotiation data} for all
+     * projects which are part of this negotiation.
+     *
+     * @return negotiation data for all projects which are part of this
+     *         negotiation.
+     */
+    public List<ProjectNegotiationData> getProjectNegotiationData() {
+        return new ArrayList<ProjectNegotiationData>(
+            projectNegotiationData.values());
+    }
+
+    /**
+     * Returns the {@link ProjectNegotiationData negotiation data} for the given
+     * project id.
+     *
+     * @return negotiation data for the given project id or <code>null</code> if
+     *         no negotiation data exists for the given project id.
+     */
+    public ProjectNegotiationData getProjectNegotiationData(final String id) {
+        return projectNegotiationData.get(id);
     }
 
     /**
@@ -328,7 +319,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             ProjectNegotiationData projectInfo = null;
 
-            for (ProjectNegotiationData data : projectNegotiationData) {
+            for (ProjectNegotiationData data : getProjectNegotiationData()) {
                 if (data.getProjectID().equals(projectID))
                     projectInfo = data;
             }
@@ -368,7 +359,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         /*
          * Remove the entries from the mapping in the SarosSession.
-         *
+         * 
          * Stefan Rossbach 28.12.2012: This will not gain you anything because
          * the project is marked as shared on the remote side and so will never
          * be able to be shared again to us. Again the whole architecture does
@@ -477,7 +468,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         LOG.debug(this + " : computing file list difference");
 
-        final boolean isPartialShared = isPartialRemoteProject(projectID);
+        final boolean isPartialShared = getProjectNegotiationData(projectID)
+            .isPartial();
 
         final FileListDiff diff = FileListDiff.diff(localFileList,
             remoteFileList, isPartialShared);
@@ -560,10 +552,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             (System.currentTimeMillis() - startTime) / 1000));
 
         // TODO: now add the checksums into the cache
-    }
-
-    public List<ProjectNegotiationData> getProjectInfos() {
-        return projectNegotiationData;
     }
 
     /**
@@ -655,15 +643,20 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     private void checkProjectMapping(final Map<String, IProject> mapping) {
+
         for (final Entry<String, IProject> entry : mapping.entrySet()) {
 
-            if (getRemoteFileList(entry.getKey()) == null)
-                throw new IllegalArgumentException("invalid project id: "
-                    + entry.getKey());
+            final String id = entry.getKey();
+            final IProject project = entry.getValue();
 
-            if (!entry.getValue().exists())
+            final ProjectNegotiationData data = getProjectNegotiationData(id);
+
+            if (data == null)
+                throw new IllegalArgumentException("invalid project id: " + id);
+
+            if (!project.exists())
                 throw new IllegalArgumentException("project does not exist: "
-                    + entry.getValue());
+                    + project);
         }
     }
 

@@ -55,6 +55,7 @@ import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
@@ -121,13 +122,13 @@ public class AddProjectToSessionWizard extends Wizard {
         }
     };
 
-    public AddProjectToSessionWizard(IncomingProjectNegotiation negotiation,
-        JID peer, List<FileList> fileLists) {
+    public AddProjectToSessionWizard(IncomingProjectNegotiation negotiation) {
 
         SarosPluginContext.initComponent(this);
 
         this.negotiation = negotiation;
-        this.peer = peer;
+        this.peer = negotiation.getPeer();
+
         this.fileLists = fileLists;
         setWindowTitle(Messages.AddProjectToSessionWizard_title);
         setHelpAvailable(true);
@@ -156,7 +157,8 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         namePage = new EnterProjectNamePage(session, connectionManager,
-            preferences, fileLists, peer, negotiation.getRemoteProjectMapping());
+            preferences, fileLists, peer,
+            negotiation.getProjectNegotiationData());
 
         addPage(namePage);
     }
@@ -583,9 +585,11 @@ public class AddProjectToSessionWizard extends Wizard {
                     "failed to compute local file list", e));
             }
 
+            final ProjectNegotiationData data = negotiation
+                .getProjectNegotiationData(projectID);
+
             final FileListDiff diff = FileListDiff.diff(localFileList,
-                negotiation.getRemoteFileList(projectID),
-                negotiation.isPartialRemoteProject(projectID));
+                data.getFileList(), data.isPartial());
 
             if (!diff.getRemovedFolders().isEmpty()
                 || !diff.getRemovedFiles().isEmpty()

@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import de.fu_berlin.inf.dpp.negotiation.FileList;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
@@ -54,7 +55,6 @@ public class EnterProjectNamePage extends WizardPage {
     private static final Logger log = Logger
         .getLogger(EnterProjectNamePage.class.getName());
 
-    private final List<FileList> fileLists;
     private final JID peer;
 
     private final ISarosSession session;
@@ -73,31 +73,28 @@ public class EnterProjectNamePage extends WizardPage {
 
     private final Set<String> unsupportedCharsets = new HashSet<String>();
 
-    /**
-     * @param remoteProjectMapping
-     *            since the <code>projectID</code> is no longer the name of the
-     *            project this mapping is necessary to display the names on
-     *            host/inviter side instead of ugly random numbers projectID =>
-     *            projectName
-     */
     public EnterProjectNamePage(ISarosSession session,
         IConnectionManager connectionManager, Preferences preferences,
         List<FileList> fileLists, JID peer,
-        Map<String, String> remoteProjectMapping) {
+        List<ProjectNegotiationData> projectNegotiationData) {
 
         super(Messages.EnterProjectNamePage_title);
         this.session = session;
         this.connectionManager = connectionManager;
         this.preferences = preferences;
         this.peer = peer;
-        this.remoteProjectMapping = remoteProjectMapping;
 
-        // TODO show per project
-        for (FileList fileList : fileLists)
-            unsupportedCharsets.addAll(getUnsupportedCharsets(fileList
-                .getEncodings()));
+        remoteProjectMapping = new HashMap<String, String>();
 
-        this.fileLists = fileLists;
+        for (final ProjectNegotiationData data : projectNegotiationData) {
+
+            remoteProjectMapping
+                .put(data.getProjectID(), data.getProjectName());
+
+            unsupportedCharsets.addAll(getUnsupportedCharsets(data
+                .getFileList().getEncodings()));
+
+        }
 
         setPageComplete(false);
         setTitle(Messages.EnterProjectNamePage_title2);
@@ -157,9 +154,7 @@ public class EnterProjectNamePage extends WizardPage {
         gridData.widthHint = 400;
         tabFolder.setLayoutData(gridData);
 
-        for (final FileList fileList : fileLists) {
-
-            final String projectID = fileList.getProjectID();
+        for (final String projectID : remoteProjectMapping.keySet()) {
 
             TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
             tabItem.setText(remoteProjectMapping.get(projectID));

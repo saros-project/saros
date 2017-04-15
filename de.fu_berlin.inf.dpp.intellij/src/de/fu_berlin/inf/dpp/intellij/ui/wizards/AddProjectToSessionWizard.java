@@ -37,6 +37,7 @@ import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
 import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -55,8 +56,11 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  * If the option to reuse an existing project is chosen, a second page is displayed,
  * that displays the files necessary to modify.
  * <p/>
- * FIXME: Add facility for more than one project.
+ *
  */
+
+//  FIXME: Add facility for more than one project.
+
 public class AddProjectToSessionWizard extends Wizard {
     private static final Logger LOG = Logger
         .getLogger(AddProjectToSessionWizard.class);
@@ -69,7 +73,6 @@ public class AddProjectToSessionWizard extends Wizard {
 
     private final IncomingProjectNegotiation negotiation;
     private final JID peer;
-    private final List<FileList> fileLists;
 
     private boolean triggered = false;
 
@@ -174,28 +177,29 @@ public class AddProjectToSessionWizard extends Wizard {
      * Creates the wizard and its pages.
      *
      * @param negotiation  The IPN this wizard handles
-     * @param peer         The peer
-     * @param fileLists    The list of resources to be shared
-     * @param projectNames The names of the projects to be shared
+
      */
     public AddProjectToSessionWizard(Window parent,
-        IncomingProjectNegotiation negotiation, JID peer,
-        List<FileList> fileLists, Map<String, String> projectNames) {
+        IncomingProjectNegotiation negotiation) {
 
         super(parent, Messages.AddProjectToSessionWizard_title,
             new HeaderPanel(Messages.EnterProjectNamePage_title2, ""));
 
         this.negotiation = negotiation;
-        this.peer = peer;
-        this.fileLists = fileLists;
+        this.peer = negotiation.getPeer();
+
+
+        List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
+
         localProjects = new HashMap<String, IProject>();
 
-        remoteProjectID = projectNames.keySet().iterator().next();
-        remoteProjectName = projectNames.values().iterator().next();
+        remoteProjectID = data.get(0).getProjectID();
+        remoteProjectName = data.get(0).getProjectName();
 
         selectProjectPage = new SelectProjectPage(SELECT_PROJECT_PAGE_ID,
             remoteProjectName, remoteProjectName,
             workspace.getLocation().toOSString(), selectProjectsPageListener);
+
         registerPage(selectProjectPage);
 
         fileListPage = new TextAreaPage(FILE_LIST_PAGE_ID,
@@ -219,9 +223,9 @@ public class AddProjectToSessionWizard extends Wizard {
         UIUtil.invokeLaterIfNeeded(new Runnable() {
             @Override
             public void run() {
-                
+
                 /*
-                 *  if we already triggered the negotiation the message will 
+                 *  if we already triggered the negotiation the message will
                  *  be displayed in the trigger logic, so do not popup another dialog here
                  */
                 if (!triggered)
@@ -308,9 +312,9 @@ public class AddProjectToSessionWizard extends Wizard {
             .entrySet()) {
             fileListPage.addLine("Project [" + key.getKey() + "]:");
             FileListDiff diff = modifiedResources.get(key.getKey());
-            
+
             /// TODO folders
-            
+
             for (String path : diff.getAlteredFiles()) {
                 fileListPage.addLine("changed: " + path);
                 empty = false;
@@ -326,7 +330,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 empty = false;
             }
         }
-        
+
         if (empty) {
             fileListPage.addLine("No files have to be modified.");
         }
@@ -390,7 +394,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
         SubProgressMonitor subMonitor = new SubProgressMonitor(monitor,
             projectMapping.size());
-        
+
         subMonitor
             .setTaskName("\"Searching for files that will be modified...\",");
 
@@ -400,17 +404,19 @@ public class AddProjectToSessionWizard extends Wizard {
             IProject project = entry.getValue();
 
             try {
-                
-                if (negotiation.isPartialRemoteProject(projectID)) 
+
+                final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
+
+                if (data.isPartial())
                     throw new IllegalStateException("partial sharing is not supported");
 
                 FileList localFileList = FileListFactory
                     .createFileList(project, null, checksumCache,
                         new SubProgressMonitor(monitor, 1,
                             SubProgressMonitor.SUPPRESS_SETTASKNAME));
-               
+
                 final FileListDiff diff = FileListDiff.diff(localFileList,
-                    negotiation.getRemoteFileList(projectID),
+                    data.getFileList(),
                     false);
 
                 if (!diff.getRemovedFolders().isEmpty()
@@ -418,7 +424,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     || !diff.getAlteredFiles().isEmpty()) {
                     modifiedResources.put(project.getName(), diff);
                 }
-                
+
             } catch (IOException e) {
                 LOG.warn("could not refresh project: " + project, e);
             }
