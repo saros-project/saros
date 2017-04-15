@@ -53,12 +53,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
-    /*
-     * FIXME remove this field, it is used as global access variable throughout
-     * multiple methods in this class which is error prone !
-     */
-    private Map<String, IProject> localProjectMapping;
-
     private boolean running;
 
     private PacketCollector startActivityQueuingRequestCollector;
@@ -88,8 +82,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         for (final ProjectNegotiationData data : projectNegotiationData)
             this.projectNegotiationData.put(data.getProjectID(), data);
-
-        this.localProjectMapping = new HashMap<String, IProject>();
 
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     }
@@ -139,8 +131,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             fileTransferManager
                 .addFileTransferListener(archiveTransferListener);
 
-            List<FileList> missingFiles = calculateMissingFiles(projectMapping,
-                monitor);
+            List<FileList> missingFiles = synchronizeProjectStructures(
+                projectMapping,
+                computeLocalVsRemoteDiff(projectMapping, monitor));
 
             monitor.subTask("");
 
@@ -156,7 +149,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              * the user who sends this ProjectNegotiation is now responsible for
              * the resources of the contained projects
              */
-            for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
+            for (Entry<String, IProject> entry : projectMapping.entrySet()) {
 
                 final String projectID = entry.getKey();
                 final IProject project = entry.getValue();
@@ -182,15 +175,16 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             for (FileList list : missingFiles)
                 filesMissing |= list.getPaths().size() > 0;
 
-            // Host/Inviter decided to transmit files with one big archive
+            // the host do not send an archive if we do not need any files
             if (filesMissing)
-                acceptArchive(archiveTransferListener, monitor);
+                receiveAndUnpackArchive(projectMapping,
+                    archiveTransferListener, monitor);
 
             /*
              * We are finished with the negotiation. Add all projects resources
              * to the session.
              */
-            for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
+            for (Entry<String, IProject> entry : projectMapping.entrySet()) {
 
                 final String projectID = entry.getKey();
                 final IProject project = entry.getValue();
@@ -222,7 +216,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              * TODO Move disable queuing responsibility to SarosSession (see
              * todo above in for loop).
              */
-            for (IProject project : localProjectMapping.values())
+            for (IProject project : projectMapping.values())
                 session.disableQueuing(project);
 
             if (fileTransferManager != null)
@@ -262,9 +256,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * Accepts the archive with all missing files and decompress it.
+     * Receives the archive with all missing files and unpacks it.
      */
-    private void acceptArchive(
+    private void receiveAndUnpackArchive(
+        final Map<String, IProject> localProjectMapping,
         final ArchiveTransferListener archiveTransferListener,
         final IProgressMonitor monitor) throws IOException,
         SarosCancellationException {
@@ -282,76 +277,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          */
 
         try {
-            unpackArchive(archiveFile, new SubProgressMonitor(monitor, 50));
+            unpackArchive(localProjectMapping, archiveFile,
+                new SubProgressMonitor(monitor, 50));
             monitor.done();
         } finally {
             if (archiveFile != null)
                 archiveFile.delete();
         }
-    }
-
-    /**
-     * calculates all the files the host/inviter has to send for synchronization
-     *
-     * @param projectMapping
-     *            projectID => projectName (in local workspace)
-     */
-    // TODO should be renamed to something like synchronizeProject(s)...
-    private List<FileList> calculateMissingFiles(
-        Map<String, IProject> projectMapping, IProgressMonitor monitor)
-        throws SarosCancellationException, IOException {
-
-        monitor.beginTask(null, projectMapping.size() * MONITOR_WORK_SCALE);
-
-        List<FileList> missingFiles = new ArrayList<FileList>();
-
-        /*
-         * this for loop sets up all the projects needed for the session and
-         * computes the missing files.
-         */
-        for (Entry<String, IProject> entry : projectMapping.entrySet()) {
-
-            checkCancellation(CancelOption.NOTIFY_PEER);
-
-            final String projectID = entry.getKey();
-
-            IProject project = entry.getValue();
-
-            ProjectNegotiationData projectInfo = null;
-
-            for (ProjectNegotiationData data : getProjectNegotiationData()) {
-                if (data.getProjectID().equals(projectID))
-                    projectInfo = data;
-            }
-
-            if (projectInfo == null)
-                // this should never happen
-                throw new RuntimeException("cannot add project with id "
-                    + projectID + ", this id is unknown");
-
-            if (!project.exists())
-                throw new IllegalStateException("project " + project
-                    + " does not exists");
-
-            localProjectMapping.put(projectID, project);
-
-            checkCancellation(CancelOption.NOTIFY_PEER);
-
-            LOG.debug("compute required files for project " + project
-                + " with ID: " + projectID);
-
-            FileList requiredFiles = computeRequiredFiles(project,
-                projectInfo.getFileList(), projectID, new SubProgressMonitor(
-                    monitor, 1 * MONITOR_WORK_SCALE));
-
-            requiredFiles.setProjectID(projectID);
-            checkCancellation(CancelOption.NOTIFY_PEER);
-            missingFiles.add(requiredFiles);
-        }
-
-        monitor.done();
-
-        return missingFiles;
     }
 
     @Override
@@ -366,14 +298,18 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * currently NOT support cancellation of the project negotiation
          * properly !
          */
-        for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
-            session.removeProjectMapping(entry.getKey(), entry.getValue());
-        }
+        // for (Entry<String, IProject> entry : localProjectMapping.entrySet())
+        // {
+        // session.removeProjectMapping(entry.getKey(), entry.getValue());
+        // }
 
-        // The session might have been stopped already, if not we will stop it.
-        if (session.getProjectResourcesMapping().keySet().isEmpty()
-            || session.getRemoteUsers().isEmpty())
-            sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
+        // // The session might have been stopped already, if not we will stop
+        // it.
+        // if (session.getProjectResourcesMapping().keySet().isEmpty()
+        // || session.getRemoteUsers().isEmpty())
+        // sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
+
+        sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Override
@@ -400,125 +336,154 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * Computes the list of files that should be requested from the host because
-     * they are either missing in the target project or are containing different
-     * data.
+     * Computes the differences (files and folders) between the local and the
+     * remote side for the given project mapping.
      *
-     * @param project
-     * @param remoteFileList
+     * @param localProjectMapping
+     *            the local project mapping to use
      * @param monitor
-     *
-     * @return The list of files that we need from the host.
-     * @throws LocalCancellationException
-     *             If the user requested a cancel.
+     * @return list of differences (one for each project) between the local and
+     *         the remote side.
+     * @throws SarosCancellationException
      * @throws IOException
      */
-    private FileList computeRequiredFiles(IProject project,
-        FileList remoteFileList, String projectID, IProgressMonitor monitor)
-        throws LocalCancellationException, IOException {
+    private Map<String, FileListDiff> computeLocalVsRemoteDiff(
+        final Map<String, IProject> localProjectMapping,
+        final IProgressMonitor monitor) throws SarosCancellationException,
+        IOException {
 
-        monitor.beginTask("Compute required Files...", 1 * MONITOR_WORK_SCALE);
+        LOG.debug(this + " : computing file and folder differences");
 
-        FileList localFileList = FileListFactory.createFileList(project, null,
-            checksumCache, new SubProgressMonitor(monitor,
-                1 * MONITOR_WORK_SCALE, SubProgressMonitor.SUPPRESS_BEGINTASK));
+        monitor.beginTask("Computing project(s) difference(s)...",
+            localProjectMapping.size() * MONITOR_WORK_SCALE);
 
-        FileListDiff filesToSynchronize = computeDiff(localFileList,
-            remoteFileList, project, projectID);
+        final Map<String, FileListDiff> result = new HashMap<String, FileListDiff>();
 
-        List<String> missingFiles = new ArrayList<String>();
+        for (final Entry<String, IProject> entry : localProjectMapping
+            .entrySet()) {
 
-        missingFiles.addAll(filesToSynchronize.getAddedFiles());
-        missingFiles.addAll(filesToSynchronize.getAlteredFiles());
+            final String id = entry.getKey();
+            final IProject project = entry.getValue();
+
+            // TODO optimize for partial shared projects
+
+            final FileList localProjectFileList = FileListFactory
+                .createFileList(project, null, checksumCache,
+                    new SubProgressMonitor(monitor, 1 * MONITOR_WORK_SCALE,
+                        SubProgressMonitor.SUPPRESS_BEGINTASK));
+
+            final ProjectNegotiationData data = getProjectNegotiationData(id);
+
+            final FileListDiff diff = FileListDiff.diff(localProjectFileList,
+                data.getFileList(), data.isPartial());
+
+            checkCancellation(CancelOption.NOTIFY_PEER);
+
+            if (data.isPartial()
+                && (!diff.getRemovedFiles().isEmpty() || !diff
+                    .getRemovedFolders().isEmpty()))
+                throw new IllegalStateException(
+                    "partial sharing cannot delete existing resources");
+
+            result.put(id, diff);
+        }
 
         monitor.done();
 
-        LOG.debug(this + " : " + missingFiles.size()
-            + " file(s) must be synchronized");
-
-        /*
-         * We send an empty file list to the host as a notification that we do
-         * not need any files.
-         */
-        return missingFiles.isEmpty() ? FileListFactory.createEmptyFileList()
-            : FileListFactory.createFileList(missingFiles);
+        return result;
     }
 
     /**
-     * Determines the missing resources.
+     * Synchronize the project structures, deleting files and folders that are
+     * not present on the remote side and creating empty folders that do not
+     * exists and the local side.
      *
-     * @param localFileList
-     *            The file list of the local project.
-     * @param remoteFileList
-     *            The file list of the remote project.
-     * @param project
-     *            The project in workspace. Every file we need to add/replace is
-     *            added to the {@link FileListDiff}
-     * @param projectID
-     * @return A modified FileListDiff which doesn't contain any directories or
-     *         files to remove, but just added and altered files.
+     * @param localProjectMapping
+     * @param diffs
+     * @return list of file lists (each for every project) containing the
+     *         missing files that are not present on the local side.
+     * @throws IOException
      */
-    /*
-     * FIXME it is not very obviously that a computeDiff method also
-     * manipulates/DELETES files !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     */
-    private FileListDiff computeDiff(final FileList localFileList,
-        final FileList remoteFileList, final IProject project,
-        final String projectID) throws IOException {
+    private List<FileList> synchronizeProjectStructures(
+        final Map<String, IProject> localProjectMapping,
+        final Map<String, FileListDiff> diffs) throws IOException {
 
-        LOG.debug(this + " : computing file list difference");
+        LOG.debug(this
+            + " : deleting files and folders, creating empty folders");
 
-        final boolean isPartialShared = getProjectNegotiationData(projectID)
-            .isPartial();
+        final List<FileList> result = new ArrayList<FileList>();
 
-        final FileListDiff diff = FileListDiff.diff(localFileList,
-            remoteFileList, isPartialShared);
+        for (final Entry<String, IProject> entry : localProjectMapping
+            .entrySet()) {
 
-        final List<String> resourcesToDelete = new ArrayList<String>(diff
-            .getRemovedFiles().size() + diff.getRemovedFolders().size());
+            final String id = entry.getKey();
+            final IProject project = entry.getValue();
 
-        resourcesToDelete.addAll(diff.getRemovedFiles());
-        resourcesToDelete.addAll(diff.getRemovedFolders());
+            final FileListDiff diff = diffs.get(id);
 
-        if (isPartialShared && !resourcesToDelete.isEmpty())
-            throw new IllegalStateException(
-                "partial sharing cannot delete existing resources");
+            final List<String> resourcesToDelete = new ArrayList<String>(diff
+                .getRemovedFiles().size() + diff.getRemovedFolders().size());
 
-        deleteResources(project, resourcesToDelete);
+            resourcesToDelete.addAll(diff.getRemovedFiles());
+            resourcesToDelete.addAll(diff.getRemovedFolders());
 
-        for (final String path : diff.getAddedFolders()) {
-            final IFolder folder = project.getFolder(path);
+            Collections.sort(resourcesToDelete, Collections.reverseOrder());
 
-            if (!folder.exists())
-                FileSystem.createFolder(folder);
+            for (final String path : resourcesToDelete) {
+                final IResource resource = getResource(project, path);
+
+                if (resource.exists()) {
+
+                    if (LOG.isTraceEnabled())
+                        LOG.trace("deleting resource: " + resource);
+
+                    resource.delete(IResource.KEEP_HISTORY);
+                }
+            }
+
+            for (final String path : diff.getAddedFolders()) {
+                final IFolder folder = project.getFolder(path);
+
+                if (!folder.exists()) {
+
+                    if (LOG.isTraceEnabled())
+                        LOG.trace("creating folder(s): " + folder);
+
+                    FileSystem.createFolder(folder);
+                }
+
+            }
+
+            final List<String> missingFiles = new ArrayList<String>();
+
+            missingFiles.addAll(diff.getAddedFiles());
+            missingFiles.addAll(diff.getAlteredFiles());
+
+            LOG.debug(this + " : " + missingFiles.size()
+                + " file(s) must be synchronized");
+
+            /*
+             * We send an empty file list to the host as a notification that we
+             * do not need any files for the given project.
+             */
+            final FileList fileList = missingFiles.isEmpty() ? FileListFactory
+                .createEmptyFileList() : FileListFactory
+                .createFileList(missingFiles);
+
+            fileList.setProjectID(id);
+
+            result.add(fileList);
 
         }
 
-        return diff;
+        return result;
     }
 
-    /**
-     * Deletes the resources denoted by the given paths for the given project.
-     * This method manipulates the order of the list!
-     */
-    private void deleteResources(final IProject project,
-        final List<String> paths) throws IOException {
+    private void unpackArchive(final Map<String, IProject> localProjectMapping,
+        final File archiveFile, final IProgressMonitor monitor)
+        throws LocalCancellationException, IOException {
 
-        Collections.sort(paths, Collections.reverseOrder());
-
-        for (final String path : paths) {
-            final IResource resource = getResource(project, path);
-
-            if (resource.exists())
-                resource.delete(IResource.KEEP_HISTORY);
-        }
-    }
-
-    private void unpackArchive(final File archiveFile,
-        final IProgressMonitor monitor) throws LocalCancellationException,
-        IOException {
-
-        final Map<String, de.fu_berlin.inf.dpp.filesystem.IProject> projectMapping = new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IProject>();
+        final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
 
         for (Entry<String, IProject> entry : localProjectMapping.entrySet())
             projectMapping.put(entry.getKey(), entry.getValue());
