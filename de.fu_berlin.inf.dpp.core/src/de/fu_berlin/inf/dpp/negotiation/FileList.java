@@ -49,11 +49,17 @@ public class FileList {
      */
     public static final String DIR_SEPARATOR = "/";
 
+    /**
+     * Separator char used to divide path segments and mark directories in a
+     * file list by suffixing the path entry with this value.
+     */
+    public static final char DIR_SEPARATOR_CHAR = '/';
+
     /*
      * Do NOT optimize this code in regards to understandability. This class IS
      * optimized in regards to memory consumption, i.e serializing / marshaling
      * an instance of this class will consume as less memory as possible.
-     * 
+     *
      * This class only stores segments differences, i.e foo/bar/foo.txt, and
      * foo/bar/foobar.txt will be stored as foo, bar, foo.txt, and foobar.txt
      */

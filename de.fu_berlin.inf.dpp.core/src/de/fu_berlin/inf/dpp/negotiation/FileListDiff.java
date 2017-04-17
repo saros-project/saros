@@ -9,11 +9,10 @@ import java.util.Set;
 import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
 
 /**
- * A diff between two {@link FileList}s.
+ * A diff between two {@link FileList file lists}.
  *
- * @see FileList#diff(FileList)
+ * @see #diff(FileList, FileList, boolean)
  *
- * @author ahaferburg
  */
 public class FileListDiff {
 
@@ -42,8 +41,8 @@ public class FileListDiff {
      * <p>
      * The <code>diff</code> describes the operations needed to transform
      * <code>base</code> into <code>target</code>. For example, the result's
-     * {@link #getAddedPaths()} returns the list of files and folders that are
-     * present in <code>target</code>, but not in <code>base</code>.
+     * {@link #getAddedFolders()} returns the list of folders that are present
+     * in <code>target</code>, but not in <code>base</code>.
      * <p>
      * If either of the two parameters is <code>null</code>, the result is an
      * empty diff.
@@ -67,42 +66,59 @@ public class FileListDiff {
         if (base == null || target == null)
             return result;
 
-        final Set<String> baseFolders = new HashSet<String>();
-        final Set<String> baseFiles = new HashSet<String>();
+        final List<String> basePaths = base.getPaths();
+        final List<String> targetPaths = target.getPaths();
 
-        final Set<String> targetFolders = new HashSet<String>();
-        final Set<String> targetFiles = new HashSet<String>();
+        /*
+         * TODO find better values to avoid multiple rehashing for larger file
+         * lists
+         */
+        final Set<String> baseFolders = new HashSet<String>(1024);
+        final Set<String> baseFiles = new HashSet<String>(1024);
 
-        for (final String path : base.getPaths()) {
+        final Set<String> targetFolders = new HashSet<String>(1024);
+        final Set<String> targetFiles = new HashSet<String>(1024);
 
-            if (isFolder(path))
-                baseFolders.add(path);
-            else
+        for (final String path : basePaths) {
+
+            addAllFolders(baseFolders, path);
+
+            if (!isFolder(path))
                 baseFiles.add(path);
         }
 
-        for (final String path : target.getPaths()) {
+        for (final String path : targetPaths) {
 
-            if (isFolder(path))
-                targetFolders.add(path);
-            else
+            addAllFolders(targetFolders, path);
+
+            if (!isFolder(path))
                 targetFiles.add(path);
         }
 
-        result.addedFiles.addAll(targetFiles);
-        result.addedFiles.removeAll(baseFiles);
+        final Set<String> complementSet = new HashSet<String>(max(
+            baseFolders.size(), baseFiles.size(), targetFolders.size(),
+            targetFiles.size()));
+
+        complementSet.addAll(targetFiles);
+        complementSet.removeAll(baseFiles);
+
+        result.addedFiles.addAll(complementSet);
 
         if (!excludeRemoved) {
-            result.removedFiles.addAll(baseFiles);
-            result.removedFiles.removeAll(targetFiles);
+            complementSet.clear();
+            complementSet.addAll(baseFiles);
+            complementSet.removeAll(targetFiles);
+
+            result.removedFiles.addAll(complementSet);
         }
 
-        final Set<String> filesIntersection = new HashSet<String>();
+        final Set<String> intersectionSet = new HashSet<String>(max(
+            targetFiles.size(), targetFolders.size()));
 
-        filesIntersection.addAll(targetFiles);
-        filesIntersection.retainAll(baseFiles);
+        intersectionSet.addAll(targetFiles);
+        intersectionSet.retainAll(baseFiles);
 
-        for (final String path : filesIntersection) {
+        for (final String path : intersectionSet) {
 
             final MetaData baseData = base.getMetaData(path);
             final MetaData targetData = target.getMetaData(path);
@@ -116,20 +132,25 @@ public class FileListDiff {
             }
         }
 
-        result.addedFolders.addAll(targetFolders);
-        result.addedFolders.removeAll(baseFolders);
+        complementSet.clear();
+        complementSet.addAll(targetFolders);
+        complementSet.removeAll(baseFolders);
+
+        result.addedFolders.addAll(complementSet);
 
         if (!excludeRemoved) {
-            result.removedFolders.addAll(baseFolders);
-            result.removedFolders.removeAll(targetFolders);
+            complementSet.clear();
+            complementSet.addAll(baseFolders);
+            complementSet.removeAll(targetFolders);
+
+            result.removedFolders.addAll(complementSet);
         }
 
-        final Set<String> foldersIntersection = new HashSet<String>();
+        intersectionSet.clear();
+        intersectionSet.addAll(targetFolders);
+        intersectionSet.retainAll(baseFolders);
 
-        foldersIntersection.addAll(targetFolders);
-        foldersIntersection.retainAll(baseFolders);
-
-        result.unalteredFolders.addAll(foldersIntersection);
+        result.unalteredFolders.addAll(intersectionSet);
 
         return result;
     }
@@ -258,6 +279,37 @@ public class FileListDiff {
     }
 
     private static boolean isFolder(final String path) {
-        return path.endsWith(FileList.DIR_SEPARATOR);
+        return path.charAt(path.length() - 1) == FileList.DIR_SEPARATOR_CHAR;
+    }
+
+    private static void addAllFolders(final Set<String> into, final String path) {
+
+        int idx = path.length() - 1;
+
+        if (!isFolder(path))
+            idx = path.lastIndexOf(FileList.DIR_SEPARATOR_CHAR, idx - 1);
+
+        String subPath;
+
+        while (idx >= 0) {
+
+            subPath = path.substring(0, idx + 1);
+
+            if (into.contains(subPath))
+                break;
+
+            into.add(subPath);
+
+            idx = subPath.lastIndexOf(FileList.DIR_SEPARATOR_CHAR, idx - 1);
+        }
+    }
+
+    private static int max(int a, int... others) {
+        int max = a;
+
+        for (int i = 0; i < others.length; i++)
+            max = Math.max(max, others[i]);
+
+        return max;
     }
 }

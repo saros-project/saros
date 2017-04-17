@@ -6,15 +6,17 @@ import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
 
 public class FileListDiffTest extends AbstractFileListTest {
 
-    private static final String FILE_A = "src/file_a";
-    private static final String FILE_B = "src/file_b";
-    private static final String FILE_C = "src/file_c";
-    private static final String FILE_D = "src/file_d";
+    private static final String FOLDER_SRC = "src/";
 
-    private static final String FOLDER_A = "src/folder_a/";
-    private static final String FOLDER_B = "src/folder_b/";
-    private static final String FOLDER_C = "src/folder_c/";
-    private static final String FOLDER_D = "src/folder_d/";
+    private static final String FILE_A = FOLDER_SRC + "file_a";
+    private static final String FILE_B = FOLDER_SRC + "file_b";
+    private static final String FILE_C = FOLDER_SRC + "file_c";
+    private static final String FILE_D = FOLDER_SRC + "file_d";
+
+    private static final String FOLDER_A = FOLDER_SRC + "folder_a/";
+    private static final String FOLDER_B = FOLDER_SRC + "folder_b/";
+    private static final String FOLDER_C = FOLDER_SRC + "folder_c/";
+    private static final String FOLDER_D = FOLDER_SRC + "folder_d/";
 
     @Test
     public void testFileDiffWithoutChecksum() {
@@ -40,7 +42,7 @@ public class FileListDiffTest extends AbstractFileListTest {
         assertPaths(diff.getAddedFolders());
         assertPaths(diff.getRemovedFolders());
 
-        assertPaths(diff.getUnalteredFolders());
+        assertPaths(diff.getUnalteredFolders(), FOLDER_SRC);
     }
 
     @Test
@@ -79,7 +81,7 @@ public class FileListDiffTest extends AbstractFileListTest {
         assertPaths(diff.getAddedFolders());
         assertPaths(diff.getRemovedFolders());
 
-        assertPaths(diff.getUnalteredFolders());
+        assertPaths(diff.getUnalteredFolders(), FOLDER_SRC);
     }
 
     @Test
@@ -108,7 +110,7 @@ public class FileListDiffTest extends AbstractFileListTest {
         assertPaths(diff.getAddedFolders(), FOLDER_C, FOLDER_D);
         assertPaths(diff.getRemovedFolders());
 
-        assertPaths(diff.getUnalteredFolders(), FOLDER_A, FOLDER_B);
+        assertPaths(diff.getUnalteredFolders(), FOLDER_SRC, FOLDER_A, FOLDER_B);
     }
 
     @Test
@@ -137,7 +139,7 @@ public class FileListDiffTest extends AbstractFileListTest {
         assertPaths(diff.getAddedFolders());
         assertPaths(diff.getRemovedFolders(), FOLDER_C, FOLDER_D);
 
-        assertPaths(diff.getUnalteredFolders(), FOLDER_A, FOLDER_B);
+        assertPaths(diff.getUnalteredFolders(), FOLDER_SRC, FOLDER_A, FOLDER_B);
     }
 
     @Test
