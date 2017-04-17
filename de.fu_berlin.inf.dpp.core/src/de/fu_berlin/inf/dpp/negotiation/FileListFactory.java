@@ -136,7 +136,7 @@ public class FileListFactory {
         for (IFile file : files) {
             try {
                 monitor.subTask(file.getProject().getName() + ": "
-                    + file.getName());
+                    + file.getProjectRelativePath());
 
                 MetaData data = list.getMetaData(file.getProjectRelativePath()
                     .toPortableString());

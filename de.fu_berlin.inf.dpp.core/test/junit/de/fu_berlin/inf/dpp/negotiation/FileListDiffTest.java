@@ -1,10 +1,16 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
 
-public class FileListDiffTest extends AbstractFileListTest {
+public class FileListDiffTest {
 
     private static final String FOLDER_SRC = "src/";
 
@@ -169,5 +175,15 @@ public class FileListDiffTest extends AbstractFileListTest {
         assertPaths(diff.getRemovedFolders());
 
         assertPaths(diff.getUnalteredFolders());
+    }
+
+    private static void assertPaths(List<String> actual, String... expected) {
+        for (int i = 0; i < expected.length; i++) {
+            assertTrue("Expected " + expected[i] + " to appear in: " + actual,
+                actual.contains(expected[i]));
+        }
+
+        assertEquals(Arrays.toString(expected) + " != " + actual,
+            expected.length, actual.size());
     }
 }
