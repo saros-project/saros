@@ -1,12 +1,17 @@
 package de.fu_berlin.inf.dpp.intellij.filesystem;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
@@ -17,6 +22,8 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 
 public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
     IFile {
+
+    private static final int BUFFER_SIZE = 32 * 1024;
 
     /** Relative path from the given project */
     private final IPath path;
@@ -124,15 +131,52 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
         final VirtualFile file = project.findVirtualFile(path);
 
         if (file == null)
-            throw new FileNotFoundException(this + " does not exists");
+            throw new FileNotFoundException(this + " does not exist");
 
         return file.getInputStream();
     }
 
     @Override
-    public void setContents(@NotNull final InputStream input,
-        final boolean force, final boolean keepHistory) throws IOException {
-        throw new IOException("NYI");
+    public void setContents(final InputStream input, final boolean force,
+        final boolean keepHistory) throws IOException {
+
+        Filesystem.runWriteAction(new ThrowableComputable<Void, IOException>() {
+
+            @Override
+            public Void compute() throws IOException {
+
+                final VirtualFile file = project.findVirtualFile(path);
+
+                if (file == null)
+                    throw new FileNotFoundException(
+                        IntelliJFileImplV2.this
+                            + " does not exist, force option not supported - force="
+                            + force);
+
+                final OutputStream out = file
+                    .getOutputStream(IntelliJFileImplV2.this);
+
+                final InputStream in = input == null ? new ByteArrayInputStream(
+                    new byte[0]) : input;
+
+                final byte[] buffer = new byte[BUFFER_SIZE];
+
+                int read = 0;
+
+                try {
+
+                    while ((read = in.read(buffer)) != -1)
+                        out.write(buffer, 0, read);
+
+                } finally {
+                    IOUtils.closeQuietly(out);
+                    IOUtils.closeQuietly(in);
+                }
+
+                return null;
+            }
+
+        }, ModalityState.any());
     }
 
     @Override
