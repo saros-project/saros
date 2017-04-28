@@ -96,8 +96,29 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
 
     @Override
     public void delete(final int updateFlags) throws IOException {
-        throw new IOException("NYI");
-    }
+        
+        Filesystem.runWriteAction(new ThrowableComputable<Void, IOException>() {
+
+            @Override
+            public Void compute() throws IOException {
+
+                final VirtualFile file = project.findVirtualFile(path);
+
+                if (file == null)
+                    throw new FileNotFoundException(
+                        IntelliJFileImplV2.this
+                            + " does not exist");
+
+                if (file.isDirectory())
+                    throw new IOException(this + " is not a file");
+
+                file.delete(IntelliJFileImplV2.this);
+                
+                return null;
+            }
+
+        }, ModalityState.any());
+    } 
 
     @Override
     public void move(@NotNull final IPath destination, final boolean force)

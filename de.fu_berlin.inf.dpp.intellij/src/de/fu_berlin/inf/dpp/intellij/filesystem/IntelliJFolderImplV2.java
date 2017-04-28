@@ -8,6 +8,8 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
@@ -141,8 +143,29 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
 
     @Override
     public void delete(final int updateFlags) throws IOException {
-        throw new IOException("NYI");
-    }
+        
+        Filesystem.runWriteAction(new ThrowableComputable<Void, IOException>() {
+
+            @Override
+            public Void compute() throws IOException {
+
+                final VirtualFile file = project.findVirtualFile(path);
+                
+                if (file == null)
+                    throw new FileNotFoundException(
+                        IntelliJFolderImplV2.this
+                            + " does not exist");
+
+                if (!file.isDirectory())
+                    throw new IOException(this + " is not a folder");
+
+                file.delete(IntelliJFolderImplV2.this);
+                
+                return null;
+            }
+
+        }, ModalityState.any());
+    } 
 
     @Override
     public void move(final IPath destination, final boolean force)
