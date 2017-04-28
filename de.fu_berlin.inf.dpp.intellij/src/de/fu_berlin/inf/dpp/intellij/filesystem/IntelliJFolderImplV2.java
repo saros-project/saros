@@ -16,14 +16,16 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 
-public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2 implements IFolder{
+public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
+    implements IFolder {
 
     /** Relative path from the given project */
     private final IPath path;
 
     private final IntelliJProjectImplV2 project;
 
-    public IntelliJFolderImplV2(@NotNull final IntelliJProjectImplV2 project, @NotNull final IPath path) {
+    public IntelliJFolderImplV2(@NotNull final IntelliJProjectImplV2 project,
+        @NotNull final IPath path) {
         this.project = project;
         this.path = path;
     }
@@ -44,21 +46,24 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2 implement
         final VirtualFile folder = project.findVirtualFile(path);
 
         if (folder == null || !folder.exists())
-            throw new IOException("folder: '" + path + "' in module: '" + project.getName() + "' does not exist");
+            throw new IOException("folder: '" + path + "' in module: '"
+                + project.getName() + "' does not exist");
 
         if (!folder.isDirectory())
-            throw new IOException("folder: '" + path + "' in module: '" + project.getName() + "' is a file");
+            throw new IOException("folder: '" + path + "' in module: '"
+                + project.getName() + "' is a file");
 
         final List<IResource> result = new ArrayList<>();
 
         final VirtualFile[] children = folder.getChildren();
 
-        for (final VirtualFile child: children) {
+        for (final VirtualFile child : children) {
 
-            final IPath childPath = path.append(IntelliJPathImpl.fromString(child.getName()));
+            final IPath childPath = path.append(IntelliJPathImpl
+                .fromString(child.getName()));
 
-            result.add(child.isDirectory() ? new IntelliJFolderImplV2(project, childPath)
-            : new IntelliJFileImplV2(project, childPath));
+            result.add(child.isDirectory() ? new IntelliJFolderImplV2(project,
+                childPath) : new IntelliJFileImplV2(project, childPath));
 
         }
 
@@ -141,7 +146,8 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2 implement
     }
 
     @Override
-    public void move(final IPath destination, final boolean force) throws IOException {
+    public void move(final IPath destination, final boolean force)
+        throws IOException {
         throw new IOException("NYI");
     }
 
@@ -153,15 +159,17 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2 implement
     }
 
     @Override
-    public void create(final int updateFlags, final boolean local) throws IOException {
+    public void create(final int updateFlags, final boolean local)
+        throws IOException {
         throw new IOException("NYI");
     }
 
     @Override
-    public void create(final boolean force, final boolean local) throws IOException {
+    public void create(final boolean force, final boolean local)
+        throws IOException {
         throw new IOException("NYI");
     }
-    
+
     @Override
     public int hashCode() {
         return project.hashCode() + 31 * path.hashCode();
@@ -169,21 +177,21 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2 implement
 
     @Override
     public boolean equals(final Object obj) {
-        
+
         if (this == obj)
             return true;
-        
+
         if (obj == null)
             return false;
-        
+
         if (getClass() != obj.getClass())
             return false;
-        
+
         IntelliJFolderImplV2 other = (IntelliJFolderImplV2) obj;
-        
+
         return project.equals(other.project) && path.equals(other.path);
     }
-    
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + " : " + path + " - " + project;
