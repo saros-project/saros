@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.filesystem;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -14,17 +15,19 @@ import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 
-public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements IFile {
+public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
+    IFile {
 
     /** Relative path from the given project */
     private final IPath path;
-    
+
     private final IntelliJProjectImplV2 project;
-    
-    public IntelliJFileImplV2(@NotNull final IntelliJProjectImplV2 project, @NotNull final IPath path) {
+
+    public IntelliJFileImplV2(@NotNull final IntelliJProjectImplV2 project,
+        @NotNull final IPath path) {
         this.project = project;
         this.path = path;
-        
+
     }
 
     @Override
@@ -51,7 +54,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements 
     public IContainer getParent() {
         if (path.segmentCount() == 1)
             return project;
-        
+
         return new IntelliJFolderImplV2(project, path.removeLastSegments(1));
     }
 
@@ -60,7 +63,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements 
     public IProject getProject() {
         return project;
     }
-    
+
     @NotNull
     @Override
     public IPath getProjectRelativePath() {
@@ -86,12 +89,13 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements 
 
     @Override
     public void delete(final int updateFlags) throws IOException {
-        throw new IOException("NYI");                
+        throw new IOException("NYI");
     }
 
     @Override
-    public void move(@NotNull final IPath destination, final boolean force) throws IOException {
-        throw new IOException("NYI");                
+    public void move(@NotNull final IPath destination, final boolean force)
+        throws IOException {
+        throw new IOException("NYI");
     }
 
     @NotNull
@@ -105,34 +109,45 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements 
     @Override
     public String getCharset() throws IOException {
         final VirtualFile file = project.findVirtualFile(path);
-        
+
         return file == null ? null : file.getCharset().name();
     }
 
     @NotNull
     @Override
     public InputStream getContents() throws IOException {
-        throw new IOException("NYI");                
+        /*
+         * TODO maybe this needs to be wrapped, the core logic assumes that it
+         * can read from any thread
+         */
+
+        final VirtualFile file = project.findVirtualFile(path);
+
+        if (file == null)
+            throw new FileNotFoundException(this + " does not exists");
+
+        return file.getInputStream();
     }
 
     @Override
-    public void setContents(@NotNull final InputStream input, final boolean force,
-        final boolean keepHistory) throws IOException {
-        throw new IOException("NYI");                
+    public void setContents(@NotNull final InputStream input,
+        final boolean force, final boolean keepHistory) throws IOException {
+        throw new IOException("NYI");
     }
 
     @Override
-    public void create(final InputStream input, final boolean force) throws IOException {
-        throw new IOException("NYI");                        
+    public void create(final InputStream input, final boolean force)
+        throws IOException {
+        throw new IOException("NYI");
     }
 
     @Override
     public long getSize() throws IOException {
         final VirtualFile file = project.findVirtualFile(path);
-        
+
         return file == null ? 0L : file.getLength();
     }
-    
+
     @Override
     public int hashCode() {
         return project.hashCode() + 31 * path.hashCode();
@@ -140,21 +155,21 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements 
 
     @Override
     public boolean equals(final Object obj) {
-        
+
         if (this == obj)
             return true;
-        
+
         if (obj == null)
             return false;
-        
+
         if (getClass() != obj.getClass())
             return false;
-        
+
         IntelliJFileImplV2 other = (IntelliJFileImplV2) obj;
-        
+
         return project.equals(other.project) && path.equals(other.path);
     }
-    
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + " : " + path + " - " + project;
