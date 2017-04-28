@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.filesystem;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +47,10 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
         final VirtualFile folder = project.findVirtualFile(path);
 
         if (folder == null || !folder.exists())
-            throw new IOException("folder: '" + path + "' in module: '"
-                + project.getName() + "' does not exist");
+            throw new FileNotFoundException(this + " does not exist");
 
         if (!folder.isDirectory())
-            throw new IOException("folder: '" + path + "' in module: '"
-                + project.getName() + "' is a file");
+            throw new IOException(this + " is a file");
 
         final List<IResource> result = new ArrayList<>();
 
