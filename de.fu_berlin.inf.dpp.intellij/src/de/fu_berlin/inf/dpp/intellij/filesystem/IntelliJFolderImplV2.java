@@ -143,29 +143,28 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
 
     @Override
     public void delete(final int updateFlags) throws IOException {
-        
+
         Filesystem.runWriteAction(new ThrowableComputable<Void, IOException>() {
 
             @Override
             public Void compute() throws IOException {
 
                 final VirtualFile file = project.findVirtualFile(path);
-                
+
                 if (file == null)
-                    throw new FileNotFoundException(
-                        IntelliJFolderImplV2.this
-                            + " does not exist");
+                    throw new FileNotFoundException(IntelliJFolderImplV2.this
+                        + " does not exist");
 
                 if (!file.isDirectory())
                     throw new IOException(this + " is not a folder");
 
                 file.delete(IntelliJFolderImplV2.this);
-                
+
                 return null;
             }
 
         }, ModalityState.any());
-    } 
+    }
 
     @Override
     public void move(final IPath destination, final boolean force)
@@ -183,13 +182,47 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
     @Override
     public void create(final int updateFlags, final boolean local)
         throws IOException {
-        throw new IOException("NYI");
+        this.create((updateFlags & IResource.FORCE) != 0, local);
     }
 
     @Override
     public void create(final boolean force, final boolean local)
         throws IOException {
-        throw new IOException("NYI");
+
+        Filesystem.runWriteAction(new ThrowableComputable<Void, IOException>() {
+
+            @Override
+            public Void compute() throws IOException {
+
+                final VirtualFile parent = project.findVirtualFile(getParent()
+                    .getProjectRelativePath());
+
+                if (parent == null)
+                    throw new IOException(parent
+                        + " does not exist, cannot create folder "
+                        + IntelliJFolderImplV2.this);
+
+                final VirtualFile file = project.findVirtualFile(path);
+
+                /*
+                 * TODO the interface needs a better spec, we do not know how to
+                 * implement force as we use the VFS and have no control where
+                 * it points to
+                 */
+                if (file != null)
+                    throw new IOException(
+                        IntelliJFolderImplV2.this
+                            + " already exists, force option not supported - force="
+                            + force);
+
+                parent.createChildDirectory(IntelliJFolderImplV2.this,
+                    getName());
+
+                return null;
+
+            }
+
+        }, ModalityState.any());
     }
 
     @Override
