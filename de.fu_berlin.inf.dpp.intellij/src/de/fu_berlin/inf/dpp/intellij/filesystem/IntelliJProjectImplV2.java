@@ -211,6 +211,11 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     @NotNull
     @Override
     public IFile getFile(final IPath path) {
+
+        if (path.segmentCount() == 0)
+            throw new IllegalArgumentException(
+                "cannot create file handle for an empty path");
+
         return new IntelliJFileImplV2(this, path);
     }
 
@@ -223,6 +228,11 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     @NotNull
     @Override
     public IFolder getFolder(final IPath path) {
+
+        if (path.segmentCount() == 0)
+            throw new IllegalArgumentException(
+                "cannot create folder handle for an empty path");
+
         return new IntelliJFolderImplV2(this, path);
     }
 
