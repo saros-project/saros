@@ -194,10 +194,12 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
             @Override
             public Void compute() throws IOException {
 
-                final VirtualFile parent = project.findVirtualFile(getParent()
+                final IResource parent = getParent();
+
+                final VirtualFile parentFile = project.findVirtualFile(parent
                     .getProjectRelativePath());
 
-                if (parent == null)
+                if (parentFile == null)
                     throw new IOException(parent
                         + " does not exist, cannot create folder "
                         + IntelliJFolderImplV2.this);
@@ -215,7 +217,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
                             + " already exists, force option not supported - force="
                             + force);
 
-                parent.createChildDirectory(IntelliJFolderImplV2.this,
+                parentFile.createChildDirectory(IntelliJFolderImplV2.this,
                     getName());
 
                 return null;

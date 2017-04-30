@@ -208,23 +208,29 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
             @Override
             public Void compute() throws IOException {
 
-                final VirtualFile parent = project.findVirtualFile(getParent()
+                final IResource parent = getParent();
+
+                final VirtualFile parentFile = project.findVirtualFile(parent
                     .getProjectRelativePath());
 
-                if (parent == null)
-                    throw new IOException(parent + " does not exist, cannot create file " +  IntelliJFileImplV2.this);
-                
+                if (parentFile == null)
+                    throw new IOException(parent
+                        + " does not exist, cannot create file "
+                        + IntelliJFileImplV2.this);
+
                 final VirtualFile file = project.findVirtualFile(path);
 
                 if (file != null && !force)
-                    throw new IOException(IntelliJFileImplV2.this + " already exists - force=" + force);
-                
+                    throw new IOException(IntelliJFileImplV2.this
+                        + " already exists - force=" + force);
+
                 if (file == null)
-                    parent.createChildData(IntelliJFileImplV2.this, getName());
+                    parentFile.createChildData(IntelliJFileImplV2.this,
+                        getName());
 
                 if (input != null)
                     setContents(input, force, true);
-                
+
                 return null;
             }
 
