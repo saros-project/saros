@@ -42,6 +42,9 @@ public class Filesystem {
         @NotNull final ThrowableComputable<T, E> computation,
         @Nullable final ModalityState modalityState) throws E {
 
+        if (application.isDispatchThread())
+            return application.runWriteAction(computation);
+
         final ModalityState chosenModalityState = modalityState != null ? modalityState
             : ModalityState.defaultModalityState();
 

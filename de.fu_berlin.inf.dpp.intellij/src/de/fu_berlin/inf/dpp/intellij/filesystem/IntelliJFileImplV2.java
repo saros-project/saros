@@ -96,7 +96,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
 
     @Override
     public void delete(final int updateFlags) throws IOException {
-        
+
         Filesystem.runWriteAction(new ThrowableComputable<Void, IOException>() {
 
             @Override
@@ -105,20 +105,19 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                 final VirtualFile file = project.findVirtualFile(path);
 
                 if (file == null)
-                    throw new FileNotFoundException(
-                        IntelliJFileImplV2.this
-                            + " does not exist");
+                    throw new FileNotFoundException(IntelliJFileImplV2.this
+                        + " does not exist");
 
                 if (file.isDirectory())
                     throw new IOException(this + " is not a file");
 
                 file.delete(IntelliJFileImplV2.this);
-                
+
                 return null;
             }
 
         }, ModalityState.any());
-    } 
+    }
 
     @Override
     public void move(@NotNull final IPath destination, final boolean force)
@@ -201,9 +200,35 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
     }
 
     @Override
-    public void create(final InputStream input, final boolean force)
+    public void create(@Nullable final InputStream input, final boolean force)
         throws IOException {
-        throw new IOException("NYI");
+
+        Filesystem.runWriteAction(new ThrowableComputable<Void, IOException>() {
+
+            @Override
+            public Void compute() throws IOException {
+
+                final VirtualFile parent = project.findVirtualFile(getParent()
+                    .getProjectRelativePath());
+
+                if (parent == null)
+                    throw new IOException(parent + " does not exist, cannot create file " +  IntelliJFileImplV2.this);
+                
+                final VirtualFile file = project.findVirtualFile(path);
+
+                if (file != null && !force)
+                    throw new IOException(IntelliJFileImplV2.this + " already exists - force=" + force);
+                
+                if (file == null)
+                    parent.createChildData(IntelliJFileImplV2.this, getName());
+
+                if (input != null)
+                    setContents(input, force, true);
+                
+                return null;
+            }
+
+        }, ModalityState.any());
     }
 
     @Override

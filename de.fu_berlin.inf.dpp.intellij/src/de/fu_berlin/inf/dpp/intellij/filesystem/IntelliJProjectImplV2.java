@@ -235,13 +235,16 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
      * @param path
      *            relative path to the file
      * @return the virtual file or <code>null</code> if it does not exists in
-     *         the VFS snapshot, or the path is absolute or empty.
+     *         the VFS snapshot, or the path is absolute.
      */
     @Nullable
     VirtualFile findVirtualFile(final IPath path) {
 
-        if (path.segmentCount() == 0 || path.isAbsolute())
+        if (path.isAbsolute())
             return null;
+
+        if (path.segmentCount() == 0)
+            return moduleRoot;
 
         return moduleRoot.findFileByRelativePath(path.toString());
     }
