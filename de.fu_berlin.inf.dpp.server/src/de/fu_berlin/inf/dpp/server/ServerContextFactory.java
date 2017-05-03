@@ -9,11 +9,15 @@ import org.apache.log4j.Logger;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
+import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
+import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
+import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
@@ -45,6 +49,7 @@ public class ServerContextFactory extends CoreContextFactory {
         super.createComponents(c);
         addVersionString(c);
         addCoreInterfaceImplementations(c);
+        addOptionialCoreInterfaceImplementations(c);
         addAdditionalComponents(c);
     }
 
@@ -73,6 +78,15 @@ public class ServerContextFactory extends CoreContextFactory {
             NullRemoteProgressIndicatorFactory.class);
 
         c.addComponent(UISynchronizer.class, ServerUISynchronizerImpl.class);
+    }
+
+    /*
+     * Components that are not necessarily needed but must be present, i.e. use
+     * dummies
+     */
+    private void addOptionialCoreInterfaceImplementations(MutablePicoContainer c) {
+        c.addComponent(IProxyResolver.class, NullProxyResolver.class);
+        c.addComponent(IChecksumCache.class, NullChecksumCacheImpl.class);
     }
 
     private void addAdditionalComponents(MutablePicoContainer c) {
