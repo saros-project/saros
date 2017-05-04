@@ -8,6 +8,7 @@
 	<classpathentry kind="lib" path="test/lib/cglib-nodep-2.2.2.jar"/>
 	<classpathentry kind="lib" path="test/lib/javassist-3.18.0-GA.jar"/>
 	<classpathentry kind="lib" path="test/lib/objenesis-1.2.jar"/>
+	<classpathentry kind="var" path="SWT_LIBRARY"/>
 	<classpathentry kind="var" path="INTELLIJ_LIB/junit-4.11.jar"/>
 	<classpathentry kind="var" path="INTELLIJ_LIB/annotations.jar"/>
 	<classpathentry kind="var" path="INTELLIJ_LIB/extensions.jar"/>
@@ -17,8 +18,6 @@
 	<classpathentry kind="var" path="INTELLIJ_LIB/util.jar"/>
 	<classpathentry kind="var" path="INTELLIJ_LIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.fu_berlin.inf.dpp.ui"/>
-	<classpathentry kind="lib" path="/de.fu_berlin.inf.dpp.ui/lib/swt-debug.jar"/>
-	<classpathentry kind="lib" path="/de.fu_berlin.inf.dpp.ui/lib/swt-src.zip"/>
 	<classpathentry kind="lib" path="lib/fest-assert-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/fest-reflect-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/fest-swing-1.2.1.jar"/>
