@@ -26,7 +26,7 @@ package de.fu_berlin.inf.dpp.filesystem;
  * Useful if your implementation has difficulties using the
  * {@link FileSystemChecksumCache}.
  */
-public class NullChecksumCacheImpl implements IChecksumCache {
+public class NullChecksumCache implements IChecksumCache {
     @Override
     public Long getChecksum(IFile file) {
         return null;

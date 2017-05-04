@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
+import de.fu_berlin.inf.dpp.filesystem.NullChecksumCache;
 import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
@@ -86,7 +86,7 @@ public class ServerContextFactory extends CoreContextFactory {
      */
     private void addOptionialCoreInterfaceImplementations(MutablePicoContainer c) {
         c.addComponent(IProxyResolver.class, NullProxyResolver.class);
-        c.addComponent(IChecksumCache.class, NullChecksumCacheImpl.class);
+        c.addComponent(IChecksumCache.class, NullChecksumCache.class);
     }
 
     private void addAdditionalComponents(MutablePicoContainer c) {

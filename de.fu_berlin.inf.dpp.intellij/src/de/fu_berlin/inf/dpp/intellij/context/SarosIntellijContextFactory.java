@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
-import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
+import de.fu_berlin.inf.dpp.filesystem.NullChecksumCache;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
@@ -78,7 +78,7 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
         Component.create(UserStatusChangeHandler.class),
         Component.create(XMPPAuthorizationHandler.class),
 
-        Component.create(IChecksumCache.class, NullChecksumCacheImpl.class),
+        Component.create(IChecksumCache.class, NullChecksumCache.class),
 
         Component.create(UISynchronizer.class, IntelliJSynchronizer.class),
 
