@@ -10,7 +10,7 @@ import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
-import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
+import de.fu_berlin.inf.dpp.communication.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;

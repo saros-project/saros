@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.intellij.context;
 import com.intellij.openapi.project.Project;
 
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
-import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
+import de.fu_berlin.inf.dpp.communication.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.context.AbstractContextFactory.Component;
