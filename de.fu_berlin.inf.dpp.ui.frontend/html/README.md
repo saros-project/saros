@@ -1,39 +1,35 @@
-# Install NPM
-To run scripts with NPM you have to install NodeJS and NPM.
-For more information about installing NodeJS and NPM see http://nodejs.org.
+# Install Node.js and NPM
+To run scripts with Yarn you have to install Node.js and NPM.
+For more information about installing Node.js see http://nodejs.org.
 Before you are able to run the build tasks you have to navigate to
 `de.fu_berlin.inf.dpp.ui.frontend/html/` and run `npm install` to download
 and install dependencies.
 
-# Development workflow
-If you make any changes in a `.js` or `.jade` file you have to build the
-JavaScript application in order to see the changes in action. The build
-artifacts which are available to the Saros Java application are present in
-`de.fu_berlin.inf.dpp.ui.frontend/html/dist/`.
-
 # Build with NPM
 Navigate to `de.fu_berlin.inf.dpp.ui.frontend/html/` and run `npm run build`.
 
+# Development workflow
+If you make any changes to a file in the src folder you have to transpile the source code. For development run `npm run dev` and changes in the sources files are automatically detected and rebuilt. In order to build the production version run `npm run build`. The build artifacts which are available to the Saros Java application are present in
+`de.fu_berlin.inf.dpp.ui.frontend/html/dist/`.
+
+
+
 ## Tasks of the build process
- - compile JADE-templates to plain old JavaScript functions
-(for more information about JADE visit http://jade-lang.com/)
- - creating a `bundle.js` which contains all internal JavaScript files,
-external JavaScript frameworks and the template functions
+ - compile the JSX source code to JavaScript ES5
+ - creating a `bundle.js` which contains all internal JavaScript files
+and external JavaScript frameworks
  - copying all necessary resources (JavaScript, CSS, images, fonts)
 to  `de.fu_berlin.inf.dpp.ui.frontend/html/dist/`
 
-For the bundling of the JavaScript components Browserify is used, see
-http://browserify.org/ for more information.
+For the bundling of the JavaScript components Webpack is used, see
+https://webpack.js.org/ for more information.
 
-## Unit testing
-To run unit tests navigate to `de.fu_berlin.inf.dpp.ui.frontend/html/` and run
-`npm run test`. The tests are specified in
-`de.fu_berlin.inf.dpp.ui.frontend/html/test`. For more information about the
-test framework see http://mochajs.org/.
-
-## Code auto-formattig
-To auto-format the JavaScript code navigate to
-`de.fu_berlin.inf.dpp.ui.frontend/html/` and run `npm run format`. The rules
-for the auto-formatting can be defined in
-`de.fu_berlin.inf.dpp.ui.frontend/html/.jscsrc`. For more information about
-the configuration see http://jscs.info/.
+## Code linting
+To see if your code fullfills the linting rules go to
+`de.fu_berlin.inf.dpp.ui.frontend/html/` and run `npm run lint`.
+In order to fix a majority of linting errors automatically use `npm run lint:fix`
+The rules for linting are defined in
+`de.fu_berlin.inf.dpp.ui.frontend/html/.eslintrc`. For more information about
+the configuration see http://eslint.org/
+The JavaScript code uses the StandardJS linting rules
+[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
