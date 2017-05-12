@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
+import de.fu_berlin.inf.dpp.ui.core_facades.RosterFacade;
 
 /**
  * Rename a roster contact.
@@ -18,17 +18,17 @@ public class RenameContact extends TypedJavascriptFunction {
 
     public static final String JS_NAME = "renameContact";
 
-    private final StateFacade stateFacade;
+    private final RosterFacade rosterFacade;
 
     /**
      * Created by PicoContainer
      * 
-     * @param stateFacade
+     * @param rosterFacade
      * @see HTMLUIContextFactory
      */
-    public RenameContact(StateFacade stateFacade) {
+    public RenameContact(RosterFacade rosterFacade) {
         super(JS_NAME);
-        this.stateFacade = stateFacade;
+        this.rosterFacade = rosterFacade;
     }
 
     /**
@@ -52,7 +52,7 @@ public class RenameContact extends TypedJavascriptFunction {
         }
 
         try {
-            stateFacade.renameContact(new JID(jid), newNickname);
+            rosterFacade.renameContact(new JID(jid), newNickname);
         } catch (XMPPException e) {
             LOG.error("Error while renaming contact", e);
             JavaScriptAPI.showError(browser,

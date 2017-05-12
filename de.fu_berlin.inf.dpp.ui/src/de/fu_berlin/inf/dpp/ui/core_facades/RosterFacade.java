@@ -5,56 +5,28 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 /**
- * Bundles all backend calls for connecting and for managing the contact list.
+ * Bundles all backend calls to alter the currently active account's contact
+ * list, or roster.
  */
-public class StateFacade {
+public class RosterFacade {
 
     private static final String CONNECTION_STATE_FAILURE = "Invalide state, connection might be lost.";
-    private final ConnectionHandler connectionHandler;
 
     private final XMPPConnectionService connectionService;
-
-    private final XMPPAccountStore accountStore;
 
     /**
      * Created by PicoContainer
      * 
-     * @param connectionHandler
      * @param connectionService
-     * @param accountStore
      * @see HTMLUIContextFactory
      */
-    public StateFacade(ConnectionHandler connectionHandler,
-        XMPPConnectionService connectionService, XMPPAccountStore accountStore) {
-        this.connectionHandler = connectionHandler;
+    public RosterFacade(XMPPConnectionService connectionService) {
         this.connectionService = connectionService;
-        this.accountStore = accountStore;
-    }
-
-    /**
-     * Connects the given XMPP account to the server.
-     * 
-     * @param account
-     *            representing an XMPP account
-     */
-    public void connect(XMPPAccount account) {
-        accountStore.setAccountActive(account);
-        connectionHandler.connect(account, false);
-    }
-
-    /**
-     * Disconnects the currently connected account.
-     */
-    public void disconnect() {
-        connectionService.disconnect();
     }
 
     /**
@@ -62,7 +34,6 @@ public class StateFacade {
      * 
      * @param jid
      *            the JID of the contact to be deleted
-     * @throws XMPPException
      */
     public void deleteContact(JID jid) throws XMPPException {
         try {
@@ -81,8 +52,6 @@ public class StateFacade {
      * @param name
      *            the new name of the contact
      * @throws XMPPException
-     * @throws IllegalArgumentException
-     *             if name is null
      */
     public void renameContact(JID jid, String name) throws XMPPException {
         if (name == null) {
@@ -94,7 +63,6 @@ public class StateFacade {
         } catch (IllegalStateException e) {
             throw new XMPPException(CONNECTION_STATE_FAILURE, e);
         }
-
     }
 
     /**
@@ -111,7 +79,6 @@ public class StateFacade {
         } catch (IllegalStateException e) {
             throw new XMPPException(CONNECTION_STATE_FAILURE, e);
         }
-
     }
 
     /**

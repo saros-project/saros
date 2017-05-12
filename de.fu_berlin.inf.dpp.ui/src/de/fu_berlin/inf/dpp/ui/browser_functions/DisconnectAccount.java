@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunction.Policy;
-import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
+import de.fu_berlin.inf.dpp.ui.core_facades.ConnectionFacade;
 
 /**
  * Disconnect the active account.
@@ -11,17 +11,17 @@ public class DisconnectAccount extends TypedJavascriptFunction {
 
     public static final String JS_NAME = "disconnect";
 
-    private final StateFacade stateFacade;
+    private final ConnectionFacade connectionFacade;
 
     /**
      * Created by PicoContainer
      * 
-     * @param stateFacade
+     * @param connectionFacade
      * @see HTMLUIContextFactory
      */
-    public DisconnectAccount(StateFacade stateFacade) {
+    public DisconnectAccount(ConnectionFacade connectionFacade) {
         super(JS_NAME);
-        this.stateFacade = stateFacade;
+        this.connectionFacade = connectionFacade;
     }
 
     /**
@@ -29,6 +29,6 @@ public class DisconnectAccount extends TypedJavascriptFunction {
      */
     @BrowserFunction(Policy.ASYNC)
     public void disconnect() {
-        stateFacade.disconnect();
+        connectionFacade.disconnect();
     }
 }

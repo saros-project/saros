@@ -21,7 +21,8 @@ import de.fu_berlin.inf.dpp.ui.browser_functions.SendInvitation;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SetActiveAccount;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ShowAccountPage;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ShowSessionWizard;
-import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
+import de.fu_berlin.inf.dpp.ui.core_facades.ConnectionFacade;
+import de.fu_berlin.inf.dpp.ui.core_facades.RosterFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
@@ -78,7 +79,7 @@ public class HTMLUIContextFactory extends AbstractContextFactory {
     }
 
     private void createFacades() {
-        add(StateFacade.class);
+        add(ConnectionFacade.class, RosterFacade.class);
     }
 
     /**

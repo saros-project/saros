@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
+import de.fu_berlin.inf.dpp.ui.core_facades.RosterFacade;
 
 /**
  * Add a given contact to the roster.
@@ -18,17 +18,17 @@ public class AddContact extends TypedJavascriptFunction {
 
     public static final String JS_NAME = "addContact";
 
-    private final StateFacade stateFacade;
+    private final RosterFacade rosterFacade;
 
     /**
      * Created by PicoContainer
      * 
-     * @param stateFacade
+     * @param rosterFacade
      * @see HTMLUIContextFactory
      */
-    public AddContact(StateFacade stateFacade) {
+    public AddContact(RosterFacade rosterFacade) {
         super(JS_NAME);
-        this.stateFacade = stateFacade;
+        this.rosterFacade = rosterFacade;
     }
 
     /**
@@ -58,10 +58,11 @@ public class AddContact extends TypedJavascriptFunction {
         }
 
         try {
-            stateFacade.addContact(newContact, nickname);
+            rosterFacade.addContact(newContact, nickname);
         } catch (XMPPException e) {
             LOG.error("Error while adding contact", e);
-            JavaScriptAPI.showError(browser, HTMLUIStrings.ERR_CONTACT_ADD_FAILED);
+            JavaScriptAPI.showError(browser,
+                HTMLUIStrings.ERR_CONTACT_ADD_FAILED);
         }
     }
 }

@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
+import de.fu_berlin.inf.dpp.ui.core_facades.RosterFacade;
 
 /**
  * Delete a contact (given by its JID) from the roster of the active account.
@@ -18,17 +18,17 @@ public class DeleteContact extends TypedJavascriptFunction {
 
     public static final String JS_NAME = "deleteContact";
 
-    private final StateFacade stateFacade;
+    private final RosterFacade rosterFacade;
 
     /**
      * Created by PicoContainer
      * 
-     * @param stateFacade
+     * @param rosterFacade
      * @see HTMLUIContextFactory
      */
-    public DeleteContact(StateFacade stateFacade) {
+    public DeleteContact(RosterFacade rosterFacade) {
         super(JS_NAME);
-        this.stateFacade = stateFacade;
+        this.rosterFacade = rosterFacade;
     }
 
     /**
@@ -50,7 +50,7 @@ public class DeleteContact extends TypedJavascriptFunction {
         }
 
         try {
-            stateFacade.deleteContact(new JID(jid));
+            rosterFacade.deleteContact(new JID(jid));
         } catch (XMPPException e) {
             LOG.error("Error while deleting contact", e);
             JavaScriptAPI.showError(browser,
