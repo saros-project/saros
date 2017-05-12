@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 
 /**
- * Bundles all backend calls for connecting to and disconnecting from a server.
+ * Bundles backend calls for connecting to and disconnecting from a server.
  */
 public class ConnectionFacade {
 

@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.packet.Presence;
-
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 
@@ -18,18 +14,20 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
  */
 public class State {
 
-    /**
-     * Used to avoid null checks in the renderer.
-     */
-    public static final State INIT_STATE = new State(null,
-        Collections.<Contact> emptyList(),
-        de.fu_berlin.inf.dpp.net.ConnectionState.NOT_CONNECTED);
-
     private XMPPAccount activeAccount;
 
     private List<Contact> contactList;
 
     private ConnectionState connectionState;
+
+    /**
+     * Initial state: no active account, an empty account list, and Saros being
+     * {@link ConnectionState#NOT_CONNECTED}.
+     */
+    public State() {
+        this(null, Collections.<Contact> emptyList(),
+            de.fu_berlin.inf.dpp.net.ConnectionState.NOT_CONNECTED);
+    }
 
     /**
      * @param activeAccount
@@ -39,36 +37,11 @@ public class State {
      * @param connectionState
      *            the current connection state of the active account
      */
-    public State(XMPPAccount activeAccount, List<Contact> contactList,
+    private State(XMPPAccount activeAccount, List<Contact> contactList,
         ConnectionState connectionState) {
         this.activeAccount = activeAccount;
         this.contactList = new ArrayList<Contact>(contactList);
         this.connectionState = connectionState;
-    }
-
-    /**
-     * @param activeAccount
-     *            the currently active account
-     * @param roster
-     *            the roster used to fill the contact list
-     * @param connectionState
-     *            the current connection state of the active account
-     */
-    public State(XMPPAccount activeAccount, Roster roster,
-        ConnectionState connectionState) {
-        this.activeAccount = activeAccount;
-        this.contactList = createListOfContacts(roster);
-        this.connectionState = connectionState;
-    }
-
-    /**
-     * Re-create the contact list according to the roster.
-     * 
-     * @param roster
-     *            the roster used to fill the contact list
-     */
-    public void setContactList(Roster roster) {
-        this.contactList = createListOfContacts(roster);
     }
 
     public void setContactList(List<Contact> contactList) {
@@ -106,34 +79,4 @@ public class State {
     public ConnectionState getConnectionState() {
         return this.connectionState;
     }
-
-    /**
-     * Adds the roster entries as contact object to a new list.
-     * 
-     * @param roster
-     *            the roster
-     * @return the list containing the roster entries as contacts
-     */
-    private List<Contact> createListOfContacts(Roster roster) {
-        // TODO Move this logic to a renderer class
-
-        List<Contact> res = new ArrayList<Contact>(roster.getEntries().size());
-        /*
-         * Buggish SMACK crap at its best ! The entries returned here can be
-         * just plain references (see implementation) so we have to lookup them
-         * correctly !
-         */
-        for (RosterEntry entryReference : roster.getEntries()) {
-            final RosterEntry correctEntry = roster.getEntry(entryReference
-                .getUser());
-
-            if (correctEntry == null)
-                continue;
-
-            Presence presence = roster.getPresence(correctEntry.getUser());
-            res.add(Contact.createContact(correctEntry, presence));
-        }
-        return res;
-    }
-
 }
