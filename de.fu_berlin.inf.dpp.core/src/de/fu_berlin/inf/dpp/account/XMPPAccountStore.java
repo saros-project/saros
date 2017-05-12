@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -42,7 +43,10 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  * The XMPPAccountStore is responsible for administering XMPP account
  * credentials. All data will just reside in memory unless
  * {@link #setAccountFile(File, String)} is called. This call should only be
- * made once and <b>before</b> any account manipulation is done.</p>
+ * made once and <b>before</b> any account manipulation is done.
+ * <p>
+ * Provides events for {@link IAccountStoreListener}s.
+ * <p>
  * <b>Note:</b> Although this class is thread safe it is <b>not</b> recommended
  * to manipulate and use data from different threads.
  * 
@@ -50,12 +54,13 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  */
 @Component(module = "account")
 public final class XMPPAccountStore {
-
     private static final Logger LOG = Logger.getLogger(XMPPAccountStore.class);
 
     private static final int MAX_ACCOUNT_DATA_SIZE = 10 * 1024 * 1024;
 
     private static final String DEFAULT_SECRET_KEY = "Saros";
+
+    private final CopyOnWriteArrayList<IAccountStoreListener> listeners = new CopyOnWriteArrayList<IAccountStoreListener>();
 
     private Set<XMPPAccount> accounts;
     private XMPPAccount activeAccount;
@@ -65,6 +70,43 @@ public final class XMPPAccountStore {
 
     public XMPPAccountStore() {
         setAccountFile(null, null);
+    }
+
+    /**
+     * Registers a listener which will be notified on changes to the list of
+     * stored accounts, in particular the addition, deletion, and altering of
+     * accounts, as well as changing the currently active account.
+     * 
+     * @param listener
+     *            will only be added once
+     */
+    public void addListener(IAccountStoreListener listener) {
+        listeners.addIfAbsent(listener);
+    }
+
+    /**
+     * Unregister a listener to be no longer notified about account store
+     * changes.
+     * 
+     * @param listener
+     *            will no longer be notified, if it was registered before
+     */
+    public void removeListener(IAccountStoreListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyAccountStoreListeners() {
+        List<XMPPAccount> allAccounts = getAllAccounts();
+        for (IAccountStoreListener listener : listeners) {
+            listener.accountsChanged(allAccounts);
+        }
+    }
+
+    private void notifyActiveAccountListeners() {
+        XMPPAccount active = getActiveAccount();
+        for (IAccountStoreListener listener : listeners) {
+            listener.activeAccountChanged(active);
+        }
     }
 
     /**
@@ -335,15 +377,18 @@ public final class XMPPAccountStore {
      * @throws IllegalArgumentException
      *             if the account is not found in the store
      */
-    public synchronized void setAccountActive(XMPPAccount account) {
+    public void setAccountActive(XMPPAccount account) {
+        synchronized (this) {
+            if (!accounts.contains(account))
+                throw new IllegalArgumentException("account '" + account
+                    + "' is not in the current account store");
 
-        if (!accounts.contains(account))
-            throw new IllegalArgumentException("account '" + account
-                + "' is not in the current account store");
+            activeAccount = account;
 
-        activeAccount = account;
+            saveAccounts();
+        }
 
-        saveAccounts();
+        notifyActiveAccountListeners();
     }
 
     /**
@@ -356,19 +401,22 @@ public final class XMPPAccountStore {
      * @throws IllegalStateException
      *             if the account is active
      */
-    public synchronized void deleteAccount(XMPPAccount account) {
+    public void deleteAccount(XMPPAccount account) {
+        synchronized (this) {
+            if (!accounts.contains(account))
+                throw new IllegalArgumentException("account '" + account
+                    + "' is not in the current account store");
 
-        if (!accounts.contains(account))
-            throw new IllegalArgumentException("account '" + account
-                + "' is not in the current account store");
+            if (this.activeAccount == account)
+                throw new IllegalStateException("account '" + account
+                    + "' is active and cannot be deleted");
 
-        if (this.activeAccount == account)
-            throw new IllegalStateException("account '" + account
-                + "' is active and cannot be deleted");
+            accounts.remove(account);
 
-        accounts.remove(account);
+            saveAccounts();
+        }
 
-        saveAccounts();
+        notifyAccountStoreListeners();
     }
 
     /**
@@ -401,23 +449,25 @@ public final class XMPPAccountStore {
      *             if an account already exists with the given username,
      *             password, domain, server and port
      */
-
-    public synchronized XMPPAccount createAccount(String username,
-        String password, String domain, String server, int port,
-        boolean useTLS, boolean useSASL) {
+    public XMPPAccount createAccount(String username, String password,
+        String domain, String server, int port, boolean useTLS, boolean useSASL) {
 
         XMPPAccount newAccount = new XMPPAccount(username, password, domain,
             server, port, useTLS, useSASL);
 
-        if (accounts.contains(newAccount))
-            throw new IllegalArgumentException("account already exists");
+        synchronized (this) {
+            if (accounts.contains(newAccount))
+                throw new IllegalArgumentException("account already exists");
 
-        if (accounts.isEmpty())
-            this.activeAccount = newAccount;
+            if (accounts.isEmpty())
+                this.activeAccount = newAccount;
 
-        this.accounts.add(newAccount);
+            this.accounts.add(newAccount);
 
-        saveAccounts();
+            saveAccounts();
+        }
+
+        notifyAccountStoreListeners();
 
         return newAccount;
     }
@@ -425,6 +475,8 @@ public final class XMPPAccountStore {
     /**
      * Changes the properties of an account.
      * 
+     * @param account
+     *            the existing account to be altered
      * @param username
      *            the new user name
      * @param password
@@ -448,33 +500,38 @@ public final class XMPPAccountStore {
      *             if an account already exists with the given username,
      *             password, domain, server and port
      */
-    public synchronized void changeAccountData(XMPPAccount account,
-        String username, String password, String domain, String server,
-        int port, boolean useTLS, boolean useSASL) {
+    public void changeAccountData(XMPPAccount account, String username,
+        String password, String domain, String server, int port,
+        boolean useTLS, boolean useSASL) {
 
         XMPPAccount changedAccount = new XMPPAccount(username, password,
             domain, server, port, useTLS, useSASL);
 
-        accounts.remove(account);
+        synchronized (this) {
+            accounts.remove(account);
 
-        if (accounts.contains(changedAccount)) {
+            if (accounts.contains(changedAccount)) {
+                accounts.add(account);
+                throw new IllegalArgumentException(
+                    "an account with user name '" + username + "', domain '"
+                        + domain + "' and server '" + server + "' with port '"
+                        + port + "' already exists");
+            }
+
+            account.setUsername(username);
+            account.setPassword(password);
+            account.setDomain(domain);
+            account.setServer(server);
+            account.setPort(port);
+            account.setUseSASL(useSASL);
+            account.setUseTLS(useTLS);
+
             accounts.add(account);
-            throw new IllegalArgumentException("an account with user name '"
-                + username + "', domain '" + domain + "' and server '" + server
-                + "' with port '" + port + "' already exists");
+
+            saveAccounts();
         }
 
-        account.setUsername(username);
-        account.setPassword(password);
-        account.setDomain(domain);
-        account.setServer(server);
-        account.setPort(port);
-        account.setUseSASL(useSASL);
-        account.setUseTLS(useTLS);
-
-        accounts.add(account);
-
-        saveAccounts();
+        notifyAccountStoreListeners();
     }
 
     /**

@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 
 /**
  * Set an existing account as active. The currently active account can't be
@@ -20,22 +19,17 @@ public class SetActiveAccount extends TypedJavascriptFunction {
     public static final String JS_NAME = "setActiveAccount";
 
     private XMPPAccountStore accountStore;
-    private AccountRenderer accountRenderer;
 
     /**
      * Created by PicoContainer
      * 
      * @param accountStore
      *            to redirect the set action.
-     * @param accountRenderer
-     *            to trigger re-rendering after the active account has been set.
      * @see HTMLUIContextFactory
      */
-    public SetActiveAccount(XMPPAccountStore accountStore,
-        AccountRenderer accountRenderer) {
+    public SetActiveAccount(XMPPAccountStore accountStore) {
         super(JS_NAME);
         this.accountStore = accountStore;
-        this.accountRenderer = accountRenderer;
     }
 
     /**
@@ -52,7 +46,6 @@ public class SetActiveAccount extends TypedJavascriptFunction {
     public void setActiveAccount(XMPPAccount account) {
         try {
             accountStore.setAccountActive(account);
-            accountRenderer.render();
         } catch (IllegalArgumentException e) {
             LOG.error("Couldn't activate account " + account.toString()
                 + ". Error:" + e.getMessage(), e);

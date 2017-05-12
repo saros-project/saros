@@ -46,12 +46,6 @@ public class StateFacade {
      *            representing an XMPP account
      */
     public void connect(XMPPAccount account) {
-        if (!accountStore.exists(account.getUsername(), account.getDomain(),
-            account.getServer(), account.getPort())) {
-
-            return;
-        }
-
         accountStore.setAccountActive(account);
         connectionHandler.connect(account, false);
     }
