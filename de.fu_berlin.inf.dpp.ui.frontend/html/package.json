@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --watch --debug",
-    "build": "webpack --env.production",
+    "dev": "rm -rf dist && webpack --watch --debug",
+    "build": "rm -rf dist && webpack --env.production",
     "test": "echo \"No tests specified yet\"",
-    "lint": "eslint src webpack.config.js",
-    "lint:fix": "eslint --fix src webpack.config.js"
+    "lint": "eslint --ext .js,.jsx src webpack.config.js",
+    "lint:fix": "eslint  --ext .js,.jsx --fix src webpack.config.js"
   },
   "author": "",
   "devDependencies": {
+    "add-asset-html-webpack-plugin": "^2.0.1",
     "babel-core": "^6.2.1",
     "babel-eslint": "6",
     "babel-loader": "^7.0.0",
@@ -20,6 +21,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "chai": "^3.5.0",
     "chai-jquery": "^2.0.0",
+    "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.0",
     "eslint": "3.x",
     "eslint-config-standard": "^10.2.1",
@@ -29,7 +31,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-react": "^7.0.0",
     "eslint-plugin-standard": "^3.0.1",
-    "extract-text-webpack-plugin": "^2.1.0",
+    "extract-text-webpack-plugin": "^2.1.2",
     "file-loader": "^0.11.1",
     "html-webpack-plugin": "^2.28.0",
     "jquery": "^3.2.1",
@@ -38,9 +40,10 @@
     "react-addons-test-utils": "^15.5.1",
     "style-loader": "^0.16.1",
     "url-loader": "^0.5.8",
-    "webpack": "^2.4.1"
+    "webpack": "^2.6.1"
   },
   "dependencies": {
+    "babel-polyfill": "^6.23.0",
     "bootstrap": "^3.3.7",
     "mobx": "^3.1.9",
     "mobx-react": "^4.1.8",

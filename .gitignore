@@ -17,6 +17,7 @@ bin_test/
 /de.fu_berlin.inf.dpp.ui.frontend/html/dist/
 /de.fu_berlin.inf.dpp.ui.frontend/html/js/templates.js
 /de.fu_berlin.inf.dpp.ui.frontend/html/npm-debug.log
+/de.fu_berlin.inf.dpp.ui.frontend/html/package-lock.json
 /de.fu_berlin.inf.dpp.update/logs.zip
 /de.fu_berlin.inf.dpp.update/features/
 /de.fu_berlin.inf.dpp.update/plugins/
