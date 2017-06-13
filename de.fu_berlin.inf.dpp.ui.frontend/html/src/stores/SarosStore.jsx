@@ -1,4 +1,5 @@
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
+import { onlineFirst, getJid } from 'Utils'
 
 export default class SarosStore {
   @observable state = {
@@ -19,23 +20,34 @@ export default class SarosStore {
 
   sarosApi = null
 
-  @action
+  @computed
+  get sortedContactList () {
+    return this.state.contactList.sort(onlineFirst)
+  }
+
+  @action.bound
   doUpdateAccounts (accounts) {
     this.accounts = accounts
   }
 
-  @action
+  @action.bound
   doUpdateState (state) {
     this.state = { ...this.state, ...state }
   }
 
-  @action
+  @action.bound
   doUpdateContacts () {
     // TODO
   }
 
-  @action
-  doChangeActiveAccount (accId) {
-    this.sarosApi && this.sarosApi.connect(this.accounts.find(({ jid }) => jid === accId))
+  @action.bound
+  doChangeActiveAccount (jid) {
+    const account = this.accounts.find(account => getJid(account) === jid)
+    this.sarosApi.connect(account)
+  }
+
+  @action.bound
+  doAddContact (jid, displayName) {
+    this.sarosApi.addContact(jid, displayName)
   }
 }

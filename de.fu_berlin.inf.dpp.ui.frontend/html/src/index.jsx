@@ -5,20 +5,26 @@ import Localization from 'react-localize'
 
 import './styles/style.css'
 import App from './components/App'
-import SarosStore from './stores/SarosStore'
+import initStores from './stores'
 import SarosApi from './SarosApi'
 import dictionary from './dictionary'
 
-const store = new SarosStore()
-const api = new SarosApi(store)
-store.sarosApi = api
+// The initialView is injected via the html page
+
+const stores = initStores(window.initialPage)
+const api = new SarosApi(stores.core)
+stores.core.sarosApi = api
 
 // Expose the Saros API globally to be accessible for Java
 window.SarosApi = api
-window.SarosStore = store
+
+// For debugging purposes, expose all stores so it can be tested in the browser
+if (process.env.NODE_ENV !== 'production') {
+  window.stores = stores
+}
 
 ReactDOM.render(
-  <Provider store={store} >
+  <Provider {...stores} >
     <Localization messages={dictionary}>
       <App />
     </Localization>

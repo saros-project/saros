@@ -4,6 +4,10 @@
     <meta charset="utf-8">
   </head>
   <body>
+    <!-- initial page gets injected here -->
+    <script>
+      window.initialPage = '<%= htmlWebpackPlugin.options.title %>'
+    </script>
     <div id="root"></div>
   </body>
 </html>
