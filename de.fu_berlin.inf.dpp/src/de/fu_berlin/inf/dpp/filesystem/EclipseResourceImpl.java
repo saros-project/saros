@@ -136,13 +136,36 @@ public class EclipseResourceImpl implements IResource {
 
     @Override
     public Object getAdapter(Class<? extends IResource> clazz) {
-        return delegate.getAdapter(clazz);
+
+        if (IResource.class.equals(clazz))
+            return this;
+
+        Class<?> classToMap = null;
+
+        if (IFile.class.equals(clazz))
+            classToMap = org.eclipse.core.resources.IFile.class;
+        else if (IFolder.class.equals(clazz))
+            classToMap = org.eclipse.core.resources.IFolder.class;
+        else if (IContainer.class.equals(clazz))
+            classToMap = org.eclipse.core.resources.IContainer.class;
+        else if (IProject.class.equals(clazz))
+            classToMap = org.eclipse.core.resources.IProject.class;
+        else if (IWorkspaceRoot.class.equals(clazz))
+            classToMap = org.eclipse.core.resources.IWorkspaceRoot.class;
+
+        if (classToMap == null)
+            return null;
+
+        final org.eclipse.core.resources.IResource result = (org.eclipse.core.resources.IResource) delegate
+            .getAdapter(classToMap);
+
+        return ResourceAdapterFactory.create(result);
     }
 
     /**
      * Returns the original {@link org.eclipse.core.resources.IResource
      * IResource} object.
-     * 
+     *
      * @return
      */
     public org.eclipse.core.resources.IResource getDelegate() {
