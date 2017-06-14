@@ -27,7 +27,6 @@ class SarosApi {
   }
 
   trigger (event, ...args) {
-    console.log(event, args)
     switch (event) {
       case 'updateState':
         return this.sarosStore.doUpdateState(args[0])
@@ -35,6 +34,8 @@ class SarosApi {
         return this.sarosStore.doUpdateAccounts(args[0])
       case 'updateContacts':
         return this.sarosStore.doUpdateContacts(args[0])
+      case 'updateProjectTrees':
+        return this.sarosStore.doUpdateProjectTrees(args[0])
     }
   }
 
