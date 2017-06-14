@@ -1,7 +1,7 @@
 import React from 'react'
 import { Text } from 'react-localize'
 import { inject, observer } from 'mobx-react'
-import ContactList from './ContactList'
+import ContactList from '../ContactList'
 import Accounts from './Accounts'
 
 @inject('core', 'mainUI')
