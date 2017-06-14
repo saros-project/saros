@@ -2,9 +2,11 @@ import React from 'react'
 import { inject, observer } from 'mobx-react'
 import { views } from 'Constants'
 import MainView from './MainView'
+import AddContactView from './AddContactView'
 
 const viewComponents = {
-  [views.MAIN]: MainView
+  [views.MAIN]: MainView,
+  [views.ADD_CONTACT]: AddContactView
 }
 
 @inject('view')
