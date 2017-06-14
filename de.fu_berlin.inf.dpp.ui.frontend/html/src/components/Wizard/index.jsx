@@ -1,0 +1,40 @@
+import React from 'react'
+import { observable, computed, action } from 'mobx'
+import { observer } from 'mobx-react'
+export { default as Step } from './Step'
+
+@observer
+export default class Wizard extends React.Component {
+  @observable step = 0
+
+  @computed
+  get currentStepInstance () {
+    return this.props.children[this.step]
+  }
+
+  @computed
+  get hasNext () {
+    return this.step < this.props.children.length - 1
+  }
+
+  @action
+  onClickNext = () => {
+    if (this.hasNext) {
+      this.step = this.step + 1
+    } else {
+      this.props.onFinish()
+    }
+  }
+
+  render () {
+    return React.cloneElement(
+      this.currentStepInstance,
+      {
+        wizard: {
+          onClickNext: this.onClickNext,
+          hasNext: this.hasNext
+        }
+      }
+    )
+  }
+}
