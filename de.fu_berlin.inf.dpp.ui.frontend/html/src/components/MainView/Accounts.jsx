@@ -4,6 +4,7 @@ import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { PropTypes as PM } from 'mobx-react'
 import P from 'prop-types'
 import { Account } from 'Utils/propTypes'
+import { getJid } from 'Utils'
 
 const AccountsProps = {
   activeAccount: Account.isRequired,
@@ -27,12 +28,12 @@ const Accounts = ({
       bsStyle={'primary'}
       title='Accounts'
     >
-      {accounts.map(({ jid, username, domain }) => (
+      {accounts.map(getJid).map(jid => (
         <MenuItem
           key={jid}
           eventKey={jid}
         >
-          {`${username}@${domain}`}
+          {jid}
         </MenuItem>
       ))}
     </DropdownButton>
