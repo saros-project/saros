@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.editor;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -27,8 +28,7 @@ public abstract class AbstractSharedEditorListener implements
     }
 
     @Override
-    public void textEdited(User user, SPath filePath, int offset,
-        String replacedText, String text) {
+    public void textEdited(TextEditActivity textEdit) {
         // Does nothing by default
     }
 

@@ -665,8 +665,7 @@ public class EditorManager extends AbstractActivityProducer implements
         fireActivity(textEdit);
 
         // inform all registered ISharedEditorListeners about this text edit
-        editorListenerDispatch.textEdited(session.getLocalUser(), path, offset,
-            replacedText, text);
+        editorListenerDispatch.textEdited(textEdit);
 
         /*
          * TODO Investigate if this is really needed here
@@ -771,8 +770,7 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         // inform all registered ISharedEditorListeners about this text edit
-        editorListenerDispatch.textEdited(user, path, textEdit.getOffset(),
-            textEdit.getReplacedText(), textEdit.getText());
+        editorListenerDispatch.textEdited(textEdit);
     }
 
     @Override

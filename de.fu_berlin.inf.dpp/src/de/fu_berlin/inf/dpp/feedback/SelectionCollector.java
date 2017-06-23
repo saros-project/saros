@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
@@ -102,8 +103,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
     private final ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void textEdited(User user, SPath filePath, int offset,
-            String replacedText, String text) {
+        public void textEdited(TextEditActivity textEdit) {
 
             /*
              * for each edit check if it is made within the range of a current
@@ -123,6 +123,10 @@ public class SelectionCollector extends AbstractStatisticCollector {
                  * single selection - i.e. when the edit consists of more than
                  * one character.
                  */
+                User user = textEdit.getSource();
+                int offset = textEdit.getOffset();
+                SPath filePath = textEdit.getPath();
+
                 if (!currentUser.equals(user) && selection.offset <= offset
                     && (selection.offset + selection.length) >= offset
                     && (selection.path).equals(filePath) && !selection.gestured) {

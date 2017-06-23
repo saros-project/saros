@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.editor;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -54,21 +55,8 @@ public interface ISharedEditorListener {
      * Fired when a user changes an editor's text content. This should only be
      * treated as an event notification; it should not be assumed that the
      * change has already been applied locally when this method is called.
-     * 
-     * @param user
-     *            the user who performed the text edit (may be the local user)
-     * @param filePath
-     *            project-relative path of the file whose associated editor was
-     *            changed
-     * @param offset
-     *            character offset inside the file where the edit occurred
-     * @param deletedText
-     *            the text deleted at the offset
-     * @param insertedText
-     *            the text inserted at the offset after deletion
      */
-    public void textEdited(User user, SPath filePath, int offset,
-        String deletedText, String insertedText);
+    public void textEdited(TextEditActivity textEdit);
 
     /**
      * Fired when a user changes the text selection in an editor. The change has

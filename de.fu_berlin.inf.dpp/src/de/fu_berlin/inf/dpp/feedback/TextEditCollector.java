@@ -12,7 +12,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
@@ -167,8 +167,10 @@ public class TextEditCollector extends AbstractStatisticCollector {
     private final ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void textEdited(User user, SPath filePath, int offset,
-            String replacedText, String text) {
+        public void textEdited(TextEditActivity textEdit) {
+            User user = textEdit.getSource();
+            String text = textEdit.getText();
+
             /*
              * delete whitespaces from the text because we don't want to count
              * them. that would result in quite a number of counted characters

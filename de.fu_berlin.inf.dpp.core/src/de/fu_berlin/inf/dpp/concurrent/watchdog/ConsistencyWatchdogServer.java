@@ -15,6 +15,7 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
@@ -22,7 +23,6 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
@@ -90,10 +90,10 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
          * when the document hasn't changed between checksum iterations.
          */
         @Override
-        public void textEdited(User user, SPath filePath, int offset,
-            String deletedText, String insertedText) {
+        public void textEdited(TextEditActivity textEdit) {
+            DocumentChecksum checksum = documentChecksums.get(textEdit
+                .getPath());
 
-            DocumentChecksum checksum = documentChecksums.get(filePath);
             if (checksum != null)
                 checksum.markDirty();
         }

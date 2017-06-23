@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.editor;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -55,11 +56,9 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
     }
 
     @Override
-    public void textEdited(User user, SPath filePath, int offset,
-        String replacedText, String text) {
-
+    public void textEdited(TextEditActivity textEdit) {
         for (ISharedEditorListener listener : editorListeners)
-            listener.textEdited(user, filePath, offset, replacedText, text);
+            listener.textEdited(textEdit);
     }
 
     @Override

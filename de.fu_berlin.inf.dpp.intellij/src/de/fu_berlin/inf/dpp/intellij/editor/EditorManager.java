@@ -167,9 +167,7 @@ public class EditorManager extends AbstractActivityProducer
                 .applyTextOperations(path, editorActivity.toOperation(),
                     colorModel.getEditColor());
 
-            editorListenerDispatch
-                .textEdited(user, path, editorActivity.getOffset(),
-                    editorActivity.getReplacedText(), editorActivity.getText());
+            editorListenerDispatch.textEdited(editorActivity);
         }
 
         private void execTextSelection(TextSelectionActivity selection) {
@@ -720,10 +718,7 @@ public class EditorManager extends AbstractActivityProducer
 
         fireActivity(textEdit);
 
-        editorListenerDispatch
-            .textEdited(session.getLocalUser(), textEdit.getPath(),
-                textEdit.getOffset(), textEdit.getReplacedText(),
-                textEdit.getText());
+        editorListenerDispatch.textEdited(textEdit);
     }
 
     /**
