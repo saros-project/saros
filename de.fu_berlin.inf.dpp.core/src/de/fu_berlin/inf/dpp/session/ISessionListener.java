@@ -19,10 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.session;
 
-import java.util.List;
-
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
@@ -135,11 +132,6 @@ public interface ISessionListener {
      * <p>
      * This method might <i>not</i> be called on the UI thread.
      * </p>
-     * 
-     * @param resources
-     *            unmodifiable list containing the resources added to the
-     *            current session or <code>null</code> if the project is a
-     *            non-partial project
      */
-    public void resourcesAdded(String projectID, List<IResource> resources);
+    public void resourcesAdded(IProject project);
 }

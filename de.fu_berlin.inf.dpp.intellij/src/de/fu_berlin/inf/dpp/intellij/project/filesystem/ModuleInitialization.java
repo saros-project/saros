@@ -7,7 +7,6 @@ import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
@@ -17,7 +16,6 @@ import org.picocontainer.Startable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * ModuleInitialization ensures that all shared modules are registered in the project structure.
@@ -35,17 +33,11 @@ public class ModuleInitialization implements Startable {
          * This method ensures that the transmitted content is shown as a module by loading the .iml file of the
          * transmitted module into the modules.xml file of the project.
          *
-         * @param projectID projectID of the module to be added
-         * @param resources added resources
+         * @param module the module to be added
          * @throws IllegalArgumentException if a module with the passed projectID could not be found
          */
         @Override
-        public void resourcesAdded(String projectID, List<IResource> resources) {
-            IProject module = session.getProject(projectID);
-            if (module == null) {
-                throw new IllegalArgumentException("Project with the specified id " + projectID + " not found");
-            }
-
+        public void resourcesAdded(IProject module) {
             final ModuleLoader moduleLoader = new ModuleLoader(module);
 
             //Registers a ModuleLoader with the AWT event dispatching thread to be executed asynchronously.

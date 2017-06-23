@@ -47,11 +47,9 @@ import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
-
 import org.apache.log4j.Logger;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -282,12 +280,11 @@ public class EditorManager extends AbstractActivityProducer
         }
 
         @Override
-        public void resourcesAdded(final String projectID, List<IResource> resources) {
-            ApplicationManager.getApplication().invokeAndWait(
-                new Runnable(){
+        public void resourcesAdded(final IProject project) {
+            ApplicationManager.getApplication().invokeAndWait(new Runnable() {
                     @Override
-                    public void run(){
-                        addProjectResources(projectID);
+                    public void run() {
+                        addProjectResources(project);
                     }
                 }, ModalityState.any());
 
@@ -308,15 +305,9 @@ public class EditorManager extends AbstractActivityProducer
      * Adds all currently open editors belonging to the passed project to the pool of open
      * editors.
      *
-     * @param projectID ID of the added project
+     * @param project the added project
      */
-    private void addProjectResources(String projectID) {
-        IProject project = session.getProject(projectID);
-        if (project == null) {
-            LOG.error("project " + projectID +
-                " of added resources does not exist");
-            return;
-        }
+    private void addProjectResources(IProject project) {
         VirtualFile[] openFiles = projectAPI.getOpenFiles();
         VirtualFile[] activeFiles = projectAPI.getSelectedFiles();
         for(VirtualFile openFile: openFiles){

@@ -61,11 +61,11 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         }
 
         @Override
-        public void resourcesAdded(final String projectID, List<IResource> resources) {
+        public void resourcesAdded(final IProject project) {
             UIUtil.invokeLaterIfNeeded(new Runnable() {
                 @Override
                 public void run() {
-                    addProjectNode(projectID);
+                    addProjectNode(project);
                 }
             });
         }
@@ -150,27 +150,25 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         treeView.expandRow(2);
     }
 
-    private void addProjectNode(String projectID) {
+    private void addProjectNode(IProject project) {
         for (DefaultMutableTreeNode nSession : sessionNodeList.values()) {
             ISarosSession session = ((SessionInfo) nSession.getUserObject())
                 .getSession();
-            IProject p = session.getProject(projectID);
-            if (p != null) {
-                ProjectInfo projInfo;
-                if (session.isCompletelyShared(p)) {
-                    projInfo = new ProjectInfo(p);
-                } else {
-                    projInfo = new ProjectInfo(p,
-                        session.getSharedResources(p));
 
-                }
-                DefaultMutableTreeNode nProject = new DefaultMutableTreeNode(
-                    projInfo);
-                treeModel.insertNodeInto(nProject, nSession,
-                    nSession.getChildCount());
-
-                treeModel.reload(nSession);
+            ProjectInfo projInfo;
+            if (session.isCompletelyShared(project)) {
+                projInfo = new ProjectInfo(project);
+            } else {
+                projInfo = new ProjectInfo(project,
+                    session.getSharedResources(project));
             }
+
+            DefaultMutableTreeNode nProject = new DefaultMutableTreeNode(
+                projInfo);
+            treeModel
+                .insertNodeInto(nProject, nSession, nSession.getChildCount());
+
+            treeModel.reload(nSession);
         }
     }
 
@@ -180,8 +178,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         userNodeList.put(user, nUser);
         treeModel.insertNodeInto(nUser, this, getChildCount());
 
-        treeView.getContactTreeRootNode()
-            .hideContact(user.getJID());
+        treeView.getContactTreeRootNode().hideContact(user.getJID());
 
         treeModel.reload(this);
     }

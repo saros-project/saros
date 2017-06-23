@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.editor;
 import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -84,9 +83,9 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * <p>
  * The EditorManager contains the testable logic. All untestable logic should
  * only appear in {@link EditorAPI}.
- *
+ * 
  * @author rdjemili
- *
+ * 
  *         TODO CO This class contains too many different concerns: TextEdits,
  *         Editor opening and closing, Parsing of activities, executing of
  *         activities, dirty state management, annotations...
@@ -97,11 +96,11 @@ public class EditorManager extends AbstractActivityProducer implements
 
     /**
      * @JTourBusStop 6, Some Basics:
-     *
+     * 
      *               When you work on a project using Saros, you still use the
      *               standard Eclipse Editor, however Saros adds a little extra
      *               needed functionality to them.
-     *
+     * 
      *               EditorManager is one of the most important classes in this
      *               respect. Remember that every change done in an Editor needs
      *               to be intercepted, translated into an Activity and sent to
@@ -165,7 +164,7 @@ public class EditorManager extends AbstractActivityProducer implements
             /**
              * @JTourBusStop 12, Activity sending, More complex example of a
              *               second dispatch:
-             *
+             * 
              *               The exec() method below is a more complex example
              *               of the second dispatch: Before letting the activity
              *               perform the third dispatch (triggered in
@@ -336,10 +335,8 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         @Override
-        public void resourcesAdded(String projectID,
-            List<de.fu_berlin.inf.dpp.filesystem.IResource> resources) {
+        public void resourcesAdded(IProject project) {
             SWTUtils.runSafeSWTSync(LOG, new Runnable() {
-
                 /*
                  * When Alice invites Bob to a session with a project and Alice
                  * has some Files of the shared project already open, Bob will
@@ -405,7 +402,7 @@ public class EditorManager extends AbstractActivityProducer implements
      * CompilationUnitDocumentProvider for Java-Files) This Method also converts
      * the line delimiters of the document. Already connected files will not be
      * connected twice.
-     *
+     * 
      */
     void connect(final IFile file) {
         if (!file.isAccessible()) {
@@ -489,7 +486,7 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Sets the local editor 'opened' and fires an {@link EditorActivity} of
      * type {@link Type#ACTIVATED}.
-     *
+     * 
      * @param path
      *            the project-relative path to the resource that the editor is
      *            currently editing or <code>null</code> if the local user has
@@ -513,16 +510,16 @@ public class EditorManager extends AbstractActivityProducer implements
      * Fires an update of the given viewport for the given {@link IEditorPart}
      * so that all remote parties know that the user is now positioned at the
      * given viewport in the given part.
-     *
+     * 
      * A ViewportActivity not necessarily indicates that the given IEditorPart
      * is currently active. If it is (the given IEditorPart matches the
      * locallyActiveEditor) then the {@link #localViewport} is updated to
      * reflect this.
-     *
-     *
+     * 
+     * 
      * @param part
      *            The IEditorPart for which to generate a ViewportActivity.
-     *
+     * 
      * @param viewport
      *            The LineRange in the given part which represents the currently
      *            visible portion of the editor. (again visible does not mean
@@ -555,10 +552,10 @@ public class EditorManager extends AbstractActivityProducer implements
      * Fires an update of the given {@link TextSelection} for the given
      * {@link IEditorPart} so that all remote parties know that the user
      * selected some text in the given part.
-     *
+     * 
      * @param part
      *            The IEditorPart for which to generate a TextSelectionActivity
-     *
+     * 
      * @param newSelection
      *            The ITextSelection in the given part which represents the
      *            currently selected text in editor.
@@ -584,7 +581,7 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * This method is called from Eclipse (via the StoppableDocumentListener)
      * whenever the local user has changed some text in an editor.
-     *
+     * 
      * @param offset
      *            The index into the given document where the text change
      *            started.
@@ -656,7 +653,7 @@ public class EditorManager extends AbstractActivityProducer implements
              * receiving this event might indicate that the user somehow
              * achieved to change his document. We should run a consistency
              * check.
-             *
+             * 
              * But watch out for changes because of a consistency check!
              */
             LOG.warn("local user caused text changes: " + textEdit
@@ -751,7 +748,7 @@ public class EditorManager extends AbstractActivityProducer implements
         /*
          * If the text edit ends in the visible region of a local editor, set
          * the cursor annotation.
-         *
+         * 
          * TODO Performance optimization in case of batch operation might make
          * sense. Problem: How to recognize batch operations?
          */
@@ -853,10 +850,10 @@ public class EditorManager extends AbstractActivityProducer implements
 
     /**
      * Called when the local user activated a shared editor.
-     *
+     * 
      * This can be called twice for a single IEditorPart, because it is called
      * from partActivated and from partBroughtToTop.
-     *
+     * 
      * We do not filter duplicate events, because it would be bad to miss events
      * and is not too bad have duplicate one's. In particular we use IPath as an
      * identifier to the IEditorPart which might not work for multiple editors
@@ -990,7 +987,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
     /**
      * Checks whether given resource is currently opened.
-     *
+     * 
      * @param path
      *            the project-relative path to the resource.
      * @return <code>true</code> if the given resource is opened according to
@@ -1005,7 +1002,7 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Checks if the local currently active editor is part of the running Saros
      * session.
-     *
+     * 
      * @return <code>true</code>, if active editor is part of the Saros session,
      *         <code>false</code> otherwise.
      */
@@ -1043,17 +1040,17 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * This method is called when a remote text edit has been received over the
      * network to apply the change to the local files.
-     *
+     * 
      * @param path
      *            The path in which the change should be made.
      * @param offset
      *            The position into the document of the given file, where the
      *            change started.
-     *
+     * 
      * @param replacedText
      *            The text which is to be replaced by this operation at the
      *            given offset (is "" if this operation is only inserting text)
-     *
+     * 
      * @param text
      *            The text which is to be inserted at the given offset instead
      *            of the replaced text (is "" if this operation is only deleting
@@ -1133,7 +1130,7 @@ public class EditorManager extends AbstractActivityProducer implements
      * Save file denoted by the given project relative path if necessary
      * according to isDirty(IPath) and call saveText(IPath) if necessary in the
      * SWT thread.
-     *
+     * 
      * @blocking This method returns after the file has been saved in the SWT
      *           Thread.
      */
@@ -1160,11 +1157,11 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Returns whether according to the DocumentProvider of this file, it has
      * been modified.
-     *
+     * 
      * @throws FileNotFoundException
      *             if the file denoted by the path does not exist on disk.
-     *
-     *
+     * 
+     * 
      */
     private boolean isDirty(SPath path) throws FileNotFoundException {
 
@@ -1182,20 +1179,20 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Programmatically saves the given editor IF and only if the file is
      * registered as a connected file.
-     *
+     * 
      * Calling this method will trigger a call to all registered
      * SharedEditorListeners (independent of the success of this method) BEFORE
      * the file is actually saved.
-     *
+     * 
      * Calling this method will NOT trigger a {@link EditorActivity} of type
      * Save to be sent to the other clients.
-     *
+     * 
      * @param path
      *            the project relative path to the file that is supposed to be
      *            saved to disk.
-     *
+     * 
      * @swt This method must be called from the SWT thread
-     *
+     * 
      * @nonReentrant This method cannot be called twice at the same time.
      */
     public void saveEditor(SPath path) {
@@ -1271,7 +1268,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
     /**
      * Sends an Activity for clients to save the editor of given path.
-     *
+     * 
      * @param path
      *            the project relative path to the resource that the user with
      *            {@link Permission#WRITE_ACCESS} was editing.
@@ -1284,7 +1281,7 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Removes all Annotation that fulfill given {@link Predicate} from all
      * editors.
-     *
+     * 
      * @param predicate
      *            The filter to use for cleaning.
      */
@@ -1299,7 +1296,7 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Returns the followed {@link User} or <code>null</code> if currently no
      * user is followed.
-     *
+     * 
      * @deprecated Use the {@link FollowModeManager} instead
      */
     @Deprecated
@@ -1313,7 +1310,7 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Sets the {@link User} to follow or <code>null</code> if no user should be
      * followed.
-     *
+     * 
      * @deprecated Use the {@link FollowModeManager} instead
      */
     @Deprecated
@@ -1361,7 +1358,7 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Removes and then re-adds all annotations (viewport, contribution,
      * selection, ...) for the given editor part.
-     *
+     * 
      * @param editorPart
      *            the editor part to refresh
      */
@@ -1430,9 +1427,9 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Returns a snap shot copy of the paths representing the editors that the
      * given user has currently opened (one of them being the active editor).
-     *
+     * 
      * Returns an empty set if the user has no editors open.
-     *
+     * 
      * TODO: This method is only called for an isEmpty() check
      */
     public Set<SPath> getRemoteOpenEditors(User user) {
@@ -1443,7 +1440,7 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Locks/unlocks all Editors for writing operations. Locked means local
      * keyboard inputs are not applied.
-     *
+     * 
      * @param lock
      *            if true then editors are locked, otherwise they are unlocked
      */
@@ -1458,7 +1455,7 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Convenience method for determining whether a file is currently open in an
      * editor.
-     *
+     * 
      * @param path
      *            path of the file to check
      * @return <code>true</code> if there is an open editor for this file,
@@ -1612,7 +1609,7 @@ public class EditorManager extends AbstractActivityProducer implements
          * own layer. There is one layer for the default color and one for each
          * of the different user colors. All SelectionFillUpAnnotations are
          * drawn in lower levels than the RemoteCursorAnnotation.
-         *
+         * 
          * TODO: The color determines on which layer a selection will be drawn.
          * So, in "competitive" situations, some selections will never be
          * visible because they are always drawn in a lower layer. (Can only
@@ -1642,14 +1639,14 @@ public class EditorManager extends AbstractActivityProducer implements
      * Adjusts viewport. Focus is set on the center of the range, but priority
      * is given to selected lines. Either range or selection can be null, but
      * not both.
-     *
+     * 
      * @param editorPart
      *            EditorPart of the open Editor
      * @param range
      *            viewport of the followed user. Can be <code>null</code>.
      * @param selection
      *            text selection of the followed user. Can be <code>null</code>.
-     *
+     * 
      */
     private void adjustViewport(IEditorPart editorPart, LineRange range,
         TextSelection selection) {

@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -18,7 +16,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -67,7 +65,7 @@ public abstract class SessionDisplayComposite extends
 
     private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void resourcesAdded(String projectID, List<IResource> resources) {
+        public void resourcesAdded(IProject project) {
             ViewerUtils.refresh(getViewer(), true);
         }
     };

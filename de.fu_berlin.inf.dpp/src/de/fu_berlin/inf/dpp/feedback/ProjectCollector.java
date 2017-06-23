@@ -35,18 +35,15 @@ public class ProjectCollector extends AbstractStatisticCollector {
 
     private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void resourcesAdded(String projectID, List<IResource> resources) {
+        public void resourcesAdded(IProject project) {
+            String projectID = sarosSession.getProjectID(project);
+
             ProjectInformation info = sharedProjects.get(projectID);
 
             if (info == null) {
                 info = new ProjectInformation();
                 sharedProjects.put(projectID, info);
             }
-
-            IProject project = sarosSession.getProject(projectID);
-
-            if (project == null)
-                return;
 
             boolean isPartial = !sarosSession.isCompletelyShared(project);
 
