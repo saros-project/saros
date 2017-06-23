@@ -380,28 +380,6 @@ public class EditorManager extends AbstractActivityProducer implements
         }
     };
 
-    private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
-
-        @Override
-        public void editorActivated(User user, SPath filePath) {
-            // #2707089 We must clear annotations from shared editors that are
-            // not commonly viewed
-
-            // We only need to react to remote users changing editor
-            if (user.isLocal())
-                return;
-
-            // Clear all viewport annotations of this user. That's not a problem
-            // because the order of the activities is:
-            // (1) EditorActivity (triggered this method call),
-            // (2) TextSelectionActivity,
-            // (3) ViewportActivity.
-            for (IEditorPart editor : editorPool.getAllEditors()) {
-                locationAnnotationManager.clearViewportForUser(user, editor);
-            }
-        }
-    };
-
     public EditorManager(ISarosSessionManager sessionManager,
         IPreferenceStore preferenceStore) {
 
@@ -413,7 +391,6 @@ public class EditorManager extends AbstractActivityProducer implements
         registerCustomAnnotations();
         sessionManager
             .addSessionLifecycleListener(this.sessionLifecycleListener);
-        addSharedEditorListener(sharedEditorListener);
     }
 
     // FIXME thread access (used by ProjectDeltaVisitor which might NOT run from
@@ -709,6 +686,18 @@ public class EditorManager extends AbstractActivityProducer implements
         switch (editorActivity.getType()) {
         case ACTIVATED:
             editorListenerDispatch.editorActivated(sender, sPath);
+
+            // #2707089 We must clear annotations from shared editors that are
+            // not commonly viewed
+
+            // Clear all viewport annotations of this user. That's not a problem
+            // because the order of the activities is:
+            // (1) EditorActivity (triggered this method call),
+            // (2) TextSelectionActivity,
+            // (3) ViewportActivity.
+            for (IEditorPart editor : editorPool.getAllEditors()) {
+                locationAnnotationManager.clearViewportForUser(sender, editor);
+            }
             break;
         case CLOSED:
             editorListenerDispatch.editorClosed(sender, sPath);
