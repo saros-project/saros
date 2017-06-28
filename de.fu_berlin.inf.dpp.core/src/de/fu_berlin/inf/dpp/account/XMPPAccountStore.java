@@ -103,7 +103,7 @@ public final class XMPPAccountStore {
     }
 
     private void notifyActiveAccountListeners() {
-        XMPPAccount active = getActiveAccount();
+        XMPPAccount active = !isEmpty() ? getActiveAccount() : null;
         for (IAccountStoreListener listener : listeners) {
             listener.activeAccountChanged(active);
         }
@@ -126,26 +126,31 @@ public final class XMPPAccountStore {
      *            the key for encryption and decryption of the file or
      *            <code>null</code> to use the default key
      */
-    public synchronized void setAccountFile(final File file, final String key) {
-        accountFile = file;
-        secretKey = key;
+    public void setAccountFile(final File file, final String key) {
+        synchronized (this) {
+            accountFile = file;
+            secretKey = key;
 
-        if (secretKey == null)
-            secretKey = DEFAULT_SECRET_KEY;
+            if (secretKey == null)
+                secretKey = DEFAULT_SECRET_KEY;
 
-        accounts = new HashSet<XMPPAccount>();
+            accounts = new HashSet<XMPPAccount>();
 
-        if (accountFile != null) {
-            File parent = accountFile.getParentFile();
+            if (accountFile != null) {
+                File parent = accountFile.getParentFile();
 
-            if (parent != null && !parent.exists() && !parent.mkdirs()) {
-                LOG.error("could not create directories for file: "
-                    + file.getAbsolutePath());
-                accountFile = null;
+                if (parent != null && !parent.exists() && !parent.mkdirs()) {
+                    LOG.error("could not create directories for file: "
+                        + file.getAbsolutePath());
+                    accountFile = null;
+                }
             }
+
+            loadAccounts();
         }
 
-        loadAccounts();
+        notifyAccountStoreListeners();
+        notifyActiveAccountListeners();
     }
 
     @SuppressWarnings("unchecked")
