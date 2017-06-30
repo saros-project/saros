@@ -28,13 +28,17 @@ public class IntelliJHTMLWorkbenchBot implements IHTMLWorkbenchBot {
     // TODO redundant declaration here and in plugin.xml
     private static final String SAROS_BROWSER_VIEW_ID = "Swt Browser";
 
-    public IntelliJHTMLWorkbenchBot() {
-        super();
-        robot = BasicRobot.robotWithCurrentAwtHierarchy();
+    public static IHTMLWorkbenchBot getInstance() {
+        return INSTANCE;
     }
 
     static {
         FailOnThreadViolationRepaintManager.install();
+    }
+
+    public IntelliJHTMLWorkbenchBot() {
+        super();
+        robot = BasicRobot.robotWithCurrentAwtHierarchy();
     }
 
     @Override
@@ -42,6 +46,11 @@ public class IntelliJHTMLWorkbenchBot implements IHTMLWorkbenchBot {
         if (!isSarosBrowserViewOpen()) {
             toggleBrowserView();
         }
+    }
+
+    @Override
+    public void closeSarosBrowserView() throws RemoteException {
+        // TODO Auto-generated method stub
     }
 
     @Override
@@ -83,9 +92,5 @@ public class IntelliJHTMLWorkbenchBot implements IHTMLWorkbenchBot {
                     return component.getText().equals(SAROS_BROWSER_VIEW_ID);
                 }
             }).click();
-    }
-
-    public static IHTMLWorkbenchBot getInstance() {
-        return INSTANCE;
     }
 }

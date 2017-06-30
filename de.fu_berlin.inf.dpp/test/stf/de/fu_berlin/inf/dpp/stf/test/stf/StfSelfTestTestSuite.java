@@ -13,6 +13,7 @@ import org.junit.runners.Suite;
     de.fu_berlin.inf.dpp.stf.test.stf.menubar.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.stf.keyboard.KeyboardLayoutTest.class,
     de.fu_berlin.inf.dpp.stf.test.stf.view.explorer.TestSuite.class,
+    de.fu_berlin.inf.dpp.stf.test.stf.view.html.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.stf.view.sarosview.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.stf.view.sarosview.content.TestSuite.class })
 public class StfSelfTestTestSuite {

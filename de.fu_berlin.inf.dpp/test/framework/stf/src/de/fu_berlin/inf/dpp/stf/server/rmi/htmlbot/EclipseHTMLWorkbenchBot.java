@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion;
 
 public class EclipseHTMLWorkbenchBot implements IHTMLWorkbenchBot {
 
@@ -11,14 +12,17 @@ public class EclipseHTMLWorkbenchBot implements IHTMLWorkbenchBot {
 
     private static final EclipseHTMLWorkbenchBot INSTANCE = new EclipseHTMLWorkbenchBot();
 
+    public static EclipseHTMLWorkbenchBot getInstance() {
+        return INSTANCE;
+    }
+
     public EclipseHTMLWorkbenchBot() {
         workbenchBot = RemoteWorkbenchBot.getInstance();
     }
 
     @Override
     public void openSarosBrowserView() throws RemoteException {
-        workbenchBot
-            .openViewById("de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion");
+        workbenchBot.openViewById(SarosViewBrowserVersion.ID);
     }
 
     @Override
@@ -26,7 +30,9 @@ public class EclipseHTMLWorkbenchBot implements IHTMLWorkbenchBot {
         return workbenchBot.isViewOpen("Saros HTML GUI");
     }
 
-    public static EclipseHTMLWorkbenchBot getInstance() {
-        return INSTANCE;
+    @Override
+    public void closeSarosBrowserView() throws RemoteException {
+        if (isSarosBrowserViewOpen())
+            workbenchBot.viewById(SarosViewBrowserVersion.ID).close();
     }
 }

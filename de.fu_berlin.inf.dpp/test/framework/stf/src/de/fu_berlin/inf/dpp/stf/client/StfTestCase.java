@@ -16,6 +16,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.MethodRule;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
@@ -38,6 +39,17 @@ public abstract class StfTestCase {
     public final MethodRule watchman = new TestWatchman() {
         @Override
         public void failed(Throwable e, FrameworkMethod method) {
+            /*
+             * Some test runners interpret a violated assumption (as in
+             * `Assume.assumeTrue(condition)` to conditionally ignore a test
+             * case) as a test failure. However, a violated assumption is not
+             * the same as a violated assertions, and therefore should not mark
+             * a test case as "failed".
+             */
+            if (e instanceof AssumptionViolatedException) {
+                return;
+            }
+
             logMessage("******* " + "TESTCASE "
                 + method.getMethod().getDeclaringClass().getName() + ":"
                 + method.getName() + " FAILED *******");
