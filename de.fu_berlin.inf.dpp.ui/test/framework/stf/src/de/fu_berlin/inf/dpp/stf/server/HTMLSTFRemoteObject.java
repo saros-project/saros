@@ -18,7 +18,7 @@ public abstract class HTMLSTFRemoteObject {
      * @param context
      *            the Saros context to use for the GUI tests
      */
-    static void setContext(IContainerContext context) {
+    public static void setContext(IContainerContext context) {
         HTMLSTFRemoteObject.context = context;
     }
 

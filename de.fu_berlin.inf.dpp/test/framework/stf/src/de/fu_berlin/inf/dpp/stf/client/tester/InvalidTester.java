@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.IControlBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 
@@ -66,6 +68,21 @@ class InvalidTester implements AbstractTester {
 
     @Override
     public IControlBot controlBot() throws RemoteException {
+        throw exception;
+    }
+
+    @Override
+    public boolean usesHtmlGui() {
+        throw exception;
+    }
+
+    @Override
+    public IHTMLWorkbenchBot htmlViewBot() throws RemoteException {
+        throw exception;
+    }
+
+    @Override
+    public IHTMLBot htmlBot() throws RemoteException {
         throw exception;
     }
 

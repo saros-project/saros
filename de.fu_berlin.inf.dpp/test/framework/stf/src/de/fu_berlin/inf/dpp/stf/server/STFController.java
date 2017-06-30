@@ -22,6 +22,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
@@ -29,6 +30,8 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.AccountManipulatorImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.NetworkManipulatorImpl;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.EclipseHTMLWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.HTMLBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCCombo;
@@ -175,6 +178,17 @@ public class STFController {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
             registry = LocateRegistry.getRegistry(port);
+        }
+
+        // remove this conditional when the HTML GUI replaces the old one
+        if (Saros.useHtmlGui()) {
+            HTMLSTFRemoteObject.setContext(context);
+
+            /*
+             * export HTML bots
+             */
+            exportObject(EclipseHTMLWorkbenchBot.getInstance(), "htmlViewBot");
+            exportObject(HTMLBotImpl.getInstance(), "htmlBot");
         }
 
         /*

@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.IControlBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 
@@ -66,4 +68,18 @@ public enum SarosTester implements AbstractTester {
         return this.tester.controlBot();
     }
 
+    @Override
+    public boolean usesHtmlGui() {
+        return this.tester.usesHtmlGui();
+    }
+
+    @Override
+    public IHTMLWorkbenchBot htmlViewBot() throws RemoteException {
+        return this.tester.htmlViewBot();
+    }
+
+    @Override
+    public IHTMLBot htmlBot() throws RemoteException {
+        return this.tester.htmlBot();
+    }
 }
