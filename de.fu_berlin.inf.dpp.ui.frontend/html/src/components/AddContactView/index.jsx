@@ -21,7 +21,7 @@ export default class AddContactView extends React.Component {
 
   render () {
     return (
-      <div className='form-horizontal'>
+      <div className='form-horizontal' id='add-contact-form'>
         <div className='form-group'>
           <label className='col-sm-2 control-label'>
             <Text message='label.jid' />
