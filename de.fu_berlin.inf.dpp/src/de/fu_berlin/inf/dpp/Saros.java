@@ -220,6 +220,19 @@ public class Saros extends AbstractUIPlugin {
 
     }
 
+    /**
+     * Feature toggle for displaying Saros in a web browser in an additional
+     * view. Also checks if required bundle is present.
+     * 
+     * @return <code>true</code> iff the feature is enabled and the UI bundle is
+     *         present.
+     */
+    public static boolean useHtmlGui() {
+        // TODO store constant string elsewhere
+        return Platform.getBundle("de.fu_berlin.inf.dpp.ui") != null
+            && Boolean.getBoolean("saros.swtbrowser");
+    }
+
     private void setupLoggers() {
         /*
          * HACK this is not the way OSGi works but it currently fulfill its

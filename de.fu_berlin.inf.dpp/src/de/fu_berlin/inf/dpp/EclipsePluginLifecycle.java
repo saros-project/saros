@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
-
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.context.AbstractContextLifecycle;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.context.ContainerContext;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
@@ -24,18 +22,6 @@ import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
 public class EclipsePluginLifecycle extends AbstractContextLifecycle {
 
     private static EclipsePluginLifecycle instance;
-
-    /**
-     * Feature toggle for displaying Saros in a web browser in an additional
-     * view. Also checks if required bundle is present.
-     * 
-     * @return true if this feature is enabled, false otherwise
-     */
-    private static boolean isSWTBrowserEnabled() {
-        // TODO store constant string elsewhere
-        return Platform.getBundle("de.fu_berlin.inf.dpp.ui") != null
-            && Boolean.getBoolean("saros.swtbrowser");
-    }
 
     /**
      * @param saros
@@ -61,7 +47,7 @@ public class EclipsePluginLifecycle extends AbstractContextLifecycle {
 
         nonCoreFactories.add(new SarosEclipseContextFactory(saros));
 
-        if (isSWTBrowserEnabled()) {
+        if (Saros.useHtmlGui()) {
             nonCoreFactories.add(new HTMLUIContextFactory());
             nonCoreFactories.add(new EclipseHTMLUIContextFactory());
         }
