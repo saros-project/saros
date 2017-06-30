@@ -5,7 +5,8 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View;
 import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 /**
@@ -14,6 +15,15 @@ import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
  * currently rendered state.
  */
 public interface IHTMLBot extends Remote {
+    /**
+     * Get a remote representation of a conceptual part of the Saros GUI.
+     * 
+     * @param view
+     *            The part of the Saros GUI on which user input should be
+     *            emulated and/or of which the current state should be queried.
+     * @throws RemoteException
+     */
+    IRemoteHTMLView view(View view) throws RemoteException;
 
     /**
      * Get a remote representation of a HTML dialog.
@@ -27,21 +37,11 @@ public interface IHTMLBot extends Remote {
         throws RemoteException;
 
     /**
-     * Gets a remote representation of the HTML button with the given ID.
-     * 
-     * @param id
-     *            the value of the ID attribute of the button
-     * 
-     * @return an instance of {@link IRemoteHTMLButton}
-     * @throws RemoteException
-     */
-    IRemoteHTMLButton buttonWithId(String id) throws RemoteException;
-
-    /**
      * Returns the currently displayed list of accounts.
      * 
      * @return a list of strings in the form 'user@domain'
      * @throws RemoteException
      */
     List<String> getAccountList() throws RemoteException;
+
 }
