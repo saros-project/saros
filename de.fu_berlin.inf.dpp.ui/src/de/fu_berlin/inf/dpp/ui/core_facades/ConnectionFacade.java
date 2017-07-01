@@ -4,7 +4,6 @@ import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 /**
  * Bundles all backend calls for connecting to and disconnecting from a server.
@@ -13,23 +12,19 @@ public class ConnectionFacade {
 
     private final ConnectionHandler connectionHandler;
 
-    private final XMPPConnectionService connectionService;
-
     private final XMPPAccountStore accountStore;
 
     /**
      * Created by PicoContainer
      * 
      * @param connectionHandler
-     * @param connectionService
      * @param accountStore
      * @see HTMLUIContextFactory
      */
     public ConnectionFacade(ConnectionHandler connectionHandler,
-        XMPPConnectionService connectionService, XMPPAccountStore accountStore) {
+        XMPPAccountStore accountStore) {
 
         this.connectionHandler = connectionHandler;
-        this.connectionService = connectionService;
         this.accountStore = accountStore;
     }
 
@@ -48,6 +43,6 @@ public class ConnectionFacade {
      * Disconnects the currently connected account.
      */
     public void disconnect() {
-        connectionService.disconnect();
+        connectionHandler.disconnect();
     }
 }
