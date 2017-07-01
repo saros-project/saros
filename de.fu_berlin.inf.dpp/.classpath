@@ -8,6 +8,7 @@
 	<classpathentry kind="src" path="test/junit"/>
 	<classpathentry kind="src" path="ext-src"/>
 	<classpathentry kind="src" path="test/framework/stf/src"/>
+	<classpathentry kind="src" path="test/framework/stf/test"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.integration_1.1.0.v20090501071000.jar"/>
