@@ -54,7 +54,9 @@ public class SarosCoreContextFactoryTest {
     @Test
     public void testCreateComponents() {
         IContextFactory factory = new CoreContextFactory();
+
         factory.createComponents(container);
+        container.start();
 
         Assert.assertNotNull(container.getComponents());
     }

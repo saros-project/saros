@@ -47,6 +47,8 @@ public class SarosEclipseContextFactoryTest {
         IContextFactory factory = new SarosEclipseContextFactory(saros);
 
         factory.createComponents(container);
+        container.start();
+
         Assert.assertNotNull(container.getComponents());
     }
 }

@@ -205,6 +205,7 @@ public class ContainerContext implements IContainerContext {
             }
         }
 
+        container.start();
         initialized = true;
 
         LOG.info("successfully initialized context");
@@ -221,6 +222,7 @@ public class ContainerContext implements IContainerContext {
             return;
 
         LOG.info("disposing context...");
+        container.stop();
         disposed = true;
         container.dispose();
         LOG.info("successfully disposed context");

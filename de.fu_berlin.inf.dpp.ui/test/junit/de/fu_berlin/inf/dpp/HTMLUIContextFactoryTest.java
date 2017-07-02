@@ -48,6 +48,8 @@ public class HTMLUIContextFactoryTest {
         IContextFactory factory = new HTMLUIContextFactory();
 
         factory.createComponents(container);
+        container.start();
+
         Assert.assertNotNull(container.getComponents());
     }
 }

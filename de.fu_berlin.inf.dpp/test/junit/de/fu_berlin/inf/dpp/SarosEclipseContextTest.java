@@ -56,6 +56,8 @@ public class SarosEclipseContextTest {
             factory.createComponents(container);
         }
 
+        container.start();
+
         Assert.assertNotNull(container.getComponents());
     }
 
@@ -71,6 +73,8 @@ public class SarosEclipseContextTest {
         for (IContextFactory factory : factories) {
             factory.createComponents(container);
         }
+
+        container.start();
 
         Assert.assertNotNull(container.getComponents());
     }
