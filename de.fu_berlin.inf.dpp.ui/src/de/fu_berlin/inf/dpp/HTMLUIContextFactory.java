@@ -6,7 +6,6 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddContact;
-import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseAccountWizard;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseSessionInvitationWizard;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ConnectAccount;
@@ -59,13 +58,20 @@ public class HTMLUIContextFactory extends AbstractContextFactory {
 
     private void createBrowserfunctions() {
         // please use alphabetic order
-        add(AddContact.class,
-            BrowserFunctions.class, // List of all BFs
-            CloseAccountWizard.class, CloseSessionInvitationWizard.class,
-            ConnectAccount.class, DeleteAccount.class, DeleteContact.class,
-            DisconnectAccount.class, EditAccount.class, GetValidJID.class,
-            RenameContact.class, SaveAccount.class, SendInvitation.class,
-            SetActiveAccount.class, ShowAccountPage.class,
+        add(AddContact.class, //
+            CloseAccountWizard.class, //
+            CloseSessionInvitationWizard.class, //
+            ConnectAccount.class, //
+            DeleteAccount.class, //
+            DeleteContact.class, //
+            DisconnectAccount.class, //
+            EditAccount.class, //
+            GetValidJID.class, //
+            RenameContact.class, //
+            SaveAccount.class, //
+            SendInvitation.class, //
+            SetActiveAccount.class, //
+            ShowAccountPage.class, //
             ShowSessionWizard.class);
     }
 

@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.ide_embedding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.util.StringUtils;
 
@@ -7,8 +10,6 @@ import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.browser_functions.TypedJavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
@@ -18,14 +19,16 @@ import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
  * instance of {@link IUIResourceLocator} which is injected by PicoContainer.
  * <p>
  * During the creation of a {@link IJQueryBrowser} all
- * {@link TypedJavascriptFunction}s that are registered in the
- * {@link BrowserFunctions} are injected into this browser instance.
+ * {@link JavascriptFunction}s that are registered in the
+ * {@link HTMLUIContextFactory} are injected into this browser instance.
  */
 public class BrowserCreator {
 
     private final BrowserManager browserManager;
 
     private final IUIResourceLocator resourceLocator;
+
+    private final List<JavascriptFunction> browserFunctions;
 
     /**
      * Injected via PicoContainer
@@ -38,6 +41,17 @@ public class BrowserCreator {
         IUIResourceLocator resourceLocator) {
         this.browserManager = browserManager;
         this.resourceLocator = resourceLocator;
+        this.browserFunctions = new ArrayList<JavascriptFunction>();
+    }
+
+    /**
+     * Adds a function to the set of {@link JavascriptFunction} that will be
+     * injected to any new {@link IJQueryBrowser browser} instance created with
+     * {@link #createBrowser(Composite, int, IBrowserPage) createBrowser()}.
+     * This does not affect already created browser instances.
+     */
+    public void addBrowserFunction(JavascriptFunction function) {
+        browserFunctions.add(function);
     }
 
     /**
@@ -73,7 +87,7 @@ public class BrowserCreator {
 
         browser.open(resourceLocation, 5000);
 
-        for (JavascriptFunction function : BrowserFunctions.getAll())
+        for (JavascriptFunction function : browserFunctions)
             browser.createBrowserFunction(function);
 
         browserManager.setBrowser(page, browser);
