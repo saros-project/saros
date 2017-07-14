@@ -35,9 +35,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
 
     @Override
     public boolean exists(@NotNull IPath path) {
-        final VirtualFile file = project.findVirtualFile(path);
-
-        return file != null && file.exists() && file.isDirectory();
+        return project.exists(this.path.append(path));
     }
 
     @NotNull
