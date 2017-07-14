@@ -56,7 +56,20 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
         return path.lastSegment();
     }
 
-    @Nullable
+    /**
+     * Returns the parent of this file.
+     *
+     * <p>
+     *
+     * <b>Note:</b> The interface specification for this method does allow
+     * <code>null</code> as a return value.
+     * This implementation, however, can not return null values, as suggested by
+     * its NotNull tag.
+     * </p>
+     *
+     * @return an <code>IContainer</code> object for the parent of this file
+     */
+    @NotNull
     @Override
     public IContainer getParent() {
         if (path.segmentCount() == 1)

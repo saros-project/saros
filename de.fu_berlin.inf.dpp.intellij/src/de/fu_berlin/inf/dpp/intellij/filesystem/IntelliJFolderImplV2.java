@@ -101,7 +101,20 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
         return path.lastSegment();
     }
 
-    @Nullable
+    /**
+     * Returns the parent of this folder.
+     *
+     * <p>
+     *
+     * <b>Note:</b> The interface specification for this method does allow
+     * <code>null</code> as a return value.
+     * This implementation, however, can not return null values, as suggested by
+     * its NotNull tag.
+     * </p>
+     *
+     * @return an <code>IContainer</code> object for the parent of this folder
+     */
+    @NotNull
     @Override
     public IContainer getParent() {
         if (path.segmentCount() == 1)
