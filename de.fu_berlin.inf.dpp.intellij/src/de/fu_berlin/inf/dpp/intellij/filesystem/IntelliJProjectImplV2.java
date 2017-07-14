@@ -41,13 +41,12 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
      * side of the session initialization. Inner modules of the shared module
      * will also be transmitted but not registered with IntelliJ as modules.
      * <p>
-     * <b>Note:</b> Only modules with one or fewer content roots are supported.
-     * IProject objects for modules with more than on content root can not be
-     * created.
+     * <b>Note:</b> Only modules with exactly one content root are currently
+     * supported. IProject objects for modules with fewer or more than one
+     * content root can not be created.
      *
      * @param module
      *            an IntelliJ <i>module</i>
-     *
      */
     public IntelliJProjectImplV2(@NotNull final Module module) {
         this.module = module;
@@ -72,7 +71,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
 
     /**
      * Returns the IntelliJ {@link Module module}.
-     * 
+     *
      * @return the IntelliJ module.
      */
     @NotNull
@@ -240,8 +239,8 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
      * Returns the virtual file for the given path belonging to this module.
      * <p>
      * <b>Note:</b> This method can return files for sub modules if the path
-     * points to a file of a submodule.
-     * 
+     * points to a file of a sub module.
+     *
      * @param path
      *            relative path to the file
      * @return the virtual file or <code>null</code> if it does not exists in
