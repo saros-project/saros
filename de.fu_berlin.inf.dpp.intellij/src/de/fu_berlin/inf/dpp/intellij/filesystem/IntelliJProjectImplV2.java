@@ -238,13 +238,12 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     /**
      * Returns the virtual file for the given path belonging to this module.
      * <p>
-     * <b>Note:</b> This method can return files for sub modules if the path
-     * points to a file of a sub module.
+     * <b>Note:</b> This method can not return files for derived resources.
      *
      * @param path
      *            relative path to the file
      * @return the virtual file or <code>null</code> if it does not exists in
-     *         the VFS snapshot, or the path is absolute.
+     *         the VFS snapshot, is derived, or the given path is absolute.
      */
     @Nullable
     VirtualFile findVirtualFile(final IPath path) {
@@ -255,7 +254,15 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
         if (path.segmentCount() == 0)
             return moduleRoot;
 
-        return moduleRoot.findFileByRelativePath(path.toString());
+        VirtualFile virtualFile = moduleRoot
+            .findFileByRelativePath(path.toString());
+
+        if (virtualFile != null && ModuleRootManager.getInstance(module)
+            .getFileIndex().isInContent(virtualFile)) {
+            return virtualFile;
+        }
+
+        return null;
     }
 
     @Override
