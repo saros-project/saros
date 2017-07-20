@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 
 import org.jetbrains.annotations.NotNull;
@@ -90,13 +91,20 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     @Override
     public IResource[] members() throws IOException {
         // TODO run as read action
-        // TODO filter files that belong to other modules
 
         final List<IResource> result = new ArrayList<>();
 
         final VirtualFile[] children = moduleRoot.getChildren();
 
+        ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module)
+            .getFileIndex();
+
         for (final VirtualFile child : children) {
+
+            if (!moduleFileIndex.isInContent(child)) {
+
+                continue;
+            }
 
             final IPath childPath = IntelliJPathImpl
                 .fromString(child.getName());

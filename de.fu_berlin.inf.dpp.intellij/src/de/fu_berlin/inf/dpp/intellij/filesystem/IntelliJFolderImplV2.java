@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.roots.ModuleFileIndex;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
 
@@ -42,7 +44,6 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
     @Override
     public IResource[] members() throws IOException {
         // TODO run as read action
-        // TODO filter files that belong to other modules
 
         final VirtualFile folder = project.findVirtualFile(path);
 
@@ -56,7 +57,15 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
 
         final VirtualFile[] children = folder.getChildren();
 
+        ModuleFileIndex moduleFileIndex = ModuleRootManager
+            .getInstance(project.getModule()).getFileIndex();
+
         for (final VirtualFile child : children) {
+
+            if (!moduleFileIndex.isInContent(child)) {
+
+                continue;
+            }
 
             final IPath childPath = path.append(IntelliJPathImpl
                 .fromString(child.getName()));
