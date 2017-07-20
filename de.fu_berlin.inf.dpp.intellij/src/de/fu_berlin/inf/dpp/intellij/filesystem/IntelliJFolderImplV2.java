@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.intellij.filesystem;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -212,6 +213,20 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
         this.create((updateFlags & IResource.FORCE) != 0, local);
     }
 
+    /**
+     * Creates this folder in the local filesystem.
+     *
+     * <p>
+     * <b>Note:</b> The force flag is not supported. It does not allow the
+     * re-creation of an already existing folder.
+     * </p>
+     *
+     * @param force not supported
+     * @param local not supported
+     * @throws FileAlreadyExistsException if the folder already exists
+     * @throws FileNotFoundException if the parent directory of this folder
+     *                               does not exist
+     */
     @Override
     public void create(final boolean force, final boolean local)
         throws IOException {
@@ -227,22 +242,21 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
                     .getProjectRelativePath());
 
                 if (parentFile == null)
-                    throw new IOException(parent
+                    throw new FileNotFoundException(parent
                         + " does not exist or is derived, cannot create folder "
                         + IntelliJFolderImplV2.this);
 
                 final VirtualFile file = parentFile.findChild(getName());
 
-                /*
-                 * TODO the interface needs a better spec, we do not know how to
-                 * implement force as we use the VFS and have no control where
-                 * it points to
-                 */
-                if (file != null)
-                    throw new IOException(
-                        IntelliJFolderImplV2.this
-                            + " already exists, force option not supported - force="
-                            + force);
+                if (file != null) {
+                    String exceptionText =
+                        IntelliJFolderImplV2.this + " already exists";
+
+                    if (force)
+                        exceptionText += ", force option is not supported";
+
+                    throw new FileAlreadyExistsException(exceptionText);
+                }
 
                 parentFile.createChildDirectory(IntelliJFolderImplV2.this,
                     getName());

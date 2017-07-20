@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.FileAlreadyExistsException;
 
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
@@ -176,6 +177,18 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
         return file.getInputStream();
     }
 
+    /**
+     * Sets the content of this file in the local filesystem.
+     *
+     * <p>
+     * <b>Note:</b> The force flag is not supported.
+     * </p>
+     *
+     * @param input new contents of the file
+     * @param force not supported
+     * @param keepHistory not supported
+     * @throws IOException if the file does not exist
+     */
     @Override
     public void setContents(final InputStream input, final boolean force,
         final boolean keepHistory) throws IOException {
@@ -187,11 +200,15 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
 
                 final VirtualFile file = project.findVirtualFile(path);
 
-                if (file == null)
-                    throw new FileNotFoundException(
-                        IntelliJFileImplV2.this
-                            + " does not exist or is derived, force option not supported - force="
-                            + force);
+                if (file == null) {
+                    String exceptionText = IntelliJFileImplV2.this
+                        + " does not exist or is derived";
+
+                    if (force)
+                        exceptionText += ", force option is not supported";
+
+                    throw new FileNotFoundException(exceptionText);
+                }
 
                 final OutputStream out = file
                     .getOutputStream(IntelliJFileImplV2.this);
@@ -219,6 +236,20 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
         }, ModalityState.any());
     }
 
+    /**
+     * Creates this file in the local filesystem with the given content.
+     *
+     * <p>
+     * <b>Note:</b> The force flag is not supported. It does not allow the
+     * re-creation of an already existing file.
+     * </p>
+     *
+     * @param input contents of the new file
+     * @param force not supported
+     * @throws FileAlreadyExistsException if the file already exists
+     * @throws FileNotFoundException if the parent directory of this file does
+     *                               not exist
+     */
     @Override
     public void create(@Nullable final InputStream input, final boolean force)
         throws IOException {
@@ -234,19 +265,23 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                     .getProjectRelativePath());
 
                 if (parentFile == null)
-                    throw new IOException(parent
+                    throw new FileNotFoundException(parent
                         + " does not exist or is derived, cannot create file "
                         + IntelliJFileImplV2.this);
 
                 final VirtualFile file = parentFile.findChild(getName());
 
-                if (file != null && !force)
-                    throw new IOException(IntelliJFileImplV2.this
-                        + " already exists - force=" + force);
+                if (file != null) {
+                    String exceptionText =
+                        IntelliJFileImplV2.this + " already exists";
 
-                if (file == null)
-                    parentFile.createChildData(IntelliJFileImplV2.this,
-                        getName());
+                    if (force)
+                        exceptionText += ", force option is not supported";
+
+                    throw new FileAlreadyExistsException(exceptionText);
+                }
+
+                parentFile.createChildData(IntelliJFileImplV2.this, getName());
 
                 if (input != null)
                     setContents(input, force, true);
