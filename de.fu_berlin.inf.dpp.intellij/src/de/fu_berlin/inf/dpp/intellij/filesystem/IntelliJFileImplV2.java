@@ -37,6 +37,14 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
 
     }
 
+    /**
+     * Returns whether this file exists.
+     * <p>
+     * <b>Note:</b> A derived file is treated as being nonexistent.
+     *
+     * @return <code>true</code> if the resource exists, is a file, and is not
+     *         derived, <code>false</code> otherwise
+     */
     @Override
     public boolean exists() {
         final VirtualFile file = project.findVirtualFile(path);
@@ -117,7 +125,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
 
                 if (file == null)
                     throw new FileNotFoundException(IntelliJFileImplV2.this
-                        + " does not exist");
+                        + " does not exist or is derived");
 
                 if (file.isDirectory())
                     throw new IOException(this + " is not a file");
@@ -162,7 +170,8 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
         final VirtualFile file = project.findVirtualFile(path);
 
         if (file == null)
-            throw new FileNotFoundException(this + " does not exist");
+            throw new FileNotFoundException(this + " does not exist or is " +
+                "derived");
 
         return file.getInputStream();
     }
@@ -181,7 +190,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                 if (file == null)
                     throw new FileNotFoundException(
                         IntelliJFileImplV2.this
-                            + " does not exist, force option not supported - force="
+                            + " does not exist or is derived, force option not supported - force="
                             + force);
 
                 final OutputStream out = file
@@ -226,7 +235,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
 
                 if (parentFile == null)
                     throw new IOException(parent
-                        + " does not exist, cannot create file "
+                        + " does not exist or is derived, cannot create file "
                         + IntelliJFileImplV2.this);
 
                 final VirtualFile file = project.findVirtualFile(path);

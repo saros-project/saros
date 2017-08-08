@@ -48,7 +48,8 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
         final VirtualFile folder = project.findVirtualFile(path);
 
         if (folder == null || !folder.exists())
-            throw new FileNotFoundException(this + " does not exist");
+            throw new FileNotFoundException(this + " does not exist or is " +
+                "derived");
 
         if (!folder.isDirectory())
             throw new IOException(this + " is a file");
@@ -91,6 +92,14 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
         return getParent().getDefaultCharset();
     }
 
+    /**
+     * Returns whether this folder exists.
+     * <p>
+     * <b>Note:</b> A derived folder is treated as being nonexistent.
+     *
+     * @return <code>true</code> if the resource exists, is a folder, and is not
+     *         derived, <code>false</code> otherwise
+     */
     @Override
     public boolean exists() {
         final VirtualFile file = project.findVirtualFile(path);
@@ -171,7 +180,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
 
                 if (file == null)
                     throw new FileNotFoundException(IntelliJFolderImplV2.this
-                        + " does not exist");
+                        + " does not exist or is derived");
 
                 if (!file.isDirectory())
                     throw new IOException(this + " is not a folder");
@@ -219,7 +228,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
 
                 if (parentFile == null)
                     throw new IOException(parent
-                        + " does not exist, cannot create folder "
+                        + " does not exist or is derived, cannot create folder "
                         + IntelliJFolderImplV2.this);
 
                 final VirtualFile file = project.findVirtualFile(path);
