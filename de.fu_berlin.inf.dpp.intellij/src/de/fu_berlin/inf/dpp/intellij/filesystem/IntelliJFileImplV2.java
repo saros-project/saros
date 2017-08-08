@@ -238,7 +238,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                         + " does not exist or is derived, cannot create file "
                         + IntelliJFileImplV2.this);
 
-                final VirtualFile file = project.findVirtualFile(path);
+                final VirtualFile file = parentFile.findChild(getName());
 
                 if (file != null && !force)
                     throw new IOException(IntelliJFileImplV2.this

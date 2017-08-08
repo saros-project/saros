@@ -231,7 +231,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
                         + " does not exist or is derived, cannot create folder "
                         + IntelliJFolderImplV2.this);
 
-                final VirtualFile file = project.findVirtualFile(path);
+                final VirtualFile file = parentFile.findChild(getName());
 
                 /*
                  * TODO the interface needs a better spec, we do not know how to
