@@ -31,8 +31,6 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
 
     private final VirtualFile moduleRoot;
 
-    private final VirtualFile[] excludedRoots;
-
     /**
      * Creates a core compatible {@link IProject project} using the given
      * IntelliJ module.
@@ -67,7 +65,6 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
                 + " has more than one content root");
 
         moduleRoot = contentRoots[0];
-        excludedRoots = moduleRootManager.getExcludeRoots();
     }
 
     /**

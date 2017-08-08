@@ -97,14 +97,12 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
 
     @Override
     public boolean isDerived(final boolean checkAncestors) {
-        // TODO Auto-generated method stub
-        return false;
+        return isDerived();
     }
 
     @Override
     public boolean isDerived() {
-        // TODO Auto-generated method stub
-        return false;
+        return !exists();
     }
 
     @Override
