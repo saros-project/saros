@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
+import de.fu_berlin.inf.dpp.intellij.negotiation.hooks.ModuleTypeNegotiationHook;
 import de.fu_berlin.inf.dpp.intellij.preferences.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.preferences.PropertiesComponentAdapter;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
@@ -134,5 +135,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
         container.addComponent(BindKey.bindKey(String.class,
                 IContextKeyBindings.PlatformVersion.class), "4.3.2"); // todo
 
+        container.addComponent(ModuleTypeNegotiationHook.class);
     }
 }

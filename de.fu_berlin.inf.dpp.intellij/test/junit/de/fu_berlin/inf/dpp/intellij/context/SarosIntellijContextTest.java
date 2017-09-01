@@ -4,6 +4,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 
@@ -32,7 +33,8 @@ import static de.fu_berlin.inf.dpp.intellij.test.IntellijMocker.mockStaticGetIns
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ CommandProcessor.class, FileDocumentManager.class,
-    FileEditorManager.class, LocalFileSystem.class, PropertiesComponent.class })
+    FileEditorManager.class, LocalFileSystem.class, PropertiesComponent.class,
+    ModuleTypeManager.class })
 public class SarosIntellijContextTest {
 
     private MutablePicoContainer container;
@@ -48,6 +50,7 @@ public class SarosIntellijContextTest {
         mockStaticGetInstance(FileEditorManager.class, Project.class);
         mockStaticGetInstance(LocalFileSystem.class, null);
         mockStaticGetInstance(PropertiesComponent.class, null);
+        mockStaticGetInstance(ModuleTypeManager.class, null);
 
         project = EasyMock.createNiceMock(Project.class);
         EasyMock.replay(project);
