@@ -31,19 +31,23 @@ public class NotificationPanel {
     private NotificationPanel() {
     }
 
+    //TODO: Move to core
     /**
-     * Dispaly the Notification.
+     * Displays a notification of the given type.
      * <p/>
-     * TODO: Move to core
-     * TODO: Add different types of notification
+     * Possible types are {@link NotificationType#INFORMATION},
+     * {@link NotificationType#WARNING} and {@link NotificationType#ERROR}.
+     * <p/>
      *
+     * @param notificationType type of the notification
      * @param message content of the notification
-     * @param title   title of the notification.
+     * @param title   title of the notification
      */
-    public static void showNotification(String message, String title) {
+    private static void showNotification(NotificationType notificationType,
+        String message, String title) {
+
         final Notification notification = GROUP_DISPLAY_ID_INFO
-            .createNotification(title, message, NotificationType.INFORMATION,
-                null);
+            .createNotification(title, message, notificationType, null);
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -52,5 +56,35 @@ public class NotificationPanel {
         });
 
         LOG.info("Notification: " + title + ", " + message);
+    }
+
+    /**
+     * Display an information notification to the user.
+     *
+     * @param message content of the notification
+     * @param title title of the notification
+     */
+    public static void showInformation(String message, String title){
+        showNotification(NotificationType.INFORMATION, message, title);
+    }
+
+    /**
+     * Display a warning notification to the user.
+     *
+     * @param message content of the notification
+     * @param title title of the notification
+     */
+    public static void showWarning(String message, String title){
+        showNotification(NotificationType.WARNING, message, title);
+    }
+
+    /**
+     * Display an error notification to the user.
+     *
+     * @param message content of the notification
+     * @param title title of the notification
+     */
+    public static void showError(String message, String title){
+        showNotification(NotificationType.ERROR, message, title);
     }
 }

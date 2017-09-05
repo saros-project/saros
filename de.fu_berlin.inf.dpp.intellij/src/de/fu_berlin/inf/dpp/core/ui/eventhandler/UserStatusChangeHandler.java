@@ -24,7 +24,7 @@ public class UserStatusChangeHandler {
         public void permissionChanged(User user) {
 
             if (user.isLocal()) {
-                NotificationPanel.showNotification(
+                NotificationPanel.showInformation(
                     Messages.UserStatusChangeHandler_permission_changed,
                     ModelFormatUtils.format(
                         Messages.UserStatusChangeHandler_you_have_now_access,
@@ -32,7 +32,7 @@ public class UserStatusChangeHandler {
                             Messages.UserStatusChangeHandler_write :
                             Messages.UserStatusChangeHandler_read_only));
             } else {
-                NotificationPanel.showNotification(
+                NotificationPanel.showInformation(
                     Messages.UserStatusChangeHandler_permission_changed,
                     ModelFormatUtils.format(
                         Messages.UserStatusChangeHandler_he_has_now_access,
@@ -47,7 +47,7 @@ public class UserStatusChangeHandler {
         public void userJoined(User user) {
 
             NotificationPanel
-                .showNotification(Messages.UserStatusChangeHandler_user_joined,
+                .showInformation(Messages.UserStatusChangeHandler_user_joined,
                     ModelFormatUtils.format(
                         Messages.UserStatusChangeHandler_user_joined_text,
                         user));
@@ -56,7 +56,7 @@ public class UserStatusChangeHandler {
         @Override
         public void userLeft(User user) {
             NotificationPanel
-                .showNotification(Messages.UserStatusChangeHandler_user_left,
+                .showInformation(Messages.UserStatusChangeHandler_user_left,
                     ModelFormatUtils
                         .format(Messages.UserStatusChangeHandler_user_left_text,
                             user));

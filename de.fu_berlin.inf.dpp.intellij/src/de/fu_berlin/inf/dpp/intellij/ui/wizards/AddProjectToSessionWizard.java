@@ -276,7 +276,7 @@ public class AddProjectToSessionWizard extends Wizard {
                                         + negotiation.getErrorMessage());
                             } else if (status == ProjectNegotiation.Status.OK) {
                                 NotificationPanel
-                                    .showNotification("Project shared",
+                                    .showInformation("Project shared",
                                         "Project successfully shared");
                             } else
                                 DialogUtils.showError(null,
