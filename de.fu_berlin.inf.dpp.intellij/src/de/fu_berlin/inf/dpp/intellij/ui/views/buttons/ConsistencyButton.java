@@ -205,7 +205,7 @@ public class ConsistencyButton extends ToolbarButton {
                     Messages.ConsistencyAction_tooltip_inconsistency_detected,
                     files));
 
-                NotificationPanel.showInformation(
+                NotificationPanel.showWarning(
                     Messages.ConsistencyAction_title_inconsistency_detected,
                     MessageFormat.format(
                         Messages.ConsistencyAction_message_inconsistency_detected,
