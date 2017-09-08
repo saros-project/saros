@@ -242,7 +242,7 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     /**
-     * Runs {@link IncomingProjectNegotiation#run(java.util.Map, IProgressMonitor, boolean)}
+     * Runs {@link IncomingProjectNegotiation#run(java.util.Map, IProgressMonitor)}
      * as a background task through {@link #runTask(Runnable, String)}.
      * <p/>
      * On success, a success notification is displayed, on error, a dialog is shown.
