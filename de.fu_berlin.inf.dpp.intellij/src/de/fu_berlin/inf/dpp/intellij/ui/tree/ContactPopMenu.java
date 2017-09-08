@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
+import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
@@ -102,6 +103,27 @@ class ContactPopMenu extends JPopupMenu {
             List<IResource> resources;
 
             IProject proj = workspace.getProject(dir.getName());
+
+            if (proj == null) {
+                LOG.error("The IProject object for the module " + dir.getName()
+                    + " could not be created. This most likely means that the"
+                    + " local IntelliJ instance does not know any module with"
+                    + " the given name.");
+
+                SafeDialogUtils.showError("Saros could not find the chosen " +
+                    "module " + dir.getName() + ". Please make sure that the " +
+                    "module is correctly configured in the current project " +
+                    "and exists on disk.\n" +
+                    "If there seems to be no problem with the module, please " +
+                    "contact the Saros development team. You can reach us by " +
+                    "writing to our mailing list " +
+                    "(saros-devel@googlegroups.com) or by using our contact " +
+                    "form " +
+                    "(https://www.saros-project.org/contact/Website%20feedback).",
+                    "Error - Project sharing aborted!");
+
+                return;
+            }
 
             resources = Arrays.asList((IResource) proj);
 
