@@ -55,33 +55,34 @@ class ContactPopMenu extends JPopupMenu {
         }
 
         ModuleManager moduleManager = ModuleManager.getInstance(project);
-        if (moduleManager != null) {
-            for (Module module : moduleManager.getModules()) {
 
-                if (project.getName().equalsIgnoreCase(module.getName())) {
-                    continue;
-                }
+        if(moduleManager == null){
 
-                JMenuItem moduleItem = new JMenuItem(module.getName());
-                moduleItem.addActionListener(new ShareDirectoryAction(new File(
-                    module.getProject().getBasePath() + "/" + module
-                        .getName())));
+            SafeDialogUtils.showError("The local module manager could not be " +
+                "found. This most likely means that you are not using " +
+                "IntelliJ IDEA or are using an unsupported version.\n" +
+                "If you are using a supported version of IntelliJ IDEA," +
+                "please contact the Saros development team. You can reach us " +
+                "by  writing to our mailing list " +
+                "(saros-devel@googlegroups.com) or by using our contact form " +
+                "(https://www.saros-project.org/contact/Website%20feedback).",
+                "Unsupported IDE!");
 
-                menuShareProject.add(moduleItem);
+            return;
+        }
+
+        for (Module module : moduleManager.getModules()) {
+
+            if (project.getName().equalsIgnoreCase(module.getName())) {
+                continue;
             }
 
-        } else {
-            File dir = new File(project.getBasePath());
-            for (File myDir : dir.listFiles()) {
-                if (myDir.getName().startsWith(".") || myDir.isFile()) {
-                    continue;
-                }
+            JMenuItem moduleItem = new JMenuItem(module.getName());
+            moduleItem.addActionListener(new ShareDirectoryAction(new File(
+                module.getProject().getBasePath() + "/" + module
+                    .getName())));
 
-                JMenuItem directoryItem = new JMenuItem(myDir.getName());
-                directoryItem
-                    .addActionListener(new ShareDirectoryAction(myDir));
-                menuShareProject.add(directoryItem);
-            }
+            menuShareProject.add(moduleItem);
         }
 
         add(menuShareProject);
