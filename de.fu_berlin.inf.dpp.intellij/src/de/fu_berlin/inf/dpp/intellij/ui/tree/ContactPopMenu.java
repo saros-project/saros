@@ -19,7 +19,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +26,6 @@ import java.util.List;
  * Contact pop-up menu for selecting a project to share. Opened when
  * right-clicking on a contact.
  */
-//TODO this might need fixing after IntelliJProjectImpl rework, seems unfinished
 class ContactPopMenu extends JPopupMenu {
 
     private static final Logger LOG = Logger.getLogger(ContactPopMenu.class);
@@ -72,15 +70,15 @@ class ContactPopMenu extends JPopupMenu {
         }
 
         for (Module module : moduleManager.getModules()) {
+            String moduleName = module.getName();
 
-            if (project.getName().equalsIgnoreCase(module.getName())) {
+            if (project.getName().equalsIgnoreCase(moduleName)) {
                 continue;
             }
 
-            JMenuItem moduleItem = new JMenuItem(module.getName());
-            moduleItem.addActionListener(new ShareDirectoryAction(new File(
-                module.getProject().getBasePath() + "/" + module
-                    .getName())));
+            JMenuItem moduleItem = new JMenuItem(moduleName);
+            moduleItem.addActionListener(
+                new ShareDirectoryAction(moduleName));
 
             menuShareProject.add(moduleItem);
         }
@@ -92,10 +90,10 @@ class ContactPopMenu extends JPopupMenu {
      * Action that is executed, when a project is selected for sharing.
      */
     private class ShareDirectoryAction implements ActionListener {
-        private final File dir;
+        private final String moduleName;
 
-        private ShareDirectoryAction(File dir) {
-            this.dir = dir;
+        private ShareDirectoryAction(String moduleName) {
+            this.moduleName = moduleName;
         }
 
         @Override
@@ -103,16 +101,16 @@ class ContactPopMenu extends JPopupMenu {
 
             List<IResource> resources;
 
-            IProject proj = workspace.getProject(dir.getName());
+            IProject module = workspace.getProject(moduleName);
 
-            if (proj == null) {
-                LOG.error("The IProject object for the module " + dir.getName()
+            if (module == null) {
+                LOG.error("The IProject object for the module " + moduleName
                     + " could not be created. This most likely means that the"
                     + " local IntelliJ instance does not know any module with"
                     + " the given name.");
 
                 SafeDialogUtils.showError("Saros could not find the chosen " +
-                    "module " + dir.getName() + ". Please make sure that the " +
+                    "module " + moduleName + ". Please make sure that the " +
                     "module is correctly configured in the current project " +
                     "and exists on disk.\n" +
                     "If there seems to be no problem with the module, please " +
@@ -126,7 +124,7 @@ class ContactPopMenu extends JPopupMenu {
                 return;
             }
 
-            resources = Arrays.asList((IResource) proj);
+            resources = Arrays.asList((IResource) module);
 
             JID user = new JID(contactInfo.getRosterEntry().getUser());
             List<JID> contacts = Arrays.asList(user);
