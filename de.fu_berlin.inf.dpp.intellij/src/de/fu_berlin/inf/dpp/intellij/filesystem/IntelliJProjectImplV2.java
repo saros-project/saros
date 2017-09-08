@@ -1,12 +1,16 @@
 package de.fu_berlin.inf.dpp.intellij.filesystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
 
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,6 +27,9 @@ import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 
 public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     implements IProject {
+
+    private static final Logger LOG = Logger
+        .getLogger(IntelliJProjectImplV2.class);
 
     // Module names are unique (even among different projects)
     private final String moduleName;
@@ -170,6 +177,44 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
         return IntelliJPathImpl.EMPTY;
     }
 
+    /**
+     * Returns the path to the given file relative to the content root of this
+     * module.
+     * <p>
+     * <b>Note:</b> This methods expects that the given <code>VirtualFile</code>
+     * exists.
+     * </p>
+     *
+     *
+     * @param file the <code>VirtualFile</code> to get the relative path for
+     *
+     * @return a relative path for the given file or <code>null</code> if the
+     *         file does not belong to this module or there is no
+     *         relative path from the content root to the file
+     */
+    @Nullable
+    private IPath getProjectRelativePath(@NotNull VirtualFile file){
+        Module fileModule = ProjectFileIndexFacade
+            .getInstance(module.getProject()).getModuleForFile(file);
+
+        if(fileModule == null || !moduleName.equals(fileModule.getName())){
+            return null;
+        }
+
+        try {
+            Path relativePath = Paths.get(moduleRoot.getPath())
+                .relativize(Paths.get(file.getPath()));
+
+            return IntelliJPathImpl.fromString(relativePath.toString());
+
+        } catch (IllegalArgumentException e) {
+            LOG.warn("Could not find a relative path from the content root " +
+                moduleRoot + " to the file " + file, e);
+
+            return null;
+        }
+    }
+
     @Override
     public int getType() {
         return IResource.PROJECT;
@@ -231,6 +276,29 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
         return new IntelliJFileImplV2(this, path);
     }
 
+    /**
+     * Returns an <code>IFile</code> for the given file.
+     *
+     * @param file the <code>VirtualFile</code> to get the <code>IFile</code>
+     *             for
+     *
+     * @return an <code>IFile</code> for the given file or <code>null</code> if
+     *         the given file is a directory, does not exist, or the relative
+     *         path of the file could not be constructed
+     */
+    @Nullable
+    public IFile getFile(@NotNull final VirtualFile file){
+        if(file.isDirectory() || !file.exists()){
+            return null;
+        }
+
+        IPath relativePath = getProjectRelativePath(file);
+
+        return relativePath != null ?
+            new IntelliJFileImplV2(this, relativePath) :
+            null;
+    }
+
     @NotNull
     @Override
     public IFolder getFolder(final String name) {
@@ -246,6 +314,29 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
                 "cannot create folder handle for an empty path");
 
         return new IntelliJFolderImplV2(this, path);
+    }
+
+    /**
+     * Returns an <code>IFolder</code> for the given file.
+     *
+     * @param file the <code>VirtualFile</code> to get the <code>IFolder</code>
+     *             for
+     *
+     * @return an <code>IFolder</code> for the given file or <code>null</code>
+     *         if the given file is not a directory, does not exist, or the
+     *         relative path of the file could not be constructed
+     */
+    @Nullable
+    public IFolder getFolder(@NotNull final VirtualFile file){
+        if(!file.isDirectory() || !file.exists()){
+            return null;
+        }
+
+        IPath relativePath = getProjectRelativePath(file);
+
+        return relativePath != null ?
+            new IntelliJFolderImplV2(this, relativePath) :
+            null;
     }
 
     /**
