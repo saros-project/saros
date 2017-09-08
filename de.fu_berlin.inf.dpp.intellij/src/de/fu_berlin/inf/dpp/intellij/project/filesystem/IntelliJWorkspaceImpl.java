@@ -1,15 +1,22 @@
 package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
+
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
+import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.project.FileSystemChangeListener;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
+
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -41,8 +48,16 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
     }
 
     @Override
-    public IProject getProject(String projectName) {
-        return new IntelliJProjectImpl(project, projectName);
+    public IProject getProject(final String moduleName) {
+        Module module = Filesystem.runReadAction(new Computable<Module>(){
+            @Override
+            public Module compute(){
+                return ModuleManager.getInstance(project)
+                    .findModuleByName(moduleName);
+            }
+        });
+
+        return module != null ? new IntelliJProjectImplV2(module) : null;
     }
 
     @Override
