@@ -1,19 +1,22 @@
 package de.fu_berlin.inf.dpp.core.ui.util;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFolderImpl;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -360,20 +363,40 @@ public class CollaborationUtils {
             List<IResource> additionalFilesForPartialSharing = new ArrayList<IResource>();
 
             /*
+             * TODO should be adjusted after partial sharing is implemented
+             *
              * we need the .iml file, otherwise the project type will not be set
              * correctly on the other side
              */
-            IFolder projectFolder = new IntelliJFolderImpl(
-                (IntelliJProjectImpl) project, project.getFullPath().toFile());
-            try {
-                for (IResource pFile : projectFolder.members(IResource.FILE)) {
-                    String sFileName = pFile.getName().toLowerCase();
-                    if (sFileName.endsWith(".iml")) {
-                        additionalFilesForPartialSharing.add(pFile);
-                    }
+            IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
+                project.getAdapter(IntelliJProjectImplV2.class);
+
+            Module module = intelliJProject.getModule();
+            VirtualFile moduleFile = module.getModuleFile();
+
+            if (moduleFile == null || !moduleFile.exists()) {
+                LOG.error("The module file for the module " + module +
+                    " does not exist or could not be found");
+
+                NotificationPanel.showWarning(
+                    "The module file for the shared module " + module +
+                    " could not be found. This could lead to the session not" +
+                    " working as expected.", "Module file not found!");
+            } else {
+                IFile moduleFileResource = intelliJProject.getFile(moduleFile);
+
+                if (moduleFileResource != null) {
+                    additionalFilesForPartialSharing.add(moduleFileResource);
+                } else {
+                    LOG.error("The module file " + moduleFile +
+                        " could not be converted to an IFile.");
+
+                    NotificationPanel.showWarning(
+                        "There was an error handling the  module file for" +
+                        " the shared module " + module + ". This could lead" +
+                        " to the session not working as expected.",
+                        "Error handling module file!");
                 }
-            } catch (IOException e) {
-                LOG.warn("could not open .iml file in " + projectFolder, e);
             }
 
             resources.addAll(additionalFilesForPartialSharing);
