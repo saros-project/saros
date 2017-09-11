@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
 import org.apache.log4j.Logger;
 
@@ -49,26 +50,47 @@ public class LocalEditorManipulator {
     }
 
     /**
-     * Opens an editor for the given path, if it exists.
+     * Opens an editor for the passed virtualFile, adds it to the pool of
+     * currently open editors and calls
+     * {@link EditorManager#startEditor(Editor)} with it.
+     * <p>
+     * <b>Note:</b> This does only work for shared resources.
      *
      * @param path path of the file to open
      * @param activate activate editor after opening
      * @return the editor for the given path,
-     * or <code>null</code> if the file does not exist
+     * or <code>null</code> if the file does not exist or is not shared
      */
     public Editor openEditor(SPath path, boolean activate) {
+        if (!manager.getSession().isShared(path.getResource())) {
+            LOG.warn("Ignored open editor request for path " + path +
+                " as it is not shared");
 
-        VirtualFile virtualFile = ResourceConverter.toVirtualFile(path);
-        if (virtualFile.exists()) {
-            //todo: in case it is already open, need to activate only, not open
-            Editor editor = projectAPI.openEditor(virtualFile,activate);
-            manager.startEditor(editor);
-            editorPool.add(path, editor);
-            return editor;
-        } else {
-            LOG.warn("File not exist " + path);
+            return null;
         }
-        return null;
+
+        IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
+            path.getProject().getAdapter(IntelliJProjectImplV2.class);
+
+        VirtualFile virtualFile = intelliJProject
+            .findVirtualFile(path.getProjectRelativePath());
+
+        if (virtualFile == null || !virtualFile.exists()) {
+            LOG.warn("Could not open Editor for path " + path + " as a " +
+                "matching VirtualFile does not exist or could not be found");
+
+            return null;
+        }
+
+        //todo: in case it is already open, need to activate only, not open
+        Editor editor = projectAPI.openEditor(virtualFile, activate);
+
+        manager.startEditor(editor);
+        editorPool.add(path, editor);
+
+        LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
+
+        return editor;
     }
 
     /**
