@@ -57,18 +57,40 @@ public class LocalEditorHandler {
      * Opens an editor for the passed virtualFile, adds it to the pool of
      * currently open editors and calls
      * {@link EditorManager#startEditor(Editor)} with it.
+     * <p>
+     * <b>Note:</b> This does only work for shared resources.
      *
      * @param virtualFile path of the file to open
      * @param activate activate editor after opening
      */
     public void openEditor(VirtualFile virtualFile, boolean activate) {
         SPath path = toPath(virtualFile);
-        if (path == null)
+
+        if (path == null) {
+            LOG.debug("Ignored open editor request for file " + virtualFile +
+                " as it does not belong to a shared module");
+
             return;
 
+        } else if(!virtualFile.exists()){
+            LOG.warn("Could not open Editor for file " + virtualFile +
+                " as it does not exist");
+
+            return;
+
+        }else if (!manager.getSession().isShared(path.getResource())) {
+            LOG.debug("Ignored open editor request for file " + virtualFile +
+                " as it is not shared");
+
+            return;
+        }
+
         Editor editor = projectAPI.openEditor(virtualFile, activate);
+
         editorPool.add(path, editor);
         manager.startEditor(editor);
+
+        LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
     }
 
     /**
