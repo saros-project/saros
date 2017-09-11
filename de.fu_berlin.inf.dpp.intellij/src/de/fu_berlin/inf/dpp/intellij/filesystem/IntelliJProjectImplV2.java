@@ -371,7 +371,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
      *         given path is absolute.
      */
     @Nullable
-    VirtualFile findVirtualFile(final IPath path) {
+    public VirtualFile findVirtualFile(final IPath path) {
 
         if (path.isAbsolute())
             return null;
