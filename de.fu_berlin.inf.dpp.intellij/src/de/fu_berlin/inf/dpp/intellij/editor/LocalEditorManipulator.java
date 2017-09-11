@@ -145,12 +145,37 @@ public class LocalEditorManipulator {
     public void applyTextOperations(SPath path, Operation operations,
         Color color) {
         Document doc = editorPool.getDocument(path);
-        //If the document was not opened in an editor yet, it is not in the editorPool
-        //so we have to create it temporarily here.
+
+        /*
+         * If the document was not opened in an editor yet, it is not in the
+         * editorPool so we have to create it temporarily here.
+         */
         if (doc == null) {
-            VirtualFile virtualFile = ResourceConverter.toVirtualFile(path);
+            IntelliJProjectImplV2 module = (IntelliJProjectImplV2)
+                path.getProject().getAdapter(IntelliJProjectImplV2.class);
+
+            VirtualFile virtualFile = module
+                .findVirtualFile(path.getProjectRelativePath());
+
+            if (virtualFile == null || !virtualFile.exists()) {
+                LOG.warn("Could not apply TextOperations " + operations
+                    + " as the VirtualFile for path " + path
+                    + " does not exist or could not be found");
+
+                return;
+            }
+
             doc = projectAPI.getDocument(virtualFile);
+
+            if (doc == null) {
+                LOG.warn("Could not apply TextOperations " + operations
+                    + " as the Document for VirtualFile " + virtualFile
+                    + " could not be found");
+
+                return;
+            }
         }
+
          /*
          * Disable documentListener temporarily to avoid being notified of the
          * change
