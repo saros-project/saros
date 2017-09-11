@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.intellij.editor;
 
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -9,57 +7,27 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ui.UIUtil;
 
-import java.util.concurrent.atomic.AtomicReference;
+import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 
 /**
  * IntellIJ API for project-level operations on editors and documents.
  */
 public class ProjectAPI {
-
-    private Application application;
     private FileDocumentManager fileDocumentManager;
 
     private Project project;
     private FileEditorManager editorFileManager;
-
-
-    private class WriteAction implements Runnable {
-        Runnable action;
-
-        WriteAction(Runnable action) {
-            this.action = action;
-        }
-
-        @Override
-        public void run() {
-            application.runWriteAction(action);
-        }
-    }
-
-    private class ReadAction implements Runnable {
-        Runnable action;
-
-        ReadAction(Runnable action) {
-            this.action = action;
-        }
-
-        @Override
-        public void run() {
-            application.runReadAction(action);
-        }
-    }
 
     /**
      * Creates an ProjectAPI with the current Project and initializes Fields.
      */
     public ProjectAPI(Project project) {
         this.project = project;
-        this.editorFileManager = FileEditorManager.getInstance(project);
 
-        this.application = ApplicationManager.getApplication();
+        this.editorFileManager = FileEditorManager.getInstance(project);
         this.fileDocumentManager = FileDocumentManager.getInstance();
     }
 
@@ -92,17 +60,15 @@ public class ProjectAPI {
      * @return Editor managing the passed file
      */
     public Editor openEditor(final VirtualFile path, final boolean activate){
-        final AtomicReference<Editor> result = new AtomicReference<>();
+        return Filesystem.runReadAction(new Computable<Editor>() {
 
-        UIUtil.invokeAndWaitIfNeeded(new ReadAction(new Runnable() {
             @Override
-            public void run() {
-                result.set(editorFileManager.openTextEditor(
-                    new OpenFileDescriptor(project,path), activate));
+            public Editor compute() {
+                return editorFileManager
+                    .openTextEditor(new OpenFileDescriptor(project, path),
+                        activate);
             }
-        }));
-
-        return result.get();
+        });
     }
 
     /**
@@ -122,14 +88,13 @@ public class ProjectAPI {
      */
     public void closeEditor(final VirtualFile file) {
 
-        Runnable action = new Runnable() {
+        Filesystem.runReadAction(new Runnable() {
+
             @Override
             public void run() {
                 editorFileManager.closeFile(file);
             }
-        };
-
-        UIUtil.invokeAndWaitIfNeeded(action);
+        });
     }
 
     public void closeEditor(Document doc) {
@@ -168,13 +133,13 @@ public class ProjectAPI {
      * @param doc
      */
     public void saveDocument(final Document doc) {
-        application.invokeAndWait(new WriteAction(new Runnable() {
+        Filesystem.runWriteAction(new Runnable() {
+
             @Override
             public void run() {
                 fileDocumentManager.saveDocument(doc);
             }
-        }), ModalityState.NON_MODAL);
-
+        }, ModalityState.NON_MODAL);
     }
 
     /**
@@ -183,26 +148,26 @@ public class ProjectAPI {
      * @param doc
      */
     public void reloadFromDisk(final Document doc) {
-        application.invokeAndWait(new ReadAction(new Runnable() {
+        Filesystem.runReadAction(new Runnable() {
+
             @Override
             public void run() {
                 fileDocumentManager.reloadFromDisk(doc);
             }
-        }), ModalityState.NON_MODAL);
+        });
     }
 
     /**
      * Saves all documents in the UI thread.
      */
     public void saveAllDocuments() {
+        Filesystem.runWriteAction(new Runnable() {
 
-        application.invokeAndWait(new WriteAction(new Runnable() {
             @Override
             public void run() {
                 fileDocumentManager.saveAllDocuments();
             }
-        }), ModalityState.NON_MODAL);
-
+        }, ModalityState.NON_MODAL);
     }
 
     public void addFileEditorManagerListener(
