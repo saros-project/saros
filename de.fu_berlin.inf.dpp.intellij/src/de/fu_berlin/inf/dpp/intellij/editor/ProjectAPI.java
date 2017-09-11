@@ -11,6 +11,8 @@ import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * IntellIJ API for project-level operations on editors and documents.
@@ -72,13 +74,28 @@ public class ProjectAPI {
     }
 
     /**
-     * Creates the given document.
+     * Returns a document for the given file.
      *
-     * @param path
-     * @return
+     * @param file the <code>VirtualFile</code> for which the document is
+     *             requested
+     *
+     * @return a <code>Document</code> for the given file or <code>null</code>
+     *         if the file does not exist, could not be read, is a directory,
+     *         or is to large
      */
-    public Document createDocument(VirtualFile path) {
-        return fileDocumentManager.getDocument(path);
+    @Nullable
+    public Document getDocument(@NotNull final VirtualFile file) {
+        if (!file.exists()) {
+            return null;
+        }
+
+        return Filesystem.runReadAction(new Computable<Document>() {
+
+            @Override
+            public Document compute() {
+                return fileDocumentManager.getDocument(file);
+            }
+        });
     }
 
     /**

@@ -127,7 +127,7 @@ public class LocalEditorManipulator {
         //so we have to create it temporarily here.
         if (doc == null) {
             VirtualFile virtualFile = ResourceConverter.toVirtualFile(path);
-            doc = projectAPI.createDocument(virtualFile);
+            doc = projectAPI.getDocument(virtualFile);
         }
          /*
          * Disable documentListener temporarily to avoid being notified of the
