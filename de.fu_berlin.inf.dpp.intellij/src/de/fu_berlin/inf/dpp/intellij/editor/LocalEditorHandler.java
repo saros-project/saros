@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 
 import org.apache.log4j.Logger;
 
@@ -143,15 +144,18 @@ public class LocalEditorHandler {
         }
 
         IResource resource = null;
-        String path = virtualFile.getPath();
 
-        //TODO: Replace manager.getSession() call by call to Project API
         for (IProject project : manager.getSession().getProjects()) {
-            resource = project.getFile(path);
-            if (resource != null) {
+            IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
+                project.getAdapter(IntelliJProjectImplV2.class);
+
+            resource = intelliJProject.getResource(virtualFile);
+
+            if(resource != null){
                 break;
             }
         }
+
         return resource == null ? null : new SPath(resource);
     }
 }
