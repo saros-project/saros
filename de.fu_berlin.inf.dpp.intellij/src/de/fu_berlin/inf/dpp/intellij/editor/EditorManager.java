@@ -28,7 +28,6 @@ import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
@@ -288,20 +287,17 @@ public class EditorManager extends AbstractActivityProducer
     };
 
     /**
-     * Adds all currently open editors belonging to the passed project to the pool of open
-     * editors.
+     * Adds all currently open editors belonging to the passed project to the
+     * pool of open editors.
      *
      * @param project the added project
      */
     private void addProjectResources(IProject project) {
         VirtualFile[] openFiles = projectAPI.getOpenFiles();
         VirtualFile[] activeFiles = projectAPI.getSelectedFiles();
+
         for(VirtualFile openFile: openFiles){
-            IResource resource = project.getFile(openFile.getPath());
-            if(resource.exists() && session.isShared(resource)){
-                localEditorHandler.openEditor(openFile,false);
-                LOG.debug("editor for " + openFile + " opened");
-            }
+            localEditorHandler.openEditor(openFile, project,false);
         }
 
         //TODO consider duplicated open editors during screen splitting
