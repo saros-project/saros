@@ -307,7 +307,7 @@ public class EditorManager extends AbstractActivityProducer
         //TODO consider duplicated open editors during screen splitting
         //activate editors that were last selected before session start
         for(int i = activeFiles.length-1; i >= 0; i--) {
-            localEditorHandler.openEditor(activeFiles[i],true);
+            projectAPI.openEditor(activeFiles[i],true);
         }
 
     }
