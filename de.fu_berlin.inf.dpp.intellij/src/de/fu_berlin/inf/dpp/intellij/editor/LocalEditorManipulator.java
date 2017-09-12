@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
 import org.apache.log4j.Logger;
 
 import java.awt.Color;
@@ -99,16 +98,28 @@ public class LocalEditorManipulator {
      * @param path
      */
     public void closeEditor(SPath path) {
-        VirtualFile virtualFile = ResourceConverter.toVirtualFile(path);
-        if (virtualFile != null && virtualFile.exists()) {
-            if (projectAPI.isOpen(virtualFile)) {
-                projectAPI.closeEditor(virtualFile);
-            }
-            editorPool.removeEditor(path);
+        editorPool.removeEditor(path);
 
-        } else {
-            LOG.warn("File not exist " + path);
+        LOG.debug("Removed editor for path " + path + " from EditorPool");
+
+        IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
+            path.getProject().getAdapter(IntelliJProjectImplV2.class);
+
+        VirtualFile virtualFile = intelliJProject
+            .findVirtualFile(path.getProjectRelativePath());
+
+        if (virtualFile == null || !virtualFile.exists()) {
+            LOG.warn("Could not close Editor for path " + path + " as a " +
+                "matching VirtualFile does not exist or could not be found");
+
+            return;
         }
+
+        if (projectAPI.isOpen(virtualFile)) {
+            projectAPI.closeEditor(virtualFile);
+        }
+
+        LOG.debug("Closed editor for file " + virtualFile);
     }
 
     /**
