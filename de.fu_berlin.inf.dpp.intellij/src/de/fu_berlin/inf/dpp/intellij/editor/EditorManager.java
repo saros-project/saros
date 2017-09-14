@@ -25,12 +25,10 @@ import de.fu_berlin.inf.dpp.editor.remote.EditorState;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -457,15 +455,24 @@ public class EditorManager extends AbstractActivityProducer
 
                 @Override
                 public String compute() {
-                    IFile file = path.getFile();
+                    IntelliJProjectImplV2 module = (IntelliJProjectImplV2) path
+                        .getProject().getAdapter(IntelliJProjectImplV2.class);
 
-                    if (!file.exists()) {
+                    VirtualFile virtualFile = module
+                        .findVirtualFile(path.getProjectRelativePath());
+
+                    if (virtualFile == null || !virtualFile.exists() ||
+                        virtualFile.isDirectory()) {
+
+                        LOG.warn("Could not retrieve content of " + path +
+                            " as a matching VirtualFile could not be found," +
+                            " does not exist, or is a directory");
+
                         return null;
                     }
 
-                    IPath fullPath = file.getLocation();
-                    Document doc = ResourceConverter
-                        .getDocument(fullPath.toFile());
+                    Document doc = projectAPI.getDocument(virtualFile);
+
                     return (doc != null) ? doc.getText() : null;
                 }
             });
