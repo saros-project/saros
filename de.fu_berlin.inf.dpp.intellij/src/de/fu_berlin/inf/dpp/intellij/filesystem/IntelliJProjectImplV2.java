@@ -6,6 +6,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 
+import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
@@ -82,6 +85,47 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     @NotNull
     public Module getModule() {
         return module;
+    }
+
+    /**
+     * This method can be used to refresh the held <code>Module</code> object in
+     * case the module was reloaded.
+     * <p>
+     * <b>Note:</b> This method should only be needed in special cases as we can
+     * not guarantee a graceful handling of a disposed module object.
+     * Any classes or methods still holding a reference to the old module object
+     * could lead to a failure of the related logic as operations on disposed
+     * modules will result in an exception.
+     * </p>
+     *
+     * @return <code>true</code> if the held <code>Module</code> has the status
+     *         disposed and is replaced with a new <code>Module</code> object
+     *         with the same name, <code>false</code> otherwise
+     *
+     * @throws ModuleNotFoundException if the old <code>Module</code> object is
+     *                                 disposed but no new module with the same
+     *                                 name could be found
+     */
+    public boolean refreshModule() throws ModuleNotFoundException{
+        if (module.isDisposed()) {
+            Project project = module.getProject();
+
+            Module newModule = ModuleManager.getInstance(project)
+                .findModuleByName(moduleName);
+
+            if (newModule == null) {
+
+                throw new ModuleNotFoundException("The module " + moduleName +
+                    " could not be refreshed as no module with the same" +
+                    " name could be found in the current project " + project);
+            }
+
+            module = newModule;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
