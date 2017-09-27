@@ -36,7 +36,8 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
      * negotiation and have to be reloaded after the correct module file was
      * transferred by the host.
      *
-     * Used in AddProjectToSessionWizard#createModuleStub(String)
+     * Used in AddProjectToSessionWizard#createModuleStub(String) and
+     * ModuleInitialization.ModuleReloader#run()
      */
     public static final String RELOAD_STUB_MODULE_TYPE =
         "SAROS_RELOAD_STUB_MODULE";

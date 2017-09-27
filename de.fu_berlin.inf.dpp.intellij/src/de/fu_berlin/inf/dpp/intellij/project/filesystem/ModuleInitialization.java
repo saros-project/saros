@@ -1,12 +1,17 @@
 package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.vfs.VirtualFile;
+import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
@@ -14,87 +19,142 @@ import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.picocontainer.Startable;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
- * ModuleInitialization ensures that all shared modules are registered in the project structure.
+ * This class is instantiated by the PicoContainer as part of the session
+ * context.
+ * <p>
+ * It ensures that modules which were transferred as part of the
+ * project negotiation are correctly registered with the local IntelliJ
+ * instance by reloading them with the transferred module file.
+ * <p>
+ * This reload is needed as transferred modules are first created as an empty
+ * module stub during the project negotiation. This creates an initial module
+ * file which is overwritten by the real module file of the transferred module.
+ * As IntelliJ can not handle external change to module files without reloading
+ * the entire project (which would reset the current session), the module is
+ * disposed and then reloaded instead.
+ *
+ * @see ModuleReloader
+ * @see AddProjectToSessionWizard#createModuleStub(String)
  */
 public class ModuleInitialization implements Startable {
 
-    private static final Logger LOG = Logger.getLogger(ModuleInitialization.class);
+    private static final Logger LOG = Logger.getLogger(
+        ModuleInitialization.class);
 
     private final ISarosSession session;
-    private final Project project;
 
-    private final ISessionListener moduleLoaderListener = new AbstractSessionListener() {
+    private final ISessionListener moduleReloaderListener = new AbstractSessionListener() {
 
-        /**
-         * This method ensures that the transmitted content is shown as a module by loading the .iml file of the
-         * transmitted module into the modules.xml file of the project.
-         *
-         * @param module the module to be added
-         * @throws IllegalArgumentException if a module with the passed projectID could not be found
-         */
         @Override
         public void resourcesAdded(IProject module) {
-            final ModuleLoader moduleLoader = new ModuleLoader(module);
+            final ModuleReloader moduleReloader = new ModuleReloader(module);
 
             //Registers a ModuleLoader with the AWT event dispatching thread to be executed asynchronously.
             ApplicationManager.getApplication().invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    ApplicationManager.getApplication().runWriteAction(moduleLoader);
+                    ApplicationManager.getApplication().runWriteAction(
+                        moduleReloader);
                 }
             });
         }
     };
 
-    public ModuleInitialization(ISarosSession session, Project project) {
+    public ModuleInitialization(ISarosSession session) {
         this.session = session;
-        this.project = project;
     }
 
     @Override
     public void start() {
-        session.addListener(moduleLoaderListener);
+        session.addListener(moduleReloaderListener);
     }
 
     @Override
     public void stop() {
-        session.removeListener(moduleLoaderListener);
+        session.removeListener(moduleReloaderListener);
     }
 
     /**
-     * Runnable loading the .iml file of the added module using the method {@link ModuleManager#loadModule}.
-     * This adds the module to the project structure.
+     * Runnable disposing and then reloading the added module using the
+     * transferred module file. To ensure that the transferred module file is
+     * used, the <code>VirtualFile</code> representing it is refreshed
+     * synchronously.
+     * <p>
+     * After the module is reloaded,
+     * {@link IntelliJProjectImplV2#refreshModule()}
+     * is called to replace the old <code>Module</code> object held by the given
+     * <code>IProject</code>. This is needed as calls on disposed modules result
+     * in an exception and the <code>IProject</code> object is at this point
+     * already held by other classes.
+     *
+     * @see IntelliJProjectImplV2#refreshModule()
      */
-    private class ModuleLoader implements Runnable {
-        private IProject module;
+    private class ModuleReloader implements Runnable {
+        private IntelliJProjectImplV2 project;
 
-        public ModuleLoader(IProject module) {
-            this.module = module;
+        public ModuleReloader(IProject project) {
+            this.project = (IntelliJProjectImplV2) project
+                .getAdapter(IntelliJProjectImplV2.class);
         }
 
         @Override
         public void run() {
-            final String moduleName = module.getName();
-            final String filePath = module.getProjectRelativePath().toString() + File.separator + moduleName + ".iml";
-            final ModuleManager moduleManager = ModuleManager.getInstance(ModuleInitialization.this.project);
+            Module module = project.getModule();
 
-            if (moduleManager.findModuleByName(moduleName) != null) {
-                LOG.debug("ModuleInitialization aborted: module \"" + moduleName + "\" already present");
-                return;
-            }
+            if (IntelliJProjectImplV2.RELOAD_STUB_MODULE_TYPE
+                .equals(ModuleType.get(module).getId())) {
 
-            try {
-                Module addedModule = moduleManager.loadModule(filePath);
-                LOG.info("ModuleInitialization successful: module \"" + addedModule.getName()
-                    + "\" added to local project structure");
-            } catch (InvalidDataException | IOException | JDOMException e) {
-                LOG.error("Failed to load module data for module " + moduleName + " from file " + filePath, e);
-            } catch (ModuleWithNameAlreadyExists e) {
-                LOG.error("Module already exists: ", e);
+                String moduleName = module.getName();
+                String moduleFilePath = module.getModuleFilePath();
+
+                VirtualFile moduleFile = module.getModuleFile();
+
+                if (moduleFile == null) {
+                    LOG.error("Failed to load module data for module " +
+                        moduleName + " from file " + moduleFilePath);
+
+                    return;
+                }
+
+                moduleFile.refresh(false, false);
+
+                ModuleManager moduleManager = ModuleManager
+                    .getInstance(module.getProject());
+
+                ModifiableModuleModel modifiableModuleModel = moduleManager
+                    .getModifiableModel();
+
+                modifiableModuleModel.disposeModule(module);
+
+                try {
+                    modifiableModuleModel.loadModule(moduleFilePath);
+
+                    LOG.info("ModuleInitialization successful: module \"" +
+                        moduleName + "\" added to local project structure");
+
+                } catch (InvalidDataException | IOException | JDOMException e) {
+                    LOG.error("Failed to load module data for module " +
+                        moduleName + " from file " + moduleFilePath, e);
+
+                } catch (ModuleWithNameAlreadyExists e) {
+                    LOG.error("Module already exists: ", e);
+                }
+
+                modifiableModuleModel.commit();
+
+                try {
+                    if (!project.refreshModule()) {
+                        LOG.error("Failed to refresh the module object for " +
+                            project + " as it it not disposed.");
+                    }
+                } catch (ModuleNotFoundException e){
+                    LOG.error("Failed to refresh the module object for " +
+                        project, e);
+                }
+                //TODO clean up excluded module roots
             }
         }
     }
