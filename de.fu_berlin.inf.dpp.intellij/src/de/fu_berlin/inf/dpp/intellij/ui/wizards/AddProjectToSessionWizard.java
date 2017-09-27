@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
 
 import com.intellij.openapi.progress.PerformInBackgroundOption;
@@ -127,17 +128,34 @@ public class AddProjectToSessionWizard extends Wizard {
 
         @Override
         public void cancel() {
-            ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                @Override
-                public void run() {
-                    negotiation.localCancel("Not accepted",
-                        NegotiationTools.CancelOption.NOTIFY_PEER);
-                }
-
-            });
-            close();
+            cancelNegotiation("Not accepted");
         }
+
     };
+
+    /**
+     * Cancels the project negotiation, notifies the host using the given
+     * reason, and closes the wizard.
+     * <p>
+     * <b>Note:</b> This is an asynchronous action. It is not guaranteed
+     * that the negotiation is canceled when this method returns.
+     * </p>
+     *
+     * @param reason description why the negotiation was canceled
+     */
+    private void cancelNegotiation(@NotNull final String reason) {
+        ThreadUtils.runSafeAsync(LOG, new Runnable() {
+
+            @Override
+            public void run() {
+                negotiation.localCancel(reason,
+                    NegotiationTools.CancelOption.NOTIFY_PEER);
+            }
+
+        });
+
+        close();
+    }
 
     private final PageActionListener fileListPageListener = new PageActionListener() {
         @Override
@@ -152,15 +170,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
         @Override
         public void cancel() {
-            ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                @Override
-                public void run() {
-                    negotiation.localCancel("Not accepted",
-                        NegotiationTools.CancelOption.NOTIFY_PEER);
-                }
-
-            });
-            close();
+            cancelNegotiation("Not accepted");
         }
     };
 
