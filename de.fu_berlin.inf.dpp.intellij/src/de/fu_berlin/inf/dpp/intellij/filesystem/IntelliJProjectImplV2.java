@@ -31,6 +31,16 @@ import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     implements IProject {
 
+    /*
+     * Used to identify module stubs that were created during the project
+     * negotiation and have to be reloaded after the correct module file was
+     * transferred by the host.
+     *
+     * Used in AddProjectToSessionWizard#createModuleStub(String)
+     */
+    public static final String RELOAD_STUB_MODULE_TYPE =
+        "SAROS_RELOAD_STUB_MODULE";
+
     private static final Logger LOG = Logger
         .getLogger(IntelliJProjectImplV2.class);
 

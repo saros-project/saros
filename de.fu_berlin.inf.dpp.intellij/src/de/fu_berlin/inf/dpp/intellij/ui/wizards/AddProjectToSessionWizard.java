@@ -1,7 +1,10 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
 import java.awt.Window;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,19 +13,30 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
 
+import com.intellij.ide.highlighter.ModuleFileType;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.module.ModifiableModuleModel;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.util.ThrowableComputable;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.UIUtil;
 
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
+import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgessMonitorAdapter;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.HeaderPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.PageActionListener;
@@ -110,19 +124,70 @@ public class AddProjectToSessionWizard extends Wizard {
             //FIXME: Only projects with the same name are supported,
             //because the project name is connected to the name of the .iml file
             //and it is unclear how that resolves.
-            final String newProjectName = selectProjectPage
-                .getLocalProjectName();
-            IProject project = workspace.getProject(newProjectName);
+            final String moduleName = selectProjectPage.getLocalProjectName();
 
-            localProjects.put(remoteProjectID, project);
+            if (selectProjectPage.isNewProjectSelected()) {
+                Module module;
 
-            if (localProjects.isEmpty()) {
-                return;
-            }
-            if (!selectProjectPage.isNewProjectSelected()) {
-                prepareFilesChangedPage(localProjects);
-            } else {
+                try {
+                    module = createModuleStub(moduleName);
+
+                } catch (IOException e) {
+                    LOG.error("Could not create the shared module " + moduleName
+                        + ".", e);
+
+                    cancelNegotiation("Failed to create shared module");
+
+                    SafeDialogUtils.showError("The module " + moduleName +
+                        " could not be created. The project negotiation " +
+                        "was aborted.\n" +
+                        "To get help with this problem, please contact the " +
+                        "Saros development team. You can reach us by writing " +
+                        "to our mailing list " +
+                        "(saros-devel@googlegroups.com) or by using our " +
+                        "contact form " +
+                        "(https://www.saros-project.org/contact/Website%20feedback).",
+                        "Negotiation aborted!");
+
+                    return;
+                }
+
+                IProject sharedProject = new IntelliJProjectImplV2(module);
+
+                localProjects.put(remoteProjectID, sharedProject);
+
                 triggerProjectNegotiation();
+
+            } else {
+                IProject sharedProject = workspace.getProject(moduleName);
+
+                if (sharedProject == null) {
+                    LOG.error("Could not find the shared module " + moduleName +
+                        ".");
+
+                    cancelNegotiation("Could not find chosen local " +
+                        "representation of shared module");
+
+                    SafeDialogUtils.showError("The chosen module " +
+                        moduleName + " could not be found. The project " +
+                        "negotiation was aborted.\n" +
+                        "Please make sure that the module is correctly " +
+                        "configured in the current project and exists on " +
+                        "disk.\n" +
+                        "If there seems to be no problem with the module, " +
+                        "please contact the Saros development team. You can " +
+                        "reach us by writing to our mailing list " +
+                        "(saros-devel@googlegroups.com) or by using our " +
+                        "contact form " +
+                        "(https://www.saros-project.org/contact/Website%20feedback).",
+                        "Negotiation aborted!");
+
+                    return;
+                }
+
+                localProjects.put(remoteProjectID, sharedProject);
+
+                prepareFilesChangedPage(localProjects);
             }
         }
 
@@ -130,7 +195,6 @@ public class AddProjectToSessionWizard extends Wizard {
         public void cancel() {
             cancelNegotiation("Not accepted");
         }
-
     };
 
     /**
@@ -155,6 +219,93 @@ public class AddProjectToSessionWizard extends Wizard {
         });
 
         close();
+    }
+
+    /**
+     * Creates an empty stub module with the given name in the base directory of
+     * the current project.
+     * <p>
+     * The created module has the module type
+     * {@link IntelliJProjectImplV2#RELOAD_STUB_MODULE_TYPE} which allows us to
+     * easily identify it as stub.
+     *
+     * @param moduleName name of the module
+     *
+     * @return a stub <code>Module</code> object with the given name
+     *
+     *
+     * @throws FileNotFoundException if the base directory of the current
+     *                               project, the base directory of the created
+     *                               module, or the module file of the created
+     *                               module could not be found in the local
+     *                               filesystem
+     * @throws IOException if the creation of the module did
+     *                     not return a valid <code>Module</code> object
+     */
+    @NotNull
+    private Module createModuleStub(@NotNull final String moduleName)
+        throws IOException {
+
+        Module module = Filesystem
+            .runWriteAction(new ThrowableComputable<Module, IOException>() {
+
+                @Override
+                public Module compute() throws IOException {
+                    VirtualFile baseDir = project.getBaseDir();
+
+                    if (baseDir == null) {
+                        throw new FileNotFoundException("Could not find base" +
+                            " directory for project " + project + ".");
+                    }
+
+                    Path moduleBasePath = Paths.get(baseDir.getPath())
+                        .resolve(moduleName);
+
+                    Path moduleFilePath = moduleBasePath.resolve(
+                        moduleName + ModuleFileType.DOT_DEFAULT_EXTENSION);
+
+                    ModifiableModuleModel modifiableModuleModel = ModuleManager
+                        .getInstance(project).getModifiableModel();
+
+                    Module module = modifiableModuleModel
+                        .newModule(moduleFilePath.toString(),
+                            IntelliJProjectImplV2.RELOAD_STUB_MODULE_TYPE);
+
+                    modifiableModuleModel.commit();
+                    project.save();
+
+                    ModifiableRootModel modifiableRootModel = ModuleRootManager
+                        .getInstance(module).getModifiableModel();
+
+                    VirtualFile moduleFile = module.getModuleFile();
+
+                    if (moduleFile == null) {
+                        throw new FileNotFoundException("Could not find " +
+                            "module file for module " + module + " after " +
+                            "creating it.");
+                    }
+
+                    VirtualFile moduleRoot = moduleFile.getParent();
+
+                    if (moduleRoot == null) {
+                        throw new FileNotFoundException("Could not  find base" +
+                            " directory for module " + module + ".");
+                    }
+
+                    modifiableRootModel.addContentEntry(moduleRoot);
+
+                    modifiableRootModel.commit();
+
+                    return module;
+                }
+            }, ModalityState.any());
+
+        if (module == null) {
+            throw new IOException("The creation of the module " + moduleName
+                + " did not return a valid reference to the new module.");
+        }
+
+        return module;
     }
 
     private final PageActionListener fileListPageListener = new PageActionListener() {
