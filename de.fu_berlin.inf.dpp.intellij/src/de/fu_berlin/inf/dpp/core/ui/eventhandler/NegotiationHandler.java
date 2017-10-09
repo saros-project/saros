@@ -173,7 +173,7 @@ public class NegotiationHandler implements INegotiationHandler {
                             peer));
 
                 case REMOTE_ERROR:
-                    NotificationPanel.showInformation(
+                    NotificationPanel.showError(
                         Messages.NegotiationHandler_error_during_invitation,
                         MessageFormat.format(
                             Messages.NegotiationHandler_error_during_invitation_text,
@@ -246,7 +246,7 @@ public class NegotiationHandler implements INegotiationHandler {
                     message = MessageFormat.format(
                         Messages.NegotiationHandler_sharing_project_canceled_remotely,
                         peerName, negotiation.getErrorMessage());
-                    NotificationPanel.showInformation(
+                    NotificationPanel.showError(
                         Messages.NegotiationHandler_sharing_project_canceled_remotely_text,
                         message);
 
