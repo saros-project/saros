@@ -340,6 +340,25 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     }
 
     /**
+     * Returns an <code>IResource</code> for the given file.
+     *
+     * @param file the <code>VirtualFile</code> to get the
+     *             <code>IResource</code> for
+     *
+     * @return an <code>IResource</code> for the given file or <code>null</code>
+     *         if the given file does not exist or the relative path of the file
+     *         could not be constructed
+     */
+    @Nullable
+    public IResource getResource(@NotNull VirtualFile file) {
+        if (file.isDirectory()) {
+            return getFolder(file);
+        } else {
+            return getFile(file);
+        }
+    }
+
+    /**
      * Returns the virtual file for the given path belonging to this module.
      * <p>
      * <b>Note:</b> This method can not return files for derived resources or
