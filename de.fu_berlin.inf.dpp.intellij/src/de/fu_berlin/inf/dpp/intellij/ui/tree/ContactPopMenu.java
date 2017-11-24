@@ -101,7 +101,30 @@ class ContactPopMenu extends JPopupMenu {
 
             List<IResource> resources;
 
-            IProject module = workspace.getProject(moduleName);
+            IProject module;
+
+            try {
+                module = workspace.getProject(moduleName);
+            } catch(IllegalArgumentException exception) {
+                LOG.debug("No session is started as an invalid module was "
+                    + "chosen", exception);
+
+                SafeDialogUtils.showError("The chosen module can not be " +
+                    "shared through Saros. This is probably due to the " +
+                    "module not meeting the current restrictions. Modules " +
+                    "should have exactly one content root that is located in " +
+                    "the project root directory. Please select a  valid " +
+                    "module.\n"+
+                    "If the chosen module meets the given restrictions, " +
+                    "please contact the Saros development team.You can reach " +
+                    "us by writing to our mailing list " +
+                    "(saros-devel@googlegroups.com) or by using our contact " +
+                    "form " +
+                    "(https://www.saros-project.org/contact/Website%20feedback).",
+                    "Invalid module chosen!");
+
+                return;
+            }
 
             if (module == null) {
                 LOG.error("The IProject object for the module " + moduleName
