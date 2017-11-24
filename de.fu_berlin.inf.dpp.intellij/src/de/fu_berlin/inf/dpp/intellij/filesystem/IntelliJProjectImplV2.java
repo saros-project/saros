@@ -86,6 +86,21 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
                 + " has more than one content root");
 
         moduleRoot = contentRoots[0];
+
+        VirtualFile moduleRootParent = moduleRoot.getParent();
+        VirtualFile projectRoot = module.getProject().getBaseDir();
+
+        if (projectRoot == null) {
+            throw new IllegalStateException("Project " + module.getProject() +
+                " has no base dir (null).");
+        }
+
+        if (moduleRootParent == null || !moduleRootParent.equals(projectRoot)) {
+
+            throw new IllegalArgumentException("content root " + moduleRoot +
+                " of module " + module + " is not located in the project " +
+                "root " + projectRoot);
+        }
     }
 
     /**
