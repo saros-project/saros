@@ -59,6 +59,10 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     @Override
     public void start() {
+        //NOP
+    }
+
+    public void manualStart(){
         ApplicationManager.getApplication().invokeAndWait(new Runnable() {
 
             @Override
@@ -239,8 +243,6 @@ public class SharedResourcesManager extends AbstractActivityProducer
             //HACK: It does not work to disable the fileSystemListener temporarly,
             //because a fileCreated event will be fired asynchronously,
             //so we have to add this file to the filter list
-            fileSystemListener
-                .addIncomingFileToFilterFor(file.getLocation().toFile());
         } finally {
             fileSystemListener.setEnabled(true);
         }
@@ -285,8 +287,6 @@ public class SharedResourcesManager extends AbstractActivityProducer
             //HACK: It does not work to disable the fileSystemListener temporarily,
             //because a fileCreated event will be fired asynchronously,
             //so we have to add this file to the filter list
-            fileSystemListener
-                .addIncomingFileToFilterFor(file.getLocation().toFile());
         } finally {
             fileSystemListener.setEnabled(true);
         }
@@ -313,8 +313,6 @@ public class SharedResourcesManager extends AbstractActivityProducer
                 }
 
             }
-            fileSystemListener
-                .addIncomingFileToFilterFor(folder.getLocation().toFile());
         } finally {
             fileSystemListener.setEnabled(true);
         }

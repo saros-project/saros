@@ -19,9 +19,7 @@ public class SarosIntellijSessionContextFactory
 
         // Other
         container.addComponent(FollowingActivitiesManager.class);
-        if (!session.isHost()) {
-            container.addComponent(ModuleInitialization.class);
-        }
+        container.addComponent(ModuleInitialization.class);
         container.addComponent(SharedResourcesManager.class);
     }
 

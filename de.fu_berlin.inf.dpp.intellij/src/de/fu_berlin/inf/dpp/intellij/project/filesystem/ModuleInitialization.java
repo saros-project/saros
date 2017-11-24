@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -46,25 +47,34 @@ public class ModuleInitialization implements Startable {
 
     private final ISarosSession session;
 
+    private final SharedResourcesManager sharedResourcesManager;
+
     private final ISessionListener moduleReloaderListener = new AbstractSessionListener() {
 
         @Override
         public void resourcesAdded(IProject module) {
             final ModuleReloader moduleReloader = new ModuleReloader(module);
 
-            //Registers a ModuleLoader with the AWT event dispatching thread to be executed asynchronously.
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    ApplicationManager.getApplication().runWriteAction(
-                        moduleReloader);
-                }
-            });
+            if(session.isHost()) {
+                //Registers a ModuleLoader with the AWT event dispatching thread to be executed asynchronously.
+                ApplicationManager.getApplication().invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ApplicationManager.getApplication()
+                            .runWriteAction(moduleReloader);
+                    }
+                });
+            }
+
+            sharedResourcesManager.manualStart();
         }
     };
 
-    public ModuleInitialization(ISarosSession session) {
+    public ModuleInitialization(ISarosSession session,
+        SharedResourcesManager sharedResourcesManager) {
+
         this.session = session;
+        this.sharedResourcesManager = sharedResourcesManager;
     }
 
     @Override
