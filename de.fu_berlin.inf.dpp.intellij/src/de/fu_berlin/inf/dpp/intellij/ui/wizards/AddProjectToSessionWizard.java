@@ -580,9 +580,12 @@ public class AddProjectToSessionWizard extends Wizard {
                     data.getFileList(),
                     false);
 
-                if (!diff.getRemovedFolders().isEmpty()
-                    || !diff.getRemovedFiles().isEmpty()
-                    || !diff.getAlteredFiles().isEmpty()) {
+                if (!diff.getRemovedFolders().isEmpty() ||
+                    !diff.getRemovedFiles().isEmpty() ||
+                    !diff.getAlteredFiles().isEmpty() ||
+                    !diff.getAddedFiles().isEmpty() ||
+                    !diff.getAddedFolders().isEmpty()) {
+
                     modifiedResources.put(project.getName(), diff);
                 }
 
