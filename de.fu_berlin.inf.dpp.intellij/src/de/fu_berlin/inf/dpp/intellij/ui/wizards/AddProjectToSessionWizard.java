@@ -18,6 +18,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -150,6 +151,26 @@ public class AddProjectToSessionWizard extends Wizard {
                         "Negotiation aborted!");
 
                     return;
+
+                } catch (ModuleWithNameAlreadyExists e) {
+                    LOG.warn("Could not create the shared module " + moduleName
+                        + ".", e);
+
+                    cancelNegotiation("Failed to create shared module");
+
+                    SafeDialogUtils.showError("The module " + moduleName +
+                        " could not be created as a module with the chosen " +
+                        "name already exists in this project. The project " +
+                        "negotiation was aborted.\n" +
+                        "If you are sure that no such module already exists, " +
+                        "please contact the Saros development team. You can " +
+                        "reach us by writing to our mailing list " +
+                        "(saros-devel@googlegroups.com) or by using our " +
+                        "contact form " +
+                        "(https://www.saros-project.org/contact/Website%20feedback).",
+                        "Negotiation aborted!");
+
+                    return;
                 }
 
                 IProject sharedProject = new IntelliJProjectImplV2(module);
@@ -271,7 +292,14 @@ public class AddProjectToSessionWizard extends Wizard {
      */
     @NotNull
     private Module createModuleStub(@NotNull final String moduleName)
-        throws IOException {
+        throws IOException, ModuleWithNameAlreadyExists {
+
+        for(Module module : ModuleManager.getInstance(project).getModules()) {
+            if (moduleName.equals(module.getName()))
+                throw new ModuleWithNameAlreadyExists("Could not create stub " +
+                    "module as a module with the chosen name already exists",
+                    moduleName);
+        }
 
         Module module = Filesystem
             .runWriteAction(new ThrowableComputable<Module, IOException>() {
