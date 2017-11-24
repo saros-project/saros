@@ -159,7 +159,34 @@ public class AddProjectToSessionWizard extends Wizard {
                 triggerProjectNegotiation();
 
             } else {
-                IProject sharedProject = workspace.getProject(moduleName);
+                IProject sharedProject;
+
+                try {
+                    sharedProject = workspace.getProject(moduleName);
+                } catch(IllegalArgumentException exception) {
+                    LOG.debug("No session is started as an invalid module was "
+                        + "chosen", exception);
+
+                    cancelNegotiation("Invalid module chosen by client");
+
+                    SafeDialogUtils.showError("The chosen module can not be " +
+                            "used to accept a Saros session. This is probably " +
+                            "due to the module not meeting the current " +
+                            "restrictions. Modules should have exactly one " +
+                            "content root that is located in the project root " +
+                            "directory. Please delete the selected module, " +
+                            "modify it to meet the given criteria, or ask the " +
+                            "host to share a different module.\n"+
+                            "If the chosen module meets the given restrictions, " +
+                            "please contact the Saros development team.You can " +
+                            "reach us by writing to our mailing list " +
+                            "(saros-devel@googlegroups.com) or by using our" +
+                            "contact form " +
+                            "(https://www.saros-project.org/contact/Website%20feedback).",
+                        "Invalid module chosen!");
+
+                    return;
+                }
 
                 if (sharedProject == null) {
                     LOG.error("Could not find the shared module " + moduleName +
