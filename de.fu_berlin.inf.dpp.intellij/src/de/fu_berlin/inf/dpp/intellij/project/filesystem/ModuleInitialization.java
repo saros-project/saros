@@ -55,7 +55,7 @@ public class ModuleInitialization implements Startable {
         public void resourcesAdded(IProject module) {
             final ModuleReloader moduleReloader = new ModuleReloader(module);
 
-            if(session.isHost()) {
+            if(!session.isHost()) {
                 //Registers a ModuleLoader with the AWT event dispatching thread to be executed asynchronously.
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                     @Override
