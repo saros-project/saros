@@ -128,12 +128,13 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
                 component.getImplementation());
         }
 
-        container.addComponent(BindKey.bindKey(String.class,
-                IContextKeyBindings.SarosVersion.class),
-            "14.1.31.DEVEL"); // todo
+        container.addComponent(BindKey
+            .bindKey(String.class, IContextKeyBindings.SarosVersion.class),
+            IntelliJVersionProvider.getPluginVersion());
 
-        container.addComponent(BindKey.bindKey(String.class,
-                IContextKeyBindings.PlatformVersion.class), "4.3.2"); // todo
+        container.addComponent(BindKey
+            .bindKey(String.class, IContextKeyBindings.PlatformVersion.class),
+            IntelliJVersionProvider.getBuildNumber());
 
         container.addComponent(ModuleTypeNegotiationHook.class);
     }

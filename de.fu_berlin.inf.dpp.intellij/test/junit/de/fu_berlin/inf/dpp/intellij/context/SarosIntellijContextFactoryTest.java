@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.picocontainer.MutablePicoContainer;
+import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.MockPolicy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -31,7 +32,7 @@ import static de.fu_berlin.inf.dpp.intellij.test.IntellijMocker.mockStaticGetIns
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ CommandProcessor.class, FileDocumentManager.class,
     FileEditorManager.class, LocalFileSystem.class, PropertiesComponent.class,
-    ModuleTypeManager.class })
+    ModuleTypeManager.class, IntelliJVersionProvider.class })
 @MockPolicy(PrepareCoreComponents.class)
 public class SarosIntellijContextFactoryTest {
 
@@ -56,6 +57,17 @@ public class SarosIntellijContextFactoryTest {
 
         project = EasyMock.createNiceMock(Project.class);
         EasyMock.replay(project);
+
+        //mock IntelliJ dependent calls to get current IDE and plugin version
+        PowerMock.mockStaticPartial(IntelliJVersionProvider.class,
+            "getPluginVersion", "getBuildNumber");
+
+        EasyMock.expect(IntelliJVersionProvider.getPluginVersion())
+            .andReturn("0.1.0");
+        EasyMock.expect(IntelliJVersionProvider.getBuildNumber())
+            .andReturn("1");
+
+        PowerMock.replay(IntelliJVersionProvider.class);
     }
 
     @Test
