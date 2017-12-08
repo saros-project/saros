@@ -627,8 +627,9 @@ public class EditorManager extends AbstractActivityProducer
                 // follower closed the followed editor (no other editor gets
                 // activated)
                 setFollowing(null);
-                NotificationPanel.showInformation("Follow Mode stopped!",
-                    "You closed the followed editor.");
+                NotificationPanel
+                    .showInformation("You closed the followed editor.",
+                        "Follow Mode stopped!");
             }
         }
 
