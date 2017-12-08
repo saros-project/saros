@@ -161,11 +161,9 @@ public class NegotiationHandler implements INegotiationHandler {
                 case OK:
                     break;
                 case REMOTE_CANCEL:
-                    NotificationPanel.showInformation(
-                        Messages.NegotiationHandler_canceled_invitation,
-                        MessageFormat.format(
-                            Messages.NegotiationHandler_canceled_invitation_text,
-                            peer));
+                    NotificationPanel.showInformation(MessageFormat.format(
+                        Messages.NegotiationHandler_canceled_invitation_text,
+                        peer), Messages.NegotiationHandler_canceled_invitation);
 
                     return new Status(IStatus.CANCEL, SarosComponent.PLUGIN_ID,
                         MessageFormat.format(
@@ -173,11 +171,10 @@ public class NegotiationHandler implements INegotiationHandler {
                             peer));
 
                 case REMOTE_ERROR:
-                    NotificationPanel.showError(
-                        Messages.NegotiationHandler_error_during_invitation,
-                        MessageFormat.format(
-                            Messages.NegotiationHandler_error_during_invitation_text,
-                            peer, negotiation.getErrorMessage()));
+                    NotificationPanel.showError(MessageFormat.format(
+                        Messages.NegotiationHandler_error_during_invitation_text,
+                        peer, negotiation.getErrorMessage()),
+                        Messages.NegotiationHandler_error_during_invitation);
 
                     return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
                         MessageFormat.format(
@@ -247,9 +244,8 @@ public class NegotiationHandler implements INegotiationHandler {
                     message = MessageFormat.format(
                         Messages.NegotiationHandler_sharing_project_canceled_remotely,
                         peerName, negotiation.getErrorMessage());
-                    NotificationPanel.showError(
-                        Messages.NegotiationHandler_sharing_project_canceled_remotely_text,
-                        message);
+                    NotificationPanel.showError(message,
+                        Messages.NegotiationHandler_sharing_project_canceled_remotely_text);
 
                     return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
                         message);
