@@ -55,8 +55,10 @@ public class ConsistencyButton extends ToolbarButton {
 
             String inconsistentFiles = createConfirmationMessage(paths);
 
-            if (!DialogUtils.showQuestion(null, inconsistentFiles,
-                Messages.ConsistencyAction_confirm_dialog_title)) {
+            if (!DialogUtils.showQuestion(null,
+                Messages.ConsistencyAction_confirm_dialog_title,
+                inconsistentFiles)) {
+
                 setEnabledFromUIThread(true);
                 return;
             }
