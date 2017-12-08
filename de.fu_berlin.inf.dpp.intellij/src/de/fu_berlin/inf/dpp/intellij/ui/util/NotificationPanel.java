@@ -46,6 +46,9 @@ public class NotificationPanel {
     private static void showNotification(NotificationType notificationType,
         String message, String title) {
 
+        LOG.info("Showing notification - " + notificationType + ": " + title +
+            " - " + message);
+
         final Notification notification = GROUP_DISPLAY_ID_INFO
             .createNotification(title, message, notificationType, null);
         ApplicationManager.getApplication().invokeLater(new Runnable() {
@@ -54,8 +57,6 @@ public class NotificationPanel {
                 Notifications.Bus.notify(notification, project);
             }
         });
-
-        LOG.info("Notification: " + title + ", " + message);
     }
 
     /**
