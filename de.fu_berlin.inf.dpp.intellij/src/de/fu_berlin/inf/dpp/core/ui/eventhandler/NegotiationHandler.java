@@ -234,8 +234,9 @@ public class NegotiationHandler implements INegotiationHandler {
                         .invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                DialogUtils.showInfo(null, message,
-                                    Messages.NegotiationHandler_project_sharing_canceled_text);
+                                DialogUtils.showInfo(null,
+                                    "Project sharing canceled remotely",
+                                    message);
                             }
                         });
 
