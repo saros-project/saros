@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import org.apache.log4j.Logger;
-import org.jdom.JDOMException;
 import org.picocontainer.Startable;
 
 import java.io.IOException;
@@ -135,7 +134,7 @@ public class ModuleInitialization implements Startable {
                     LOG.info("ModuleInitialization successful: module \"" +
                         moduleName + "\" added to local project structure");
 
-                } catch (InvalidDataException | IOException | JDOMException e) {
+                } catch (InvalidDataException | IOException e) {
                     LOG.error("Failed to load module data for module " +
                         moduleName + " from file " + moduleFilePath, e);
 
