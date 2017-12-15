@@ -76,7 +76,7 @@
     <path id="jdk.classpath.idea_sdk">
         <fileset dir="${idea.home}"
                  includes="lib/**/*.jar"
-                 excludes="lib/xstream*.jar, lib/picocontainer.jar, lib/ant/**/*.jar"/>
+                 excludes="lib/junit*.jar, lib/picocontainer.jar, lib/ant/**/*.jar"/>
     </path>
 
     <property name="project.jdk.home" value="${idea.home}"/>
@@ -102,7 +102,11 @@
     <property name="core.testoutput.dir" value="${core.build.dir}/test"/>
 
     <path id="core.main.classpath">
-        <fileset dir="${core.libdir}" includes="*.jar"/>
+        <fileset dir="${core.libdir}"
+                 includes="*.jar"
+                 excludes="xstream*.jar"/>
+        <fileset dir="${idea.home}/lib"
+                 includes="xstream*.jar" />
     </path>
 
     <path id="core.main.sourcepath">
@@ -119,7 +123,7 @@
 
         <!-- necessary because the core test utilities need to be compiled
              outside of a junit ant task -->
-        <fileset dir="${idea.home}/lib" includes="junit*.jar"/>
+        <fileset dir="${basedir}/lib" includes="junit*.jar"/>
     </path>
 
     <path id="core.test.sourcepath">
