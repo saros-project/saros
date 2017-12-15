@@ -221,6 +221,14 @@ public class ConsistencyButton extends ToolbarButton {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
+                if (files.isEmpty()) {
+                    NotificationPanel.showWarning(
+                        Messages.ConsistencyAction_message_inconsistency_detected_no_files,
+                        Messages.ConsistencyAction_title_inconsistency_detected);
+
+                    return;
+                }
+
                 NotificationPanel.showWarning(MessageFormat.format(
                     Messages.ConsistencyAction_message_inconsistency_detected,
                     files),
