@@ -205,7 +205,7 @@
          - - - - - - - - - - - - - - - - - -->
 
     <path id="libraries.classpath">
-        <fileset dir="${core.libdir}" includes="*.jar"/>
+        <fileset dir="${core.libdir}" includes="*.jar" excludes="xstream*.jar"/>
         <fileset dir="${ui.libdir}" includes="*.jar"/>
         <fileset dir="${saros-i.libdir}" includes="*.jar"/>
         <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar"
@@ -494,7 +494,10 @@
                         excludes="*-src.zip,*-debug.jar"/>
             <zipfileset dir="${core.libdir}"
                         prefix="de.fu_berlin.inf.dpp.intellij/lib"
-                        excludes="*-sources.jar"/>
+                        excludes="*-sources.jar,xstream*.jar"/>
+            <zipfileset dir="${idea.home}/lib"
+                        prefix="de.fu_berlin.inf.dpp.intellij/lib"
+                        includes="xstream*.jar"/>
             <zipfileset file="${saros-i.plugin.path.jar}"
                         prefix="de.fu_berlin.inf.dpp.intellij/lib"/>
         </zip>
