@@ -49,6 +49,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         @NotNull
         VirtualFileEvent virtualFileEvent) {
 
+        if(!enabled)
+            return;
+
         VirtualFile file = virtualFileEvent.getFile();
 
         IProject module = getModuleForFile(file);
@@ -90,6 +93,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         @NotNull
         VirtualFileCopyEvent virtualFileCopyEvent) {
 
+        if(!enabled)
+            return;
+
         VirtualFile file = virtualFileCopyEvent.getFile();
         VirtualFile originalFile = virtualFileCopyEvent.getOriginalFile();
 
@@ -112,6 +118,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     public void beforePropertyChange(
         @NotNull
         VirtualFilePropertyEvent filePropertyEvent) {
+
+        if(!enabled)
+            return;
 
         VirtualFile file = filePropertyEvent.getFile();
         String propertyName = filePropertyEvent.getPropertyName();
@@ -147,6 +156,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         @NotNull
         VirtualFileEvent virtualFileEvent) {
 
+        if(!enabled)
+            return;
+
         VirtualFile file = virtualFileEvent.getFile();
 
         IProject module = getModuleForFile(file);
@@ -166,6 +178,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     public void beforeFileMovement(
         @NotNull
         VirtualFileMoveEvent virtualFileMoveEvent) {
+
+        if(!enabled)
+            return;
 
         VirtualFile file = virtualFileMoveEvent.getFile();
         VirtualFile oldParent = virtualFileMoveEvent.getOldParent();
