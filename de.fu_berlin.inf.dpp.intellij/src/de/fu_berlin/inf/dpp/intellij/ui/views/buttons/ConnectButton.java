@@ -4,6 +4,7 @@ import com.intellij.openapi.ui.Messages;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.exceptions.IllegalAWTContextException;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.AbstractSarosAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.ConnectServerAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.DisconnectServerAction;
@@ -152,8 +153,22 @@ public class ConnectButton extends ToolbarButton {
      *         the user entered at least one illegal value
      */
     private XMPPAccount createNewAccount() {
-        final String userID = SafeDialogUtils.showInputDialog(
-            "Your User-ID, e.g. user@saros-con.imp.fu-berlin.de", "", "Login");
+        final String userID;
+
+        try {
+            userID = SafeDialogUtils.showInputDialog(
+                "Your User-ID, e.g. user@saros-con.imp.fu-berlin.de",
+                "", "Login");
+
+        } catch (IllegalAWTContextException e) {
+            LOG.error("Account creation failed.", e);
+
+            SafeDialogUtils.showError(
+                "There was an error creating the account.\nDetails: "
+                    + e.getMessage(), "Account creation failed");
+
+            return null;
+        }
 
         if (userID == null) {
             LOG.debug("Account creation canceled by user during user id"
@@ -198,9 +213,22 @@ public class ConnectButton extends ToolbarButton {
 
         int port = 0;
 
-        String server = SafeDialogUtils.showInputDialog(
-            "XMPP server (optional, not necessary in most cases)",
-            "", "Server");
+        String server;
+
+        try {
+            server = SafeDialogUtils.showInputDialog(
+                "XMPP server (optional, not necessary in most cases)",
+                "", "Server");
+
+        } catch (IllegalAWTContextException e) {
+            LOG.error("Account creation failed.", e);
+
+            SafeDialogUtils.showError(
+                "There was an error creating the account.\nDetails: "
+                    + e.getMessage(), "Account creation failed");
+
+            return null;
+        }
 
         if (server == null) {
             LOG.debug("Account creation canceled by user during server entry.");
@@ -208,8 +236,21 @@ public class ConnectButton extends ToolbarButton {
             return null;
 
         } else if(!server.isEmpty()){
-            String portUserEntry = SafeDialogUtils.showInputDialog(
-                "XMPP server port", "", "Server port");
+            String portUserEntry;
+
+            try {
+                portUserEntry = SafeDialogUtils.showInputDialog(
+                    "XMPP server port", "", "Server port");
+
+            } catch (IllegalAWTContextException e) {
+                LOG.error("Account creation failed.", e);
+
+                SafeDialogUtils.showError(
+                    "There was an error creating the account.\nDetails: " +
+                        e.getMessage(), "Account creation failed");
+
+                return null;
+            }
 
             if (portUserEntry == null) {
                 LOG.debug("Account creation canceled by user during server "
@@ -237,7 +278,6 @@ public class ConnectButton extends ToolbarButton {
 
                 return null;
             }
-
         }
 
         try {
@@ -248,7 +288,7 @@ public class ConnectButton extends ToolbarButton {
             LOG.error("Account creation failed", e);
 
             SafeDialogUtils.showError(
-                "There was an error creating the account. Details:\n"
+                "There was an error creating the account.\nDetails: "
                     + e.getMessage(), "Account creation failed");
 
             return null;
