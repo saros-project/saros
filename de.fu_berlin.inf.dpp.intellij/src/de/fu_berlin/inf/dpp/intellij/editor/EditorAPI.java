@@ -85,7 +85,8 @@ public class EditorAPI {
                     public void run() {
                         doc.insertString(position, text);
                     }
-                }, "insertText()", commandProcessor.getCurrentCommandGroupId());
+                }, "Saros text insertion at index " + position + " of \""
+                    + text + "\"", commandProcessor.getCurrentCommandGroupId());
             }
         };
 
@@ -108,7 +109,8 @@ public class EditorAPI {
                     public void run() {
                         doc.setText(text);
                     }
-                }, "setText()", commandProcessor.getCurrentCommandGroupId());
+                }, "Saros text set to \"" + text + "\"",
+                    commandProcessor.getCurrentCommandGroupId());
             }
         };
 
@@ -184,8 +186,8 @@ public class EditorAPI {
                         public void run() {
                             doc.deleteString(start, end);
                         }
-                    }, "deleteText(" + start + "," + end + ")",
-                    commandProcessor.getCurrentCommandGroupId());
+                    }, "Saros text deletion from index " + start + " to "
+                    + end, commandProcessor.getCurrentCommandGroupId());
             }
         };
 
