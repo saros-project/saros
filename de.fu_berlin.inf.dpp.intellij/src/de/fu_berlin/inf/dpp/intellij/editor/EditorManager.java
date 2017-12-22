@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
+import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -450,8 +451,7 @@ public class EditorManager extends AbstractActivityProducer
 
     @Override
     public String getContent(final SPath path) {
-        return ApplicationManager.getApplication()
-            .runReadAction(new Computable<String>() {
+        return Filesystem.runReadAction(new Computable<String>() {
 
                 @Override
                 public String compute() {
