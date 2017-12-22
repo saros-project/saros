@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -12,8 +13,8 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
+import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 
 import java.awt.Color;
 
@@ -62,7 +63,7 @@ public class EditorAPI {
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
+        application.invokeAndWait(action, ModalityState.defaultModalityState());
     }
 
     /**
@@ -79,20 +80,16 @@ public class EditorAPI {
             @Override
             public void run() {
                 commandProcessor.executeCommand(project, new Runnable() {
+
                     @Override
                     public void run() {
-                        application.runWriteAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                doc.insertString(position, text);
-                            }
-                        });
+                        doc.insertString(position, text);
                     }
                 }, "insertText()", commandProcessor.getCurrentCommandGroupId());
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
+        Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
     }
 
     /**
@@ -106,20 +103,16 @@ public class EditorAPI {
             @Override
             public void run() {
                 commandProcessor.executeCommand(project, new Runnable() {
+
                     @Override
                     public void run() {
-                        application.runWriteAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                doc.setText(text);
-                            }
-                        });
+                        doc.setText(text);
                     }
                 }, "setText()", commandProcessor.getCurrentCommandGroupId());
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
+        Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
     }
 
     /**
@@ -186,21 +179,17 @@ public class EditorAPI {
             @Override
             public void run() {
                 commandProcessor.executeCommand(project, new Runnable() {
-                        @Override
+
+                    @Override
                         public void run() {
-                            application.runWriteAction(new Runnable() {
-                                @Override
-                                public void run() {
-                                    doc.deleteString(start, end);
-                                }
-                            });
+                            doc.deleteString(start, end);
                         }
                     }, "deleteText(" + start + "," + end + ")",
                     commandProcessor.getCurrentCommandGroupId());
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
+        Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
     }
 
     /**
@@ -247,7 +236,7 @@ public class EditorAPI {
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
+        application.invokeAndWait(action, ModalityState.defaultModalityState());
 
     }
 }
