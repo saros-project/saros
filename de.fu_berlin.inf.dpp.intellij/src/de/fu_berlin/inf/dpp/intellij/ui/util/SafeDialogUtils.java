@@ -1,9 +1,14 @@
 package de.fu_berlin.inf.dpp.intellij.ui.util;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.util.ui.UIUtil;
+
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.exceptions.IllegalAWTContextException;
+
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
@@ -11,15 +16,30 @@ import java.awt.Component;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Dialog helper used to show messages in safe manner by starting it in UI thread.
+ * Dialog helper used to show messages in safe manner by starting it on the AWT
+ * event dispatcher thread.
+ * <p>
+ * <b>NOTE:</b> Synchronous dialogs must not be triggered while inside a write
+ * safe context. This applies to all input dialogs as they need to be executed
+ * synchronously to return the input value. Such dialogs should check whether
+ * they are executed in a write safe context with
+ * {@link Application#isWriteAccessAllowed()} and then throw an
+ * {@link de.fu_berlin.inf.dpp.exceptions.IllegalAWTContextException}.
+ * <p>
+ * Asynchronous dialogs can still be safely executed from any context with
+ * {@link Application#invokeLater(Runnable,ModalityState)}.
  */
 public class SafeDialogUtils {
     private static final Logger LOG = Logger.getLogger(SafeDialogUtils.class);
+
+    private static final Application application;
 
     @Inject
     private static Project project;
 
     static {
+        application = ApplicationManager.getApplication();
+
         SarosPluginContext.initComponent(new SafeDialogUtils());
     }
 
@@ -27,24 +47,35 @@ public class SafeDialogUtils {
     }
 
     /**
-     * Shows an input dialog in the UI thread.
+     * Shows an input dialog. This method must not be called from a write safe
+     * context as it needs to be executed synchronously and AWT actions are not
+     * allowed from a write safe context.
      *
      * @return the <code>String</code> entered by the user or
      *         <code>null</code> if the dialog did not finish with the exit code
      *         0 (it was not closed by pressing the "OK" button)
      *
+     * @throws IllegalAWTContextException if the calling thread is currently
+     *                                    inside a write safe context
+     *
      * @see Messages.InputDialog#getInputString()
      * @see com.intellij.openapi.ui.DialogWrapper#OK_EXIT_CODE
      */
     public static String showInputDialog(final String message,
-        final String initialValue, final String title) {
+        final String initialValue, final String title)
+        throws IllegalAWTContextException{
+
+        if(application.isWriteAccessAllowed()) {
+            throw new IllegalAWTContextException("AWT events are not allowed " +
+                "inside write actions.");
+        }
 
         LOG.info("Showing input dialog: " + title + " - " + message + " - " +
             initialValue);
 
         final AtomicReference<String> response = new AtomicReference<>();
 
-        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 String option = Messages
@@ -54,7 +85,7 @@ public class SafeDialogUtils {
                     response.set(option);
                 }
             }
-        });
+        }, ModalityState.defaultModalityState());
 
         return response.get();
     }
@@ -62,23 +93,23 @@ public class SafeDialogUtils {
     public static void showWarning(final String message, final String title) {
         LOG.info("Showing warning dialog: " + title + " - " + message);
 
-        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 Messages.showWarningDialog(project, message, title);
             }
-        });
+        }, ModalityState.defaultModalityState());
     }
 
     public static void showError(final String message, final String title) {
         LOG.info("Showing error dialog: " + title + " - " + message);
 
-        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 Messages.showErrorDialog(project, message, title);
             }
-        });
+        }, ModalityState.defaultModalityState());
     }
 
     public static void showError(final Component component,
@@ -86,11 +117,11 @@ public class SafeDialogUtils {
 
         LOG.info("Showing error dialog: " + title + " - " + message);
 
-        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 Messages.showErrorDialog(component, message, title);
             }
-        });
+        }, ModalityState.defaultModalityState());
     }
 }
