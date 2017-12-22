@@ -4,6 +4,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
@@ -86,7 +87,8 @@ public class EditorAPI {
                         doc.insertString(position, text);
                     }
                 }, "Saros text insertion at index " + position + " of \""
-                    + text + "\"", commandProcessor.getCurrentCommandGroupId());
+                    + text + "\"", commandProcessor.getCurrentCommandGroupId(),
+                    UndoConfirmationPolicy.REQUEST_CONFIRMATION, doc);
             }
         };
 
@@ -110,7 +112,8 @@ public class EditorAPI {
                         doc.setText(text);
                     }
                 }, "Saros text set to \"" + text + "\"",
-                    commandProcessor.getCurrentCommandGroupId());
+                    commandProcessor.getCurrentCommandGroupId(),
+                    UndoConfirmationPolicy.REQUEST_CONFIRMATION, doc);
             }
         };
 
@@ -187,7 +190,8 @@ public class EditorAPI {
                             doc.deleteString(start, end);
                         }
                     }, "Saros text deletion from index " + start + " to "
-                    + end, commandProcessor.getCurrentCommandGroupId());
+                    + end, commandProcessor.getCurrentCommandGroupId(),
+                    UndoConfirmationPolicy.REQUEST_CONFIRMATION, doc);
             }
         };
 
