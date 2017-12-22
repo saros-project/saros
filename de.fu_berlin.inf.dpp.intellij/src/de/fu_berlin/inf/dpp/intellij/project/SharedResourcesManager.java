@@ -68,7 +68,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
                 intelliJWorkspaceImpl.addResourceListener(fileSystemListener);
 
             }
-        }, ModalityState.any());
+        }, ModalityState.defaultModalityState());
     }
 
     @Override
@@ -83,7 +83,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
                     .removeActivityProducer(SharedResourcesManager.this);
                 sarosSession.removeActivityConsumer(consumer);
             }
-        }, ModalityState.any());
+        }, ModalityState.defaultModalityState());
     }
 
     public SharedResourcesManager(ISarosSession sarosSession,

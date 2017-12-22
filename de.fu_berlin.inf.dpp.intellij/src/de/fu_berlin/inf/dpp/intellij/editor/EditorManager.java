@@ -280,7 +280,7 @@ public class EditorManager extends AbstractActivityProducer
                     public void run() {
                         addProjectResources(project);
                     }
-                }, ModalityState.any());
+                }, ModalityState.defaultModalityState());
         }
     };
 
