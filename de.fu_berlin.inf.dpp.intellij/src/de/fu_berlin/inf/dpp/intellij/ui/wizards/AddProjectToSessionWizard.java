@@ -353,7 +353,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     return module;
                 }
-            }, ModalityState.any());
+            }, ModalityState.defaultModalityState());
 
         if (module == null) {
             throw new IOException("The creation of the module " + moduleName
