@@ -58,11 +58,19 @@ public class ConnectButton extends ToolbarButton {
             public void actionPerformed(ActionEvent ev) {
                 if (accountStore.isEmpty()) {
                     XMPPAccount account = createNewAccount();
-                    connectAction.executeWithUser(account.getUsername());
-                } else {
-                    popupMenu.show(ConnectButton.this, 0,
-                        getBounds().y + getBounds().height);
+
+                    if (account != null) {
+                        createMenuItems();
+                        connectAction.executeWithUser(account.getUsername() +
+                            USERID_SEPARATOR + account.getDomain());
+
+                        return;
+                    }
                 }
+
+                popupMenu.show(ConnectButton.this, 0,
+                    getBounds().y + getBounds().height);
+
             }
         });
     }
@@ -81,7 +89,7 @@ public class ConnectButton extends ToolbarButton {
 
     private void createAccountMenuItem(XMPPAccount account) {
         final String userName =
-            account.getUsername() + "@" + account.getDomain();
+            account.getUsername() + USERID_SEPARATOR + account.getDomain();
         JMenuItem accountItem = createMenuItemForUser(userName);
         popupMenu.add(accountItem);
     }
@@ -123,10 +131,11 @@ public class ConnectButton extends ToolbarButton {
             @Override
             public void actionPerformed(ActionEvent e) {
                 XMPPAccount account = createNewAccount();
+
                 if (account == null) {
-                    SafeDialogUtils
-                        .showError("Account was not created.", "Error");
+                    return;
                 }
+
                 createMenuItems();
             }
         });
@@ -139,20 +148,45 @@ public class ConnectButton extends ToolbarButton {
         final String userID = SafeDialogUtils.showInputDialog(
             "Your User-ID, e.g. user@saros-con.imp.fu-berlin.de", "", "Login");
         if (userID.isEmpty()) {
+            SafeDialogUtils.showError("No user id entered.",
+                "Account creation aborted");
+
             return null;
         }
-        if (!userID.contains("@")) {
-            SafeDialogUtils.showError("No @ found in the ID!", "Error");
+        if (!userID.contains(USERID_SEPARATOR)) {
+            SafeDialogUtils.showError("No " + USERID_SEPARATOR +
+                    " found in the ID.", "Account creation aborted");
+
             return null;
         }
 
-        String[] fields = userID.split(USERID_SEPARATOR);
+        String[] fields = userID.split(USERID_SEPARATOR, 2);
+
+        if (fields.length < 2 || fields[1].isEmpty() ||
+            fields[1].contains(USERID_SEPARATOR)) {
+
+            SafeDialogUtils.showError("No acceptable domain entered.",
+                "Account creation aborted");
+
+            return null;
+        }
+
         String username = fields[0];
         String domain = fields[1];
 
+        if(username.isEmpty()){
+            SafeDialogUtils.showError("No acceptable user name entered.",
+                "Account creation aborted");
+
+            return null;
+        }
+
         final String password = Messages
             .showPasswordDialog("Password", "Password");
-        if (password.isEmpty()) {
+        if (password == null || password.isEmpty()) {
+            SafeDialogUtils.showError("No password entered.",
+                "Account creation aborted");
+
             return null;
         }
 
@@ -166,10 +200,10 @@ public class ConnectButton extends ToolbarButton {
                 .createAccount(username, password, domain, server, 0, true,
                     true);
         } catch (IllegalArgumentException e) {
-            LOG.error("Error creating account", e);
+            LOG.error("Account creation failed", e);
             SafeDialogUtils.showError(
-                "There was an error creating the account.\n Details:\n\n" + e
-                    .getMessage(), "Error");
+                "There was an error creating the account. Details:\n"
+                    + e.getMessage(), "Account creation failed");
         }
         return null;
     }
