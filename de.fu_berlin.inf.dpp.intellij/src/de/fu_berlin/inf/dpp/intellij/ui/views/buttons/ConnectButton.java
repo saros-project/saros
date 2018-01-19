@@ -147,6 +147,12 @@ public class ConnectButton extends ToolbarButton {
     protected XMPPAccount createNewAccount() {
         final String userID = SafeDialogUtils.showInputDialog(
             "Your User-ID, e.g. user@saros-con.imp.fu-berlin.de", "", "Login");
+        if (userID == null) {
+            LOG.debug("Account creation canceled by user during user id"
+                + " entry.");
+
+            return null;
+        }
         if (userID.isEmpty()) {
             SafeDialogUtils.showError("No user id entered.",
                 "Account creation aborted");
@@ -183,7 +189,13 @@ public class ConnectButton extends ToolbarButton {
 
         final String password = Messages
             .showPasswordDialog("Password", "Password");
-        if (password == null || password.isEmpty()) {
+        if (password == null) {
+            LOG.debug("Account creation canceled by user during password"
+                + " entry.");
+
+            return null;
+        }
+        if (password.isEmpty()) {
             SafeDialogUtils.showError("No password entered.",
                 "Account creation aborted");
 
@@ -194,6 +206,12 @@ public class ConnectButton extends ToolbarButton {
         String server = SafeDialogUtils.showInputDialog(
             "XMPP server (optional, not necessary in most cases)", "",
             "Server");
+
+        if (server == null) {
+            LOG.debug("Account creation canceled by user during server entry.");
+
+            return null;
+        }
 
         try {
             return accountStore

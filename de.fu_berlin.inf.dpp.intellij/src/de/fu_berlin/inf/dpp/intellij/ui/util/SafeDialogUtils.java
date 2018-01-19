@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
 import java.awt.Component;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Dialog helper used to show messages in safe manner by starting it in UI thread.
@@ -27,6 +28,13 @@ public class SafeDialogUtils {
 
     /**
      * Shows an input dialog in the UI thread.
+     *
+     * @return the <code>String</code> entered by the user or
+     *         <code>null</code> if the dialog did not finish with the exit code
+     *         0 (it was not closed by pressing the "OK" button)
+     *
+     * @see Messages.InputDialog#getInputString()
+     * @see com.intellij.openapi.ui.DialogWrapper#OK_EXIT_CODE
      */
     public static String showInputDialog(final String message,
         final String initialValue, final String title) {
@@ -34,7 +42,7 @@ public class SafeDialogUtils {
         LOG.info("Showing input dialog: " + title + " - " + message + " - " +
             initialValue);
 
-        final StringBuilder response = new StringBuilder();
+        final AtomicReference<String> response = new AtomicReference<>();
 
         UIUtil.invokeAndWaitIfNeeded(new Runnable() {
             @Override
@@ -43,12 +51,12 @@ public class SafeDialogUtils {
                     .showInputDialog(project, message, title,
                         Messages.getQuestionIcon(), initialValue, null);
                 if (option != null) {
-                    response.append(option);
+                    response.set(option);
                 }
             }
         });
 
-        return response.toString();
+        return response.get();
     }
 
     public static void showWarning(final String message, final String title) {
