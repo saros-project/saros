@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.actions.ConnectServerAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.DisconnectServerAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.NotImplementedAction;
 import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
@@ -142,70 +143,62 @@ public class ConnectButton extends ToolbarButton {
     }
 
     /**
-     * Asks for Name, Password and domain and server for a new XMPP account.
+     * Asks for user id (name@domain), password, and server for a new XMPP
+     * account.
+     *
+     * @return an <code>XMPPAccount</code> with the values entered by the user
+     *         or <code>null</code> if the creation was canceled by the user or
+     *         the user entered at least one illegal value
      */
-    protected XMPPAccount createNewAccount() {
+    private XMPPAccount createNewAccount() {
         final String userID = SafeDialogUtils.showInputDialog(
             "Your User-ID, e.g. user@saros-con.imp.fu-berlin.de", "", "Login");
+
         if (userID == null) {
             LOG.debug("Account creation canceled by user during user id"
                 + " entry.");
 
             return null;
         }
-        if (userID.isEmpty()) {
-            SafeDialogUtils.showError("No user id entered.",
+
+        JID jid = new JID(userID);
+
+        if (!jid.isValid() || jid.getName().isEmpty()) {
+            SafeDialogUtils.showError("Entered user id is not valid.",
                 "Account creation aborted");
 
-            return null;
-        }
-        if (!userID.contains(USERID_SEPARATOR)) {
-            SafeDialogUtils.showError("No " + USERID_SEPARATOR +
-                    " found in the ID.", "Account creation aborted");
+            LOG.debug("Account creation failed as the user did not provide a "
+                + "valid user id.");
 
             return null;
         }
 
-        String[] fields = userID.split(USERID_SEPARATOR, 2);
-
-        if (fields.length < 2 || fields[1].isEmpty() ||
-            fields[1].contains(USERID_SEPARATOR)) {
-
-            SafeDialogUtils.showError("No acceptable domain entered.",
-                "Account creation aborted");
-
-            return null;
-        }
-
-        String username = fields[0];
-        String domain = fields[1];
-
-        if(username.isEmpty()){
-            SafeDialogUtils.showError("No acceptable user name entered.",
-                "Account creation aborted");
-
-            return null;
-        }
+        String username = jid.getName();
+        String domain = jid.getDomain();
 
         final String password = Messages
             .showPasswordDialog("Password", "Password");
+
         if (password == null) {
             LOG.debug("Account creation canceled by user during password"
                 + " entry.");
 
             return null;
-        }
-        if (password.isEmpty()) {
+
+        } else if (password.isEmpty()) {
             SafeDialogUtils.showError("No password entered.",
                 "Account creation aborted");
+
+            LOG.debug("Account creation failed as the user did not provide a "
+                + "valid password.");
 
             return null;
         }
 
         // TODO query port
         String server = SafeDialogUtils.showInputDialog(
-            "XMPP server (optional, not necessary in most cases)", "",
-            "Server");
+            "XMPP server (optional, not necessary in most cases)",
+            "", "Server");
 
         if (server == null) {
             LOG.debug("Account creation canceled by user during server entry.");
@@ -214,15 +207,17 @@ public class ConnectButton extends ToolbarButton {
         }
 
         try {
-            return accountStore
-                .createAccount(username, password, domain, server, 0, true,
-                    true);
+            return accountStore.createAccount(username, password, domain,
+                server, 0, true, true);
+
         } catch (IllegalArgumentException e) {
             LOG.error("Account creation failed", e);
+
             SafeDialogUtils.showError(
                 "There was an error creating the account. Details:\n"
                     + e.getMessage(), "Account creation failed");
+
+            return null;
         }
-        return null;
     }
 }
