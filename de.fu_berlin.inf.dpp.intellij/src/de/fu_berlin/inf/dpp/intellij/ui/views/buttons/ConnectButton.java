@@ -17,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Scanner;
 
 /**
  * Implementation of connect XMPP/jabber server button
@@ -195,7 +196,8 @@ public class ConnectButton extends ToolbarButton {
             return null;
         }
 
-        // TODO query port
+        int port = 0;
+
         String server = SafeDialogUtils.showInputDialog(
             "XMPP server (optional, not necessary in most cases)",
             "", "Server");
@@ -204,11 +206,43 @@ public class ConnectButton extends ToolbarButton {
             LOG.debug("Account creation canceled by user during server entry.");
 
             return null;
+
+        } else if(!server.isEmpty()){
+            String portUserEntry = SafeDialogUtils.showInputDialog(
+                "XMPP server port", "", "Server port");
+
+            if (portUserEntry == null) {
+                LOG.debug("Account creation canceled by user during server "
+                    + "port entry.");
+
+                return null;
+
+            }
+
+            Scanner scanner = new Scanner(portUserEntry.trim());
+
+            if(scanner.hasNextInt(10)){
+                port = scanner.nextInt(10);
+
+                scanner.close();
+
+            } else {
+                scanner.close();
+
+                SafeDialogUtils.showError("No valid server port "
+                        + "entered.", "Account creation aborted");
+
+                LOG.debug("Account creation failed as the user did not "
+                    + "provide a valid server port.");
+
+                return null;
+            }
+
         }
 
         try {
             return accountStore.createAccount(username, password, domain,
-                server, 0, true, true);
+                server, port, true, true);
 
         } catch (IllegalArgumentException e) {
             LOG.error("Account creation failed", e);
