@@ -4,6 +4,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.exceptions.IllegalAWTContextException;
+import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.AbstractSarosAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.ConnectServerAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.DisconnectServerAction;
@@ -11,6 +12,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.actions.NotImplementedAction;
 import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JMenuItem;
@@ -63,8 +65,8 @@ public class ConnectButton extends ToolbarButton {
 
                     if (account != null) {
                         createMenuItems();
-                        connectAction.executeWithUser(account.getUsername() +
-                            USERID_SEPARATOR + account.getDomain());
+
+                        askToConnectToAccount(account);
 
                         return;
                     }
@@ -139,8 +141,33 @@ public class ConnectButton extends ToolbarButton {
                 }
 
                 createMenuItems();
+
+                askToConnectToAccount(account);
             }
         });
+    }
+
+    private void askToConnectToAccount(@NotNull XMPPAccount account){
+        try {
+            Integer option = SafeDialogUtils.showYesNoDialog(
+                Messages.ConnectButton_connect_to_new_account_message,
+                Messages.ConnectButton_connect_to_new_account_title);
+
+            if (option == com.intellij.openapi.ui.Messages.YES){
+                connectAction.executeWithUser(
+                    account.getUsername() + USERID_SEPARATOR
+                        + account.getDomain());
+            }
+
+
+        } catch (IllegalAWTContextException e) {
+            LOG.error("Account creation failed.", e);
+
+            SafeDialogUtils.showError(
+                "There was an error creating the account.\nDetails: "
+                    + e.getMessage(),
+                "Account creation failed");
+        }
     }
 
     /**
