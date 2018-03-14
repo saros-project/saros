@@ -164,4 +164,40 @@ public class SafeDialogUtils {
 
         return response.get();
     }
+
+    /**
+     * Shows a yes/no dialog. This method must not be called from a write safe
+     * context as it needs to be executed synchronously and AWT actions are not
+     * allowed from a write safe context.
+     *
+     * @return the value {@link Messages#YES} if "Yes" is chosen and
+     *         {@link Messages#NO} if "No" is chosen or the dialog is closed
+     *
+     * @throws IllegalAWTContextException if the calling thread is currently
+     *                                    inside a write safe context
+     */
+    public static Integer showYesNoDialog(final String message,
+        final String title) throws IllegalAWTContextException {
+
+        if (application.isWriteAccessAllowed()) {
+            throw new IllegalAWTContextException(
+                "AWT events are not allowed inside write actions.");
+        }
+
+        LOG.info("Showing yes/no dialog: " + title + " - " + message);
+
+        final AtomicReference<Integer> response = new AtomicReference<>();
+
+        application.invokeAndWait(() -> {
+            Integer option = Messages
+                .showYesNoDialog(project, message, title,
+                    Messages.getQuestionIcon());
+
+
+            response.set(option);
+
+        }, ModalityState.defaultModalityState());
+
+        return response.get();
+    }
 }

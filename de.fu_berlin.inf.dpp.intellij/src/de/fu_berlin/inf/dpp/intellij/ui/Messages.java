@@ -72,6 +72,9 @@ public class Messages {
     public static String SubscriptionManager_incoming_subscription_request_title;
     public static String SubscriptionManager_incoming_subscription_request_message;
 
+    public static String ConnectButton_connect_to_new_account_title;
+    public static String ConnectButton_connect_to_new_account_message;
+
     private Messages() {
     }
 }
