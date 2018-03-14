@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 
-import com.intellij.openapi.ui.Messages;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
@@ -192,8 +191,21 @@ public class ConnectButton extends ToolbarButton {
         String username = jid.getName();
         String domain = jid.getDomain();
 
-        final String password = Messages
-            .showPasswordDialog("Password", "Password");
+        final String password;
+
+        try {
+            password = SafeDialogUtils
+                .showPasswordDialog("Password", "Password");
+
+        } catch (IllegalAWTContextException e) {
+            LOG.error("Account creation failed.", e);
+
+            SafeDialogUtils.showError(
+                "There was an error creating the account.\nDetails: "
+                    + e.getMessage(), "Account creation failed");
+
+            return null;
+        }
 
         if (password == null) {
             LOG.debug("Account creation canceled by user during password"
