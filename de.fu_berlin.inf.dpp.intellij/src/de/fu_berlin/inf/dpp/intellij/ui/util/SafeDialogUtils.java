@@ -124,4 +124,44 @@ public class SafeDialogUtils {
             }
         }, ModalityState.defaultModalityState());
     }
+
+    /**
+     * Shows a password dialog. This method must not be called from a write safe
+     * context as it needs to be executed synchronously and AWT actions are not
+     * allowed from a write safe context.
+     *
+     * @return the <code>String</code> entered by the user or
+     *         <code>null</code> if the dialog did not finish with the exit code
+     *         0 (it was not closed by pressing the "OK" button)
+     *
+     * @throws IllegalAWTContextException if the calling thread is currently
+     *                                    inside a write safe context
+     *
+     * @see Messages.InputDialog#getInputString()
+     * @see com.intellij.openapi.ui.DialogWrapper#OK_EXIT_CODE
+     */
+    public static String showPasswordDialog(final String message,
+        final String title) throws IllegalAWTContextException{
+
+        if(application.isWriteAccessAllowed()) {
+            throw new IllegalAWTContextException("AWT events are not allowed " +
+                "inside write actions.");
+        }
+
+        LOG.info("Showing password dialog: " + title + " - " + message);
+
+        final AtomicReference<String> response = new AtomicReference<>();
+
+        application.invokeAndWait(() -> {
+            String option = Messages
+                .showPasswordDialog(project, message, title,
+                    Messages.getQuestionIcon());
+
+            if (option != null) {
+                response.set(option);
+            }
+        }, ModalityState.defaultModalityState());
+
+        return response.get();
+    }
 }
