@@ -6,7 +6,6 @@ import com.intellij.openapi.module.ModuleTypeManager;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -177,7 +176,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
 
-            SafeDialogUtils.showWarning(stringBuilder.toString(),
+            NotificationPanel.showWarning(stringBuilder.toString(),
                 "Unknown Module Type(s)");
         }
     }

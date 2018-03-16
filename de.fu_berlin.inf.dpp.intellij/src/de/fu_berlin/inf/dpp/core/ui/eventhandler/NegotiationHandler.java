@@ -6,27 +6,21 @@ import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.openapi.wm.ex.WindowManagerEx;
-import com.intellij.openapi.wm.impl.IdeFrameImpl;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -36,8 +30,6 @@ import org.apache.log4j.Logger;
 
 import java.awt.Window;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This handler is responsible for presenting and running the session and
@@ -231,9 +223,8 @@ public class NegotiationHandler implements INegotiationHandler {
                         .invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                DialogUtils.showInfo(null,
-                                    "Project sharing canceled remotely",
-                                    message);
+                                NotificationPanel.showInformation(message,
+                                    "Project sharing canceled remotely");
                             }
                         });
 
