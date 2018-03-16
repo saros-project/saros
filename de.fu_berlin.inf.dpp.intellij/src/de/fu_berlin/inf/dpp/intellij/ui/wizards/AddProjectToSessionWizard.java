@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgessMonitorAdapter;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.HeaderPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.PageActionListener;
@@ -187,7 +186,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     cancelNegotiation("Invalid module chosen by client");
 
-                    SafeDialogUtils.showError("The chosen module can not be " +
+                    NotificationPanel.showError("The chosen module can not be " +
                             "used to accept a Saros session. This is probably " +
                             "due to the module not meeting the current " +
                             "restrictions. Modules should have exactly one " +
@@ -201,7 +200,7 @@ public class AddProjectToSessionWizard extends Wizard {
                             "(saros-devel@googlegroups.com) or by using our" +
                             "contact form " +
                             "(https://www.saros-project.org/contact/Website%20feedback).",
-                        "Invalid module chosen!");
+                        "Invalid module chosen");
 
                     return;
                 }
