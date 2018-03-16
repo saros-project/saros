@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
-import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
+import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         if (module != null) {
             LOG.error(file + " created in shared module " + module);
-            SafeDialogUtils.showError("Saros/I detected the creation of " +
+            NotificationPanel.showError("Saros/I detected the creation of " +
                 file + " in the shared module " + module.getName() + ". " +
                 "The creation of new shared files during a session is " +
                 "currently not supported. This means that the current " +
@@ -104,7 +104,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (module != null) {
             LOG.error(originalFile + " copied to " + file + " in shared " +
                 "module " + module);
-            SafeDialogUtils.showError("Saros/I detected the creation of " +
+            NotificationPanel.showError("Saros/I detected the creation of " +
                 file + " by copying " + originalFile + " in the " +
                 "shared module " + module.getName() + ". The creation of " +
                 "new shared files during a session is currently not " +
@@ -133,7 +133,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             LOG.error(file + " property changed in shared module " + module +
                 " ; property: " + propertyName +" ; old value: " + oldValue +
                 " ; new value: " + newValue);
-            SafeDialogUtils.showError("Saros/I detected a property change of " +
+            NotificationPanel.showError("Saros/I detected a property change of " +
                 file + " in the shared module " + module.getName() +". The " +
                 "property \"" + propertyName + "\" was changed from " +
                 oldValue + " to " + newValue + ". Changing the property of " +
@@ -165,7 +165,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         if (module != null) {
             LOG.error(file + " deleted in shared module " + module);
-            SafeDialogUtils.showError("Saros/I detected the deletion of " +
+            NotificationPanel.showError("Saros/I detected the deletion of " +
                 file + " in the shared module " + module.getName() + ". " +
                 "The deletion of shared files during a session is " +
                 "currently not supported. This means that the current " +
@@ -191,7 +191,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (module != null) {
             LOG.error(file + " moved in shared module " + module +
                 " ; old parent: " + oldParent + " ; new parent: " + newParent);
-            SafeDialogUtils.showError("Saros/I detected the move of " +
+            NotificationPanel.showError("Saros/I detected the move of " +
                 file + " in the shared module " + module.getName() + ". " +
                 "The file was moved from " + oldParent + " to " + newParent +
                 ". The move of shared files during a session is currently " +
