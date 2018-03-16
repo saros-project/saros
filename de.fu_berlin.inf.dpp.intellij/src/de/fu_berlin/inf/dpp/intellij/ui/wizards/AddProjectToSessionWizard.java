@@ -1,18 +1,5 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
-import java.awt.Window;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.picocontainer.annotations.Inject;
-
 import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.ModifiableModuleModel;
@@ -28,14 +15,12 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.UIUtil;
-
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgessMonitorAdapter;
@@ -58,6 +43,18 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
+import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.picocontainer.annotations.Inject;
+
+import java.awt.Window;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Wizard for adding projects to a session.
@@ -139,7 +136,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     cancelNegotiation("Failed to create shared module");
 
-                    SafeDialogUtils.showError("The module " + moduleName +
+                    NotificationPanel.showError("The module " + moduleName +
                         " could not be created. The project negotiation " +
                         "was aborted.\n" +
                         "To get help with this problem, please contact the " +
@@ -148,7 +145,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         "(saros-devel@googlegroups.com) or by using our " +
                         "contact form " +
                         "(https://www.saros-project.org/contact/Website%20feedback).",
-                        "Negotiation aborted!");
+                        "Negotiation aborted");
 
                     return;
 
@@ -158,7 +155,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     cancelNegotiation("Failed to create shared module");
 
-                    SafeDialogUtils.showError("The module " + moduleName +
+                    NotificationPanel.showError("The module " + moduleName +
                         " could not be created as a module with the chosen " +
                         "name already exists in this project. The project " +
                         "negotiation was aborted.\n" +
@@ -168,7 +165,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         "(saros-devel@googlegroups.com) or by using our " +
                         "contact form " +
                         "(https://www.saros-project.org/contact/Website%20feedback).",
-                        "Negotiation aborted!");
+                        "Negotiation aborted");
 
                     return;
                 }
@@ -216,7 +213,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     cancelNegotiation("Could not find chosen local " +
                         "representation of shared module");
 
-                    SafeDialogUtils.showError("The chosen module " +
+                    NotificationPanel.showError("The chosen module " +
                         moduleName + " could not be found. The project " +
                         "negotiation was aborted.\n" +
                         "Please make sure that the module is correctly " +
@@ -228,7 +225,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         "(saros-devel@googlegroups.com) or by using our " +
                         "contact form " +
                         "(https://www.saros-project.org/contact/Website%20feedback).",
-                        "Negotiation aborted!");
+                        "Negotiation aborted");
 
                     return;
                 }
@@ -445,11 +442,9 @@ public class AddProjectToSessionWizard extends Wizard {
                  *  be displayed in the trigger logic, so do not popup another dialog here
                  */
                 if (!triggered)
-                    DialogUtils
-                        .showInfo(AddProjectToSessionWizard.this, message,
-                            message + (errorMsg != null ?
-                                "\n\n" + errorMsg :
-                                ""));
+                    NotificationPanel.showInformation(
+                        message + (errorMsg != null ? "\n\n" + errorMsg : ""),
+                        message);
 
                 close();
             }
@@ -486,7 +481,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         @Override
                         public void run() {
                             if (status == ProjectNegotiation.Status.ERROR) {
-                                DialogUtils.showError(null,
+                                NotificationPanel.showError(
                                     "Error during project negotiation",
                                     "The project could not be shared: "
                                         + negotiation.getErrorMessage());
@@ -495,7 +490,7 @@ public class AddProjectToSessionWizard extends Wizard {
                                     .showInformation("Project shared",
                                         "Project successfully shared");
                             } else
-                                DialogUtils.showError(null,
+                                NotificationPanel.showError(
                                     "Project negotiation aborted",
                                     "Project negotiation was canceled");
                         }

@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
+import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.log4j.Logger;
@@ -56,15 +57,15 @@ class ContactPopMenu extends JPopupMenu {
 
         if(moduleManager == null){
 
-            SafeDialogUtils.showError("The local module manager could not be " +
-                "found. This most likely means that you are not using " +
-                "IntelliJ IDEA or are using an unsupported version.\n" +
+            NotificationPanel.showError("The local module manager " +
+                "could not be found. This most likely means that you are not " +
+                "using IntelliJ IDEA or are using an unsupported version.\n" +
                 "If you are using a supported version of IntelliJ IDEA," +
                 "please contact the Saros development team. You can reach us " +
                 "by  writing to our mailing list " +
                 "(saros-devel@googlegroups.com) or by using our contact form " +
                 "(https://www.saros-project.org/contact/Website%20feedback).",
-                "Unsupported IDE!");
+                "Unsupported IDE");
 
             return;
         }
@@ -132,17 +133,17 @@ class ContactPopMenu extends JPopupMenu {
                     + " local IntelliJ instance does not know any module with"
                     + " the given name.");
 
-                SafeDialogUtils.showError("Saros could not find the chosen " +
-                    "module " + moduleName + ". Please make sure that the " +
-                    "module is correctly configured in the current project " +
-                    "and exists on disk.\n" +
+                NotificationPanel.showError("Saros could not find " +
+                    "the chosen module " + moduleName + ". Please make sure " +
+                    "that the module is correctly configured in the current " +
+                    "project and exists on disk.\n" +
                     "If there seems to be no problem with the module, please " +
                     "contact the Saros development team. You can reach us by " +
                     "writing to our mailing list " +
                     "(saros-devel@googlegroups.com) or by using our contact " +
                     "form " +
                     "(https://www.saros-project.org/contact/Website%20feedback).",
-                    "Error - Project sharing aborted!");
+                    "Error - Project sharing aborted");
 
                 return;
             }

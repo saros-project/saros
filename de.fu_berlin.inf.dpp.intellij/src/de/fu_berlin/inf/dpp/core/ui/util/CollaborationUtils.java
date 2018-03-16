@@ -192,9 +192,9 @@ public class CollaborationUtils {
                     return;
                 }
 
-                DialogUtils.showError(null,
-                    Messages.CollaborationUtils_insufficient_privileges,
-                    Messages.CollaborationUtils_insufficient_privileges_text);
+                NotificationPanel.showError(
+                    Messages.CollaborationUtils_insufficient_privileges_text,
+                    Messages.CollaborationUtils_insufficient_privileges);
             }
         });
     }
