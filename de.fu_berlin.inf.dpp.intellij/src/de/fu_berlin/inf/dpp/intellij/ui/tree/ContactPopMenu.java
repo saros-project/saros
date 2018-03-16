@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
@@ -110,7 +109,7 @@ class ContactPopMenu extends JPopupMenu {
                 LOG.debug("No session is started as an invalid module was "
                     + "chosen", exception);
 
-                SafeDialogUtils.showError("The chosen module can not be " +
+                NotificationPanel.showError("The chosen module can not be " +
                     "shared through Saros. This is probably due to the " +
                     "module not meeting the current restrictions. Modules " +
                     "should have exactly one content root that is located in " +
