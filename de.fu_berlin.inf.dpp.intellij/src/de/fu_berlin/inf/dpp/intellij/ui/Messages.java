@@ -75,6 +75,9 @@ public class Messages {
     public static String ConnectButton_connect_to_new_account_title;
     public static String ConnectButton_connect_to_new_account_message;
 
+    public static String Contact_option_mailing_list_devel;
+    public static String Contact_option_website_feedback;
+
     private Messages() {
     }
 }

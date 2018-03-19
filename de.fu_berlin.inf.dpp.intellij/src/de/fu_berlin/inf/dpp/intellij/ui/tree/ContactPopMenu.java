@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -61,9 +62,10 @@ class ContactPopMenu extends JPopupMenu {
                 "using IntelliJ IDEA or are using an unsupported version.\n" +
                 "If you are using a supported version of IntelliJ IDEA," +
                 "please contact the Saros development team. You can reach us " +
-                "by  writing to our mailing list " +
-                "(saros-devel@googlegroups.com) or by using our contact form " +
-                "(https://www.saros-project.org/contact/Website%20feedback).",
+                "by  writing to our mailing list (" +
+                Messages.Contact_option_mailing_list_devel +
+                ") or by using our contact form (" +
+                Messages.Contact_option_website_feedback + ").",
                 "Unsupported IDE");
 
             return;
@@ -138,10 +140,10 @@ class ContactPopMenu extends JPopupMenu {
                     "project and exists on disk.\n" +
                     "If there seems to be no problem with the module, please " +
                     "contact the Saros development team. You can reach us by " +
-                    "writing to our mailing list " +
-                    "(saros-devel@googlegroups.com) or by using our contact " +
-                    "form " +
-                    "(https://www.saros-project.org/contact/Website%20feedback).",
+                    "writing to our mailing list (" +
+                    Messages.Contact_option_mailing_list_devel +
+                    ") or by using our contact form (" +
+                    Messages.Contact_option_website_feedback + ").",
                     "Error - Project sharing aborted");
 
                 return;

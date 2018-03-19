@@ -140,10 +140,10 @@ public class AddProjectToSessionWizard extends Wizard {
                         "was aborted.\n" +
                         "To get help with this problem, please contact the " +
                         "Saros development team. You can reach us by writing " +
-                        "to our mailing list " +
-                        "(saros-devel@googlegroups.com) or by using our " +
-                        "contact form " +
-                        "(https://www.saros-project.org/contact/Website%20feedback).",
+                        "to our mailing list (" +
+                        Messages.Contact_option_mailing_list_devel +
+                        ") or by using our contact form (" +
+                        Messages.Contact_option_website_feedback + ").",
                         "Negotiation aborted");
 
                     return;
@@ -160,10 +160,10 @@ public class AddProjectToSessionWizard extends Wizard {
                         "negotiation was aborted.\n" +
                         "If you are sure that no such module already exists, " +
                         "please contact the Saros development team. You can " +
-                        "reach us by writing to our mailing list " +
-                        "(saros-devel@googlegroups.com) or by using our " +
-                        "contact form " +
-                        "(https://www.saros-project.org/contact/Website%20feedback).",
+                        "reach us by writing to our mailing list (" +
+                        Messages.Contact_option_mailing_list_devel +
+                        ") or by using our contact form (" +
+                        Messages.Contact_option_website_feedback + ").",
                         "Negotiation aborted");
 
                     return;
@@ -220,10 +220,10 @@ public class AddProjectToSessionWizard extends Wizard {
                         "disk.\n" +
                         "If there seems to be no problem with the module, " +
                         "please contact the Saros development team. You can " +
-                        "reach us by writing to our mailing list " +
-                        "(saros-devel@googlegroups.com) or by using our " +
-                        "contact form " +
-                        "(https://www.saros-project.org/contact/Website%20feedback).",
+                        "reach us by writing to our mailing list (" +
+                        Messages.Contact_option_mailing_list_devel +
+                        ") or by using our contact form (" +
+                        Messages.Contact_option_website_feedback + ").",
                         "Negotiation aborted");
 
                     return;
