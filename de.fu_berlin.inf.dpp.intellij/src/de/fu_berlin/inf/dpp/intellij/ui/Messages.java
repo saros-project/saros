@@ -15,6 +15,12 @@ public class Messages {
     }
 
     public static String AddProjectToSessionWizard_title;
+    public static String AddProjectToSessionWizard_module_creation_failed_title;
+    public static String AddProjectToSessionWizard_module_creation_failed_message_condition;
+    public static String AddProjectToSessionWizard_module_already_exists_title;
+    public static String AddProjectToSessionWizard_module_already_exists_message_condition;
+    public static String AddProjectToSessionWizard_module_not_found_title;
+    public static String AddProjectToSessionWizard_module_not_found_message_condition;
 
     public static String CollaborationUtils_confirm_closing;
     public static String CollaborationUtils_confirm_closing_text;
@@ -77,6 +83,12 @@ public class Messages {
 
     public static String Contact_option_mailing_list_devel;
     public static String Contact_option_website_feedback;
+    public static String Contact_saros_message_conditional;
+
+    public static String ContactPopMenu_unsupported_ide_title;
+    public static String ContactPopMenu_unsupported_ide_message_condition;
+    public static String ContactPopMenu_module_not_found_title;
+    public static String ContactPopMenu_module_not_found_message_condition;
 
     private Messages() {
     }
