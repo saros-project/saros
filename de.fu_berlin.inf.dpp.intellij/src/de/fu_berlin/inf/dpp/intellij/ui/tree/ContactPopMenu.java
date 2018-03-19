@@ -20,6 +20,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,16 +58,10 @@ class ContactPopMenu extends JPopupMenu {
 
         if(moduleManager == null){
 
-            NotificationPanel.showError("The local module manager " +
-                "could not be found. This most likely means that you are not " +
-                "using IntelliJ IDEA or are using an unsupported version.\n" +
-                "If you are using a supported version of IntelliJ IDEA," +
-                "please contact the Saros development team. You can reach us " +
-                "by  writing to our mailing list (" +
-                Messages.Contact_option_mailing_list_devel +
-                ") or by using our contact form (" +
-                Messages.Contact_option_website_feedback + ").",
-                "Unsupported IDE");
+            NotificationPanel.showError(MessageFormat
+                    .format(Messages.Contact_saros_message_conditional,
+                        Messages.ContactPopMenu_unsupported_ide_message_condition),
+                Messages.ContactPopMenu_unsupported_ide_title);
 
             return;
         }
@@ -134,17 +129,12 @@ class ContactPopMenu extends JPopupMenu {
                     + " local IntelliJ instance does not know any module with"
                     + " the given name.");
 
-                NotificationPanel.showError("Saros could not find " +
-                    "the chosen module " + moduleName + ". Please make sure " +
-                    "that the module is correctly configured in the current " +
-                    "project and exists on disk.\n" +
-                    "If there seems to be no problem with the module, please " +
-                    "contact the Saros development team. You can reach us by " +
-                    "writing to our mailing list (" +
-                    Messages.Contact_option_mailing_list_devel +
-                    ") or by using our contact form (" +
-                    Messages.Contact_option_website_feedback + ").",
-                    "Error - Project sharing aborted");
+                NotificationPanel.showError(MessageFormat
+                        .format(Messages.Contact_saros_message_conditional,
+                            MessageFormat.format(
+                                Messages.ContactPopMenu_module_not_found_message_condition,
+                                moduleName)),
+                    Messages.ContactPopMenu_module_not_found_title);
 
                 return;
             }

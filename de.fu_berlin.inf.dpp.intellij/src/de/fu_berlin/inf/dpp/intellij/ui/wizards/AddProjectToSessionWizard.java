@@ -51,6 +51,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,16 +136,12 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     cancelNegotiation("Failed to create shared module");
 
-                    NotificationPanel.showError("The module " + moduleName +
-                        " could not be created. The project negotiation " +
-                        "was aborted.\n" +
-                        "To get help with this problem, please contact the " +
-                        "Saros development team. You can reach us by writing " +
-                        "to our mailing list (" +
-                        Messages.Contact_option_mailing_list_devel +
-                        ") or by using our contact form (" +
-                        Messages.Contact_option_website_feedback + ").",
-                        "Negotiation aborted");
+                    NotificationPanel.showError(MessageFormat
+                            .format(Messages.Contact_saros_message_conditional,
+                                MessageFormat.format(
+                                    Messages.AddProjectToSessionWizard_module_creation_failed_message_condition,
+                                    moduleName) + "\n" + e),
+                        Messages.AddProjectToSessionWizard_module_creation_failed_title);
 
                     return;
 
@@ -154,17 +151,12 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     cancelNegotiation("Failed to create shared module");
 
-                    NotificationPanel.showError("The module " + moduleName +
-                        " could not be created as a module with the chosen " +
-                        "name already exists in this project. The project " +
-                        "negotiation was aborted.\n" +
-                        "If you are sure that no such module already exists, " +
-                        "please contact the Saros development team. You can " +
-                        "reach us by writing to our mailing list (" +
-                        Messages.Contact_option_mailing_list_devel +
-                        ") or by using our contact form (" +
-                        Messages.Contact_option_website_feedback + ").",
-                        "Negotiation aborted");
+                    NotificationPanel.showError(MessageFormat
+                            .format(Messages.Contact_saros_message_conditional,
+                                MessageFormat.format(
+                                    Messages.AddProjectToSessionWizard_module_already_exists_message_condition,
+                                    moduleName)),
+                        Messages.AddProjectToSessionWizard_module_already_exists_title);
 
                     return;
                 }
@@ -212,19 +204,12 @@ public class AddProjectToSessionWizard extends Wizard {
                     cancelNegotiation("Could not find chosen local " +
                         "representation of shared module");
 
-                    NotificationPanel.showError("The chosen module " +
-                        moduleName + " could not be found. The project " +
-                        "negotiation was aborted.\n" +
-                        "Please make sure that the module is correctly " +
-                        "configured in the current project and exists on " +
-                        "disk.\n" +
-                        "If there seems to be no problem with the module, " +
-                        "please contact the Saros development team. You can " +
-                        "reach us by writing to our mailing list (" +
-                        Messages.Contact_option_mailing_list_devel +
-                        ") or by using our contact form (" +
-                        Messages.Contact_option_website_feedback + ").",
-                        "Negotiation aborted");
+                    NotificationPanel.showError(MessageFormat
+                            .format(Messages.Contact_saros_message_conditional,
+                                MessageFormat.format(
+                                    Messages.AddProjectToSessionWizard_module_not_found_message_condition,
+                                    moduleName)),
+                        Messages.AddProjectToSessionWizard_module_not_found_title);
 
                     return;
                 }
