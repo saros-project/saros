@@ -21,6 +21,8 @@ public class Messages {
     public static String AddProjectToSessionWizard_module_already_exists_message_condition;
     public static String AddProjectToSessionWizard_module_not_found_title;
     public static String AddProjectToSessionWizard_module_not_found_message_condition;
+    public static String AddProjectToSessionWizard_invalid_module_title;
+    public static String AddProjectToSessionWizard_invalid_module_message_condition;
 
     public static String CollaborationUtils_confirm_closing;
     public static String CollaborationUtils_confirm_closing_text;
@@ -89,6 +91,8 @@ public class Messages {
     public static String ContactPopMenu_unsupported_ide_message_condition;
     public static String ContactPopMenu_module_not_found_title;
     public static String ContactPopMenu_module_not_found_message_condition;
+    public static String ContactPopMenu_invalid_module_title;
+    public static String ContactPopMenu_invalid_module_message_condition;
 
     private Messages() {
     }

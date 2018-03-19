@@ -106,19 +106,12 @@ class ContactPopMenu extends JPopupMenu {
                 LOG.debug("No session is started as an invalid module was "
                     + "chosen", exception);
 
-                NotificationPanel.showError("The chosen module can not be " +
-                    "shared through Saros. This is probably due to the " +
-                    "module not meeting the current restrictions. Modules " +
-                    "should have exactly one content root that is located in " +
-                    "the project root directory. Please select a  valid " +
-                    "module.\n"+
-                    "If the chosen module meets the given restrictions, " +
-                    "please contact the Saros development team.You can reach " +
-                    "us by writing to our mailing list " +
-                    "(saros-devel@googlegroups.com) or by using our contact " +
-                    "form " +
-                    "(https://www.saros-project.org/contact/Website%20feedback).",
-                    "Invalid module chosen!");
+                NotificationPanel.showError(MessageFormat
+                        .format(Messages.Contact_saros_message_conditional,
+                            MessageFormat.format(
+                                Messages.ContactPopMenu_invalid_module_message_condition,
+                                moduleName)),
+                    Messages.ContactPopMenu_invalid_module_title);
 
                 return;
             }
