@@ -56,10 +56,9 @@ public class TreeClickListener extends MouseAdapter {
                     ContactPopMenu menu = new ContactPopMenu(contactInfo);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
-            } else if (
-                node.getUserObject() instanceof SessionTreeRootNode.UserInfo
-                    || node
-                    .getUserObject() instanceof SessionTreeRootNode.SessionInfo) {
+            } else if (node
+                .getUserObject() instanceof SessionTreeRootNode.UserInfo) {
+
                 SessionTreeRootNode.UserInfo userInfo = (SessionTreeRootNode.UserInfo) node
                     .getUserObject();
                 User user = userInfo.getUser();
@@ -68,6 +67,10 @@ public class TreeClickListener extends MouseAdapter {
                     SessionPopMenu menu = new SessionPopMenu(user);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
+            } else if (node
+                .getUserObject() instanceof SessionTreeRootNode.SessionInfo) {
+
+                //TODO implement behavior when clicking on session entry
             }
         }
     }
