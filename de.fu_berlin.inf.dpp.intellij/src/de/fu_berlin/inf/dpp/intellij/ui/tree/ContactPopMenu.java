@@ -45,16 +45,20 @@ class ContactPopMenu extends JPopupMenu {
     ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
         this.contactInfo = contactInfo;
 
-        if (workspace == null && project == null) {
+        if (workspace == null || project == null) {
             SarosPluginContext.initComponent(this);
+
+            if (workspace == null || project == null) {
+                LOG.error("PicoContainer injection failed. Objects still not "
+                    + "present after injection.");
+
+                return;
+            }
         }
+
 
         JMenu menuShareProject = new JMenu("Work together on...");
         menuShareProject.setIcon(IconManager.SESSIONS_ICON);
-
-        if (project == null) {
-            return;
-        }
 
         ModuleManager moduleManager = ModuleManager.getInstance(project);
 
