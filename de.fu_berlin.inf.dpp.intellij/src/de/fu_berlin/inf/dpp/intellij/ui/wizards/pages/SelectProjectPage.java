@@ -43,6 +43,10 @@ public class SelectProjectPage extends AbstractWizardPage {
     };
 
     private void checkForNewSameNameAsOld() {
+        if (wizard == null) {
+            return;
+        }
+
         String newName = getLocalProjectName();
         if (!newName.equals(projectName)) {
             wizard.disableNextButton();
@@ -224,6 +228,8 @@ public class SelectProjectPage extends AbstractWizardPage {
         fldExistingProjectName.setEnabled(true);
         lblExistingProject.setEnabled(true);
         browseButton.setEnabled(true);
+
+        checkForNewSameNameAsOld();
     }
 
     private void doNewProject() {
@@ -236,6 +242,8 @@ public class SelectProjectPage extends AbstractWizardPage {
         lblExistingProject.setEnabled(false);
         fldExistingProjectName.setEnabled(false);
         browseButton.setEnabled(false);
+
+        checkForNewSameNameAsOld();
     }
 
     @Override
