@@ -1,6 +1,11 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
+import org.picocontainer.annotations.Inject;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -18,6 +23,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Selects local project.
@@ -74,11 +81,17 @@ public class SelectProjectPage extends AbstractWizardPage {
     private JLabel lblNewProject;
     private JLabel lblExistingProject;
 
+    @Inject
+    private transient Project project;
+
     public SelectProjectPage(String id, String projectName,
         String newProjectName, String projectBase,
         PageActionListener pageListener) {
         super(id, pageListener);
         this.projectName = projectName;
+
+        SarosPluginContext.initComponent(this);
+
         create(newProjectName, projectBase);
     }
 
@@ -215,7 +228,18 @@ public class SelectProjectPage extends AbstractWizardPage {
         };
         browseButton.addActionListener(browseListener);
 
-        doNewProject();
+        ModuleManager moduleManager = ModuleManager.getInstance(project);
+
+        Optional<Module> module = Arrays.stream(moduleManager.getModules())
+            .filter(m -> projectName.equals(m.getName())).findFirst();
+
+        if (!module.isPresent()) {
+            doNewProject();
+
+        } else {
+            fldExistingProjectName.setText(module.get().getName());
+            doExistingProject();
+        }
     }
 
     private void doExistingProject() {
