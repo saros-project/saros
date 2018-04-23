@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.intellij.ui.util;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
@@ -17,9 +18,11 @@ import org.picocontainer.annotations.Inject;
 public class NotificationPanel {
     private static final Logger LOG = Logger.getLogger(NotificationPanel.class);
 
-    public static final String GROUP_NOTIFICATION_ID = "sarosNotification";
-    public static final NotificationGroup GROUP_DISPLAY_ID_INFO = new NotificationGroup(
+    private static final String GROUP_NOTIFICATION_ID = "sarosNotification";
+    private static final NotificationGroup GROUP_DISPLAY_ID_INFO = new NotificationGroup(
         GROUP_NOTIFICATION_ID, NotificationDisplayType.BALLOON, true);
+    private static final NotificationListener.UrlOpeningListener URL_OPENING_LISTENER =
+        new NotificationListener.UrlOpeningListener(false);
 
     @Inject
     private static Project project;
@@ -33,7 +36,8 @@ public class NotificationPanel {
 
     //TODO: Move to core
     /**
-     * Displays a notification of the given type.
+     * Displays a notification of the given type. Notifications support html
+     * formatting, including hyperlinks, by using html tags.
      * <p/>
      * Possible types are {@link NotificationType#INFORMATION},
      * {@link NotificationType#WARNING} and {@link NotificationType#ERROR}.
@@ -50,7 +54,7 @@ public class NotificationPanel {
             " - " + message);
 
         final Notification notification = GROUP_DISPLAY_ID_INFO
-            .createNotification(title, message, notificationType, null);
+            .createNotification(title, message, notificationType, URL_OPENING_LISTENER);
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -64,6 +68,8 @@ public class NotificationPanel {
      *
      * @param message content of the notification
      * @param title title of the notification
+     *
+     * @see NotificationPanel#showNotification(NotificationType, String, String)
      */
     public static void showInformation(String message, String title){
         showNotification(NotificationType.INFORMATION, message, title);
@@ -74,6 +80,8 @@ public class NotificationPanel {
      *
      * @param message content of the notification
      * @param title title of the notification
+     *
+     * @see NotificationPanel#showNotification(NotificationType, String, String)
      */
     public static void showWarning(String message, String title){
         showNotification(NotificationType.WARNING, message, title);
@@ -84,6 +92,8 @@ public class NotificationPanel {
      *
      * @param message content of the notification
      * @param title title of the notification
+     *
+     * @see NotificationPanel#showNotification(NotificationType, String, String)
      */
     public static void showError(String message, String title){
         showNotification(NotificationType.ERROR, message, title);
