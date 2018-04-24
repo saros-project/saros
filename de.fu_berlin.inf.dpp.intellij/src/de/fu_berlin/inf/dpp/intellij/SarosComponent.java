@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
 
 /**
  * Component that is initalized when a project is loaded.
- * It initializes the logging, shortcuts and the {@link IntelliJSarosLifecycle} singleton.
+ * It initializes the logging, shortcuts and the {@link IntellijProjectLifecycle} singleton.
  */
 public class SarosComponent
     implements com.intellij.openapi.components.ProjectComponent {
