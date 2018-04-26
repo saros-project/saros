@@ -21,6 +21,8 @@ public class SarosToolbar extends JToolBar {
 
     private static final boolean ENABLE_RECOVERY = Boolean
         .getBoolean("saros.intellij.ENABLE_RECOVERY");
+    private static final boolean ENABLE_FOLLOW_MODE = Boolean
+        .getBoolean("saros.intellij.ENABLE_FOLLOW_MODE");
 
     public SarosToolbar() {
         super("Saros IDEA toolbar");
@@ -38,7 +40,9 @@ public class SarosToolbar extends JToolBar {
         add(new SimpleButton(new NotImplementedAction("preferences"),
             "Open preferences", OPEN_REFS_ICON_PATH, "preferences"));
 
-        add(new FollowButton());
+        if (ENABLE_FOLLOW_MODE) {
+            add(new FollowButton());
+        }
 
         if (ENABLE_RECOVERY) {
             add(new ConsistencyButton());
