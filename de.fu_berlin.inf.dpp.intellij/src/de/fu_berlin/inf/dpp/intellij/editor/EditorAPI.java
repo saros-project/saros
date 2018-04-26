@@ -27,6 +27,9 @@ import java.awt.Color;
 
 public class EditorAPI {
 
+    private static final boolean ENABLE_ANNOTATIONS = Boolean
+        .getBoolean("saros.intellij.ENABLE_ANNOTATIONS");
+
     private Application application;
     private CommandProcessor commandProcessor;
 
@@ -131,7 +134,7 @@ public class EditorAPI {
      */
     public RangeHighlighter textMarkAdd(final Editor editor, final int start,
         final int end, Color color) {
-        if (color == null || editor == null) {
+        if (color == null || editor == null || !ENABLE_ANNOTATIONS) {
             return null;
         }
 
@@ -157,7 +160,7 @@ public class EditorAPI {
      */
     public void textMarkRemove(final Editor editor,
         RangeHighlighter highlighter) {
-        if (editor == null) {
+        if (editor == null || !ENABLE_ANNOTATIONS) {
             return;
         }
 
@@ -208,6 +211,10 @@ public class EditorAPI {
      */
     public void setSelection(final Editor editor, final int start,
         final int end, ColorModel colorMode) {
+
+        if (!ENABLE_ANNOTATIONS) {
+            return;
+        }
 
         Runnable action = new Runnable() {
             @Override
