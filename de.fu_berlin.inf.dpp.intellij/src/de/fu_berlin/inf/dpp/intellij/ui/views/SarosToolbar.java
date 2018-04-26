@@ -23,6 +23,8 @@ public class SarosToolbar extends JToolBar {
         .getBoolean("saros.intellij.ENABLE_RECOVERY");
     private static final boolean ENABLE_FOLLOW_MODE = Boolean
         .getBoolean("saros.intellij.ENABLE_FOLLOW_MODE");
+    private static final boolean ENABLE_ADD_CONTACT = Boolean
+        .getBoolean("saros.intellij.ENABLE_ADD_CONTACT");
 
     public SarosToolbar() {
         super("Saros IDEA toolbar");
@@ -34,8 +36,10 @@ public class SarosToolbar extends JToolBar {
 
         add(new ConnectButton());
 
-        add(new SimpleButton(new NotImplementedAction("addContact"),
-            "Add contact to list", ADD_CONTACT_ICON_PATH, "addContact"));
+        if (ENABLE_ADD_CONTACT) {
+            add(new SimpleButton(new NotImplementedAction("addContact"),
+                "Add contact to list", ADD_CONTACT_ICON_PATH, "addContact"));
+        }
 
         add(new SimpleButton(new NotImplementedAction("preferences"),
             "Open preferences", OPEN_REFS_ICON_PATH, "preferences"));
