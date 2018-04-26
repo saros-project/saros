@@ -19,6 +19,9 @@ public class SarosToolbar extends JToolBar {
     public static final String ADD_CONTACT_ICON_PATH = "/icons/famfamfam/contact_add_tsk.png";
     public static final String OPEN_REFS_ICON_PATH = "/icons/famfamfam/test_con.gif";
 
+    private static final boolean ENABLE_RECOVERY = Boolean
+        .getBoolean("saros.intellij.ENABLE_RECOVERY");
+
     public SarosToolbar() {
         super("Saros IDEA toolbar");
         setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -37,7 +40,9 @@ public class SarosToolbar extends JToolBar {
 
         add(new FollowButton());
 
-        add(new ConsistencyButton());
+        if (ENABLE_RECOVERY) {
+            add(new ConsistencyButton());
+        }
 
         add(new LeaveSessionButton());
     }
