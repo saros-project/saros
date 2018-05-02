@@ -371,7 +371,8 @@ public class AddProjectToSessionWizard extends Wizard {
         IncomingProjectNegotiation negotiation) {
 
         super(parent, Messages.AddProjectToSessionWizard_title,
-            new HeaderPanel(Messages.EnterProjectNamePage_title2, ""));
+            new HeaderPanel(Messages.EnterProjectNamePage_title2,
+                Messages.EnterProjectNamePage_description));
 
         this.negotiation = negotiation;
         this.peer = negotiation.getPeer();
@@ -391,7 +392,7 @@ public class AddProjectToSessionWizard extends Wizard {
         registerPage(selectProjectPage);
 
         fileListPage = new TextAreaPage(FILE_LIST_PAGE_ID,
-            "Local file changes:", fileListPageListener);
+            "Changes applied to local modules:", fileListPageListener);
         registerPage(fileListPage);
 
         create();
