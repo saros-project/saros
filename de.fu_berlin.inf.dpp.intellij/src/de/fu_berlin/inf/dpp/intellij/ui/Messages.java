@@ -54,6 +54,7 @@ public class Messages {
     public static String EnterProjectNamePage_project_name;
     public static String EnterProjectNamePage_title2;
     public static String EnterProjectNamePage_description;
+    public static String EnterProjectNamePage_description_changed_files;
     public static String EnterProjectNamePage_use_existing_project;
 
     public static String ShowDescriptionPage_description;

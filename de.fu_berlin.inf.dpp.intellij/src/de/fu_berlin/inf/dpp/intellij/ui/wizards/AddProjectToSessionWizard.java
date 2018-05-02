@@ -208,6 +208,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 localProjects.put(remoteProjectID, sharedProject);
 
                 prepareFilesChangedPage(localProjects);
+
+                setTopPanelText(Messages.EnterProjectNamePage_description_changed_files);
             }
         }
 
