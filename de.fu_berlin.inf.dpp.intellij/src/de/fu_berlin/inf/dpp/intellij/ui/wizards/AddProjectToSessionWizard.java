@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
 
+import java.awt.Dimension;
 import java.awt.Window;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -378,6 +379,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
         this.negotiation = negotiation;
         this.peer = negotiation.getPeer();
+
+        this.setPreferredSize(new Dimension(650,515));
 
 
         List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
