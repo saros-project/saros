@@ -36,7 +36,7 @@
     <actions>
         <!-- Add your actions here -->
         <group id="saros.MainMenu" text="Saros" description="Saros menu">
-            <add-to-group group-id="MainMenu" anchor="last"/>
+            <add-to-group group-id="MainMenu" relative-to-action="HelpMenu" anchor="before"/>
             <action id="saros.about"
                     class="de.fu_berlin.inf.dpp.intellij.ui.menu.AboutSarosHandler"
                     text="About Saros"/>
