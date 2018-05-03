@@ -31,6 +31,9 @@ public class ConnectButton extends ToolbarButton {
 
     public static final String USERID_SEPARATOR = "@";
 
+    private static final boolean ENABLE_CONFIGURE_ACCOUNTS = Boolean
+            .getBoolean("saros.intellij.ENABLE_CONFIGURE_ACCOUNTS");
+
     private JPopupMenu popupMenu = new JPopupMenu();
     private JMenuItem menuItemAdd;
     private JMenuItem configure;
@@ -87,7 +90,11 @@ public class ConnectButton extends ToolbarButton {
 
         popupMenu.addSeparator();
         popupMenu.add(menuItemAdd);
-        popupMenu.add(configure);
+
+        if (ENABLE_CONFIGURE_ACCOUNTS) {
+            popupMenu.add(configure);
+        }
+
         popupMenu.add(disconnect);
     }
 
