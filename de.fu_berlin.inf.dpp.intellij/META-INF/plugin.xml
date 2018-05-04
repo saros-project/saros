@@ -46,7 +46,7 @@
                id="saros.ShareWith"
                icon="/icons/famfamfam/session_tsk.png" text="Share With..."
                class="de.fu_berlin.inf.dpp.intellij.ui.menu.SarosFileShareGroup">
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </group>
 
     </actions>
