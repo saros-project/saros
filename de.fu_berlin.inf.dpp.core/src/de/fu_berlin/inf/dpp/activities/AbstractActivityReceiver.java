@@ -86,11 +86,6 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
-    public void receive(ShareConsoleActivity shareConsoleActivity) {
-        // do nothing
-    }
-
-    @Override
     public void receive(StartFollowingActivity startFollowingActivity) {
         // do nothing
     }

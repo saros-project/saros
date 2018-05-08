@@ -48,8 +48,6 @@ public interface IActivityReceiver {
 
     void receive(ProgressActivity progressActivity);
 
-    void receive(ShareConsoleActivity shareConsoleActivity);
-
     void receive(StartFollowingActivity startFollowingActivity);
 
     void receive(StopActivity stopActivity);
