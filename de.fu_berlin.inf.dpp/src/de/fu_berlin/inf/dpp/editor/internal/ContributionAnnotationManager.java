@@ -19,6 +19,7 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
@@ -28,8 +29,19 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
- * This class keeps a history of added {@link ContributionAnnotation}s and
- * removes old ones.
+ * Throughout a session, the user should be made aware of the textual changes
+ * made by the other session participants. Additions and changes are represented
+ * by {@link ContributionAnnotation}s and distinguished by authors (deletions
+ * are not highlighted). The Annotations are added in real-time along with the
+ * application of the textual changes and are removed when the characters they
+ * belong to are deleted, the session ends, or their respective author leaves
+ * the session. To avoid cluttering the editors, only the last
+ * {@value #MAX_HISTORY_LENGTH} changes are annotated.
+ * <p>
+ * This class takes care of managing the annotations for session participants
+ * which involves adding, removing, and splitting of Annotations.
+ * <p>
+ * TODO Move responsibilities from {@link EditorManager} to here
  */
 public class ContributionAnnotationManager {
 
