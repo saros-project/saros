@@ -146,8 +146,8 @@ public class ContributionAnnotationManager {
      * insert text ranges a, b, c, d ... now we split a into a0, a1 and as a
      * result a0 and a1 are now the newest entries instead the oldest
      * 
-     * See also http://sourceforge.net/p/dpp/bugs/757/ that includes also
-     * another defect which is part of this behavior
+     * See also https://github.com/saros-project/saros/issues/32 that includes
+     * also another defect which is part of this behavior
      */
     @SuppressWarnings("unchecked")
     public void splitAnnotation(final IAnnotationModel model, final int offset) {
