@@ -110,23 +110,43 @@ public final class NegotiationFactory {
     }
 
     public OutgoingProjectNegotiation newOutgoingProjectNegotiation(
-        final JID remoteAddress, final List<IProject> resources,
+        final JID remoteAddress, final TransferType transferType,
+        final List<IProject> resources,
         final ISarosSessionManager sessionManager, final ISarosSession session) {
 
-        return new OutgoingProjectNegotiation(remoteAddress, resources,
-            sessionManager, session, /* editorManager */
-            context.getComponent(IEditorManager.class), workspace,
-            checksumCache, connectionService, transmitter, receiver);
+        if (transferType == null) {
+            throw new IllegalArgumentException("transferType must not be null");
+        }
+
+        switch (transferType) {
+        case ARCHIVE:
+            return new OutgoingProjectNegotiation(remoteAddress, resources,
+                sessionManager, session, /* editorManager */
+                context.getComponent(IEditorManager.class), workspace,
+                checksumCache, connectionService, transmitter, receiver);
+        default:
+            throw new UnsupportedOperationException("transferType not implemented");
+        }
     }
 
     public IncomingProjectNegotiation newIncomingProjectNegotiation(
-        final JID remoteAddress, final String negotiationID,
+        final JID remoteAddress, final TransferType transferType,
+        final String negotiationID,
         final List<ProjectNegotiationData> projectNegotiationData,
         final ISarosSessionManager sessionManager, final ISarosSession session) {
 
-        return new IncomingProjectNegotiation(remoteAddress, negotiationID,
-            projectNegotiationData, sessionManager, session,
-            fileReplacementInProgressObservable, workspace, checksumCache,
-            connectionService, transmitter, receiver);
+        if (transferType == null) {
+            throw new IllegalArgumentException("transferType must not be null");
+        }
+
+        switch (transferType) {
+        case ARCHIVE:
+            return new IncomingProjectNegotiation(remoteAddress, negotiationID,
+                projectNegotiationData, sessionManager, session,
+                fileReplacementInProgressObservable, workspace, checksumCache,
+                connectionService, transmitter, receiver);
+        default:
+            throw new UnsupportedOperationException("transferType not implemented");
+        }
     }
 }

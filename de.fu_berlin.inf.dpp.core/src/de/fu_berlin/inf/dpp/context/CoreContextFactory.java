@@ -38,6 +38,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.session.ProjectNegotiationTypeHook;
 import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
@@ -80,6 +81,7 @@ public class CoreContextFactory extends AbstractContextFactory {
             // Negotiation hooks
             Component.create(SessionNegotiationHookManager.class),
             Component.create(ColorNegotiationHook.class),
+            Component.create(ProjectNegotiationTypeHook.class),
 
             // Network
             Component.create(DispatchThreadContext.class),

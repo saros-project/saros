@@ -75,8 +75,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     )
 
     {
-        super(negotiationID, peer, sessionManager, session, workspace,
-            checksumCache, connectionService, transmitter, receiver);
+        super(negotiationID, peer, TransferType.ARCHIVE, sessionManager, session,
+            workspace, checksumCache, connectionService, transmitter, receiver);
 
         this.projectNegotiationData = new HashMap<String, ProjectNegotiationData>();
 

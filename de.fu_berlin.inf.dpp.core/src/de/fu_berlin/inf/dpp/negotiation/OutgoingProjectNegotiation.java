@@ -73,8 +73,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     {
         super(String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()), peer,
-            sessionManager, session, workspace, checksumCache,
-            connectionService, transmitter, receiver);
+            TransferType.ARCHIVE, sessionManager, session, workspace,
+            checksumCache, connectionService, transmitter, receiver);
 
         this.projects = projects;
 
@@ -202,7 +202,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * current implementation opens a wizard on the remote side)
          */
         ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
-            getSessionID(), getID(), projectInfos);
+            getSessionID(), getID(), projectInfos, getTransferType());
 
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
             ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
