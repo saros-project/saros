@@ -8,6 +8,8 @@ import com.intellij.openapi.vfs.VirtualFileMoveEvent;
 import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import com.intellij.openapi.vfs.encoding.EncodingProjectManager;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
+import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -129,8 +131,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         byte[] bytes = FileUtils.getLocalFileContent(file);
         String charset = getEncoding(file);
-        IActivity activity = new FileActivity(user, FileActivity.Type.MOVED,
-            newSPath, oldSPath, bytes, charset, FileActivity.Purpose.ACTIVITY);
+        IActivity activity = new FileActivity(user, Type.MOVED,
+            Purpose.ACTIVITY, newSPath, oldSPath, bytes, charset);
 
         resourceManager.internalFireActivity(activity);
     }
@@ -236,8 +238,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             byte[] bytes = new byte[0];
             String charset;
             charset = virtualFileEvent.getFile().getCharset().name();
-            activity = FileActivity.created(user, spath, bytes, charset,
-                FileActivity.Purpose.ACTIVITY);
+            activity = new FileActivity(user, Type.CREATED, Purpose.ACTIVITY,
+                spath, null, bytes, charset);
 
             //If the file was created with a template, it is filled only later
             //so we check for newly created files' content in {@link #contentsChanged},
@@ -281,8 +283,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (virtualFileEvent.getFile().isDirectory()) {
             activity = new FolderDeletedActivity(user, spath);
         } else {
-            activity = FileActivity
-                .removed(user, spath, FileActivity.Purpose.ACTIVITY);
+            activity = new FileActivity(user, Type.REMOVED, Purpose.ACTIVITY,
+                spath, null, null, null);
         }
 
         project.removeResource(path);
@@ -419,9 +421,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             return;
         }
 
-        activity = FileActivity
-            .created(user, spath, bytes, virtualFile.getCharset().name(),
-                FileActivity.Purpose.ACTIVITY);
+        activity = new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath,
+            null, bytes, virtualFile.getCharset().name());
 
         project.addFile(newFile);
 

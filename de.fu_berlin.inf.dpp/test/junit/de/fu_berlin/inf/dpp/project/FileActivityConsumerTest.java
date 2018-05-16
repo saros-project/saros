@@ -124,7 +124,7 @@ public class FileActivityConsumerTest {
 
     private FileActivity createFileActivity(IFile file, byte[] content) {
         return new FileActivity(new User(new JID("foo@bar"), true, true, 0, 0),
-            Type.CREATED, createPathMockForFile(file), null, content, null,
-            Purpose.ACTIVITY);
+            Type.CREATED, Purpose.ACTIVITY, createPathMockForFile(file), null,
+            content, null);
     }
 }

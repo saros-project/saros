@@ -9,8 +9,8 @@ import de.fu_berlin.inf.dpp.session.User;
  * Subclass of FileActivity that allows the specification of targets.
  */
 @XStreamAlias("targetedFileActivity")
-public class TargetedFileActivity extends FileActivity
-    implements ITargetedActivity {
+public class TargetedFileActivity extends FileActivity implements
+    ITargetedActivity {
 
     @XStreamAsAttribute
     private User target;
@@ -39,15 +39,15 @@ public class TargetedFileActivity extends FileActivity
      * @param encoding
      *            the encoding the content is encoded with or <code>null</code>
      * @param purpose
-     *            purpose of this FileActivity (see
-     *            {@link FileActivity.Purpose})
+     *            purpose of this FileActivity (see {@link FileActivity.Purpose}
+     *            )
      * 
      */
     public TargetedFileActivity(User source, User target, Type type,
         SPath newPath, SPath oldPath, byte[] content, String encoding,
         Purpose purpose) {
 
-        super(source, type, newPath, oldPath, content, encoding, purpose);
+        super(source, type, purpose, newPath, oldPath, content, encoding);
 
         if (target == null)
             throw new IllegalArgumentException("target must not be null");

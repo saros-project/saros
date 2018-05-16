@@ -172,7 +172,9 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
             // Tell the client to delete the file
             fireActivity(new TargetedFileActivity(user, from, Type.REMOVED,
                 path, null, null, null, Purpose.RECOVERY));
-            fireActivity(ChecksumActivity.missing(user, path));
+            fireActivity(new ChecksumActivity(user, path,
+                ChecksumActivity.NON_EXISTING_DOC,
+                ChecksumActivity.NON_EXISTING_DOC, null));
             return;
         }
 
