@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot;
+package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.impl;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View;
