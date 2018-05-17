@@ -149,7 +149,7 @@ public abstract class Preferences {
      * @return true if force In-Band Bytestreams (IBB) transport is enabled.
      */
     public boolean forceIBBTransport() {
-        return store.getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
+        return store.getBoolean(PreferenceConstants.FORCE_IBB_CONNECTIONS);
     }
 
     /**
