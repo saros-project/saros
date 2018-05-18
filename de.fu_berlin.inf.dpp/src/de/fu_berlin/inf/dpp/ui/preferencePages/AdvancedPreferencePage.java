@@ -71,12 +71,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                 Messages.AdvancedPreferencePage_activate_server,
                 getFieldEditorParent()));
         }
-
-        addField(new BooleanFieldEditor(
-            EclipsePreferenceConstants.CONSOLESHARING_ENABLED,
-            Messages.AdvancedPreferencePage_enable_consolesharing,
-            getFieldEditorParent()));
-
     }
 
     @Override
