@@ -46,9 +46,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
+import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;

@@ -10,9 +10,9 @@ import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
 
 /**
  * A diff between two {@link FileList file lists}.
- *
+ * 
  * @see #diff(FileList, FileList, boolean)
- *
+ * 
  */
 public class FileListDiff {
 
@@ -46,7 +46,7 @@ public class FileListDiff {
      * <p>
      * If either of the two parameters is <code>null</code>, the result is an
      * empty diff.
-     *
+     * 
      * @param base
      *            The base {@link FileList}.
      * @param target
@@ -54,7 +54,7 @@ public class FileListDiff {
      * @param excludeRemoved
      *            if <code>true</code> removed files and folders are not
      *            included in the result
-     *
+     * 
      * @return a new {@link FileListDiff} which contains the difference
      *         information of the two {@link FileList}s.
      */
@@ -159,7 +159,7 @@ public class FileListDiff {
      * Returns an unmodifiable list containing the files that must be added to
      * <code>base</code> to match <code>target</code>, i.e the files do not
      * exist.
-     *
+     * 
      * @return an unmodifiable list containing the files that must be added.
      */
 
@@ -170,7 +170,7 @@ public class FileListDiff {
     /**
      * Returns an unmodifiable list containing the files that must be removed
      * from <code>base</code> to match <code>target</code>.
-     *
+     * 
      * @return an unmodifiable list containing the files that must be removed.
      */
     public List<String> getRemovedFiles() {
@@ -180,7 +180,7 @@ public class FileListDiff {
     /**
      * Returns an unmodifiable list containing the files that must be changed,
      * i.e their contents differ.
-     *
+     * 
      * @return an unmodifiable list containing the files that that must be
      *         changed.
      */
@@ -191,7 +191,7 @@ public class FileListDiff {
     /**
      * Returns an unmodifiable list containing the files that do not need to be
      * changed.
-     *
+     * 
      * @return an unmodifiable list containing the files that do not need to be
      *         changed.
      */
@@ -202,7 +202,7 @@ public class FileListDiff {
     /**
      * Returns an unmodifiable list containing the folders that must be added to
      * <code>base</code> to match <code>target</code>.
-     *
+     * 
      * @return an unmodifiable list containing the folders that must be added.
      */
     public List<String> getAddedFolders() {
@@ -212,7 +212,7 @@ public class FileListDiff {
     /**
      * Returns an unmodifiable list containing the folders that must be deleted
      * from <code>base</code> to match <code>target</code>.
-     *
+     * 
      * @return an unmodifiable list containing the removed folders that must be
      *         removed.
      */
@@ -223,7 +223,7 @@ public class FileListDiff {
     /**
      * Returns an unmodifiable list containing the folders that do not need to
      * be changed.
-     *
+     * 
      * @return an unmodifiable list containing the folders that do not need to
      *         be changed.
      */

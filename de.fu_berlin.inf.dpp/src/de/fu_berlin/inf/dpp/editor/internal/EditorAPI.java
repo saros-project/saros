@@ -458,7 +458,7 @@ public class EditorAPI {
      * IDocumentProvider provider = EditorAPI.connect(editorInput)
      * 
      * if (provider == null) {
-     *  doErrorHandling 
+     *  doErrorHandling
      *  return;
      * }
      * 

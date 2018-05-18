@@ -37,7 +37,7 @@ public abstract class AbstractContextLifecycle {
      * <p>
      * It may contain additional initialization logic like setting up other
      * components before its context factories are returned.
-     *
+     * 
      * @return a collection of platform specific context factories.
      */
     protected abstract Collection<IContextFactory> additionalContextFactories();
@@ -84,7 +84,7 @@ public abstract class AbstractContextLifecycle {
      * will create a {@link CoreContextFactory} plus each context factory
      * {@link #additionalContextFactories()} returns. Additional initialization
      * logic will be called here.
-     *
+     * 
      * @see #initializeContext
      */
     public final void start() {
@@ -111,7 +111,7 @@ public abstract class AbstractContextLifecycle {
      * Disposes all (disposable) components created by the
      * {@link IContextFactory context factories}. Additional finalization logic
      * will be called here.
-     *
+     * 
      * @see #finalizeContext
      */
     public final void stop() {

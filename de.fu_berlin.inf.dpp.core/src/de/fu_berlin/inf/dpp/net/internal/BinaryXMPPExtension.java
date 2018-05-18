@@ -41,8 +41,8 @@ public final class BinaryXMPPExtension {
 
     /**
      * 
-     * Returns the {@link StreamMode} that was used to receive theXMPP
-     * packet extension.
+     * Returns the {@link StreamMode} that was used to receive theXMPP packet
+     * extension.
      */
     StreamMode getTransferMode() {
         return transferMode;

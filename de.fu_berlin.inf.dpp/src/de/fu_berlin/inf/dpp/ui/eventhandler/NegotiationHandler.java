@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
  * This handler is responsible for presenting and running the session and
  * project negotiations that are received by the Saros Session Manager
  * component.
- *
+ * 
  * @author srossbach
  */
 public class NegotiationHandler implements INegotiationHandler {
@@ -46,14 +46,14 @@ public class NegotiationHandler implements INegotiationHandler {
         .getLogger(NegotiationHandler.class);
 
     /**
-     *
+     * 
      * OutgoingInvitationJob wraps the instance of
      * {@link OutgoingSessionNegotiation} and cares about handling the
      * exceptions like local or remote cancellation.
-     *
+     * 
      * It notifies the user about the progress using the Eclipse Jobs API and
      * interrupts the negotiation if the session closes.
-     *
+     * 
      */
     private class OutgoingInvitationJob extends Job {
 
@@ -269,7 +269,7 @@ public class NegotiationHandler implements INegotiationHandler {
             public void run() {
                 /**
                  * @JTourBusStop 7, Invitation Process:
-                 *
+                 * 
                  *               (4a) The SessionManager then hands over the
                  *               control to the NegotiationHandler (this class)
                  *               which works on a newly started
@@ -312,10 +312,10 @@ public class NegotiationHandler implements INegotiationHandler {
                 /*
                  * IMPORTANT: as the dialog is non modal it MUST NOT block on
                  * open or there is a good chance to crash the whole GUI
-                 *
+                 * 
                  * Scenario: A modal dialog is currently open with
                  * setBlockOnOpen(true) (as most input dialogs are).
-                 *
+                 * 
                  * When we now open this wizard with setBlockOnOpen(true) this
                  * wizard will become the main dispatcher for the SWT Thread. As
                  * this wizard is non modal you cannot close it because you

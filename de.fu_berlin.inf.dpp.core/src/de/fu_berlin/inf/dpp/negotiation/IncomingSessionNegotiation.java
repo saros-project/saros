@@ -143,24 +143,24 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
             /**
              * @JTourBusStop 8, Invitation Process:
-             *
+             * 
              *               This method is called by the JoinSessionWizard
              *               after the user clicked on "Finish" (indicating that
              *               he is willing to join the session).
-             *
+             * 
              *               (4b) Send acceptance to host.
-             *
+             * 
              *               (5a) Create "wishlist" with session's parameters
              *               (e.g. preferred color) and send it.
-             *
+             * 
              *               (6b) Wait for host's response.
-             *
+             * 
              *               (7) Initialize the session and related components
              *               (e.g. chat, color management) with the parameters
              *               as defined by the host.
-             *
+             * 
              *               (8) Establish a connection to the host (e.g Socks5)
-             *
+             * 
              *               (9) Start the session accordingly, inform the host
              *               and wait for his final acknowledgement (which
              *               indicates, that this client has been successfully

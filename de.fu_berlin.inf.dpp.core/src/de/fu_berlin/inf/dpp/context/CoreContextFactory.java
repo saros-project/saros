@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
  * This is the basic core factory for Saros. All components that are created by
  * this factory <b>must</b> be working on any platform the application is
  * running on.
- *
+ * 
  * @author srossbach
  */
 public class CoreContextFactory extends AbstractContextFactory {
@@ -53,7 +53,7 @@ public class CoreContextFactory extends AbstractContextFactory {
     /**
      * Must not be static in order to avoid heavy work during class
      * initialization
-     *
+     * 
      * @see <a
      *      href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
      */

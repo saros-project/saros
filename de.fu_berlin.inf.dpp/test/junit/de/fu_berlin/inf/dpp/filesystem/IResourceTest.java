@@ -15,7 +15,8 @@ public class IResourceTest {
 
         Capture<Class<?>> mappedAdapterClassCapture = new Capture<Class<?>>();
 
-        EasyMock.expect(folder.getAdapter(EasyMock.capture(mappedAdapterClassCapture)))
+        EasyMock.expect(
+            folder.getAdapter(EasyMock.capture(mappedAdapterClassCapture)))
             .andStubReturn(folder);
 
         EasyMock.expect(folder.getType()).andStubReturn(

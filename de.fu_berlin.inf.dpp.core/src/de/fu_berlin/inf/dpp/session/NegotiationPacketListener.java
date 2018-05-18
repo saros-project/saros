@@ -165,7 +165,7 @@ final class NegotiationPacketListener {
 
     /**
      * Allows to reject incoming session negotiation requests.
-     *
+     * 
      * @param reject
      *            <code>true</code> if requests should be rejected,
      *            <code>false</code> otherwise
@@ -177,7 +177,7 @@ final class NegotiationPacketListener {
     /**
      * Determines if incoming session negotiations requests are currently
      * rejected.
-     *
+     * 
      * @return <code>true</code> if requests are rejected, <code>false</code>
      *         otherwise
      */

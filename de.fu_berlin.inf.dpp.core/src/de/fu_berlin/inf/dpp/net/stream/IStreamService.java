@@ -23,7 +23,7 @@ public interface IStreamService {
 
     /**
      * Establishes a {@link IByteStreamConnection connection} to the given JID.
-     *
+     * 
      * @param connectionID
      *            an ID used to identify this stream(session)
      * @param remoteAddress
@@ -44,7 +44,7 @@ public interface IStreamService {
     /**
      * Initializes the service. After initialization the service is able to
      * establish connections via {@link #connect}.
-     *
+     * 
      * @param connection
      * @param listener
      */

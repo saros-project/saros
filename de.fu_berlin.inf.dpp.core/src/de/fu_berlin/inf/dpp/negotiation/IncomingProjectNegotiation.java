@@ -93,10 +93,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * actions are performed to avoid unintended data loss, i.e this method will
      * do a best effort to backup altered data but no guarantee can be made in
      * doing so!
-     *
+     * 
      * @param projectMapping
      *            mapping from remote project ids to the target local projects
-     *
+     * 
      * @throws IllegalArgumentException
      *             if either a project id is not valid or the referenced project
      *             for that id does not exist
@@ -235,7 +235,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Returns the {@link ProjectNegotiationData negotiation data} for all
      * projects which are part of this negotiation.
-     *
+     * 
      * @return negotiation data for all projects which are part of this
      *         negotiation.
      */
@@ -247,7 +247,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Returns the {@link ProjectNegotiationData negotiation data} for the given
      * project id.
-     *
+     * 
      * @return negotiation data for the given project id or <code>null</code> if
      *         no negotiation data exists for the given project id.
      */
@@ -338,7 +338,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Computes the differences (files and folders) between the local and the
      * remote side for the given project mapping.
-     *
+     * 
      * @param localProjectMapping
      *            the local project mapping to use
      * @param monitor
@@ -397,7 +397,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * Synchronize the project structures, deleting files and folders that are
      * not present on the remote side and creating empty folders that do not
      * exists and the local side.
-     *
+     * 
      * @param localProjectMapping
      * @param diffs
      * @return list of file lists (each for every project) containing the
@@ -521,7 +521,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Waits for the activity queuing request from the remote side.
-     *
+     * 
      * @param monitor
      */
     private void awaitActivityQueueingActivation(IProgressMonitor monitor)

@@ -211,7 +211,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Retrieve the peer's partial file list and remember which files need to be
      * sent to that user
-     *
+     * 
      * @param monitor
      * @throws IOException
      * @throws SarosCancellationException
@@ -476,7 +476,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Sends an activity queuing request to the remote side and awaits the
      * confirmation of the request.
-     *
+     * 
      * @param monitor
      */
     private void sendAndAwaitActivityQueueingActivation(IProgressMonitor monitor)

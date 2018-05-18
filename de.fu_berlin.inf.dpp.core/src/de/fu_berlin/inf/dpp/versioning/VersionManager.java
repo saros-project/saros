@@ -80,7 +80,8 @@ public class VersionManager {
 
             createResponseData: {
 
-                versionExchangeResponse.set(VERSION_KEY, localVersion.toString());
+                versionExchangeResponse.set(VERSION_KEY,
+                    localVersion.toString());
                 versionExchangeResponse.set(COMPATIBILITY_KEY,
                     String.valueOf(Compatibility.UNKNOWN.getCode()));
 
@@ -279,7 +280,8 @@ public class VersionManager {
 
         if (currentCompatibleVersions == null) {
             currentCompatibleVersions = new ArrayList<Version>();
-            newCompatibilityChart.put(currentVersion, currentCompatibleVersions);
+            newCompatibilityChart
+                .put(currentVersion, currentCompatibleVersions);
         }
 
         if (!currentCompatibleVersions.contains(currentVersion))

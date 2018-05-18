@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.session.User;
 /**
  * This manager is responsible for handling color changes and managing the
  * currently available colors. It both produces and consumes activities.
- *
+ * 
  * @author Stefan Rossbach
  */
 /*
@@ -58,12 +58,12 @@ public class ChangeColorManager extends AbstractActivityProducer implements
     /**
      * @JTourBusStop 7, Creating a new Activity type, Waiting for incoming
      *               activities:
-     *
+     * 
      *               All you have to do on the receiver's side, is to create a
      *               new IActivityReceiver (or amend an existing one), provide
      *               it with an receive() method of your newly created flavor,
      *               and react on the incoming activity.
-     *
+     * 
      *               However, the Saros Session from which we get all incoming
      *               activities, expects an IActivityConsumer (which is, in
      *               contrast to IActivityReceiver not aware of different
@@ -155,7 +155,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
         }
         /**
          * @JTourBusStop 8, Creating a new Activity type, Arming your consumer:
-         *
+         * 
          *               To ensure your newly created consumer actually receives
          *               incoming activities, you need to register it on the
          *               session. That's it :)
@@ -174,7 +174,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
 
     /**
      * Returns a snapshot of the currently in use color IDs.
-     *
+     * 
      * @return
      */
     public synchronized Set<Integer> getUsedColorIDs() {
@@ -185,7 +185,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
      * Changes the color id for the current local user. The change is done
      * asynchronously and may not be available immediately. Negative color id
      * values will result in the next available color id.
-     *
+     * 
      * @param colorID
      *            the new color ID for the current session
      */
@@ -194,13 +194,13 @@ public class ChangeColorManager extends AbstractActivityProducer implements
         /**
          * @JTourBusStop 6, Creating a new Activity type, Create activity
          *               instances of your new type:
-         *
+         * 
          *               Now you are prepared to make use of your new activity
          *               type: Find a place in the business logic where to react
          *               on the events you want to send as an Activity to the
          *               other session participants. However, it is not unusual
          *               to create that piece of business logic anew.
-         *
+         * 
          *               Anyway, once you found a place where to wait for
          *               certain things to happen, you can create new activity
          *               instances of your type there and hand them over to
@@ -271,9 +271,9 @@ public class ChangeColorManager extends AbstractActivityProducer implements
     /*
      * original algorithm by: fzieris and pschlott, modified and integrated by
      * srossbach
-     *
+     * 
      * it ensures one invariant: favorite colors are optimally distributed
-     *
+     * 
      * it assumes following invariants: if a colorIdSet exists, it contains no
      * color collisions (except when a colorIdSet is created for the first time,
      * then all colors are UserColorId.UNKNOWN)
@@ -410,7 +410,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
      * <li>The assignment is valid (i.e each color is unique, and none of the
      * colors is UserColorId.UNKNOWN</li>
      * </ul>
-     *
+     * 
      * @param assignedColors
      * @return
      */
@@ -443,7 +443,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
      * <li>their favorite color</li>
      * <li>a color from a previous session</li>
      * </ul>
-     *
+     * 
      * @param assignedColors
      */
     private synchronized void autoAssignColors(Map<User, Integer> assignedColors) {
@@ -480,7 +480,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
     /**
      * creates a color assignment, which assumes the favorite colors of the
      * users in the session don't collide
-     *
+     * 
      * @param currentUsers
      * @return
      */

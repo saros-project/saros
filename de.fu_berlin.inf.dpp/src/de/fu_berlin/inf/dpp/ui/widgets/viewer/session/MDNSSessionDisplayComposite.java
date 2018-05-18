@@ -112,7 +112,6 @@ public final class MDNSSessionDisplayComposite extends SessionDisplayComposite {
     protected void updateViewer() {
         checkWidget();
         getViewer().setInput(
-            new SessionInput(sessionManager.getSession(),
-                currentmDNSService));
+            new SessionInput(sessionManager.getSession(), currentmDNSService));
     }
 }

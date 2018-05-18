@@ -2,10 +2,10 @@ package de.fu_berlin.inf.dpp.preferences;
 
 /**
  * This {@link PreferenceChangeEvent} is describing a changed preference.
- *
+ * 
  * This event is given to a listener and stores the old value, the new value and
  * the name of the changed preference.
- *
+ * 
  * @see IPreferenceChangeListener
  * @see Preferences
  */
@@ -17,7 +17,7 @@ public class PreferenceChangeEvent {
 
     /**
      * Constructor for a PreferenceChangeEvent
-     *
+     * 
      * @param preferenceName
      *            name of the preference
      * @param oldValue

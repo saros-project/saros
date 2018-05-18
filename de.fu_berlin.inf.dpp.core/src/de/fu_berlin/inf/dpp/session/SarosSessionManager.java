@@ -61,7 +61,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
  * reacting to invitations. The user can be only part of one session at most.
- *
+ * 
  * @author rdjemili
  */
 
@@ -70,19 +70,19 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 6, Architecture Overview, Invitation Management:
-     *
+     * 
      *               While Activities are used to keep a running session
      *               consistent, we use MESSAGES whenever the Session itself is
      *               modified. This means adding users or projects to the
      *               session.
-     *
+     * 
      *               The Invitation Process is managed by the "Invitation
      *               Management"-Component. This class is the main entrance
      *               point of this Component. During the invitation Process, the
      *               Network Layer is used to send MESSAGES between the host and
      *               the invitees and the Session Management is informed about
      *               joined users and added projects.
-     *
+     * 
      *               For more information about the Invitation Process see the
      *               "Invitation Process"-Tour.
      */
@@ -171,19 +171,19 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 3, Invitation Process:
-     *
+     * 
      *               This class manages the current Saros session.
-     *
+     * 
      *               Saros makes a distinction between a session and a shared
      *               project. A session is an on-line collaboration between
      *               users which allows users to carry out activities. The main
      *               activity is to share projects. Hence, before you share a
      *               project, a session has to be started and all users added to
      *               it.
-     *
+     * 
      *               (At the moment, this separation is invisible to the user.
      *               He/she must share a project in order to start a session.)
-     *
+     * 
      */
     @Override
     public void startSession(
@@ -271,8 +271,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         assert session == null;
 
-        session = new SarosSession(id, host, clientColor, hostColor,
-            context);
+        session = new SarosSession(id, host, clientColor, hostColor, context);
 
         log.info("joined uninitialized Saros session");
 
@@ -352,7 +351,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * method. The caller needs to save the returned value to a local variable
      * and do a null check. For new code you should consider being scoped by the
      * SarosSession and get the SarosSession in the constructor.
-     *
+     * 
      * @deprecated Error prone method, which produces NPE if not handled
      *             correctly. Will soon get removed.
      */
@@ -496,9 +495,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * Adds project resources to an existing session.
-     *
+     * 
      * @param projectResourcesMapping
-     *
+     * 
      */
     @Override
     public void addResourcesToSession(

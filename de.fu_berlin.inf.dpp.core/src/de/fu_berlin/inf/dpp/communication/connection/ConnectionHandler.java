@@ -301,8 +301,7 @@ public class ConnectionHandler {
         try {
 
             if (preferences.forceIBBTransport())
-                connectionManager
-                    .setServices(IConnectionManager.IBB_SERVICE);
+                connectionManager.setServices(IConnectionManager.IBB_SERVICE);
             else
                 connectionManager.setServices(/* use all */-1);
 
