@@ -216,7 +216,7 @@ public class AddContactWizard extends Wizard {
                 throw new XMPPException(
                     dialogContent.invocationTargetExceptionMessage);
 
-            log.warn("Problem while adding a contact. User decided to add contact anyway. Problem:\n"
+            log.warn("Problem while adding a contact. User decided to add contact anyway. Problem: "
                 + e.getMessage());
         }
 
