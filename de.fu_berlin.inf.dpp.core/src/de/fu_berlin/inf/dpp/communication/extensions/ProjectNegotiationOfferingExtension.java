@@ -7,8 +7,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 
-//TODO Move to core (package communication.extensions)
-
 @XStreamAlias(/* ProjectNegotiationOffering */"PNOF")
 public class ProjectNegotiationOfferingExtension extends
     ProjectNegotiationExtension {
