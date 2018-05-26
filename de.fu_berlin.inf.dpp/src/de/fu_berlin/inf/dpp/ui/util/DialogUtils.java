@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.util;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
@@ -49,37 +48,6 @@ public class DialogUtils {
             dialogMessage, MessageDialog.ERROR,
             new String[] { IDialogConstants.OK_LABEL }, 0);
         return openWindow(md);
-    }
-
-    /**
-     * Shows an error window and sets monitors subTask to <code>message</code>
-     * or exceptions message.
-     * 
-     * @param title
-     *            Title of error window
-     * @param message
-     *            Message of error window
-     * @param e
-     *            Exception caused this error, may be <code>null</code>
-     * @param monitor
-     *            May be <code>null</code>
-     */
-    public static void showErrorPopup(final Logger log, final String title,
-        final String message, Exception e, IProgressMonitor monitor) {
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
-            @Override
-            public void run() {
-                DialogUtils.openErrorMessageDialog(SWTUtils.getShell(), title,
-                    message);
-            }
-        });
-        if (monitor != null) {
-            if (e != null && e.getMessage() != null
-                && !(e.getMessage().length() == 0))
-                monitor.subTask(e.getMessage());
-            else
-                monitor.subTask(message);
-        }
     }
 
     /**
@@ -143,45 +111,6 @@ public class DialogUtils {
             dialogMessage, MessageDialog.QUESTION, new String[] {
                 IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
         return openWindow(md) == 0;
-    }
-
-    /**
-     * Ask the User a given question. It pops up a QuestionDialog with given
-     * title and message. Additionally custom button labels are applicable.
-     * 
-     * @param title
-     *            dialog title
-     * @param message
-     *            displayed message
-     * @param dialogButtonLabels
-     *            custom button labels
-     * @param failSilently
-     *            don`t open the dialog
-     * 
-     * @return boolean indicating whether the user said Yes or No
-     */
-    public static boolean popUpCustomQuestion(final String title,
-        final String message, final String[] dialogButtonLabels,
-        boolean failSilently) {
-        if (failSilently)
-            return false;
-
-        try {
-            return SWTUtils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    MessageDialog md = new MessageDialog(SWTUtils.getShell(),
-                        title, null, message, MessageDialog.QUESTION,
-                        dialogButtonLabels, 0);
-                    md.open();
-                    return md.getReturnCode() == 0;
-                }
-            });
-        } catch (Exception e) {
-            log.error("An internal error occurred while trying"
-                + " to open the question dialog.");
-            return false;
-        }
     }
 
     /**
