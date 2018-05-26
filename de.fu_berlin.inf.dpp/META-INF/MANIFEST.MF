@@ -52,7 +52,6 @@ Export-Package: de.fu_berlin.inf.dpp;
    org.osgi.framework,
    org.jivesoftware.smackx,
    de.fu_berlin.inf.dpp.net",
- de.fu_berlin.inf.dpp.accountManagement,
  de.fu_berlin.inf.dpp.communication.chat.muc.negotiation,
  de.fu_berlin.inf.dpp.editor;
   uses:="org.eclipse.jface.text,
