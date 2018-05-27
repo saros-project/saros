@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * This class describes the history of incoming messages of a chat. It saves
- * entries in the form of {@link ChatElement} instances.
+ * entries in the form of {@link ChatElement} instances.
  */
 public class ChatHistory {
     private List<ChatElement> history = Collections
