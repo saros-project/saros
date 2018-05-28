@@ -136,4 +136,20 @@ public class ComponentViewTest extends StfHtmlTestCase {
         assertTrue(view.multiSelect("multiSelect").options()
             .containsAll(Arrays.asList("option1", "option2", "option2")));
     }
+
+    @Test
+    public void shouldTestProgressBar() throws Exception {
+        IRemoteHTMLView view = ALICE.htmlBot().view(View.COMPONENT_TEST);
+
+        assertTrue(view.hasElementWithName("progressBar"));
+
+        view.progressBar("progressBar").setValue(100);
+        assertTrue(view.progressBar("progressBar").getValue() == 100);
+
+        view.progressBar("progressBar").setValue(0);
+        assertTrue(view.progressBar("progressBar").getValue() == 0);
+
+        view.progressBar("progressBar").setValue(42);
+        assertTrue(view.progressBar("progressBar").getValue() == 42);
+    }
 }
