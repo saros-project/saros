@@ -136,4 +136,34 @@ public interface IRemoteHTMLView extends Remote {
      */
     IRemoteHTMLRadioGroup radioGroup(String name) throws RemoteException;
 
+    /**
+     * Gets a remote representation of the HTML select with the given name from
+     * within this view.
+     * 
+     * @param name
+     *            the value of the name attribute of the select
+     * 
+     * @return an instance of {@link IRemoteHTMLSelect}, if such a select exists
+     *         in this view
+     * 
+     * @throws RemoteException
+     *             e.g. if no such select exist in this view
+     */
+    IRemoteHTMLSelect select(String name) throws RemoteException;
+
+    /**
+     * Gets a remote representation of the HTML multi select with the given name
+     * from within this view.
+     * 
+     * @param name
+     *            the value of the name attribute of the multi select
+     * 
+     * @return an instance of {@link IRemoteHTMLSelect}, if such a multi select
+     *         exists in this view
+     * 
+     * @throws RemoteException
+     *             e.g. if no such multi select exist in this view
+     */
+    IRemoteHTMLMultiSelect multiSelect(String name) throws RemoteException;
+
 }
