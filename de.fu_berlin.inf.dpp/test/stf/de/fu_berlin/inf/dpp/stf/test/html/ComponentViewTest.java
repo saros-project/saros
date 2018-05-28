@@ -92,4 +92,48 @@ public class ComponentViewTest extends StfHtmlTestCase {
             .containsAll(Arrays.asList("1", "2", "3")));
         assertTrue(view.radioGroup("radioGroup").size() == 3);
     }
+
+    @Test
+    public void shouldTestSelect() throws Exception {
+        IRemoteHTMLView view = ALICE.htmlBot().view(View.COMPONENT_TEST);
+
+        assertTrue(view.hasElementWithName("select"));
+
+        view.select("select").select("option2");
+        assertTrue(view.select("select").getSelection().equals("option2"));
+        view.select("select").select("option3");
+        assertTrue(view.select("select").getSelection().equals("option3"));
+
+        assertTrue(view.select("select").options()
+            .containsAll(Arrays.asList("option1", "option2", "option3")));
+        assertTrue(view.select("select").size() == 3);
+    }
+
+    @Test
+    public void shouldTestMultiSelect() throws Exception {
+        IRemoteHTMLView view = ALICE.htmlBot().view(View.COMPONENT_TEST);
+
+        assertTrue(view.hasElementWithName("multiSelect"));
+
+        view.multiSelect("multiSelect").select(Arrays.asList("option3"));
+        assertTrue(view.multiSelect("multiSelect").getSelection()
+            .containsAll(Arrays.asList("option3")));
+        assertTrue(view.multiSelect("multiSelect").getSelection().size() == 1);
+
+        view.multiSelect("multiSelect").select(
+            Arrays.asList("option1", "option2", "option3"));
+        assertTrue(view.multiSelect("multiSelect").getSelection()
+            .containsAll(Arrays.asList("option1", "option2", "option3")));
+        assertTrue(view.multiSelect("multiSelect").getSelection().size() == 3);
+
+        view.multiSelect("multiSelect").select(
+            Arrays.asList("option1", "option3"));
+        assertTrue(view.multiSelect("multiSelect").getSelection()
+            .containsAll(Arrays.asList("option1", "option3")));
+        assertTrue(view.multiSelect("multiSelect").getSelection().size() == 2);
+
+        assertTrue(view.multiSelect("multiSelect").size() == 3);
+        assertTrue(view.multiSelect("multiSelect").options()
+            .containsAll(Arrays.asList("option1", "option2", "option2")));
+    }
 }
