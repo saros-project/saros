@@ -18,7 +18,9 @@ import de.fu_berlin.inf.dpp.stf.server.bot.BotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLCheckbox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLInputField;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLMultiSelect;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLRadioGroup;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLSelect;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.ui.pages.AbstractBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
@@ -77,12 +79,16 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     private RemoteHTMLInputField inputField;
     private RemoteHTMLCheckbox checkbox;
     private RemoteHTMLRadioGroup radioGroup;
+    private RemoteHTMLSelect select;
+    private RemoteHTMLMultiSelect multiSelect;
 
     public RemoteHTMLView() {
         button = RemoteHTMLButton.getInstance();
         inputField = RemoteHTMLInputField.getInstance();
         checkbox = RemoteHTMLCheckbox.getInstance();
         radioGroup = RemoteHTMLRadioGroup.getInstance();
+        select = RemoteHTMLSelect.getInstance();
+        multiSelect = RemoteHTMLMultiSelect.getInstance();
     }
 
     @Override
@@ -128,6 +134,23 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     }
 
     @Override
+    public IRemoteHTMLSelect select(String name) throws RemoteException {
+        NameSelector selector = new NameSelector(name);
+        select.setSelector(selector);
+        ensureExistence(selector);
+        return select;
+    }
+
+    @Override
+    public IRemoteHTMLMultiSelect multiSelect(String name)
+        throws RemoteException {
+        NameSelector selector = new NameSelector(name);
+        multiSelect.setSelector(selector);
+        ensureExistence(selector);
+        return multiSelect;
+    }
+
+    @Override
     public boolean isOpen() {
         String id = map.get(view).id;
         return exists(new IdSelector(id));
@@ -146,6 +169,8 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
         this.inputField.setBrowser(getBrowser());
         this.checkbox.setBrowser(getBrowser());
         this.radioGroup.setBrowser(getBrowser());
+        this.select.setBrowser(getBrowser());
+        this.multiSelect.setBrowser(getBrowser());
 
     }
 
