@@ -166,4 +166,19 @@ public interface IRemoteHTMLView extends Remote {
      */
     IRemoteHTMLMultiSelect multiSelect(String name) throws RemoteException;
 
+    /**
+     * Gets a remote representation of the HTML progressbar with the given name
+     * from within this view.
+     * 
+     * @param name
+     *            the value of the name attribute of the progressbar
+     * 
+     * @return an instance of {@link IRemoteHTMLSelect}, if such a progressbar
+     *         exists in this view
+     * 
+     * @throws RemoteException
+     *             e.g. if no such progressbar exist in this view
+     */
+    IRemoteHTMLProgressBar progressBar(String name) throws RemoteException;
+
 }
