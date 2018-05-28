@@ -65,6 +65,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLButto
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLCheckbox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLInputField;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLMultiSelect;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLProgressBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLRadioGroup;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLSelect;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLView;
@@ -207,6 +208,7 @@ public class STFController {
             exportObject(RemoteHTMLRadioGroup.getInstance(), "htmlRadioGroup");
             exportObject(RemoteHTMLSelect.getInstance(), "htmlSelect");
             exportObject(RemoteHTMLMultiSelect.getInstance(), "htmlMultiSelect");
+            exportObject(RemoteHTMLProgressBar.getInstance(), "htmlProgressBar");
         }
 
         /*
