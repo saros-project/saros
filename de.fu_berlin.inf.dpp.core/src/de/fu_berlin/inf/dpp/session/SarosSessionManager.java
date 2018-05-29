@@ -58,7 +58,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -101,8 +100,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     private static final long NEGOTIATION_TIMEOUT = 10000L;
 
     private volatile SarosSession session;
-
-    private final Preferences preferences;
 
     private final IContainerContext context;
 
@@ -155,13 +152,12 @@ public class SarosSessionManager implements ISarosSessionManager {
         NegotiationFactory negotiationFactory,
         SessionNegotiationHookManager hookManager,
         XMPPConnectionService connectionService, ITransmitter transmitter,
-        IReceiver receiver, Preferences preferences) {
+        IReceiver receiver) {
 
         this.context = context;
         this.connectionService = connectionService;
         this.currentSessionNegotiations = new SessionNegotiationObservable();
         this.currentProjectNegotiations = new ProjectNegotiationObservable();
-        this.preferences = preferences;
         this.connectionService.addListener(connectionListener);
 
         this.negotiationFactory = negotiationFactory;
@@ -252,7 +248,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 }
             }
 
-            session = new SarosSession(sessionID, preferences.getFavoriteColorID(), hostProperties, context);
+            session = new SarosSession(sessionID, hostProperties, context);
 
             sessionStarting(session);
             session.start();
@@ -280,13 +276,13 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     // FIXME offer a startSession method for the client and host !
     @Override
-    public ISarosSession joinSession(String id, JID host, int clientColor,
-        int hostColor, IPreferenceStore hostProperties, IPreferenceStore localProperties) {
+    public ISarosSession joinSession(String id, JID host,
+        IPreferenceStore hostProperties, IPreferenceStore localProperties) {
 
         assert session == null;
 
-        session = new SarosSession(id, host, clientColor, hostColor,
-            localProperties, hostProperties, context);
+        session = new SarosSession(id, host, localProperties, hostProperties,
+            context);
 
         log.info("joined uninitialized Saros session");
 

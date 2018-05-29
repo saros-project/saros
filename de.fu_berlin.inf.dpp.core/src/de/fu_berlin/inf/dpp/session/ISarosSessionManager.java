@@ -41,7 +41,7 @@ public interface ISarosSessionManager {
      * @return a new session.
      */
     public ISarosSession joinSession(final String id, JID host,
-        int clientColor, int hostColor, IPreferenceStore hostProperties, IPreferenceStore clientProperties);
+        IPreferenceStore hostProperties, IPreferenceStore clientProperties);
 
     /**
      * Stops the currently active session. If the local user is the host, this

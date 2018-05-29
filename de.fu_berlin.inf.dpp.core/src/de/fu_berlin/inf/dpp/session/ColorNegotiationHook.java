@@ -9,14 +9,18 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 
+/**
+ * NegotiationHook to exchange initial and favorite color values and preferences
+ */
 public class ColorNegotiationHook implements ISessionNegotiationHook {
     private static final String HOOK_IDENTIFIER = "colorManagement";
-    // This high visibility is not needed for good. Currently there is a color
-    // related HACK in the SessionNegotiation that relies on these constants.
-    public static final String KEY_CLIENT_COLOR = "clientColor";
-    public static final String KEY_CLIENT_FAV_COLOR = "clientFavoriteColor";
-    public static final String KEY_HOST_COLOR = "hostColor";
-    public static final String KEY_HOST_FAV_COLOR = "hostFavoriteColor";
+    private static final String KEY_CLIENT_COLOR = "clientColor";
+    private static final String KEY_CLIENT_FAV_COLOR = "clientFavoriteColor";
+    private static final String KEY_HOST_COLOR = "hostColor";
+    private static final String KEY_HOST_FAV_COLOR = "hostFavoriteColor";
+
+    public static final String KEY_INITIAL_COLOR = "color";
+    public static final String KEY_FAV_COLOR = "favoriteColor";
 
     private Preferences preferences;
     private ISarosSessionManager sessionManager;
@@ -77,9 +81,17 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
     @Override
     public void applyActualParameters(Map<String, String> input,
         IPreferenceStore hostPreferences, IPreferenceStore clientPreferences) {
-        // TODO Implement the application of the returned color settings. This
-        // is currently done with a HACK in IncomingSessionNegotiation (see
-        // method initializeSession())
+
+        hostPreferences.setValue(KEY_INITIAL_COLOR,
+            Integer.parseInt(input.get(KEY_HOST_COLOR)));
+        hostPreferences.setValue(KEY_FAV_COLOR,
+            Integer.parseInt(input.get(KEY_HOST_FAV_COLOR)));
+        if (clientPreferences != null) {
+            clientPreferences.setValue(KEY_INITIAL_COLOR,
+                Integer.parseInt(input.get(KEY_CLIENT_COLOR)));
+            clientPreferences.setValue(KEY_FAV_COLOR,
+                Integer.parseInt(input.get(KEY_CLIENT_FAV_COLOR)));
+        }
     }
 
     @Override

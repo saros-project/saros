@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -23,7 +22,6 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -311,9 +309,6 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Initializing session...");
 
-        // HACK
-        int clientColor = UserColorID.UNKNOWN;
-        int hostFavoriteColor = UserColorID.UNKNOWN;
         IPreferenceStore hostPreferences = new PreferenceStore();
         IPreferenceStore clientPreferences = new PreferenceStore();
 
@@ -324,19 +319,10 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
             if (settings == null)
                 continue;
-
-            if (hook instanceof ColorNegotiationHook) {
-                clientColor = Integer.parseInt(settings
-                    .get(ColorNegotiationHook.KEY_CLIENT_COLOR));
-                hostFavoriteColor = Integer.parseInt(settings
-                    .get(ColorNegotiationHook.KEY_HOST_FAV_COLOR));
-            }
         }
-        // end of HACK
 
         sarosSession = sessionManager.joinSession(sessionID,
-            parameters.getSessionHost(), clientColor, hostFavoriteColor,
-            hostPreferences, clientPreferences);
+            parameters.getSessionHost(), hostPreferences, clientPreferences);
     }
 
     /**

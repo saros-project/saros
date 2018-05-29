@@ -18,12 +18,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 
 @RunWith(PowerMockRunner.class)
@@ -95,27 +93,24 @@ public class SarosSessionManagerTest {
     public void setUp() throws Exception {
         SarosSession session = PowerMock.createNiceMock(SarosSession.class);
 
-        SessionNegotiationHookManager hooks = new SessionNegotiationHookManager();
         XMPPConnectionService network = PowerMock
             .createNiceMock(XMPPConnectionService.class);
 
         ITransmitter transmitter = PowerMock.createNiceMock(ITransmitter.class);
         IReceiver receiver = PowerMock.createNiceMock(IReceiver.class);
 
-        Preferences preferences = PowerMock.createNiceMock(Preferences.class);
-
         IContainerContext context = PowerMock
             .createNiceMock(IContainerContext.class);
 
         PowerMock.expectNew(SarosSession.class,
-            EasyMock.anyObject(String.class), EasyMock.anyInt(),
+            EasyMock.anyObject(String.class),
             EasyMock.anyObject(IPreferenceStore.class),
             EasyMock.anyObject(IContainerContext.class)).andStubReturn(session);
 
         PowerMock.replayAll();
 
-        manager = new SarosSessionManager(context, null, hooks, network,
-            transmitter, receiver, preferences);
+        manager = new SarosSessionManager(context, null, null, network,
+            transmitter, receiver);
     }
 
     @Test
