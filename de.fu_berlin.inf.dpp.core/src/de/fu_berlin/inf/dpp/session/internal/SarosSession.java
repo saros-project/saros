@@ -55,6 +55,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
@@ -109,6 +110,8 @@ public final class SarosSession implements ISarosSession {
     private final User localUser;
 
     private final ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
+
+    private final ConcurrentHashMap<User, IPreferenceStore> userProperties = new ConcurrentHashMap<User, IPreferenceStore>();
 
     private final SessionListenerDispatch listenerDispatch = new SessionListenerDispatch();
 
@@ -214,18 +217,19 @@ public final class SarosSession implements ISarosSession {
      * Constructor for host.
      */
     public SarosSession(final String id, int colorID,
-        IContainerContext containerContext) {
+        IPreferenceStore properties, IContainerContext containerContext) {
         this(id, containerContext, /* unused */null, colorID, /* unused */
-        -1);
+        -1, properties, /* unused */ null);
     }
 
     /**
      * Constructor for client.
      */
     public SarosSession(final String id, JID hostJID, int clientColorID,
-        int hostColorID, IContainerContext containerContext) {
+        int hostColorID, IPreferenceStore localProperties,
+        IPreferenceStore hostProperties, IContainerContext containerContext) {
 
-        this(id, containerContext, hostJID, clientColorID, hostColorID);
+        this(id, containerContext, hostJID, clientColorID, hostColorID, localProperties, hostProperties);
     }
 
     @Override
@@ -363,7 +367,7 @@ public final class SarosSession implements ISarosSession {
      * proper initialization etc. of User objects !
      */
     @Override
-    public void addUser(final User user) {
+    public void addUser(final User user, IPreferenceStore properties) {
 
         // TODO synchronize this method !
 
@@ -379,6 +383,9 @@ public final class SarosSession implements ISarosSession {
             log.error("user " + user + " added twice to SarosSession",
                 new StackTrace());
             throw new IllegalArgumentException();
+        }
+        if (this.userProperties.putIfAbsent(user, properties) != null) {
+            log.warn("user " + user + " already has properties");
         }
 
         /*
@@ -482,6 +489,10 @@ public final class SarosSession implements ISarosSession {
             log.error("tried to remove user " + user
                 + " who was never added to the session");
             return;
+        }
+        if (userProperties.remove(user) == null) {
+            log.error("tried to remove properties of user " + user
+                + " that were never initialized");
         }
 
         activitySequencer.unregisterUser(user);
@@ -644,6 +655,14 @@ public final class SarosSession implements ISarosSession {
             return null;
 
         return user;
+    }
+
+    @Override
+    public IPreferenceStore getUserProperties(User user) {
+        if (user == null)
+            throw new IllegalArgumentException("user is null");
+
+        return userProperties.get(user);
     }
 
     @Override
@@ -1033,7 +1052,8 @@ public final class SarosSession implements ISarosSession {
     }
 
     private SarosSession(final String id, IContainerContext context, JID host,
-        int localColorID, int hostColorID) {
+        int localColorID, int hostColorID, IPreferenceStore localProperties,
+        IPreferenceStore hostProperties) {
 
         context.initComponent(this);
 
@@ -1055,11 +1075,14 @@ public final class SarosSession implements ISarosSession {
         if (host == null) {
             hostUser = localUser;
             participants.put(hostUser.getJID(), hostUser);
+            userProperties.put(hostUser, localProperties);
         } else {
             hostUser = new User(host, true, false, hostColorID, hostColorID);
             hostUser.setInSession(true);
             participants.put(hostUser.getJID(), hostUser);
             participants.put(localUser.getJID(), localUser);
+            userProperties.put(hostUser, hostProperties);
+            userProperties.put(localUser, localProperties);
         }
 
         sessionContainer = context.createChildContainer();

@@ -6,6 +6,7 @@ import java.util.Map;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 
 public class ColorNegotiationHook implements ISessionNegotiationHook {
@@ -25,6 +26,18 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
         this.preferences = preferences;
         this.sessionManager = sessionManager;
         hooks.addHook(this);
+    }
+
+    @Override
+    public Map<String, String> tellHostPreferences() {
+        String favoriteColor = Integer.toString(preferences
+            .getFavoriteColorID());
+
+        Map<String, String> colorSettings = new HashMap<String, String>();
+        colorSettings.put(KEY_HOST_COLOR, favoriteColor);
+        colorSettings.put(KEY_HOST_FAV_COLOR, favoriteColor);
+
+        return colorSettings;
     }
 
     @Override
@@ -62,7 +75,8 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
     }
 
     @Override
-    public void applyActualParameters(Map<String, String> settings) {
+    public void applyActualParameters(Map<String, String> input,
+        IPreferenceStore hostPreferences, IPreferenceStore clientPreferences) {
         // TODO Implement the application of the returned color settings. This
         // is currently done with a HACK in IncomingSessionNegotiation (see
         // method initializeSession())

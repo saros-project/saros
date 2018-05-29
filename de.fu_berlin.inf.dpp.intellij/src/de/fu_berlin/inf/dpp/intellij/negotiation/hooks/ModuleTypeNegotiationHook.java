@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 import org.apache.log4j.Logger;
@@ -69,6 +70,12 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
     public String getIdentifier() {
         return HOOK_IDENTIFIER;
     }
+    
+    @Override
+    public Map<String, String> tellHostPreferences() {
+        return null;
+    }
+     
 
     @Override
     public Map<String, String> tellClientPreferences() {
@@ -137,8 +144,14 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
     }
 
     @Override
-    public void applyActualParameters(Map<String, String> settings) {
-        if (settings == null) {
+    public void applyActualParameters(Map<String, String> input, IPreferenceStore hostPreferences,
+        IPreferenceStore clientPreferences) {
+        if (clientPreferences == null) {
+           //there is not client yet, nothing to do
+           return;  
+        }
+
+        if (input == null) {
             LOG.warn("The client did not indicate any module type " +
                 "preferences. This could be an indication for a version " +
                 "mismatch.");
@@ -150,7 +163,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (String mappingEntry : settings.get(KEY_TYPE_MAPPINGS)
+        for (String mappingEntry : input.get(KEY_TYPE_MAPPINGS)
             .split("\t")) {
 
             String[] separatedEntry = mappingEntry.split(":");

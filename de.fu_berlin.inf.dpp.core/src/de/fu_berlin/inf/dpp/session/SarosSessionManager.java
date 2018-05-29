@@ -48,12 +48,16 @@ import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
+import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -106,6 +110,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final NegotiationPacketListener negotiationPacketLister;
 
+    private final SessionNegotiationHookManager hookManager;
+
     private final SessionNegotiationObservable currentSessionNegotiations;
 
     private final ProjectNegotiationObservable currentProjectNegotiations;
@@ -147,6 +153,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     public SarosSessionManager(IContainerContext context,
         NegotiationFactory negotiationFactory,
+        SessionNegotiationHookManager hookManager,
         XMPPConnectionService connectionService, ITransmitter transmitter,
         IReceiver receiver, Preferences preferences) {
 
@@ -158,6 +165,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.connectionService.addListener(connectionListener);
 
         this.negotiationFactory = negotiationFactory;
+        this.hookManager = hookManager;
 
         this.negotiationPacketLister = new NegotiationPacketListener(this,
             currentSessionNegotiations, currentProjectNegotiations,
@@ -236,9 +244,15 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             negotiationPacketLister.setRejectSessionNegotiationRequests(true);
 
-            // FIXME should be passed in (colorID)
-            session = new SarosSession(sessionID,
-                preferences.getFavoriteColorID(), context);
+            IPreferenceStore hostProperties = new PreferenceStore();
+            if (hookManager != null) {
+                for (ISessionNegotiationHook hook : hookManager.getHooks()) {
+                    hook.applyActualParameters(hook.tellHostPreferences(),
+                        hostProperties, null);
+                }
+            }
+
+            session = new SarosSession(sessionID, preferences.getFavoriteColorID(), hostProperties, context);
 
             sessionStarting(session);
             session.start();
@@ -267,11 +281,12 @@ public class SarosSessionManager implements ISarosSessionManager {
     // FIXME offer a startSession method for the client and host !
     @Override
     public ISarosSession joinSession(String id, JID host, int clientColor,
-        int hostColor) {
+        int hostColor, IPreferenceStore hostProperties, IPreferenceStore localProperties) {
 
         assert session == null;
 
-        session = new SarosSession(id, host, clientColor, hostColor, context);
+        session = new SarosSession(id, host, clientColor, hostColor,
+            localProperties, hostProperties, context);
 
         log.info("joined uninitialized Saros session");
 

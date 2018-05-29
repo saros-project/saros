@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
@@ -112,7 +113,7 @@ public class SessionNegotiationTest {
 
         aliceSession = createNiceMock(ISarosSession.class);
 
-        aliceSession.addUser(eq(INVITEE));
+        aliceSession.addUser(eq(INVITEE), anyObject(IPreferenceStore.class));
         expectLastCall().once();
 
         bobSession = createNiceMock(ISarosSession.class);
@@ -127,7 +128,9 @@ public class SessionNegotiationTest {
 
         expect(
             bobSessionManager.joinSession(anyObject(String.class), eq(ALICE),
-                anyInt(), anyInt())).andReturn(bobSession).once();
+                anyInt(), anyInt(), anyObject(IPreferenceStore.class),
+                anyObject(IPreferenceStore.class))).andReturn(bobSession)
+            .once();
 
         replay(aliceSessionManager, bobSessionManager);
     }

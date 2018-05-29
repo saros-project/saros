@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 
 /**
  * Interface for starting and stopping a DPP session. It also offers support for
@@ -40,7 +41,7 @@ public interface ISarosSessionManager {
      * @return a new session.
      */
     public ISarosSession joinSession(final String id, JID host,
-        int clientColor, int hostColor);
+        int clientColor, int hostColor, IPreferenceStore hostProperties, IPreferenceStore clientProperties);
 
     /**
      * Stops the currently active session. If the local user is the host, this

@@ -5,6 +5,7 @@ import java.util.Map;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 
 /**
@@ -29,6 +30,19 @@ public interface ISessionNegotiationHook {
      * @return A unique string identifying the hook.
      */
     public String getIdentifier();
+
+    /**
+     * Receives the host's fixed preferences.
+     * <p>
+     * During the session creation this method will be called on the <b>host</b>
+     * side (see {@link SarosSessionManager#startSession(Map)}).
+     * 
+     * @return The settings in form of [Key, Value] pairs. The settings should
+     *         in general look the same as those returned by
+     *         {@link #considerClientPreferences(JID, Map)} as both will be
+     *         passed to {@link #applyActualParameters(Map, IPreferenceStore)}.
+     */
+    public Map<String, String> tellHostPreferences();
 
     /**
      * Receive the client's preferences for later consideration.
@@ -62,29 +76,48 @@ public interface ISessionNegotiationHook {
      * @return The settings determined by the host which -- if not
      *         <code>null</code> -- will be sent back to the client. It's up to
      *         the specific hook to which extent the host considers the wishes
-     *         of the client.
+     *         of the client. The settings should in general look the same as
+     *         those returned by {@link #tellHostPreferences()} as both will be
+     *         passed into {@link #applyActualParameters(Map, IPreferenceStore)}
+     *         .
      */
     public Map<String, String> considerClientPreferences(JID client,
         Map<String, String> input);
 
     /**
-     * Duty of the client: Apply the parameters defined by the host.
+     * This will be called on <b>client</b>'s and <b>host</b>'s side upon
+     * determination of the actual session parameters by the host. The hook
+     * itself is responsible for accessing and modifying the according
+     * components (e.g. the {@link SarosSessionManager}) or storing the result
+     * in the given IPreferenceStore, where other components may receive the
+     * parameters.
      * 
-     * This method will be called on the <b>client</b>'s side upon reception of
-     * the actual session parameters determined by the host. The hook itself is
-     * responsible for accessing and modifying the according components (e.g.
-     * the {@link SarosSessionManager}). This method will be called right before
-     * the Session is created on the client side (via
-     * <code>SarosSessionManager.joinSession()</code>) and may not rely on the
-     * effects of other hooks.
+     * This method will be called right before the Session is created and may
+     * not rely on the effects of other hooks.
      * 
-     * @param settings
+     * @param input
      *            The parameters concerning the hook at hand, which were
      *            determined by the host during his
-     *            {@link OutgoingSessionNegotiation} (i.e. the return value of
-     *            {@link #considerClientPreferences(JID, Map)} ). Might be
+     *            {@link OutgoingSessionNegotiation}. On the host this is the
+     *            result of {@link #tellHostPreferences()} for the first call
+     *            and the result of {@link #considerClientPreferences(JID, Map),
+     *            for subsequent calls. On the client the received result of
+     *            {@link #considerClientPreferences(JID, Map)}. Might be
      *            <code>null</code>, if the host has no counterpart for this
      *            hook.
+     * 
+     * @param hostPreferences
+     *            The session preference store that corresponds to the host.
+     *            Maybe used to store the final properties for access of other
+     *            components.
+     * 
+     * @param clientPreferences
+     *            The session preference store that corresponds to the client.
+     *            Maybe used to store the final properties for access of other
+     *            components. The IPreferenceStore may be <code>null</code>,
+     *            if the host is currently the only member of the session.
+     * 
      */
-    public void applyActualParameters(Map<String, String> settings);
+    public void applyActualParameters(Map<String, String> input,
+        IPreferenceStore hostPreferences, IPreferenceStore clientPreferences);
 }

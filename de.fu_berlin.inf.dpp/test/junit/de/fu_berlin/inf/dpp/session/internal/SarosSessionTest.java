@@ -62,6 +62,7 @@ import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
+import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.project.internal.SarosEclipseSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -327,7 +328,8 @@ public class SarosSessionTest {
         final IContainerContext context = createContextMock(container);
 
         // Test creating, starting and stopping the session.
-        SarosSession session = new SarosSession(SAROS_SESSION_ID, 0, context);
+        SarosSession session = new SarosSession(SAROS_SESSION_ID, 0,
+            new PreferenceStore(), context);
 
         assertFalse(session.hasActivityConsumers());
         assertFalse(session.hasActivityProducers());

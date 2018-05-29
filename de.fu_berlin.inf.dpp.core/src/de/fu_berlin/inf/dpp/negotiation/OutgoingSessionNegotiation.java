@@ -27,6 +27,8 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
@@ -200,7 +202,12 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
             awaitCompletion(monitor);
 
-            User newUser = completeInvitation(monitor);
+            IPreferenceStore clientProperties = new PreferenceStore();
+            applySessionParameters(actualSessionParameters,
+                sarosSession.getUserProperties(sarosSession.getHost()),
+                clientProperties);
+
+            User newUser = completeInvitation(clientProperties, monitor);
 
             monitor.done();
 
@@ -485,6 +492,23 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : remote side started its Saros session");
     }
 
+    /**
+     * Applies and saves the final session parameters.
+     */
+    private void applySessionParameters(
+        InvitationParameterExchangeExtension clientParameters,
+        IPreferenceStore hostProperties, IPreferenceStore clientProperties) {
+
+        // call each hook to do its magic
+        for (ISessionNegotiationHook hook : hookManager.getHooks()) {
+            Map<String, String> actualSettings = clientParameters
+                .getHookSettings(hook);
+
+            hook.applyActualParameters(actualSettings, hostProperties,
+                clientProperties);
+        }
+    }
+
     private static final Object REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE = new Object();
 
     /**
@@ -496,8 +520,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
      * 
      * @throws IOException
      */
-    private User completeInvitation(IProgressMonitor monitor)
-        throws IOException {
+    private User completeInvitation(IPreferenceStore properties,
+        IProgressMonitor monitor) throws IOException {
 
         log.debug(this + " : synchronizing user list");
 
@@ -508,7 +532,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         synchronized (REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE) {
 
-            sarosSession.addUser(user);
+            sarosSession.addUser(user, properties);
             log.debug(this + " : added " + getPeer()
                 + " to the current session, colorID: " + clientColorID);
 

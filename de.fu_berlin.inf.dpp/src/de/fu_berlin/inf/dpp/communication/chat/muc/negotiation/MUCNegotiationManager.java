@@ -65,6 +65,12 @@ public class MUCNegotiationManager {
         }
 
         @Override
+        public Map<String, String> tellHostPreferences() {
+            // Nothing to do
+            return null;
+        }
+
+        @Override
         public Map<String, String> considerClientPreferences(JID client,
             Map<String, String> input) {
             // We don't think about the client's preferences. We are the host,
@@ -80,7 +86,9 @@ public class MUCNegotiationManager {
         }
 
         @Override
-        public void applyActualParameters(Map<String, String> settings) {
+        public void applyActualParameters(Map<String, String> settings,
+            de.fu_berlin.inf.dpp.preferences.IPreferenceStore hostPreferences,
+            de.fu_berlin.inf.dpp.preferences.IPreferenceStore clientPreferences) {
 
             if (settings == null)
                 return;

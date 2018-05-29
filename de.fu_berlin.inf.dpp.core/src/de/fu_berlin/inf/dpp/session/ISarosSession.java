@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -120,8 +121,10 @@ public interface ISarosSession {
      * 
      * @param user
      *            the user that is to be added
+     * @param preferences
+     *            the initial properties of the new user
      */
-    public void addUser(User user);
+    public void addUser(User user, IPreferenceStore preferences);
 
     /**
      * Informs all listeners that a user now has Projects and can process
@@ -208,6 +211,16 @@ public interface ISarosSession {
      *         if not user with such a JID exists in the session
      */
     public User getUser(JID jid);
+
+    /**
+     * <p>
+     * Given a user, this method will return this users session properties.
+     * </p>
+     * 
+     * @return Properties of the given user or <code>null</code> if the user is
+     *         not known to th session
+     */
+    public IPreferenceStore getUserProperties(User user);
 
     /**
      * Given a JID (resource qualified or not), will return the resource

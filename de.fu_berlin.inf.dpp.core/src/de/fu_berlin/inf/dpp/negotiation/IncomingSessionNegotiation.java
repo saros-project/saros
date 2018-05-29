@@ -24,6 +24,8 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
@@ -312,10 +314,13 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
         // HACK
         int clientColor = UserColorID.UNKNOWN;
         int hostFavoriteColor = UserColorID.UNKNOWN;
+        IPreferenceStore hostPreferences = new PreferenceStore();
+        IPreferenceStore clientPreferences = new PreferenceStore();
 
         for (ISessionNegotiationHook hook : hookManager.getHooks()) {
             Map<String, String> settings = parameters.getHookSettings(hook);
-            hook.applyActualParameters(settings);
+            hook.applyActualParameters(settings, hostPreferences,
+                clientPreferences);
 
             if (settings == null)
                 continue;
@@ -330,7 +335,8 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
         // end of HACK
 
         sarosSession = sessionManager.joinSession(sessionID,
-            parameters.getSessionHost(), clientColor, hostFavoriteColor);
+            parameters.getSessionHost(), clientColor, hostFavoriteColor,
+            hostPreferences, clientPreferences);
     }
 
     /**
