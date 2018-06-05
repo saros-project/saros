@@ -1,0 +1,16 @@
+sudo: enabled
+
+notifications:
+  email: false
+
+git:
+  depth: false
+
+services:
+  - docker
+
+jobs:
+  include:
+    - before_script: docker pull saros/build_test:0.1
+      script:
+        - docker run -v $PWD:/home/saros/ci/saros_src saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/build/build_all.sh
