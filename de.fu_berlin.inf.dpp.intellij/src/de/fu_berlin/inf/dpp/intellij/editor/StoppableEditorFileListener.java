@@ -3,7 +3,10 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.messages.MessageBusConnection;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,7 +15,12 @@ import org.jetbrains.annotations.NotNull;
 public class StoppableEditorFileListener extends AbstractStoppableListener
     implements FileEditorManagerListener {
 
-    public StoppableEditorFileListener(EditorManager manager) {
+    private static final Logger LOG = Logger
+        .getLogger(StoppableEditorFileListener.class);
+
+    private MessageBusConnection messageBusConnection;
+
+    StoppableEditorFileListener(EditorManager manager) {
         super(manager);
     }
 
@@ -69,5 +77,33 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
 
         editorManager.getLocalEditorHandler()
             .activateEditor(event.getNewFile());
+    }
+
+    /**
+     * Subscribes the editor listeners to the given project.
+     *
+     * @param project the project whose file operations to listen to
+     */
+    void subscribe(
+        @NotNull
+            Project project) {
+
+        if (messageBusConnection != null) {
+            LOG.warn("Tried to register StoppableEditorListener that was "
+                + "already registered");
+
+            return;
+        }
+
+        messageBusConnection = project.getMessageBus().connect();
+
+        messageBusConnection.subscribe(FILE_EDITOR_MANAGER, this);
+    }
+
+    /**
+     * Unsubscribes the editor listeners.
+     */
+    void unsubscribe(){
+        messageBusConnection.disconnect();
     }
 }

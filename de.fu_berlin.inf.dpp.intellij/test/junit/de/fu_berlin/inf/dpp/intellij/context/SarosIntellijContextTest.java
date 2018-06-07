@@ -8,6 +8,8 @@ import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 
+import com.intellij.util.messages.MessageBus;
+import com.intellij.util.messages.MessageBusConnection;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.context.IContextFactory;
@@ -53,7 +55,21 @@ public class SarosIntellijContextTest {
         mockStaticGetInstance(PropertiesComponent.class, null);
         mockStaticGetInstance(ModuleTypeManager.class, null);
 
+        // mock IntelliJ message bus used to listen for editor activities
+        MessageBusConnection messageBusConnection = EasyMock
+            .createNiceMock(MessageBusConnection.class);
+
+        EasyMock.replay(messageBusConnection);
+
+        MessageBus messageBus = EasyMock.createNiceMock(MessageBus.class);
+        EasyMock.expect(messageBus.connect()).andReturn(messageBusConnection);
+
+        EasyMock.replay(messageBus);
+
+
         project = EasyMock.createNiceMock(Project.class);
+        EasyMock.expect(project.getMessageBus()).andReturn(messageBus);
+
         EasyMock.replay(project);
 
         //mock IntelliJ dependent calls to get current IDE and plugin version
