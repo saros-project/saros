@@ -71,12 +71,14 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
     public void selectionChanged(
         @NotNull
         FileEditorManagerEvent event) {
-        if (!enabled) {
+
+        VirtualFile virtualFile = event.getNewFile();
+
+        if (!enabled || virtualFile == null) {
             return;
         }
 
-        editorManager.getLocalEditorHandler()
-            .activateEditor(event.getNewFile());
+        editorManager.getLocalEditorHandler().activateEditor(virtualFile);
     }
 
     /**
