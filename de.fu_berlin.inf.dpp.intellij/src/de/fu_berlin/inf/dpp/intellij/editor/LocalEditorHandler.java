@@ -60,22 +60,29 @@ public class LocalEditorHandler {
      * {@link EditorManager#startEditor(Editor)} with it.
      * <p>
      * <b>Note:</b> This only works for shared resources.
+     * </p>
      *
      * @param virtualFile path of the file to open
-     * @param activate activate editor after opening
+     * @param activate    activate editor after opening
+     * @return the opened <code>Editor</code> or <code>null</code> if the given
+     * file does not belong to a shared module
      */
-    public void openEditor(VirtualFile virtualFile, boolean activate) {
+    @Nullable
+    public Editor openEditor(
+        @NotNull
+            VirtualFile virtualFile, boolean activate) {
+
         SPath path = toPath(virtualFile);
 
         if (path == null) {
             LOG.debug("Ignored open editor request for file " + virtualFile +
                 " as it does not belong to a shared module");
 
-            return;
+            return null;
 
         }
 
-        openEditor(virtualFile,path,activate);
+        return openEditor(virtualFile,path,activate);
     }
 
     /**
@@ -85,13 +92,20 @@ public class LocalEditorHandler {
      * <p>
      * <b>Note:</b> This only works for shared resources that belong to the
      * given module.
+     * </p>
      *
      * @param virtualFile path of the file to open
-     * @param project module the file belongs to
-     * @param activate activate editor after opening
+     * @param project     module the file belongs to
+     * @param activate    activate editor after opening
+     * @return the opened <code>Editor</code> or <code>null</code> if the given
+     * file does not belong to a shared module
      */
-    public void openEditor(VirtualFile virtualFile, IProject project,
-        boolean activate){
+    @Nullable
+    public Editor openEditor(
+        @NotNull
+            VirtualFile virtualFile,
+        @NotNull
+            IProject project, boolean activate) {
 
         IResource resource = getResource(virtualFile, project);
 
@@ -99,13 +113,11 @@ public class LocalEditorHandler {
             LOG.debug("Could not open Editor for file " + virtualFile +
                 " as it does not belong to the given module " + project);
 
-            return;
+            return null;
         }
 
-        openEditor(virtualFile, new SPath(resource), activate);
+        return openEditor(virtualFile, new SPath(resource), activate);
     }
-
-
 
     /**
      * Opens an editor for the passed virtualFile, adds it to the pool of
@@ -113,28 +125,33 @@ public class LocalEditorHandler {
      * {@link EditorManager#startEditor(Editor)} with it.
      * <p>
      * <b>Note:</b> This only works for shared resources.
+     * </p>
      * <p>
      * <b>Note:</b> This method expects the VirtualFile and the SPath to point
      * to the same resource.
+     * </p>
      *
      * @param virtualFile path of the file to open
-     * @param path saros resource representation of the file
-     * @param activate activate editor after opening
+     * @param path        saros resource representation of the file
+     * @param activate    activate editor after opening
+     * @return the opened <code>Editor</code> or <code>null</code> if the given
+     * file does not exist or does not belong to a shared module
      */
-    private void openEditor(@NotNull VirtualFile virtualFile,
+    @Nullable
+    private Editor openEditor(@NotNull VirtualFile virtualFile,
         @NotNull SPath path, boolean activate){
 
         if(!virtualFile.exists()){
             LOG.debug("Could not open Editor for file " + virtualFile +
                 " as it does not exist");
 
-            return;
+            return null;
 
         }else if (!manager.getSession().isShared(path.getResource())) {
             LOG.debug("Ignored open editor request for file " + virtualFile +
                 " as it is not shared");
 
-            return;
+            return null;
         }
 
         Editor editor = projectAPI.openEditor(virtualFile, activate);
@@ -143,6 +160,8 @@ public class LocalEditorHandler {
         manager.startEditor(editor);
 
         LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
+
+        return editor;
     }
 
     /**
