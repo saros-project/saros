@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
+import de.fu_berlin.inf.dpp.intellij.editor.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.negotiation.hooks.ModuleTypeNegotiationHook;
 import de.fu_berlin.inf.dpp.intellij.preferences.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.preferences.PropertiesComponentAdapter;
@@ -73,6 +74,9 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
         Component.create(ISarosSessionContextFactory.class,
             SarosIntellijSessionContextFactory.class),
+
+        // Utility to create Saros resources from a VirtualFile
+        Component.create(VirtualFileConverter.class),
 
         // UI handlers
         Component.create(NegotiationHandler.class),
