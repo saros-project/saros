@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.core.editor.RemoteWriteAccessManager;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
@@ -380,23 +379,6 @@ public class EditorManager extends AbstractActivityProducer
 
     };
 
-    private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
-
-        @Override
-        public void editorActivated(User user, SPath filePath) {
-
-            // We only need to react to remote users changing editor
-            if (user.isLocal()) {
-                return;
-            }
-
-            // Clear all viewport annotations of this user.
-            for (SPath editorPath : getOpenEditors()) {
-                localEditorManipulator.clearSelection(editorPath);
-            }
-        }
-    };
-
     private final LocalEditorHandler localEditorHandler;
     private final LocalEditorManipulator localEditorManipulator;
 
@@ -429,7 +411,6 @@ public class EditorManager extends AbstractActivityProducer
         LocalEditorManipulator localEditorManipulator, ProjectAPI projectAPI) {
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-        addSharedEditorListener(sharedEditorListener);
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
 

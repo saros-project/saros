@@ -253,18 +253,6 @@ public class LocalEditorManipulator {
     }
 
     /**
-     * Removes all text marks from the path.
-     *
-     * @param path
-     */
-    public void clearSelection(SPath path) {
-        Editor editor = editorPool.getEditor(path);
-        if (editor != null) {
-            editorAPI.textMarkRemove(editor, null);
-        }
-    }
-
-    /**
      * Adjusts viewport. Focus is set on the center of the range, but priority
      * is given to selected lines.
      *
