@@ -38,12 +38,12 @@ import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
@@ -430,7 +430,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        IncomingProjectNegotiation negotiation;
+        AbstractIncomingProjectNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -568,7 +568,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        List<OutgoingProjectNegotiation> negotiations = new ArrayList<OutgoingProjectNegotiation>();
+        List<AbstractOutgoingProjectNegotiation> negotiations = new ArrayList<AbstractOutgoingProjectNegotiation>();
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -582,7 +582,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     TransferType type = TransferType.valueOf(currentSession
                         .getUserProperties(user).getString(
                             ProjectNegotiationTypeHook.KEY_TYPE));
-                    OutgoingProjectNegotiation negotiation = negotiationFactory
+                    AbstractOutgoingProjectNegotiation negotiation = negotiationFactory
                         .newOutgoingProjectNegotiation(user.getJID(), type,
                             projectsToShare, this, currentSession);
 
@@ -595,7 +595,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
         }
 
-        for (OutgoingProjectNegotiation negotiation : negotiations)
+        for (AbstractOutgoingProjectNegotiation negotiation : negotiations)
             handler.handleOutgoingProjectNegotiation(negotiation);
     }
 
@@ -627,7 +627,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        OutgoingProjectNegotiation negotiation;
+        AbstractOutgoingProjectNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {

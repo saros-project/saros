@@ -26,8 +26,8 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 /**
- * This abstract class is the superclass for {@link OutgoingProjectNegotiation}
- * and {@link IncomingProjectNegotiation}.
+ * This abstract class is the superclass for {@link AbstractOutgoingProjectNegotiation}
+ * and {@link AbstractIncomingProjectNegotiation}.
  */
 public abstract class ProjectNegotiation extends Negotiation {
 

@@ -109,7 +109,7 @@ public final class NegotiationFactory {
             connectionManager, transmitter, receiver);
     }
 
-    public OutgoingProjectNegotiation newOutgoingProjectNegotiation(
+    public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
         final JID remoteAddress, final TransferType transferType,
         final List<IProject> resources,
         final ISarosSessionManager sessionManager, final ISarosSession session) {
@@ -120,7 +120,7 @@ public final class NegotiationFactory {
 
         switch (transferType) {
         case ARCHIVE:
-            return new OutgoingProjectNegotiation(remoteAddress, resources,
+            return new ArchiveOutgoingProjectNegotiation(remoteAddress, resources,
                 sessionManager, session, /* editorManager */
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);
@@ -129,7 +129,7 @@ public final class NegotiationFactory {
         }
     }
 
-    public IncomingProjectNegotiation newIncomingProjectNegotiation(
+    public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
         final JID remoteAddress, final TransferType transferType,
         final String negotiationID,
         final List<ProjectNegotiationData> projectNegotiationData,
@@ -141,7 +141,7 @@ public final class NegotiationFactory {
 
         switch (transferType) {
         case ARCHIVE:
-            return new IncomingProjectNegotiation(remoteAddress, negotiationID,
+            return new ArchiveIncomingProjectNegotiation(remoteAddress, negotiationID,
                 projectNegotiationData, sessionManager, session,
                 fileReplacementInProgressObservable, workspace, checksumCache,
                 connectionService, transmitter, receiver);
