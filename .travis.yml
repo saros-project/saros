@@ -1,3 +1,4 @@
+language: java
 sudo: enabled
 
 notifications:
@@ -9,8 +10,17 @@ git:
 services:
   - docker
 
+# Sonar token is encrypted via travis encrypt
+addons:
+  sonarcloud:
+    organization: "saros"
+    token:
+      secure: "PQfyFSZVBAiDpPV3/WTaDQq+vWervZP8TbBto6IGnePUEmndydQgdaN66wpgvlC+erh4OAf2vSeueH2/6olIJo6l+q1WjAitYL/Et5h3J3N7vIokzPwyuAr0OOyvd3dSo2LgkePqcBxvP6AOHgCIWPT+cXt4qHpgzXMCN4P+Fko="
+
 jobs:
   include:
     - before_script: docker pull saros/build_test:0.1
       script:
         - docker run -v $PWD:/home/saros/ci/saros_src saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/build/build_all.sh
+      after_success:
+        - sonar-scanner
