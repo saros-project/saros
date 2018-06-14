@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.account;
 
 import java.io.Serializable;
+import java.lang.Exception;
 
 /**
  * Representation of an XMPP account.
@@ -74,6 +75,10 @@ public final class XMPPAccount implements Serializable {
 
         this.useSASL = useSASL;
         this.useTLS = useTLS;
+    }
+
+    public void sonarViolation() throws Exception {
+      throw new Exception("FAIL");
     }
 
     public boolean useSASL() {
