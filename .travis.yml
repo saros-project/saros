@@ -7,8 +7,8 @@ notifications:
 git:
   depth: false
 
-services:
-  - docker
+services: docker
+
 
 # Sonar token is encrypted via travis encrypt
 addons:
@@ -16,6 +16,23 @@ addons:
     organization: "saros"
     token:
       secure: "PQfyFSZVBAiDpPV3/WTaDQq+vWervZP8TbBto6IGnePUEmndydQgdaN66wpgvlC+erh4OAf2vSeueH2/6olIJo6l+q1WjAitYL/Et5h3J3N7vIokzPwyuAr0OOyvd3dSo2LgkePqcBxvP6AOHgCIWPT+cXt4qHpgzXMCN4P+Fko="
+
+# Avoid config duplication via yaml anchors
+stf_before_script: &stf_before_script
+  if: env(TRAVIS_EVENT_TYPE) = cron
+  before_script:
+    # Pull required images
+    - docker pull saros/build_test:0.1
+    - docker pull saros/stf_test_master:0.1
+    - docker pull saros/stf_test_slave:0.1
+    - docker pull saros/stf_xmpp_server:0.1
+    # Create shared workspace dir which is mounted by the build, master and slave containers
+    - mkdir stf_ws
+    # Build required artifacts and move them in the shared workspace
+    - docker run -t -v $PWD:/home/saros/ci/saros_src -v $PWD/stf_ws:/home/saros/ci/stf_ws
+      saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/stf/build/provide_testee.sh
+    # Start required containers and services
+    - export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf; $PWD/travis/script/stf/setup_stf_container.sh $PWD
 
 jobs:
   include:
@@ -25,20 +42,10 @@ jobs:
         - docker run -v $PWD:/home/saros/ci/saros_src saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/build/build_all.sh
       after_success:
         - sonar-scanner
+      # set env to avoid multiple build executions
 
-    - if: env(TRAVIS_EVENT_TYPE) = cron
-      before_script:
-        # Pull required images
-        - docker pull saros/build_test:0.1
-        - docker pull saros/stf_test_master:0.1
-        - docker pull saros/stf_test_slave:0.1
-        - docker pull saros/stf_xmpp_server:0.1
-        # Create shared workspace dir which is mounted by the build, master and slave containers
-        - mkdir stf_ws
-        # Build required artifacts and move them in the shared workspace
-        - docker run -t -v $PWD:/home/saros/ci/saros_src -v $PWD/stf_ws:/home/saros/ci/stf_ws
-          saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/stf/build/provide_testee.sh
-        # Start required containers and services
-        - export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf; $PWD/travis/script/stf/setup_stf_container.sh $PWD
-      script:
-        - docker exec -t stf_master scripts/start_stf_tests.sh
+    - <<: *stf_before_script
+      script: docker exec -t stf_master scripts/start_stf_tests.sh
+
+    - <<: *stf_before_script
+      script: docker exec -t stf_master scripts/start_stf_self_tests.sh
