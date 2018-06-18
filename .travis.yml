@@ -18,8 +18,8 @@ addons:
       secure: "PQfyFSZVBAiDpPV3/WTaDQq+vWervZP8TbBto6IGnePUEmndydQgdaN66wpgvlC+erh4OAf2vSeueH2/6olIJo6l+q1WjAitYL/Et5h3J3N7vIokzPwyuAr0OOyvd3dSo2LgkePqcBxvP6AOHgCIWPT+cXt4qHpgzXMCN4P+Fko="
 
 # Avoid config duplication via yaml anchors
-stf_before_script: &stf_before_script
-  if: env(TRAVIS_EVENT_TYPE) = cron
+_stf_setup_config: &stf_before_script
+  if: type in (cron, api)
   before_script:
     # Pull required images
     - docker pull saros/build_test:0.1
@@ -29,14 +29,13 @@ stf_before_script: &stf_before_script
     # Create shared workspace dir which is mounted by the build, master and slave containers
     - mkdir stf_ws
     # Build required artifacts and move them in the shared workspace
-    - docker run -t -v $PWD:/home/saros/ci/saros_src -v $PWD/stf_ws:/home/saros/ci/stf_ws
-      saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/stf/build/provide_testee.sh
+    - docker run -t -v $PWD:/home/saros/ci/saros_src -v $PWD/stf_ws:/home/saros/ci/stf_ws saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/stf/build/provide_testee.sh
     # Start required containers and services
     - export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf; $PWD/travis/script/stf/setup_stf_container.sh $PWD
 
 jobs:
   include:
-    - if: env(TRAVIS_EVENT_TYPE) != cron
+    - if: type in (push, pull_request)
       before_script: docker pull saros/build_test:0.1
       script:
         - docker run -v $PWD:/home/saros/ci/saros_src saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/build/build_all.sh
