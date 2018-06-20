@@ -1,11 +1,14 @@
 package de.fu_berlin.inf.dpp.intellij.editor;
 
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
+import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,10 +21,19 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
     private static final Logger LOG = Logger
         .getLogger(StoppableEditorFileListener.class);
 
+    private final VirtualFileConverter virtualFileConverter;
+    private final AnnotationManager annotationManager;
+
     private MessageBusConnection messageBusConnection;
 
-    StoppableEditorFileListener(EditorManager manager) {
+    StoppableEditorFileListener(EditorManager manager,
+        VirtualFileConverter virtualFileConverter,
+        AnnotationManager annotationManager) {
+
         super(manager);
+
+        this.virtualFileConverter = virtualFileConverter;
+        this.annotationManager = annotationManager;
     }
 
     /**
@@ -40,7 +52,14 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
             return;
         }
 
-        editorManager.getLocalEditorHandler().openEditor(virtualFile,false);
+        Editor editor = editorManager.getLocalEditorHandler()
+            .openEditor(virtualFile, false);
+
+        SPath sPath = virtualFileConverter.convertToPath(virtualFile);
+
+        if (sPath != null && editor != null) {
+            annotationManager.applyStoredAnnotations(sPath.getFile(), editor);
+        }
     }
 
     /**

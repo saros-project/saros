@@ -483,6 +483,7 @@ public class EditorManager extends AbstractActivityProducer
     public EditorManager(ISarosSessionManager sessionManager,
         LocalEditorHandler localEditorHandler,
         LocalEditorManipulator localEditorManipulator, ProjectAPI projectAPI,
+        VirtualFileConverter virtualFileConverter,
         AnnotationManager annotationManager) {
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
@@ -491,7 +492,9 @@ public class EditorManager extends AbstractActivityProducer
         this.annotationManager = annotationManager;
 
         documentListener = new StoppableDocumentListener(this);
-        fileListener = new StoppableEditorFileListener(this);
+        fileListener = new StoppableEditorFileListener(this,
+                virtualFileConverter, annotationManager);
+
         selectionListener = new StoppableSelectionListener(this);
         viewportListener = new StoppableViewPortListener(this);
 
