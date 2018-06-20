@@ -30,8 +30,6 @@ import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
-import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
-import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
@@ -241,16 +239,19 @@ public class EditorManager extends AbstractActivityProducer
                 return;
             }
 
+            IFile file = path.getFile();
+
             LOG.debug(
                 "Text selection activity received: " + path + ", " + selection);
 
             User user = selection.getSource();
-            ColorModel colorModel = ColorManager
-                .getColorModel(user.getColorID());
+            int start = selection.getOffset();
+            int end = start + selection.getLength();
 
-            localEditorManipulator
-                .selectText(path, selection.getOffset(), selection.getLength(),
-                    colorModel);
+            Editor editor = editorPool.getEditor(path);
+
+            annotationManager
+                .addSelectionAnnotation(user, file, start, end, editor);
 
             editorListenerDispatch.textSelectionChanged(selection);
         }
@@ -363,6 +364,7 @@ public class EditorManager extends AbstractActivityProducer
 
         for(VirtualFile openFile: openFiles){
             localEditorHandler.openEditor(openFile, project,false);
+            //TODO create selection activity if there is a current selection
         }
 
         //TODO consider duplicated open editors during screen splitting
