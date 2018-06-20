@@ -529,7 +529,11 @@ public class AnnotationManager {
         @NotNull
             IFile file) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        selectionAnnotationStore.getAnnotations(file)
+            .forEach(AbstractEditorAnnotation::removeLocalRepresentation);
+
+        contributionAnnotationStore.getAnnotations(file)
+            .forEach(AbstractEditorAnnotation::removeLocalRepresentation);
     }
 
     /**
@@ -545,7 +549,11 @@ public class AnnotationManager {
         @NotNull
             User user) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        selectionAnnotationStore.removeAnnotations(user)
+            .forEach(this::removeRangeHighlighter);
+
+        contributionAnnotationStore.removeAnnotations(user)
+            .forEach(this::removeRangeHighlighter);
     }
 
     /**
@@ -553,7 +561,11 @@ public class AnnotationManager {
      * annotations from all annotation stores.
      */
     public void removeAllAnnotations() {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        selectionAnnotationStore.removeAllAnnotations()
+            .forEach(this::removeRangeHighlighter);
+
+        contributionAnnotationStore.removeAllAnnotations()
+            .forEach(this::removeRangeHighlighter);
     }
 
     /**
