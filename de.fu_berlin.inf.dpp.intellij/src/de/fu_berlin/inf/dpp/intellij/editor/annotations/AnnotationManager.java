@@ -35,11 +35,13 @@ public class AnnotationManager {
     }
 
     private final AnnotationStore<SelectionAnnotation> selectionAnnotationStore;
+    private final AnnotationStore<ContributionAnnotation> contributionAnnotationStore;
 
     private final Application application;
 
     public AnnotationManager() {
         this.selectionAnnotationStore = new AnnotationStore<>();
+        this.contributionAnnotationStore = new AnnotationStore<>();
 
         this.application = ApplicationManager.getApplication();
     }
@@ -129,7 +131,39 @@ public class AnnotationManager {
         @Nullable
             Editor editor) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        checkRange(start, end);
+
+        if (start == end) {
+            return;
+        }
+
+        List<AnnotationRange> annotationRanges = new ArrayList<>();
+
+        for (int i = 0; i < end - start; i++) {
+            int currentStart = start + i;
+            int currentEnd = start + i + 1;
+
+            AnnotationRange annotationRange;
+
+            if (editor != null) {
+                RangeHighlighter rangeHighlighter = addRangeHighlighter(user,
+                    currentStart, currentEnd, editor,
+                    AnnotationType.CONTRIBUTION_ANNOTATION);
+
+                annotationRange = new AnnotationRange(currentStart, currentEnd,
+                    rangeHighlighter);
+
+            } else {
+                annotationRange = new AnnotationRange(currentStart, currentEnd);
+            }
+
+            annotationRanges.add(annotationRange);
+        }
+
+        ContributionAnnotation contributionAnnotation = new ContributionAnnotation(
+            user, file, editor, annotationRanges);
+
+        contributionAnnotationStore.addAnnotation(contributionAnnotation);
     }
 
     /**
