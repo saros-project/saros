@@ -9,15 +9,9 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.VisualPosition;
-import com.intellij.openapi.editor.markup.HighlighterLayer;
-import com.intellij.openapi.editor.markup.HighlighterTargetArea;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
-
-import java.awt.Color;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.
@@ -121,58 +115,6 @@ public class EditorAPI {
         };
 
         Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
-    }
-
-    /**
-     * Adds text mark on the editor for the specified line range.
-     *
-     * @param editor
-     * @param start
-     * @param end
-     * @param color
-     * @return
-     */
-    public RangeHighlighter textMarkAdd(final Editor editor, final int start,
-        final int end, Color color) {
-        if (color == null || editor == null || !ENABLE_ANNOTATIONS) {
-            return null;
-        }
-
-        TextAttributes textAttr = new TextAttributes();
-        textAttr.setBackgroundColor(color);
-
-        RangeHighlighter highlighter = editor.getMarkupModel()
-            .addRangeHighlighter(start, end, HighlighterLayer.LAST, textAttr,
-                HighlighterTargetArea.EXACT_RANGE);
-        highlighter.setGreedyToLeft(false);
-        highlighter.setGreedyToRight(false);
-
-        return highlighter;
-    }
-
-    /**
-     * Removes text mark of the <code>highlighter</code> from editor.
-     * When <code>highlighter</code> is <code>null</code>, it removes all marks.
-     *
-     * @param editor
-     * @param highlighter when <code>highlighter</code> is <code>null</code>,
-     *                    it removes all marks.
-     */
-    public void textMarkRemove(final Editor editor,
-        RangeHighlighter highlighter) {
-        if (editor == null || !ENABLE_ANNOTATIONS) {
-            return;
-        }
-
-        //TODO: Check if this is necessary at all.
-        if (highlighter != null) {
-            editor.getMarkupModel().removeHighlighter(highlighter);
-        } else {
-            for (RangeHighlighter myHighlighter : editor.getMarkupModel()
-                .getAllHighlighters()) {
-                editor.getMarkupModel().removeHighlighter(myHighlighter);
-            }
-        }
     }
 
     /**
