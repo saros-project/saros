@@ -21,9 +21,6 @@ import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 
 public class EditorAPI {
 
-    private static final boolean ENABLE_ANNOTATIONS = Boolean
-        .getBoolean("saros.intellij.ENABLE_ANNOTATIONS");
-
     private Application application;
     private CommandProcessor commandProcessor;
 
@@ -153,10 +150,6 @@ public class EditorAPI {
      */
     public void setSelection(final Editor editor, final int start,
         final int end, ColorModel colorMode) {
-
-        if (!ENABLE_ANNOTATIONS) {
-            return;
-        }
 
         Runnable action = new Runnable() {
             @Override
