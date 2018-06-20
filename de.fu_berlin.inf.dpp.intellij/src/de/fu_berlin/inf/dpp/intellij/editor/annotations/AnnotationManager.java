@@ -407,7 +407,59 @@ public class AnnotationManager {
         @NotNull
             Editor editor) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        addLocalRepresentationToAnnotations(
+            selectionAnnotationStore.getAnnotations(file), editor);
+
+        addLocalRepresentationToAnnotations(
+            contributionAnnotationStore.getAnnotations(file), editor);
+    }
+
+    /**
+     * Creates RangeHighlighters for the given annotations and adds the given
+     * editor and the matching created RangeHighlighters to each given
+     * annotation.
+     *
+     * @param annotations the annotations to add a local representation to
+     * @param editor      the editor to create RangeHighlighters in
+     * @param <E>         the annotation type
+     * @see #addRangeHighlighter(User, int, int, Editor, AnnotationType)
+     */
+    private <E extends AbstractEditorAnnotation> void addLocalRepresentationToAnnotations(
+        @NotNull
+            List<E> annotations,
+        @NotNull
+            Editor editor) {
+
+        annotations.forEach(annotation -> {
+            AnnotationType annotationType;
+
+            if (annotation instanceof SelectionAnnotation) {
+                annotationType = AnnotationType.SELECTION_ANNOTATION;
+
+            } else if (annotation instanceof ContributionAnnotation) {
+                annotationType = AnnotationType.CONTRIBUTION_ANNOTATION;
+
+            } else {
+                throw new IllegalArgumentException(
+                    "Unknown annotation type " + annotation.getClass());
+            }
+
+            User user = annotation.getUser();
+            List<AnnotationRange> annotationRanges = annotation
+                .getAnnotationRanges();
+
+            annotation.addEditor(editor);
+
+            annotationRanges.forEach(annotationRange -> {
+                int start = annotationRange.getStart();
+                int end = annotationRange.getEnd();
+
+                RangeHighlighter rangeHighlighter = addRangeHighlighter(user,
+                    start, end, editor, annotationType);
+
+                annotationRange.addRangeHighlighter(rangeHighlighter);
+            });
+        });
     }
 
     /**
