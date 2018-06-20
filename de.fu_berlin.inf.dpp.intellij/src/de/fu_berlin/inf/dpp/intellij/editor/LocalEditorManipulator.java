@@ -14,8 +14,6 @@ import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import org.apache.log4j.Logger;
 
-import java.awt.Color;
-
 /**
  * This class applies the logic for activities that were received from remote.
  */
@@ -151,10 +149,8 @@ public class LocalEditorManipulator {
      *
      * @param path
      * @param operations
-     * @param color
      */
-    public void applyTextOperations(SPath path, Operation operations,
-        Color color) {
+    public void applyTextOperations(SPath path, Operation operations) {
         Document doc = editorPool.getDocument(path);
 
         /*
@@ -204,11 +200,6 @@ public class LocalEditorManipulator {
                 editorAPI.insertText(doc, op.getPosition(), op.getText());
                 if (!writePermission) {
                     doc.setReadOnly(true);
-                }
-                Editor editor = editorPool.getEditor(path);
-                if (editor != null) {
-                    editorAPI.textMarkAdd(editor, op.getPosition(),
-                        op.getPosition() + op.getTextLength(), color);
                 }
             }
         }
