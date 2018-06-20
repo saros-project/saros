@@ -1,10 +1,22 @@
 package de.fu_berlin.inf.dpp.intellij.editor.annotations;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
+import com.intellij.openapi.editor.markup.TextAttributes;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.session.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.awt.Color;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Annotation manager used to create, delete and manage annotations for a Saros
@@ -14,6 +26,18 @@ import org.jetbrains.annotations.Nullable;
 //TODO move saved local selections affected by changes while editor is closed
 //TODO adjust position of local selection when editor is re-opened
 public class AnnotationManager {
+    /**
+     * Enum containing the possible annotation types.
+     */
+    public enum AnnotationType {
+        SELECTION_ANNOTATION, CONTRIBUTION_ANNOTATION
+    }
+
+    private final Application application;
+
+    public AnnotationManager() {
+        this.application = ApplicationManager.getApplication();
+    }
 
     /**
      * Removes the current selection annotation for the given file and user
@@ -218,5 +242,131 @@ public class AnnotationManager {
      */
     public void removeAllAnnotations() {
         throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    /**
+     * Checks whether the given start and end point form a valid range.
+     * <p>
+     * The following conditions must hold true:
+     * </p>
+     * <ul>
+     * <li>start >= 0</li>
+     * <li>end >= 0</li>
+     * <li>start <= end</li>
+     * </ul>
+     * Throws an <code>IllegalArgumentException</code> otherwise.
+     *
+     * @param start the start position
+     * @param end   the end position
+     */
+    private void checkRange(int start, int end) {
+        if (start < 0 || end < 0) {
+            throw new IllegalArgumentException(
+                "The start and end of the annotation must not be negative "
+                    + "values. start: " + start + ", end: " + end);
+        }
+
+        if (start > end) {
+            throw new IllegalArgumentException(
+                "The start of the annotation must not be after the end of the "
+                    + "annotation. start: " + start + ", end: " + end);
+
+        }
+    }
+
+    /**
+     * Creates a RangeHighlighter with the given position for the given
+     * editor.
+     * <p>
+     * The color of the highlighter is determined by the given user and
+     * annotation type. Valid types are defined in the enum
+     * <code>AnnotationType</code>.
+     * </p>
+     * The returned <code>RangeHighlighter</code> can not be modified through
+     * the API but is automatically updated by Intellij if there are changes to
+     * the editor.
+     *
+     * @param user           the user whose color to use
+     * @param start          the start of the highlighted area
+     * @param end            the end of the highlighted area
+     * @param editor         the editor to create the highlighter for
+     * @param annotationType the type of annotation
+     * @return a RangeHighlighter with the given parameters.
+     */
+    @NotNull
+    private RangeHighlighter addRangeHighlighter(
+        @NotNull
+            User user, int start, int end,
+        @NotNull
+            Editor editor,
+        @NotNull
+            AnnotationType annotationType) {
+
+        Color color;
+        switch (annotationType) {
+
+        case SELECTION_ANNOTATION:
+            color = ColorManager.getColorModel(user.getColorID())
+                .getSelectColor();
+            break;
+
+        case CONTRIBUTION_ANNOTATION:
+            color = ColorManager.getColorModel(user.getColorID())
+                .getEditColor();
+            break;
+
+        default:
+            throw new IllegalArgumentException(
+                "Unknown annotation type: " + annotationType);
+        }
+
+        TextAttributes textAttr = new TextAttributes();
+        textAttr.setBackgroundColor(color);
+
+        AtomicReference<RangeHighlighter> result = new AtomicReference<>();
+
+        application.invokeAndWait(() -> result.set(editor.getMarkupModel()
+                .addRangeHighlighter(start, end, HighlighterLayer.LAST, textAttr,
+                    HighlighterTargetArea.EXACT_RANGE)),
+            ModalityState.defaultModalityState());
+
+        return result.get();
+    }
+
+    /**
+     * Removes all existing RangeHighlighters for the given annotation from
+     * the editor of the annotation. This does <b>not</b> affect the stored
+     * values in the given annotation, meaning the objects for the
+     * RangeHighlighters will still remain stored in the annotation.
+     *
+     * @param annotation the annotation whose highlighters to remove
+     */
+    private void removeRangeHighlighter(
+        @NotNull
+            AbstractEditorAnnotation annotation) {
+
+        Editor editor = annotation.getEditor();
+
+        if (editor == null) {
+            return;
+        }
+
+        List<AnnotationRange> annotationRanges = annotation
+            .getAnnotationRanges();
+
+        annotationRanges.forEach(annotationRange -> {
+
+            RangeHighlighter rangeHighlighter = annotationRange
+                .getRangeHighlighter();
+
+            if (rangeHighlighter == null || !rangeHighlighter.isValid()) {
+                return;
+            }
+
+            application.invokeAndWait(() -> editor.getMarkupModel()
+                    .removeHighlighter(rangeHighlighter),
+                ModalityState.defaultModalityState());
+        });
+
     }
 }
