@@ -335,6 +335,8 @@ public class EditorManager extends AbstractActivityProducer
 
         @Override
         public void userLeft(final User user) {
+            annotationManager.removeAnnotations(user);
+
             // TODO: Let the FollowModeManager handle this
             if (user.equals(followedUser)) {
                 setFollowing(null);
@@ -423,6 +425,8 @@ public class EditorManager extends AbstractActivityProducer
         }
 
         private void endSession() {
+            annotationManager.removeAllAnnotations();
+
             setFollowing(null);
 
             //This sets all editors, that were set to read only, writeable
