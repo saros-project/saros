@@ -15,6 +15,9 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.core.editor.RemoteWriteAccessManager;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
@@ -24,7 +27,9 @@ import de.fu_berlin.inf.dpp.editor.remote.EditorState;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
@@ -44,6 +49,8 @@ import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -153,17 +160,77 @@ public class EditorManager extends AbstractActivityProducer
 
             SPath path = editorActivity.getPath();
 
+            if (path == null) {
+                return;
+            }
+
             LOG.debug(path + " text edit activity received " + editorActivity);
 
             User user = editorActivity.getSource();
-            ColorModel colorModel = ColorManager
-                .getColorModel(user.getColorID());
 
-            localEditorManipulator
-                .applyTextOperations(path, editorActivity.toOperation(),
-                    colorModel.getEditColor());
+            Operation operation = editorActivity.toOperation();
+
+            localEditorManipulator.applyTextOperations(path, operation);
+
+            adjustAnnotationsAfterEdit(user, path.getFile(),
+                editorPool.getEditor(path), operation);
 
             editorListenerDispatch.textEdited(editorActivity);
+        }
+
+        /**
+         * Adjusts the currently present notifications.
+         * <p></p>
+         * <p>
+         * If the given operation is an <code>InsertOperation</code>, a
+         * <code>ContributionAnnotation</code> is added for the inserted
+         * text and all existing annotations for the file are adjusted through
+         * {@link AnnotationManager#moveAnnotationsAfterAddition(IFile, int, int)}.
+         * </p>
+         * <p>
+         * If the given operation is a <code>DeleteOperation</code>, all
+         * existing annotations for the file are adjusted through
+         * {@link AnnotationManager#moveAnnotationsAfterDeletion(IFile, int, int)}.
+         * </p>
+         *
+         * @param user       the user for the given operation
+         * @param file       the file for the given operation
+         * @param editor     the editor for the given file
+         * @param operations the received operation
+         */
+        private void adjustAnnotationsAfterEdit(
+            @NotNull
+                User user,
+            @NotNull
+                IFile file,
+            @Nullable
+                Editor editor,
+            @NotNull
+                Operation operations) {
+
+            operations.getTextOperations().forEach(textOperation -> {
+                int start = textOperation.getPosition();
+                int end =
+                    textOperation.getPosition() + textOperation.getTextLength();
+
+                if (textOperation instanceof InsertOperation) {
+                    if (editor == null) {
+                        annotationManager
+                            .moveAnnotationsAfterAddition(file, start, end);
+                    }
+
+                    annotationManager
+                        .addContributionAnnotation(user, file, start, end,
+                            editor);
+
+                } else if (textOperation instanceof DeleteOperation
+                        && editor == null) {
+
+                    annotationManager
+                            .moveAnnotationsAfterDeletion(file, start, end);
+
+                }
+            });
         }
 
         private void execTextSelection(TextSelectionActivity selection) {
@@ -381,6 +448,7 @@ public class EditorManager extends AbstractActivityProducer
 
     private final LocalEditorHandler localEditorHandler;
     private final LocalEditorManipulator localEditorManipulator;
+    private final AnnotationManager annotationManager;
 
     private final EditorPool editorPool = new EditorPool();
 
@@ -408,11 +476,13 @@ public class EditorManager extends AbstractActivityProducer
 
     public EditorManager(ISarosSessionManager sessionManager,
         LocalEditorHandler localEditorHandler,
-        LocalEditorManipulator localEditorManipulator, ProjectAPI projectAPI) {
+        LocalEditorManipulator localEditorManipulator, ProjectAPI projectAPI,
+        AnnotationManager annotationManager) {
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
+        this.annotationManager = annotationManager;
 
         documentListener = new StoppableDocumentListener(this);
         fileListener = new StoppableEditorFileListener(this);
