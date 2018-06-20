@@ -479,7 +479,36 @@ public class AnnotationManager {
         @NotNull
             IFile file) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        updateAnnotationStore(selectionAnnotationStore, file);
+        updateAnnotationStore(contributionAnnotationStore, file);
+    }
+
+    /**
+     * Updates the given annotation stores for the given file by checking if
+     * an editor for the annotation is present and then updating the stored
+     * annotation range if it has changed. If the annotation is marked as not
+     * valid by the editor, it is removed from the annotation store.
+     *
+     * @param annotationStore the annotation store to update
+     * @param file            the file to update
+     * @param <E>             the type of annotations stored in the given
+     *                        annotation store
+     */
+    private <E extends AbstractEditorAnnotation> void updateAnnotationStore(
+        @NotNull
+            AnnotationStore<E> annotationStore,
+        @NotNull
+            IFile file) {
+
+        List<E> annotations = annotationStore.getAnnotations(file);
+
+        annotations.forEach(annotation -> {
+            annotation.updateBoundaries();
+
+            if (annotation.getAnnotationRanges().isEmpty()) {
+                annotationStore.removeAnnotation(annotation);
+            }
+        });
     }
 
     /**
