@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -33,9 +34,13 @@ public class AnnotationManager {
         SELECTION_ANNOTATION, CONTRIBUTION_ANNOTATION
     }
 
+    private final AnnotationStore<SelectionAnnotation> selectionAnnotationStore;
+
     private final Application application;
 
     public AnnotationManager() {
+        this.selectionAnnotationStore = new AnnotationStore<>();
+
         this.application = ApplicationManager.getApplication();
     }
 
@@ -66,7 +71,36 @@ public class AnnotationManager {
         @Nullable
             Editor editor) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        List<SelectionAnnotation> currentSelectionAnnotation = selectionAnnotationStore
+            .removeAnnotations(user, file);
+
+        currentSelectionAnnotation.forEach(this::removeRangeHighlighter);
+
+        checkRange(start, end);
+
+        if (start == end) {
+            return;
+        }
+
+        List<AnnotationRange> annotationRanges = new ArrayList<>();
+        AnnotationRange annotationRange;
+
+        if (editor != null) {
+            RangeHighlighter rangeHighlighter = addRangeHighlighter(user, start,
+                end, editor, AnnotationType.SELECTION_ANNOTATION);
+
+            annotationRange = new AnnotationRange(start, end, rangeHighlighter);
+
+        } else {
+            annotationRange = new AnnotationRange(start, end);
+        }
+
+        annotationRanges.add(annotationRange);
+
+        SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user,
+            file, editor, annotationRanges);
+
+        selectionAnnotationStore.addAnnotation(selectionAnnotation);
     }
 
     /**
