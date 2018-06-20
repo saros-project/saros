@@ -8,7 +8,7 @@ cd $WORKSPACE
 ui_package_json="de.fu_berlin.inf.dpp.ui.frontend/html/package.json"
 if [ -f "$ui_package_json" ]; then
   cd de.fu_berlin.inf.dpp.ui.frontend/html
-  npm cache verify --verbose
-  npm install --verbose
-  npm run build --verbose
+  npm cache verify
+  npm install
+  npm run build
 fi
