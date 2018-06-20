@@ -285,7 +285,106 @@ public class AnnotationManager {
         @NotNull
             IFile file, int start, int end) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        if (start == end) {
+            return;
+        }
+
+        checkRange(start, end);
+
+        List<SelectionAnnotation> emptySelectionAnnotations = moveAnnotationsAfterDeletion(
+            selectionAnnotationStore.getAnnotations(file), start, end);
+
+        emptySelectionAnnotations
+            .forEach(selectionAnnotationStore::removeAnnotation);
+
+        List<ContributionAnnotation> emptyContributionAnnotations = moveAnnotationsAfterDeletion(
+            contributionAnnotationStore.getAnnotations(file), start, end);
+
+        emptyContributionAnnotations
+            .forEach(contributionAnnotationStore::removeAnnotation);
+    }
+
+    /**
+     * <p>
+     * If there are not range highlighters or editors present:
+     * </p>
+     * Moves all given annotations for the given file forward by the length of
+     * the removal if they are located behind the removed text. Shortens the
+     * annotations if they partially overlap with the removed text. Returns a
+     * list of annotations that were completely contained in the removed text.
+     * <p></p>
+     * Does nothing if the annotation has a local representation (an editor or
+     * range highlighters).
+     *
+     * @param annotations   the annotations to adjust
+     * @param deletionStart the start position of the deleted text
+     * @param deletionEnd   the end position of the deleted text
+     * @param <E>           the annotation type
+     * @return the list of deleted annotations
+     * @see #moveAnnotationsAfterDeletion(IFile, int, int)
+     */
+    @NotNull
+    private <E extends AbstractEditorAnnotation> List<E> moveAnnotationsAfterDeletion(
+        @NotNull
+            List<E> annotations, int deletionStart, int deletionEnd) {
+
+        int offset = deletionEnd - deletionStart;
+
+        List<E> emptyAnnotations = new ArrayList<>();
+
+        annotations.forEach(annotation -> {
+            if (annotation.getEditor() != null) {
+                return;
+            }
+
+            annotation.getAnnotationRanges().forEach(annotationRange -> {
+                int currentStart = annotationRange.getStart();
+                int currentEnd = annotationRange.getEnd();
+
+                if (annotationRange.getRangeHighlighter() != null
+                    || currentEnd <= deletionStart) {
+
+                    return;
+                }
+
+                AnnotationRange newAnnotationRange;
+
+                if (currentStart >= deletionEnd) {
+                    newAnnotationRange = new AnnotationRange(
+                        currentStart - offset, currentEnd - offset);
+
+                } else if (currentStart < deletionStart) {
+                    if (currentEnd <= deletionEnd) {
+                        newAnnotationRange = new AnnotationRange(currentStart,
+                            deletionStart);
+
+                    } else {
+                        newAnnotationRange = new AnnotationRange(currentStart,
+                            currentEnd - offset);
+                    }
+
+                } else {
+                    if (currentEnd <= deletionEnd) {
+                        annotation.removeAnnotationRange(annotationRange);
+
+                        return;
+
+                    } else {
+                        newAnnotationRange = new AnnotationRange(deletionStart,
+                            currentEnd - offset);
+                    }
+                }
+
+                annotation.replaceAnnotationRange(annotationRange,
+                    newAnnotationRange);
+            });
+
+            if (annotation.getAnnotationRanges().isEmpty()) {
+                emptyAnnotations.add(annotation);
+            }
+        });
+
+        return emptyAnnotations;
     }
 
     /**
