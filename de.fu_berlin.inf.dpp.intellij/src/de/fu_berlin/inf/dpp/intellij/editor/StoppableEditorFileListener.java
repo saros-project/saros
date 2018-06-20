@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +21,8 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
 
     private static final Logger LOG = Logger
         .getLogger(StoppableEditorFileListener.class);
+
+    private final BeforeEditorActionListener beforeEditorActionListener;
 
     private final VirtualFileConverter virtualFileConverter;
     private final AnnotationManager annotationManager;
@@ -34,6 +37,8 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
 
         this.virtualFileConverter = virtualFileConverter;
         this.annotationManager = annotationManager;
+
+        this.beforeEditorActionListener = new BeforeEditorActionListener();
     }
 
     /**
@@ -119,6 +124,9 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
         messageBusConnection = project.getMessageBus().connect();
 
         messageBusConnection.subscribe(FILE_EDITOR_MANAGER, this);
+        messageBusConnection
+            .subscribe(BeforeEditorActionListener.FILE_EDITOR_MANAGER,
+                beforeEditorActionListener);
     }
 
     /**
@@ -126,5 +134,31 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
      */
     void unsubscribe(){
         messageBusConnection.disconnect();
+    }
+
+    /**
+     * Intellij editor listener called <b>before</b> editors are opened or
+     * closed
+     */
+    private class BeforeEditorActionListener
+        extends FileEditorManagerListener.Before.Adapter {
+
+        @Override
+        public void beforeFileClosed(
+            @NotNull
+                FileEditorManager source,
+            @NotNull
+                VirtualFile virtualFile) {
+
+            SPath sPath = virtualFileConverter.convertToPath(virtualFile);
+
+            if (sPath != null) {
+                IFile file = sPath.getFile();
+
+                annotationManager.updateAnnotationStore(file);
+                annotationManager.removeLocalRepresentation(file);
+            }
+
+        }
     }
 }
