@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.stf.test.html;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View.ADD_CONTACT;
-import static de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View.MAIN_VIEW;
+import static de.fu_berlin.inf.dpp.ui.View.ADD_CONTACT;
+import static de.fu_berlin.inf.dpp.ui.View.MAIN_VIEW;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

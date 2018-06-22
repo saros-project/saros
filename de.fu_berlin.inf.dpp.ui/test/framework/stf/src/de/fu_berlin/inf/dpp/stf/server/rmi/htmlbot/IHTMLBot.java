@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View;
+import de.fu_berlin.inf.dpp.ui.View;
 import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 /**
