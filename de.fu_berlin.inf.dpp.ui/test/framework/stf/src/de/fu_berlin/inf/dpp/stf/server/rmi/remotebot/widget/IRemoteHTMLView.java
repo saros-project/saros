@@ -11,29 +11,6 @@ import java.rmi.RemoteException;
  */
 public interface IRemoteHTMLView extends Remote {
     /**
-     * Each of the conceptual views of the Saros GUI is represented by a
-     * {@link View} value, i.e. to get access to an {@link IRemoteHTMLView}
-     * instance callers must go through by {@link View} value. It's the duty of
-     * the implementors of {@link IRemoteHTMLView} to map the abstract names to
-     * their technical counterpart.
-     */
-    public enum View {
-        /**
-         * The permanently accessible view of Saros, which provides access to
-         * most of its features.
-         */
-        MAIN_VIEW,
-        /**
-         * The form to add a new contact with
-         */
-        ADD_CONTACT,
-        /**
-         * The dummy page for testing all html components
-         */
-        COMPONENT_TEST;
-    }
-
-    /**
      * Checks whether this view is currently open and visible on the remote
      * side.
      * 
