@@ -11,9 +11,9 @@ import de.fu_berlin.inf.dpp.stf.server.bot.BotUtils;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLView;
+import de.fu_berlin.inf.dpp.ui.View;
 import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 
@@ -50,8 +50,7 @@ public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 
     @Override
     public List<String> getAccountList() throws RemoteException {
-        return BotUtils.getListItemsText(getBrowser(),
-            SELECTOR_ACCOUNT_ENTRY);
+        return BotUtils.getListItemsText(getBrowser(), SELECTOR_ACCOUNT_ENTRY);
     }
 
     @Override
