@@ -80,6 +80,18 @@ public interface IRemoteHTMLView extends Remote {
     boolean hasButton(String id) throws RemoteException;
 
     /**
+     * Checks whether this view contains a element with the given name.
+     * 
+     * @param name
+     *            the value of the name attribute of the element
+     * @return <code>true</code> if a element with the given name exists,
+     *         <code>false</code> if not
+     * @throws RemoteException
+     *             if the presence could not be determined
+     */
+    boolean hasElementWithName(String name) throws RemoteException;
+
+    /**
      * Gets a remote representation of the HTML input field with the given name
      * from within this view.
      * 
@@ -95,14 +107,33 @@ public interface IRemoteHTMLView extends Remote {
     IRemoteHTMLInputField inputField(String name) throws RemoteException;
 
     /**
-     * Checks whether this view contains a input field with the given name.
+     * Gets a remote representation of the HTML checkbox with the given name
+     * from within this view.
      * 
      * @param name
-     *            the value of the name attribute of the input field
-     * @return <code>true</code> if a input field with the given name exists,
-     *         <code>false</code> if not
+     *            the value of the name attribute of the checkbox
+     * 
+     * @return an instance of {@link IRemoteHTMLCheckbox}, if such a checkbox
+     *         exists in this view
+     * 
      * @throws RemoteException
-     *             if the presence could not be determined
+     *             e.g. if no such checkbox exist in this view
      */
-    boolean hasInputField(String name) throws RemoteException;
+    IRemoteHTMLCheckbox checkbox(String name) throws RemoteException;
+
+    /**
+     * Gets a remote representation of the HTML radio group with the given name
+     * from within this view.
+     * 
+     * @param name
+     *            the value of the name attribute of the radio group
+     * 
+     * @return an instance of {@link IRemoteHTMLRadioGroup}, if such a radio
+     *         group exists in this view
+     * 
+     * @throws RemoteException
+     *             e.g. if no such radio group exist in this view
+     */
+    IRemoteHTMLRadioGroup radioGroup(String name) throws RemoteException;
+
 }
