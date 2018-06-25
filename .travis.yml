@@ -4,11 +4,11 @@ sudo: enabled
 notifications:
   email: false
 
+# git history is not needed during build
 git:
   depth: false
 
 services: docker
-
 
 # Sonar token is encrypted via travis encrypt
 addons:
@@ -20,6 +20,8 @@ addons:
 # Avoid config duplication via yaml anchors
 _stf_setup_config: &stf_before_script
   if: type in (cron, api)
+  # variable is only used for allow_failures
+  env: J_TYPE=STF_TEST
   before_script:
     # Pull required images
     - docker pull saros/build_test:0.1
@@ -34,6 +36,9 @@ _stf_setup_config: &stf_before_script
     - export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf; $PWD/travis/script/stf/setup_stf_container.sh $PWD
 
 jobs:
+  # Dont report failures on master branch commits if stf tests fail
+  allow_failures:
+    - env: J_TYPE=STF_TEST
   include:
     - if: type in (push, pull_request)
       before_script: docker pull saros/build_test:0.1
