@@ -10,12 +10,11 @@ git:
 
 services: docker
 
-# Sonar token is encrypted via travis encrypt
-addons:
-  sonarcloud:
-    organization: "saros"
-    token:
-      secure: "i9qx/WK3iDm96WGznDUVIJ7PXSUqwE3qg4ZjGkrbtVQ3wshfya9K4G7A4ll7jLIQ+m1ZhW3H5v1yamNFlOUj1xQ88BJt+sHU674cRASpWePk+TQSTEHvtGut35n17Ibl9rrtQyqxi3TlrqMSlpxiThSoVqJ0XBJnvrGt4dkMO9FWm4f43Jj5MdO0AJKdwthAmJT+bR6xhYFgIOjAwJOYZ3doRNkR8cLBU9QPkzeZC7hUVFwVT8DWNSBQUz3iNuhSzzxfpzX8WBqTJuoytJQTgRcS9SULzJ5xPG/KYt+1xkHvpc8yM1l7fyjxjWL4FP3Q3kaXiy09vfQoLAwsQ18EZ2dulQVx2gI7eDGASNEeM0BWri+pKc/anJRRi7gLM/wKkB3vdoSS3EdEbpxyEIz10wIeVN81izgRAZh0TR/3d22Jjt3usm7DBzBTAtqaKuvsgmE5JVZwc4vU+53guXOoax2ZiLdeKamTTsmWBDvn77poQPhkTDfwBL8/GEkvYJoKjjWdbfhcFeNiGlb4Jq8/7BitFXKN6mWMuIcQTsJ8xX7oA3Ics7mAjKsppw+6w6HXsfrB5rczcbbsp8FQb0n4JPsvz+dAbsWz4OT5Zi9Fy8hOu+bosENrFBUEVc42u4BuCUdWWtY122u4jnr2rHoaHMZwlflm6EuJ9FQTWmyorOM="
+env:
+  global:
+    # GH_TOKEN - GitHub automated release token
+    secure: "eHVjZ4S7sSnNffbT4rBTvmE8Z2B0uh8xpwu7gEUsxmDVpa5w+CmRRECeSaae6v3+1BMnBhs2vxcN0OrtEFt8tFzqD/PMqql8cwT5PTS/i6HsRJyjH5opRNyQ/FeYmbYGPBecTA4OdvZtO4P1pIIBEKxTzqUA++VhVWF3nWinEbrBQWqWdpYM6WxYTXNISYF7os49ohnpemCjRjPc13V8vGZnguRy0UD4ZFg/67l6b4ebYbcOHLoNw6K8xg98x0BxjwQnwvEXN8eXbxBUDPIiPBR2BawCvSNh5snhzFpLN1caV43RsUq+SajbRfu8YuiGpOaxTqL59AX62YEvPJqIsvcxjvcSnNglZrz0lVj6emfzFJJhKlmkVZ4jxhmnQ5QFx3OSQRWi4lJ2i+obEDoPvRn3NCDau66rWQ+MnbSS6kxpWYw6j/ea6R+BGC5x81bSROHbEH+2UHOW9iRihnbK+E4Ozqjr3TYXMSOeC6bx+TgX90MfdM0tjDxKu7wWaYZ37fIOFBqs2pRgUz8E06MEcTb1t9tsxnZF+i3siTpmO9aN+GAZvScmbrHiDLKcXCx6DLdAaEvViJynpxqIBu+cXMarIiV4engdRiU16CxkxaJ8MJSD7Dt7oRvd4bSG2fWjiVTjue/yUgiua+v9qelSwEeqAoLulgaqNtdtK8Rjxd4="
+
 
 # Avoid config duplication via yaml anchors
 _stf_setup_config: &stf_before_script
@@ -40,13 +39,21 @@ jobs:
   allow_failures:
     - env: J_TYPE=STF_TEST
   include:
-    - if: type in (push, pull_request)
-      before_script: docker pull saros/build_test:0.1
+    # Always build, but deploy only on master branch during a cron job
+    - before_script: docker pull saros/build_test:0.1
       script:
         - docker run -v $PWD:/home/saros/ci/saros_src saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/build/build_all.sh
       after_success:
         - sonar-scanner
-      # set env to avoid multiple build executions
+      before_deploy:
+        - sudo apt-get update
+        - sudo apt-get install jq
+      deploy:
+        provider: script
+        script: export SCRIPT_DIR=travis/script/deploy; travis/script/deploy/release_daily.sh $GH_TOKEN $TRAVIS_REPO_SLUG $TRAVIS_BRANCH
+        on:
+          branch: master
+          condition: $TRAVIS_EVENT_TYPE = cron
 
     - <<: *stf_before_script
       script: docker exec -t stf_master scripts/start_stf_tests.sh
