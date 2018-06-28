@@ -217,8 +217,10 @@ public interface ISarosSession {
      * Given a user, this method will return this users session properties.
      * </p>
      * 
+     * @param user
+     *            the user to get the preferences for
      * @return Properties of the given user or <code>null</code> if the user is
-     *         not known to th session
+     *         not known to the session
      */
     public IPreferenceStore getUserProperties(User user);
 

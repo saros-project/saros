@@ -70,12 +70,12 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
     public String getIdentifier() {
         return HOOK_IDENTIFIER;
     }
-    
+
     @Override
     public Map<String, String> tellHostPreferences() {
         return null;
     }
-     
+
 
     @Override
     public Map<String, String> tellClientPreferences() {
@@ -148,7 +148,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
         IPreferenceStore clientPreferences) {
         if (clientPreferences == null) {
            //there is not client yet, nothing to do
-           return;  
+           return;
         }
 
         if (input == null) {
