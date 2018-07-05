@@ -8,7 +8,7 @@ import { Text } from 'react-localize'
 export default class AddContactView extends React.Component {
   @observable fields = {
     jid: '',
-    displayName: ''
+    displayName: '',
   }
 
   @action onChangeField = (e) => {
