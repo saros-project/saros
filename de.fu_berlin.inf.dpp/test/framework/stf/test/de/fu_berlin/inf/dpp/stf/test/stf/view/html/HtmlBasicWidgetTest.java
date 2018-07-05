@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.stf.test.html;
+package de.fu_berlin.inf.dpp.stf.test.stf.view.html;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.ui.View.COMPONENT_TEST;
+import static de.fu_berlin.inf.dpp.ui.View.BASIC_WIDGET_TEST;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -12,9 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfHtmlTestCase;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
 
-public class ComponentViewTest extends StfHtmlTestCase {
+public class HtmlBasicWidgetTest extends StfHtmlTestCase {
 
     @BeforeClass
     public static void selectTesters() throws Exception {
@@ -23,13 +23,13 @@ public class ComponentViewTest extends StfHtmlTestCase {
 
     @Before
     public void setUp() throws Exception {
-        ALICE.htmlBot().view(COMPONENT_TEST).open();
-        assertTrue(ALICE.htmlBot().view(COMPONENT_TEST).isOpen());
+        ALICE.htmlBot().view(BASIC_WIDGET_TEST).open();
+        assertTrue(ALICE.htmlBot().view(BASIC_WIDGET_TEST).isOpen());
     }
 
     @Test
     public void shouldTestInputFields() throws Exception {
-        IRemoteHTMLView view = ALICE.htmlBot().view(COMPONENT_TEST);
+        IRemoteHTMLView view = ALICE.htmlBot().view(BASIC_WIDGET_TEST);
 
         // text
         assertTrue(view.hasElementWithName("text"));
@@ -57,7 +57,7 @@ public class ComponentViewTest extends StfHtmlTestCase {
 
     @Test
     public void shouldTestCheckboxes() throws Exception {
-        IRemoteHTMLView view = ALICE.htmlBot().view(COMPONENT_TEST);
+        IRemoteHTMLView view = ALICE.htmlBot().view(BASIC_WIDGET_TEST);
 
         assertTrue(view.hasElementWithName("checkbox1"));
         assertTrue(view.hasElementWithName("checkbox2"));
@@ -75,7 +75,7 @@ public class ComponentViewTest extends StfHtmlTestCase {
 
     @Test
     public void shouldTestRadioGroup() throws Exception {
-        IRemoteHTMLView view = ALICE.htmlBot().view(COMPONENT_TEST);
+        IRemoteHTMLView view = ALICE.htmlBot().view(BASIC_WIDGET_TEST);
 
         assertTrue(view.hasElementWithName("radioGroup"));
 
@@ -95,7 +95,7 @@ public class ComponentViewTest extends StfHtmlTestCase {
 
     @Test
     public void shouldTestSelect() throws Exception {
-        IRemoteHTMLView view = ALICE.htmlBot().view(COMPONENT_TEST);
+        IRemoteHTMLView view = ALICE.htmlBot().view(BASIC_WIDGET_TEST);
 
         assertTrue(view.hasElementWithName("select"));
 
@@ -111,7 +111,7 @@ public class ComponentViewTest extends StfHtmlTestCase {
 
     @Test
     public void shouldTestMultiSelect() throws Exception {
-        IRemoteHTMLView view = ALICE.htmlBot().view(COMPONENT_TEST);
+        IRemoteHTMLView view = ALICE.htmlBot().view(BASIC_WIDGET_TEST);
 
         assertTrue(view.hasElementWithName("multiSelect"));
 
@@ -139,7 +139,7 @@ public class ComponentViewTest extends StfHtmlTestCase {
 
     @Test
     public void shouldTestProgressBar() throws Exception {
-        IRemoteHTMLView view = ALICE.htmlBot().view(COMPONENT_TEST);
+        IRemoteHTMLView view = ALICE.htmlBot().view(BASIC_WIDGET_TEST);
 
         assertTrue(view.hasElementWithName("progressBar"));
 
@@ -155,7 +155,7 @@ public class ComponentViewTest extends StfHtmlTestCase {
 
     @Test
     public void shouldTestTextElement() throws Exception {
-        IRemoteHTMLView view = ALICE.htmlBot().view(COMPONENT_TEST);
+        IRemoteHTMLView view = ALICE.htmlBot().view(BASIC_WIDGET_TEST);
 
         assertTrue(view.hasElementWithId("button-display-text"));
         assertTrue(view.textElement("button-display-text").getText()
@@ -169,7 +169,7 @@ public class ComponentViewTest extends StfHtmlTestCase {
 
     @Test
     public void shouldTestButton() throws Exception {
-        IRemoteHTMLView view = ALICE.htmlBot().view(COMPONENT_TEST);
+        IRemoteHTMLView view = ALICE.htmlBot().view(BASIC_WIDGET_TEST);
 
         assertTrue(view.hasElementWithId("button"));
         view.button("button").click();

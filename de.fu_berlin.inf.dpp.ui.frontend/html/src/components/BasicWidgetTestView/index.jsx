@@ -6,7 +6,7 @@ import { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button, Dro
 
 @inject('mainUI')
 @observer
-export default class ComponentTestView extends React.Component {
+export default class BasicWidgetTestView extends React.Component {
   componentDidMount () {
     window.view = this
   }
@@ -64,7 +64,7 @@ export default class ComponentTestView extends React.Component {
 
   render () {
     return (
-      <div style={{margin: 20}} id='component-test-root'>
+      <div style={{margin: 20}} id='basic-widget-test-root'>
         <Grid>
           <Row>
             <Col sm={6}>
