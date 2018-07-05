@@ -4,6 +4,7 @@ import { observer } from 'mobx-react'
 import P from 'prop-types'
 import { noop } from 'Utils'
 import './style.css'
+import { Text } from 'react-localize'
 
 @observer
 export default class Step extends React.Component {
@@ -12,13 +13,13 @@ export default class Step extends React.Component {
     title: P.string,
     wizard: P.shape({
       hasNext: P.boolean,
-      onClickNext: P.func
-    })
+      onClickNext: P.func,
+    }),
   }
 
   static defaultProps = {
     onClickNext: noop,
-    title: ''
+    title: '',
   }
 
   @observable isValid = true
@@ -68,6 +69,9 @@ export default class Step extends React.Component {
           <Component ref={this.setComponentRef} setIsValid={this.setIsValid} />
         </div>
         <nav className='footer navbar navbar-default'>
+          <button className='btn btn-default' onClick={wizard.onClickCancel}>
+            <Text message='action.cancel' />
+          </button>
           <button className={btnClass} onClick={this.onClickNext}>
             { hasNext ? 'Next' : 'Finish'}
           </button>

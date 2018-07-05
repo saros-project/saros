@@ -32,8 +32,9 @@ export default class Wizard extends React.Component {
       {
         wizard: {
           onClickNext: this.onClickNext,
-          hasNext: this.hasNext
-        }
+          hasNext: this.hasNext,
+          onClickCancel: this.props.onClickCancel,
+        },
       }
     )
   }
