@@ -1,19 +1,14 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl;
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLTextElement;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLTextElement;
 
 public final class RemoteHTMLTextElement extends HTMLSTFRemoteObject implements
     IRemoteHTMLTextElement {
 
     private static final RemoteHTMLTextElement INSTANCE = new RemoteHTMLTextElement();
-
-    private IJQueryBrowser browser;
-    private ISelector selector;
 
     public static RemoteHTMLTextElement getInstance() {
         return INSTANCE;
@@ -32,13 +27,4 @@ public final class RemoteHTMLTextElement extends HTMLSTFRemoteObject implements
         browser.run(String.format("%s.text('%s')", selector.getStatement(),
             text));
     }
-
-    void setBrowser(IJQueryBrowser browser) {
-        this.browser = browser;
-    }
-
-    void setSelector(ISelector selector) {
-        this.selector = selector;
-    }
-
 }
