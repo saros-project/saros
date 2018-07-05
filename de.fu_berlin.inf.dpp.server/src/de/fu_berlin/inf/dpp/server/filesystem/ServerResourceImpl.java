@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 public abstract class ServerResourceImpl implements IResource {
 
     private IWorkspace workspace;
+    private IProject project;
     private IPath path;
 
     /**
@@ -23,11 +24,14 @@ public abstract class ServerResourceImpl implements IResource {
      * 
      * @param workspace
      *            the containing workspace
+     * @param project
+     *            the containing project
      * @param path
      *            the resource's path relative to the workspace's root
      */
-    public ServerResourceImpl(IWorkspace workspace, IPath path) {
+    public ServerResourceImpl(IWorkspace workspace, IProject project, IPath path) {
         this.path = path;
+        this.project = project;
         this.workspace = workspace;
     }
 
@@ -40,6 +44,16 @@ public abstract class ServerResourceImpl implements IResource {
         return workspace;
     }
 
+    /**
+     * Returns the project the resource belongs to.
+     *
+     * @return the containing project
+     */
+    @Override
+    public IProject getProject() {
+        return project;
+    }
+
     @Override
     public IPath getFullPath() {
         return path;
@@ -47,7 +61,9 @@ public abstract class ServerResourceImpl implements IResource {
 
     @Override
     public IPath getProjectRelativePath() {
-        return getFullPath().removeFirstSegments(1);
+        return new ServerPathImpl(
+            project.getLocation().toFile().toPath().relativize(getLocation().toFile().toPath())
+        );
     }
 
     @Override
@@ -66,12 +82,6 @@ public abstract class ServerResourceImpl implements IResource {
         IProject project = getProject();
         return parentPath.segmentCount() == 0 ? project : project
             .getFolder(parentPath);
-    }
-
-    @Override
-    public IProject getProject() {
-        String projectName = getFullPath().segment(0);
-        return workspace.getProject(projectName);
     }
 
     @Override

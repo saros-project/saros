@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 
@@ -20,11 +21,13 @@ public class ServerFolderImpl extends ServerContainerImpl implements IFolder {
      * 
      * @param workspace
      *            the containing workspace
+     * @param project
+     *            the containing project
      * @param path
      *            the folder's path relative to the workspace's root
      */
-    public ServerFolderImpl(IWorkspace workspace, IPath path) {
-        super(workspace, path);
+    public ServerFolderImpl(IWorkspace workspace, IProject project, IPath path) {
+        super(workspace, project, path);
     }
 
     @Override

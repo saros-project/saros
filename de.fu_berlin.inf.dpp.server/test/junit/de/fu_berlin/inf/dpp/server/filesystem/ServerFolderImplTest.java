@@ -11,6 +11,7 @@ import static org.easymock.EasyMock.expect;
 
 import java.io.IOException;
 
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
@@ -29,15 +30,21 @@ public class ServerFolderImplTest extends EasyMockSupport {
 
     private IFolder folder;
     private IWorkspace workspace;
+    private IProject project;
 
     @Before
     public void setUp() throws Exception {
         workspace = createMock(IWorkspace.class);
+        project = createMock(IProject.class);
+
         expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
+
+        expect(workspace.getProject("project")).andStubReturn(project);
+        expect(project.getDefaultCharset()).andStubReturn("UTF-8");
 
         replayAll();
 
-        folder = new ServerFolderImpl(workspace, path(FOLDER_PATH));
+        folder = new ServerFolderImpl(workspace, project, path(FOLDER_PATH));
     }
 
     @After

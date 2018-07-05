@@ -47,7 +47,7 @@ public class ServerFileImplTest extends EasyMockSupport {
         expect(project.getDefaultCharset()).andStubReturn("UTF-8");
 
         replayAll();
-        file = new ServerFileImpl(workspace, path("project/file"));
+        file = new ServerFileImpl(workspace, project, path("project/file"));
 
     }
 

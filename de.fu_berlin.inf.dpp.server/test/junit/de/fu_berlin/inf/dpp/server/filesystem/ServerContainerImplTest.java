@@ -34,8 +34,8 @@ public class ServerContainerImplTest extends EasyMockSupport {
 
     private static class ExampleContainer extends ServerContainerImpl {
 
-        public ExampleContainer(IPath path, IWorkspace workspace) {
-            super(workspace, path);
+        public ExampleContainer(IPath path, IProject project, IWorkspace workspace) {
+            super(workspace, project, path);
         }
 
         @Override
@@ -64,7 +64,7 @@ public class ServerContainerImplTest extends EasyMockSupport {
 
         replayAll();
 
-        container = new ExampleContainer(path(CONTAINER_PATH), workspace);
+        container = new ExampleContainer(path(CONTAINER_PATH), project, workspace);
     }
 
     @After

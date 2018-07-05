@@ -8,6 +8,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -28,11 +29,13 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
      * 
      * @param workspace
      *            the containing workspace
+     * @param project
+     *            the containing project
      * @param path
      *            the file's path relative to the workspace's root
      */
-    public ServerFileImpl(IWorkspace workspace, IPath path) {
-        super(workspace, path);
+    public ServerFileImpl(IWorkspace workspace, IProject project, IPath path) {
+        super(workspace, project, path);
     }
 
     /**
