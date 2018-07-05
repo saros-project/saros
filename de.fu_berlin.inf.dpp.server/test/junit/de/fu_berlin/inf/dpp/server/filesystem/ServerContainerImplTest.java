@@ -34,8 +34,8 @@ public class ServerContainerImplTest extends EasyMockSupport {
 
     private static class ExampleContainer extends ServerContainerImpl {
 
-        public ExampleContainer(IPath path, IWorkspace workspace) {
-            super(workspace, path);
+        public ExampleContainer(IPath path, IProject project, IWorkspace workspace) {
+            super(workspace, project, path);
         }
 
         @Override
@@ -57,14 +57,16 @@ public class ServerContainerImplTest extends EasyMockSupport {
         workspace = createMock(IWorkspace.class);
         project = createMock(IProject.class);
 
-        expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
+        IPath workspacePath = createWorkspaceFolder();
 
+        expect(workspace.getLocation()).andStubReturn(workspacePath);
         expect(workspace.getProject("project")).andStubReturn(project);
+        expect(project.getLocation()).andStubReturn(workspacePath.append("project"));
         expect(project.getDefaultCharset()).andStubReturn("UTF-8");
 
         replayAll();
 
-        container = new ExampleContainer(path(CONTAINER_PATH), workspace);
+        container = new ExampleContainer(path(CONTAINER_PATH), project, workspace);
     }
 
     @After

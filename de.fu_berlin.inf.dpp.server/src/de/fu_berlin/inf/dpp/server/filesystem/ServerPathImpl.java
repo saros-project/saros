@@ -19,7 +19,7 @@ public class ServerPathImpl implements IPath {
         return new ServerPathImpl(Paths.get(pathString));
     }
 
-    private ServerPathImpl(Path delegate) {
+    public ServerPathImpl(Path delegate) {
         /*
          * OpenJDK 7 on Linux has a bug which causes normalize() to throw an
          * ArrayIndexOutOfBoundsException if called on the empty path.

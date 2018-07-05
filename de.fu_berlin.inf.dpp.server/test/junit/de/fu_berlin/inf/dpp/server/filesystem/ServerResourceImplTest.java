@@ -29,8 +29,8 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
     private static class ExampleResource extends ServerResourceImpl {
 
-        public ExampleResource(IPath path, IWorkspace workspace) {
-            super(workspace, path);
+        public ExampleResource(IPath path, IProject project, IWorkspace workspace) {
+            super(workspace, project, path);
         }
 
         @Override
@@ -60,14 +60,16 @@ public class ServerResourceImplTest extends EasyMockSupport {
         project = createMock(IProject.class);
         parent = createMock(IFolder.class);
 
-        expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
+        IPath workspacePath = createWorkspaceFolder();
 
+        expect(workspace.getLocation()).andStubReturn(workspacePath);
+        expect(project.getLocation()).andStubReturn(workspacePath.append("project"));
         expect(workspace.getProject("project")).andStubReturn(project);
         expect(project.getFolder(path("folder"))).andStubReturn(parent);
 
         replayAll();
 
-        resource = new ExampleResource(path("project/folder/file"), workspace);
+        resource = new ExampleResource(path("project/folder/file"), project, workspace);
     }
 
     @After
@@ -108,7 +110,7 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
     @Test
     public void getParentIfParentIsProject() {
-        resource = new ExampleResource(path("project/file"), workspace);
+        resource = new ExampleResource(path("project/file"), project, workspace);
         assertEquals(project, resource.getParent());
     }
 

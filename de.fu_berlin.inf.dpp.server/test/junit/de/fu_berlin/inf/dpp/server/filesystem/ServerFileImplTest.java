@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 
+import de.fu_berlin.inf.dpp.filesystem.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -24,11 +25,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Test.None;
-
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 
 public class ServerFileImplTest extends EasyMockSupport {
 
@@ -41,13 +37,15 @@ public class ServerFileImplTest extends EasyMockSupport {
         workspace = createMock(IWorkspace.class);
         project = createMock(IProject.class);
 
-        expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
+        IPath workspacePath = createWorkspaceFolder();
 
+        expect(workspace.getLocation()).andStubReturn(workspacePath);
+        expect(project.getLocation()).andStubReturn(workspacePath.append("project"));
         expect(workspace.getProject("project")).andStubReturn(project);
         expect(project.getDefaultCharset()).andStubReturn("UTF-8");
 
         replayAll();
-        file = new ServerFileImpl(workspace, path("project/file"));
+        file = new ServerFileImpl(workspace, project, path("project/file"));
 
     }
 

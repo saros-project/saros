@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 
@@ -25,11 +26,13 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements
      * 
      * @param workspace
      *            the containing workspace
+     * @param project
+     *            the containing project
      * @param path
      *            the container's path relative to the workspace's root
      */
-    public ServerContainerImpl(IWorkspace workspace, IPath path) {
-        super(workspace, path);
+    public ServerContainerImpl(IWorkspace workspace, IProject project, IPath path) {
+        super(workspace, project, path);
     }
 
     @Override
@@ -61,9 +64,9 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements
             IResource member;
 
             if (f.isDirectory()) {
-                member = new ServerFolderImpl(getWorkspace(), memberPath);
+                member = new ServerFolderImpl(getWorkspace(), getProject(), memberPath);
             } else {
-                member = new ServerFileImpl(getWorkspace(), memberPath);
+                member = new ServerFileImpl(getWorkspace(), getProject(), memberPath);
             }
 
             members.add(member);
