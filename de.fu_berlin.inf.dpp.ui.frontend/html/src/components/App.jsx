@@ -4,13 +4,13 @@ import { views } from 'Constants'
 import MainView from './MainView'
 import AddContactView from './AddContactView'
 import StartSessionWizardView from './StartSessionWizardView'
-import ComponentTestView from './ComponentTestView'
+import BasicWidgetTestView from './BasicWidgetTestView'
 
 const viewComponents = {
   [views.MAIN]: MainView,
   [views.ADD_CONTACT]: AddContactView,
   [views.START_SESSION_WIZARD]: StartSessionWizardView,
-  [views.COMPONENT_TEST]: ComponentTestView
+  [views.BASIC_WIDGET_TEST]: BasicWidgetTestView
 }
 
 @inject('view')

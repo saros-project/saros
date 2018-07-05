@@ -72,7 +72,7 @@ module.exports = (env = {}) => {
       // TODO there should be a more elegant way of telling the application which view to show
       createPage('main-page'),
       createPage('start-session-wizard'),
-      createPage('component-test')
+      createPage('basic-widget-test')
     ]
     .concat(isProd ? [
       // In Production Mode the global variable process.env.NODE_ENV is set to production

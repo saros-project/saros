@@ -28,7 +28,8 @@ public enum View {
     /**
      * The dummy page for testing all html components
      */
-    COMPONENT_TEST(MainPage.class, "component-test", "component-test-root");
+    BASIC_WIDGET_TEST(MainPage.class, "basic-widget-test",
+        "basic-widget-test-root");
 
     private final Class<? extends AbstractBrowserPage> pageClass;
     private final String viewName;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget;
+package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -7,17 +7,17 @@ import java.util.List;
 /**
  * Represent an HTML select and makes it controllable via RMI.
  */
-public interface IRemoteHTMLMultiSelect extends Remote {
+public interface IRemoteHTMLSelect extends Remote {
 
     /**
-     * return a list of values of the selected options
+     * return the value of the selected option
      */
-    public List<String> getSelection() throws RemoteException;
+    public String getSelection() throws RemoteException;
 
     /**
-     * select all options which has the given values
+     * select the option which has the given value
      */
-    public void select(List<String> value) throws RemoteException;
+    public void select(String value) throws RemoteException;
 
     /**
      * get the size of how many options the select has
@@ -28,5 +28,4 @@ public interface IRemoteHTMLMultiSelect extends Remote {
      * return all a list of all options
      */
     public List<String> options() throws RemoteException;
-
 }

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget;
+package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
