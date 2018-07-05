@@ -10,14 +10,15 @@ export default class SarosStore {
       server: '',
       port: 0,
       useTLS: false,
-      useSASL: false
+      useSASL: false,
     },
     contactList: [],
-    connectionState: 'INITIALIZING'
+    connectionState: 'INITIALIZING',
   }
 
   @observable accounts = []
   @observable projectTrees = null
+  @observable runningSession = null
 
   sarosApi = null
 
@@ -39,6 +40,11 @@ export default class SarosStore {
   @action.bound
   doUpdateContacts () {
     // TODO
+  }
+
+  @action.bound
+  doUpdateRunningSession (runningSession) {
+    this.runningSession = runningSession
   }
 
   @action.bound

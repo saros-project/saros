@@ -36,6 +36,8 @@ class SarosApi {
         return this.sarosStore.doUpdateContacts(args[0])
       case 'updateProjectTrees':
         return this.sarosStore.doUpdateProjectTrees(args[0])
+      case 'updateRunningSession':
+        return this.sarosStore.doUpdateRunningSession(args[0])
     }
   }
 
