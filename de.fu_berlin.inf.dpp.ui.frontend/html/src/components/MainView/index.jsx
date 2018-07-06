@@ -29,7 +29,7 @@ class MainView extends React.Component {
         </nav>
         <div className='content-container'>
           <RunningSession
-            runningSession={props.core.runningSession}
+            runningSession={core.runningSession}
           />
           <ContactList contactList={core.sortedContactList} />
         </div>

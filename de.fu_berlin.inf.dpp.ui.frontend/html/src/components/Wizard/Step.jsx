@@ -1,10 +1,11 @@
 import React from 'react'
-import { observable, action } from 'mobx'
-import { observer } from 'mobx-react'
-import P from 'prop-types'
-import { noop } from 'Utils'
 import './style.css'
 import { Text } from 'react-localize'
+import { action, observable } from 'mobx'
+import { noop } from 'Utils'
+import { observer } from 'mobx-react'
+import P from 'prop-types'
+import cn from 'classnames'
 
 @observer
 export default class Step extends React.Component {
@@ -60,8 +61,7 @@ export default class Step extends React.Component {
 
   render () {
     const { title, Component, wizard } = this.props
-    const { hasNext } = wizard
-    const btnClass = `btn btn-${hasNext ? 'default' : 'primary'}`
+    const { hasNext, hasPrev } = wizard
     return (
       <div className='wizard-step'>
         <nav className='header navbar navbar-default'>{title}</nav>
@@ -72,8 +72,11 @@ export default class Step extends React.Component {
           <button className='btn btn-default' onClick={wizard.onClickCancel}>
             <Text message='action.cancel' />
           </button>
-          <button className={btnClass} onClick={this.onClickNext}>
-            { hasNext ? 'Next' : 'Finish'}
+          <button disabled={!hasPrev} className={cn('btn', 'btn-default', !hasPrev && 'disabled')} onClick={wizard.onClickBack}>
+            <Text message='action.back' />
+          </button>
+          <button className={cn('wizard-next-btn', 'btn', hasNext ? 'btn-default' : 'btn-primary')} onClick={this.onClickNext}>
+            <Text message={hasNext ? 'action.next' : 'action.finish'} />
           </button>
         </nav>
       </div>
