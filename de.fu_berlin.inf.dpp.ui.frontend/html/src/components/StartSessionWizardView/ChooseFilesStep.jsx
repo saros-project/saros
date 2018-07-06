@@ -1,7 +1,7 @@
-import React from 'react'
+import './style.css'
 import { inject, observer } from 'mobx-react'
+import React from 'react'
 import Tree, { TreeNode } from 'rc-tree'
-import 'rc-tree/dist/rc-tree.css'
 
 function renderTreeNode (root) {
   return (
@@ -13,14 +13,14 @@ function renderTreeNode (root) {
 @inject(({ core, sessionUI }) => ({
   initialProjectTrees: core.projectTrees,
   setCheckedKeys: sessionUI.setCheckedKeys,
-  checkedKeys: sessionUI.checkedKeys
+  checkedKeys: sessionUI.checkedKeys,
 }))
 @observer
 export default class ChooseFilesStep extends React.Component {
   render () {
     const { initialProjectTrees, checkedKeys, setCheckedKeys } = this.props
     // This renders once before the initialProjectTrees got injected
-    // Thats why we need to render something that does not depend on 
+    // Thats why we need to render something that does not depend on
     // initialProjectTrees first (e.g. null)
     if (!initialProjectTrees) return null
     return (
