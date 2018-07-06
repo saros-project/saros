@@ -2,6 +2,12 @@ extends:
 - eslint:recommended
 - standard
 - standard-react
+env:
+  browser: true,
+  node: true,
+  mocha: true,
+globals:
+  expect: true,
 parser: babel-eslint
 plugins:
 - sort-imports-es6

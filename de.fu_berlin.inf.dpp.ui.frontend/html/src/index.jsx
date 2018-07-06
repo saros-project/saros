@@ -10,10 +10,8 @@ import SarosApi from './SarosApi'
 import dictionary from './dictionary'
 
 // The initialView is injected via the html page
-
-const stores = initStores(window.initialPage)
-const api = new SarosApi(stores.core)
-stores.core.sarosApi = api
+const api = new SarosApi()
+const stores = initStores(window.initialPage, api)
 
 // Expose the Saros API globally to be accessible for Java
 window.SarosApi = api

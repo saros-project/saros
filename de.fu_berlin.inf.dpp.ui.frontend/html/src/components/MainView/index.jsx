@@ -19,10 +19,10 @@ class MainView extends React.Component {
             accounts={core.accounts}
           />
           <div className='btn-list'>
-            <button id='add-contact' type='button' onClick={mainUI.doShowAddContactView} className='btn btn-default btn-sm add'>
+            <button id='add-contact' type='button' onClick={mainUI.doShowAddContactView} className='ac-btn btn btn-default btn-sm add'>
               <Text message='action.addContact' />
             </button>
-            <button id='start-session' type='button' onClick={core.doShowStartSessionWizard} className='btn btn-default btn-sm'>
+            <button id='start-session' type='button' onClick={core.doShowStartSessionWizard} className='ssw-btn btn btn-default btn-sm'>
               <Text message='action.startSession' />
             </button>
           </div>
