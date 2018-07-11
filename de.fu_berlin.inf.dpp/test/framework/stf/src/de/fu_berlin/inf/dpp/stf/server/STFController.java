@@ -68,6 +68,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLMulti
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLProgressBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLRadioGroup;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLSelect;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLTextElement;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.NewC;
@@ -209,6 +210,7 @@ public class STFController {
             exportObject(RemoteHTMLSelect.getInstance(), "htmlSelect");
             exportObject(RemoteHTMLMultiSelect.getInstance(), "htmlMultiSelect");
             exportObject(RemoteHTMLProgressBar.getInstance(), "htmlProgressBar");
+            exportObject(RemoteHTMLTextElement.getInstance(), "htmlTextElement");
         }
 
         /*
