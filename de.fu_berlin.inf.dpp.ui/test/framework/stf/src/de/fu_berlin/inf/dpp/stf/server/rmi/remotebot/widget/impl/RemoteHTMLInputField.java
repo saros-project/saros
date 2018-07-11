@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
@@ -12,6 +14,8 @@ public final class RemoteHTMLInputField extends HTMLSTFRemoteObject implements
     IRemoteHTMLInputField {
 
     private static final RemoteHTMLInputField INSTANCE = new RemoteHTMLInputField();
+    private static final Logger log = Logger
+        .getLogger(RemoteHTMLInputField.class);
 
     private IJQueryBrowser browser;
     private ISelector selector;
