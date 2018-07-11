@@ -26,7 +26,11 @@ public interface IRemoteHTMLView extends Remote {
         /**
          * The form to add a new contact with
          */
-        ADD_CONTACT;
+        ADD_CONTACT,
+        /**
+         * The dummy page for testing all html components
+         */
+        COMPONENT_TEST;
     }
 
     /**
