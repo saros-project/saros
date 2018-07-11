@@ -12,9 +12,11 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.IdSelector;
+import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.BotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLInputField;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.ui.pages.AbstractBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
@@ -63,9 +65,11 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
 
     private View view;
     private RemoteHTMLButton button;
+    private RemoteHTMLInputField inputField;
 
     public RemoteHTMLView() {
         button = RemoteHTMLButton.getInstance();
+        inputField = RemoteHTMLInputField.getInstance();
     }
 
     @Override
@@ -82,6 +86,19 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     }
 
     @Override
+    public boolean hasInputField(String name) throws RemoteException {
+        return exists(new NameSelector(name));
+    }
+
+    @Override
+    public IRemoteHTMLInputField inputField(String name) throws RemoteException {
+        NameSelector selector = new NameSelector(name);
+        inputField.setSelector(selector);
+        ensureExistence(selector);
+        return inputField;
+    }
+
+    @Override
     public boolean isOpen() {
         String id = map.get(view).id;
         return exists(new IdSelector(id));
@@ -90,6 +107,7 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     public void selectView(View view) {
         this.view = view;
         this.button.setBrowser(getBrowser());
+        this.inputField.setBrowser(getBrowser());
     }
 
     private IJQueryBrowser getBrowser() {
