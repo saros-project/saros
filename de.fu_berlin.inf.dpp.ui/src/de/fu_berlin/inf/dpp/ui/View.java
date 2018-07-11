@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui;
 
 import de.fu_berlin.inf.dpp.ui.pages.AbstractBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
+import de.fu_berlin.inf.dpp.ui.pages.SessionWizardPage;
 
 /**
  * This enum make the connection between conceptual View and their technical
@@ -19,6 +20,11 @@ public enum View {
      * The form to add a new contact with
      */
     ADD_CONTACT(MainPage.class, "add-contact", "add-contact-form"),
+    /**
+     * The session wizard dialog
+     */
+    SESSION_WIZARD(SessionWizardPage.class, "start-session-wizard",
+        "session-wizard"),
     /**
      * The dummy page for testing all html components
      */
