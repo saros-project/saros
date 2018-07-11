@@ -53,6 +53,30 @@ public interface IRemoteHTMLView extends Remote {
     void open() throws RemoteException;
 
     /**
+     * Checks whether this view contains a button with the given ID.
+     * 
+     * @param id
+     *            the value of the ID attribute of the button
+     * @return <code>true</code> if a button with the given id exists,
+     *         <code>false</code> if not
+     * @throws RemoteException
+     *             if the presence could not be determined
+     */
+    boolean hasElementWithId(String id) throws RemoteException;
+
+    /**
+     * Checks whether this view contains a element with the given name.
+     * 
+     * @param name
+     *            the value of the name attribute of the element
+     * @return <code>true</code> if a element with the given name exists,
+     *         <code>false</code> if not
+     * @throws RemoteException
+     *             if the presence could not be determined
+     */
+    boolean hasElementWithName(String name) throws RemoteException;
+
+    /**
      * Gets a remote representation of the HTML button with the given ID from
      * within this view.
      * 
@@ -66,30 +90,6 @@ public interface IRemoteHTMLView extends Remote {
      *             e.g. if no such button exist in this view
      */
     IRemoteHTMLButton button(String id) throws RemoteException;
-
-    /**
-     * Checks whether this view contains a button with the given ID.
-     * 
-     * @param id
-     *            the value of the ID attribute of the button
-     * @return <code>true</code> if a button with the given id exists,
-     *         <code>false</code> if not
-     * @throws RemoteException
-     *             if the presence could not be determined
-     */
-    boolean hasButton(String id) throws RemoteException;
-
-    /**
-     * Checks whether this view contains a element with the given name.
-     * 
-     * @param name
-     *            the value of the name attribute of the element
-     * @return <code>true</code> if a element with the given name exists,
-     *         <code>false</code> if not
-     * @throws RemoteException
-     *             if the presence could not be determined
-     */
-    boolean hasElementWithName(String name) throws RemoteException;
 
     /**
      * Gets a remote representation of the HTML input field with the given name
@@ -180,5 +180,20 @@ public interface IRemoteHTMLView extends Remote {
      *             e.g. if no such progressbar exist in this view
      */
     IRemoteHTMLProgressBar progressBar(String name) throws RemoteException;
+
+    /**
+     * Gets a remote representation of the HTML Element (div, span, ... ) with
+     * the given id from within this view.
+     * 
+     * @param id
+     *            the value of the id of the element
+     * 
+     * @return an instance of {@link IRemoteHTMLTextElement}, if such a element
+     *         exists in this view
+     * 
+     * @throws RemoteException
+     *             e.g. if no such element exist in this view
+     */
+    IRemoteHTMLTextElement textElement(String id) throws RemoteException;
 
 }
