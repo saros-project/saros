@@ -3,5 +3,6 @@
 export const views = {
   MAIN: 'main-page',
   ADD_CONTACT: 'add-contact',
-  START_SESSION_WIZARD: 'start-session-wizard'
+  START_SESSION_WIZARD: 'start-session-wizard',
+  COMPONENT_TEST: 'component-test'
 }
