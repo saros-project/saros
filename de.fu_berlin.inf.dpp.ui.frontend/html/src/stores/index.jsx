@@ -14,6 +14,7 @@ export default function initStores (initialPage, api) {
   const core = new SarosStore(view)
   core.sarosApi = api
   api.sarosStore = core
+  api.viewStore = view
   return {
     view,
     core,

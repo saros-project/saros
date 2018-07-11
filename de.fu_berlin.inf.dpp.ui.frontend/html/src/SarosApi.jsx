@@ -22,8 +22,9 @@
  */
 
 class SarosApi {
-  constructor (sarosStore) {
+  constructor (sarosStore, viewStore) {
     this.sarosStore = sarosStore
+    this.viewStore = viewStore
   }
 
   trigger (event, ...args) {
