@@ -42,5 +42,7 @@ public class PreferenceInitializer {
             UserColorID.UNKNOWN);
 
         store.setDefault(PreferenceConstants.SESSION_NICKNAME, "");
+        store.setDefault(PreferenceConstants.INSTANT_SESSION_START_PREFERED,
+            false);
     }
 }
