@@ -44,4 +44,6 @@ public class PreferenceConstants {
     public static final String FAVORITE_SESSION_COLOR_ID = "favorite.session.color.id";
 
     public static final String SESSION_NICKNAME = "session.nickname";
+
+    public static final String INSTANT_SESSION_START_PREFERED = "instant_session_start_prefered";
 }

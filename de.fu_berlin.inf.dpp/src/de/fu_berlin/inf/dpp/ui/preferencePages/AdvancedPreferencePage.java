@@ -71,6 +71,11 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                 Messages.AdvancedPreferencePage_activate_server,
                 getFieldEditorParent()));
         }
+
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.INSTANT_SESSION_START_PREFERED,
+            Messages.AdvancedPreferencePage_instant_session_start_preferred,
+            getFieldEditorParent()));
     }
 
     @Override

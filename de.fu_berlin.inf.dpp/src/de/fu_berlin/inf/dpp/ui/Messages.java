@@ -36,6 +36,7 @@ public class Messages extends NLS {
     public static String AdvancedPreferencePage_description;
     public static String AdvancedPreferencePage_show_xmpp_debug;
     public static String AdvancedPreferencePage_activate_server;
+    public static String AdvancedPreferencePage_instant_session_start_preferred;
 
     public static String ChangeColorAction_message_text;
     public static String ChangeColorAction_message_title;
