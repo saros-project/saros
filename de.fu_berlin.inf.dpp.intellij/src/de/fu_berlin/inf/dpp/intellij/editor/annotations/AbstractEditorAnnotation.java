@@ -233,4 +233,11 @@ abstract class AbstractEditorAnnotation {
     Editor getEditor() {
         return editor;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[user=" + user + ", file=" + file
+            + ", editor=" + editor + ", annotationRanges=" + annotationRanges
+            + "]";
+    }
 }

@@ -142,4 +142,10 @@ class AnnotationRange {
     RangeHighlighter getRangeHighlighter() {
         return rangeHighlighter;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[start=" + start + ", end=" + end
+            + ", rangeHighlighter=" + rangeHighlighter + "]";
+    }
 }
