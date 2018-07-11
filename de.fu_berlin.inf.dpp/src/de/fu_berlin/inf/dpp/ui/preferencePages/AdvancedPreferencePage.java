@@ -73,7 +73,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         }
 
         addField(new BooleanFieldEditor(
-            PreferenceConstants.INSTANT_SESSION_START_PREFERED,
+            PreferenceConstants.INSTANT_SESSION_START_PREFERRED,
             Messages.AdvancedPreferencePage_instant_session_start_preferred,
             getFieldEditorParent()));
     }

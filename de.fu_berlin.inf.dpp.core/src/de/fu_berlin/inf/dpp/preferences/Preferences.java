@@ -202,6 +202,6 @@ public abstract class Preferences {
      */
     public boolean isInstantSessionStartPreferred() {
         return store
-            .getBoolean(PreferenceConstants.INSTANT_SESSION_START_PREFERED);
+            .getBoolean(PreferenceConstants.INSTANT_SESSION_START_PREFERRED);
     }
 }

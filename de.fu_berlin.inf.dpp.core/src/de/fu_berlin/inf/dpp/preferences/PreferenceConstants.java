@@ -45,5 +45,5 @@ public class PreferenceConstants {
 
     public static final String SESSION_NICKNAME = "session.nickname";
 
-    public static final String INSTANT_SESSION_START_PREFERED = "instant_session_start_prefered";
+    public static final String INSTANT_SESSION_START_PREFERRED = "instant_session_start_preferred";
 }
