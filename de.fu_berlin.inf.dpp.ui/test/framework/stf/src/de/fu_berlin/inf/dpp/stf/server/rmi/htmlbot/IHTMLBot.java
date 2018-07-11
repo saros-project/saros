@@ -4,10 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.ui.View;
-import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 /**
  * This interface is part of the HTML GUI test framework. It provides methods to
@@ -24,17 +22,6 @@ public interface IHTMLBot extends Remote {
      * @throws RemoteException
      */
     IRemoteHTMLView view(View view) throws RemoteException;
-
-    /**
-     * Get a remote representation of a HTML dialog.
-     * 
-     * @param pageClass
-     *            the class of the dialog's browser page
-     * @return an instance of {@link IRemoteBotDialog}
-     * @throws RemoteException
-     */
-    IRemoteBotDialog getDialogWindow(Class<? extends IBrowserPage> pageClass)
-        throws RemoteException;
 
     /**
      * Returns the currently displayed list of accounts.
