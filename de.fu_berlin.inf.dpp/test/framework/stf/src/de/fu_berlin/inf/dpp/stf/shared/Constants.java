@@ -243,6 +243,7 @@ public interface Constants {
     public static final String NODE_SAROS_FEEDBACK = get("node_Saros_feedback");
 
     public static final String NODE_SAROS_ADVANCED = get("node_Saros_Advanced");
+    public static final String PREF_NODE_SAROS_ADVANCED_INSTANT_SESSION_START_PREFERRED = get("AdvancedPreferencePage_instant_session_start_preferred");
 
     public static final String NODE_SAROS_COMMUNICATION = get("node_Saros_Communication");
 
