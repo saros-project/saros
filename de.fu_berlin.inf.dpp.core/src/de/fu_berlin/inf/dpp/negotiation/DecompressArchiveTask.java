@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
+import de.fu_berlin.inf.dpp.monitoring.CancelableInputStream;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
@@ -116,16 +117,24 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
                 monitor.subTask("decompressing: " + path);
 
-                final InputStream in = zipFile.getInputStream(entry);
+                final InputStream inZip = zipFile.getInputStream(entry);
 
-                /*
-                 * FIXME make it possible to cancel the task during
-                 * decompressing large files
-                 */
-                if (!decompressedFile.exists())
-                    decompressedFile.create(in, false);
-                else
-                    decompressedFile.setContents(in, false, true);
+                CancelableInputStream in;
+                in = new CancelableInputStream(inZip, monitor);
+
+                try {
+                    if (!decompressedFile.exists())
+                        decompressedFile.create(in, false);
+                    else
+                        decompressedFile.setContents(in, false, true);
+                } catch (IOException e) {
+                    /* if triggered by check in CancelableInputStream */
+                    if (monitor.isCanceled()) {
+                        throw new OperationCanceledException();
+                    } else {
+                        throw e;
+                    }
+                }
 
                 monitor.worked(1);
 
