@@ -46,11 +46,11 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
@@ -76,7 +76,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
     private EnterProjectNamePage namePage;
     private WizardDialogAccessable wizardDialog;
-    private IncomingProjectNegotiation negotiation;
+    private AbstractIncomingProjectNegotiation negotiation;
     private JID peer;
 
     private boolean isExceptionCancel;
@@ -122,7 +122,8 @@ public class AddProjectToSessionWizard extends Wizard {
         }
     };
 
-    public AddProjectToSessionWizard(IncomingProjectNegotiation negotiation) {
+    public AddProjectToSessionWizard(
+        AbstractIncomingProjectNegotiation negotiation) {
 
         SarosPluginContext.initComponent(this);
 

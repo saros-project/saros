@@ -12,9 +12,11 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.IdSelector;
+import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.BotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLInputField;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.ui.pages.AbstractBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
@@ -26,15 +28,19 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
      * Defines how to identify the HTML representation of a given
      * {@link de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View
      * View}. As multiple conceptual views may be displayed in the same browser
-     * widget, this "key" has two parts: The pageClass to find the correct
-     * browser widget, and the id of the corresponding DOM entry.
+     * widget, this "key" has three parts: The pageClass to find the correct
+     * browser widget, the viewName to open it and the id of the corresponding
+     * DOM entry.
      */
     private static class Key {
         private Class<? extends AbstractBrowserPage> pageClass;
+        private String viewName;
         private String id;
 
-        Key(Class<? extends AbstractBrowserPage> pageClass, String id) {
+        Key(Class<? extends AbstractBrowserPage> pageClass, String viewName,
+            String id) {
             this.pageClass = pageClass;
+            this.viewName = viewName;
             this.id = id;
         }
     }
@@ -50,8 +56,8 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
      */
     private static final Map<View, Key> map = new HashMap<View, Key>();
     static {
-        map.put(View.MAIN_VIEW, new Key(MainPage.class, "root"));
-        map.put(View.ADD_CONTACT, new Key(MainPage.class, "add-contact-form"));
+        map.put(View.MAIN_VIEW, new Key(MainPage.class, "main-page", "root"));
+        map.put(View.ADD_CONTACT, new Key(MainPage.class, "add-contact", "add-contact-form"));
     }
 
     private static final RemoteHTMLView INSTANCE = new RemoteHTMLView();
@@ -63,9 +69,11 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
 
     private View view;
     private RemoteHTMLButton button;
+    private RemoteHTMLInputField inputField;
 
     public RemoteHTMLView() {
         button = RemoteHTMLButton.getInstance();
+        inputField = RemoteHTMLInputField.getInstance();
     }
 
     @Override
@@ -82,14 +90,35 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     }
 
     @Override
+    public boolean hasInputField(String name) throws RemoteException {
+        return exists(new NameSelector(name));
+    }
+
+    @Override
+    public IRemoteHTMLInputField inputField(String name) throws RemoteException {
+        NameSelector selector = new NameSelector(name);
+        inputField.setSelector(selector);
+        ensureExistence(selector);
+        return inputField;
+    }
+
+    @Override
     public boolean isOpen() {
         String id = map.get(view).id;
         return exists(new IdSelector(id));
     }
 
+    @Override
+    public void open() {
+        getBrowser().run(
+            String.format("SarosApi.viewStore.doChangeView('%s')",
+                map.get(view).viewName));
+    }
+
     public void selectView(View view) {
         this.view = view;
         this.button.setBrowser(getBrowser());
+        this.inputField.setBrowser(getBrowser());
     }
 
     private IJQueryBrowser getBrowser() {
@@ -116,5 +145,4 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
         }
         return foundIt;
     }
-
 }
