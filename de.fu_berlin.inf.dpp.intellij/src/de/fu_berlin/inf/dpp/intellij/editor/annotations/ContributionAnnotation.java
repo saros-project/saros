@@ -51,7 +51,8 @@ class ContributionAnnotation extends AbstractEditorAnnotation {
         super(user, file, editor, annotationRanges);
 
         annotationRanges.forEach(annotationRange -> {
-            int length = annotationRange.getEnd() - annotationRange.getStart();
+            int length = annotationRange.getLength();
+
             if (length != 1) {
                 throw new IllegalArgumentException(
                     "Each AnnotationRange for a ContributionAnnotation has to "
