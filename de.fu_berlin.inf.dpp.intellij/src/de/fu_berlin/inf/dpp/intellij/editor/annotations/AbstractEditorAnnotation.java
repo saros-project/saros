@@ -44,6 +44,10 @@ abstract class AbstractEditorAnnotation {
      * editor is not null, the given annotation ranges <b>must</b> contain a
      * <code>RangeHighlighter</code>.
      * </p>
+     * The created annotation holds a <b>copy</b> of the passed list of
+     * annotation ranges instead of the passed list itself. This is done to
+     * prevent external sources from directly changing the internal state of the
+     * annotation by modifying the passed list.
      *
      * @param user             the user the annotation belongs to and whose
      *                         color is used
