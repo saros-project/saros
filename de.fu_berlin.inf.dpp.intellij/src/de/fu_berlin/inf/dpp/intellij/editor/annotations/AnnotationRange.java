@@ -138,6 +138,15 @@ class AnnotationRange {
         return end;
     }
 
+    /**
+     * Returns the length of the <code>AnnotationRange</code>.
+     *
+     * @return the length of the <code>AnnotationRange</code>
+     */
+    int getLength() {
+        return end - start;
+    }
+
     @Nullable
     RangeHighlighter getRangeHighlighter() {
         return rangeHighlighter;
