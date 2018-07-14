@@ -18,7 +18,7 @@ public class CancelableInputStream extends InputStream {
     /**
      * Creates a new <code>CancelableInputStream</code> that wraps the given
      * input and checks for a canceled monitor at every read call.
-     * 
+     *
      * @param in
      *            The wrapped input stream
      * @param monitor
@@ -38,10 +38,45 @@ public class CancelableInputStream extends InputStream {
     }
 
     @Override
+    public int read(byte[] b) throws IOException {
+        return read(b, 0, b.length);
+    }
+
+    @Override
     public int read() throws IOException {
         if (monitor.isCanceled())
             throw new IOException("Processing was canceled!");
 
         return in.read();
+    }
+
+    @Override
+    public long skip(long n) throws IOException {
+        return in.skip(n);
+    }
+
+    @Override
+    public int available() throws IOException {
+        return in.available();
+    }
+
+    @Override
+    public void close() throws IOException {
+        in.close();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit) {
+        in.mark(readlimit);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+        in.reset();
+    }
+
+    @Override
+    public boolean markSupported() {
+        return in.markSupported();
     }
 }
