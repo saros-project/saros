@@ -25,7 +25,7 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
      *            the project's name
      */
     public ServerProjectImpl(IWorkspace workspace, String name) {
-        super(workspace, ServerPathImpl.fromString(name));
+        super(workspace, null, ServerPathImpl.fromString(name));
     }
 
     @Override
@@ -49,9 +49,9 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
         File memberFile = memberLocation.toFile();
 
         if (memberFile.isFile()) {
-            return new ServerFileImpl(getWorkspace(), getFullMemberPath(path));
+            return new ServerFileImpl(getWorkspace(), getProject(), getFullMemberPath(path));
         } else if (memberFile.isDirectory()) {
-            return new ServerFolderImpl(getWorkspace(), getFullMemberPath(path));
+            return new ServerFolderImpl(getWorkspace(), getProject(), getFullMemberPath(path));
         } else {
             return null;
         }
@@ -59,7 +59,7 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
 
     @Override
     public IFile getFile(IPath path) {
-        return new ServerFileImpl(getWorkspace(), getFullMemberPath(path));
+        return new ServerFileImpl(getWorkspace(), getProject(), getFullMemberPath(path));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
 
     @Override
     public IFolder getFolder(IPath path) {
-        return new ServerFolderImpl(getWorkspace(), getFullMemberPath(path));
+        return new ServerFolderImpl(getWorkspace(), getProject(), getFullMemberPath(path));
     }
 
     @Override
@@ -79,5 +79,15 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
 
     private IPath getFullMemberPath(IPath memberPath) {
         return getFullPath().append(memberPath);
+    }
+
+    @Override
+    public IPath getProjectRelativePath() {
+        return ServerPathImpl.EMPTY;
+    }
+
+    @Override
+    public IProject getProject() {
+        return this;
     }
 }
