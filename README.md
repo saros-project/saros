@@ -3,6 +3,10 @@
 Saros is an Open Source IDE plugin for distributed collaborative software
 development.
 
+Note: This is a mirror of xxx which is maintained by a bot, even though it is not marked as "mirror" by Github. Changes go in both directions constantly.
+
+## Details
+
 * All participants of a Saros session have an **identical local copy** of the
   projects they work on.
 * They can work in their **usual IDE using all of its features** (currently
