@@ -1,0 +1,38 @@
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a href="{{ '/' | absolute_url }}">
+    <div class="logo">
+        <img src="{{ '/assets/images/logo/saros-logo-100x100.png' | relative_url }}"/>
+    </div></a>
+    <a class="navbar-brand" href="{{ '/' | absolute_url }}">{{ site.title }}<small>{{ site.subtitle }}</small></a>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+        {% assign links = site.data.navigation %}
+        {% for link in links %}
+            {% assign class = nil %}
+            {% if page.url contains link.url %}
+                {% assign class = 'active' %}
+            {% endif %}
+            {% if link.sublinks %}
+                <li class="nav-item dropdown {{ class }}">
+                    <a class="nav-link dropdown-toggle" href="{{ link.url | relative_url }}" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ link.title }}</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% for sublink in link.sublinks %}
+                            {% if sublink.title == 'separator' %}
+                              <div class="dropdown-divider"></div>
+                            {% else %}
+                              <a class="dropdown-item" href="{{ sublink.url | relative_url }}">{{ sublink.title }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </li>
+            {% else %}
+                <li  class="nav-item {{ class }}">
+                    <a class="nav-link" href="{{ link.url | relative_url }}">{{ link.title }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+  </div>
+</nav>
