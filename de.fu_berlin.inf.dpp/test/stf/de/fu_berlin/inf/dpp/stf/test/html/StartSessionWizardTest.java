@@ -4,6 +4,7 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.ui.View.MAIN_VIEW;
 import static de.fu_berlin.inf.dpp.ui.View.SESSION_WIZARD;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
@@ -54,6 +55,7 @@ public class StartSessionWizardTest extends StfHtmlTestCase {
             .getText().equals("Choose Contacts"));
     }
 
+    // TODO: fix the HTML StartSessionWizard to success this test
     @Test
     public void shouldStartSession() throws Exception {
         assertTrue(ALICE.superBot().views().packageExplorerView()
@@ -76,9 +78,11 @@ public class StartSessionWizardTest extends StfHtmlTestCase {
             SESSION_WIZARD);
         assertTrue(contactList.contains(BOB.getBaseJid()));
 
-        // TODO click on user in list
-        // TODO click on Finish button
-        // TODO assert that dialog is closed
-
+        ALICE.htmlBot().view(SESSION_WIZARD).contactListItem(BOB.getBaseJid())
+            .click();
+        assertTrue(ALICE.htmlBot().view(SESSION_WIZARD).button("next-button")
+            .text().equals("Finish"));
+        ALICE.htmlBot().view(SESSION_WIZARD).button("next-button").click();
+        assertFalse(ALICE.htmlBot().view(SESSION_WIZARD).isOpen());
     }
 }

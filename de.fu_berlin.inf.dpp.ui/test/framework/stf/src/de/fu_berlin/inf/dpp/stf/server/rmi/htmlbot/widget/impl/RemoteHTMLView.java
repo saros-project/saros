@@ -78,6 +78,14 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     }
 
     @Override
+    public IRemoteHTMLButton contactListItem(String jid) throws RemoteException {
+        Selector selector = new Selector("li[data-jid=\"" + jid + "\"]");
+        button.setSelector(selector);
+        ensureExistence(selector);
+        return button;
+    }
+
+    @Override
     public IRemoteHTMLInputField inputField(String name) throws RemoteException {
         NameSelector selector = new NameSelector(name);
         inputField.setSelector(selector);
@@ -137,7 +145,7 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
 
     @Override
     public IRemoteHTMLTree tree(String className) throws RemoteException {
-        Selector selector = new Selector("ul." + className + "[role=tree]");
+        Selector selector = new Selector("ul." + className);
         tree.setSelector(selector);
         ensureExistence(selector);
         return tree;

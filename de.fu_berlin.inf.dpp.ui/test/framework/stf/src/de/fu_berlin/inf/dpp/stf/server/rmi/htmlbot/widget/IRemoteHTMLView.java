@@ -69,6 +69,21 @@ public interface IRemoteHTMLView extends Remote {
     IRemoteHTMLButton button(String id) throws RemoteException;
 
     /**
+     * Gets a remote representation of the contact-list item with the given JID
+     * from within this view. The item is used as a button.
+     * 
+     * @param jid
+     *            the value of the JID of the contact
+     * 
+     * @return an instance of {@link IRemoteHTMLButton}, if such a item exists
+     *         in this view
+     * 
+     * @throws RemoteException
+     *             e.g. if no such item exist in this view
+     */
+    IRemoteHTMLButton contactListItem(String jid) throws RemoteException;
+
+    /**
      * Gets a remote representation of the HTML input field with the given name
      * from within this view.
      * 
@@ -180,8 +195,8 @@ public interface IRemoteHTMLView extends Remote {
      * @param className
      *            the value of the identifying class of the element
      * 
-     * @return an instance of {@link IRemoteHTMLTree}, if such a element
-     *         exists in this view
+     * @return an instance of {@link IRemoteHTMLTree}, if such a element exists
+     *         in this view
      * 
      * @throws RemoteException
      *             e.g. if no such element exist in this view
