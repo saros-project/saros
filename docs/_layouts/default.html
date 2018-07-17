@@ -36,10 +36,10 @@
       <section id="main_content" class="inner">
         {% if page.url == "/" %}
           <a class="center twitter-timeline"
-            href="https://twitter.com/saros_project"
+            href="https://twitter.com/{{ site.twitter.username }}"
             data-tweet-limit="1"
             data-chrome="noheader nofooter transparent noborders noscrollbar">
-          Tweets by @saros_project
+          Tweets by @{{ site.twitter.username }}
           </a>
           <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
         {% endif %}
