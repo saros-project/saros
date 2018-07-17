@@ -1,5 +1,4 @@
 import React from 'react'
-import $ from 'jquery'
 import { observable, action } from 'mobx'
 import { observer, inject } from 'mobx-react'
 import { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button, DropdownButton, SplitButton, MenuItem, Checkbox, Radio, ProgressBar } from 'react-bootstrap'
@@ -21,7 +20,7 @@ export default class BasicWidgetTestView extends React.Component {
     radioGroup: '1',
     select: 'option1', // Default value
     multiSelect: [],
-    progressBar: 50
+    progressBar: 50,
   }
 
   @action setFieldValue = (field, value) => {

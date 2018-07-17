@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLProgres
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLRadioGroup;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLSelect;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLTextElement;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
@@ -211,6 +212,7 @@ public class STFController {
             exportObject(RemoteHTMLMultiSelect.getInstance(), "htmlMultiSelect");
             exportObject(RemoteHTMLProgressBar.getInstance(), "htmlProgressBar");
             exportObject(RemoteHTMLTextElement.getInstance(), "htmlTextElement");
+            exportObject(RemoteHTMLTree.getInstance(), "htmlTree");
         }
 
         /*

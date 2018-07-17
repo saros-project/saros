@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLView;
 import de.fu_berlin.inf.dpp.ui.View;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 
 public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
@@ -37,17 +38,19 @@ public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 
     @Override
     public List<String> getAccountList() throws RemoteException {
-        return BotUtils.getListItemsText(getBrowser(), SELECTOR_ACCOUNT_ENTRY);
+        return BotUtils.getListItemsText(getBrowser(MainPage.class),
+            SELECTOR_ACCOUNT_ENTRY);
     }
 
     @Override
-    public List<String> getContactList() throws RemoteException {
-        return BotUtils.getListItemsText(getBrowser(),
+    public List<String> getContactList(View view) throws RemoteException {
+        return BotUtils.getListItemsText(getBrowser(view.getPageClass()),
             SELECTOR_CONTACT_ITEM_DISPLAY_NAME);
     }
 
-    private IJQueryBrowser getBrowser() {
-        return getBrowserManager().getBrowser(MainPage.class);
+    private IJQueryBrowser getBrowser(
+        Class<? extends IBrowserPage> browserPageClass) {
+        return getBrowserManager().getBrowser(browserPageClass);
     }
 
     public static IHTMLBot getInstance() {
