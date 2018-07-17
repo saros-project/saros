@@ -34,9 +34,11 @@ public interface IHTMLBot extends Remote {
     /**
      * Returns the currently displayed list of contacts.
      * 
+     * @param view
+     *            The part of the Saros GUI on which the contact list is
+     *            displayed.
      * @return a list of diplayNames of contacts
      * @throws RemoteException
      */
-    List<String> getContactList() throws RemoteException;
-
+    List<String> getContactList(View view) throws RemoteException;
 }
