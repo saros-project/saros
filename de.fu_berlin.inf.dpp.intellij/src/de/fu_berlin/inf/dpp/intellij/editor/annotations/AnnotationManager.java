@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -84,7 +85,6 @@ public class AnnotationManager {
             return;
         }
 
-        List<AnnotationRange> annotationRanges = new ArrayList<>();
         AnnotationRange annotationRange;
 
         if (editor != null) {
@@ -97,10 +97,8 @@ public class AnnotationManager {
             annotationRange = new AnnotationRange(start, end);
         }
 
-        annotationRanges.add(annotationRange);
-
         SelectionAnnotation selectionAnnotation = new SelectionAnnotation(user,
-            file, editor, annotationRanges);
+            file, editor, Collections.singletonList(annotationRange));
 
         selectionAnnotationStore.addAnnotation(selectionAnnotation);
     }
