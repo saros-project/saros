@@ -16,5 +16,8 @@ public class ServerSessionContextFactory extends SarosCoreSessionContextFactory 
     public final void createNonCoreComponents(ISarosSession session,
         MutablePicoContainer container) {
         container.addComponent(ServerEditorManager.class);
+        container.addComponent(FileActivityExecutor.class);
+        container.addComponent(FolderActivityExecutor.class);
+        container.addComponent(TextEditActivityExecutor.class);
     }
 }
