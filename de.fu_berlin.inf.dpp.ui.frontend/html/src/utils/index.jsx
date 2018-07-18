@@ -13,3 +13,16 @@ export function getJid ({ username, domain }) {
 }
 
 export const noop = () => {}
+
+/**
+ * @param {Object} tree - tree to traverse over
+ * @param {string} keyPrefix - the tree path of the current child e.g '0-1-2-3'
+ * @param {Function} onChild - called when a child is being traversed over
+ * @returns {void}
+ */
+export function traverse (tree, keyPrefix, onChild) {
+  onChild(tree, keyPrefix)
+  tree.members.forEach((child, i) => {
+    traverse(child, `${keyPrefix}-${i}`, onChild)
+  })
+}

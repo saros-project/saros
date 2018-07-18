@@ -56,6 +56,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
@@ -216,20 +217,19 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for host.
      */
-    public SarosSession(final String id, int colorID,
-        IPreferenceStore properties, IContainerContext containerContext) {
-        this(id, containerContext, /* unused */null, colorID, /* unused */
-        -1, properties, /* unused */ null);
+    public SarosSession(final String id, IPreferenceStore properties,
+        IContainerContext containerContext) {
+        this(id, containerContext, properties, /* unused */
+        null, /* unused */null);
     }
 
     /**
      * Constructor for client.
      */
-    public SarosSession(final String id, JID hostJID, int clientColorID,
-        int hostColorID, IPreferenceStore localProperties,
-        IPreferenceStore hostProperties, IContainerContext containerContext) {
-
-        this(id, containerContext, hostJID, clientColorID, hostColorID, localProperties, hostProperties);
+    public SarosSession(final String id, JID hostJID,
+        IPreferenceStore localProperties, IPreferenceStore hostProperties,
+        IContainerContext containerContext) {
+        this(id, containerContext, localProperties, hostJID, hostProperties);
     }
 
     @Override
@@ -1051,8 +1051,8 @@ public final class SarosSession implements ISarosSession {
             localUser, localUser, 0));
     }
 
-    private SarosSession(final String id, IContainerContext context, JID host,
-        int localColorID, int hostColorID, IPreferenceStore localProperties,
+    private SarosSession(final String id, IContainerContext context,
+        IPreferenceStore localProperties, JID host,
         IPreferenceStore hostProperties) {
 
         context.initComponent(this);
@@ -1067,8 +1067,12 @@ public final class SarosSession implements ISarosSession {
 
         assert localUserJID != null;
 
+        int localColorID = localProperties
+            .getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
+        int localFavoriteColorID = localProperties
+            .getInt(ColorNegotiationHook.KEY_FAV_COLOR);
         localUser = new User(localUserJID, host == null, true, localColorID,
-            localColorID);
+            localFavoriteColorID);
 
         localUser.setInSession(true);
 
@@ -1077,7 +1081,12 @@ public final class SarosSession implements ISarosSession {
             participants.put(hostUser.getJID(), hostUser);
             userProperties.put(hostUser, localProperties);
         } else {
-            hostUser = new User(host, true, false, hostColorID, hostColorID);
+            int hostColorID = hostProperties
+                .getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
+            int hostFavoriteColorID = hostProperties
+                .getInt(ColorNegotiationHook.KEY_FAV_COLOR);
+            hostUser = new User(host, true, false, hostColorID,
+                hostFavoriteColorID);
             hostUser.setInSession(true);
             participants.put(hostUser.getJID(), hostUser);
             participants.put(localUser.getJID(), localUser);

@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExten
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -60,11 +59,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     private final VersionManager versionManager;
 
     private final DiscoveryManager discoveryManager;
-
-    // HACK last residue of the direct connection between SessionNegotiation and
-    // the color property of users.
-    private int clientColorID = UserColorID.UNKNOWN;
-    private int clientFavoriteColorID = UserColorID.UNKNOWN;
 
     public OutgoingSessionNegotiation( //
         final JID peer, //
@@ -438,16 +432,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
                 continue;
 
             hostParameters.saveHookSettings(hook, finalSettings);
-
-            // HACK A User object representing the client needs to access these
-            // two values in completeInvitation(). Color management should work
-            // differently.
-            if (hook instanceof ColorNegotiationHook) {
-                clientColorID = Integer.parseInt(finalSettings
-                    .get(ColorNegotiationHook.KEY_CLIENT_COLOR));
-                clientFavoriteColorID = Integer.parseInt(finalSettings
-                    .get(ColorNegotiationHook.KEY_CLIENT_FAV_COLOR));
-            }
         }
 
         return hostParameters;
@@ -527,6 +511,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Synchronizing user list...");
 
+        int clientColorID = properties
+            .getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
+        int clientFavoriteColorID = properties
+            .getInt(ColorNegotiationHook.KEY_FAV_COLOR);
         User user = new User(getPeer(), false, false, clientColorID,
             clientFavoriteColorID);
 

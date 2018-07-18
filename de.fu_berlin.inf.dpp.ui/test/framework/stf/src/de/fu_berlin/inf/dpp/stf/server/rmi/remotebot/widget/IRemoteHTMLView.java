@@ -41,6 +41,14 @@ public interface IRemoteHTMLView extends Remote {
     boolean isOpen() throws RemoteException;
 
     /**
+     * Opens this View on the remote side
+     * 
+     * @throws RemoteException
+     *             if the view could not be opened
+     */
+    void open() throws RemoteException;
+
+    /**
      * Gets a remote representation of the HTML button with the given ID from
      * within this view.
      * 
@@ -66,4 +74,31 @@ public interface IRemoteHTMLView extends Remote {
      *             if the presence could not be determined
      */
     boolean hasButton(String id) throws RemoteException;
+
+    /**
+     * Gets a remote representation of the HTML input field with the given name
+     * from within this view.
+     * 
+     * @param name
+     *            the value of the name attribute of the input field
+     * 
+     * @return an instance of {@link IRemoteHTMLInputField}, if such a input
+     *         field exists in this view
+     * 
+     * @throws RemoteException
+     *             e.g. if no such input field exist in this view
+     */
+    IRemoteHTMLInputField inputField(String name) throws RemoteException;
+
+    /**
+     * Checks whether this view contains a input field with the given name.
+     * 
+     * @param name
+     *            the value of the name attribute of the input field
+     * @return <code>true</code> if a input field with the given name exists,
+     *         <code>false</code> if not
+     * @throws RemoteException
+     *             if the presence could not be determined
+     */
+    boolean hasInputField(String name) throws RemoteException;
 }

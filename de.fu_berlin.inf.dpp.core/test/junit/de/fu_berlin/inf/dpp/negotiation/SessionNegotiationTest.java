@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
@@ -128,7 +127,7 @@ public class SessionNegotiationTest {
 
         expect(
             bobSessionManager.joinSession(anyObject(String.class), eq(ALICE),
-                anyInt(), anyInt(), anyObject(IPreferenceStore.class),
+                anyObject(IPreferenceStore.class),
                 anyObject(IPreferenceStore.class))).andReturn(bobSession)
             .once();
 

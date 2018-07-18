@@ -17,4 +17,9 @@ export default class MainUIStore {
     this.core.doAddContact(jid, displayName)
     this.view.doChangeView(views.MAIN)
   }
+
+  @action.bound
+  doCancelAddContact () {
+    this.view.doChangeView(views.MAIN)
+  }
 }

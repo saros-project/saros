@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.session;
 
-import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 
 /**
@@ -44,7 +44,7 @@ public interface INegotiationHandler {
      *            synchronization
      */
     public void handleOutgoingProjectNegotiation(
-        OutgoingProjectNegotiation negotiation);
+        AbstractOutgoingProjectNegotiation negotiation);
 
     /**
      * Called when a remote project from a remote session user should be
@@ -55,5 +55,5 @@ public interface INegotiationHandler {
      *            synchronization
      */
     public void handleIncomingProjectNegotiation(
-        IncomingProjectNegotiation negotiation);
+        AbstractIncomingProjectNegotiation negotiation);
 }

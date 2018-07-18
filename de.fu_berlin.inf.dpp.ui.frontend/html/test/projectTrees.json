@@ -6,35 +6,6 @@
       "isSelectedForSharing": true,
       "members": [
         {
-          "type": "FILE",
-          "label": ".classpath",
-          "isSelectedForSharing": true,
-          "members": [],
-          "hash": -1226657312
-        },
-        {
-          "type": "FILE",
-          "label": ".project",
-          "isSelectedForSharing": true,
-          "members": [],
-          "hash": 1861614436
-        },
-        {
-          "type": "FOLDER",
-          "label": ".settings",
-          "isSelectedForSharing": true,
-          "members": [
-            {
-              "type": "FILE",
-              "label": "org.eclipse.jdt.core.prefs",
-              "isSelectedForSharing": true,
-              "members": [],
-              "hash": 430432649
-            }
-          ],
-          "hash": 717970891
-        },
-        {
           "type": "FOLDER",
           "label": "afolder",
           "isSelectedForSharing": true,
@@ -70,13 +41,6 @@
             }
           ],
           "hash": 715774433
-        },
-        {
-          "type": "FOLDER",
-          "label": "bin",
-          "isSelectedForSharing": true,
-          "members": [],
-          "hash": 1986132872
         }
       ],
       "hash": -2049958649
@@ -88,42 +52,6 @@
       "label": "project2",
       "isSelectedForSharing": true,
       "members": [
-        {
-          "type": "FILE",
-          "label": ".classpath",
-          "isSelectedForSharing": true,
-          "members": [],
-          "hash": -1226657312
-        },
-        {
-          "type": "FILE",
-          "label": ".project",
-          "isSelectedForSharing": true,
-          "members": [],
-          "hash": 1861614436
-        },
-        {
-          "type": "FOLDER",
-          "label": ".settings",
-          "isSelectedForSharing": true,
-          "members": [
-            {
-              "type": "FILE",
-              "label": "org.eclipse.jdt.core.prefs",
-              "isSelectedForSharing": true,
-              "members": [],
-              "hash": 430432649
-            }
-          ],
-          "hash": 717970891
-        },
-        {
-          "type": "FOLDER",
-          "label": "bin",
-          "isSelectedForSharing": true,
-          "members": [],
-          "hash": 1986132872
-        },
         {
           "type": "FOLDER",
           "label": "somefolder",

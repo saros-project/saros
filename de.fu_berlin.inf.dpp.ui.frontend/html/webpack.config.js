@@ -41,7 +41,7 @@ module.exports = (env = {}) => {
     },
     devtool: 'source-map',
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
@@ -92,6 +92,7 @@ module.exports = (env = {}) => {
       extensions: ['.js', '.jsx'],
       // This is why we can just import 'Utils' and 'Constants'
       alias: {
+        '~': resolve(__dirname, 'src/'),
         Utils: resolve(__dirname, 'src/utils/'),
         Constants: resolve(__dirname, 'src/constants.jsx')
       }

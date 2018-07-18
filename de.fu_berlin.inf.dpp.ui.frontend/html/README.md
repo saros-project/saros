@@ -29,7 +29,7 @@ To see if your code fullfills the linting rules go to
 `de.fu_berlin.inf.dpp.ui.frontend/html/` and run `npm run lint`.
 In order to fix a majority of linting errors automatically use `npm run lint:fix`
 The rules for linting are defined in
-`de.fu_berlin.inf.dpp.ui.frontend/html/.eslintrc`. For more information about
+`de.fu_berlin.inf.dpp.ui.frontend/html/.eslintrc.yml`. For more information about
 the configuration see http://eslint.org/
 The JavaScript code uses the StandardJS linting rules
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)

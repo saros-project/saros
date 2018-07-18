@@ -108,14 +108,15 @@ public interface ISessionNegotiationHook {
      * 
      * @param hostPreferences
      *            The session preference store that corresponds to the host.
-     *            Maybe used to store the final properties for access of other
-     *            components.
+     *            May be used to store the final properties so they can be
+     *            accessed by other components.
      * 
      * @param clientPreferences
      *            The session preference store that corresponds to the client.
-     *            Maybe used to store the final properties for access of other
-     *            components. The IPreferenceStore may be <code>null</code>,
-     *            if the host is currently the only member of the session.
+     *            May be used to store the final properties so they can be
+     *            accessed by other components. The IPreferenceStore may be
+     *            <code>null</code> if the host is currently the only member
+     *            of the session.
      * 
      */
     public void applyActualParameters(Map<String, String> input,

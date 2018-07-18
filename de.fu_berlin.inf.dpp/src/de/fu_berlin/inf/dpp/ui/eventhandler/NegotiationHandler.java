@@ -12,9 +12,9 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
@@ -140,11 +140,11 @@ public class NegotiationHandler implements INegotiationHandler {
 
     private class OutgoingProjectJob extends Job {
 
-        private OutgoingProjectNegotiation negotiation;
+        private AbstractOutgoingProjectNegotiation negotiation;
         private String peer;
 
         public OutgoingProjectJob(
-            OutgoingProjectNegotiation outgoingProjectNegotiation) {
+            AbstractOutgoingProjectNegotiation outgoingProjectNegotiation) {
             super(Messages.NegotiationHandler_sharing_project);
             negotiation = outgoingProjectNegotiation;
             peer = negotiation.getPeer().getBase();
@@ -239,7 +239,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     @Override
     public void handleOutgoingProjectNegotiation(
-        OutgoingProjectNegotiation negotiation) {
+        AbstractOutgoingProjectNegotiation negotiation) {
 
         OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
         job.setPriority(Job.SHORT);
@@ -248,7 +248,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     @Override
     public void handleIncomingProjectNegotiation(
-        IncomingProjectNegotiation negotiation) {
+        AbstractIncomingProjectNegotiation negotiation) {
         showIncomingProjectUI(negotiation);
     }
 
@@ -295,7 +295,7 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     private void showIncomingProjectUI(
-        final IncomingProjectNegotiation negotiation) {
+        final AbstractIncomingProjectNegotiation negotiation) {
 
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 

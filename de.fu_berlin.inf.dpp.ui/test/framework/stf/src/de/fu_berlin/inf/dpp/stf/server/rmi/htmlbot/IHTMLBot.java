@@ -44,4 +44,12 @@ public interface IHTMLBot extends Remote {
      */
     List<String> getAccountList() throws RemoteException;
 
+    /**
+     * Returns the currently displayed list of contacts.
+     * 
+     * @return a list of diplayNames of contacts
+     * @throws RemoteException
+     */
+    List<String> getContactList() throws RemoteException;
+
 }

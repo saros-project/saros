@@ -38,16 +38,17 @@ import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.TransferType;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
@@ -58,7 +59,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -101,8 +101,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     private static final long NEGOTIATION_TIMEOUT = 10000L;
 
     private volatile SarosSession session;
-
-    private final Preferences preferences;
 
     private final IContainerContext context;
 
@@ -155,13 +153,12 @@ public class SarosSessionManager implements ISarosSessionManager {
         NegotiationFactory negotiationFactory,
         SessionNegotiationHookManager hookManager,
         XMPPConnectionService connectionService, ITransmitter transmitter,
-        IReceiver receiver, Preferences preferences) {
+        IReceiver receiver) {
 
         this.context = context;
         this.connectionService = connectionService;
         this.currentSessionNegotiations = new SessionNegotiationObservable();
         this.currentProjectNegotiations = new ProjectNegotiationObservable();
-        this.preferences = preferences;
         this.connectionService.addListener(connectionListener);
 
         this.negotiationFactory = negotiationFactory;
@@ -252,7 +249,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 }
             }
 
-            session = new SarosSession(sessionID, preferences.getFavoriteColorID(), hostProperties, context);
+            session = new SarosSession(sessionID, hostProperties, context);
 
             sessionStarting(session);
             session.start();
@@ -280,13 +277,13 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     // FIXME offer a startSession method for the client and host !
     @Override
-    public ISarosSession joinSession(String id, JID host, int clientColor,
-        int hostColor, IPreferenceStore hostProperties, IPreferenceStore localProperties) {
+    public ISarosSession joinSession(String id, JID host,
+        IPreferenceStore hostProperties, IPreferenceStore localProperties) {
 
         assert session == null;
 
-        session = new SarosSession(id, host, clientColor, hostColor,
-            localProperties, hostProperties, context);
+        session = new SarosSession(id, host, localProperties, hostProperties,
+            context);
 
         log.info("joined uninitialized Saros session");
 
@@ -422,6 +419,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     void projectNegotiationRequestReceived(JID remoteAddress,
+        TransferType transferType,
         List<ProjectNegotiationData> projectNegotiationData,
         String negotiationID) {
 
@@ -432,7 +430,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        IncomingProjectNegotiation negotiation;
+        AbstractIncomingProjectNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -442,8 +440,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             try {
                 negotiation = negotiationFactory.newIncomingProjectNegotiation(
-                    remoteAddress, negotiationID, projectNegotiationData, this,
-                    session);
+                    remoteAddress, transferType, negotiationID,
+                    projectNegotiationData, this, session);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentProjectNegotiations.add(negotiation);
@@ -570,7 +568,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        List<OutgoingProjectNegotiation> negotiations = new ArrayList<OutgoingProjectNegotiation>();
+        List<AbstractOutgoingProjectNegotiation> negotiations = new ArrayList<AbstractOutgoingProjectNegotiation>();
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -581,8 +579,11 @@ public class SarosSessionManager implements ISarosSessionManager {
             try {
                 for (User user : currentSession.getRemoteUsers()) {
 
-                    OutgoingProjectNegotiation negotiation = negotiationFactory
-                        .newOutgoingProjectNegotiation(user.getJID(),
+                    TransferType type = TransferType.valueOf(currentSession
+                        .getUserProperties(user).getString(
+                            ProjectNegotiationTypeHook.KEY_TYPE));
+                    AbstractOutgoingProjectNegotiation negotiation = negotiationFactory
+                        .newOutgoingProjectNegotiation(user.getJID(), type,
                             projectsToShare, this, currentSession);
 
                     negotiation.setNegotiationListener(negotiationListener);
@@ -594,7 +595,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
         }
 
-        for (OutgoingProjectNegotiation negotiation : negotiations)
+        for (AbstractOutgoingProjectNegotiation negotiation : negotiations)
             handler.handleOutgoingProjectNegotiation(negotiation);
     }
 
@@ -621,21 +622,33 @@ public class SarosSessionManager implements ISarosSessionManager {
         INegotiationHandler handler = negotiationHandler;
 
         if (handler == null) {
-            log.warn("could not start a project negotiation because no handler is installed");
+            log.warn("could not start a project negotiation because no"
+                + " handler is installed");
             return;
         }
 
-        OutgoingProjectNegotiation negotiation;
+        AbstractOutgoingProjectNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
-                log.warn("could not start a project negotiation because the current session is about to stop");
+                log.warn("could not start a project negotiation because the"
+                    + " current session is about to stop");
                 return;
             }
 
             try {
+                User remoteUser = currentSession.getUser(user);
+                if (remoteUser == null) {
+                    log.warn("could not start a project negotiation because"
+                        + " the remote user is not part of the current session");
+                    return;
+                }
+
+                TransferType type = TransferType.valueOf(currentSession
+                    .getUserProperties(remoteUser).getString(
+                        ProjectNegotiationTypeHook.KEY_TYPE));
                 negotiation = negotiationFactory.newOutgoingProjectNegotiation(
-                    user, currentSharedProjects, this, currentSession);
+                    user, type, currentSharedProjects, this, currentSession);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentProjectNegotiations.add(negotiation);

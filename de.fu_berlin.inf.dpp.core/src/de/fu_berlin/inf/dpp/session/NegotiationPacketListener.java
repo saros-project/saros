@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.TransferType;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -140,7 +141,7 @@ final class NegotiationPacketListener {
             }
 
             projectNegotiationRequest(new JID(packet.getFrom()),
-                extension.getNegotiationID(),
+                extension.getNegotiationID(), extension.getTransferType(),
                 extension.getProjectNegotiationData());
         }
     };
@@ -279,13 +280,13 @@ final class NegotiationPacketListener {
     }
 
     private void projectNegotiationRequest(final JID sender,
-        final String negotiationID,
+        final String negotiationID, final TransferType transferType,
         final List<ProjectNegotiationData> projectNegotiationData) {
 
         LOG.info("received project negotiation from " + sender
             + " with negotiation id: " + negotiationID);
 
-        sessionManager.projectNegotiationRequestReceived(sender,
+        sessionManager.projectNegotiationRequestReceived(sender, transferType,
             projectNegotiationData, negotiationID);
     }
 }

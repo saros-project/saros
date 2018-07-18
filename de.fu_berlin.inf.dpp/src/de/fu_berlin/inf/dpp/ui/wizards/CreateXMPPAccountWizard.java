@@ -128,7 +128,7 @@ public class CreateXMPPAccountWizard extends Wizard {
             Throwable t = e.getCause();
 
             if (t instanceof XMPPException)
-                message = getErrorMessage((XMPPException) t);
+                message = getErrorMessage((XMPPException) t, cachedServer);
 
             if (message == null && t != null)
                 message = t.getMessage();
@@ -224,7 +224,7 @@ public class CreateXMPPAccountWizard extends Wizard {
         return createdXMPPAccount;
     }
 
-    private String getErrorMessage(XMPPException e) {
+    private String getErrorMessage(XMPPException e, String server) {
         String message = null;
         XMPPError error = e.getXMPPError();
 
@@ -234,7 +234,10 @@ public class CreateXMPPAccountWizard extends Wizard {
         if (error.getCode() == 409)
             message = "The XMPP account already exists.";
         else
-            message = "An unknown error occurred. Please register on provider's website.";
+            message = "An unknown error occurred. Please register on "
+                + ("saros-con.imp.fu-berlin.de".equals(server) ? ("our website:"
+                    + " https://saros-con.imp.fu-berlin.de:5280/register/")
+                    : "the provider's website.");
 
         return message;
     }

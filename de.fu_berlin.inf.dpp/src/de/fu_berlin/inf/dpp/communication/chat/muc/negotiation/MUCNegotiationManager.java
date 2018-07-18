@@ -86,16 +86,16 @@ public class MUCNegotiationManager {
         }
 
         @Override
-        public void applyActualParameters(Map<String, String> settings,
+        public void applyActualParameters(Map<String, String> input,
             de.fu_berlin.inf.dpp.preferences.IPreferenceStore hostPreferences,
             de.fu_berlin.inf.dpp.preferences.IPreferenceStore clientPreferences) {
 
-            if (settings == null)
+            if (input == null)
                 return;
 
-            final String service = settings.get(KEY_SERVICE);
-            final String roomname = settings.get(KEY_ROOMNAME);
-            final String actualPassword = settings.get(KEY_PASSWORD);
+            final String service = input.get(KEY_SERVICE);
+            final String roomname = input.get(KEY_ROOMNAME);
+            final String actualPassword = input.get(KEY_PASSWORD);
 
             if (service == null || roomname == null || actualPassword == null)
                 return;
