@@ -35,14 +35,18 @@ public class AnnotationManager {
         SELECTION_ANNOTATION, CONTRIBUTION_ANNOTATION
     }
 
+    private static final int MAX_CONTRIBUTION_ANNOTATIONS = Integer
+        .getInteger("saros.intellij.MAX_CONTRIBUTION_ANNOTATIONS",50);
+
     private final AnnotationStore<SelectionAnnotation> selectionAnnotationStore;
-    private final AnnotationStore<ContributionAnnotation> contributionAnnotationStore;
+    private final QueueAnnotationStore<ContributionAnnotation> contributionAnnotationStore;
 
     private final Application application;
 
     public AnnotationManager() {
         this.selectionAnnotationStore = new AnnotationStore<>();
-        this.contributionAnnotationStore = new AnnotationStore<>();
+        this.contributionAnnotationStore = new QueueAnnotationStore<>(
+            MAX_CONTRIBUTION_ANNOTATIONS);
 
         this.application = ApplicationManager.getApplication();
     }
@@ -120,7 +124,6 @@ public class AnnotationManager {
      * @param start  the starting position of the annotation
      * @param end    the ending position of the annotation
      */
-    //TODO only save last X contribution annotations, rotate out older ones
     public void addContributionAnnotation(
         @NotNull
             User user,
@@ -160,6 +163,13 @@ public class AnnotationManager {
 
         ContributionAnnotation contributionAnnotation = new ContributionAnnotation(
             user, file, editor, annotationRanges);
+
+        ContributionAnnotation dequeuedAnnotation = contributionAnnotationStore
+            .removeIfFull();
+
+        if (dequeuedAnnotation != null) {
+            removeRangeHighlighter(dequeuedAnnotation);
+        }
 
         contributionAnnotationStore.addAnnotation(contributionAnnotation);
     }
