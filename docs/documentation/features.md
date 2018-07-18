@@ -34,7 +34,7 @@ the session's participants as well.
 
 ## Communication
 
-For instant messaging you can use a multi-user or 1-to-1 chat.\
+For instant messaging you can use a multi-user or 1-to-1 chat.
 In addition, we recommend to make use of your favorite VoIP application
 or audio conferencing tool.
 

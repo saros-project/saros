@@ -5,6 +5,22 @@ title: Home
 ![Comic: Distributed Pair
 Programmers](images/comics/dpp_0.png){:class="center"}
 
+<!-- TODO: add short description of saros-->
+
+## [Get Saros](/downloads/)
+
+* Eclipse update site @ Heroku:
+  <https://get-saros.herokuapp.com/eclipse/>
+* Eclipse update site @ Sourceforge:
+  <http://dpp.sf.net/update>
+* [Installation Instructions](http://www.saros-project.org/installation)
+
+## Good Starting Points
+
+* [Getting Started with
+  Saros](documentation/getting-started.md)
+* [Features Overview](features.md)
+* [Bug tracker](https://sourceforge.net/p/dpp/bugs/)
 
 ## What others think 
 
@@ -21,18 +37,3 @@ Programmers](images/comics/dpp_0.png){:class="center"}
 
 For more comments read on
 [Sourceforge](http://sourceforge.net/projects/dpp/#ratings).
-
-## Good Starting Points
-
-* [Getting Started with
-  Saros](documentation/getting-started.md)
-* [Features Overview](features.md)
-* [Bug tracker](https://sourceforge.net/p/dpp/bugs/)
-
-## [Get Saros](/downloads/)
-
-* Eclipse update site @ Heroku:
-  <https://get-saros.herokuapp.com/eclipse/>
-* Eclipse update site @ Sourceforge:
-  <http://dpp.sf.net/update>
-* [Installation Instructions](http://www.saros-project.org/installation)

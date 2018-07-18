@@ -1,8 +1,8 @@
-- title: Review Process
-  url: /contribute/processes/review.html
-
 - title: Development Process
   url: /contribute/processes/development.html
+
+- title: Review Process
+  url: /contribute/processes/review.html
 
 - title: Continuous Integration
   url: /contribute/processes/continuous-integration.html

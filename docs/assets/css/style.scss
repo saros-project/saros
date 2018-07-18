@@ -1,8 +1,6 @@
 ---
 ---
 
-@import "{{ site.theme }}";
-
 .logo img {
   float: left;
   width: 50px;
@@ -44,11 +42,6 @@
   margin-left: auto;
   margin-right: auto;
 }
-
-#header_wrap .inner {
-  padding: 0;
-}
-
 
 .sidenav {
   position: relative;

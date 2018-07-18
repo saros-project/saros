@@ -82,7 +82,7 @@ title: Saros Documentation
 
 * **Distributed Party Programming**     
 
-  Two or more participants work
+  **Two or more participants work
   together in a loosely coupled
   fashion.** They **work independently
   much of the time, but can call one

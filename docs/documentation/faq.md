@@ -140,9 +140,6 @@ Google Hangouts.
 ### Is Saros language dependent or which languages does Saros support?
 
 No, Saros is not language-dependent as it works on a character-level.
-For a list of programming language plugins explicitly tested see:
-[compatible plugins](compatibility.md). If your favorite plugin is not
-supported, please let us know.
 
 ------------------------------------------------------------------------
 

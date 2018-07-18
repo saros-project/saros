@@ -34,27 +34,31 @@ title: Coding and Commit Guidelines
     line to make it easier for people to understand what your commit was
     about:
 
-* `[NOP]` - This commit did not have any effect and only concerns whitespace, removing unused methods, fixing documentation typos, etc.
-* `[TASK]` (includes: `[NOP]`) - Adds things that need to be done.
-* `[DOC]` (includes: `[TASK]`) - Improves JavaDocs or comments.
-* `[INTERNAL]` (includes: `[DOC]`) - Only affects the details of the implementation without any effects to users of the component.
-* `[API]` (includes: `[INTERNAL]`) - Affects the interface or dependencies of a component without creating any new functionality or fixing an existing bug.
-* `[REFACTOR]` - `API` or `INTERNAL` changes, which are done using automated tool support. So while `REFACTOR` changes usually result in large diffs, they are not very error prone. Caution: A refactoring should always be a separate patch, because refactorings are very hard to read.
-* (`[FIX]` \| `[FIX] #bug id`) (includes: `[INTERNAL]`) - Fixes a bug. If existing, please attach the SourceForge bug tracker ID.
-* (`[FEATURE]`\|`[FEATURE] #feature id`) (includes: `[INTERNAL]`) - Improves the functionality of the software. If existing, please attach the SourceForge feature tracker ID.
-* `[LOG]` (includes: `[DOC]`) - Improves Logging with Log4j.
-* `[UI]` (includes: `[INTERNAL]`) - Improvements to the user interface.
-* (`[JUNIT]`\|`[STF]`) (includes: `[INTERNAL]`) - Improves testing -- either JUnit tests or STF tests.
-* `[BUILD]` (includes: `[TASK]`) - Changes the way how the sources are compiled or distributed, e.g. changes to build scripts, MANIFEST files, or update sites.
+|Tag|Includes|Description 
+|----------|----------|-----------------------------------
+|`[NOP]`|          | This commit did not have any effect and only concerns whitespace, removing unused methods, fixing documentation typos, etc.
+|`[TASK]`  | `[NOP]` | Adds things that need to be done.
+|`[DOC]`   | `[TASK]` | Improves JavaDocs or comments.
+|`[INTERNAL]` | `[DOC]` | Only affects the details of the implementation without any effects to users of the component.
+|`[API]` | `[INTERNAL]` | Affects the interface or dependencies of a component without creating any new functionality or fixing an existing bug.
+|`[REFACTOR]` | |`API` or `INTERNAL` changes, which are done using automated tool support. So while `REFACTOR` changes usually result in large diffs, they are not very error prone. Caution: A refactoring should always be a separate patch, because refactorings are very hard to read.
+|(`[FIX]` \| `[FIX] #bug id`) | `[INTERNAL]` | Fixes a bug. If existing, please attach the SourceForge bug tracker ID.
+|(`[FEATURE]`\|`[FEATURE] #feature id`) | `[INTERNAL]` | Improves the functionality of the software. If existing, please attach the SourceForge feature tracker ID.
+|`[LOG]` | `[DOC]` | Improves Logging with Log4j.
+|`[UI]` | `[INTERNAL]` | Improvements to the user interface.
+|(`[JUNIT]`\|`[STF]`) | `[INTERNAL]` | Improves testing -- either JUnit tests or STF tests.
+|`[BUILD]` | `[TASK]` | Changes the way how the sources are compiled or distributed, e.g. changes to build scripts, MANIFEST files, or update sites.
 
  The following **scope tags** can (and should) be used in addition to
  make it easier to track what part of Saros your commit is changing.
 
-* `[E]`    - This commit ONLY affects the Eclipse version of Saros
-* `[I]`    - IntelliJ version of Saros
-* `[S]`    - Saros Server
-* `[HTML]` - Saros HTML UI
-* `[CORE]` - Saros core
+|Tag|Description
+|---|----------------------------
+|`[E]`|    This commit ONLY affects the Eclipse version of Saros
+|`[I]`|    IntelliJ version of Saros
+|`[S]`|    Saros Server
+|`[HTML]`| Saros HTML UI
+|`[CORE]`| Saros core
 
 Example usage: `[INTERNAL][I]` = Only affects the details of the
 implementation in IntelliJ.

@@ -174,7 +174,7 @@ details for these tasks follow below.
             uses the previous Saros release. This information is
             important in the releasing process that follows.
 
-    2.  \(b) As soon as the RMs completed their **Changelog**, the
+    2.  (b) As soon as the RMs completed their **Changelog**, the
         **![](http://icons.iconarchive.com/icons/icons-land/vista-people/16/Occupations-Writer-Male-Light-icon.png)DM**
         adds new documentation issues, prioritizes and assigns them to
         the developers.
@@ -343,9 +343,9 @@ development for the next release, `14.1.31`.
 
 ### How to prepare the User Acceptance Test
 
-Note: There is actually no need for the "update\_beta" project. We
+Note: There is actually no need for the `update_beta` project. We
 should use the normal "update" project instead, which will then be
-changed twice on the release branch, and delete the update\_beta project
+changed twice on the release branch, and delete the `update_beta` project
 once the HowTo below is adapted.
 
 #### Preconditions
@@ -493,7 +493,7 @@ Note: This section needs an update to include the Core project.
     b.  Update plugin version of feature
         1.  Go to tab *Plug-ins*
         2.  Make sure
-            `de.fu_berlin.inf.dpp.core, `de.fu\_berlin.inf.dpp, and
+            `de.fu_berlin.inf.dpp.core`, `de.fu_berlin.inf.dpp`, and
             `de.fu_berlin.inf.dpp.whiteboard` are included
         3.  For all projects, click on *Versions...*
         4.  Select *Copy versions from plugin and fragment manifests*

@@ -12,23 +12,23 @@ This is very roughly how Saros happened:
     in the [group of Prof. Lutz Prechelt at Freie Universität
     Berlin](http://www.inf.fu-berlin.de/w/SE)) in early 2006: Wouldn't
     it be great if both members of a pair programming team could each
-    use their own machine?\
+    use their own machine?
     They would not even strictly need to be in the same room then
     (assuming some voice connection is present)!
 *   He convinced his colleague **Christopher Özbek** and they decided to
     issue a topic for a diploma thesis that called for building a
     prototype of such a tool.
 *   **Riad Djemili** took up the topic and developed the first version
-    of Saros as an Eclipse plugin.\
+    of Saros as an Eclipse plugin.
     It had a strict driver/observer model (with token handover) but
     worked reasonably well and had a strong-enough architecture to build
     upon it.
 *   Christopher and Stephan decided Saros was worth pursuing and started
-    working with a long string of students to extend and improve it:\
+    working with a long string of students to extend and improve it:
     During 2008 to 2010, we added many things to Saros: concurrent
     editing, VoIP, screen sharing, a whiteboard for sketching,
     multi-project support, dynamic adding of files, text chat, NAT
-    traversal, and various other functionality.\
+    traversal, and various other functionality.
     Most of it initially did not work or was otherwise deficient (e.g
     too cryptic to find, too minimal, or plain crappy).
 *   At the end of that extension period, Saros was fairly large, but
@@ -38,7 +38,7 @@ This is very roughly how Saros happened:
     Fixing the nasty bugs, re-simplifying the now-contrived architecture
     that had provoked many of those defects, kicking out much of the
     non-core functionality the usefulness of which did not pay for its
-    maintenance burden (in particular VoIP and screensharing), etc.\
+    maintenance burden (in particular VoIP and screensharing), etc.
     Meanwhile, the senior people also changed: Christopher left and
     others took over the chief architect role from him, in particular
     **Franz Zieris**.
@@ -51,7 +51,7 @@ This is very roughly how Saros happened:
     is today.
 *   At the end of this consolidation work, we are proud to say Saros is
     now an industrial-strength tool for synchronous distributed
-    collaborative work.\
+    collaborative work.
     And we built this interactive, framework-heavy, real-time,
     distributed/concurrent (summing up: difficult) software with mostly
     inexperienced developers and a staff turnover of around 150% a year.
@@ -63,7 +63,7 @@ This is very roughly how Saros happened:
     concurrency logic).
 *   An independent core also allows building session-compatible variants
     of Saros for other IDEs and we are now beginning to do this for
-    IntelliJ IDEA.\
+    IntelliJ IDEA.
     Lithuanian outsourcing provider [NFQ](http://nfq.com) is sponsoring
     this development by paying for a full-time developer, because they
     want to use Saros to introduce an [Agile

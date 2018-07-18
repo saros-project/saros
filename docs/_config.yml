@@ -1,9 +1,10 @@
 title: Saros
-subtitle: Distributed Party Programming
+subtitle: Distributed Collaborative Programming
 description: >- 
   Homepage of Saros, an IDE plugin which enabled users to
   participate in distributed pair programming sessions.
 
+repository: saros-project/saros
 twitter:
   username: saros_project
 

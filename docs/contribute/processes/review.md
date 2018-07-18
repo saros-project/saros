@@ -67,7 +67,7 @@ code. This rigid process serves a dual purpose:
 #### b) Format of your pull request
 
 *   Write a **concise commit message** following our
-    [guidelines](coderules.1.md#before_committing). If you have
+    [guidelines](../guidelines.md). If you have
     trouble finding one single descriptive type tag for your commit, you
     probably mixed up different concerns and should address them in
     separate pull requests instead.

@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,maximum-scale=2">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/jekyll-theme-slate.css' | relative_url }}">
     <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/style.css' | relative_url }}">
 
 {% seo %}
@@ -52,19 +53,8 @@
     <div id="footer_wrap" class="outer">
       <footer class="inner">
         <div id="copyright">Copyright &copy; {{ site.time | date: '%Y' }}, <a href="{{ '/documentation/history.html' | relative_url }}">Saros Team</a></div>
-        <a href="http://www.mi.fu-berlin.de/fb/impressum/" id="impressum" target="_blank">Impressum</a>
+        <a href="http://www.mi.fu-berlin.de/fb/impressum/" id="impressum" target="_blank">Imprint</a>
       </footer>
     </div>
-
-    {% if site.google_analytics %}
-      <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-        ga('create', '{{ site.google_analytics }}', 'auto');
-        ga('send', 'pageview');
-      </script>
-    {% endif %}
   </body>
 </html>

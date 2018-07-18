@@ -36,13 +36,13 @@ You need an **XMPP account** to use Saros.
 
 1.  You can **create a new account** within Saros by using the
     FU-Berlin servers.
-2.  You can **use an existing account.**\
+2.  You can **use an existing account.**
     For example your Google, GMX, or web.de mail address. **They are
-    valid XMPP accounts**.\
+    valid XMPP accounts**.
     To use your Google account you have to allow less secure apps access
-    your account, see\
-    <https://support.google.com/accounts/answer/6010255?hl=en>\
-    Unfortunately, gmx and web.de accounts do not work currently.\
+    your account, see
+    <https://support.google.com/accounts/answer/6010255?hl=en>
+    Unfortunately, gmx and web.de accounts do not work currently.
      
 
 To do that simply start the *Saros Configuration* wizard (*Menu &gt;
@@ -57,7 +57,7 @@ Server](images/1_GettingStartedCreateAccount_0.png)
 To add a contact to your list you need to **know his/her XMPP ID**.
 
 **After entering your partner's XMPP ID**, a message will be sent to
-your contact.\
+your contact.
 Once s/he accepts your request you will be able to see his/her **online
 status in your contact list**.
 
@@ -75,11 +75,11 @@ computer of your invited contacts.
 ![Share
 Projects](images/3_GettingStartedShareProjects_0.png)
 
-#### a) Start a session ([host](GettingStarted.md#Step%200:%20The%20Host))
+#### Start a session ([host](#the-host))
 
-1.  Right-click on...\
+1.  Right-click on...
     a.  a **project** in your **Package Explorer** and select *Share
-        With*\
+        With*
         or
     b.  a **contact** in the **Saros View** and select *Work Together
         on*
@@ -89,11 +89,11 @@ Projects](images/3_GettingStartedShareProjects_0.png)
 Want to know more about the Saros host role? Check out our comic
 [here](host-comic.md).
 
-#### b) Join a session (client)
+#### Join a session (client)
 
 1.  Wait for a **session invitation** to appear on your screen
 2.  Click *Accept* to **accept the invitation**
-3.  Tell Saros **where to save the incoming project**:\
+3.  Tell Saros **where to save the incoming project**:
     a.  You can create a **new project**, or
     b.  synchronize with an **already existing project** on
         your computer.
@@ -129,7 +129,7 @@ Saros sessions.
 
 When you are in a Saros session you will see all **participants in the
 session list**. Saros also provides **instant chat messaging** to
-accompany your sessions.\
+accompany your sessions.
 Whenever you begin a Saros session, a **chat session** is also
 automatically started.
 
@@ -137,7 +137,7 @@ automatically started.
 
 ### Step 5: Exploring the Saros Toolbar
 
-#### a) General
+#### General
 
 ![connect
 button](images/saros_connect_button.png)**Connecting:**
@@ -183,10 +183,10 @@ followed user sees.
 session:**
 
 Click here to leave the current session. If you are the
-[host](GettingStarted.md#Step%200:%20The%20Host), the session will be
+[host](#the-host), the session will be
 closed and all participants will be ejected from the session.
 
-#### b) Context Menu
+#### Context Menu
 
 ![write
 access](images/buddy_saros_obj.png)**Grant Write
@@ -205,11 +205,9 @@ affected participant will only have read access afterwards.
 icon](images/followmode_0.png)**Follow
 Participant:**
 
-Follows the selected participant as described in section [Follow
-Mode](GettingStarted.md#Good%20to%20Know:%20Follow_Mode).
+Follows the selected participant as described in section [Follow Mode](#follow-mode).
 
-![jump icon](images/jump.png)**Jump to
-Position:**
+![jump icon](images/jump.png)**Jump to Position:**
 
 Jumps to the cursor position of the selected participant and open the
 corresponding file if necessary.
@@ -228,7 +226,7 @@ participant.
 
 ### Good to know
 
-#### a) User Roles
+#### User Roles
 
 By default all participants of a session have **writing access**. To
 restrict or grant this access to other participants, right-click on that
@@ -236,7 +234,7 @@ user in the session list and select *Restrict to read-only access* or
 *Grant writing access*. This can **only be done by the
 host**.
 
-#### b) Follow Mode
+#### Follow Mode
 
 You can use this feature to follow a single participant as s/he
 navigates the project and performs changes. When you follow a
@@ -249,16 +247,15 @@ participant:
 -   As s/he scrolls through a file, the viewpoint is moved on your
     computer also, so that you see what s/he sees.
 
-#### c) Staying Aware of your Fellow Participants
+#### Staying Aware of your Fellow Participants
 
 There are multiple ways of staying aware of what a driver is currently
 doing:
 
 -   In the package explorer (or resource navigator):
-    -   ![active file](images/active_file.png) A
-        colored dot decorates the file that a participant has currently
+    - ![active file](images/active_file.png) A colored dot decorates the file that a participant has currently
         in focus. The color resembles the color of the active user.
-    -   ![shared file](images/shared_file.png) A
+    - ![shared file](images/shared_file.png) A
         blue arrow decorates a file that is shared with
         other participants.
 -   Cursors:

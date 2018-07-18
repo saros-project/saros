@@ -81,9 +81,6 @@ or from within Eclipse:
     10.6.25.r2236](https://sourceforge.net/projects/dpp/files/Saros/DPP%2010.6.25.r2236/)
 *   Saros is by-and-large compatible with almost all other
     Eclipse plug-ins.
-*   We have tested it successfully with sizeable Eclipse installations
-    with substantial numbers of plug-ins (see [compatible
-    plugins](compatibility.md).)
 *   In our tests, we mainly use Windows (7 and 10), Linux (Ubuntu) and
     Mac OS X (10.6). In Mac OS X 10.6 you will need Eclipse 3.5 64bit
     version
