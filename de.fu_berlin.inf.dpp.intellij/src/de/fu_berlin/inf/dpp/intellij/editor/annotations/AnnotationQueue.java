@@ -5,7 +5,7 @@ import de.fu_berlin.inf.dpp.session.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 
@@ -17,7 +17,7 @@ import java.util.Queue;
  *
  * @param <E> the stored annotation type
  */
-class QueueAnnotationStore<E extends AbstractEditorAnnotation>
+class AnnotationQueue<E extends AbstractEditorAnnotation>
     extends AnnotationStore<E> {
 
     private final Queue<E> annotationQueue;
@@ -30,7 +30,7 @@ class QueueAnnotationStore<E extends AbstractEditorAnnotation>
      *
      * @param maxSize the capacity of the annotation store.
      */
-    QueueAnnotationStore(int maxSize) {
+    AnnotationQueue(int maxSize) {
         super();
 
         if (maxSize < 1) {
@@ -41,7 +41,7 @@ class QueueAnnotationStore<E extends AbstractEditorAnnotation>
 
         this.maxSize = maxSize;
 
-        this.annotationQueue = new LinkedList<>();
+        this.annotationQueue = new ArrayDeque<>(maxSize);
     }
 
     /**
