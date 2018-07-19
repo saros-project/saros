@@ -66,24 +66,6 @@ class AnnotationQueue<E extends AbstractEditorAnnotation>
     }
 
     /**
-     * Returns the current size of the annotation queue.
-     *
-     * @return the current size of the annotation queue
-     */
-    int getSize() {
-        return annotationQueue.size();
-    }
-
-    /**
-     * Returns the maximum size of the annotation queue.
-     *
-     * @return the maximum size of the annotation queue
-     */
-    int getMaxSize() {
-        return maxSize;
-    }
-
-    /**
      * Adds the given annotation to the annotation store.
      * <p>
      * {@link #removeIfFull()} should always be called before this method to
