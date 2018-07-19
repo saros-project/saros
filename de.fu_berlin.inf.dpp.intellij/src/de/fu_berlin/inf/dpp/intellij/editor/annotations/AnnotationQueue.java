@@ -45,16 +45,16 @@ class AnnotationQueue<E extends AbstractEditorAnnotation>
     }
 
     /**
-     * Removes and returns the last element of the annotation queue if the queue
-     * has reached its maximum size.
+     * Removes and returns the oldest element of the annotation queue if the
+     * queue has reached its maximum size.
      * <p>
      * <b>NOTE:</b> This does not remove the annotation from the local editor.
      * </p>
      * This method should always be called before
      * {@link #addAnnotation(AbstractEditorAnnotation)}.
      *
-     * @return the last element of the annotation queue if the queue has reached
-     * its maximum size or <code>null</code> otherwise
+     * @return the oldest element of the annotation queue if the queue has
+     * reached its maximum size or <code>null</code> otherwise
      */
     @Nullable
     E removeIfFull() {
