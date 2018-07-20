@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 public class IncomingStreamProtocol extends AbstractStreamProtocol {
 
     private static final Logger log = Logger
-        .getLogger(OutgoingStreamProtocol.class);
+        .getLogger(IncomingStreamProtocol.class);
 
     private DataInputStream in;
 
@@ -34,7 +34,7 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol {
     /**
      * Receive Files from {@code InputStream in} via in
      * {@link AbstractStreamProtocol} defined protocol.
-     *
+     * 
      * @throws IOException
      *             if any file or stream operation fails
      * @throws LocalCancellationException
