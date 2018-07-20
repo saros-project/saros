@@ -35,14 +35,18 @@ public class AnnotationManager {
         SELECTION_ANNOTATION, CONTRIBUTION_ANNOTATION
     }
 
+    private static final int MAX_CONTRIBUTION_ANNOTATIONS = Integer
+        .getInteger("saros.intellij.MAX_CONTRIBUTION_ANNOTATIONS", 50);
+
     private final AnnotationStore<SelectionAnnotation> selectionAnnotationStore;
-    private final AnnotationStore<ContributionAnnotation> contributionAnnotationStore;
+    private final AnnotationQueue<ContributionAnnotation> contributionAnnotationQueue;
 
     private final Application application;
 
     public AnnotationManager() {
         this.selectionAnnotationStore = new AnnotationStore<>();
-        this.contributionAnnotationStore = new AnnotationStore<>();
+        this.contributionAnnotationQueue = new AnnotationQueue<>(
+            MAX_CONTRIBUTION_ANNOTATIONS);
 
         this.application = ApplicationManager.getApplication();
     }
@@ -120,7 +124,6 @@ public class AnnotationManager {
      * @param start  the starting position of the annotation
      * @param end    the ending position of the annotation
      */
-    //TODO only save last X contribution annotations, rotate out older ones
     public void addContributionAnnotation(
         @NotNull
             User user,
@@ -161,7 +164,14 @@ public class AnnotationManager {
         ContributionAnnotation contributionAnnotation = new ContributionAnnotation(
             user, file, editor, annotationRanges);
 
-        contributionAnnotationStore.addAnnotation(contributionAnnotation);
+        ContributionAnnotation dequeuedAnnotation = contributionAnnotationQueue
+            .removeIfFull();
+
+        if (dequeuedAnnotation != null) {
+            removeRangeHighlighter(dequeuedAnnotation);
+        }
+
+        contributionAnnotationQueue.addAnnotation(contributionAnnotation);
     }
 
     /**
@@ -199,7 +209,7 @@ public class AnnotationManager {
         moveAnnotationsAfterAddition(
             selectionAnnotationStore.getAnnotations(file), start, end);
         moveAnnotationsAfterAddition(
-            contributionAnnotationStore.getAnnotations(file), start, end);
+            contributionAnnotationQueue.getAnnotations(file), start, end);
     }
 
     /**
@@ -296,10 +306,10 @@ public class AnnotationManager {
             .forEach(selectionAnnotationStore::removeAnnotation);
 
         List<ContributionAnnotation> emptyContributionAnnotations = moveAnnotationsAfterDeletion(
-            contributionAnnotationStore.getAnnotations(file), start, end);
+            contributionAnnotationQueue.getAnnotations(file), start, end);
 
         emptyContributionAnnotations
-            .forEach(contributionAnnotationStore::removeAnnotation);
+            .forEach(contributionAnnotationQueue::removeAnnotation);
     }
 
     /**
@@ -409,7 +419,7 @@ public class AnnotationManager {
             selectionAnnotationStore.getAnnotations(file), editor);
 
         addLocalRepresentationToAnnotations(
-            contributionAnnotationStore.getAnnotations(file), editor);
+            contributionAnnotationQueue.getAnnotations(file), editor);
     }
 
     /**
@@ -478,7 +488,7 @@ public class AnnotationManager {
             IFile file) {
 
         updateAnnotationStore(selectionAnnotationStore, file);
-        updateAnnotationStore(contributionAnnotationStore, file);
+        updateAnnotationStore(contributionAnnotationQueue, file);
     }
 
     /**
@@ -530,7 +540,7 @@ public class AnnotationManager {
         selectionAnnotationStore.getAnnotations(file)
             .forEach(AbstractEditorAnnotation::removeLocalRepresentation);
 
-        contributionAnnotationStore.getAnnotations(file)
+        contributionAnnotationQueue.getAnnotations(file)
             .forEach(AbstractEditorAnnotation::removeLocalRepresentation);
     }
 
@@ -550,7 +560,7 @@ public class AnnotationManager {
         selectionAnnotationStore.removeAnnotations(user)
             .forEach(this::removeRangeHighlighter);
 
-        contributionAnnotationStore.removeAnnotations(user)
+        contributionAnnotationQueue.removeAnnotations(user)
             .forEach(this::removeRangeHighlighter);
     }
 
@@ -562,7 +572,7 @@ public class AnnotationManager {
         selectionAnnotationStore.removeAllAnnotations()
             .forEach(this::removeRangeHighlighter);
 
-        contributionAnnotationStore.removeAllAnnotations()
+        contributionAnnotationQueue.removeAllAnnotations()
             .forEach(this::removeRangeHighlighter);
     }
 
