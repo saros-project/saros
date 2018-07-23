@@ -184,5 +184,22 @@ public interface ISarosPreferences extends Remote {
      */
     public void disableIBBOnlyTransfer() throws RemoteException;
 
+    /**
+     * Checks the button Prefer Instant Session Start in the Saros advanced
+     * preferences. This setting is applied at next Project Negotiation.
+     * 
+     * @throws RemoteException
+     */
+    public void preferInstantSessionStart() throws RemoteException;
+
+    /**
+     * Unchecks the button Prefer Instant Session Start in the Saros advanced
+     * preferences, which leads to Archive Mode. This setting is applied at next
+     * Project Negotiation.
+     * 
+     * @throws RemoteException
+     */
+    public void preferArchiveSessionStart() throws RemoteException;
+
     public void restoreDefaults() throws RemoteException;
 }
