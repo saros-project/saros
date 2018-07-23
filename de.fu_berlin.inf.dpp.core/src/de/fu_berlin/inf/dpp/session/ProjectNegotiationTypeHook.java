@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.session;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -10,13 +10,18 @@ import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 
 /**
  * Hooks for negotiating the used {@link TransferType} to determine a strategy
  * used between two {@link User}s to transfer files during a project
  * negotiation.
- * 
- * Currently only {@link #TYPE_ARCHIVE} exists and is always selected.
+ * <p>
+ * Host and Client tell a preference, the host decides if they are the same and
+ * use it. Otherwise defaults to Archive. This approach is good enough and works
+ * best for two supported types, like now {@link TransferType#ARCHIVE} and
+ * {@link TransferType#INSTANT}.
+ * </p>
  */
 public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
     private static final String HOOK_IDENTIFIER = "projectNegotiationTypeHook";
@@ -25,11 +30,16 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
     public static final String KEY_TYPE = "projectNegotiationType";
 
     private static final String TYPE_ARCHIVE = TransferType.ARCHIVE.name();
+    private static final String TYPE_INSTANT = TransferType.INSTANT.name();
 
     private static final Logger LOG = Logger
         .getLogger(ProjectNegotiationTypeHook.class);
 
-    public ProjectNegotiationTypeHook(SessionNegotiationHookManager hookManager) {
+    private Preferences localPref;
+
+    public ProjectNegotiationTypeHook(
+        SessionNegotiationHookManager hookManager, Preferences localPref) {
+        this.localPref = localPref;
         hookManager.addHook(this);
     }
 
@@ -40,56 +50,38 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
 
     @Override
     public Map<String, String> tellHostPreferences() {
-        Map<String, String> hostPreferences = new HashMap<String, String>();
-        // Currently the host does have a general preference, that is used
-        // if the client indicates support as well. Otherwise a fallback shall
-        // be used.
-        // In future multiple TransferTypes might require the client to send
-        // a list of supported types instead of one preference.
-        hostPreferences.put(KEY_PREFERRED_TYPE, TYPE_ARCHIVE);
-        return hostPreferences;
+        return getLocalPreference();
     }
 
     @Override
     public Map<String, String> tellClientPreferences() {
-        Map<String, String> clientPreferences = new HashMap<String, String>();
-        // The clients preferences may enable more advanced transfer types,
-        // if the host agrees. The host decides upon the final transfer type
-        // and might choose a generally supported fallback instead.
-        clientPreferences.put(KEY_PREFERRED_TYPE, TYPE_ARCHIVE);
-        return clientPreferences;
+        return getLocalPreference();
     }
 
     @Override
     public Map<String, String> considerClientPreferences(JID client,
         Map<String, String> input) {
-        if (input == null) {
+        if (input == null || !input.containsKey(KEY_PREFERRED_TYPE)) {
             LOG.warn("The client did not indicate any transfer type "
                 + "preferences. This could be an indication for a version "
                 + "mismatch.");
             return null;
         }
 
-        Map<String, String> finalParameters = new HashMap<String, String>();
-
-        // A new transfer type should be selected here,
-        // if the client indicates support/preference and the host does as well.
-        // Archive should currently always be the field-tested fallback.
-
-        if (input.get(KEY_PREFERRED_TYPE).equals(
-            tellHostPreferences().get(KEY_PREFERRED_TYPE))) {
-            finalParameters.put(KEY_TYPE, input.get(KEY_PREFERRED_TYPE));
-        } else {
-            finalParameters.put(KEY_TYPE, TYPE_ARCHIVE);
+        /* if both prefer the same type, set it */
+        String inputType = input.get(KEY_PREFERRED_TYPE);
+        if (inputType.equals(tellHostPreferences().get(KEY_PREFERRED_TYPE))) {
+            return Collections.singletonMap(KEY_TYPE, inputType);
         }
 
-        return finalParameters;
+        /* otherwise Archive should currently be the field-tested fallback */
+        return Collections.singletonMap(KEY_TYPE, TYPE_ARCHIVE);
     }
 
     @Override
     public void applyActualParameters(Map<String, String> input,
         IPreferenceStore hostPreferences, IPreferenceStore clientPreferences) {
-        if (input == null) {
+        if (input == null || !input.containsKey(KEY_TYPE)) {
             LOG.warn("The host did not set any parameters. This may be caused"
                 + "if the client did not indicate any transfer type "
                 + "preferences to begin with."
@@ -98,10 +90,27 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
             return;
         }
 
-        TransferType type = TransferType.valueOf(input.get(KEY_TYPE));
+        TransferType type;
+        try {
+            type = TransferType.valueOf(input.get(KEY_TYPE));
+        } catch (IllegalArgumentException e) {
+            LOG.warn("The client send a unknown transfer type: '"
+                + input.get(KEY_TYPE)
+                + "'! This could be an indication for a version mismatch.");
+            return;
+        }
+
         hostPreferences.setValue(KEY_TYPE, type.name());
         if (clientPreferences != null) {
             clientPreferences.setValue(KEY_TYPE, type.name());
         }
+    }
+
+    private Map<String, String> getLocalPreference() {
+        if (localPref != null && localPref.isInstantSessionStartPreferred()) {
+            return Collections.singletonMap(KEY_PREFERRED_TYPE, TYPE_INSTANT);
+        }
+
+        return Collections.singletonMap(KEY_PREFERRED_TYPE, TYPE_ARCHIVE);
     }
 }
