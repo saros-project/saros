@@ -10,16 +10,16 @@
         {% if link.sublinks %}
 
         <li class="{{ class }}">
-            <a  href="{{ site.url }}{{ link.url }}">{{ link.title }}</a>
+            <a  href="{{ link.url | absolute_url }}">{{ link.title }}</a>
             <ul>
                 {% for sublink in link.sublinks %}
-                <li><a href="{{ site.url }}{{ sublink.url }}">{{ sublink.title }}</a></li>
+                <li><a href="{{ sublink.url | absolute_url }}">{{ sublink.title }}</a></li>
                 {% endfor %}
             </ul>
         </li>
         {% else %}
         <li  class="nav-item {{ class }}">
-            <a class="nav-link" href="{{ site.url }}{{ link.url }}">{{ link.title }}</a>
+            <a class="nav-link" href="{{ link.url | absolute_url }}">{{ link.title }}</a>
         </li>
         {% endif %}
         {% endfor %}
