@@ -7,5 +7,5 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("TT")
 public enum TransferType {
-    ARCHIVE
+    ARCHIVE, INSTANT
 }

@@ -120,12 +120,18 @@ public final class NegotiationFactory {
 
         switch (transferType) {
         case ARCHIVE:
-            return new ArchiveOutgoingProjectNegotiation(remoteAddress, resources,
-                sessionManager, session, /* editorManager */
+            return new ArchiveOutgoingProjectNegotiation(remoteAddress,
+                resources, sessionManager, session, /* editorManager */
+                context.getComponent(IEditorManager.class), workspace,
+                checksumCache, connectionService, transmitter, receiver);
+        case INSTANT:
+            return new InstantOutgoingProjectNegotiation(remoteAddress,
+                resources, sessionManager, session, /* editorManager */
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);
         default:
-            throw new UnsupportedOperationException("transferType not implemented");
+            throw new UnsupportedOperationException(
+                "transferType not implemented");
         }
     }
 
@@ -141,12 +147,18 @@ public final class NegotiationFactory {
 
         switch (transferType) {
         case ARCHIVE:
-            return new ArchiveIncomingProjectNegotiation(remoteAddress, negotiationID,
-                projectNegotiationData, sessionManager, session,
+            return new ArchiveIncomingProjectNegotiation(remoteAddress,
+                negotiationID, projectNegotiationData, sessionManager, session,
+                fileReplacementInProgressObservable, workspace, checksumCache,
+                connectionService, transmitter, receiver);
+        case INSTANT:
+            return new InstantIncomingProjectNegotiation(remoteAddress,
+                negotiationID, projectNegotiationData, sessionManager, session,
                 fileReplacementInProgressObservable, workspace, checksumCache,
                 connectionService, transmitter, receiver);
         default:
-            throw new UnsupportedOperationException("transferType not implemented");
+            throw new UnsupportedOperationException(
+                "transferType not implemented");
         }
     }
 }
