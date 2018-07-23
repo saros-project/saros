@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ActivityQueuerTest {
+public class ProjectActivityQueuerTest {
 
   private static final User ALICE = new User(new JID("Alice"), true, true, 0, 0);
   private static final User BOB = new User(new JID("Bob"), false, false, 0, 0);
@@ -40,7 +40,7 @@ public class ActivityQueuerTest {
   private static SPath BAR_PATH_SHARED_PROJECT;
   private static SPath PATH_TO_NOT_SHARED_PROJECT;
 
-  private ActivityQueuer activityQueuer;
+  private ProjectActivityQueuer activityQueuer;
 
   @BeforeClass
   public static void prepare() {
@@ -56,7 +56,7 @@ public class ActivityQueuerTest {
 
   @Before
   public void setUp() {
-    activityQueuer = new ActivityQueuer();
+    activityQueuer = new ProjectActivityQueuer();
   }
 
   @Test
@@ -204,7 +204,7 @@ public class ActivityQueuerTest {
 
     List<IActivity> activities;
 
-    activityQueuer = new ActivityQueuer();
+    activityQueuer = new ProjectActivityQueuer();
     activityQueuer.enableQueuing(SHARED_PROJECT);
 
     activityQueuer.process(Collections.singletonList(fooJupiterADO));
@@ -224,7 +224,7 @@ public class ActivityQueuerTest {
 
     // ------------------------------------------
 
-    activityQueuer = new ActivityQueuer();
+    activityQueuer = new ProjectActivityQueuer();
     activityQueuer.enableQueuing(SHARED_PROJECT);
 
     activityQueuer.process(Collections.singletonList(fooClosedEditorADO));
@@ -240,7 +240,7 @@ public class ActivityQueuerTest {
 
     // ------------------------------------------
 
-    activityQueuer = new ActivityQueuer();
+    activityQueuer = new ProjectActivityQueuer();
     activityQueuer.enableQueuing(SHARED_PROJECT);
 
     activityQueuer.process(Collections.singletonList(fooSavedEditorADO));
@@ -256,7 +256,7 @@ public class ActivityQueuerTest {
 
     // ------------------------------------------
 
-    activityQueuer = new ActivityQueuer();
+    activityQueuer = new ProjectActivityQueuer();
     activityQueuer.enableQueuing(SHARED_PROJECT);
 
     activityQueuer.process(Arrays.asList(fooJupiterADO, fooSavedEditorADO, fooClosedEditorADO));
@@ -272,7 +272,7 @@ public class ActivityQueuerTest {
 
     // ------------------------------------------
 
-    activityQueuer = new ActivityQueuer();
+    activityQueuer = new ProjectActivityQueuer();
     activityQueuer.enableQueuing(SHARED_PROJECT);
 
     activityQueuer.process(Arrays.asList(fooJupiterADO, barJupiterADO));
@@ -304,7 +304,7 @@ public class ActivityQueuerTest {
         new JupiterActivity(
             new JupiterVectorTime(0, 0), new NoOperation(), BOB, FOO_PATH_SHARED_PROJECT);
 
-    activityQueuer = new ActivityQueuer();
+    activityQueuer = new ProjectActivityQueuer();
     activityQueuer.enableQueuing(SHARED_PROJECT);
 
     activityQueuer.process(Arrays.asList(aliceJupiterADO, bobJupiterADO));

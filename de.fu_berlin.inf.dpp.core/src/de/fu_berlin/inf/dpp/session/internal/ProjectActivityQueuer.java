@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /** This class enables the queuing of {@linkplain IActivity activities} for given projects. */
-public class ActivityQueuer implements IActivityQueuer {
+public class ProjectActivityQueuer implements IActivityQueuer {
 
   private static class ProjectQueue {
     private final IProject project;
@@ -31,7 +31,7 @@ public class ActivityQueuer implements IActivityQueuer {
 
   private final List<ProjectQueue> projectQueues;
 
-  public ActivityQueuer() {
+  public ProjectActivityQueuer() {
     projectQueues = new ArrayList<ProjectQueue>();
   }
 

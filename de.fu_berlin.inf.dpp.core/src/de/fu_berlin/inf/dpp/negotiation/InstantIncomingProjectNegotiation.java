@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.internal.ActivityQueuer;
+import de.fu_berlin.inf.dpp.session.internal.ProjectActivityQueuer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -37,7 +37,7 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
    *
    * <p>TODO change to resource based queuer
    */
-  private static final ActivityQueuer activityQueuer = new ActivityQueuer();
+  private static final ProjectActivityQueuer activityQueuer = new ProjectActivityQueuer();
 
   public InstantIncomingProjectNegotiation(
       final JID peer, //
