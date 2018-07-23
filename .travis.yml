@@ -1,12 +1,14 @@
 language: java
 sudo: enabled
 
-notifications:
-  email: false
-
 # git history is not needed during build
 git:
   depth: false
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
 
 services: docker
 
