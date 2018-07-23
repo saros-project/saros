@@ -7,14 +7,23 @@ import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.session.IActivityQueuer;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** This class enables the queuing of {@linkplain IActivity activities} for given projects. */
-public class ActivityQueuer {
+/**
+ * This class enables queuing of {@linkplain IActivity activities} for given {@link IProject
+ * IProjects}.
+ *
+ * <p>This Queuer relies on an existing project-to-projectID mapping in session (see {@link
+ * ISarosSession#addProjectMapping(String, IProject)}), otherwise incoming activities cannot be
+ * queued and will be lost.
+ */
+public class ActivityQueuer implements IActivityQueuer {
 
   private static class ProjectQueue {
     private final IProject project;
@@ -34,18 +43,7 @@ public class ActivityQueuer {
     projectQueues = new ArrayList<ProjectQueue>();
   }
 
-  /**
-   * Processes the incoming {@linkplain IActivity activities} and decides which activities should be
-   * queued. All {@linkplain IResourceActivity resource related activities} which relate to a
-   * project that is configured for queuing using {@link #enableQueuing} will be queued. The method
-   * returns all other activities which should not be queued.
-   *
-   * <p>If a flushing of the queue was previously requested by calling {@link #disableQueuing} than
-   * the method will return a list of all queued activities.
-   *
-   * @param activities
-   * @return the activities that are not queued
-   */
+  @Override
   public synchronized List<IActivity> process(final List<IActivity> activities) {
 
     if (projectQueues.isEmpty()) return activities;

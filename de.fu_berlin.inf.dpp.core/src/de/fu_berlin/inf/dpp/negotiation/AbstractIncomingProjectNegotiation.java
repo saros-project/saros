@@ -213,13 +213,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
   protected void cleanup(IProgressMonitor monitor, Map<String, IProject> projectMapping) {
     fileReplacementInProgressObservable.replacementDone();
 
-    /*
-     * TODO Queuing responsibility should be moved to Project
-     * Negotiation, since its the only consumer of queuing
-     * functionality. This will enable a specific Queuing mechanism per
-     * TransferType (see github issue #137).
-     */
-    for (IProject project : projectMapping.values()) session.disableQueuing(project);
+    session.flushQueue();
 
     if (fileTransferManager != null)
       fileTransferManager.removeFileTransferListener(transferListener);

@@ -387,26 +387,15 @@ public interface ISarosSession {
   public void changeColor(int colorID);
 
   /**
-   * FOR INTERNAL USE ONLY !
+   * Register a activity queuer. Effective only at first call as all following calls are ignored.
    *
-   * <p>Starts queuing of incoming {@linkplain IResourceActivity project-related activities}, since
-   * they cannot be applied before their corresponding project is received and extracted.
-   *
-   * <p>That queuing relies on an existing project-to-projectID mapping (see {@link
-   * #addProjectMapping(String, IProject)}), otherwise incoming activities cannot be queued and will
-   * be lost.
-   *
-   * @param project the project for which project-related activities should be queued
-   * @see #disableQueuing
+   * @param activityQueuer
+   * @return true if the activityQueuer was registered successfully
    */
-  public void enableQueuing(IProject project);
+  public boolean registerActivityQueuer(IActivityQueuer activityQueuer);
 
-  /**
-   * FOR INTERNAL USE ONLY !
-   *
-   * <p>Disables queuing for the given project and flushes all queued activities.
-   */
-  public void disableQueuing(IProject project);
+  /** Send a NOPActivity to trigger queue processing. */
+  public void flushQueue();
 
   /**
    * Returns the id of the current session.

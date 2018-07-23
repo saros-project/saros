@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.internal.ActivityQueuer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -30,6 +31,13 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNegotiation {
 
   private static final Logger log = Logger.getLogger(InstantIncomingProjectNegotiation.class);
+
+  /**
+   * the one queuer used for all incoming project negotiations
+   *
+   * <p>TODO change to resource based queuer
+   */
+  private static final ActivityQueuer activityQueuer = new ActivityQueuer();
 
   public InstantIncomingProjectNegotiation(
       final JID peer, //
@@ -57,6 +65,9 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
         connectionService,
         transmitter,
         receiver);
+
+    // Always registers the same, basically a NOP after the first call
+    session.registerActivityQueuer(activityQueuer);
   }
 
   @Override
@@ -76,7 +87,7 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
       session.addProjectMapping(projectID, project);
       /* TODO change queuing to resource based queuing */
-      session.enableQueuing(project);
+      activityQueuer.enableQueuing(project);
     }
 
     transmitter.send(
@@ -93,6 +104,14 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
     for (FileList list : missingFiles) filesMissing += list.getPaths().size();
 
     if (filesMissing > 0) receiveStream(monitor, filesMissing);
+  }
+
+  @Override
+  protected void cleanup(IProgressMonitor monitor, Map<String, IProject> projectMapping) {
+
+    for (IProject project : projectMapping.values()) activityQueuer.disableQueuing(project);
+
+    super.cleanup(monitor, projectMapping);
   }
 
   private void receiveStream(IProgressMonitor monitor, int fileCount)
