@@ -77,7 +77,7 @@ public class SendFileAction extends Action implements Disposable {
 
             if (description != null
                 && description
-                    .startsWith(ProjectNegotiation.ARCHIVE_TRANSFER_ID))
+                    .startsWith(ProjectNegotiation.TRANSFER_ID))
                 return;
 
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {

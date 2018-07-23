@@ -37,7 +37,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     /**
      * Prefix part of the id used in the SMACK XMPP file transfer protocol.
      */
-    public static final String ARCHIVE_TRANSFER_ID = "saros-dpp-pn-server-client-archive/";
+    public static final String TRANSFER_ID = "saros-dpp-pn-server-client-archive/";
 
     /**
      * Delimiter for every Zip entry to delimit the project id from the path
