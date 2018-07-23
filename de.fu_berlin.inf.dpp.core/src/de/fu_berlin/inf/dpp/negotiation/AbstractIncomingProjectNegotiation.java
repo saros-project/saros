@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
@@ -57,6 +59,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     protected boolean running;
 
     private PacketCollector startActivityQueuingRequestCollector;
+
+    TransferListener transferListener = null;
 
     public AbstractIncomingProjectNegotiation(
         final JID peer, //
@@ -182,10 +186,18 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
      * @param monitor
      *      monitor to show progress to the user
      *
-     * @throws IOException, SarosCancellationException
+     * @throws SarosCancellationException
      */
-    protected abstract void setup(IProgressMonitor monitor)
-        throws IOException, SarosCancellationException;
+    protected void setup(IProgressMonitor monitor)
+        throws SarosCancellationException {
+        if (fileTransferManager == null)
+            throw new LocalCancellationException(
+                "not connected to a XMPP server",
+                CancelOption.DO_NOT_NOTIFY_PEER);
+
+        transferListener = new TransferListener(TRANSFER_ID + getID());
+        fileTransferManager.addFileTransferListener(transferListener);
+    }
 
     /**
      * Handle the actual transfer.
@@ -219,6 +231,16 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     protected void cleanup(IProgressMonitor monitor,
         Map<String, IProject> projectMapping) {
         fileReplacementInProgressObservable.replacementDone();
+
+        /*
+         * TODO Move disable queuing responsibility to SarosSession (see todo
+         * in {@link ArchiveIncomingProjectNegotiation#transfer}).
+         */
+        for (IProject project : projectMapping.values())
+            session.disableQueuing(project);
+
+        if (fileTransferManager != null)
+            fileTransferManager.removeFileTransferListener(transferListener);
 
         deleteCollectors();
         monitor.done();
@@ -502,5 +524,42 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     @Override
     public String toString() {
         return "IPN [remote side: " + getPeer() + "]";
+    }
+
+    void awaitTransferRequest() throws SarosCancellationException {
+        LOG.debug(this + ": waiting for incoming transfer request");
+        try {
+            while (!transferListener.hasReceived()) {
+                checkCancellation(CancelOption.NOTIFY_PEER);
+                Thread.sleep(200);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new LocalCancellationException();
+        }
+    }
+
+    static class TransferListener implements FileTransferListener {
+        private String description;
+        private volatile FileTransferRequest request;
+
+        public TransferListener(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public void fileTransferRequest(FileTransferRequest request) {
+            if (request.getDescription().equals(description)) {
+                this.request = request;
+            }
+        }
+
+        public boolean hasReceived() {
+            return this.request != null;
+        }
+
+        public FileTransferRequest getRequest() {
+            return this.request;
+        }
     }
 }
