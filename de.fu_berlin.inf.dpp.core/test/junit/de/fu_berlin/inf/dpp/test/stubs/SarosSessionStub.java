@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
+import de.fu_berlin.inf.dpp.session.IActivityQueuer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -196,16 +197,6 @@ public class SarosSessionStub implements ISarosSession {
   }
 
   @Override
-  public void enableQueuing(IProject project) {
-    throw new RuntimeException("Unexpected call to Stub");
-  }
-
-  @Override
-  public void disableQueuing(IProject project) {
-    throw new RuntimeException("Unexpected call to Stub");
-  }
-
-  @Override
   public void userStartedQueuing(User user) {
     throw new RuntimeException("Unexpected call to Stub");
   }
@@ -242,6 +233,16 @@ public class SarosSessionStub implements ISarosSession {
 
   @Override
   public void removeActivityConsumer(IActivityConsumer consumer) {
+    throw new RuntimeException("Unexpected call to Stub");
+  }
+
+  @Override
+  public void registerActivityQueuer(IActivityQueuer activityQueuer) {
+    throw new RuntimeException("Unexpected call to Stub");
+  }
+
+  @Override
+  public void flushQueue() {
     throw new RuntimeException("Unexpected call to Stub");
   }
 

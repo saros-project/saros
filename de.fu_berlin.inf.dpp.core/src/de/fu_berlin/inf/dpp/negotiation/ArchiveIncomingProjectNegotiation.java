@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.internal.ActivityQueuer;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +36,9 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNegotiation {
 
   private static final Logger LOG = Logger.getLogger(ArchiveIncomingProjectNegotiation.class);
+
+  /** the one queuer used for all incoming project negotiations */
+  private static final ActivityQueuer activityQueuer = new ActivityQueuer();
 
   public ArchiveIncomingProjectNegotiation(
       final JID peer, //
@@ -62,6 +66,9 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
         connectionService,
         transmitter,
         receiver);
+
+    // Always registers the same, basically a NOP after the first call
+    session.registerActivityQueuer(activityQueuer);
   }
 
   @Override
@@ -80,14 +87,9 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
       final String projectID = entry.getKey();
       final IProject project = entry.getValue();
-      /*
-       * TODO Queuing responsibility should be moved to Project
-       * Negotiation, since its the only consumer of queuing
-       * functionality. This will enable a specific Queuing mechanism per
-       * TransferType (see github issue #137).
-       */
+
       session.addProjectMapping(projectID, project);
-      session.enableQueuing(project);
+      activityQueuer.enableQueuing(project);
     }
 
     transmitter.send(
@@ -106,6 +108,14 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
     if (filesMissing) {
       receiveAndUnpackArchive(projectMapping, transferListener, monitor);
     }
+  }
+
+  @Override
+  protected void cleanup(IProgressMonitor monitor, Map<String, IProject> projectMapping) {
+
+    for (IProject project : projectMapping.values()) activityQueuer.disableQueuing(project);
+
+    super.cleanup(monitor, projectMapping);
   }
 
   /** Receives the archive with all missing files and unpacks it. */
