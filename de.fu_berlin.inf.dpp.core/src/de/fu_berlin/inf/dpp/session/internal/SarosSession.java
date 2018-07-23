@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -422,7 +423,7 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void userStartedQueuing(final User user) {
+  public void userStartedQueuing(final User user, Set<SPath> resourcesUnavailable) {
 
     log.info("user " + user + " started queuing projects and can receive IResourceActivities");
 
@@ -438,7 +439,7 @@ public final class SarosSession implements ISarosSession {
             new Runnable() {
               @Override
               public void run() {
-                listenerDispatch.userStartedQueuing(user);
+                listenerDispatch.userStartedQueuing(user, resourcesUnavailable);
               }
             }));
   }

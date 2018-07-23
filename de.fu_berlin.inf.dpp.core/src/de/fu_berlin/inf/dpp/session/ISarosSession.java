@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.session;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -111,8 +112,10 @@ public interface ISarosSession {
    *
    * @host This method may only called by the host.
    * @param user
+   * @param resourcesUnavailable Set of resources the user is currently not able to process
+   *     activities for
    */
-  public void userStartedQueuing(final User user);
+  public void userStartedQueuing(User user, Set<SPath> resourcesUnavailable);
 
   /**
    * Informs all participants and listeners that a user now has finished the Project Negotiation.

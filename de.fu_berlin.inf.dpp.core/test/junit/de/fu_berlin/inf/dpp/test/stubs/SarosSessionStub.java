@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.test.stubs;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -197,7 +198,7 @@ public class SarosSessionStub implements ISarosSession {
   }
 
   @Override
-  public void userStartedQueuing(User user) {
+  public void userStartedQueuing(User user, Set<SPath> resourcesUnavailable) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 

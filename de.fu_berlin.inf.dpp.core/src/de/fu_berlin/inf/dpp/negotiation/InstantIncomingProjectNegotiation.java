@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.internal.ResourceActivityQueuer;
+import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -37,6 +38,9 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
   /** the one queuer used for all incoming project negotiations */
   private static final ResourceActivityQueuer activityQueuer = new ResourceActivityQueuer();
+
+  // TODO remove need of a local IDE write lock
+  private StartHandle localIdeWriteLock;
 
   public InstantIncomingProjectNegotiation(
       final JID peer, //
@@ -73,6 +77,14 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
   protected void transfer(
       IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
+    try {
+      localIdeWriteLock =
+          session.getStopManager().stop(session.getLocalUser(), "Read-only while negotiation!");
+    } catch (InterruptedException e) {
+      log.error("while blocking local ide", e);
+      Thread.currentThread().interrupt();
+    }
+
     /*
      * the user who sends this ProjectNegotiation is now responsible for the
      * resources of the contained projects
@@ -114,6 +126,14 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
     if (missingFilesCount > 0) {
       receiveStream(monitor, missingFilesCount);
     }
+  }
+
+  @Override
+  protected void cleanup(IProgressMonitor monitor, Map<String, IProject> projectMapping) {
+    if (localIdeWriteLock != null) {
+      localIdeWriteLock.start();
+    }
+    super.cleanup(monitor, projectMapping);
   }
 
   private void receiveStream(IProgressMonitor monitor, int fileCount)

@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +24,13 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
   private final byte[] buffer = new byte[BUFFER_SIZE];
 
   private DataOutputStream out;
+  private User remoteUser;
 
-  public OutgoingStreamProtocol(OutputStream out, ISarosSession session, IProgressMonitor monitor) {
+  public OutgoingStreamProtocol(
+      OutputStream out, ISarosSession session, User remoteUser, IProgressMonitor monitor) {
     super(session, monitor);
     this.out = new DataOutputStream(out);
+    this.remoteUser = remoteUser;
   }
 
   /**
@@ -49,6 +53,7 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
     InputStream fileIn = null;
     try {
       fileIn = fileHandle.getContents();
+      session.getConcurrentDocumentServer().setResourceAvailable(remoteUser, file);
       int readBytes = 0;
       /* buffer the file content and send to stream */
       while (readBytes != -1) {

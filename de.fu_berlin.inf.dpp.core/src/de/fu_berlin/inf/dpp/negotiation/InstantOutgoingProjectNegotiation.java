@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
@@ -58,7 +57,6 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
         }
       };
 
-  private List<StartHandle> stoppedUsers = null;
   private User remoteUser = null;
 
   public InstantOutgoingProjectNegotiation(
@@ -104,8 +102,6 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   protected void prepareTransfer(IProgressMonitor monitor, List<FileList> fileLists)
       throws IOException, SarosCancellationException {
 
-    /* until further patch, lock the complete session */
-    stoppedUsers = stopUsers(monitor);
     sendAndAwaitActivityQueueingActivation(monitor);
 
     remoteUser = session.getUser(getPeer());
@@ -125,14 +121,22 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
             CancelOption.NOTIFY_PEER);
     }
 
-    createTransferList(fileLists, fileCount);
-    transmittedFiles = new HashSet<SPath>(fileCount * 2);
+    if (fileCount > 0) {
+      createTransferList(fileLists, fileCount);
+      transmittedFiles = new HashSet<>(fileCount * 2);
+    }
+
+    // add User to Activity Processing
+    session.userStartedQueuing(remoteUser, transferList);
+    userFinishedProjectNegotiation();
   }
 
   @Override
   protected void transfer(IProgressMonitor monitor, List<FileList> fileLists)
       throws SarosCancellationException, IOException {
-    if (transferList.isEmpty()) return;
+    if (transferList == null || transferList.isEmpty()) {
+      return;
+    }
 
     log.debug(this + ": file transfer start");
     assert fileTransferManager != null;
@@ -150,7 +154,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
     try {
       OutgoingStreamProtocol osp;
-      osp = new OutgoingStreamProtocol(out, session, monitor);
+      osp = new OutgoingStreamProtocol(out, session, remoteUser, monitor);
 
       /* id in description needed to bypass SendFileAction handler */
       String streamName = TRANSFER_ID_PREFIX + getID();
@@ -173,9 +177,6 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   @Override
   protected void cleanup(IProgressMonitor monitor) {
     editorManager.removeSharedEditorListener(listener);
-    session.userStartedQueuing(remoteUser);
-
-    if (stoppedUsers != null) startUsers(stoppedUsers);
 
     super.cleanup(monitor);
   }

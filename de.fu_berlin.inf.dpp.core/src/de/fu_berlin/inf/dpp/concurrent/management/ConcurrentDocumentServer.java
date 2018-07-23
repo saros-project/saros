@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
 
@@ -41,8 +42,8 @@ public class ConcurrentDocumentServer implements Startable {
       new ISessionListener() {
 
         @Override
-        public void userStartedQueuing(final User user) {
-          server.addUser(user);
+        public void userStartedQueuing(User user, Set<SPath> resourcesUnavailable) {
+          server.addUser(user, resourcesUnavailable);
         }
 
         @Override
@@ -189,5 +190,16 @@ public class ConcurrentDocumentServer implements Startable {
       result.add(new QueueItem(user, transformed));
     }
     return result;
+  }
+
+  /**
+   * Set a user resource available for activity processing and add to existing Jupiter documents.
+   *
+   * @host
+   * @param user
+   * @param resource
+   */
+  public synchronized void setResourceAvailable(User user, SPath resource) {
+    server.setResourceAvailable(user, resource);
   }
 }

@@ -19,8 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.session;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.session.User.Permission;
+import java.util.Set;
 
 /**
  * Listens for events that can happen during a {@link ISarosSession session}. For life-cycle events
@@ -57,7 +59,7 @@ public interface ISessionListener {
    *
    * @param user the user that has joined.
    */
-  public default void userStartedQueuing(User user) {
+  public default void userStartedQueuing(User user, Set<SPath> resourcesUnavailable) {
     // NOP
   }
 

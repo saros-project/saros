@@ -104,11 +104,6 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
       checkCancellation(CancelOption.NOTIFY_PEER);
 
       transfer(monitor, fileLists);
-
-      User user = session.getUser(getPeer());
-      if (user == null) throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
-
-      session.userFinishedProjectNegotiation(user);
     } catch (Exception e) {
       exception = e;
     } finally {
@@ -274,6 +269,19 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
       LOG.debug(this + " : restarting user " + startHandle.getUser());
       startHandle.start();
     }
+  }
+
+  /**
+   * TODO rename userFinishedProjectNegotiation saros wide, because its actually telling if a user
+   * is (partially) processing activities
+   */
+  protected void userFinishedProjectNegotiation() throws LocalCancellationException {
+    User user = session.getUser(getPeer());
+    if (user == null) {
+      throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
+    }
+
+    session.userFinishedProjectNegotiation(user);
   }
 
   protected void createCollectors() {

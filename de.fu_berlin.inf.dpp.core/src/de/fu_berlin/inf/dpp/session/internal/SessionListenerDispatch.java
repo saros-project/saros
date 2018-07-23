@@ -1,8 +1,10 @@
 package de.fu_berlin.inf.dpp.session.internal;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /** {@link ISessionListener} implementation which can dispatch events to multiple listeners. */
@@ -22,8 +24,9 @@ public class SessionListenerDispatch implements ISessionListener {
   }
 
   @Override
-  public void userStartedQueuing(User user) {
-    for (ISessionListener listener : listeners) listener.userStartedQueuing(user);
+  public void userStartedQueuing(User user, Set<SPath> resourcesUnavailable) {
+    for (ISessionListener listener : listeners)
+      listener.userStartedQueuing(user, resourcesUnavailable);
   }
 
   @Override

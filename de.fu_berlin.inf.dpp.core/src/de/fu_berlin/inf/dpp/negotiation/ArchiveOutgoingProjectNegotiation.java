@@ -94,7 +94,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
        * this time. Maybe change the description of the listener interface
        * ?
        */
-      session.userStartedQueuing(user);
+      session.userStartedQueuing(user, null);
 
       zipArchive = createProjectArchive(fileLists, monitor);
       monitor.subTask("");
@@ -108,6 +108,8 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       throws SarosCancellationException, IOException {
     if (zipArchive != null)
       sendArchive(zipArchive, getPeer(), TRANSFER_ID_PREFIX + getID(), monitor);
+
+    userFinishedProjectNegotiation();
   }
 
   @Override
