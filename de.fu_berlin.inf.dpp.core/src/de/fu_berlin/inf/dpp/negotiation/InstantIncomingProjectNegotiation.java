@@ -99,6 +99,9 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
     awaitActivityQueueingActivation(monitor);
     activityQueuer.enableQueuing(files);
 
+    /* start being part of the session */
+    addResourcesToSession(projectMapping);
+
     /* notify host about queuing */
     transmitter.send(
         ISarosSession.SESSION_CONNECTION_ID,

@@ -138,33 +138,6 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       transfer(monitor, projectMapping, missingFiles);
 
       checkCancellation(CancelOption.NOTIFY_PEER);
-
-      /*
-       * We are finished with the negotiation. Add all projects resources
-       * to the session.
-       */
-      for (Entry<String, IProject> entry : projectMapping.entrySet()) {
-
-        final String projectID = entry.getKey();
-        final IProject project = entry.getValue();
-
-        final boolean isPartialRemoteProject = getProjectNegotiationData(projectID).isPartial();
-
-        final FileList remoteFileList = getProjectNegotiationData(projectID).getFileList();
-
-        List<IResource> resources = null;
-
-        if (isPartialRemoteProject) {
-
-          final List<String> paths = remoteFileList.getPaths();
-
-          resources = new ArrayList<IResource>(paths.size());
-
-          for (final String path : paths) resources.add(getResource(project, path));
-        }
-
-        session.addSharedResources(project, projectID, resources);
-      }
     } catch (Exception e) {
       exception = e;
     } finally {
@@ -172,6 +145,30 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     }
 
     return terminate(exception);
+  }
+
+  /**
+   * Adds resources to the session.
+   *
+   * @param projectMapping
+   */
+  protected void addResourcesToSession(Map<String, IProject> projectMapping) {
+    projectMapping.forEach(
+        (projectID, project) -> {
+          List<IResource> resources = null;
+
+          ProjectNegotiationData negotiationData = getProjectNegotiationData(projectID);
+          if (negotiationData.isPartial()) {
+            List<String> paths = negotiationData.getFileList().getPaths();
+
+            resources = new ArrayList<>(paths.size());
+            for (String path : paths) {
+              resources.add(getResource(project, path));
+            }
+          }
+
+          session.addSharedResources(project, projectID, resources);
+        });
   }
 
   /**

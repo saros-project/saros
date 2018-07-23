@@ -108,6 +108,8 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
     if (filesMissing) {
       receiveAndUnpackArchive(projectMapping, transferListener, monitor);
     }
+
+    addResourcesToSession(projectMapping);
   }
 
   @Override
