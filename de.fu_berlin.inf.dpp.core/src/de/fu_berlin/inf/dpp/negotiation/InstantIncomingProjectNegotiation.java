@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -16,12 +17,14 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.internal.ProjectActivityQueuer;
+import de.fu_berlin.inf.dpp.session.internal.ResourceActivityQueuer;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
@@ -32,12 +35,8 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
   private static final Logger log = Logger.getLogger(InstantIncomingProjectNegotiation.class);
 
-  /**
-   * the one queuer used for all incoming project negotiations
-   *
-   * <p>TODO change to resource based queuer
-   */
-  private static final ProjectActivityQueuer activityQueuer = new ProjectActivityQueuer();
+  /** the one queuer used for all incoming project negotiations */
+  private static final ResourceActivityQueuer activityQueuer = new ResourceActivityQueuer();
 
   public InstantIncomingProjectNegotiation(
       final JID peer, //
@@ -74,9 +73,6 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
   protected void transfer(
       IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
-
-    awaitActivityQueueingActivation(monitor);
-
     /*
      * the user who sends this ProjectNegotiation is now responsible for the
      * resources of the contained projects
@@ -86,39 +82,40 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
       final IProject project = entry.getValue();
 
       session.addProjectMapping(projectID, project);
-      /* TODO change queuing to resource based queuing */
-      activityQueuer.enableQueuing(project);
     }
 
+    int missingFilesCount = missingFiles.stream().mapToInt(f -> f.getPaths().size()).sum();
+
+    /* generate file lists */
+    Set<SPath> files = new HashSet<>(missingFilesCount * 2);
+    for (FileList list : missingFiles) {
+      IProject project = session.getProject(list.getProjectID());
+      for (String file : list.getPaths()) {
+        files.add(new SPath(project.getFile(file)));
+      }
+    }
+
+    /* enable queuing for missing files */
+    awaitActivityQueueingActivation(monitor);
+    activityQueuer.enableQueuing(files);
+
+    /* notify host about queuing */
     transmitter.send(
         ISarosSession.SESSION_CONNECTION_ID,
-        getPeer(), //
-        StartActivityQueuingResponse.PROVIDER //
-            .create( //
+        getPeer(),
+        StartActivityQueuingResponse.PROVIDER.create(
             new StartActivityQueuingResponse(getSessionID(), getID())));
 
     checkCancellation(CancelOption.NOTIFY_PEER);
 
-    /* only get files, if something is missing */
-    int filesMissing = 0;
-    for (FileList list : missingFiles) filesMissing += list.getPaths().size();
-
-    if (filesMissing > 0) receiveStream(monitor, filesMissing);
-  }
-
-  @Override
-  protected void cleanup(IProgressMonitor monitor, Map<String, IProject> projectMapping) {
-
-    for (IProject project : projectMapping.values()) activityQueuer.disableQueuing(project);
-
-    super.cleanup(monitor, projectMapping);
+    if (missingFilesCount > 0) {
+      receiveStream(monitor, missingFilesCount);
+    }
   }
 
   private void receiveStream(IProgressMonitor monitor, int fileCount)
       throws SarosCancellationException, IOException {
-
-    String message = "Receiving files from " + getPeer().getName() + "...";
-    monitor.beginTask(message, fileCount);
+    monitor.beginTask("Receiving files from " + getPeer().getName() + "...", fileCount);
     monitor.subTask("Waiting for Host to start...");
 
     awaitTransferRequest();
@@ -133,7 +130,7 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
       IncomingStreamProtocol isp;
       isp = new IncomingStreamProtocol(in, session, monitor);
-      isp.receiveStream();
+      isp.receiveStream(activityQueuer);
     } catch (XMPPException e) {
       throw new LocalCancellationException(e.getMessage(), CancelOption.NOTIFY_PEER);
     } finally {

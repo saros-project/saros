@@ -1,11 +1,13 @@
 package de.fu_berlin.inf.dpp.negotiation.stream;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.internal.ResourceActivityQueuer;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,14 +34,17 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol {
    * @throws IOException if any file or stream operation fails
    * @throws LocalCancellationException on local user cancellation
    */
-  public void receiveStream() throws IOException, LocalCancellationException {
+  public void receiveStream(ResourceActivityQueuer activityQueuer)
+      throws IOException, LocalCancellationException {
     BoundedInputStream fileIn = null;
     try {
       while (true) {
         String projectID = in.readUTF();
 
         /* check stream end */
-        if (projectID.isEmpty()) break;
+        if (projectID.isEmpty()) {
+          break;
+        }
 
         String fileName = in.readUTF();
         IFile file = session.getProject(projectID).getFile(fileName);
@@ -58,14 +63,18 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol {
         fileIn = new BoundedInputStream(in, fileSize);
         fileIn.setPropagateClose(false);
 
-        if (file.exists()) file.setContents(fileIn, false, true);
-        else file.create(fileIn, false);
+        if (file.exists()) {
+          file.setContents(fileIn, false, true);
+        } else {
+          file.create(fileIn, false);
+        }
 
         if (monitor.isCanceled()) {
           throw new LocalCancellationException(
               "User canceled transmission", CancelOption.NOTIFY_PEER);
         }
 
+        activityQueuer.disableQueuing(new SPath(file));
         monitor.worked(1);
       }
     } finally {

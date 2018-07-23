@@ -7,6 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
   ActivityHandlerTest.class,
   ProjectActivityQueuerTest.class,
+  ResourceActivityQueuerTest.class,
   ActivitySequencerTest.class,
   SharedProjectMapperTest.class,
   UserInformationHandlerTest.class
