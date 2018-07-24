@@ -5,11 +5,14 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ HostInvitesBelatedlyTest.class,
-    InviteAndLeaveStressTest.class, InviteWithDifferentVersionsTest.class,
-    NonHostInvitesContactTest.class,
+    InviteAndLeaveStressTest.class,
+    InviteAndLeaveStressInstantSessionTest.class,
+    InviteWithDifferentVersionsTest.class, NonHostInvitesContactTest.class,
     ParallelInvitationWithTerminationByHostTest.class,
-    Share2UsersSequentiallyTest.class, Share3UsersConcurrentlyTest.class,
-    Share3UsersLeavingSessionTest.class, Share3UsersSequentiallyTest.class,
+    Share2UsersSequentiallyTest.class,
+    Share2UsersSequentiallyInstantSessionTest.class,
+    Share3UsersConcurrentlyTest.class, Share3UsersLeavingSessionTest.class,
+    Share3UsersSequentiallyTest.class,
     ShareProjectUsingExistingProjectTest.class, ShareProjectWizardUITest.class,
     UserDeclinesInvitationToCurrentSessionTest.class,
     AwarenessInformationVisibleAfterInvitationTest.class })

@@ -396,6 +396,44 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     @Override
+    public void preferInstantSessionStart() throws RemoteException {
+        preferInstantSessionStart(true);
+
+    }
+
+    @Override
+    public void preferArchiveSessionStart() throws RemoteException {
+        preferInstantSessionStart(false);
+
+    }
+
+    private void preferInstantSessionStart(boolean check)
+        throws RemoteException {
+
+        clickMenuSarosPreferences();
+
+        SWTBot bot = new SWTBot();
+
+        SWTBotShell shell = bot.shell(SHELL_PREFERNCES);
+
+        shell.activate();
+        shell.bot().tree().expandNode(NODE_SAROS, NODE_SAROS_ADVANCED).select();
+
+        SWTBotCheckBox checkBox = shell.bot().checkBox(
+            PREF_NODE_SAROS_ADVANCED_INSTANT_SESSION_START_PREFERRED);
+
+        if (check)
+            checkBox.select();
+        else
+            checkBox.deselect();
+
+        shell.bot().button(APPLY).click();
+        shell.bot().button(OK).click();
+
+        shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
+    }
+
+    @Override
     public void restoreDefaults() throws RemoteException {
         SWTBotShell shell = preCondition();
         shell.bot().button(RESTORE_DEFAULTS).click();
