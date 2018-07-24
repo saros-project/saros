@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
@@ -39,6 +41,7 @@ public class ArchiveIncomingProjectNegotiation extends
 
     private static final Logger LOG = Logger
         .getLogger(ArchiveIncomingProjectNegotiation.class);
+    private ArchiveTransferListener archiveTransferListener = null;
 
     public ArchiveIncomingProjectNegotiation(
         final JID peer, //
@@ -62,6 +65,19 @@ public class ArchiveIncomingProjectNegotiation extends
     }
 
     @Override
+    protected void setup(IProgressMonitor monitor)
+        throws IOException {
+        archiveTransferListener = new ArchiveTransferListener(
+            ARCHIVE_TRANSFER_ID + getID());
+
+        if (fileTransferManager == null)
+            // FIXME: the logic will try to send this to the remote contact
+            throw new IOException("not connected to a XMPP server");
+
+        fileTransferManager.addFileTransferListener(archiveTransferListener);
+    }
+
+    @Override
     protected void transfer(IProgressMonitor monitor,
         Map<String, IProject> projectMapping, List<FileList> missingFiles)
         throws IOException, SarosCancellationException {
@@ -81,7 +97,7 @@ public class ArchiveIncomingProjectNegotiation extends
              * TODO Move enable (and disable) queuing responsibility to
              * SarosSession, since the second call relies on the first one, and
              * the first one is never done without the second. (see also TODO in
-             * {@link AbstractIncomingProjectNegotiation#cleanup}).
+             * {@link cleanup}).
              */
             session.addProjectMapping(projectID, project);
             session.enableQueuing(project);
@@ -101,8 +117,26 @@ public class ArchiveIncomingProjectNegotiation extends
 
         // the host do not send an archive if we do not need any files
         if (filesMissing) {
-            receiveAndUnpackArchive(projectMapping, transferListener, monitor);
+            receiveAndUnpackArchive(projectMapping, archiveTransferListener,
+                monitor);
         }
+    }
+
+    @Override
+    protected void cleanup(IProgressMonitor monitor,
+        Map<String, IProject> projectMapping) {
+        /*
+         * TODO Move disable queuing responsibility to SarosSession (see todo
+         * above in {@link transfer}).
+         */
+        for (IProject project : projectMapping.values())
+            session.disableQueuing(project);
+
+        if (fileTransferManager != null)
+            fileTransferManager
+                .removeFileTransferListener(archiveTransferListener);
+
+        super.cleanup(monitor, projectMapping);
     }
 
     /**
@@ -110,7 +144,7 @@ public class ArchiveIncomingProjectNegotiation extends
      */
     private void receiveAndUnpackArchive(
         final Map<String, IProject> localProjectMapping,
-        final TransferListener archiveTransferListener,
+        final ArchiveTransferListener archiveTransferListener,
         final IProgressMonitor monitor) throws IOException,
         SarosCancellationException {
 
@@ -132,8 +166,7 @@ public class ArchiveIncomingProjectNegotiation extends
             monitor.done();
         } finally {
             if (archiveFile != null && !archiveFile.delete()) {
-                LOG.warn("Could not clean up archive file "
-                    + archiveFile.getAbsolutePath());
+                LOG.warn("Could not clean up archive file "+archiveFile.getAbsolutePath());
             }
         }
     }
@@ -178,7 +211,8 @@ public class ArchiveIncomingProjectNegotiation extends
         // TODO: now add the checksums into the cache
     }
 
-    private File receiveArchive(TransferListener archiveTransferListener,
+    private File receiveArchive(
+        ArchiveTransferListener archiveTransferListener,
         IProgressMonitor monitor) throws IOException,
         SarosCancellationException {
 
@@ -188,7 +222,15 @@ public class ArchiveIncomingProjectNegotiation extends
         monitor
             .subTask("Host is compressing project files. Waiting for the archive file...");
 
-        awaitTransferRequest();
+        try {
+            while (!archiveTransferListener.hasReceived()) {
+                checkCancellation(CancelOption.NOTIFY_PEER);
+                Thread.sleep(200);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new LocalCancellationException();
+        }
 
         monitor.subTask("Receiving archive file...");
 
@@ -211,8 +253,7 @@ public class ArchiveIncomingProjectNegotiation extends
             throw new IOException(e.getMessage(), e.getCause());
         } finally {
             if (transferFailed && !archiveFile.delete()) {
-                LOG.warn("Could not clean up archive file "
-                    + archiveFile.getAbsolutePath());
+                LOG.warn("Could not clean up archive file "+archiveFile.getAbsolutePath());
             }
         }
 
@@ -225,4 +266,28 @@ public class ArchiveIncomingProjectNegotiation extends
         return archiveFile;
     }
 
+    private static class ArchiveTransferListener implements
+        FileTransferListener {
+        private String description;
+        private volatile FileTransferRequest request;
+
+        public ArchiveTransferListener(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public void fileTransferRequest(FileTransferRequest request) {
+            if (request.getDescription().equals(description)) {
+                this.request = request;
+            }
+        }
+
+        public boolean hasReceived() {
+            return this.request != null;
+        }
+
+        public FileTransferRequest getRequest() {
+            return this.request;
+        }
+    }
 }
