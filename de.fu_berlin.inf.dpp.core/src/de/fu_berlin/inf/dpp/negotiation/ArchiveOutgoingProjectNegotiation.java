@@ -111,7 +111,8 @@ public class ArchiveOutgoingProjectNegotiation extends
     protected void transfer(IProgressMonitor monitor, List<FileList> fileLists)
         throws SarosCancellationException, IOException {
         if (zipArchive != null)
-            sendArchive(zipArchive, getPeer(), TRANSFER_ID + getID(), monitor);
+            sendArchive(zipArchive, getPeer(), TRANSFER_ID_PREFIX + getID(),
+                monitor);
     }
 
     @Override

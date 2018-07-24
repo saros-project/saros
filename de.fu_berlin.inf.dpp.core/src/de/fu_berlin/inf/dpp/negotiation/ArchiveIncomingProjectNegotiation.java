@@ -78,10 +78,10 @@ public class ArchiveIncomingProjectNegotiation extends
             final String projectID = entry.getKey();
             final IProject project = entry.getValue();
             /*
-             * TODO Move enable (and disable) queuing responsibility to
-             * SarosSession, since the second call relies on the first one, and
-             * the first one is never done without the second. (see also TODO in
-             * {@link AbstractIncomingProjectNegotiation#cleanup}).
+             * TODO Queuing responsibility should be moved to Project
+             * Negotiation, since its the only consumer of queuing
+             * functionality. This will enable a specific Queuing mechanism per
+             * TransferType (see github issue #137).
              */
             session.addProjectMapping(projectID, project);
             session.enableQueuing(project);

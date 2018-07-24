@@ -60,7 +60,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
     private PacketCollector startActivityQueuingRequestCollector;
 
-    TransferListener transferListener = null;
+    /** used to handle file transmissions **/
+    protected TransferListener transferListener = null;
 
     public AbstractIncomingProjectNegotiation(
         final JID peer, //
@@ -180,12 +181,12 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     }
 
     /**
-     * Preparation for the Project Negotiation.
-     * The negotiation can be aborted by canceling the given monitor.
+     * In preparation of the Project Negotiation, this setups a File Transfer
+     * Handler, used to receive the incoming negotiation data.
      *
      * @param monitor
-     *      monitor to show progress to the user
-     *
+     *            monitor to show progress to the user
+     * 
      * @throws SarosCancellationException
      */
     protected void setup(IProgressMonitor monitor)
@@ -195,7 +196,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
                 "not connected to a XMPP server",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
-        transferListener = new TransferListener(TRANSFER_ID + getID());
+        transferListener = new TransferListener(TRANSFER_ID_PREFIX + getID());
         fileTransferManager.addFileTransferListener(transferListener);
     }
 
@@ -220,21 +221,25 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
         throws IOException, SarosCancellationException;
 
     /**
-     * Cleanup acquired resources during {@link #setup} and {@link #transfer}.
-     *
+     * Cleanup ends the negotiation process, by disabling the project based
+     * queue and removes acquired handlers during {@link #setup} and
+     * {@link #transfer}.
+     * 
      * @param monitor
-     *      mapping from remote project ids to the target local projects
-     *
+     *            mapping from remote project ids to the target local projects
+     * 
      * @param projectMapping
-     *      mapping of projects
+     *            mapping of projects
      */
     protected void cleanup(IProgressMonitor monitor,
         Map<String, IProject> projectMapping) {
         fileReplacementInProgressObservable.replacementDone();
 
         /*
-         * TODO Move disable queuing responsibility to SarosSession (see todo
-         * in {@link ArchiveIncomingProjectNegotiation#transfer}).
+         * TODO Queuing responsibility should be moved to Project
+         * Negotiation, since its the only consumer of queuing
+         * functionality. This will enable a specific Queuing mechanism per
+         * TransferType (see github issue #137).
          */
         for (IProject project : projectMapping.values())
             session.disableQueuing(project);
@@ -526,7 +531,14 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
         return "IPN [remote side: " + getPeer() + "]";
     }
 
-    void awaitTransferRequest() throws SarosCancellationException {
+    /**
+     * Checks continuously, if the host started a FileTransferRequest. Returns
+     * when a request was received.
+     * 
+     * @throws SarosCancellationException
+     *             on user cancellation
+     */
+    protected void awaitTransferRequest() throws SarosCancellationException {
         LOG.debug(this + ": waiting for incoming transfer request");
         try {
             while (!transferListener.hasReceived()) {
@@ -539,7 +551,11 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
         }
     }
 
-    static class TransferListener implements FileTransferListener {
+    /**
+     * Listens to FileTransferRequests and checks if they meet the provided
+     * description.
+     */
+    protected static class TransferListener implements FileTransferListener {
         private String description;
         private volatile FileTransferRequest request;
 
