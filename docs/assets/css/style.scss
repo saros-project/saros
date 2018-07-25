@@ -1,0 +1,69 @@
+---
+---
+
+.logo img {
+  float: left;
+  width: 50px;
+  height: 50px;
+  border-style: none;
+  box-shadow: none;
+}
+
+.logo a {
+  text-decoration: none;
+}
+
+.active a {
+  color: black;
+}
+
+.navbar {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.navbar-brand small {
+  display:block;
+  font-size:12px;
+}
+
+#copyright {
+  color: #949494;
+  float: left;
+}
+
+#impressum {
+  text-decoration: none;
+  float: right;
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sidenav {
+  position: relative;
+  height: 100%;
+  float:left;
+  padding-top: 20px;
+}
+
+.sidenav ul {
+  list-style-type: none;
+}
+
+#page_title {
+  font-weight: bold;
+}
+
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.sidenav a:hover {
+  color: #212121;
+}

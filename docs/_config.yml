@@ -1,0 +1,14 @@
+title: Saros
+subtitle: Distributed Collaborative Programming
+description: >- 
+  Homepage of Saros, an IDE plugin which enabled users to
+  participate in distributed pair programming sessions.
+
+repository: saros-project/saros
+twitter:
+  username: saros_project
+
+theme: jekyll-theme-slate
+markdown: kramdown
+kramdown:
+  parse_block_html: true

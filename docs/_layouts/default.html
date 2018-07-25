@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en-US' }}">
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,maximum-scale=2">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/jekyll-theme-slate.css' | relative_url }}">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/style.css' | relative_url }}">
+
+{% seo %}
+  </head>
+
+  <body>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+
+      <a id="forkme_banner" href="{{ site.github.repository_url }}">View on GitHub</a>
+      <header class="inner">
+
+        {% include navbar.html %}
+
+      </header>
+    </div>
+
+    {% if page.url contains '/documentation' %}
+      {% assign sidebar_data = site.data.documentation.sidebar %}
+    {% elsif page.url contains '/contribute' %}
+      {% assign sidebar_data = site.data.contribute.sidebar %}
+    {% endif %}
+
+    {% include sidebar.html %}
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        {% if page.url == "/" %}
+          <a class="center twitter-timeline"
+            href="https://twitter.com/{{ site.twitter.username }}"
+            data-tweet-limit="1"
+            data-chrome="noheader nofooter transparent noborders noscrollbar">
+          Tweets by @{{ site.twitter.username }}
+          </a>
+          <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        {% endif %}
+
+        {{ content }}
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <div id="copyright">Copyright &copy; {{ site.time | date: '%Y' }}, <a href="{{ '/documentation/history.html' | relative_url }}">Saros Team</a></div>
+        <a href="http://www.mi.fu-berlin.de/fb/impressum/" id="impressum" target="_blank">Imprint</a>
+      </footer>
+    </div>
+  </body>
+</html>
