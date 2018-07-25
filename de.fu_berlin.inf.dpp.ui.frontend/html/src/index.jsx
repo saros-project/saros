@@ -17,7 +17,7 @@ const stores = initStores(window.initialPage, api)
 window.SarosApi = api
 
 // TODO remove this once the updateRunningSession action is implemented
-api.trigger('updateRunningSession', runningSessionMock)
+//api.trigger('updateRunningSession', runningSessionMock)
 
 // For debugging purposes, expose all stores so it can be tested in the browser
 if (process.env.NODE_ENV !== 'production') {

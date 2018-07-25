@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.commandHandlers.GettingStartedHandler;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewUtils;
@@ -141,7 +140,8 @@ public class StartupSaros implements IStartup {
             @Override
             public void run() {
                 try {
-                    STFController.start(port, context);
+                    // TODO FIX Project dependency
+                    // STFController.start(port, context);
                 } catch (Exception e) {
                     LOG.error("starting STF controller failed", e);
                 }
