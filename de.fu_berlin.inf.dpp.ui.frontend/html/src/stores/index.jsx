@@ -2,6 +2,7 @@ import SarosStore from './SarosStore'
 import ViewStore from './ViewStore'
 import MainUIStore from './MainUIStore'
 import SessionUIStore from './SessionUIStore'
+import ConfigurationUIStore from './ConfigurationUIStore'
 
 /**
  * creates all stores, which store the application data
@@ -20,5 +21,6 @@ export default function initStores (initialPage, api) {
     core,
     mainUI: new MainUIStore(core, view),
     sessionUI: new SessionUIStore(core, view),
+    configurationUI: new ConfigurationUIStore(core, view),
   }
 }
