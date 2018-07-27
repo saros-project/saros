@@ -27,6 +27,13 @@ export default class SarosStore {
     return this.state.contactList.sort(onlineFirst)
   }
 
+  @computed
+  get contactIndex () {
+    return new Map(
+      this.state.contactList.map(contact => [ contact.jid, contact ])
+    )
+  }
+
   @action.bound
   doUpdateAccounts (accounts) {
     this.accounts = accounts
@@ -64,7 +71,17 @@ export default class SarosStore {
   }
 
   @action.bound
-  doShowStartSessionWizard () {
+  doRenameContact (jid, displayName) {
+    this.sarosApi.renameContact(jid, displayName)
+  }
+
+  @action.bound
+  doDeleteContact (jid) {
+    this.sarosApi.deleteContact(jid)
+  }
+
+  @action.bound
+  doShowSessionWizard () {
     this.sarosApi.showStartSessionWizard()
   }
 

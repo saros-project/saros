@@ -19,7 +19,7 @@ class App extends React.Component {
     if (!View) {
       return null
     }
-    return <View />
+    return <View intent={this.props.view.intent} />
   }
 }
 

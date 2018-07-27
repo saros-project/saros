@@ -13,8 +13,17 @@ export default class MainUIStore {
   }
 
   @action.bound
-  doSubmitAddContact (jid, displayName) {
-    this.core.doAddContact(jid, displayName)
+  doShowRenameContactView (jid) {
+    this.view.doChangeView(views.ADD_CONTACT, { rename: true, jid })
+  }
+
+  @action.bound
+  doSubmitAddContact (jid, displayName, rename = false) {
+    if (rename) {
+      this.core.doRenameContact(jid, displayName)
+    } else {
+      this.core.doAddContact(jid, displayName)
+    }
     this.view.doChangeView(views.MAIN)
   }
 

@@ -1,4 +1,5 @@
 import React from 'react'
+import './style.css'
 import { Text } from 'react-localize'
 import Contact from './Contact'
 import cn from 'classnames'
@@ -7,7 +8,8 @@ import { noop } from 'Utils'
 const ContactList = ({
   contactList,
   selectedContacts = new Set(),
-  onClickContact = noop
+  onClickContact = noop,
+  renderOps,
 }) => (
   <div className='contact-list-container'>
     <h6><Text message='headline.contacts' /></h6>
@@ -18,7 +20,7 @@ const ContactList = ({
           key={contact.jid}
           className={cn('list-group-item', { active: selectedContacts.has(contact.jid) })}
         >
-          <Contact {...contact} />
+          <Contact {...contact} renderOps={renderOps} />
         </li>
       ))}
     </ul>

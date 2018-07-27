@@ -6,21 +6,24 @@ const Contact = ({
   displayName,
   presence,
   addition,
+  jid,
+  renderOps,
 }) => (
-  <div className='contact-item'>
-    <span className='contact-item-display-name'>{displayName}</span>
-    <span className='text-muted ml-1'>{ addition && `(${addition})`}</span>
-    {presence === 'Online' &&
-      <span className='badge badge-success'>
-        <Text message='label.online' />
-      </span>
-    }
-    <div data-hook='context-menu'>
-      <ul role='menu' className='dropdown-menu'>
-        <li><Text message='action.rename' /></li>
-        <li><Text message='action.delete' /></li>
-      </ul>
+  <div className='contact-item row'>
+    <div className='col-xs-7'>
+      <span className='contact-item-display-name'>{displayName || jid}</span>
+      <span className='text-muted ml-1'>{ addition && `(${addition})`}</span>
+      {presence === 'Online' &&
+        <span className='badge badge-success'>
+          <Text message='label.online' />
+        </span>
+      }
     </div>
+    { renderOps &&
+      <div className='contact-ops col-xs-5'>
+        {renderOps(jid, displayName, presence, addition)}
+      </div>
+    }
   </div>
 )
 

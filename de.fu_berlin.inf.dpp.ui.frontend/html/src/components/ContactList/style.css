@@ -1,0 +1,8 @@
+.contact-item .contact-ops {
+  display: none
+}
+
+.contact-item:hover .contact-ops {
+  display: block
+}
+
