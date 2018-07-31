@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.intellij.openapi.module.ModuleManager;
@@ -67,25 +68,14 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
      *
      * @param module
      *            an IntelliJ <i>module</i>
+     * @throws IllegalArgumentException if the given module does not have
+     *                                  exactly one content root
      */
     public IntelliJProjectImplV2(@NotNull final Module module) {
         this.module = module;
         this.moduleName = module.getName();
 
-        ModuleRootManager moduleRootManager = ModuleRootManager
-            .getInstance(module);
-
-        final VirtualFile[] contentRoots = moduleRootManager.getContentRoots();
-
-        if (contentRoots.length == 0)
-            throw new IllegalArgumentException("module: " + module
-                + " does not have a content root");
-
-        if (contentRoots.length > 1)
-            throw new IllegalArgumentException("module: " + module
-                + " has more than one content root");
-
-        moduleRoot = contentRoots[0];
+        moduleRoot = getModuleContentRoot(module);
 
         VirtualFile moduleRootParent = moduleRoot.getParent();
         VirtualFile projectRoot = module.getProject().getBaseDir();
@@ -101,6 +91,41 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
                 " of module " + module + " is not located in the project " +
                 "root " + projectRoot);
         }
+    }
+
+    /**
+     * Returns the content root of the given module.
+     * <p>
+     * This method is used to enforce the current restriction that shared
+     * modules must contain exactly one content root.
+     * </p>
+     *
+     * @param module the module to get the content root for
+     * @return the content root of the given module
+     * @throws IllegalArgumentException if the given module does not have
+     *                                  exactly one content root
+     */
+    @NotNull
+    private static VirtualFile getModuleContentRoot(
+        @NotNull
+            Module module) {
+
+        ModuleRootManager moduleRootManager = ModuleRootManager
+            .getInstance(module);
+
+        VirtualFile[] contentRoots = moduleRootManager.getContentRoots();
+
+        int numberOfContentRoots = contentRoots.length;
+
+        if (numberOfContentRoots != 1) {
+            throw new IllegalArgumentException(
+                "Modules shared with Saros currently must contain exactly one "
+                    + "content root. The given module " + module + " has "
+                    + numberOfContentRoots + " content roots: " + Arrays
+                    .toString(contentRoots));
+        }
+
+        return contentRoots[0];
     }
 
     /**
