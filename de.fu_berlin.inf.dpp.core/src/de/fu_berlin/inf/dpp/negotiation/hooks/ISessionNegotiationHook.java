@@ -32,17 +32,18 @@ public interface ISessionNegotiationHook {
     public String getIdentifier();
 
     /**
-     * Receives the host's fixed preferences.
+     * Sets the host preferences that are needed before the session negotiation
+     * is started.
      * <p>
-     * During the session creation this method will be called on the <b>host</b>
-     * side (see {@link SarosSessionManager#startSession(Map)}).
+     * This method will be called on the <b>host</b> side during the session
+     * creation as part of {@link SarosSessionManager#startSession(Map)}).
      * 
-     * @return The settings in form of [Key, Value] pairs. The settings should
-     *         in general look the same as those returned by
-     *         {@link #considerClientPreferences(JID, Map)} as both will be
-     *         passed to {@link #applyActualParameters(Map, IPreferenceStore)}.
+     * @param hostPreferences
+     *            The session preference store that corresponds to the host. May
+     *            be used to store the initial host properties so they can be
+     *            accessed by other components.
      */
-    public Map<String, String> tellHostPreferences();
+    public void setInitialHostPreferences(IPreferenceStore hostPreferences);
 
     /**
      * Receive the client's preferences for later consideration.
@@ -76,10 +77,7 @@ public interface ISessionNegotiationHook {
      * @return The settings determined by the host which -- if not
      *         <code>null</code> -- will be sent back to the client. It's up to
      *         the specific hook to which extent the host considers the wishes
-     *         of the client. The settings should in general look the same as
-     *         those returned by {@link #tellHostPreferences()} as both will be
-     *         passed into {@link #applyActualParameters(Map, IPreferenceStore)}
-     *         .
+     *         of the client.
      */
     public Map<String, String> considerClientPreferences(JID client,
         Map<String, String> input);
@@ -98,26 +96,20 @@ public interface ISessionNegotiationHook {
      * @param input
      *            The parameters concerning the hook at hand, which were
      *            determined by the host during his
-     *            {@link OutgoingSessionNegotiation}. On the host this is the
-     *            result of {@link #tellHostPreferences()} for the first call
-     *            and the result of {@link #considerClientPreferences(JID, Map),
-     *            for subsequent calls. On the client the received result of
+     *            {@link OutgoingSessionNegotiation} through
      *            {@link #considerClientPreferences(JID, Map)}. Might be
      *            <code>null</code>, if the host has no counterpart for this
      *            hook.
      * 
      * @param hostPreferences
-     *            The session preference store that corresponds to the host.
-     *            May be used to store the final properties so they can be
-     *            accessed by other components.
+     *            The session preference store that corresponds to the host. May
+     *            be used to store the final properties so they can be accessed
+     *            by other components.
      * 
      * @param clientPreferences
      *            The session preference store that corresponds to the client.
      *            May be used to store the final properties so they can be
-     *            accessed by other components. The IPreferenceStore may be
-     *            <code>null</code> if the host is currently the only member
-     *            of the session.
-     * 
+     *            accessed by other components.
      */
     public void applyActualParameters(Map<String, String> input,
         IPreferenceStore hostPreferences, IPreferenceStore clientPreferences);
