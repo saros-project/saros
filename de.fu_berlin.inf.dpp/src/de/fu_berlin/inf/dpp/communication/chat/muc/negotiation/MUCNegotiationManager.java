@@ -65,9 +65,9 @@ public class MUCNegotiationManager {
         }
 
         @Override
-        public Map<String, String> tellHostPreferences() {
-            // Nothing to do
-            return null;
+        public void setInitialHostPreferences(
+            de.fu_berlin.inf.dpp.preferences.IPreferenceStore hostPreferences) {
+            // NOP
         }
 
         @Override
