@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget;
+package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -12,4 +12,14 @@ public interface IRemoteHTMLInputField extends Remote {
      * enter text to the field.
      */
     public void enter(String text) throws RemoteException;
+
+    /**
+     * get the value of the field
+     */
+    public String getValue() throws RemoteException;
+
+    /**
+     * clear the field so that value is empty
+     */
+    public void clear() throws RemoteException;
 }
