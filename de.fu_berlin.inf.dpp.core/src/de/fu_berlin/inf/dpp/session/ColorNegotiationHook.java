@@ -33,15 +33,11 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
     }
 
     @Override
-    public Map<String, String> tellHostPreferences() {
-        String favoriteColor = Integer.toString(preferences
-            .getFavoriteColorID());
-
-        Map<String, String> colorSettings = new HashMap<String, String>();
-        colorSettings.put(KEY_HOST_COLOR, favoriteColor);
-        colorSettings.put(KEY_HOST_FAV_COLOR, favoriteColor);
-
-        return colorSettings;
+    public void setInitialHostPreferences(IPreferenceStore hostPreferences) {
+        hostPreferences.setValue(KEY_INITIAL_COLOR,
+            preferences.getFavoriteColorID());
+        hostPreferences.setValue(KEY_FAV_COLOR,
+            preferences.getFavoriteColorID());
     }
 
     @Override
@@ -86,12 +82,11 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
             Integer.parseInt(input.get(KEY_HOST_COLOR)));
         hostPreferences.setValue(KEY_FAV_COLOR,
             Integer.parseInt(input.get(KEY_HOST_FAV_COLOR)));
-        if (clientPreferences != null) {
-            clientPreferences.setValue(KEY_INITIAL_COLOR,
-                Integer.parseInt(input.get(KEY_CLIENT_COLOR)));
-            clientPreferences.setValue(KEY_FAV_COLOR,
-                Integer.parseInt(input.get(KEY_CLIENT_FAV_COLOR)));
-        }
+
+        clientPreferences.setValue(KEY_INITIAL_COLOR,
+            Integer.parseInt(input.get(KEY_CLIENT_COLOR)));
+        clientPreferences.setValue(KEY_FAV_COLOR,
+            Integer.parseInt(input.get(KEY_CLIENT_FAV_COLOR)));
     }
 
     @Override

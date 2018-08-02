@@ -72,10 +72,9 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
     }
 
     @Override
-    public Map<String, String> tellHostPreferences() {
-        return null;
+    public void setInitialHostPreferences(IPreferenceStore hostPreferences) {
+        //NOP
     }
-
 
     @Override
     public Map<String, String> tellClientPreferences() {
@@ -144,12 +143,8 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
     }
 
     @Override
-    public void applyActualParameters(Map<String, String> input, IPreferenceStore hostPreferences,
-        IPreferenceStore clientPreferences) {
-        if (clientPreferences == null) {
-           //there is not client yet, nothing to do
-           return;
-        }
+    public void applyActualParameters(Map<String, String> input,
+        IPreferenceStore hostPreferences, IPreferenceStore clientPreferences) {
 
         if (input == null) {
             LOG.warn("The client did not indicate any module type " +

@@ -146,8 +146,8 @@ public class WhiteboardManager {
         }
 
         @Override
-        public Map<String, String> tellHostPreferences() {
-            return null;
+        public void setInitialHostPreferences(IPreferenceStore hostPreferences) {
+            // NOP
         }
 
         @Override
@@ -179,9 +179,6 @@ public class WhiteboardManager {
         @Override
         public void applyActualParameters(Map<String, String> input,
             IPreferenceStore hostPreferences, IPreferenceStore clientPreferences) {
-
-            if (clientPreferences == null)
-                return; // no client yet
 
             hostHasWhiteboard = (input != null && USE_VAL.equals(input
                 .get(USE_KEY)));

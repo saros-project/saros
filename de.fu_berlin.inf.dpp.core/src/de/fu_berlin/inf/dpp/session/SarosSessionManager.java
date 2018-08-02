@@ -244,8 +244,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             IPreferenceStore hostProperties = new PreferenceStore();
             if (hookManager != null) {
                 for (ISessionNegotiationHook hook : hookManager.getHooks()) {
-                    hook.applyActualParameters(hook.tellHostPreferences(),
-                        hostProperties, null);
+                    hook.setInitialHostPreferences(hostProperties);
                 }
             }
 

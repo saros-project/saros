@@ -49,8 +49,8 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
     }
 
     @Override
-    public Map<String, String> tellHostPreferences() {
-        return getLocalPreference();
+    public void setInitialHostPreferences(IPreferenceStore hostPreferences) {
+        // NOP
     }
 
     @Override
@@ -70,7 +70,7 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
 
         /* if both prefer the same type, set it */
         String inputType = input.get(KEY_PREFERRED_TYPE);
-        if (inputType.equals(tellHostPreferences().get(KEY_PREFERRED_TYPE))) {
+        if (inputType.equals(getLocalPreference().get(KEY_PREFERRED_TYPE))) {
             return Collections.singletonMap(KEY_TYPE, inputType);
         }
 
@@ -101,9 +101,8 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
         }
 
         hostPreferences.setValue(KEY_TYPE, type.name());
-        if (clientPreferences != null) {
-            clientPreferences.setValue(KEY_TYPE, type.name());
-        }
+
+        clientPreferences.setValue(KEY_TYPE, type.name());
     }
 
     private Map<String, String> getLocalPreference() {
