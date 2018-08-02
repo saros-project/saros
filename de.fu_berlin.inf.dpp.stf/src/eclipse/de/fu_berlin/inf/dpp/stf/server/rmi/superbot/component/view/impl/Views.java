@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorerView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.RosterView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
 
@@ -31,7 +31,7 @@ public final class Views extends StfRemoteObject implements IViews {
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
         RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_ID);
         bot.viewByTitle(VIEW_SAROS).show();
-        return SarosView.getInstance().setView(bot.viewByTitle(VIEW_SAROS));
+        return RosterView.getInstance().setView(bot.viewByTitle(VIEW_SAROS));
     }
 
     @Override

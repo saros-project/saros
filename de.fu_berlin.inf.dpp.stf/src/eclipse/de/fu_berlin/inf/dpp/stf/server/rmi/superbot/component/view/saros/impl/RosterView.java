@@ -52,16 +52,16 @@ import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
  * 
  * @author lchen
  */
-public final class SarosView extends StfRemoteObject implements ISarosView {
+public final class RosterView extends StfRemoteObject implements ISarosView {
 
-    private static final Logger log = Logger.getLogger(SarosView.class);
+    private static final Logger log = Logger.getLogger(RosterView.class);
 
-    private static final SarosView INSTANCE = new SarosView();
+    private static final RosterView INSTANCE = new RosterView();
 
     private SWTBotView view;
     private SWTBotTree tree;
 
-    public static SarosView getInstance() {
+    public static RosterView getInstance() {
         return INSTANCE;
     }
 
