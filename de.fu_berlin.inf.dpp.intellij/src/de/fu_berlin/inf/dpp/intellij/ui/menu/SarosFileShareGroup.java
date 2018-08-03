@@ -68,12 +68,16 @@ public class SarosFileShareGroup extends ActionGroup {
             return new AnAction[0];
         }
 
+        int userCount = 1;
+
         List<AnAction> list = new ArrayList<>();
         for (RosterEntry rosterEntry : roster.getEntries()) {
             Presence presence = roster.getPresence(rosterEntry.getUser());
             if (presence.getType() == Presence.Type.available) {
-                list.add(
-                    new ShareWithUserAction(new JID(rosterEntry.getUser())));
+                list.add(new ShareWithUserAction(new JID(rosterEntry.getUser()),
+                    userCount));
+
+                userCount++;
             }
         }
 
