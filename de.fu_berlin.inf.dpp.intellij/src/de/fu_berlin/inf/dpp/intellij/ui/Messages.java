@@ -96,6 +96,8 @@ public class Messages {
     public static String ContactPopMenu_error_creating_module_object_title;
     public static String ContactPopMenu_error_creating_module_object_message;
 
+    public static String ShareWithUserAction_description;
+
     private Messages() {
     }
 }
