@@ -36,8 +36,9 @@ public class ShareWithUserAction extends AnAction {
     private final JID userJID;
     private final String title;
 
-    ShareWithUserAction(JID user) {
-        super(user.getName(), null, IconManager.CONTACT_ONLINE_ICON);
+    ShareWithUserAction(JID user, int userCount) {
+        super("_" + userCount + ": " + user.getName(), null,
+            IconManager.CONTACT_ONLINE_ICON);
         userJID = user;
         title = user.getName();
     }
