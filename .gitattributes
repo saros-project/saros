@@ -1,0 +1,10 @@
+* text eol=lf
+
+*.icns binary
+*.zip binary
+*.wav binary
+*.png binary
+*.jpg binary
+*.jar binary
+*.gif binary
+*.xpm binary
