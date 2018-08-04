@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
@@ -57,6 +59,9 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     protected boolean running;
 
     private PacketCollector startActivityQueuingRequestCollector;
+
+    /** used to handle file transmissions **/
+    protected TransferListener transferListener = null;
 
     public AbstractIncomingProjectNegotiation(
         final JID peer, //
@@ -176,16 +181,24 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     }
 
     /**
-     * Preparation for the Project Negotiation.
-     * The negotiation can be aborted by canceling the given monitor.
+     * In preparation of the Project Negotiation, this setups a File Transfer
+     * Handler, used to receive the incoming negotiation data.
      *
      * @param monitor
-     *      monitor to show progress to the user
-     *
-     * @throws IOException, SarosCancellationException
+     *            monitor to show progress to the user
+     * 
+     * @throws SarosCancellationException
      */
-    protected abstract void setup(IProgressMonitor monitor)
-        throws IOException, SarosCancellationException;
+    protected void setup(IProgressMonitor monitor)
+        throws SarosCancellationException {
+        if (fileTransferManager == null)
+            throw new LocalCancellationException(
+                "not connected to a XMPP server",
+                CancelOption.DO_NOT_NOTIFY_PEER);
+
+        transferListener = new TransferListener(TRANSFER_ID_PREFIX + getID());
+        fileTransferManager.addFileTransferListener(transferListener);
+    }
 
     /**
      * Handle the actual transfer.
@@ -208,17 +221,31 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
         throws IOException, SarosCancellationException;
 
     /**
-     * Cleanup acquired resources during {@link #setup} and {@link #transfer}.
-     *
+     * Cleanup ends the negotiation process, by disabling the project based
+     * queue and removes acquired handlers during {@link #setup} and
+     * {@link #transfer}.
+     * 
      * @param monitor
-     *      mapping from remote project ids to the target local projects
-     *
+     *            mapping from remote project ids to the target local projects
+     * 
      * @param projectMapping
-     *      mapping of projects
+     *            mapping of projects
      */
     protected void cleanup(IProgressMonitor monitor,
         Map<String, IProject> projectMapping) {
         fileReplacementInProgressObservable.replacementDone();
+
+        /*
+         * TODO Queuing responsibility should be moved to Project
+         * Negotiation, since its the only consumer of queuing
+         * functionality. This will enable a specific Queuing mechanism per
+         * TransferType (see github issue #137).
+         */
+        for (IProject project : projectMapping.values())
+            session.disableQueuing(project);
+
+        if (fileTransferManager != null)
+            fileTransferManager.removeFileTransferListener(transferListener);
 
         deleteCollectors();
         monitor.done();
@@ -502,5 +529,53 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     @Override
     public String toString() {
         return "IPN [remote side: " + getPeer() + "]";
+    }
+
+    /**
+     * Checks continuously, if the host started a FileTransferRequest. Returns
+     * when a request was received.
+     * 
+     * @throws SarosCancellationException
+     *             on user cancellation
+     */
+    protected void awaitTransferRequest() throws SarosCancellationException {
+        LOG.debug(this + ": waiting for incoming transfer request");
+        try {
+            while (!transferListener.hasReceived()) {
+                checkCancellation(CancelOption.NOTIFY_PEER);
+                Thread.sleep(200);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new LocalCancellationException();
+        }
+    }
+
+    /**
+     * Listens to FileTransferRequests and checks if they meet the provided
+     * description.
+     */
+    protected static class TransferListener implements FileTransferListener {
+        private String description;
+        private volatile FileTransferRequest request;
+
+        public TransferListener(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public void fileTransferRequest(FileTransferRequest request) {
+            if (request.getDescription().equals(description)) {
+                this.request = request;
+            }
+        }
+
+        public boolean hasReceived() {
+            return this.request != null;
+        }
+
+        public FileTransferRequest getRequest() {
+            return this.request;
+        }
     }
 }
