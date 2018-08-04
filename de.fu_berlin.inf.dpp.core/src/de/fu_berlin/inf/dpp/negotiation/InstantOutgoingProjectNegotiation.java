@@ -158,7 +158,7 @@ public class InstantOutgoingProjectNegotiation extends
             osp = new OutgoingStreamProtocol(out, session, monitor);
 
             /* id in description needed to bypass SendFileAction handler */
-            String streamName = TRANSFER_ID + getID();
+            String streamName = TRANSFER_ID_PREFIX + getID();
             transfer.sendStream(in, streamName, 0, streamName);
 
             awaitNegotation(transfer, monitor);
