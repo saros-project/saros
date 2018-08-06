@@ -66,6 +66,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.project.internal.SarosEclipseSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 import de.fu_berlin.inf.dpp.test.mocks.EclipseMocker;
@@ -358,7 +359,7 @@ public class SarosSessionTest {
         assertTrue(session.hasActivityProducers());
         assertFalse(workspaceListeners.isEmpty());
 
-        session.stop();
+        session.stop(SessionEndReason.LOCAL_USER_LEFT);
 
         stopManager3 = session.getComponent(StopManager.class);
         assertNull(
