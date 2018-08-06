@@ -93,6 +93,8 @@ public class Messages {
     public static String ContactPopMenu_module_not_found_message_condition;
     public static String ContactPopMenu_invalid_module_title;
     public static String ContactPopMenu_invalid_module_message_condition;
+    public static String ContactPopMenu_error_creating_module_object_title;
+    public static String ContactPopMenu_error_creating_module_object_message;
 
     private Messages() {
     }
