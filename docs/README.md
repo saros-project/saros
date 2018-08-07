@@ -1,6 +1,14 @@
 # Documentation writing
 
-## Compile GitHub Pages locally
+## Compile GitHub Pages using Docker
+If you installed docker, you can simply use the image `starefossen/github-pages` that already contains
+the dependencies listed in the subsequent section.
+
+* Change your currrent directory to `docs/`
+* Run `docker run -t --rm -v "$PWD":/usr/src/app -p "4000:4000" starefossen/github-pages`
+* Open your browser and open `localhost:4000`
+
+## Compile GitHub Pages
 
 ### Install required tools and dependencies:
 

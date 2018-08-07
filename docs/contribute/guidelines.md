@@ -1,5 +1,5 @@
 ---
-title: Coding and Commit Guidelines
+title: Commit and Coding Guidelines
 ---
 
 # {{ page.title }}
@@ -7,27 +7,27 @@ title: Coding and Commit Guidelines
 
 {% include toc.html %}
 
-## Git
+## Review rules at a glance
+All pull requests in our project have to be reviewed. See the [review process documentation](processes/review.md) for more information.
 
-### Configuration
-1.  Make sure that both "Author" and "Committer" conform to the format:
+Make sure that your pull request:
 
-        John Doe <john.doe@anywhere.com>
+* has a commit message as defined below
+* is small
+* is formatted as defined below
 
-    The following formats are **not** allowed: "**johnd**
-    &lt;john.doe@...&gt;" or "**johnny** &lt;john.doe@...&gt;" or
-    "**John** &lt;john.doe@...&gt;"
+In order to merge a pull request you need:
 
+* all checks (Travis CI, Sonar) passed
+* two reviewers approved **OR**
+* one reviewer approved two days ago and no further modification requests are posted
 
-2.  Make sure you commit files with Unix line endings. Refer to the [Git
-    manual](https://git-scm.com/book/tr/v2/Customizing-Git-Git-Configuration#Formatting-and-Whitespace)
-    for more information.
+**For each review you received you have to perform two reviews.**
 
-### Commit message
+## Commit message
 
-1.  Follow the general rule of how Git commit messages are formatted.
-    Refer to the [Git manual](https://git-scm.com/book/ch5-2.md#Commit-Guidelines) for
-    more information. In particular, every patch must have an
+1.  Follow the rule of [how Git commit messages are formatted](https://chris.beams.io/posts/git-commit/).
+    In particular, every patch must have an
     informative short summary or "subject line" (also see next point in
     the list) and it should have a more detailed explanation below.
 2.  In addition, use one of the following **type tags** in the subject
@@ -65,10 +65,182 @@ implementation in IntelliJ.
 If you can't decide on a single type tag, you probably mixed up
 different concerns and should consider splitting your patch.
 
-## Coding rules
 
-### Formatting
+## Naming
 
+This section is mainly based on the [Code Conventions for the Java TM Programming Language, Chapter 9](http://www.oracle.com/technetwork/java/codeconventions-135099.md#367)
+* Differences and additional conventions
+  * Non-Listener interfaces should be preceded by an `I`
+    e.g: `IProject`, `IPreferenceStore`
+  * Listener interfaces should use the name of their corresponding class and add `Listener` to it
+    e.g. `MouseListener`
+* All test case classes **must** end with **Test**.
+  e.g  `HelloWorldTest`
+*   A test suite classes must contain the character sequence
+    **TestSuite**
+* Every test class that is used for White-Box testing must be declared
+  in the same package.
+  e.g `foo.bar.HelloWorld` -> `foo.bar.HelloWorldTest`
+* STF test cases **must** be put in any subpackage of
+  `de.fu_berlin.inf.dpp.stf.test`, e.g
+  `de.fu_berlin.inf.dpp.stf.test.account.AccountPreferencePageTest`
+
+## Documentation
+
+### Keep this size up-to-date
+Update this website (located in the directory `docs`) if a pull request:
+
+* changes something that is documented on this website
+* introduces a new feature 
+
+If a pull request changes a GUI, a logic or something else which is documented
+in this sites then the pull request also has to contain corresponding changes of this site.
+
+#### Rules
+
+* Create new pages
+  * Check whether your content fits into another page before you create a new page.
+  * Add the page into the corresponding sidebar (change file `../_data/*/sidebar.yml`).
+* Avoid to link sections. Otherwise the link will be broken if the section name is changed.
+* **Never** copy content of another page (e.g. a tutorial), rather write a short sentence which links to the corresponding page
+* **Always** separate user documentation (located in the directory `docs/documentation`) and developer documentation (located in the directory `docs/contribute`)
+* Dont be afraid to remove superfluous documentation
+
+### Commenting in Code
+
+#### No @author tags
+
+We don't use @author tags in new code because of the following two
+reasons:
+
+* Such tags do not reliably point to a person that can be asked
+  questions concerning the tagged file.
+* Such tags do not accurately represent the actual involvement of/work
+  done by a certain developer. More often than not, developers in our
+  project work in files they did not create. If anyone really wants to
+  determine the authorship of certain files, our version control does
+  a much better job by accurately crediting both the developers and
+  reviewers of each commit.
+
+#### JavaDoc
+
+* JavaDoc documentation and names should be meaningful and make the
+  programming element understandable with minimum insight into
+  the code. If your comments make the code more difficult to
+  understand, remove them.
+* Don't use single line comments (starting with //) for multi line
+  text.
+* Comments should describe complex code in **shorter** text. Comments
+  like "Create HashMap", "Set Value", "Loop here", or "else" should
+  be removed.
+
+* The following JavaDoc tags should be used for highlighting important
+  aspects of a method or a class:
+  * `@ui` or `@swing` or `@swt` - This method needs to be called
+    from the UI thread, otherwise an exception might occur.
+  * `@nonBlocking` - This method does return before finishing
+    its activities. If there is at least one method is a class which
+    is non-blocking it is highly recommended to put `@blocking` to
+    all other methods to help users recognize that blocking behavior
+    is important for this class
+  * `@blocking` - This method is potentially long-running and blocks
+    until it is done. This is the default for all method, which
+    are unmarked.
+  * `@valueObject` - The objects of this class are immutable. All
+    methods are side effect free.
+  * `@nonReentrant` - This method cannot be called twice at the
+    same time.
+  * `@threadsafe` - This method can safely be called twice at the
+    same time.
+  * `@caching` - If possible, this method uses a cache to calculate
+    the return value.
+
+#### What to comment
+
+Generally you should document the code starting from the highest level
+of code hierarchy. This means that all packages need a documentation
+followed by interfaces and classes. All documentation should be in
+JavaDoc comments in order to automatically generate HTML source code
+documentation.
+
+-   Each interface should be documented.
+    -   The comments in the interface should provide a short description
+        of what you can use it for. For all exposed routines you should
+        at a minimum document each parameter and each return value but
+        hide implementation details.
+
+-   Each class should be documented.
+    -   The description of the class should provide a short overview of
+        what this class is about. Design decisions and limitations
+        should be mentioned as well.
+
+-   Methods should be documented, if they are complex enough and it will
+    be helpful for other readers to summarize or explain the purpose of
+    these methods.
+-   Important objects and variables should also be briefly documented.
+
+## Logging with Log4J [NO]
+
+-   We use one private static final logger per class. An editor template
+    for Eclipse:\
+    `private static final Logger LOG = LOgger.getLogger(${enclosing_type}.class);`
+-   We use the following Log-Levels:
+    -   `ERROR` An error should be printed if something occurred which
+        is the fault of the developer and which will cause unexpected
+        behavior for the user.
+    -   `WARN` A warning should be printed if something occurred which
+        is the fault of the developer but which while not expected to
+        occur should be handled gracefully by the application.
+    -   `INFO` Any information that is of interest to the user may be
+        printed using INFO.
+    -   `DEBUG` Any information which might be useful for the developer
+        when figuring out what the application did may be printed
+        as DEBUG. The amount of information printed should not cause the
+        performance of the application to suffer (use `TRACE` for this).
+    -   `TRACE` Detailed information about the program execution should
+        use the TRACE level. This information usually is so detailed
+        that the application runs slower and thus should never be
+        enabled in a production version.
+
+## Error handling
+We expect that all source code used in thesis to deal gracefully with
+errors. The goals to aim for should be:
+
+-   Provide information to the user that something went wrong and how
+    s/he can fix the problem (if). A typical example for this is a
+    failed to log-in to a server, because the password is wrong which
+    should lead to a error-dialog box. In the best of all cases this
+    error message will offer the user to correct the problem or lead him
+    to the place to correct it (for instance a preference dialog).
+-   Provide information to the developer when some operation failed that
+    should not have (unexpected) and where the problem
+    occurred (stack-trace).
+-   Provide information about the kind of events that happened
+    internally (tracing/logging). It should be possible to
+    disable these.
+
+## Refactor --> Rename
+
+This section contains a couple of guidelines for renaming classes or
+methods. They are worth sticking to because of our review process,
+which requires you to create follow-up commits, which can be problematic
+in combination with renaming.
+
+**Beware of renaming classes.** If you want to rename a
+class, put the Refactor --> Rename in a separate patch, and post/commit
+it as soon as possible.
+
+If you rename a class and make additional changes to that class, your
+pull request becomes hard to review, because the additional changes are now in
+a different file. The Compare editor in Eclipse and the Diff view in the
+Reviewboard won't be able to display what the additional change was.
+
+Even worse, what if someone else makes changes to that class? You
+renamed it locally, and someone else commited a change to the "old"
+class, how are you going to merge that? You'll be in integration hell
+faster than you can say *"Refactoring is easy in Java"*.
+
+## Formatting
 
 We expect source code to be formatted and cleaned up using an automated
 tool prior to submission.
@@ -83,191 +255,27 @@ tool prior to submission.
     is selected. Make sure to check "Organize Imports" in the
     configuration dialog.
 
-
 The following steps are necessary to ensure that your Eclipse recognizes
 our code style presets. You only need to do this once for any given
-Eclipse insallation.
+Eclipse installation:
 
-#### Configure
+1. Install the **clean up profile**
+   1. Navigate to *Window > Preferences > Java > Code Style > Clean Up*
+   2. Click on the *Import...* Button and select [`de.fu_berlin.inf.dpp/clean-up-profile.xml`](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/clean-up-profile.xml)
+   3. *Apply* these changes
+2. Install the **formatter profile**
+   1. Navigate to *Window > Preferences > Java > Code Style > Formatter*
+   2. Click on the *Import...* Button and select [`de.fu_berlin.inf.dpp/clean-up-profile.xml`](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/formatter-profile.xml)
+   3. *Apply* these changes
 
-The code style presets are meant to keep the patches clean. They will be
-applied automatically every time you save a file within Eclipse.
 
-To "install" the presets follow the following steps:
+## License
 
-1.  Right-click the "Saros" project in the project explorer and select
-    "Properties"
-2.  Navigate to the section "**Java Code Style**"
-3.  Import the clean-up profile:
-    1.  Select the sub-section "Java Code Style" &gt; "**Clean up**"
-    2.  Under the box "Active profile:", click Import...
-    3.  Navigate to the base folder of the "Saros"
-        project ("\[...\]/de.fu\_berlin.inf.dpp/")
-    4.  Select ["`clean-up-profile.xml`"](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/clean-up-profile.xml) and click Open
-    5.  Click Apply and exit the menu by clicking Ok
+Saros is licensed under GPLv2.
+All 3rd party code that has not been written by a Saros team member
+is kept in a separate source folder named `ext-src`.
 
-4.  Import the formatter profile:
-    1.  Select the sub-section "Java Code Style" &gt; "**Formatter**"
-    2.  Under the box "Active profile:", click Import...
-    3.  Navigate to the base folder of the "Saros"
-        project ("\[...\]/de.fu\_berlin.inf.dpp/")
-    4.  Select ["`formatter-profile.xml`"](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/formatter-profile.xml) and click "Open"
-    5.  Click Apply and exit the menu by clicking Ok
+## Language
 
-### Structure
-
-#### Getters and Setters
-
-*   Use getters and setters by default except for very good reason
-*   Internal Local Entity Classes do not need (but may) use
-    getters/setters
-*   Internal collections may be returned from classes, but it MUST be
-    clearly indicated whether the returned value MUST not be changed
-    (then an immutable view should be returned) or whether a user of a
-    class MAY change the collection (in which case the class must ensure
-    that the behavior is well defined, for instance using an
-    observable collection)
-
-#### Class member visibility
-
-By default all fields and methods should be **`private`**. For any field
-or method with a visibility higher than **`private `**(visible from the
-outside) there MUST be a detailed JavaDoc explanation. Thus, especially
-making something `public `should be a deliberate and conscious act.
-
-To facilitate testing, you may be tempted to make members more
-accessible. This is fine up to **package-private** (no modifier). But it
-is not acceptable to make a member part of a package's API
-(`protected `or `public`) solely for testing purposes.
-
-#### Final members and variables
-
-*   For class variables: By default, make them final, unless you find a
-    good reason not to. It makes the code easier to understand when you
-    know where changes are expected to happen.
-*   For local variables and parameters: In principle, the same rule
-    applies as for class variables. But since local variables and
-    parameters have a limited scope, the additional information gained
-    through the presence of a final modifer is not tremendous.
-    Therefore, we tend to not use the final keyword here.
-*   For methods: By default, don't make them final, unless you have good
-    reason not to. After all, we want to use
-    object-oriented programming.
-    
-    
-#### Classes and Interfaces
-
-*   Take your time, look at the environment of your code and think. When
-    it comes to the establishment of classes and interfaces, there is a
-    lot of mistakes to make that work against the designed architecture
-    and make solving problems afterwards very expensive.
-*   Components must implement an interface if they access
-    external resources. Implementing an interface to combine things to
-    reusable units is always a good idea, but before doing so make sure
-    that there is no such similar implementation in place already and
-    how the newly created one would fit into the architecture.
-*   If you develop a listener interface with more than one method, you
-    should in most cases provide an abstract base implementation which
-    provides empty implementations, because in many cases implementors
-    of your interface will not want to implement all methods. Also it
-    helps to improve ability to change the program, as methods can be
-    added to the interface more easily.
-    *   see [Naming Conventions](../index.md#naming_conventions) for
-        more information
-*   Do not implement more than one listener interface per class,
-    especially if using a top level class, because it makes the code
-    much less readable and makes you more likely to forget unregistering
-    your listener.
-    *   Anonymous inner-classes assigned to fields are much better:
-    
-Instead of:
-        
-```
-public class A implements B, C, D { 
-  ...
-}
-```
-you should write:
-```
-public class A implements D {
-  ... 
- 
-  B b = new B(){
-    ...
-  };
- 
-  C c = new C(){
-    ... 
-  };
-
-  ...
-```
-
-#### Control flow
-
-Test whether you can return from a method instead of testing whether
-you should execute a block of code.
-
-Instead of:
-    
-```
-    public void foo(){
-      //some code
-      
-      if (condition){
-        // long block of code
-      }
-    }
-```
-
-you should write:
-        
-```
-    public void foo(){
-      //some code
-      
-      if (!condition)
-        return;
-        
-      // long block of code
-    }
-```
-
-Furthermore, there is no need to put the code after the return
-statement into an explicit "else"-branch. You can easily save one
-level of block-nesting.
-
-#### Checking parameters
-
-*   Methods may assume that they are called with correct non-null input
-    unless the method specifies that it allows incorrect or null input.
-*   If a parameter may be `null `or is checked add a `@param`-JavaDoc
-    that indicates this.
-    
-
-```
-        /**
-         * Get positions of slashes in the filename.
-         * @param filename may be null
-         * @return Null-based indices into the string 
-                   pointing to the slash positions.
-         */
-
-        public int[] findAllSlashes(String filename) {
-          if (filename == null)
-            return new int[];
-          ...
-        }
-```
-
-*   If a method checks for correct parameters it should throw an
-    `IllegalArgumentException `in case of error.
-    *   It is recommended to perform checking in particular at important
-        component boundaries. For instance, we had a central entry point
-        were events were buffered for sending over the network. Somehow
-        a `null `event was inserted into the buffer queue and caused a
-        `NullPointerException `later on. The programmer of the method
-        which inserted the event into the buffer should have checked at
-        this important boundary with many callers.
-*   Use assert to check for complex preconditions, that cost a lot
-    during runtime.
+All code (i.e. identifiers) and comments are written in American
+English.
