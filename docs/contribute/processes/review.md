@@ -7,21 +7,6 @@ title: Review Process
 
 {% include toc.html %}
 
-## Review rules at a glance
-
-Make sure that your change:
-
-* has a commit message that complies with the [guidelines](../guidelines.md#commit-message)
-* is small
-* is formatted as defined in the [guidelines](../guidelines.md#formatting)
-
-In order to merge a pull request you need:
-
-* all checks (Travis CI, Sonar) passed
-* two reviewers approved **OR**
-* one reviewer approved two days ago and no further modification requests are posted
-
-*For each review you received you have to perform two reviews.*
 
 ## Why do reviews at all?
 

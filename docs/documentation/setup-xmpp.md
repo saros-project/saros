@@ -23,7 +23,7 @@ In order to use Saros you need to configure an XMPP/Jabber account.
     peer, we recommend using your own XMPP server. From our own testing
     we can
     recommend [OpenFire](http://www.igniterealtime.org/projects/openfire/index.jsp) (others
-    such as [ejabberd](http://www.process-one.net/en/ejabberd/) should
+    such as [ejabberd](https://www.ejabberd.im/) should
     be suitable as well)
 
 ### Suitable Jabber servers
@@ -51,21 +51,3 @@ In order to use Saros you need to configure an XMPP/Jabber account.
     *   [jabber.cc](http://www.jabber.cc/) - Outdated certificates and
         frequent out-takes
 *   [List of other public servers](http://xmpp.org/services/)
-
-## eJabberD (Linux)
-
-See [https://www.ejabberd.im](https://www.ejabberd.im/).
-
-
-## Openfire installation (Windows)
-
-1.  Download [Openfire for
-    Windows](http://www.igniterealtime.org/downloads/index.jsp)
-2.  The installation requires administrator privileges.
-3.  When the installation wizard asks about database settings choose the
-    embedded database.
-4.  Enable the proxy service under Server &gt; Server Settings &gt; File
-    Transfer Settings. (Should be the default value but it had to be
-    disabled for Saros in the past.)
-
-![](images/openfire_settings_02.png)
