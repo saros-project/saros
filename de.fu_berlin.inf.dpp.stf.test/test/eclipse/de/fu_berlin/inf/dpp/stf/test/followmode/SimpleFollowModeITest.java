@@ -58,7 +58,9 @@ public class SimpleFollowModeITest extends StfTestCase {
         ALICE
             .remoteBot()
             .editor("readme.txt")
-            .pressShortcut(IKeyLookup.BACKSPACE_NAME, IKeyLookup.BACKSPACE_NAME);
+            .pressShortcut(
+                new String[] { IKeyLookup.BACKSPACE_NAME,
+                    IKeyLookup.BACKSPACE_NAME });
 
         ALICE.controlBot().getNetworkManipulator()
             .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);

@@ -5,6 +5,6 @@
 	<classpathentry kind="src" path="test/eclipse"/>
 	<classpathentry kind="src" path="test/html"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.swt.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="/de.fu_berlin.inf.dpp.stf/lib/org.eclipse.swtbot.swt.finder_2.7.0.201806111355.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
