@@ -23,7 +23,7 @@ eclipse_dropin_dir="${eclipse_dir}/dropins"
 
 workspace="${STF_WS}/ws/workspace_${user}"
 
-plugin_id_prefix="de.fu_berlin.inf.dpp"
+plugin_id_prefix="de.fu_berlin.inf.dpp.eclipse"
 saros_plugin_dir="${STF_WS}/plugins"
 
 # determine (versioned) filename of plugin (_ suppresses .source versions)

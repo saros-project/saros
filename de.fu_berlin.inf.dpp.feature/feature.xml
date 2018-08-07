@@ -368,7 +368,7 @@ Public License instead of this License.
    </requires>
 
    <plugin
-         id="de.fu_berlin.inf.dpp"
+         id="de.fu_berlin.inf.dpp.eclipse"
          download-size="0"
          install-size="0"
          version="14.10.31"

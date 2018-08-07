@@ -42,7 +42,7 @@ public class Saros extends AbstractUIPlugin {
     /**
      * This is the Bundle-SymbolicName (a.k.a the pluginID)
      */
-    public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
+    public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp.eclipse"; //$NON-NLS-1$
 
     private static final String VERSION_COMPATIBILITY_PROPERTY_FILE = "version.comp"; //$NON-NLS-1$
 

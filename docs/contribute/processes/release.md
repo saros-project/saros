@@ -360,7 +360,7 @@ some important preconditions:
     for building the test files.
 *   Up-to-date working copy and the following projects in your Eclipse
     workspace
-    *   Saros Eclipse plugin: `de.fu_berlin.inf.dpp`
+    *   Saros Eclipse plugin: `de.fu_berlin.inf.dpp.eclipse`
     *   Saros core project: `de.fu_berlin.inf.dpp.core`
     *   Whiteboard plugin: `de.fu_berlin.inf.dpp.whiteboard`
     *   Saros Eclipse Feature: `de.fu_berlin.inf.dpp.feature`
@@ -380,7 +380,7 @@ Note: This section needs an update to include the Core project.
         to ` 13.12.6``.TESTING`
     *   Update plugin version of feature
         a.  Go to tab *Plug-ins*
-        b.  Make sure `de.fu_berlin.inf.dpp` and
+        b.  Make sure `de.fu_berlin.inf.dpp.eclipse` and
             `de.fu_berlin.inf.dpp.whiteboard` and
             `de.fu_berlin.inf.dpp.core `are included
         c.  For all projects, click on *Versions...*
@@ -442,7 +442,7 @@ Note: This section needs an update to include the Core project.
         using Eclipse 3.7 it will not work on earlier versions.
 *   Up-to-date working copy and the following projects in your Eclipse
     workspace
-    *   Saros Eclipse plugin: `de.fu_berlin.inf.dpp`
+    *   Saros Eclipse plugin: `de.fu_berlin.inf.dpp.eclipse`
     *   Saros core project: `de.fu_berlin.inf.dpp.core`
     *   Whiteboard plugin: `de.fu_berlin.inf.dpp.whiteboard`
     *   Saros Eclipse Feature: `de.fu_berlin.inf.dpp.feature`
@@ -493,7 +493,7 @@ Note: This section needs an update to include the Core project.
     b.  Update plugin version of feature
         1.  Go to tab *Plug-ins*
         2.  Make sure
-            `de.fu_berlin.inf.dpp.core`, `de.fu_berlin.inf.dpp`, and
+            `de.fu_berlin.inf.dpp.core`, `de.fu_berlin.inf.dpp.eclipse`, and
             `de.fu_berlin.inf.dpp.whiteboard` are included
         3.  For all projects, click on *Versions...*
         4.  Select *Copy versions from plugin and fragment manifests*
@@ -577,14 +577,14 @@ Note: This section needs an update to include the Core project.
     them otherwise):
     *   `de.fu_berlin.inf.dpp.feature/feature.xml`
     *   `de.fu_berlin.inf.dpp.update/artifacts.jar`
-    *   `de.fu_berlin.inf.dpp.update/``content.jar`
-    *   `de.fu_berlin.inf.dpp.update/``site.xml`
+    *   `de.fu_berlin.inf.dpp.update/content.jar`
+    *   `de.fu_berlin.inf.dpp.update/site.xml`
     *   `de.fu_berlin.inf.dpp.whiteboard/META-INF/MANIFEST.MF`
-    *   `de.fu_berlin.inf.dpp/CHANGELOG`
-    *   `de.fu_berlin.inf.dpp/``META-INF/MANIFEST.MF`
-    *   `de.fu_berlin.inf.dpp/``credits.txt`
-    *   `de.fu_berlin.inf.dpp/``saros.properties`
-    *   `de.fu_berlin.inf.dpp/``version.comp`
+    *   `de.fu_berlin.inf.dpp.eclipse/CHANGELOG`
+    *   `de.fu_berlin.inf.dpp.eclipse/META-INF/MANIFEST.MF`
+    *   `de.fu_berlin.inf.dpp.eclipse/credits.txt`
+    *   `de.fu_berlin.inf.dpp.eclipse/saros.properties`
+    *   `de.fu_berlin.inf.dpp.eclipse/version.comp`
 
 ### How to announce a new release
 

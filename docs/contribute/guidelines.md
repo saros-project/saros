@@ -102,16 +102,16 @@ To "install" the presets follow the following steps:
     1.  Select the sub-section "Java Code Style" &gt; "**Clean up**"
     2.  Under the box "Active profile:", click Import...
     3.  Navigate to the base folder of the "Saros"
-        project ("\[...\]/de.fu\_berlin.inf.dpp/")
-    4.  Select ["`clean-up-profile.xml`"](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/clean-up-profile.xml) and click Open
+        project ("\[...\]/de.fu\_berlin.inf.dpp.eclipse/")
+    4.  Select ["`clean-up-profile.xml`"](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp.eclipse/clean-up-profile.xml) and click Open
     5.  Click Apply and exit the menu by clicking Ok
 
 4.  Import the formatter profile:
     1.  Select the sub-section "Java Code Style" &gt; "**Formatter**"
     2.  Under the box "Active profile:", click Import...
     3.  Navigate to the base folder of the "Saros"
-        project ("\[...\]/de.fu\_berlin.inf.dpp/")
-    4.  Select ["`formatter-profile.xml`"](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/formatter-profile.xml) and click "Open"
+        project ("\[...\]/de.fu\_berlin.inf.dpp.eclipse/")
+    4.  Select ["`formatter-profile.xml`"](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp.eclipse/formatter-profile.xml) and click "Open"
     5.  Click Apply and exit the menu by clicking Ok
 
 ### Structure

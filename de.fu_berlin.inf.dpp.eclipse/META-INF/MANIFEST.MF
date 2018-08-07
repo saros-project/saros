@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Saros Plug-in
-Bundle-SymbolicName: de.fu_berlin.inf.dpp;singleton:=true
+Bundle-SymbolicName: de.fu_berlin.inf.dpp.eclipse;singleton:=true
 Bundle-Version: 14.11.28.DEVEL
 Bundle-Activator: de.fu_berlin.inf.dpp.Saros
 Bundle-Localization: plugin

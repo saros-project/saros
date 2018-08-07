@@ -8,13 +8,14 @@ cd $STF_WS
 mkdir src lib instr ws
 
 cd src
+
 jar xf ../de.fu_berlin.inf.dpp.core.source*.jar
 jar xf ../de.fu_berlin.inf.dpp.ui.source*.jar
 jar xf ../de.fu_berlin.inf.dpp.source*.jar
 
 cd ..
 
-jar xf de.fu_berlin.inf.dpp_*.jar lib
+jar xf de.fu_berlin.inf.dpp.eclipse_*.jar lib
 jar xf de.fu_berlin.inf.dpp.core_*.jar lib
 jar xf de.fu_berlin.inf.dpp.ui_*.jar lib
 
