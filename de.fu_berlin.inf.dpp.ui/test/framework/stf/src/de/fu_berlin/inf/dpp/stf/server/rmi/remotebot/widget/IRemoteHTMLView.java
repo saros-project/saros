@@ -41,6 +41,14 @@ public interface IRemoteHTMLView extends Remote {
     boolean isOpen() throws RemoteException;
 
     /**
+     * Opens this View on the remote side
+     * 
+     * @throws RemoteException
+     *             if the view could not be opened
+     */
+    void open() throws RemoteException;
+
+    /**
      * Gets a remote representation of the HTML button with the given ID from
      * within this view.
      * 
