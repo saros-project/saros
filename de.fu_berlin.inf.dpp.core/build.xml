@@ -20,6 +20,8 @@
     <!-- define the workspace location here -->
     <property name="workspaceDirectory" value="${basedir}/.." />
 
+    <property name="test.haltonfailure" value="off" />
+
     <property name="src.dir" value="${basedir}/src" />
     <property name="src.test.dir" value="${basedir}/test/junit" />
     <property name="bin.dir" value="${basedir}/bin" />
@@ -95,7 +97,7 @@
     <target name="test" depends="instrument">
         <mkdir dir="${junit.report.dir}" />
 
-        <junit printsummary="yes" fork="yes" forkmode="once">
+        <junit fork="yes" forkmode="once" haltonfailure="${test.haltonfailure}" >
 
             <sysproperty key="net.sourceforge.cobertura.datafile"
                          value="${cobertura.datafile}" />
@@ -112,11 +114,14 @@
                 <!-- finally the compiled test classes -->
                 <pathelement path="${bin.test.dir}" />
 
+                <pathelement path="${java.class.path}" />
+
             </classpath>
 
             <classpath refid="cobertura.classpath" />
 
             <formatter type="xml" />
+            <formatter type="plain" usefile="false" />
 
             <batchtest todir="${junit.report.dir}">
                 <fileset dir="${src.test.dir}">
