@@ -16,7 +16,7 @@ public class EclipseBrowserDialog implements IBrowserDialog {
 
     public EclipseBrowserDialog(Shell shell) {
         this.shell = shell;
-        sizeShellNotBiggerThanParent();
+        adjustShellSize();
         centerShellRelativeToParent();
     }
 
@@ -48,7 +48,11 @@ public class EclipseBrowserDialog implements IBrowserDialog {
             + (parentShellBounds.height - shellSize.y) / 2);
     }
 
-    private void sizeShellNotBiggerThanParent() {
+    /**
+     * If the shell is bigger that the parent, the shell size is set to 80% of
+     * the parent size.
+     */
+    private void adjustShellSize() {
         final Composite composite = shell.getParent();
 
         if (!(composite instanceof Shell))
