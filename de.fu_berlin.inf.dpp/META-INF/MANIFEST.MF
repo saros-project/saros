@@ -24,12 +24,7 @@ Require-Bundle: org.eclipse.ui,
  de.fu_berlin.inf.dpp.core,
  de.fu_berlin.inf.dpp.ui
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .,
- lib/org.hamcrest_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.core_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.integration_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.library_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.text_1.1.0.v20090501071000.jar
+Bundle-ClassPath: .
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,

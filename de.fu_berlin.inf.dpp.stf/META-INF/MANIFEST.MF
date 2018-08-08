@@ -24,8 +24,8 @@ Bundle-ClassPath: .,
  lib/org.eclipse.swtbot.eclipse.finder_2.7.0.201806111355.jar,
  lib/org.eclipse.swtbot.swt.finder_2.7.0.201806111355.jar,
  lib/org.eclipse.swtbot.eclipse.gef.finder_2.7.0.201806111355.jar,
- lib/org.hamcrest.library_1.3.0.v20180524-2246.jar,
- lib/org.hamcrest.core_1.3.0.v20180420-1519.jar
+ lib/org.hamcrest.core_1.1.0.v20090501071000.jar,
+ lib/org.hamcrest.library_1.1.0.v20090501071000.jar
 Export-Package: 
  de.fu_berlin.inf.dpp.stf,
  de.fu_berlin.inf.dpp.stf.annotation,
