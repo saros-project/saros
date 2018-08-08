@@ -1,0 +1,12 @@
+<ul class="list-group">
+    <a class="list-group-item list-group-item-action flex-column align-items-start active bg-blue">
+        <h6 class="mb-0" style="color: white">Resources</h6>
+    </a>
+
+  {% assign entries = site.data.navigation %}
+  {% for entry in entries %}
+    <a class="list-group-item list-group-item-action flex-column align-items-start" href="{{ entry.url | absolute_url }}">
+      <h6 class="mb-0"><i class="{{ entry.icon_class }}"></i>&emsp;{{ entry.long_title }}</h6>
+    </a>
+  {% endfor %}
+</ul>
