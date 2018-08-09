@@ -49,7 +49,7 @@ public class EclipseBrowserDialog implements IBrowserDialog {
     }
 
     /**
-     * If the shell is bigger that the parent, the shell size is set to 80% of
+     * If the shell is bigger than the parent, the shell size is set to 80% of
      * the parent size.
      */
     private void adjustShellSize() {
