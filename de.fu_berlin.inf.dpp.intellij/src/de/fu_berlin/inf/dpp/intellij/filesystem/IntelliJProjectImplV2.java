@@ -51,7 +51,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
 
     private volatile Module module;
 
-    private final VirtualFile moduleRoot;
+    private volatile VirtualFile moduleRoot;
 
     /**
      * Creates a core compatible {@link IProject project} using the given
@@ -258,6 +258,10 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
             }
 
             module = newModule;
+
+            moduleRoot = getModuleContentRoot(module);
+            checkIfContentRootLocatedBelowProjectRoot(module, moduleRoot);
+            checkIfModuleFileLocatedInContentRoot(module, moduleRoot);
 
             return true;
         }
