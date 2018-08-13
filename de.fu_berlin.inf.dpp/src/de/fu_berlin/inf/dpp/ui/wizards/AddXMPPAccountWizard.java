@@ -78,7 +78,7 @@ public class AddXMPPAccountWizard extends Wizard {
 
     /**
      * Adds the {@link EnterXMPPAccountWizardPage}'s account data to the
-     * {@link XMPPAccountStore}.
+     * {@link XMPPAccountStore} and set the added account as active.
      * 
      */
     private void addXMPPAccount() {
@@ -100,8 +100,9 @@ public class AddXMPPAccountWizard extends Wizard {
         boolean useTLS = enterXMPPAccountWizardPage.isUsingTLS();
         boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
 
-        accountStore.createAccount(username, password, domain, server, port,
-            useTLS, useSASL);
+        XMPPAccount addedAccount = accountStore.createAccount(username,
+            password, domain, server, port, useTLS, useSASL);
+        accountStore.setAccountActive(addedAccount);
     }
 
     private void autoConnectXMPPAccount() {
