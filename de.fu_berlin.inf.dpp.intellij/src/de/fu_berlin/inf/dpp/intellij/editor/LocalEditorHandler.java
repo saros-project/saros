@@ -189,7 +189,7 @@ public class LocalEditorHandler {
      * @param path path
      */
     public void removeEditor(@NotNull SPath path){
-        editorPool.removeAll(path);
+        editorPool.removeEditor(path);
     }
 
     /**
