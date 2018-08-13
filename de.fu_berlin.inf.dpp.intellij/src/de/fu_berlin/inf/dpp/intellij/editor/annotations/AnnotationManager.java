@@ -11,6 +11,7 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.session.User;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,9 @@ import java.util.concurrent.atomic.AtomicReference;
 //TODO move saved local selections affected by changes while editor is closed
 //TODO adjust position of local selection when editor is re-opened
 public class AnnotationManager {
+
+    private static final Logger LOG = Logger.getLogger(AnnotationManager.class);
+
     /**
      * Enum containing the possible annotation types.
      */
@@ -93,7 +97,11 @@ public class AnnotationManager {
 
         if (editor != null) {
             RangeHighlighter rangeHighlighter = addRangeHighlighter(user, start,
-                end, editor, AnnotationType.SELECTION_ANNOTATION);
+                end, editor, AnnotationType.SELECTION_ANNOTATION, file);
+
+            if (rangeHighlighter == null) {
+                return;
+            }
 
             annotationRange = new AnnotationRange(start, end, rangeHighlighter);
 
@@ -149,7 +157,11 @@ public class AnnotationManager {
             if (editor != null) {
                 RangeHighlighter rangeHighlighter = addRangeHighlighter(user,
                     currentStart, currentEnd, editor,
-                    AnnotationType.CONTRIBUTION_ANNOTATION);
+                    AnnotationType.CONTRIBUTION_ANNOTATION, file);
+
+                if (rangeHighlighter == null) {
+                    return;
+                }
 
                 annotationRange = new AnnotationRange(currentStart, currentEnd,
                     rangeHighlighter);
@@ -430,7 +442,7 @@ public class AnnotationManager {
      * @param annotations the annotations to add a local representation to
      * @param editor      the editor to create RangeHighlighters in
      * @param <E>         the annotation type
-     * @see #addRangeHighlighter(User, int, int, Editor, AnnotationType)
+     * @see #addRangeHighlighter(User, int, int, Editor, AnnotationType, IFile)
      */
     private <E extends AbstractEditorAnnotation> void addLocalRepresentationToAnnotations(
         @NotNull
@@ -458,14 +470,19 @@ public class AnnotationManager {
 
             annotation.addEditor(editor);
 
+            IFile file = annotation.getFile();
+
             annotationRanges.forEach(annotationRange -> {
                 int start = annotationRange.getStart();
                 int end = annotationRange.getEnd();
 
                 RangeHighlighter rangeHighlighter = addRangeHighlighter(user,
-                    start, end, editor, annotationType);
+                    start, end, editor, annotationType, file);
 
-                annotationRange.addRangeHighlighter(rangeHighlighter);
+                if (rangeHighlighter != null) {
+                    annotationRange.addRangeHighlighter(rangeHighlighter);
+                }
+
             });
         });
     }
@@ -623,16 +640,34 @@ public class AnnotationManager {
      * @param end            the end of the highlighted area
      * @param editor         the editor to create the highlighter for
      * @param annotationType the type of annotation
-     * @return a RangeHighlighter with the given parameters.
+     * @param file           the file the annotation belongs to
+     * @return a RangeHighlighter with the given parameters or <code>null</code>
+     * if the given end position is located after the document end
      */
-    @NotNull
+    @Nullable
     private RangeHighlighter addRangeHighlighter(
         @NotNull
             User user, int start, int end,
         @NotNull
             Editor editor,
         @NotNull
-            AnnotationType annotationType) {
+            AnnotationType annotationType,
+        @NotNull
+            IFile file) {
+
+        int documentLength = editor.getDocument().getTextLength();
+
+        if (documentLength < end) {
+            LOG.warn(
+                "The creation of a range highlighter with the bounds (" + start
+                    + ", " + end + ") for the file " + file.getProject()
+                    .getName() + " - " + file.getProjectRelativePath()
+                    + " failed as the given end position is located after the "
+                    + "document end. document length: " + documentLength
+                    + ", end position: " + end);
+
+            return null;
+        }
 
         Color color;
         switch (annotationType) {
