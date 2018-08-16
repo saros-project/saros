@@ -10,6 +10,8 @@ import java.rmi.RemoteException;
 
 public interface IViews extends Remote {
 
+  public void forceUseHtmlGui() throws RemoteException;
+
   public ISarosView sarosView() throws RemoteException;
 
   public ISarosWhiteboardView sarosWhiteboardView() throws RemoteException;

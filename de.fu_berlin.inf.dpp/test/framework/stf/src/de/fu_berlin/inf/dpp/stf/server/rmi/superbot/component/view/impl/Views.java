@@ -1,6 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.EclipseHTMLWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.impl.HTMLBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
@@ -10,9 +14,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorerView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosHTMLView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
+import de.fu_berlin.inf.dpp.ui.View;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 
@@ -24,12 +30,34 @@ public final class Views extends StfRemoteObject implements IViews {
     return INSTANCE;
   }
 
+  private boolean forceUseHtmlGui = false;
+
+  /* Use this method to force the STF to use the HTML-GUI.
+   * This can be removed when the old GUI is fully replaced.
+   * */
+  @Override
+  public void forceUseHtmlGui() throws RemoteException {
+    if (Saros.useHtmlGui() == false) {
+      throw new RuntimeException(
+          "HTML-GUI is not enabled. Please set saros.swtbrowser propertie to true.");
+    }
+    forceUseHtmlGui = true;
+  }
+
   @Override
   public ISarosView sarosView() throws RemoteException {
-    SWTWorkbenchBot bot = new SWTWorkbenchBot();
-    RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_ID);
-    bot.viewByTitle(VIEW_SAROS).show();
-    return SarosView.getInstance().setView(bot.viewByTitle(VIEW_SAROS));
+    if (Saros.useHtmlGui() && this.forceUseHtmlGui) {
+      IHTMLBot htmlBot = HTMLBotImpl.getInstance();
+      EclipseHTMLWorkbenchBot.getInstance().openSarosBrowserView();
+      htmlBot.view(View.MAIN_VIEW).open();
+      return SarosHTMLView.getInstance().setBot(htmlBot);
+    } else {
+      // this else block can be removed when the old GUI is fully replaced
+      SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_ID);
+      bot.viewByTitle(VIEW_SAROS).show();
+      return SarosView.getInstance().setView(bot.viewByTitle(VIEW_SAROS));
+    }
   }
 
   @Override

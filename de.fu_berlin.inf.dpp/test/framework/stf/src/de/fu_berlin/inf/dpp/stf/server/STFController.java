@@ -66,6 +66,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.Chatroom;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosHTMLView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.WhiteboardFigure;
@@ -200,6 +201,11 @@ public class STFController {
       exportObject(RemoteHTMLProgressBar.getInstance(), "htmlProgressBar");
       exportObject(RemoteHTMLTextElement.getInstance(), "htmlTextElement");
       exportObject(RemoteHTMLTree.getInstance(), "htmlTree");
+
+      /*
+       * export HTML view
+       */
+      exportObject(SarosHTMLView.getInstance(), "sarosHTMLView");
     }
 
     /*
