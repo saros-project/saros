@@ -1,6 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.EclipseHTMLWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.impl.HTMLBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
@@ -10,9 +14,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorerView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosHTMLView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
+import de.fu_berlin.inf.dpp.ui.View;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 
@@ -26,10 +32,17 @@ public final class Views extends StfRemoteObject implements IViews {
 
   @Override
   public ISarosView sarosView() throws RemoteException {
-    SWTWorkbenchBot bot = new SWTWorkbenchBot();
-    RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_ID);
-    bot.viewByTitle(VIEW_SAROS).show();
-    return SarosView.getInstance().setView(bot.viewByTitle(VIEW_SAROS));
+    if (Saros.useHtmlGui()) {
+      IHTMLBot htmlBot = HTMLBotImpl.getInstance();
+      EclipseHTMLWorkbenchBot.getInstance().openSarosBrowserView();
+      htmlBot.view(View.MAIN_VIEW).open();
+      return SarosHTMLView.getInstance().setBot(htmlBot);
+    } else {
+      SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_ID);
+      bot.viewByTitle(VIEW_SAROS).show();
+      return SarosView.getInstance().setView(bot.viewByTitle(VIEW_SAROS));
+    }
   }
 
   @Override

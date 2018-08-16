@@ -17,7 +17,7 @@ const Accounts = ({
   accounts,
   onChangeActiveAccount
 }) => (
-  <div>
+  <div id='active-account'>
     { (typeof activeAccount === 'object' && activeAccount.username && activeAccount.domain)
       ? `${activeAccount.username}@${activeAccount.domain}`
       : <Text message='message.noAccount' />
@@ -28,12 +28,13 @@ const Accounts = ({
       bsStyle={'primary'}
       title='Accounts'
     >
-      {accounts.map(getJid).map(jid => (
+      {accounts.map(jid => (
         <MenuItem
-          key={jid}
-          eventKey={jid}
+          key={getJid(jid)}
+          eventKey={getJid(jid)}
+          id={jid.username}
         >
-          {jid}
+          {getJid(jid)}
         </MenuItem>
       ))}
     </DropdownButton>
