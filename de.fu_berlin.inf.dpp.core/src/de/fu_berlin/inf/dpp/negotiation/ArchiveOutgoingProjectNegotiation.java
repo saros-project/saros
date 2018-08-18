@@ -30,8 +30,8 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 
 /**
- * Implementation of {@link AbstractOutgoingProjectNegotiation} utilizing
- * a transferred zip archive to exchange differences in the project files.
+ * Implementation of {@link AbstractOutgoingProjectNegotiation} utilizing a
+ * transferred zip archive to exchange differences in the project files.
  */
 public class ArchiveOutgoingProjectNegotiation extends
     AbstractOutgoingProjectNegotiation {
@@ -62,8 +62,7 @@ public class ArchiveOutgoingProjectNegotiation extends
     }
 
     @Override
-    protected void setup(IProgressMonitor monitor)
-        throws IOException {
+    protected void setup(IProgressMonitor monitor) throws IOException {
         if (fileTransferManager == null)
             // FIXME: the logic will try to send this to the remote contact
             throw new IOException("not connected to a XMPP server");
@@ -155,7 +154,8 @@ public class ArchiveOutgoingProjectNegotiation extends
         for (final FileList list : fileLists) {
             final String projectID = list.getProjectID();
 
-            final IProject project = session.getProject(projectID);
+            final IProject project = referencePointManager.get(session
+                .getReferencePoint(projectID));
 
             if (project == null)
                 throw new LocalCancellationException("project with id "

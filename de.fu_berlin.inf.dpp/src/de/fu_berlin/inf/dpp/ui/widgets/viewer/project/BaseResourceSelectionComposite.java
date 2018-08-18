@@ -500,8 +500,8 @@ public abstract class BaseResourceSelectionComposite extends
                         .create((IResource) element));
                 } else if (element instanceof IProject) {
                     return !(sarosSession
-                        .isCompletelyShared(ResourceAdapterFactory
-                            .create((IProject) element)));
+                        .isCompletelyShared(ResourceAdapterFactory.create(
+                            (IProject) element).getReferencePoint()));
                 }
             }
             return true;

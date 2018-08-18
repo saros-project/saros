@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -499,7 +500,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     }
 
     private boolean isCompletelyShared(IntelliJProjectImpl project) {
-        return resourceManager.getSession().isCompletelyShared(project);
+        return resourceManager.getSession().isCompletelyShared(project.
+            getReferencePoint());
     }
 
     private boolean isValidProject(IntelliJProjectImpl project) {
@@ -515,7 +517,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      * <b>null</b> if no such project exists
      */
     private IntelliJProjectImpl getProjectForResource(IPath path){
-        for(IProject sessionProject: resourceManager.getSession().getProjects()){
+        IReferencePointManager referencePointManager = resourceManager.getSession()
+            .getComponent(IReferencePointManager.class);
+        for(IProject sessionProject: referencePointManager.getProjects(
+            resourceManager.getSession().getReferencePoints())){
 
             IntelliJProjectImpl project = (IntelliJProjectImpl)sessionProject;
 

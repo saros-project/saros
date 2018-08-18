@@ -14,7 +14,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -84,8 +84,8 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
     private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void resourcesAdded(IProject project) {
-            LOG.debug("updating project decoration for all shared projects");
+        public void resourcesAdded(IReferencePoint referencePoint) {
+            LOG.debug("updating project decoration for all shared reference points");
             updateDecoratorsAsync(null); // update all labels
         }
     };
@@ -119,8 +119,8 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
         if (resource.getType() == IResource.PROJECT) {
             boolean isCompletelyShared = currentSession
-                .isCompletelyShared(ResourceAdapterFactory.create(resource
-                    .getProject()));
+                .isCompletelyShared(ResourceAdapterFactory.create(
+                    resource.getProject()).getReferencePoint());
 
             decoration
                 .addSuffix(isCompletelyShared ? Messages.SharedProjectDecorator_shared
