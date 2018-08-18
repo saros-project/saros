@@ -13,7 +13,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.junit.After;
 import org.junit.Before;
@@ -44,6 +46,8 @@ public class FileActivityConsumerTest {
      * before being used.
      */
     private IFile file;
+    private IProject project;
+    private IPath path;
 
     private SharedResourcesManager resourceChangeListener;
 
@@ -62,6 +66,13 @@ public class FileActivityConsumerTest {
 
         consumer = new FileActivityConsumer(null, resourceChangeListener, null);
 
+        path = createMock(IPath.class);
+        replay(path);
+
+        project = createMock(IProject.class);
+        expect(project.getLocation()).andStubReturn(path);
+        replay(project);
+
         file = createMock(IFile.class);
 
         expect(file.getContents()).andStubReturn(
@@ -71,6 +82,7 @@ public class FileActivityConsumerTest {
         expect(file.getType()).andStubReturn(IResource.FILE);
         expect(file.getAdapter(IFile.class)).andStubReturn(file);
 
+        expect(file.getProject()).andStubReturn(project);
     }
 
     @After

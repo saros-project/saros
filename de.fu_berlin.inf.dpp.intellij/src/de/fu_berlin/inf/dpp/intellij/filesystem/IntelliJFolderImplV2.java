@@ -34,6 +34,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
         @NotNull final IPath path) {
         this.project = project;
         this.path = path;
+        this.referencePoint = project.getReferencePoint();
     }
 
     @Override

@@ -58,4 +58,11 @@ public interface IResource {
 
     public Object getAdapter(Class<? extends IResource> clazz);
 
+    /**
+     * Returns the {@link IReferencePoint} on which the resource referenced to
+     * 
+     * @return
+     */
+    public IReferencePoint getReferencePoint();
+
 }
