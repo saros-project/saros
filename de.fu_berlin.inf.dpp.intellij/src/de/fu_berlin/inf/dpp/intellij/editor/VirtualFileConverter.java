@@ -3,8 +3,10 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
@@ -95,8 +97,11 @@ public class VirtualFileConverter {
 
         IResource resource = null;
 
-        for (IProject project : currentSession.getProjects()) {
-            resource = getResource(virtualFile, project);
+        IReferencePointManager referencePointManager = currentSession
+            .getComponent(IReferencePointManager.class);
+
+        for (IReferencePoint referencePoint : currentSession.getReferencePoints()) {
+            resource = getResource(virtualFile, referencePointManager.get(referencePoint));
 
             if (resource != null) {
                 break;

@@ -19,7 +19,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 
-public class SharedProjectMapperTest {
+public class SharedReferencePointMapperTest {
 
     private SharedReferencePointMapper mapper;
 

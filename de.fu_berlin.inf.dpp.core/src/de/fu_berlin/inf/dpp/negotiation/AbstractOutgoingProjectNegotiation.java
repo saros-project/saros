@@ -35,12 +35,13 @@ import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 
 /**
  * Handles outgoing ProjectNegotiations except for the actual file transfer.
- *
+ * 
  * Concrete implementations need to provide an implementation to exchange the
  * calculated differences. This class only provides the initial setup and
  * calculation.
  */
-public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiation {
+public abstract class AbstractOutgoingProjectNegotiation extends
+    ProjectNegotiation {
 
     private static final Logger LOG = Logger
         .getLogger(AbstractOutgoingProjectNegotiation.class);
@@ -124,10 +125,10 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
     /**
      * Preparation for the Project Negotiation. The negotiation can be aborted
      * by canceling the given monitor.
-     *
+     * 
      * @param monitor
      *            monitor to show progress to the user
-     *
+     * 
      * @throws IOException
      *             , SarosCancellationException
      */
@@ -137,13 +138,13 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
     /**
      * Prepare the file transfer. Can be used to process files (e.g. compress
      * them) before the actual transfer.
-     *
+     * 
      * @param monitor
      *            monitor to show progress to the user
-     *
+     * 
      * @param fileLists
      *            list of files to be send
-     *
+     * 
      * @throws IOException
      *             , SarosCancellationException
      */
@@ -153,13 +154,13 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
     /**
      * Transfer the differing files.
-     *
+     * 
      * @param monitor
      *            monitor to show progress to the user
-     *
+     * 
      * @param fileLists
      *            list of files to be send
-     *
+     * 
      * @throws IOException
      *             , SarosCancellationException
      */
@@ -170,7 +171,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
     /**
      * Cleanup acquired resources during {@link #setup},
      * {@link #prepareTransfer} and {@link #transfer}.
-     *
+     * 
      * @param monitor
      *            mapping from remote project ids to the target local projects
      */
@@ -338,18 +339,21 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
                     editorManager.saveEditors(project);
 
                 FileList projectFileList = FileListFactory.createFileList(
-                    project, session.getSharedResources(project),
-                    checksumCache, new SubProgressMonitor(monitor, 1 * scale,
+                    project, session.getSharedResources(project
+                        .getReferencePoint()), checksumCache,
+                    new SubProgressMonitor(monitor, 1 * scale,
                         SubProgressMonitor.SUPPRESS_BEGINTASK
                             | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-                boolean partial = !session.isCompletelyShared(project);
+                boolean partial = !session.isCompletelyShared(project
+                    .getReferencePoint());
 
-                String projectID = session.getProjectID(project);
-                projectFileList.setProjectID(projectID);
+                String referencePointID = session.getReferencePointID(project
+                    .getReferencePoint());
+                projectFileList.setProjectID(referencePointID);
 
                 ProjectNegotiationData data = new ProjectNegotiationData(
-                    projectID, project.getName(), partial, projectFileList);
+                    referencePointID, project.getName(), partial, projectFileList);
 
                 negData.add(data);
 

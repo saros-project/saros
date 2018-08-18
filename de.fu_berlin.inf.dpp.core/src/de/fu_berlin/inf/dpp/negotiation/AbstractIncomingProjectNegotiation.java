@@ -40,12 +40,13 @@ import de.fu_berlin.inf.dpp.session.SessionEndReason;
 
 /**
  * Handles incoming ProjectNegotiations except for the actual file transfer.
- *
+ * 
  * Concrete implementations need to provide an implementation to exchange the
  * calculated differences. This class only provides the initial setup and
  * calculation.
  */
-public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiation {
+public abstract class AbstractIncomingProjectNegotiation extends
+    ProjectNegotiation {
 
     private static final Logger LOG = Logger
         .getLogger(AbstractIncomingProjectNegotiation.class);
@@ -169,7 +170,9 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
                         resources.add(getResource(project, path));
                 }
 
-                session.addSharedResources(project, projectID, resources);
+                referencePointManager.put(project.getReferencePoint(), project);
+                session.addSharedResources(project.getReferencePoint(),
+                    projectID, resources);
             }
         } catch (Exception e) {
             exception = e;
@@ -183,7 +186,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     /**
      * In preparation of the Project Negotiation, this setups a File Transfer
      * Handler, used to receive the incoming negotiation data.
-     *
+     * 
      * @param monitor
      *            monitor to show progress to the user
      * 
@@ -201,20 +204,21 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     }
 
     /**
-     * Handle the actual transfer.
-     * The negotiation can be aborted by canceling the given monitor.
-     *
+     * Handle the actual transfer. The negotiation can be aborted by canceling
+     * the given monitor.
+     * 
      * @param monitor
-     *      monitor to show progress to the user
-     *
+     *            monitor to show progress to the user
+     * 
      * @param projectMapping
-     *      mapping from remote project ids to the target local projects
-     *
+     *            mapping from remote project ids to the target local projects
+     * 
      * @param missingFiles
-     *      files missing, that should be transferred and synchronized
-     *      by this method call
-     *
-     * @throws IOException, SarosCancellationException
+     *            files missing, that should be transferred and synchronized by
+     *            this method call
+     * 
+     * @throws IOException
+     *             , SarosCancellationException
      */
     protected abstract void transfer(IProgressMonitor monitor,
         Map<String, IProject> projectMapping, List<FileList> missingFiles)
@@ -236,13 +240,13 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
         fileReplacementInProgressObservable.replacementDone();
 
         /*
-         * TODO Queuing responsibility should be moved to Project
-         * Negotiation, since its the only consumer of queuing
-         * functionality. This will enable a specific Queuing mechanism per
-         * TransferType (see github issue #137).
+         * TODO Queuing responsibility should be moved to Project Negotiation,
+         * since its the only consumer of queuing functionality. This will
+         * enable a specific Queuing mechanism per TransferType (see github
+         * issue #137).
          */
         for (IProject project : projectMapping.values())
-            session.disableQueuing(project);
+            session.disableQueuing(project.getReferencePoint());
 
         if (fileTransferManager != null)
             fileTransferManager.removeFileTransferListener(transferListener);

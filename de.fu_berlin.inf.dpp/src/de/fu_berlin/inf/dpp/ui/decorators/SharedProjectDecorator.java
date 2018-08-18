@@ -119,8 +119,8 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
         if (resource.getType() == IResource.PROJECT) {
             boolean isCompletelyShared = currentSession
-                .isCompletelyShared(ResourceAdapterFactory.create(resource
-                    .getProject()));
+                .isCompletelyShared(ResourceAdapterFactory.create(
+                    resource.getProject()).getReferencePoint());
 
             decoration
                 .addSuffix(isCompletelyShared ? Messages.SharedProjectDecorator_shared

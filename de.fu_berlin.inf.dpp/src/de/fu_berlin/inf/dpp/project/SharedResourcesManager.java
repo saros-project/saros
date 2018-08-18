@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -93,6 +94,8 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     /** map that holds the current open or closed state for every shared project */
     private final Map<IProject, Boolean> projectStates = new HashMap<IProject, Boolean>();
 
+    private IReferencePointManager referencePointManager;
+
     private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
@@ -152,6 +155,8 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         this.stopManager = stopManager;
         this.projectDeltaVisitor = new ProjectDeltaVisitor(sarosSession,
             editorManager);
+        this.referencePointManager = sarosSession
+            .getComponent(IReferencePointManager.class);
     }
 
     /**

@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -72,6 +73,8 @@ public class EnterProjectNamePage extends WizardPage {
 
     private final Set<String> unsupportedCharsets = new HashSet<String>();
 
+    private IReferencePointManager referencePointManager;
+
     public EnterProjectNamePage(ISarosSession session,
         IConnectionManager connectionManager, Preferences preferences,
         JID peer, List<ProjectNegotiationData> projectNegotiationData) {
@@ -81,7 +84,8 @@ public class EnterProjectNamePage extends WizardPage {
         this.connectionManager = connectionManager;
         this.preferences = preferences;
         this.peer = peer;
-
+        this.referencePointManager = session
+            .getComponent(IReferencePointManager.class);
         remoteProjectMapping = new HashMap<String, String>();
 
         for (final ProjectNegotiationData data : projectNegotiationData) {
@@ -384,8 +388,8 @@ public class EnterProjectNamePage extends WizardPage {
             String projectID = entry.getKey();
             ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-            de.fu_berlin.inf.dpp.filesystem.IProject project = session
-                .getProject(projectID);
+            de.fu_berlin.inf.dpp.filesystem.IProject project = referencePointManager
+                .get(session.getReferencePoint(projectID));
 
             if (project == null)
                 continue;
@@ -401,8 +405,8 @@ public class EnterProjectNamePage extends WizardPage {
             String projectID = entry.getKey();
             ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-            de.fu_berlin.inf.dpp.filesystem.IProject project = session
-                .getProject(projectID);
+            de.fu_berlin.inf.dpp.filesystem.IProject project = referencePointManager
+                .get(session.getReferencePoint(projectID));
 
             if (project != null)
                 continue;

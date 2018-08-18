@@ -22,12 +22,14 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 /**
- * This abstract class is the superclass for {@link AbstractOutgoingProjectNegotiation}
- * and {@link AbstractIncomingProjectNegotiation}.
+ * This abstract class is the superclass for
+ * {@link AbstractOutgoingProjectNegotiation} and
+ * {@link AbstractIncomingProjectNegotiation}.
  */
 public abstract class ProjectNegotiation extends Negotiation {
 
@@ -71,6 +73,8 @@ public abstract class ProjectNegotiation extends Negotiation {
 
     protected TransferType transferType;
 
+    protected IReferencePointManager referencePointManager;
+
     public ProjectNegotiation(final String id, final JID peer,
         final TransferType transferType,
         final ISarosSessionManager sessionManager, final ISarosSession session,
@@ -91,6 +95,8 @@ public abstract class ProjectNegotiation extends Negotiation {
             fileTransferManager = new FileTransferManager(connection);
 
         this.transferType = transferType;
+        this.referencePointManager = session
+            .getComponent(IReferencePointManager.class);
     }
 
     /**
@@ -184,7 +190,7 @@ public abstract class ProjectNegotiation extends Negotiation {
 
     /**
      * Returns the {@link TransferType} used for this negotiation
-     *
+     * 
      * @return the {@link TransferType} used for this negotiation
      */
     public TransferType getTransferType() {

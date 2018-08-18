@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -39,6 +40,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -65,6 +67,8 @@ public class EditorManager extends AbstractActivityProducer
     implements IEditorManager {
 
     private static final Logger LOG = Logger.getLogger(EditorManager.class);
+
+    IReferencePointManager referencePointManager;
 
     private final Blockable stopManagerListener = new Blockable() {
 
@@ -293,7 +297,7 @@ public class EditorManager extends AbstractActivityProducer
         }
 
         @Override
-        public void userFinishedProjectNegotiation(User user) {
+        public void userFinishedReferencePointNegotiation(User user) {
 
             // Send awareness-information
             User localUser = session.getLocalUser();
@@ -345,11 +349,11 @@ public class EditorManager extends AbstractActivityProducer
         }
 
         @Override
-        public void resourcesAdded(final IProject project) {
+        public void resourcesAdded(final IReferencePoint referencePoint) {
             ApplicationManager.getApplication().invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
-                        addProjectResources(project);
+                        addProjectResources(referencePointManager.get(referencePoint));
                     }
                 }, ModalityState.defaultModalityState());
         }
@@ -403,6 +407,7 @@ public class EditorManager extends AbstractActivityProducer
                 .isEmpty() : "EditorPool was not correctly reset!";
 
             session = newSarosSession;
+            referencePointManager = session.getComponent(IReferencePointManager.class);
             session.getStopManager().addBlockable(stopManagerListener);
 
             hasWriteAccess = session.hasWriteAccess();

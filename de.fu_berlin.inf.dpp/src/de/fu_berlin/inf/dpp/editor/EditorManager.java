@@ -338,12 +338,13 @@ public class EditorManager extends AbstractActivityProducer implements
         public void resourcesAdded(IProject project) {
             SWTUtils.runSafeSWTSync(LOG, new Runnable() {
                 /*
-                 * When Alice invites Bob to a session with a project and Alice
-                 * has some Files of the shared project already open, Bob will
-                 * not receive any Actions (Selection, Contribution etc.) for
-                 * the open editors. When Alice closes and reopens this Files
-                 * again everything is going back to normal. To prevent that
-                 * from happening we have to update the editor pool.
+                 * When Alice invites Bob to a session with a project/reference
+                 * point and Alice has some Files of the shared project already
+                 * open, Bob will not receive any Actions (Selection,
+                 * Contribution etc.) for the open editors. When Alice closes
+                 * and reopens this Files again everything is going back to
+                 * normal. To prevent that from happening we have to update the
+                 * editor pool.
                  */
                 @Override
                 public void run() {

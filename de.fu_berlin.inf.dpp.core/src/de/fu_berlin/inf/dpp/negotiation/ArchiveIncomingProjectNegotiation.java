@@ -31,8 +31,8 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 
 /**
- * Implementation of {@link AbstractIncomingProjectNegotiation} utilizing
- * a transferred zip archive to exchange differences in the project files.
+ * Implementation of {@link AbstractIncomingProjectNegotiation} utilizing a
+ * transferred zip archive to exchange differences in the project files.
  */
 public class ArchiveIncomingProjectNegotiation extends
     AbstractIncomingProjectNegotiation {
@@ -56,9 +56,10 @@ public class ArchiveIncomingProjectNegotiation extends
         final ITransmitter transmitter, //
         final IReceiver receiver //
     ) {
-        super(peer, TransferType.ARCHIVE, negotiationID, projectNegotiationData,
-            sessionManager, session, fileReplacementInProgressObservable,
-            workspace, checksumCache, connectionService, transmitter, receiver);
+        super(peer, TransferType.ARCHIVE, negotiationID,
+            projectNegotiationData, sessionManager, session,
+            fileReplacementInProgressObservable, workspace, checksumCache,
+            connectionService, transmitter, receiver);
     }
 
     @Override
@@ -83,8 +84,10 @@ public class ArchiveIncomingProjectNegotiation extends
              * functionality. This will enable a specific Queuing mechanism per
              * TransferType (see github issue #137).
              */
-            session.addProjectMapping(projectID, project);
-            session.enableQueuing(project);
+            referencePointManager.put(project.getReferencePoint(), project);
+            session.addReferencePointMapping(projectID,
+                project.getReferencePoint());
+            session.enableQueuing(project.getReferencePoint());
         }
 
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
