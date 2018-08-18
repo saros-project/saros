@@ -124,7 +124,7 @@ public final class SarosSession implements ISarosSession {
 
     private final User hostUser;
 
-    private final SharedProjectMapper projectMapper;
+    private final SharedReferencePointMapper projectMapper;
 
     private final MutablePicoContainer sessionContainer;
 
@@ -1088,7 +1088,7 @@ public final class SarosSession implements ISarosSession {
         context.initComponent(this);
 
         this.sessionID = id;
-        this.projectMapper = new SharedProjectMapper();
+        this.projectMapper = new SharedReferencePointMapper();
         this.activityQueuer = new ActivityQueuer();
         this.containerContext = context;
 
