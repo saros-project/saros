@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -419,5 +420,11 @@ public class IntelliJProjectImpl implements IProject {
         }
 
         return getClass().getName() + sb;
+    }
+
+    @Override
+    public IReferencePoint getReferencePoint()
+    {
+        return null;
     }
 }
