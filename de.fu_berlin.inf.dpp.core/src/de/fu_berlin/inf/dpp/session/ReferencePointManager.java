@@ -25,7 +25,6 @@ public class ReferencePointManager implements IReferencePointManager {
         if (!referencePointToProjectMapper.containsKey(referencePoint)) {
             referencePointToProjectMapper.put(referencePoint, project);
         }
-
     }
 
     @Override
