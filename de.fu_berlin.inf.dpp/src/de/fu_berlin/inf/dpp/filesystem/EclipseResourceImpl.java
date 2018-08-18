@@ -8,12 +8,17 @@ import org.eclipse.core.runtime.OperationCanceledException;
 public class EclipseResourceImpl implements IResource {
 
     protected final org.eclipse.core.resources.IResource delegate;
+    protected IReferencePoint referencePoint;
 
     EclipseResourceImpl(org.eclipse.core.resources.IResource delegate) {
         if (delegate == null)
             throw new NullPointerException("delegate is null");
 
         this.delegate = delegate;
+
+        if (delegate.getProject() != null)
+            referencePoint = new EclipseReferencePointImpl(new EclipsePathImpl(
+                delegate.getProject().getLocation()));
     }
 
     @Override
@@ -191,5 +196,10 @@ public class EclipseResourceImpl implements IResource {
     @Override
     public String toString() {
         return delegate.toString() + " (" + getClass().getSimpleName() + ")";
+    }
+
+    @Override
+    public IReferencePoint getReferencePoint() {
+        return referencePoint;
     }
 }
