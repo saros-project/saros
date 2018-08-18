@@ -13,6 +13,12 @@ public class IResourceTest {
         org.eclipse.core.resources.IFolder folder = EasyMock
             .createMock(org.eclipse.core.resources.IFolder.class);
 
+        org.eclipse.core.resources.IProject project = EasyMock
+            .createMock(org.eclipse.core.resources.IProject.class);
+
+        org.eclipse.core.runtime.IPath path = EasyMock
+            .createMock(org.eclipse.core.runtime.IPath.class);
+
         Capture<Class<?>> mappedAdapterClassCapture = new Capture<Class<?>>();
 
         EasyMock.expect(
@@ -22,7 +28,11 @@ public class IResourceTest {
         EasyMock.expect(folder.getType()).andStubReturn(
             org.eclipse.core.resources.IResource.FOLDER);
 
-        EasyMock.replay(folder);
+        EasyMock.expect(folder.getProject()).andStubReturn(project);
+
+        EasyMock.expect(project.getLocation()).andStubReturn(path);
+
+        EasyMock.replay(folder, project, path);
 
         final IFolder coreFolder = new EclipseFolderImpl(folder);
 
