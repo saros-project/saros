@@ -23,10 +23,12 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -93,24 +95,24 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     /** map that holds the current open or closed state for every shared project */
     private final Map<IProject, Boolean> projectStates = new HashMap<IProject, Boolean>();
 
+    private IReferencePointManager referencePointManager;
+
     private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void projectAdded(
-            de.fu_berlin.inf.dpp.filesystem.IProject project) {
+        public void referencePointAdded(IReferencePoint referencePoint) {
             synchronized (projectStates) {
                 IProject eclipseProject = (IProject) ResourceAdapterFactory
-                    .convertBack(project);
+                    .convertBack(referencePointManager.get(referencePoint));
                 projectStates.put(eclipseProject, eclipseProject.isOpen());
             }
         }
 
         @Override
-        public void projectRemoved(
-            de.fu_berlin.inf.dpp.filesystem.IProject project) {
+        public void referencePointRemoved(IReferencePoint referencePoint) {
             synchronized (projectStates) {
                 IProject eclipseProject = (IProject) ResourceAdapterFactory
-                    .convertBack(project);
+                    .convertBack(referencePointManager.get(referencePoint));
                 projectStates.remove(eclipseProject);
             }
         }
@@ -152,6 +154,8 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         this.stopManager = stopManager;
         this.projectDeltaVisitor = new ProjectDeltaVisitor(sarosSession,
             editorManager);
+        this.referencePointManager = sarosSession
+            .getComponent(IReferencePointManager.class);
     }
 
     /**

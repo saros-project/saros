@@ -25,10 +25,10 @@ import de.fu_berlin.inf.dpp.session.User;
  * the network, even when the local names of shared reference point are
  * different. The ID is determined by the reference point/file-host.
  */
-class SharedProjectMapper {
+class SharedReferencePointMapper {
 
     private static final Logger LOG = Logger
-        .getLogger(SharedProjectMapper.class);
+        .getLogger(SharedReferencePointMapper.class);
 
     /**
      * Mapping from reference point IDs to currently registered shared reference
@@ -64,7 +64,7 @@ class SharedProjectMapper {
      */
     private Set<IReferencePoint> partiallySharedReferencePoints;
 
-    public SharedProjectMapper() {
+    public SharedReferencePointMapper() {
         idToReferencePointMapping = new HashMap<String, IReferencePoint>();
         referencePointToIDMapping = new HashMap<IReferencePoint, String>();
         referencePointsOfUsers = new HashMap<User, List<String>>();

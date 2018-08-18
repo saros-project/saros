@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -30,6 +31,8 @@ public final class SessionStatusRequestHandler {
     private final ITransmitter transmitter;
 
     private final IPreferenceStore preferenceStore;
+
+    private IReferencePointManager referencePointManager;
 
     private final PacketListener statusRequestListener = new PacketListener() {
 
@@ -71,6 +74,8 @@ public final class SessionStatusRequestHandler {
             response = new SessionStatusResponseExtension();
         } else {
             // Don't count the server
+            this.referencePointManager = session
+                .getComponent(IReferencePointManager.class);
             int participants = session.getUsers().size() - 1;
 
             response = new SessionStatusResponseExtension(participants,
@@ -82,16 +87,17 @@ public final class SessionStatusRequestHandler {
     }
 
     private String getSessionDescription(ISarosSession session) {
-        String description = "Projects: ";
+        String description = "ReferencePoints: ";
 
-        Set<IProject> projects = session.getProjects();
+        Set<IProject> projects = referencePointManager.getProjects(session
+            .getReferencePoints());
         int i = 0;
         int numOfProjects = projects.size();
 
         for (IProject project : projects) {
             description += project.getName();
 
-            if (!session.isCompletelyShared(project))
+            if (!session.isCompletelyShared(project.getReferencePoint()))
                 description += " (partial)";
 
             if (i < numOfProjects - 1)

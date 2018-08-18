@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.session.internal;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -33,9 +33,9 @@ public class SessionListenerDispatch implements ISessionListener {
     }
 
     @Override
-    public void userFinishedProjectNegotiation(User user) {
+    public void userFinishedReferencePointNegotiation(User user) {
         for (ISessionListener listener : listeners)
-            listener.userFinishedProjectNegotiation(user);
+            listener.userFinishedReferencePointNegotiation(user);
     }
 
     @Override
@@ -51,21 +51,21 @@ public class SessionListenerDispatch implements ISessionListener {
     }
 
     @Override
-    public void projectAdded(IProject project) {
+    public void referencePointAdded(IReferencePoint referencePoint) {
         for (ISessionListener listener : listeners)
-            listener.projectAdded(project);
+            listener.referencePointAdded(referencePoint);
     }
 
     @Override
-    public void projectRemoved(IProject project) {
+    public void referencePointRemoved(IReferencePoint referencePoint) {
         for (ISessionListener listener : listeners)
-            listener.projectRemoved(project);
+            listener.referencePointRemoved(referencePoint);
     }
 
     @Override
-    public void resourcesAdded(IProject project) {
+    public void resourcesAdded(IReferencePoint referencePoint) {
         for (ISessionListener listener : listeners)
-            listener.resourcesAdded(project);
+            listener.resourcesAdded(referencePoint);
     }
 
     public void add(ISessionListener listener) {

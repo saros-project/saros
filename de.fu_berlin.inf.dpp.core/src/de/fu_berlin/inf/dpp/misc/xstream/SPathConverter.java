@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
@@ -40,9 +41,13 @@ public class SPathConverter implements Converter, Startable {
     private final ISarosSession session;
     private final IPathFactory pathFactory;
 
+    private IReferencePointManager referencePointManager;
+
     public SPathConverter(ISarosSession session, IPathFactory pathFactory) {
         this.session = session;
         this.pathFactory = pathFactory;
+        this.referencePointManager = session
+            .getComponent(IReferencePointManager.class);
     }
 
     @Override
@@ -67,7 +72,8 @@ public class SPathConverter implements Converter, Startable {
 
         SPath spath = (SPath) value;
 
-        String i = session.getProjectID(spath.getProject());
+        String i = session.getReferencePointID(spath.getProject()
+            .getReferencePoint());
         if (i == null) {
             LOG.error("Could not retrieve project id for project '"
                 + spath.getProject().getName()
@@ -89,7 +95,8 @@ public class SPathConverter implements Converter, Startable {
         String i = reader.getAttribute(PROJECT_ID);
         String p = URLCodec.decode(reader.getAttribute(PATH));
 
-        IProject project = session.getProject(i);
+        IProject project = referencePointManager.get(session
+            .getReferencePoint(i));
         if (project == null) {
             LOG.error("Could not create SPath because there is no shared project for id '"
                 + i + "'");

@@ -19,13 +19,13 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 
-public class SharedProjectMapperTest {
+public class SharedReferencePointMapperTest {
 
-    private SharedProjectMapper mapper;
+    private SharedReferencePointMapper mapper;
 
     @Before
     public void setUp() {
-        mapper = new SharedProjectMapper();
+        mapper = new SharedReferencePointMapper();
     }
 
     @Test(expected = NullPointerException.class)
