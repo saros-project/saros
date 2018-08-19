@@ -16,7 +16,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -65,7 +65,7 @@ public abstract class SessionDisplayComposite extends
 
     private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void resourcesAdded(IProject project) {
+        public void resourcesAdded(IReferencePoint referencePoint) {
             ViewerUtils.refresh(getViewer(), true);
         }
     };

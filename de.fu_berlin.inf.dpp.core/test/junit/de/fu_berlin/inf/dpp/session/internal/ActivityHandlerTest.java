@@ -42,6 +42,7 @@ import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -361,13 +362,24 @@ public class ActivityHandlerTest {
             }
         }).anyTimes();
 
+        IReferencePoint referencePoint = EasyMock
+            .createMock(IReferencePoint.class);
+
         IProject project = EasyMock.createMock(IProject.class);
 
-        EasyMock.expect(sessionMock.userHasProject(dave, project))
-            .andStubReturn(false);
+        EasyMock.expect(project.getReferencePoint()).andStubReturn(
+            referencePoint);
+
+        EasyMock.replay(referencePoint, project);
+
+        EasyMock
+            .expect(
+                sessionMock.userHasReferencePoint(dave,
+                    project.getReferencePoint())).andStubReturn(false);
         for (User user : remoteUsersWithProjects) {
-            EasyMock.expect(sessionMock.userHasProject(user, project))
-                .andStubReturn(true);
+            EasyMock.expect(
+                sessionMock.userHasReferencePoint(user,
+                    project.getReferencePoint())).andStubReturn(true);
         }
 
         EasyMock.expect(sessionMock.getUsers()).andStubReturn(participants);

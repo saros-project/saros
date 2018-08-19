@@ -121,7 +121,8 @@ public class InstantOutgoingProjectNegotiation extends
             fileCount += list.getPaths().size();
 
             final String projectID = list.getProjectID();
-            final IProject project = session.getProject(projectID);
+            final IProject project = referencePointManager.get(session
+                .getReferencePoint(projectID));
 
             if (project == null)
                 throw new LocalCancellationException("project with id "
@@ -189,7 +190,8 @@ public class InstantOutgoingProjectNegotiation extends
     private void createTransferList(List<FileList> fileLists, int fileCount) {
         List<SPath> files = new ArrayList<SPath>(fileCount);
         for (final FileList list : fileLists) {
-            IProject project = session.getProject(list.getProjectID());
+            IProject project = referencePointManager.get(session
+                .getReferencePoint(list.getProjectID()));
             for (String file : list.getPaths()) {
                 files.add(new SPath(project.getFile(file)));
             }

@@ -10,9 +10,11 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import org.apache.log4j.Logger;
@@ -48,8 +50,10 @@ public class ModuleInitialization implements Startable {
     private final ISessionListener moduleReloaderListener = new AbstractSessionListener() {
 
         @Override
-        public void resourcesAdded(IProject module) {
-            final ModuleReloader moduleReloader = new ModuleReloader(module);
+        public void resourcesAdded(IReferencePoint referencePoint) {
+            IReferencePointManager referencePointManager = session.
+                getComponent(IReferencePointManager.class);
+            final ModuleReloader moduleReloader = new ModuleReloader(referencePointManager.get(referencePoint));
 
             //Registers a ModuleLoader with the AWT event dispatching thread to be executed asynchronously.
             ApplicationManager.getApplication().invokeLater(new Runnable() {
