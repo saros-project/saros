@@ -72,9 +72,11 @@ public class InstantIncomingProjectNegotiation extends
             final String projectID = entry.getKey();
             final IProject project = entry.getValue();
 
-            session.addProjectMapping(projectID, project);
+            referencePointManager.put(project.getReferencePoint(), project);
+            session.addReferencePointMapping(projectID,
+                project.getReferencePoint());
             /* TODO change queuing to resource based queuing */
-            session.enableQueuing(project);
+            session.enableQueuing(project.getReferencePoint());
         }
 
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(), //

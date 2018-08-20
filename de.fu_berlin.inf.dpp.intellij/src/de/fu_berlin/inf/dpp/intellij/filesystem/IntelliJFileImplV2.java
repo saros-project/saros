@@ -35,7 +35,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
         @NotNull final IPath path) {
         this.project = project;
         this.path = path;
-
+        this.referencePoint = project.getReferencePoint();
     }
 
     /**

@@ -41,7 +41,7 @@ public class ProjectPropertyTester extends PropertyTester {
 
             if (resource.getType() == IResource.PROJECT) {
                 return session.isCompletelyShared(ResourceAdapterFactory
-                    .create((IProject) resource));
+                    .create((IProject) resource).getReferencePoint());
             }
 
             return session.isShared(ResourceAdapterFactory.create(resource));

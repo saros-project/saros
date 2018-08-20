@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import org.apache.log4j.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -230,7 +231,11 @@ public class LocalEditorHandler {
 
         IResource resource = null;
 
-        for (IProject project : manager.getSession().getProjects()) {
+        IReferencePointManager referencePointManager = manager.getSession()
+        .getComponent(IReferencePointManager.class);
+
+        for (IProject project : referencePointManager.getProjects(
+            manager.getSession().getReferencePoints())) {
             resource = getResource(virtualFile, project);
 
             if(resource != null){

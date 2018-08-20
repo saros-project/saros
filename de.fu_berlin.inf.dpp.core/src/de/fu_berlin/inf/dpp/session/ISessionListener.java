@@ -19,7 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.session;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
@@ -42,7 +42,7 @@ public interface ISessionListener {
     public void permissionChanged(User user);
 
     /**
-     * Is fired when an user joins the shared project.
+     * Is fired when an user joins the shared reference point.
      * <p>
      * This method is called on the UI thread.
      * </p>
@@ -65,7 +65,7 @@ public interface ISessionListener {
     public void userStartedQueuing(User user);
 
     /**
-     * Is fired when a finished the Project Negotiation
+     * Is fired when a finished the Reference point Negotiation
      * <p>
      * This method is called on the UI thread.
      * </p>
@@ -73,7 +73,7 @@ public interface ISessionListener {
      * @param user
      *            the user that has joined.
      */
-    public void userFinishedProjectNegotiation(User user);
+    public void userFinishedReferencePointNegotiation(User user);
 
     /**
      * Is fired when the color assigned to a user in the session changed.
@@ -87,7 +87,7 @@ public interface ISessionListener {
     public void userColorChanged(User user);
 
     /**
-     * Is fired when an user leaves the shared project.
+     * Is fired when an user leaves the shared reference point.
      * <p>
      * This method is called on the UI thread.
      * </p>
@@ -98,34 +98,34 @@ public interface ISessionListener {
     public void userLeft(User user);
 
     /**
-     * Is fired then a project has been made part of the session, either because
-     * the local user began sharing it or because it is being shared by a remote
-     * user.
+     * Is fired then a reference point has been made part of the session, either
+     * because the local user began sharing it or because it is being shared by
+     * a remote user.
      * <p>
-     * Note that this event is also fired if a project is re-shared with a
-     * different set of shared resources (e.g. by sharing a previously unshared
-     * folder of a partially shared project).
+     * Note that this event is also fired if a reference point is re-shared with
+     * a different set of shared resources (e.g. by sharing a previously
+     * unshared folder of a partially shared project).
      * <p>
      * This method might <i>not</i> be called on the UI thread.
      * </p>
      * 
-     * @param project
-     *            the project that was added
+     * @param referencePoint
+     *            the referencePoint that was added
      * 
      */
-    public void projectAdded(IProject project);
+    public void referencePointAdded(IReferencePoint referencePoint);
 
     /**
-     * Is fired then a project has been removed from the session, meaning it is
-     * not shared between the session's users anymore.
+     * Is fired then a referencePoint has been removed from the session, meaning
+     * it is not shared between the session's users anymore.
      * <p>
      * This method might <i>not</i> be called on the UI thread.
      * </p>
      * 
-     * @param project
-     *            the project that was removed
+     * @param referencePoint
+     *            the referencePoint that was removed
      */
-    public void projectRemoved(IProject project);
+    public void referencePointRemoved(IReferencePoint referencePoint);
 
     /**
      * Is fired when resources are added to the current session.
@@ -133,5 +133,5 @@ public interface ISessionListener {
      * This method might <i>not</i> be called on the UI thread.
      * </p>
      */
-    public void resourcesAdded(IProject project);
+    public void resourcesAdded(IReferencePoint referencePoint);
 }
