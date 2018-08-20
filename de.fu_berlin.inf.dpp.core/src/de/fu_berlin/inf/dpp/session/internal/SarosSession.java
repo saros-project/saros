@@ -571,12 +571,6 @@ public final class SarosSession implements ISarosSession {
         listenerDispatch.remove(listener);
     }
 
-    /*
-     * Set<IProject> projectSet = new HashSet<IProject>(); for (IReferencePoint
-     * referencePoint : projectMapper .getReferencePoints()) {
-     * projectSet.add(referencePointManager.get(referencePoint)); } return
-     * projectSet;
-     */
     @Override
     public Set<IReferencePoint> getReferencePoints() {
         return referencePointMapper.getReferencePoints();
@@ -993,19 +987,6 @@ public final class SarosSession implements ISarosSession {
         return referencePointMapper.getReferencePoint(referencePointID);
     }
 
-    /*
-     * Map<IReferencePoint, List<IResource>> referencePointResourceMap =
-     * projectMapper .getReferencePointResourceMapping(); Map<IProject,
-     * List<IResource>> projectResourceMap = new HashMap<IProject,
-     * List<IResource>>();
-     * 
-     * for (IReferencePoint referencePoint : referencePointResourceMap
-     * .keySet()) {
-     * projectResourceMap.put(referencePointManager.get(referencePoint),
-     * referencePointResourceMap.get(referencePoint)); }
-     * 
-     * return projectResourceMap;
-     */
     @Override
     public Map<IReferencePoint, List<IResource>> getReferencePointResourcesMapping() {
 

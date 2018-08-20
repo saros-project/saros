@@ -98,8 +98,29 @@ class SharedReferencePointMapper {
      */
     public synchronized void addReferencePoint(String id,
         IReferencePoint referencePoint, boolean isPartially) {
-        boolean upgrade = false;
 
+        CheckIfReferencePointIsAbleToBeShared(id, referencePoint);
+        if (isPartially) {
+            addReferencePointPartially(id, referencePoint);
+        } else if (partiallySharedReferencePoints.contains(referencePoint)) {
+            upgradeToCompletellyShared(id, referencePoint);
+            return;
+        } else {
+            addReferencePointCompletelly(id, referencePoint);
+        }
+
+        assert Collections.disjoint(completelySharedReferencePoints,
+            partiallySharedReferencePoints);
+
+        idToReferencePointMapping.put(id, referencePoint);
+        referencePointToIDMapping.put(referencePoint, id);
+
+        LOG.debug("added referencePoint " + referencePoint + " with ID " + id
+            + " [completely shared:" + !isPartially + "]");
+    }
+
+    private synchronized void CheckIfReferencePointIsAbleToBeShared(String id,
+        IReferencePoint referencePoint) {
         if (id == null)
             throw new NullPointerException("ID is null");
 
@@ -125,59 +146,43 @@ class SharedReferencePointMapper {
                 + referencePoint + " is already used by referencePoint "
                 + currentReferencePoint);
         }
+    }
 
-        if (isPartially
-            && partiallySharedReferencePoints.contains(referencePoint))
+    private synchronized void addReferencePointPartially(String id,
+        IReferencePoint referencePoint) {
+
+        if (partiallySharedReferencePoints.contains(referencePoint))
             throw new IllegalStateException("referencePoint " + referencePoint
                 + " is already partially shared");
 
-        if (!isPartially
-            && completelySharedReferencePoints.contains(referencePoint))
+        if (completelySharedReferencePoints.contains(referencePoint))
             throw new IllegalStateException("referencePoint " + referencePoint
                 + " is already completely shared");
 
-        if (isPartially
-            && completelySharedReferencePoints.contains(referencePoint))
-            throw new IllegalStateException(
-                "referencePoint "
-                    + referencePoint
-                    + " is already completely shared (cannot downgrade a completely shared referencePoint)");
+        partiallySharedReferencePoints.add(referencePoint);
 
-        if (!isPartially
-            && partiallySharedReferencePoints.contains(referencePoint)) {
-            partiallySharedReferencePoints.remove(referencePoint);
-            upgrade = true;
-        }
+        partiallySharedResourceMapping.put(referencePoint,
+            new HashSet<IResource>());
+    }
 
-        if (isPartially)
-            partiallySharedReferencePoints.add(referencePoint);
-        else
-            completelySharedReferencePoints.add(referencePoint);
+    private synchronized void addReferencePointCompletelly(String id,
+        IReferencePoint referencePoint) {
 
-        assert Collections.disjoint(completelySharedReferencePoints,
-            partiallySharedReferencePoints);
+        if (completelySharedReferencePoints.contains(referencePoint))
+            throw new IllegalStateException("referencePoint " + referencePoint
+                + " is already completely shared");
 
-        if (upgrade) {
-            // release resources
-            partiallySharedResourceMapping.put(referencePoint, null);
+        completelySharedReferencePoints.add(referencePoint);
+    }
 
-            LOG.debug("upgraded partially shared referencePoint "
-                + referencePoint + " with ID " + id
-                + " to a completely shared referencePoint");
-            return;
-        }
+    private synchronized void upgradeToCompletellyShared(String id,
+        IReferencePoint referencePoint) {
+        partiallySharedReferencePoints.remove(referencePoint);
+        partiallySharedResourceMapping.put(referencePoint, null);
 
-        idToReferencePointMapping.put(id, referencePoint);
-        referencePointToIDMapping.put(referencePoint, id);
-
-        if (isPartially)
-            partiallySharedResourceMapping.put(referencePoint,
-                new HashSet<IResource>());
-        else
-            partiallySharedResourceMapping.put(referencePoint, null);
-
-        LOG.debug("added referencePoint " + referencePoint + " with ID " + id
-            + " [completely shared:" + !isPartially + "]");
+        LOG.debug("upgraded partially shared referencePoint " + referencePoint
+            + " with ID " + id + " to a completely shared referencePoint");
+        completelySharedReferencePoints.add(referencePoint);
     }
 
     /**
@@ -229,17 +234,12 @@ class SharedReferencePointMapper {
         if (referencePointToIDMapping.get(referencePoint) == null) {
             LOG.warn("could not add resources to referencePoint "
                 + referencePoint + " because it is not shared");
-            // throw new IllegalStateException(
-            // "could not add resources to project " + project
-            // + " because it is not shared");
             return;
         }
 
         if (completelySharedReferencePoints.contains(referencePoint)) {
             LOG.warn("cannot add resources to completely shared referencePoint: "
                 + referencePoint);
-            // throw new IllegalStateException(
-            // "cannot add resources to completely shared project: " + project);
             return;
         }
 
@@ -279,18 +279,12 @@ class SharedReferencePointMapper {
         if (referencePointToIDMapping.get(referencePoint) == null) {
             LOG.warn("could not remove resources from referencePoint "
                 + referencePoint + " because it is not shared");
-            // throw new IllegalStateException(
-            // "could not remove resources from project " + project
-            // + " because it is not shared");
             return;
         }
 
         if (completelySharedReferencePoints.contains(referencePoint)) {
             LOG.warn("cannot remove resources from completely shared reference point: "
                 + referencePoint);
-            // throw new IllegalStateException(
-            // "cannot remove resources from completely shared project: " +
-            // project);
             return;
         }
 
