@@ -59,8 +59,7 @@ public class AddXMPPAccountWizard extends Wizard {
 
         assert accountStore.getActiveAccount() != null;
 
-        if (preferences.isAutoConnecting())
-            autoConnectXMPPAccount();
+        autoConnectXMPPAccount();
 
         return true;
     }
