@@ -119,10 +119,13 @@ public final class NegotiationFactory {
         }
 
         switch (transferType) {
-        case INSTANT:
-            /* $FALL-THROUGH$ - implemented in follow-up patch */
         case ARCHIVE:
             return new ArchiveOutgoingProjectNegotiation(remoteAddress,
+                resources, sessionManager, session, /* editorManager */
+                context.getComponent(IEditorManager.class), workspace,
+                checksumCache, connectionService, transmitter, receiver);
+        case INSTANT:
+            return new InstantOutgoingProjectNegotiation(remoteAddress,
                 resources, sessionManager, session, /* editorManager */
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);
@@ -143,10 +146,13 @@ public final class NegotiationFactory {
         }
 
         switch (transferType) {
-        case INSTANT:
-            /* $FALL-THROUGH$ - implemented in follow-up patch */
         case ARCHIVE:
             return new ArchiveIncomingProjectNegotiation(remoteAddress,
+                negotiationID, projectNegotiationData, sessionManager, session,
+                fileReplacementInProgressObservable, workspace, checksumCache,
+                connectionService, transmitter, receiver);
+        case INSTANT:
+            return new InstantIncomingProjectNegotiation(remoteAddress,
                 negotiationID, projectNegotiationData, sessionManager, session,
                 fileReplacementInProgressObservable, workspace, checksumCache,
                 connectionService, transmitter, receiver);
