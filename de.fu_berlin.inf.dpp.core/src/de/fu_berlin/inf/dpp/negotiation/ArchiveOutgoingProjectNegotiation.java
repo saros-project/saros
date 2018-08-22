@@ -152,7 +152,7 @@ public class ArchiveOutgoingProjectNegotiation extends
         final List<IResource> projectsToLock = new ArrayList<IResource>();
 
         for (final FileList list : fileLists) {
-            final String projectID = list.getProjectID();
+            final String projectID = list.getReferencePointID();
 
             final IProject project = referencePointManager.get(session
                 .getReferencePoint(projectID));

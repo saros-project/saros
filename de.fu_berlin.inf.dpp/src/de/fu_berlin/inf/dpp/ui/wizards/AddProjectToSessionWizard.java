@@ -59,6 +59,7 @@ import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -569,7 +570,12 @@ public class AddProjectToSessionWizard extends Wizard {
              */
 
             try {
-                localFileList = FileListFactory.createFileList(adaptedProject,
+                IReferencePointManager referencePointManager = session
+                    .getComponent(IReferencePointManager.class);
+                referencePointManager.put(adaptedProject.getReferencePoint(),
+                    adaptedProject);
+                localFileList = FileListFactory.createFileList(
+                    referencePointManager, adaptedProject.getReferencePoint(),
                     null, checksumCache, ProgressMonitorAdapterFactory
                         .convert(subMonitor.newChild(1,
                             SubMonitor.SUPPRESS_ALL_LABELS)));

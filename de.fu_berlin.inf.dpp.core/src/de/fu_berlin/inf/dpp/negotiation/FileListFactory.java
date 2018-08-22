@@ -12,18 +12,20 @@ import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 
 /**
  * Offers two ways to create {@link FileList file lists}.
  * <p>
  * <li>Either an inexpensive one that rescans the whole project to gather meta
  * data:<br>
- * {@link #createFileList(IProject, List, IChecksumCache, IProgressMonitor)}</li>
+ * {@link #createFileList(IReferenecPoint, List, IChecksumCache, IProgressMonitor)}
+ * </li>
  * <li>Or a cheap one which requires the caller to take care of the validity of
  * input data:<br>
  * {@link #createFileList(List)}</li>
@@ -34,22 +36,27 @@ public class FileListFactory {
 
     private IChecksumCache checksumCache;
     private IProgressMonitor monitor;
+    private IReferencePointManager referencePointManager;
 
     private FileListFactory(IChecksumCache checksumCache,
-        IProgressMonitor monitor) {
+        IProgressMonitor monitor, IReferencePointManager referencePointManager) {
         this.checksumCache = checksumCache;
         this.monitor = monitor;
+        this.referencePointManager = referencePointManager;
 
         if (this.monitor == null)
             this.monitor = new NullProgressMonitor();
     }
 
-    public static FileList createFileList(IProject project,
-        List<IResource> resources, IChecksumCache checksumCache,
-        IProgressMonitor monitor) throws IOException {
+    public static FileList createFileList(
+        IReferencePointManager referencePointManager,
+        IReferencePoint referencePoint, List<IResource> resources,
+        IChecksumCache checksumCache, IProgressMonitor monitor)
+        throws IOException {
 
-        FileListFactory fact = new FileListFactory(checksumCache, monitor);
-        return fact.build(project, resources);
+        FileListFactory fact = new FileListFactory(checksumCache, monitor,
+            referencePointManager);
+        return fact.build(referencePoint, resources);
     }
 
     /**
@@ -77,14 +84,16 @@ public class FileListFactory {
         return new FileList();
     }
 
-    private FileList build(IProject project, List<IResource> resources)
-        throws IOException {
+    private FileList build(IReferencePoint referencePoint,
+        List<IResource> resources) throws IOException {
 
         FileList list = new FileList();
 
         if (resources == null) {
-            list.addEncoding(project.getDefaultCharset());
-            resources = Arrays.asList(project.members());
+            list.addEncoding(referencePointManager.get(referencePoint)
+                .getDefaultCharset());
+            resources = Arrays.asList(referencePointManager.get(referencePoint)
+                .members());
         }
 
         addMembersToList(list, resources);

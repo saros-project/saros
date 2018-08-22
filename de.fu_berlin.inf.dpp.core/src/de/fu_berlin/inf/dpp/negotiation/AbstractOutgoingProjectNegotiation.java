@@ -339,21 +339,22 @@ public abstract class AbstractOutgoingProjectNegotiation extends
                     editorManager.saveEditors(project);
 
                 FileList projectFileList = FileListFactory.createFileList(
-                    project, session.getSharedResources(project
-                        .getReferencePoint()), checksumCache,
-                    new SubProgressMonitor(monitor, 1 * scale,
+                    referencePointManager, project.getReferencePoint(), session
+                        .getSharedResources(project.getReferencePoint()),
+                    checksumCache, new SubProgressMonitor(monitor, 1 * scale,
                         SubProgressMonitor.SUPPRESS_BEGINTASK
                             | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
                 boolean partial = !session.isCompletelyShared(project
                     .getReferencePoint());
 
-                String projectID = session.getReferencePointID(project
+                String referencePointID = session.getReferencePointID(project
                     .getReferencePoint());
-                projectFileList.setProjectID(projectID);
+                projectFileList.setReferencePointID(referencePointID);
 
                 ProjectNegotiationData data = new ProjectNegotiationData(
-                    projectID, project.getName(), partial, projectFileList);
+                    referencePointID, project.getName(), partial,
+                    projectFileList);
 
                 negData.add(data);
 

@@ -120,7 +120,7 @@ public class InstantOutgoingProjectNegotiation extends
         for (final FileList list : fileLists) {
             fileCount += list.getPaths().size();
 
-            final String projectID = list.getProjectID();
+            final String projectID = list.getReferencePointID();
             final IProject project = referencePointManager.get(session
                 .getReferencePoint(projectID));
 
@@ -191,7 +191,7 @@ public class InstantOutgoingProjectNegotiation extends
         List<SPath> files = new ArrayList<SPath>(fileCount);
         for (final FileList list : fileLists) {
             IProject project = referencePointManager.get(session
-                .getReferencePoint(list.getProjectID()));
+                .getReferencePoint(list.getReferencePointID()));
             for (String file : list.getPaths()) {
                 files.add(new SPath(project.getFile(file)));
             }

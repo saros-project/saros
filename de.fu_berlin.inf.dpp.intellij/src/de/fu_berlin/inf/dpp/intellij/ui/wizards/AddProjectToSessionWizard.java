@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
@@ -571,8 +572,13 @@ public class AddProjectToSessionWizard extends Wizard {
                 if (data.isPartial())
                     throw new IllegalStateException("partial sharing is not supported");
 
+                IReferencePointManager referencePointManager = session.
+                    getComponent(IReferencePointManager.class);
+                referencePointManager.put(project.getReferencePoint(), project);
+
                 FileList localFileList = FileListFactory
-                    .createFileList(project, null, checksumCache,
+                    .createFileList(referencePointManager, project.getReferencePoint(),
+                        null, checksumCache,
                         new SubProgressMonitor(monitor, 1,
                             SubProgressMonitor.SUPPRESS_SETTASKNAME));
 

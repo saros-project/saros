@@ -33,10 +33,10 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
  * A FileList is a list of resources -- files and folders -- which belong to the
- * same project. FileLists can be compared to other FileLists. Folders are
- * denoted by a trailing separator. Instances of this class are immutable. No
- * further modification is allowed after creation. Instances should be created
- * using the methods provided by the {@link FileListFactory}.
+ * same reference point. FileLists can be compared to other FileLists. Folders
+ * are denoted by a trailing separator. Instances of this class are immutable.
+ * No further modification is allowed after creation. Instances should be
+ * created using the methods provided by the {@link FileListFactory}.
  */
 
 // FIXME remove the projectID stuff, as it is mutable !
@@ -335,8 +335,8 @@ public class FileList {
         }
     }
 
-    /** ID of Project this list of files belong to */
-    private String projectID;
+    /** ID of reference point this list of files belong to */
+    private String referencePointID;
 
     private Set<String> encodings = new HashSet<String>();
 
@@ -418,12 +418,12 @@ public class FileList {
         return inflated;
     }
 
-    public String getProjectID() {
-        return projectID;
+    public String getReferencePointID() {
+        return referencePointID;
     }
 
-    public void setProjectID(String projectID) {
-        this.projectID = projectID;
+    public void setReferencePointID(String referencePointID) {
+        this.referencePointID = referencePointID;
     }
 
     @Override

@@ -359,8 +359,10 @@ public abstract class AbstractIncomingProjectNegotiation extends
 
             // TODO optimize for partial shared projects
 
+            referencePointManager.put(project.getReferencePoint(), project);
             final FileList localProjectFileList = FileListFactory
-                .createFileList(project, null, checksumCache,
+                .createFileList(referencePointManager, project
+                    .getReferencePoint(), null, checksumCache,
                     new SubProgressMonitor(monitor, 1 * MONITOR_WORK_SCALE,
                         SubProgressMonitor.SUPPRESS_BEGINTASK));
 
@@ -462,7 +464,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
                 .createEmptyFileList() : FileListFactory
                 .createFileList(missingFiles);
 
-            fileList.setProjectID(id);
+            fileList.setReferencePointID(id);
 
             result.add(fileList);
 

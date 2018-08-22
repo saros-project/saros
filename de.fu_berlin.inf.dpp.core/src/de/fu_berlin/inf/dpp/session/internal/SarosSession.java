@@ -98,8 +98,6 @@ public final class SarosSession implements ISarosSession {
     @Inject
     private IConnectionManager connectionManager;
 
-    private IReferencePointManager referencePointManager;
-
     private final IContainerContext containerContext;
 
     private final ConcurrentDocumentClient concurrentDocumentClient;
@@ -1157,9 +1155,6 @@ public final class SarosSession implements ISarosSession {
 
         userListHandler = sessionContainer
             .getComponent(UserInformationHandler.class);
-
-        referencePointManager = sessionContainer
-            .getComponent(IReferencePointManager.class);
 
         // ensure that the container uses caching
         assert sessionContainer.getComponent(ActivityHandler.class) == sessionContainer
