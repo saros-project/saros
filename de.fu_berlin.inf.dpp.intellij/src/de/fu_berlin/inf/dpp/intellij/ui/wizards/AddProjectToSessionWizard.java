@@ -1,5 +1,18 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
+import java.awt.Window;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
+import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.picocontainer.annotations.Inject;
 import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.ModifiableModuleModel;
@@ -43,20 +56,8 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.picocontainer.annotations.Inject;
-
 import java.awt.Dimension;
-import java.awt.Window;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Wizard for adding projects to a session.
@@ -441,7 +442,7 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     /**
-     * Runs {@link AbstractIncomingProjectNegotiation#run(java.util.Map, IProgressMonitor)}
+     * Runs {@link AbstractIncomingProjectNegotiation#run(Map, IProgressMonitor)}
      * as a background task through {@link #runTask(Runnable, String)}.
      * <p/>
      * On success, a success notification is displayed, on error, a dialog is shown.
@@ -452,6 +453,15 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         triggered = true;
+        IReferencePointManager referencePointManager = sessionManager.getSession().
+            getComponent(IReferencePointManager.class);
+        Map<String, IReferencePoint> localReferencePoints = new HashMap<>();
+
+        for(Map.Entry<String, IProject> pair : localProjects.entrySet()){
+            IProject project = pair.getValue();
+            referencePointManager.put(project.getReferencePoint(), project);
+            localReferencePoints.put(pair.getKey(), project.getReferencePoint());
+        }
 
         ProgressManager.getInstance().run(
             new Task.Backgroundable(project, "Sharing project...", true,
@@ -460,7 +470,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 @Override
                 public void run(ProgressIndicator indicator) {
                     final ProjectNegotiation.Status status = negotiation
-                        .run(localProjects,
+                        .run(localReferencePoints,
                             new ProgessMonitorAdapter(indicator));
 
                     indicator.stop();
@@ -609,8 +619,13 @@ public class AddProjectToSessionWizard extends Wizard {
                 if (data.isPartial())
                     throw new IllegalStateException("partial sharing is not supported");
 
+                IReferencePointManager referencePointManager = session.
+                    getComponent(IReferencePointManager.class);
+                referencePointManager.put(project.getReferencePoint(), project);
+
                 FileList localFileList = FileListFactory
-                    .createFileList(project, null, checksumCache,
+                    .createFileList(referencePointManager, project.getReferencePoint(),
+                        null, checksumCache,
                         new SubProgressMonitor(monitor, 1,
                             SubProgressMonitor.SUPPRESS_SETTASKNAME));
 

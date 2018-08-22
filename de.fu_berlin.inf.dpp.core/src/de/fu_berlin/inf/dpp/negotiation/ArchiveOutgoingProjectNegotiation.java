@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -42,7 +43,7 @@ public class ArchiveOutgoingProjectNegotiation extends
 
     public ArchiveOutgoingProjectNegotiation( //
         final JID peer, //
-        final List<IProject> projects, //
+        final List<IReferencePoint> referencePoints, //
 
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //
@@ -56,7 +57,7 @@ public class ArchiveOutgoingProjectNegotiation extends
         final ITransmitter transmitter, //
         final IReceiver receiver//
     ) {
-        super(peer, TransferType.ARCHIVE, projects, sessionManager, session,
+        super(peer, TransferType.ARCHIVE, referencePoints, sessionManager, session,
             editorManager, workspace, checksumCache, connectionService,
             transmitter, receiver);
     }
@@ -152,14 +153,15 @@ public class ArchiveOutgoingProjectNegotiation extends
         final List<IResource> projectsToLock = new ArrayList<IResource>();
 
         for (final FileList list : fileLists) {
-            final String projectID = list.getProjectID();
+            final String referencePointID = list.getReferencePointID();
 
             final IProject project = referencePointManager.get(session
-                .getReferencePoint(projectID));
+                .getReferencePoint(referencePointID));
 
             if (project == null)
-                throw new LocalCancellationException("project with id "
-                    + projectID + " was unshared during synchronization",
+                throw new LocalCancellationException(
+                    "reference point with id " + referencePointID
+                        + " was unshared during synchronization",
                     CancelOption.NOTIFY_PEER);
 
             projectsToLock.add(project);
@@ -173,7 +175,7 @@ public class ArchiveOutgoingProjectNegotiation extends
 
             final StringBuilder aliasBuilder = new StringBuilder();
 
-            aliasBuilder.append(projectID).append(PATH_DELIMITER);
+            aliasBuilder.append(referencePointID).append(PATH_DELIMITER);
 
             final int prefixLength = aliasBuilder.length();
 

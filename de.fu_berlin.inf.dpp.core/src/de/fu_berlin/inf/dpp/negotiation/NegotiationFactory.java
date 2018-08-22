@@ -1,11 +1,13 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -15,6 +17,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
@@ -117,16 +120,23 @@ public final class NegotiationFactory {
         if (transferType == null) {
             throw new IllegalArgumentException("transferType must not be null");
         }
+        List<IReferencePoint> referencePoints = new ArrayList<IReferencePoint>();
+        IReferencePointManager referencePointManager = session
+            .getComponent(IReferencePointManager.class);
+        for (IProject project : resources) {
+            referencePointManager.put(project.getReferencePoint(), project);
+            referencePoints.add(project.getReferencePoint());
+        }
 
         switch (transferType) {
         case ARCHIVE:
             return new ArchiveOutgoingProjectNegotiation(remoteAddress,
-                resources, sessionManager, session, /* editorManager */
+                referencePoints, sessionManager, session, /* editorManager */
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);
         case INSTANT:
             return new InstantOutgoingProjectNegotiation(remoteAddress,
-                resources, sessionManager, session, /* editorManager */
+                referencePoints, sessionManager, session, /* editorManager */
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);
         default:
