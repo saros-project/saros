@@ -7,7 +7,7 @@ import { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button, Dro
 @observer
 export default class ComponentTestView extends React.Component {
   componentDidMount () {
-    window.componentTestView = this
+    window.view = this
   }
 
   @observable fields = {
@@ -25,6 +25,10 @@ export default class ComponentTestView extends React.Component {
 
   @action setFieldValue = (field, value) => {
     this.fields[field] = value
+  }
+
+  @action getFieldValue = (field) => {
+    return this.fields[field]
   }
 
   @action onChangeField = (e) => {

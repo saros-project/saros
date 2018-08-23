@@ -50,13 +50,13 @@ public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 
     @Override
     public List<String> getAccountList() throws RemoteException {
-        return BotUtils.getListItemsWithSelector(getBrowser(),
+        return BotUtils.getListItemsText(getBrowser(),
             SELECTOR_ACCOUNT_ENTRY);
     }
 
     @Override
     public List<String> getContactList() throws RemoteException {
-        return BotUtils.getListItemsWithSelector(getBrowser(),
+        return BotUtils.getListItemsText(getBrowser(),
             SELECTOR_CONTACT_ITEM_DISPLAY_NAME);
     }
 
