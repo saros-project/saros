@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.server.console.InviteCommand;
 import de.fu_berlin.inf.dpp.server.console.ServerConsole;
+import de.fu_berlin.inf.dpp.server.console.ShareCommand;
 import de.fu_berlin.inf.dpp.server.dummies.NullRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathFactoryImpl;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathImpl;
@@ -92,6 +93,7 @@ public class ServerContextFactory extends AbstractContextFactory {
     if (ServerConfig.isInteractive()) {
       c.addComponent(new ServerConsole(System.in, System.out));
       c.addComponent(InviteCommand.class);
+      c.addComponent(ShareCommand.class);
     }
   }
 
