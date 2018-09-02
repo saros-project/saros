@@ -5,10 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -404,7 +406,7 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     /**
-     * Runs {@link AbstractIncomingProjectNegotiation#run(java.util.Map, IProgressMonitor)}
+     * Runs {@link AbstractIncomingProjectNegotiation#run(Map, IProgressMonitor)}
      * as a background task through {@link #runTask(Runnable, String)}.
      * <p/>
      * On success, a success notification is displayed, on error, a dialog is shown.
@@ -415,6 +417,15 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         triggered = true;
+        IReferencePointManager referencePointManager = sessionManager.getSession().
+            getComponent(IReferencePointManager.class);
+        Map<String, IReferencePoint> localReferencePoints = new HashMap<>();
+
+        for(String key : localProjects.keySet()){
+            IProject project = localProjects.get(key);
+            referencePointManager.put(project.getReferencePoint(), project);
+            localReferencePoints.put(key, project.getReferencePoint());
+        }
 
         ProgressManager.getInstance().run(
             new Task.Backgroundable(project, "Sharing project...", true,
@@ -423,7 +434,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 @Override
                 public void run(ProgressIndicator indicator) {
                     final ProjectNegotiation.Status status = negotiation
-                        .run(localProjects,
+                        .run(localReferencePoints,
                             new ProgessMonitorAdapter(indicator));
 
                     indicator.stop();

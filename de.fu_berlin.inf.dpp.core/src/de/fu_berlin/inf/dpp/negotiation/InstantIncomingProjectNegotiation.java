@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRespons
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
@@ -59,8 +59,9 @@ public class InstantIncomingProjectNegotiation extends
 
     @Override
     protected void transfer(IProgressMonitor monitor,
-        Map<String, IProject> projectMapping, List<FileList> missingFiles)
-        throws IOException, SarosCancellationException {
+        Map<String, IReferencePoint> referencePointMapping,
+        List<FileList> missingFiles) throws IOException,
+        SarosCancellationException {
 
         awaitActivityQueueingActivation(monitor);
 
@@ -68,15 +69,15 @@ public class InstantIncomingProjectNegotiation extends
          * the user who sends this ProjectNegotiation is now responsible for the
          * resources of the contained projects
          */
-        for (Entry<String, IProject> entry : projectMapping.entrySet()) {
-            final String projectID = entry.getKey();
-            final IProject project = entry.getValue();
+        for (Entry<String, IReferencePoint> entry : referencePointMapping
+            .entrySet()) {
+            final String referencePointID = entry.getKey();
+            final IReferencePoint referencePoint = entry.getValue();
 
-            referencePointManager.put(project.getReferencePoint(), project);
-            session.addReferencePointMapping(projectID,
-                project.getReferencePoint());
+            // referencePointManager.put(project.getReferencePoint(), project);
+            session.addReferencePointMapping(referencePointID, referencePoint);
             /* TODO change queuing to resource based queuing */
-            session.enableQueuing(project.getReferencePoint());
+            session.enableQueuing(referencePoint);
         }
 
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(), //

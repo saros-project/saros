@@ -94,6 +94,8 @@ public class AddProjectToSessionWizard extends Wizard {
     @Inject
     private ISarosSessionManager sessionManager;
 
+    private IReferencePointManager referencePointManager;
+
     private static class OverwriteErrorDialog extends ErrorDialog {
 
         public OverwriteErrorDialog(Shell parentShell, String dialogTitle,
@@ -304,12 +306,17 @@ public class AddProjectToSessionWizard extends Wizard {
                         }
                     }
 
-                    final Map<String, de.fu_berlin.inf.dpp.filesystem.IProject> convertedMapping = new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IProject>();
+                    final Map<String, de.fu_berlin.inf.dpp.filesystem.IReferencePoint> convertedMapping = new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IReferencePoint>();
 
                     for (final Entry<String, IProject> entry : targetProjectMapping
                         .entrySet()) {
+                        de.fu_berlin.inf.dpp.filesystem.IProject convertedProject = ResourceAdapterFactory
+                            .create(entry.getValue());
                         convertedMapping.put(entry.getKey(),
-                            ResourceAdapterFactory.create(entry.getValue()));
+                            convertedProject.getReferencePoint());
+                        referencePointManager.put(
+                            convertedProject.getReferencePoint(),
+                            convertedProject);
                     }
 
                     final ProjectNegotiation.Status status = negotiation.run(
@@ -543,6 +550,9 @@ public class AddProjectToSessionWizard extends Wizard {
         if (session == null)
             throw new IllegalStateException("no session running");
 
+        referencePointManager = session
+            .getComponent(IReferencePointManager.class);
+
         final SubMonitor subMonitor = SubMonitor.convert(monitor,
             "Searching for files that will be modified...",
             projectMapping.size());
@@ -570,8 +580,7 @@ public class AddProjectToSessionWizard extends Wizard {
              */
 
             try {
-                IReferencePointManager referencePointManager = session
-                    .getComponent(IReferencePointManager.class);
+
                 referencePointManager.put(adaptedProject.getReferencePoint(),
                     adaptedProject);
                 localFileList = FileListFactory.createFileList(

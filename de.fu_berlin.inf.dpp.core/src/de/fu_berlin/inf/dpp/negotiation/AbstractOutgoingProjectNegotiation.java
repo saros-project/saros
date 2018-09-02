@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
@@ -46,7 +46,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
     private static final Logger LOG = Logger
         .getLogger(AbstractOutgoingProjectNegotiation.class);
 
-    protected List<IProject> projects;
+    protected List<IReferencePoint> referencePoints;
 
     private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 
@@ -59,7 +59,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
     protected AbstractOutgoingProjectNegotiation( //
         final JID peer, //
         final TransferType transferType, //
-        final List<IProject> projects, //
+        final List<IReferencePoint> referencePoints, //
 
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //
@@ -77,7 +77,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
             transferType, sessionManager, session, workspace, checksumCache,
             connectionService, transmitter, receiver);
 
-        this.projects = projects;
+        this.referencePoints = referencePoints;
 
         this.editorManager = editorManager;
     }
@@ -93,7 +93,8 @@ public abstract class AbstractOutgoingProjectNegotiation extends
         try {
             setup(monitor);
 
-            sendFileList(createProjectNegotiationDataList(projects, monitor),
+            sendFileList(
+                createProjectNegotiationDataList(referencePoints, monitor),
                 monitor);
 
             monitor.subTask("");
@@ -310,8 +311,9 @@ public abstract class AbstractOutgoingProjectNegotiation extends
     }
 
     protected List<ProjectNegotiationData> createProjectNegotiationDataList(
-        final List<IProject> projectsToShare, final IProgressMonitor monitor)
-        throws IOException, LocalCancellationException {
+        final List<IReferencePoint> referencePointsToShare,
+        final IProgressMonitor monitor) throws IOException,
+        LocalCancellationException {
 
         // *stretch* progress bar so it will increment smoothly
         final int scale = 1000;
@@ -319,12 +321,12 @@ public abstract class AbstractOutgoingProjectNegotiation extends
         monitor
             .beginTask(
                 "Creating file list and calculating file checksums. This may take a while...",
-                projectsToShare.size() * scale);
+                referencePointsToShare.size() * scale);
 
         List<ProjectNegotiationData> negData = new ArrayList<ProjectNegotiationData>(
-            projectsToShare.size());
+            referencePointsToShare.size());
 
-        for (IProject project : projectsToShare) {
+        for (IReferencePoint referencePoint : referencePointsToShare) {
 
             if (monitor.isCanceled())
                 throw new LocalCancellationException(null,
@@ -336,25 +338,25 @@ public abstract class AbstractOutgoingProjectNegotiation extends
                  * underlying storage
                  */
                 if (editorManager != null)
-                    editorManager.saveEditors(project);
+                    editorManager.saveEditors(referencePointManager
+                        .get(referencePoint));
 
                 FileList projectFileList = FileListFactory.createFileList(
-                    referencePointManager, project.getReferencePoint(), session
-                        .getSharedResources(project.getReferencePoint()),
-                    checksumCache, new SubProgressMonitor(monitor, 1 * scale,
+                    referencePointManager, referencePoint, session
+                        .getSharedResources(referencePoint), checksumCache,
+                    new SubProgressMonitor(monitor, 1 * scale,
                         SubProgressMonitor.SUPPRESS_BEGINTASK
                             | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-                boolean partial = !session.isCompletelyShared(project
-                    .getReferencePoint());
+                boolean partial = !session.isCompletelyShared(referencePoint);
 
-                String referencePointID = session.getReferencePointID(project
-                    .getReferencePoint());
+                String referencePointID = session
+                    .getReferencePointID(referencePoint);
                 projectFileList.setReferencePointID(referencePointID);
 
                 ProjectNegotiationData data = new ProjectNegotiationData(
-                    referencePointID, project.getName(), partial,
-                    projectFileList);
+                    referencePointID, referencePointManager.get(referencePoint)
+                        .getName(), partial, projectFileList);
 
                 negData.add(data);
 
