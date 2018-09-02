@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
 import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -469,7 +469,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                 @Override
                 public void run(ProgressIndicator indicator) {
-                    final ProjectNegotiation.Status status = negotiation
+                    final ReferencePointNegotiation.Status status = negotiation
                         .run(localReferencePoints,
                             new ProgessMonitorAdapter(indicator));
 
@@ -478,12 +478,12 @@ public class AddProjectToSessionWizard extends Wizard {
                     UIUtil.invokeLaterIfNeeded(new Runnable() {
                         @Override
                         public void run() {
-                            if (status == ProjectNegotiation.Status.ERROR) {
+                            if (status == ReferencePointNegotiation.Status.ERROR) {
                                 NotificationPanel.showError(
                                     "Error during project negotiation",
                                     "The project could not be shared: "
                                         + negotiation.getErrorMessage());
-                            } else if (status == ProjectNegotiation.Status.OK) {
+                            } else if (status == ReferencePointNegotiation.Status.OK) {
                                 NotificationPanel
                                     .showInformation("Project shared",
                                         "Project successfully shared");
