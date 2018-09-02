@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.session.SessionEndReason;
  * calculation.
  */
 public abstract class AbstractIncomingProjectNegotiation extends
-    ProjectNegotiation {
+    ReferencePointNegotiation {
 
     private static final Logger LOG = Logger
         .getLogger(AbstractIncomingProjectNegotiation.class);

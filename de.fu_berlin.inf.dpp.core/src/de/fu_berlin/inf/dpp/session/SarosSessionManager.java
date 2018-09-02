@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.TransferType;
@@ -135,7 +135,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         @Override
-        public void negotiationTerminated(final ProjectNegotiation negotiation) {
+        public void negotiationTerminated(final ReferencePointNegotiation negotiation) {
             currentProjectNegotiations.remove(negotiation);
         }
     };
@@ -742,7 +742,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
         }
 
-        for (ProjectNegotiation negotiation : currentProjectNegotiations.list())
+        for (ReferencePointNegotiation negotiation : currentProjectNegotiations.list())
             negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
 
         log.trace("waiting for all session and project negotiations to terminate");

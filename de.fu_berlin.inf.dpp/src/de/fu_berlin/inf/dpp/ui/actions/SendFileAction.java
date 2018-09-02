@@ -27,7 +27,7 @@ import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
@@ -77,7 +77,7 @@ public class SendFileAction extends Action implements Disposable {
 
             if (description != null
                 && description
-                    .startsWith(ProjectNegotiation.TRANSFER_ID_PREFIX))
+                    .startsWith(ReferencePointNegotiation.TRANSFER_ID_PREFIX))
                 return;
 
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {

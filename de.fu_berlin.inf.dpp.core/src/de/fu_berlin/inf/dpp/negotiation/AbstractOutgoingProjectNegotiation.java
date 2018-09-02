@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.synchronize.StartHandle;
  * calculation.
  */
 public abstract class AbstractOutgoingProjectNegotiation extends
-    ProjectNegotiation {
+    ReferencePointNegotiation {
 
     private static final Logger LOG = Logger
         .getLogger(AbstractOutgoingProjectNegotiation.class);

@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.ui.util;
 
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
 
 /**
  * Helper class to run Runnables that return a

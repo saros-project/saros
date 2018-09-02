@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.CancelProjectNegotiationExt
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.TransferType;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
@@ -265,7 +265,7 @@ final class NegotiationPacketListener {
     private void projectNegotiationCanceled(final JID sender,
         final String negotiationID, final String errorMessage) {
 
-        final ProjectNegotiation negotiation = projectNegotiations.get(sender,
+        final ReferencePointNegotiation negotiation = projectNegotiations.get(sender,
             negotiationID);
 
         if (negotiation != null) {

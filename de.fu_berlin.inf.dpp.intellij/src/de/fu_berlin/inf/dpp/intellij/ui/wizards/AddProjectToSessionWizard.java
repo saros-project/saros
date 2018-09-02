@@ -54,7 +54,7 @@ import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
 import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
