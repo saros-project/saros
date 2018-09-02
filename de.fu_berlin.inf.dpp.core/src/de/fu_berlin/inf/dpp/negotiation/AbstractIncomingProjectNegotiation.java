@@ -53,7 +53,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
 
     private static int MONITOR_WORK_SCALE = 1000;
 
-    private final Map<String, ProjectNegotiationData> projectNegotiationData;
+    private final Map<String, ReferencePointNegotiationData> projectNegotiationData;
 
     protected final FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
@@ -68,7 +68,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
         final JID peer, //
         final TransferType transferType, //
         final String negotiationID, //
-        final List<ProjectNegotiationData> projectNegotiationData, //
+        final List<ReferencePointNegotiationData> projectNegotiationData, //
 
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //
@@ -84,9 +84,9 @@ public abstract class AbstractIncomingProjectNegotiation extends
         super(negotiationID, peer, transferType, sessionManager, session,
             workspace, checksumCache, connectionService, transmitter, receiver);
 
-        this.projectNegotiationData = new HashMap<String, ProjectNegotiationData>();
+        this.projectNegotiationData = new HashMap<String, ReferencePointNegotiationData>();
 
-        for (final ProjectNegotiationData data : projectNegotiationData)
+        for (final ReferencePointNegotiationData data : projectNegotiationData)
             this.projectNegotiationData.put(data.getProjectID(), data);
 
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
@@ -259,25 +259,25 @@ public abstract class AbstractIncomingProjectNegotiation extends
     }
 
     /**
-     * Returns the {@link ProjectNegotiationData negotiation data} for all
+     * Returns the {@link ReferencePointNegotiationData negotiation data} for all
      * projects which are part of this negotiation.
      * 
      * @return negotiation data for all projects which are part of this
      *         negotiation.
      */
-    public List<ProjectNegotiationData> getProjectNegotiationData() {
-        return new ArrayList<ProjectNegotiationData>(
+    public List<ReferencePointNegotiationData> getProjectNegotiationData() {
+        return new ArrayList<ReferencePointNegotiationData>(
             projectNegotiationData.values());
     }
 
     /**
-     * Returns the {@link ProjectNegotiationData negotiation data} for the given
+     * Returns the {@link ReferencePointNegotiationData negotiation data} for the given
      * project id.
      * 
      * @return negotiation data for the given project id or <code>null</code> if
      *         no negotiation data exists for the given project id.
      */
-    public ProjectNegotiationData getProjectNegotiationData(final String id) {
+    public ReferencePointNegotiationData getProjectNegotiationData(final String id) {
         return projectNegotiationData.get(id);
     }
 
@@ -367,7 +367,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
                         1 * MONITOR_WORK_SCALE,
                         SubProgressMonitor.SUPPRESS_BEGINTASK));
 
-            final ProjectNegotiationData data = getProjectNegotiationData(id);
+            final ReferencePointNegotiationData data = getProjectNegotiationData(id);
 
             final FileListDiff diff = FileListDiff.diff(localProjectFileList,
                 data.getFileList(), data.isPartial());
@@ -517,7 +517,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
             final String id = entry.getKey();
             final IReferencePoint referencePoint = entry.getValue();
 
-            final ProjectNegotiationData data = getProjectNegotiationData(id);
+            final ReferencePointNegotiationData data = getProjectNegotiationData(id);
 
             if (data == null)
                 throw new IllegalArgumentException("invalid project id: " + id);

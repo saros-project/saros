@@ -31,11 +31,11 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 
 /**
- * Implementation of {@link AbstractOutgoingProjectNegotiation} utilizing a
+ * Implementation of {@link AbstractOutgoingReferencePointNegotiation} utilizing a
  * transferred zip archive to exchange differences in the project files.
  */
 public class ArchiveOutgoingProjectNegotiation extends
-    AbstractOutgoingProjectNegotiation {
+    AbstractOutgoingReferencePointNegotiation {
 
     private static final Logger LOG = Logger
         .getLogger(ArchiveOutgoingProjectNegotiation.class);

@@ -41,7 +41,7 @@ public class InstantIncomingProjectNegotiation extends
     public InstantIncomingProjectNegotiation(
         final JID peer, //
         final String negotiationID, //
-        final List<ProjectNegotiationData> projectNegotiationData, //
+        final List<ReferencePointNegotiationData> projectNegotiationData, //
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //
         final FileReplacementInProgressObservable fileReplacementInProgressObservable, //

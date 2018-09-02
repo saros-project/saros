@@ -55,7 +55,7 @@ import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
 import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -353,7 +353,7 @@ public class AddProjectToSessionWizard extends Wizard {
         this.peer = negotiation.getPeer();
 
 
-        List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
+        List<ReferencePointNegotiationData> data = negotiation.getProjectNegotiationData();
 
         localProjects = new HashMap<String, IProject>();
 
@@ -578,7 +578,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
             try {
 
-                final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
+                final ReferencePointNegotiationData data = negotiation.getProjectNegotiationData(projectID);
 
                 if (data.isPartial())
                     throw new IllegalStateException("partial sharing is not supported");

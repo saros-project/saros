@@ -55,7 +55,7 @@ import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
@@ -599,7 +599,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     "failed to compute local file list", e));
             }
 
-            final ProjectNegotiationData data = negotiation
+            final ReferencePointNegotiationData data = negotiation
                 .getProjectNegotiationData(projectID);
 
             final FileListDiff diff = FileListDiff.diff(localFileList,
@@ -643,7 +643,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
         final Map<String, IProject> result = new HashMap<String, IProject>();
 
-        for (final ProjectNegotiationData data : negotiation
+        for (final ReferencePointNegotiationData data : negotiation
             .getProjectNegotiationData()) {
             final String projectID = data.getProjectID();
 
