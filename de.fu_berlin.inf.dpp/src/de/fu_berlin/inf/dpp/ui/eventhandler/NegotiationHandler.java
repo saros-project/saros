@@ -158,7 +158,7 @@ public class NegotiationHandler implements INegotiationHandler {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-                ProjectNegotiation.Status status = negotiation
+                ReferencePointNegotiation.Status status = negotiation
                     .run(ProgressMonitorAdapterFactory.convert(monitor));
 
                 String peerName = getNickname(new JID(peer));

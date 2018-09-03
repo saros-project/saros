@@ -319,9 +319,9 @@ public class AddProjectToSessionWizard extends Wizard {
                             convertedProject);
                     }
 
-                    final ProjectNegotiation.Status status = negotiation.run(
-                        convertedMapping,
-                        ProgressMonitorAdapterFactory.convert(monitor));
+                    final ReferencePointNegotiation.Status status = negotiation
+                        .run(convertedMapping,
+                            ProgressMonitorAdapterFactory.convert(monitor));
 
                     if (isAutoBuilding) {
                         description.setAutoBuilding(true);
@@ -332,7 +332,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         }
                     }
 
-                    if (status != ProjectNegotiation.Status.OK)
+                    if (status != ReferencePointNegotiation.Status.OK)
                         return Status.CANCEL_STATUS;
 
                     final List<String> projectNames = new ArrayList<String>();

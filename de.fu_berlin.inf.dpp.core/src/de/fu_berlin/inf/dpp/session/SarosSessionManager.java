@@ -36,6 +36,7 @@ import org.jivesoftware.smack.Connection;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
@@ -135,7 +136,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         @Override
-        public void negotiationTerminated(final ReferencePointNegotiation negotiation) {
+        public void negotiationTerminated(
+            final ReferencePointNegotiation negotiation) {
             currentProjectNegotiations.remove(negotiation);
         }
     };
@@ -538,7 +540,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        List<IProject> projectsToShare = new ArrayList<IProject>();
+        List<IReferencePoint> referencePointsToShare = new ArrayList<IReferencePoint>();
 
         for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
             .entrySet()) {
@@ -559,11 +561,11 @@ public class SarosSessionManager implements ISarosSessionManager {
                 currentSession.addSharedResources(project.getReferencePoint(),
                     projectID, resourcesList);
 
-                projectsToShare.add(project);
+                referencePointsToShare.add(project.getReferencePoint());
             }
         }
 
-        if (projectsToShare.isEmpty()) {
+        if (referencePointsToShare.isEmpty()) {
             log.warn("skipping project negotiation because no new projects were added to the current session");
             return;
         }
@@ -591,7 +593,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                             ProjectNegotiationTypeHook.KEY_TYPE));
                     AbstractOutgoingReferencePointNegotiation negotiation = negotiationFactory
                         .newOutgoingProjectNegotiation(user.getJID(), type,
-                            projectsToShare, this, currentSession);
+                            referencePointsToShare, this, currentSession);
 
                     negotiation.setNegotiationListener(negotiationListener);
                     currentProjectNegotiations.add(negotiation);
@@ -620,11 +622,10 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        List<IProject> currentSharedProjects = new ArrayList<IProject>(
-            referencePointManager.getProjects(currentSession
-                .getReferencePoints()));
+        List<IReferencePoint> currentSharedReferencePoints = new ArrayList<IReferencePoint>(
+            currentSession.getReferencePoints());
 
-        if (currentSharedProjects.isEmpty())
+        if (currentSharedReferencePoints.isEmpty())
             return;
 
         INegotiationHandler handler = negotiationHandler;
@@ -656,7 +657,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     .getUserProperties(remoteUser).getString(
                         ProjectNegotiationTypeHook.KEY_TYPE));
                 negotiation = negotiationFactory.newOutgoingProjectNegotiation(
-                    user, type, currentSharedProjects, this, currentSession);
+                    user, type, currentSharedReferencePoints, this, currentSession);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentProjectNegotiations.add(negotiation);
@@ -742,7 +743,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
         }
 
-        for (ReferencePointNegotiation negotiation : currentProjectNegotiations.list())
+        for (ReferencePointNegotiation negotiation : currentProjectNegotiations
+            .list())
             negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
 
         log.trace("waiting for all session and project negotiations to terminate");
