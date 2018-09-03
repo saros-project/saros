@@ -13,27 +13,29 @@ import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
- * Observable which keeps track of all {@link ReferencePointNegotiation project
- * negotiations} currently running.
+ * Observable which keeps track of all {@link ReferencePointNegotiation
+ * referencePoint negotiations} currently running.
  */
-final class ProjectNegotiationObservable {
+final class ReferencePointNegotiationObservable {
 
     private static final Logger LOG = Logger
-        .getLogger(ProjectNegotiationObservable.class);
+        .getLogger(ReferencePointNegotiationObservable.class);
 
     private final Map<JID, List<ReferencePointNegotiation>> negotiations = new HashMap<JID, List<ReferencePointNegotiation>>();
 
     /**
-     * Returns the project negotiation for the given JID with the given id.
+     * Returns the referencePoint negotiation for the given JID with the given
+     * id.
      * 
      * @param jid
      *            the JID to lookup
      * @param id
      *            the ID to lookup
-     * @return the current {@link ReferencePointNegotiation project negotiation} or
-     *         <code>null</code> if no such negotiation exists
+     * @return the current {@link ReferencePointNegotiation referencePoint
+     *         negotiation} or <code>null</code> if no such negotiation exists
      */
-    public synchronized ReferencePointNegotiation get(final JID jid, final String id) {
+    public synchronized ReferencePointNegotiation get(final JID jid,
+        final String id) {
         final List<ReferencePointNegotiation> currentNegotiations = negotiations
             .get(jid);
 
@@ -48,10 +50,10 @@ final class ProjectNegotiationObservable {
     }
 
     /**
-     * Adds a project negotiation.
+     * Adds a referencePoint negotiation.
      * 
      * @param negotiation
-     *            the project negotiation to add
+     *            the referencePoint negotiation to add
      */
     public synchronized void add(final ReferencePointNegotiation negotiation) {
         List<ReferencePointNegotiation> currentNegotiations = negotiations
@@ -65,8 +67,8 @@ final class ProjectNegotiationObservable {
         for (final ReferencePointNegotiation currentNegotiation : currentNegotiations) {
             if (currentNegotiation.getID().equals(negotiation.getID())) {
                 LOG.warn(negotiation.getPeer()
-                    + ": a project negotiation with ID " + negotiation.getID()
-                    + " is already registered");
+                    + ": a referencePoint negotiation with ID "
+                    + negotiation.getID() + " is already registered");
                 return;
             }
         }
@@ -75,10 +77,10 @@ final class ProjectNegotiationObservable {
     }
 
     /**
-     * Removes a project negotiation.
+     * Removes a referencePoint negotiation.
      * 
      * @param negotiation
-     *            the project negotiation to remove
+     *            the referencePoint negotiation to remove
      */
     public synchronized void remove(ReferencePointNegotiation negotiation) {
         List<ReferencePointNegotiation> currentNegotiations = negotiations
@@ -97,15 +99,16 @@ final class ProjectNegotiationObservable {
             }
         }
 
-        LOG.warn(negotiation.getPeer() + ": a project negotiation with ID "
-            + negotiation.getID() + " is not registered");
+        LOG.warn(negotiation.getPeer()
+            + ": a referencePoint negotiation with ID " + negotiation.getID()
+            + " is not registered");
 
     }
 
     /**
-     * Returns a snap shot of all currently running project negotiations.
+     * Returns a snap shot of all currently running referencePoint negotiations.
      * 
-     * @return a list of all currently running project negotiations
+     * @return a list of all currently running referencePoint negotiations
      */
     public synchronized List<ReferencePointNegotiation> list() {
         final List<ReferencePointNegotiation> currentNegotiations = new ArrayList<ReferencePointNegotiation>();

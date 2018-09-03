@@ -39,7 +39,7 @@ final class NegotiationPacketListener {
     private final SarosSessionManager sessionManager;
 
     private final SessionNegotiationObservable sessionNegotiations;
-    private final ProjectNegotiationObservable projectNegotiations;
+    private final ReferencePointNegotiationObservable projectNegotiations;
 
     private boolean rejectSessionNegotiationRequests;
 
@@ -152,7 +152,7 @@ final class NegotiationPacketListener {
 
     NegotiationPacketListener(final SarosSessionManager sessionManager,
         final SessionNegotiationObservable sessionNegotiations,
-        final ProjectNegotiationObservable projectNegotiations,
+        final ReferencePointNegotiationObservable projectNegotiations,
         final ITransmitter transmitter, final IReceiver receiver) {
         this.sessionManager = sessionManager;
 
