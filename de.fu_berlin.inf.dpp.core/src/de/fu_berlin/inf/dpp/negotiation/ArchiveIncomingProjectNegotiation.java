@@ -32,11 +32,11 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 
 /**
- * Implementation of {@link AbstractIncomingProjectNegotiation} utilizing a
+ * Implementation of {@link AbstractIncomingReferencePointNegotiation} utilizing a
  * transferred zip archive to exchange differences in the project files.
  */
 public class ArchiveIncomingProjectNegotiation extends
-    AbstractIncomingProjectNegotiation {
+    AbstractIncomingReferencePointNegotiation {
 
     private static final Logger LOG = Logger
         .getLogger(ArchiveIncomingProjectNegotiation.class);

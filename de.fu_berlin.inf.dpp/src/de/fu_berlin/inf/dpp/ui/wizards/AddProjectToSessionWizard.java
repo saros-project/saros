@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
@@ -77,7 +77,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
     private EnterProjectNamePage namePage;
     private WizardDialogAccessable wizardDialog;
-    private AbstractIncomingProjectNegotiation negotiation;
+    private AbstractIncomingReferencePointNegotiation negotiation;
     private JID peer;
 
     private boolean isExceptionCancel;
@@ -126,7 +126,7 @@ public class AddProjectToSessionWizard extends Wizard {
     };
 
     public AddProjectToSessionWizard(
-        AbstractIncomingProjectNegotiation negotiation) {
+        AbstractIncomingReferencePointNegotiation negotiation) {
 
         SarosPluginContext.initComponent(this);
 
@@ -160,7 +160,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         namePage = new EnterProjectNamePage(session, connectionManager,
-            preferences, peer, negotiation.getProjectNegotiationData());
+            preferences, peer, negotiation.getReferencePointNegotiationData());
 
         addPage(namePage);
     }
@@ -600,7 +600,7 @@ public class AddProjectToSessionWizard extends Wizard {
             }
 
             final ReferencePointNegotiationData data = negotiation
-                .getProjectNegotiationData(projectID);
+                .getReferencePointNegotiationData(projectID);
 
             final FileListDiff diff = FileListDiff.diff(localFileList,
                 data.getFileList(), data.isPartial());
@@ -644,7 +644,7 @@ public class AddProjectToSessionWizard extends Wizard {
         final Map<String, IProject> result = new HashMap<String, IProject>();
 
         for (final ReferencePointNegotiationData data : negotiation
-            .getProjectNegotiationData()) {
+            .getReferencePointNegotiationData()) {
             final String projectID = data.getProjectID();
 
             result.put(projectID, ResourcesPlugin.getWorkspace().getRoot()
