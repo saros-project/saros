@@ -157,7 +157,7 @@ public final class NegotiationFactory {
 
         switch (transferType) {
         case ARCHIVE:
-            return new ArchiveIncomingProjectNegotiation(remoteAddress,
+            return new ArchiveIncomingReferencePointNegotiation(remoteAddress,
                 negotiationID, projectNegotiationData, sessionManager, session,
                 fileReplacementInProgressObservable, workspace, checksumCache,
                 connectionService, transmitter, receiver);

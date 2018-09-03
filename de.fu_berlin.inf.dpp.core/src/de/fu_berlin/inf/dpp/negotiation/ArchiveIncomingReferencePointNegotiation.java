@@ -32,16 +32,16 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 
 /**
- * Implementation of {@link AbstractIncomingReferencePointNegotiation} utilizing a
- * transferred zip archive to exchange differences in the project files.
+ * Implementation of {@link AbstractIncomingReferencePointNegotiation} utilizing
+ * a transferred zip archive to exchange differences in the project files.
  */
-public class ArchiveIncomingProjectNegotiation extends
+public class ArchiveIncomingReferencePointNegotiation extends
     AbstractIncomingReferencePointNegotiation {
 
     private static final Logger LOG = Logger
-        .getLogger(ArchiveIncomingProjectNegotiation.class);
+        .getLogger(ArchiveIncomingReferencePointNegotiation.class);
 
-    public ArchiveIncomingProjectNegotiation(
+    public ArchiveIncomingReferencePointNegotiation(
         final JID peer, //
         final String negotiationID, //
         final List<ReferencePointNegotiationData> projectNegotiationData, //
@@ -73,8 +73,8 @@ public class ArchiveIncomingProjectNegotiation extends
         monitor.subTask("");
 
         /*
-         * the user who sends this ProjectNegotiation is now responsible for the
-         * resources of the contained projects
+         * the user who sends this ReferencePointNegotiation is now responsible
+         * for the resources of the contained referencePoint
          */
         for (Entry<String, IReferencePoint> entry : referencePointMapping
             .entrySet()) {
@@ -82,7 +82,7 @@ public class ArchiveIncomingProjectNegotiation extends
             final String referencePointID = entry.getKey();
             final IReferencePoint referencePoint = entry.getValue();
             /*
-             * TODO Queuing responsibility should be moved to Project
+             * TODO Queuing responsibility should be moved to ReferencePoint
              * Negotiation, since its the only consumer of queuing
              * functionality. This will enable a specific Queuing mechanism per
              * TransferType (see github issue #137).
