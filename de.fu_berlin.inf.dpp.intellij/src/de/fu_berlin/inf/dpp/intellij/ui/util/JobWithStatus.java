@@ -7,5 +7,5 @@ import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
  */
 public abstract class JobWithStatus implements Runnable {
 
-    public ProjectNegotiation.Status status;
+    public ReferencePointNegotiation.Status status;
 }

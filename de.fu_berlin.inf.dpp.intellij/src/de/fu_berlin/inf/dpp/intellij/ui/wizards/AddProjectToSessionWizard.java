@@ -433,7 +433,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                 @Override
                 public void run(ProgressIndicator indicator) {
-                    final ProjectNegotiation.Status status = negotiation
+                    final ReferencePointNegotiation.Status status = negotiation
                         .run(localReferencePoints,
                             new ProgessMonitorAdapter(indicator));
 
@@ -442,12 +442,12 @@ public class AddProjectToSessionWizard extends Wizard {
                     UIUtil.invokeLaterIfNeeded(new Runnable() {
                         @Override
                         public void run() {
-                            if (status == ProjectNegotiation.Status.ERROR) {
+                            if (status == ReferencePointNegotiation.Status.ERROR) {
                                 DialogUtils.showError(null,
                                     "Error during project negotiation",
                                     "The project could not be shared: "
                                         + negotiation.getErrorMessage());
-                            } else if (status == ProjectNegotiation.Status.OK) {
+                            } else if (status == ReferencePointNegotiation.Status.OK) {
                                 NotificationPanel
                                     .showInformation("Project shared",
                                         "Project successfully shared");
