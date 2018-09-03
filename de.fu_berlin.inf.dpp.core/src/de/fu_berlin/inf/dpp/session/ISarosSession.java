@@ -138,11 +138,11 @@ public interface ISarosSession {
 
     /**
      * Informs all participants and listeners that a user now has finished the
-     * Project Negotiation.
+     * ReferencePoint Negotiation.
      * 
      * @param user
      */
-    public void userFinishedProjectNegotiation(final User user);
+    public void userFinishedReferencePointNegotiation(final User user);
 
     /**
      * Removes a user from this session.
