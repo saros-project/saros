@@ -113,7 +113,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final SessionNegotiationObservable currentSessionNegotiations;
 
-    private final ProjectNegotiationObservable currentProjectNegotiations;
+    private final ReferencePointNegotiationObservable currentProjectNegotiations;
 
     private XMPPConnectionService connectionService;
 
@@ -162,7 +162,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.context = context;
         this.connectionService = connectionService;
         this.currentSessionNegotiations = new SessionNegotiationObservable();
-        this.currentProjectNegotiations = new ProjectNegotiationObservable();
+        this.currentProjectNegotiations = new ReferencePointNegotiationObservable();
         this.connectionService.addListener(connectionListener);
 
         this.negotiationFactory = negotiationFactory;
