@@ -130,7 +130,7 @@ public final class NegotiationFactory {
 
         switch (transferType) {
         case ARCHIVE:
-            return new ArchiveOutgoingProjectNegotiation(remoteAddress,
+            return new ArchiveOutgoingReferencePointNegotiation(remoteAddress,
                 referencePoints, sessionManager, session, /* editorManager */
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);

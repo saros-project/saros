@@ -34,14 +34,14 @@ import de.fu_berlin.inf.dpp.synchronize.StartHandle;
  * Implementation of {@link AbstractOutgoingReferencePointNegotiation} utilizing a
  * transferred zip archive to exchange differences in the project files.
  */
-public class ArchiveOutgoingProjectNegotiation extends
+public class ArchiveOutgoingReferencePointNegotiation extends
     AbstractOutgoingReferencePointNegotiation {
 
     private static final Logger LOG = Logger
-        .getLogger(ArchiveOutgoingProjectNegotiation.class);
+        .getLogger(ArchiveOutgoingReferencePointNegotiation.class);
     private File zipArchive = null;
 
-    public ArchiveOutgoingProjectNegotiation( //
+    public ArchiveOutgoingReferencePointNegotiation( //
         final JID peer, //
         final List<IReferencePoint> referencePoints, //
 
