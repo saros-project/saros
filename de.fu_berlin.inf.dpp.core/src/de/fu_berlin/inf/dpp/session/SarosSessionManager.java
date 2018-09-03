@@ -446,7 +446,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
 
             try {
-                negotiation = negotiationFactory.newIncomingProjectNegotiation(
+                negotiation = negotiationFactory.newIncomingReferencePointNegotiation(
                     remoteAddress, transferType, negotiationID,
                     projectNegotiationData, this, session);
 
@@ -592,7 +592,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                         .getUserProperties(user).getString(
                             ProjectNegotiationTypeHook.KEY_TYPE));
                     AbstractOutgoingReferencePointNegotiation negotiation = negotiationFactory
-                        .newOutgoingProjectNegotiation(user.getJID(), type,
+                        .newOutgoingReferencePointNegotiation(user.getJID(), type,
                             referencePointsToShare, this, currentSession);
 
                     negotiation.setNegotiationListener(negotiationListener);
@@ -656,7 +656,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 TransferType type = TransferType.valueOf(currentSession
                     .getUserProperties(remoteUser).getString(
                         ProjectNegotiationTypeHook.KEY_TYPE));
-                negotiation = negotiationFactory.newOutgoingProjectNegotiation(
+                negotiation = negotiationFactory.newOutgoingReferencePointNegotiation(
                     user, type, currentSharedReferencePoints, this, currentSession);
 
                 negotiation.setNegotiationListener(negotiationListener);
