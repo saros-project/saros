@@ -452,7 +452,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void userFinishedProjectNegotiation(final User user) {
+    public void userFinishedReferencePointNegotiation(final User user) {
 
         log.info("user " + user
             + " now has Projects and can process IResourceActivities");

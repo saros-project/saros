@@ -113,7 +113,7 @@ public abstract class AbstractOutgoingReferencePointNegotiation extends
                 throw new LocalCancellationException(null,
                     CancelOption.DO_NOT_NOTIFY_PEER);
 
-            session.userFinishedProjectNegotiation(user);
+            session.userFinishedReferencePointNegotiation(user);
         } catch (Exception e) {
             exception = e;
         } finally {
