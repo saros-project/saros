@@ -109,7 +109,7 @@ public final class NegotiationFactory {
             connectionManager, transmitter, receiver);
     }
 
-    public AbstractOutgoingReferencePointNegotiation newOutgoingProjectNegotiation(
+    public AbstractOutgoingReferencePointNegotiation newOutgoingReferencePointNegotiation(
         final JID remoteAddress, final TransferType transferType,
         final List<IReferencePoint> referencePoints,
         final ISarosSessionManager sessionManager, final ISarosSession session) {
@@ -135,7 +135,7 @@ public final class NegotiationFactory {
         }
     }
 
-    public AbstractIncomingReferencePointNegotiation newIncomingProjectNegotiation(
+    public AbstractIncomingReferencePointNegotiation newIncomingReferencePointNegotiation(
         final JID remoteAddress, final TransferType transferType,
         final String negotiationID,
         final List<ReferencePointNegotiationData> referencePointNegotiationData,
