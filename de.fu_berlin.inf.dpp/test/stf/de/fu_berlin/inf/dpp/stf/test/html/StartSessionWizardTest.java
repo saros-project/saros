@@ -4,6 +4,7 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.ui.View.MAIN_VIEW;
 import static de.fu_berlin.inf.dpp.ui.View.SESSION_WIZARD;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
@@ -69,6 +70,11 @@ public class StartSessionWizardTest extends StfHtmlTestCase {
         ALICE.htmlBot().view(SESSION_WIZARD).tree("project-tree")
             .check(Constants.PROJECT1);
         assertTrue(ALICE.htmlBot().view(SESSION_WIZARD).tree("project-tree")
+            .isChecked(Constants.PROJECT1));
+
+        ALICE.htmlBot().view(SESSION_WIZARD).tree("project-tree")
+            .uncheck(".classpath");
+        assertFalse(ALICE.htmlBot().view(SESSION_WIZARD).tree("project-tree")
             .isChecked(Constants.PROJECT1));
 
         ALICE.htmlBot().view(SESSION_WIZARD).button("next-button").click();

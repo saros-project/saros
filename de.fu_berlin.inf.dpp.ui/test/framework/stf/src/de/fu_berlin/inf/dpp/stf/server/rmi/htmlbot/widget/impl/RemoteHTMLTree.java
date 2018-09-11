@@ -17,10 +17,11 @@ public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements
 
     @Override
     public void check(String title) throws RemoteException {
-        // if (isChecked(title) == false) {
-        Selector nodeSelector = new Selector("span[title=\"" + title + "\"]");
-        browser.run(nodeSelector.getStatement() + ".click();");
-        // }
+        if (isChecked(title) == false) {
+            Selector nodeSelector = new Selector("span[title=\"" + title
+                + "\"]");
+            browser.run(nodeSelector.getStatement() + "[0].click();");
+        }
     }
 
     @Override
