@@ -20,7 +20,8 @@ public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements
         if (isChecked(title) == false) {
             Selector nodeSelector = new Selector("span[title=\"" + title
                 + "\"]");
-            browser.run(nodeSelector.getStatement() + "[0].click();");
+            browser.run(String.format("%s[0].click();",
+                nodeSelector.getStatement()));
         }
     }
 
@@ -29,16 +30,17 @@ public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements
         if (isChecked(title)) {
             Selector nodeSelector = new Selector("span[title=\"" + title
                 + "\"]");
-            browser.run(nodeSelector.getStatement() + "[0].click();");
+            browser.run(String.format("%s[0].click();",
+                nodeSelector.getStatement()));
         }
     }
 
     @Override
     public boolean isChecked(String title) throws RemoteException {
         Selector nodeSelector = new Selector("span[title=\"" + title + "\"]");
-        Object checked = browser.syncRun("return "
-            + nodeSelector.getStatement()
-            + ".prev().hasClass('rc-tree-checkbox-checked')");
+        Object checked = browser.syncRun(String.format(
+            "return %s.prev().hasClass('rc-tree-checkbox-checked')",
+            nodeSelector.getStatement()));
         return checked != null ? (Boolean) checked : null;
     }
 }

@@ -16,6 +16,6 @@ public final class RemoteHTMLButton extends HTMLSTFRemoteObject implements
 
     @Override
     public void click() throws RemoteException {
-        browser.run(selector.getStatement() + "[0].click();");
+        browser.run(String.format("%s[0].click();", selector.getStatement()));
     }
 }
