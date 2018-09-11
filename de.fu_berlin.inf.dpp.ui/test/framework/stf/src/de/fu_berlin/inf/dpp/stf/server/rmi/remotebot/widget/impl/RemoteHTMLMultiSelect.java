@@ -34,8 +34,7 @@ public final class RemoteHTMLMultiSelect extends HTMLSTFRemoteObject implements
             "return view.getFieldValue('%s')", name));
         if (selection != null) {
             String raw = selection.toString();
-            String[] items = raw.replaceAll("\\[", "").replaceAll("\\]", "")
-                .replaceAll("\\s", "").split(",");
+            String[] items = raw.replaceAll("(\\[|\\]|\\s)", "").split(",");
             return Arrays.asList(items);
         }
 
