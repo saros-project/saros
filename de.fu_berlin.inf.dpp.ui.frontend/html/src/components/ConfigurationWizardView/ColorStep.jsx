@@ -3,7 +3,7 @@ import React from 'react'
 import cn from 'classnames'
 @inject('configurationUI', 'api')
 @observer
-export default class AccountStep extends React.Component {
+export default class ColorStep extends React.Component {
 
   constructor (props) {
     super()

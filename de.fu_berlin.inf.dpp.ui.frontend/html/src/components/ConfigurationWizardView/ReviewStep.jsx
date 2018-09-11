@@ -4,7 +4,7 @@ import React from 'react'
 
 @inject('configurationUI')
 @observer
-export default class AccountStep extends React.Component {
+export default class ReviewStep extends React.Component {
   settingLabels = {
     autoConnect: 'Connect automatically',
     isSkypeUsernameVisible: 'Show my Skype username',
