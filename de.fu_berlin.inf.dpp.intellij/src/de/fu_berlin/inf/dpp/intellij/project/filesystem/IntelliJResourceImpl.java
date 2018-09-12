@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import org.jetbrains.annotations.NotNull;
 
@@ -224,5 +225,11 @@ public abstract class IntelliJResourceImpl implements IResource {
 
         return getType() == other.getType() && getLocation()
                 .equals(other.getLocation());
+    }
+
+    @Override
+    public IReferencePoint getReferencePoint()
+    {
+        return null;
     }
 }

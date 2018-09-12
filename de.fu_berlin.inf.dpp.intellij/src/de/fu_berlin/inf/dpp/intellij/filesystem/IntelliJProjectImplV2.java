@@ -71,6 +71,8 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     public IntelliJProjectImplV2(@NotNull final Module module) {
         this.module = module;
         this.moduleName = module.getName();
+        this.referencePoint = new IntelliJReferencePointImpl((IntelliJPathImpl)
+            this.getLocation());
 
         ModuleRootManager moduleRootManager = ModuleRootManager
             .getInstance(module);

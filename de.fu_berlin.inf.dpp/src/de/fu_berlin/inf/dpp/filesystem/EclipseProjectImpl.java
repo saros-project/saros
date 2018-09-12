@@ -5,6 +5,9 @@ public class EclipseProjectImpl extends EclipseContainerImpl implements
 
     EclipseProjectImpl(org.eclipse.core.resources.IProject delegate) {
         super(delegate);
+
+        referencePoint = new EclipseReferencePointImpl(new EclipsePathImpl(
+            delegate.getLocation()));
     }
 
     @Override
