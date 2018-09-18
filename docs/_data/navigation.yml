@@ -1,11 +1,19 @@
 - title: Docs
+  long_title: User Documentation
   url: /documentation
+  icon_class: fa fa-book
 
 - title: Downloads
+  long_title: Get Saros
   url: /downloads
+  icon_class: fa fa-download
 
 - title: Contribute
+  long_title: Contribute to Saros
   url: /contribute
+  icon_class: fa fa-upload
 
 - title: Support
+  long_title: Support
   url: /support
+  icon_class: fa fa-headset
