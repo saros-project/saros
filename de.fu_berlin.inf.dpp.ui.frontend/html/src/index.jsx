@@ -25,7 +25,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 ReactDOM.render(
-  <Provider {...stores} >
+  <Provider {...stores} api={api} >
     <Localization messages={dictionary}>
       <App />
     </Localization>

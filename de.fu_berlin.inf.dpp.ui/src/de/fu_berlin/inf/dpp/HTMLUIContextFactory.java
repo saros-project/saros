@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
 import de.fu_berlin.inf.dpp.ui.pages.AccountPage;
+import de.fu_berlin.inf.dpp.ui.pages.ConfigurationPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 import de.fu_berlin.inf.dpp.ui.pages.SessionWizardPage;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
@@ -76,7 +77,8 @@ public class HTMLUIContextFactory extends AbstractContextFactory {
     }
 
     private void createPages() {
-        add(AccountPage.class, MainPage.class, SessionWizardPage.class);
+        add(AccountPage.class, MainPage.class, SessionWizardPage.class,
+            ConfigurationPage.class);
     }
 
     private void createRenderer() {

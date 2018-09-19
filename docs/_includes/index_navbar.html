@@ -1,0 +1,9 @@
+<ul class="list-group">
+
+  {% assign entries = site.data.navigation %}
+  {% for entry in entries %}
+    <a class="list-group-item list-group-item-action flex-column align-items-start bg-blue" href="{{ entry.url | absolute_url }}">
+      <h6 class="mb-0"><i class="{{ entry.icon_class }}"></i>&emsp;{{ entry.long_title }}</h6>
+    </a>
+  {% endfor %}
+</ul>
