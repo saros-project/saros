@@ -333,7 +333,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             sessionEnding(session);
 
             try {
-                session.stop();
+                session.stop(reason);
                 log.info("session stopped");
             } catch (RuntimeException e) {
                 log.error("failed to stop the session", e);
