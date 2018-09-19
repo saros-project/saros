@@ -57,7 +57,10 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     private static final Map<View, Key> map = new HashMap<View, Key>();
     static {
         map.put(View.MAIN_VIEW, new Key(MainPage.class, "main-page", "root"));
-        map.put(View.ADD_CONTACT, new Key(MainPage.class, "add-contact", "add-contact-form"));
+        map.put(View.ADD_CONTACT, new Key(MainPage.class, "add-contact",
+            "add-contact-form"));
+        map.put(View.COMPONENT_TEST, new Key(MainPage.class, "component-test",
+            "component-test-root"));
     }
 
     private static final RemoteHTMLView INSTANCE = new RemoteHTMLView();
