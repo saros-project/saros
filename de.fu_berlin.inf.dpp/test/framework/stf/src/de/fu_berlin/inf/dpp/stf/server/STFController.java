@@ -62,7 +62,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotTreeIt
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotViewMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLButton;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLCheckbox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLInputField;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLMultiSelect;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLProgressBar;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLRadioGroup;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLSelect;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.NewC;
@@ -199,6 +204,11 @@ public class STFController {
             exportObject(RemoteHTMLView.getInstance(), "htmlView");
             exportObject(RemoteHTMLButton.getInstance(), "htmlButton");
             exportObject(RemoteHTMLInputField.getInstance(), "htmlInputField");
+            exportObject(RemoteHTMLCheckbox.getInstance(), "htmlCheckbox");
+            exportObject(RemoteHTMLRadioGroup.getInstance(), "htmlRadioGroup");
+            exportObject(RemoteHTMLSelect.getInstance(), "htmlSelect");
+            exportObject(RemoteHTMLMultiSelect.getInstance(), "htmlMultiSelect");
+            exportObject(RemoteHTMLProgressBar.getInstance(), "htmlProgressBar");
         }
 
         /*

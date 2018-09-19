@@ -8,40 +8,36 @@ import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLInputField;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLProgressBar;
 
-public final class RemoteHTMLInputField extends HTMLSTFRemoteObject implements
-    IRemoteHTMLInputField {
+public final class RemoteHTMLProgressBar extends HTMLSTFRemoteObject implements
+    IRemoteHTMLProgressBar {
 
-    private static final RemoteHTMLInputField INSTANCE = new RemoteHTMLInputField();
+    private static final RemoteHTMLProgressBar INSTANCE = new RemoteHTMLProgressBar();
     private static final Logger log = Logger
-        .getLogger(RemoteHTMLInputField.class);
+        .getLogger(RemoteHTMLProgressBar.class);
 
     private IJQueryBrowser browser;
     private ISelector selector;
 
-    public static RemoteHTMLInputField getInstance() {
+    public static RemoteHTMLProgressBar getInstance() {
         return INSTANCE;
     }
 
     @Override
-    public void enter(String text) throws RemoteException {
+    public int getValue() throws RemoteException {
         String name = getSelectorName();
-        browser.val(selector, text);
-        browser.run(String.format("view.setFieldValue('%s','%s')", name, text));
-    }
-
-    @Override
-    public String getValue() throws RemoteException {
-        String name = getSelectorName();
-        Object value = browser.syncRun(String.format(
+        Object selection = browser.syncRun(String.format(
             "return view.getFieldValue('%s')", name));
-        return value != null ? value.toString() : null;
+        return selection != null ? ((Double) selection).intValue() : null;
     }
 
     @Override
-    public void clear() throws RemoteException {
-        enter("");
+    public void setValue(int value) throws RemoteException {
+        String name = getSelectorName();
+        browser.syncRun(String.format("view.setFieldValue('%s',%d)", name,
+            value));
+
     }
 
     void setBrowser(IJQueryBrowser browser) {
@@ -55,4 +51,5 @@ public final class RemoteHTMLInputField extends HTMLSTFRemoteObject implements
     private String getSelectorName() {
         return ((NameSelector) selector).getName();
     }
+
 }

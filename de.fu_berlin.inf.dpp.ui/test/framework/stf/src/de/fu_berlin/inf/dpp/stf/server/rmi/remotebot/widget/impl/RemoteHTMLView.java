@@ -16,7 +16,12 @@ import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.BotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLCheckbox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLInputField;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLMultiSelect;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLProgressBar;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLRadioGroup;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLSelect;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.ui.pages.AbstractBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
@@ -73,10 +78,20 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     private View view;
     private RemoteHTMLButton button;
     private RemoteHTMLInputField inputField;
+    private RemoteHTMLCheckbox checkbox;
+    private RemoteHTMLRadioGroup radioGroup;
+    private RemoteHTMLSelect select;
+    private RemoteHTMLMultiSelect multiSelect;
+    private RemoteHTMLProgressBar progressBar;
 
     public RemoteHTMLView() {
         button = RemoteHTMLButton.getInstance();
         inputField = RemoteHTMLInputField.getInstance();
+        checkbox = RemoteHTMLCheckbox.getInstance();
+        radioGroup = RemoteHTMLRadioGroup.getInstance();
+        select = RemoteHTMLSelect.getInstance();
+        multiSelect = RemoteHTMLMultiSelect.getInstance();
+        progressBar = RemoteHTMLProgressBar.getInstance();
     }
 
     @Override
@@ -93,7 +108,7 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     }
 
     @Override
-    public boolean hasInputField(String name) throws RemoteException {
+    public boolean hasElementWithName(String name) throws RemoteException {
         return exists(new NameSelector(name));
     }
 
@@ -106,6 +121,48 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     }
 
     @Override
+    public IRemoteHTMLCheckbox checkbox(String name) throws RemoteException {
+        NameSelector selector = new NameSelector(name);
+        checkbox.setSelector(selector);
+        ensureExistence(selector);
+        return checkbox;
+    }
+
+    @Override
+    public IRemoteHTMLRadioGroup radioGroup(String name) throws RemoteException {
+        NameSelector selector = new NameSelector(name);
+        radioGroup.setSelector(selector);
+        ensureExistence(selector);
+        return radioGroup;
+    }
+
+    @Override
+    public IRemoteHTMLSelect select(String name) throws RemoteException {
+        NameSelector selector = new NameSelector(name);
+        select.setSelector(selector);
+        ensureExistence(selector);
+        return select;
+    }
+
+    @Override
+    public IRemoteHTMLMultiSelect multiSelect(String name)
+        throws RemoteException {
+        NameSelector selector = new NameSelector(name);
+        multiSelect.setSelector(selector);
+        ensureExistence(selector);
+        return multiSelect;
+    }
+
+    @Override
+    public IRemoteHTMLProgressBar progressBar(String name)
+        throws RemoteException {
+        NameSelector selector = new NameSelector(name);
+        progressBar.setSelector(selector);
+        ensureExistence(selector);
+        return progressBar;
+    }
+
+    @Override
     public boolean isOpen() {
         String id = map.get(view).id;
         return exists(new IdSelector(id));
@@ -115,13 +172,23 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     public void open() {
         getBrowser().run(
             String.format("SarosApi.viewStore.doChangeView('%s')",
-                map.get(view).viewName));
+                getViewName()));
     }
 
     public void selectView(View view) {
         this.view = view;
         this.button.setBrowser(getBrowser());
         this.inputField.setBrowser(getBrowser());
+        this.checkbox.setBrowser(getBrowser());
+        this.radioGroup.setBrowser(getBrowser());
+        this.select.setBrowser(getBrowser());
+        this.multiSelect.setBrowser(getBrowser());
+        this.progressBar.setBrowser(getBrowser());
+
+    }
+
+    private String getViewName() {
+        return map.get(view).viewName;
     }
 
     private IJQueryBrowser getBrowser() {
@@ -148,4 +215,5 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
         }
         return foundIt;
     }
+
 }

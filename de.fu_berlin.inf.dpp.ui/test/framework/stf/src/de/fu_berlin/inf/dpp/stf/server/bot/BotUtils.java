@@ -8,11 +8,28 @@ import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 
 public class BotUtils {
 
-    public static List<String> getListItemsWithSelector(IJQueryBrowser browser,
+    public static List<String> getListItemsText(IJQueryBrowser browser,
         ISelector selector) {
-        Object[] objects = (Object[]) browser.syncRun("var strings = [];"
-            + selector.getStatement() + ".each(function (i) { "
-            + "strings[i] = $(this).text().trim(); }); return strings; ");
+        String code = "var strings = [];" + selector.getStatement()
+            + ".each(function (i) { "
+            + "strings[i] = $(this).text().trim(); }); return strings; ";
+
+        return getListItems(browser, selector, code);
+    }
+
+    public static List<String> getListItemsValue(IJQueryBrowser browser,
+        ISelector selector) {
+        String code = "var strings = [];" + selector.getStatement()
+            + ".each(function (i) { "
+            + "strings[i] = $(this).val(); }); return strings; ";
+
+        return getListItems(browser, selector, code);
+    }
+
+    private static List<String> getListItems(IJQueryBrowser browser,
+        ISelector selector, String code) {
+
+        Object[] objects = (Object[]) browser.syncRun(code);
 
         List<String> strings = new ArrayList<String>();
         for (Object o : objects) {
@@ -20,6 +37,7 @@ public class BotUtils {
         }
 
         return strings;
+
     }
 
 }
