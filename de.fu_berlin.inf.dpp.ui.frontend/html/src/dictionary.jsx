@@ -34,6 +34,7 @@ export default {
     'jid': 'XMPP/Jabber ID',
     'online': 'Online',
     'host': 'Host',
+    'password': 'Password',
   },
   'message': {
     'noAccount': 'No account selected',
