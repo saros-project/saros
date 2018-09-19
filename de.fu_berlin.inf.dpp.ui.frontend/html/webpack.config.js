@@ -72,6 +72,7 @@ module.exports = (env = {}) => {
       // TODO there should be a more elegant way of telling the application which view to show
       createPage('main-page'),
       createPage('start-session-wizard'),
+      createPage('configuration-page'),
       createPage('component-test')
     ]
     .concat(isProd ? [
