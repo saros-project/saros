@@ -12,9 +12,13 @@ de.fu_berlin.inf.dpp.editor.internal.TestSuite.class,
 
 de.fu_berlin.inf.dpp.feedback.TestSuite.class,
 
+de.fu_berlin.inf.dpp.filesystem.EclipseTestSuite.class,
+
 de.fu_berlin.inf.dpp.project.TestSuite.class,
 
-de.fu_berlin.inf.dpp.session.internal.TestSuite.class,
+de.fu_berlin.inf.dpp.session.internal.EclipseTestSuite.class,
+
+de.fu_berlin.inf.dpp.ui.browser.EclipseTestSuite.class,
 
 de.fu_berlin.inf.dpp.ui.model.roster.TestSuite.class,
 
