@@ -63,8 +63,8 @@ export default class Step extends React.Component {
     const { title, Component, wizard } = this.props
     const { hasNext, hasPrev } = wizard
     return (
-      <div className='wizard-step'>
-        <nav className='header navbar navbar-default'>{title}</nav>
+      <div className='wizard-step' id='session-wizard'>
+        <nav className='header navbar navbar-default' id='header'>{title}</nav>
         <div className='wizard-body'>
           <Component ref={this.setComponentRef} setIsValid={this.setIsValid} />
         </div>
