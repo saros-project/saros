@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl;
 
 import java.rmi.RemoteException;
 import java.util.concurrent.ExecutionException;
@@ -13,15 +13,15 @@ import de.fu_berlin.inf.ag_se.browser.html.ISelector.IdSelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.BotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLCheckbox;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLInputField;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLMultiSelect;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLProgressBar;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLRadioGroup;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLSelect;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLTextElement;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLButton;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLCheckbox;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLInputField;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLMultiSelect;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLProgressBar;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLRadioGroup;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLSelect;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLTextElement;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.ui.View;
 
 public class RemoteHTMLView extends HTMLSTFRemoteObject implements
