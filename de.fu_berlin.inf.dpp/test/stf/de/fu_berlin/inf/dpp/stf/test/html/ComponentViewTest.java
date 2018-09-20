@@ -152,4 +152,59 @@ public class ComponentViewTest extends StfHtmlTestCase {
         view.progressBar("progressBar").setValue(42);
         assertTrue(view.progressBar("progressBar").getValue() == 42);
     }
+
+    @Test
+    public void shouldTestTextElement() throws Exception {
+        IRemoteHTMLView view = ALICE.htmlBot().view(View.COMPONENT_TEST);
+
+        assertTrue(view.hasElementWithId("button-display-text"));
+        assertTrue(view.textElement("button-display-text").getText()
+            .equals("none"));
+
+        view.textElement("button-display-text").setText("Some other content");
+        assertTrue(view.textElement("button-display-text").getText()
+            .equals("Some other content"));
+
+    }
+
+    @Test
+    public void shouldTestButton() throws Exception {
+        IRemoteHTMLView view = ALICE.htmlBot().view(View.COMPONENT_TEST);
+
+        assertTrue(view.hasElementWithId("button"));
+        view.button("button").click();
+        assertTrue(view.textElement("button-display-text").getText()
+            .equals("button"));
+
+        assertTrue(view.hasElementWithId("button-dropdown-1"));
+        view.button("button-dropdown-1").click();
+        assertTrue(view.textElement("button-display-text").getText()
+            .equals("key-dropdown-1"));
+
+        assertTrue(view.hasElementWithId("button-dropdown-2"));
+        view.button("button-dropdown-2").click();
+        assertTrue(view.textElement("button-display-text").getText()
+            .equals("key-dropdown-2"));
+
+        assertTrue(view.hasElementWithId("button-dropdown-3"));
+        view.button("button-dropdown-3").click();
+        assertTrue(view.textElement("button-display-text").getText()
+            .equals("key-dropdown-3"));
+
+        assertTrue(view.hasElementWithId("split-button-1"));
+        view.button("split-button-1").click();
+        assertTrue(view.textElement("button-display-text").getText()
+            .equals("key-split-1"));
+
+        assertTrue(view.hasElementWithId("split-button-2"));
+        view.button("split-button-2").click();
+        assertTrue(view.textElement("button-display-text").getText()
+            .equals("key-split-2"));
+
+        assertTrue(view.hasElementWithId("split-button-3"));
+        view.button("split-button-3").click();
+        assertTrue(view.textElement("button-display-text").getText()
+            .equals("key-split-3"));
+
+    }
 }

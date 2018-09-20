@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLMultiSele
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLProgressBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLRadioGroup;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLSelect;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLTextElement;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.ui.pages.AbstractBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
@@ -83,6 +84,7 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     private RemoteHTMLSelect select;
     private RemoteHTMLMultiSelect multiSelect;
     private RemoteHTMLProgressBar progressBar;
+    private RemoteHTMLTextElement textElement;
 
     public RemoteHTMLView() {
         button = RemoteHTMLButton.getInstance();
@@ -92,11 +94,17 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
         select = RemoteHTMLSelect.getInstance();
         multiSelect = RemoteHTMLMultiSelect.getInstance();
         progressBar = RemoteHTMLProgressBar.getInstance();
+        textElement = RemoteHTMLTextElement.getInstance();
     }
 
     @Override
-    public boolean hasButton(String id) throws RemoteException {
+    public boolean hasElementWithId(String id) throws RemoteException {
         return exists(new IdSelector(id));
+    }
+
+    @Override
+    public boolean hasElementWithName(String name) throws RemoteException {
+        return exists(new NameSelector(name));
     }
 
     @Override
@@ -105,11 +113,6 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
         button.setSelector(selector);
         ensureExistence(selector);
         return button;
-    }
-
-    @Override
-    public boolean hasElementWithName(String name) throws RemoteException {
-        return exists(new NameSelector(name));
     }
 
     @Override
@@ -163,6 +166,14 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     }
 
     @Override
+    public IRemoteHTMLTextElement textElement(String id) throws RemoteException {
+        IdSelector selector = new IdSelector(id);
+        textElement.setSelector(selector);
+        ensureExistence(selector);
+        return textElement;
+    }
+
+    @Override
     public boolean isOpen() {
         String id = map.get(view).id;
         return exists(new IdSelector(id));
@@ -184,6 +195,7 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
         this.select.setBrowser(getBrowser());
         this.multiSelect.setBrowser(getBrowser());
         this.progressBar.setBrowser(getBrowser());
+        this.textElement.setBrowser(getBrowser());
 
     }
 

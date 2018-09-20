@@ -21,8 +21,8 @@ public class MainViewTest extends StfHtmlTestCase {
             .isOpen());
 
         assertTrue("No 'Add Contact' button", ALICE.htmlBot().view(MAIN_VIEW)
-            .hasButton("add-contact"));
+            .hasElementWithId("add-contact"));
         assertTrue("No 'Start Session' button", ALICE.htmlBot().view(MAIN_VIEW)
-            .hasButton("start-session"));
+            .hasElementWithId("start-session"));
     }
 }

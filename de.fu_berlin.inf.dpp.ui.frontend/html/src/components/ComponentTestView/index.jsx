@@ -1,4 +1,5 @@
 import React from 'react'
+import $ from 'jquery'
 import { observable, action } from 'mobx'
 import { observer, inject } from 'mobx-react'
 import { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button, DropdownButton, SplitButton, MenuItem, Checkbox, Radio, ProgressBar } from 'react-bootstrap'
@@ -51,8 +52,14 @@ export default class ComponentTestView extends React.Component {
   }
 
   @action onClickButton = (e) => {
-    // TODO: do something with this click or display a message
-    console.log(e.target.id)
+    var value
+    if (e.target === undefined) {
+      value = e // key
+    } else {
+      value = e.target.id
+    }
+    $('#button-display-text').html(value)
+    console.log(value)
   }
 
   render () {
@@ -148,17 +155,20 @@ export default class ComponentTestView extends React.Component {
 
                 <FormGroup>
                   <Col smOffset={2} sm={10}>
+                    <div>
+                      <span>Pressed Button: </span><span id='button-display-text'>none</span>
+                    </div>
                     <div className='btn-toolbar'>
                       <Button type='button' id='button' onClick={this.onClickButton} >Button</Button>
                       <DropdownButton title='DropdownButton' id='button-dropdown'>
-                        <MenuItem eventKey='1' id='button-dropdown-1' onClick={this.onClickButton}>Dropdown link 1</MenuItem>
-                        <MenuItem eventKey='2' id='button-dropdown-2' onClick={this.onClickButton}>Dropdown link 2</MenuItem>
-                        <MenuItem eventKey='3' id='button-dropdown-3' onClick={this.onClickButton}>Dropdown link 3</MenuItem>
+                        <MenuItem eventKey='key-dropdown-1' id='button-dropdown-1' onSelect={this.onClickButton}>Dropdown link 1</MenuItem>
+                        <MenuItem eventKey='key-dropdown-2' id='button-dropdown-2' onSelect={this.onClickButton}>Dropdown link 2</MenuItem>
+                        <MenuItem eventKey='key-dropdown-3' id='button-dropdown-3' onSelect={this.onClickButton}>Dropdown link 3</MenuItem>
                       </DropdownButton>
                       <SplitButton title='SplitButton' id='split-button' onClick={this.onClickButton}>
-                        <MenuItem eventKey='1' id='split-button-1' onClick={this.onClickButton}>Dropdown link 1</MenuItem>
-                        <MenuItem eventKey='2' id='split-button-2' onClick={this.onClickButton}>Dropdown link 2</MenuItem>
-                        <MenuItem eventKey='3' id='split-button-3' onClick={this.onClickButton}>Dropdown link 3</MenuItem>
+                        <MenuItem eventKey='key-split-1' id='split-button-1' onSelect={this.onClickButton}>SplitButton link 1</MenuItem>
+                        <MenuItem eventKey='key-split-2' id='split-button-2' onSelect={this.onClickButton}>SplitButton link 2</MenuItem>
+                        <MenuItem eventKey='key-split-3' id='split-button-3' onSelect={this.onClickButton}>SplitButton link 3</MenuItem>
                       </SplitButton>
                     </div>
                   </Col>
