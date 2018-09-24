@@ -11,6 +11,7 @@ import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.IdSelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
+import de.fu_berlin.inf.ag_se.browser.html.ISelector.Selector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.BotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLButton;
@@ -21,6 +22,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLProgressBar
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLRadioGroup;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLSelect;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLTextElement;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
 import de.fu_berlin.inf.dpp.ui.View;
 
@@ -43,6 +45,7 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     private RemoteHTMLMultiSelect multiSelect;
     private RemoteHTMLProgressBar progressBar;
     private RemoteHTMLTextElement textElement;
+    private RemoteHTMLTree tree;
 
     public RemoteHTMLView() {
         button = RemoteHTMLButton.getInstance();
@@ -53,6 +56,7 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
         multiSelect = RemoteHTMLMultiSelect.getInstance();
         progressBar = RemoteHTMLProgressBar.getInstance();
         textElement = RemoteHTMLTextElement.getInstance();
+        tree = RemoteHTMLTree.getInstance();
     }
 
     @Override
@@ -132,6 +136,14 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     }
 
     @Override
+    public IRemoteHTMLTree tree(String className) throws RemoteException {
+        Selector selector = new Selector("ul." + className + "[role=tree]");
+        tree.setSelector(selector);
+        ensureExistence(selector);
+        return tree;
+    }
+
+    @Override
     public boolean isOpen() {
         return exists(new IdSelector(view.getRootId()));
     }
@@ -153,6 +165,7 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
         this.multiSelect.setBrowser(getBrowser());
         this.progressBar.setBrowser(getBrowser());
         this.textElement.setBrowser(getBrowser());
+        this.tree.setBrowser(getBrowser());
     }
 
     private IJQueryBrowser getBrowser() {

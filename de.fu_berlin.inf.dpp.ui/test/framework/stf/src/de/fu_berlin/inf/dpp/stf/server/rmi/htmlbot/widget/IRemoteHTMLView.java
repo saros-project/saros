@@ -173,4 +173,19 @@ public interface IRemoteHTMLView extends Remote {
      */
     IRemoteHTMLTextElement textElement(String id) throws RemoteException;
 
+    /**
+     * Gets a remote representation of the React Tree Element with the given
+     * className from within this view.
+     * 
+     * @param className
+     *            the value of the identifying class of the element
+     * 
+     * @return an instance of {@link IRemoteHTMLTree}, if such a element
+     *         exists in this view
+     * 
+     * @throws RemoteException
+     *             e.g. if no such element exist in this view
+     */
+    IRemoteHTMLTree tree(String className) throws RemoteException;
+
 }
