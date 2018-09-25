@@ -206,5 +206,7 @@ public class HtmlBasicWidgetTest extends StfHtmlTestCase {
         assertTrue(view.textElement("button-display-text").getText()
             .equals("key-split-3"));
 
+        assertTrue(view.button("button").text().equals("Button"));
+
     }
 }
