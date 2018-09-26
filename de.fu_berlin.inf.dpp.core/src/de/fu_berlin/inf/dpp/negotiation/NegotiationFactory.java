@@ -152,7 +152,7 @@ public final class NegotiationFactory {
                 fileReplacementInProgressObservable, workspace, checksumCache,
                 connectionService, transmitter, receiver);
         case INSTANT:
-            return new InstantIncomingProjectNegotiation(remoteAddress,
+            return new InstantIncomingReferencePointNegotiation(remoteAddress,
                 negotiationID, referencePointNegotiationData, sessionManager, session,
                 fileReplacementInProgressObservable, workspace, checksumCache,
                 connectionService, transmitter, receiver);
