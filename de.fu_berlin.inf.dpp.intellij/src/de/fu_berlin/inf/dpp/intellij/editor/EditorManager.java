@@ -557,11 +557,11 @@ public class EditorManager extends AbstractActivityProducer
     }
 
     public void removeAllEditorsForPath(SPath path) {
-        editorPool.removeAll(path);
+        editorPool.removeEditor(path);
     }
 
     public void replaceAllEditorsForPath(SPath oldPath, SPath newPath) {
-        editorPool.replaceAll(oldPath, newPath);
+        editorPool.replacePath(oldPath, newPath);
     }
 
     /**
