@@ -76,6 +76,10 @@ public class LocalEditorHandler {
         @NotNull
             VirtualFile virtualFile, boolean activate) {
 
+        if (!manager.hasSession()) {
+            return null;
+        }
+
         SPath path = virtualFileConverter.convertToPath(virtualFile);
 
         if (path == null) {
@@ -83,7 +87,6 @@ public class LocalEditorHandler {
                 " as it does not belong to a shared module");
 
             return null;
-
         }
 
         return openEditor(virtualFile,path,activate);
