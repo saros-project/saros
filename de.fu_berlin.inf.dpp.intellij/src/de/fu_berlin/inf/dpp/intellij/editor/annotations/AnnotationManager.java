@@ -11,7 +11,8 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.session.User;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 //TODO adjust position of local selection when editor is re-opened
 public class AnnotationManager {
 
-    private static final Logger LOG = Logger.getLogger(AnnotationManager.class);
+    private static final Logger LOG = LogManager.getLogger(AnnotationManager.class);
 
     /**
      * Enum containing the possible annotation types.

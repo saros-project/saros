@@ -1,0 +1,37 @@
+dependencies {
+  compile project(':de.fu_berlin.inf.dpp.core')
+  compile project(':de.fu_berlin.inf.dpp')
+  compile fileTree(dir: eclipsePluginDir, include: '*.jar', exclude: '*commons.lang*')
+  releaseDep log4jVersion
+  testCompile configurations.testConfig
+}
+
+jar {
+  manifest {
+    from file('META-INF/MANIFEST.MF')
+    attributes('-removeheaders': 'Import-Package')
+  }
+  from sourceSets.main.output
+
+  into('lib') {
+    from configurations.getByName('releaseDep')
+  }
+}
+
+sourceSets {
+  main.java.srcDirs =  ['src', 'ext-src']
+  test.java.srcDir 'test'
+}
+
+test {
+  exclude '**/Abstract*'
+  exclude '**/*TestSuite*'
+}
+
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/Whiteboard'
+    property 'sonar.projectDescription', 'Saros Whiteboard plugin for Eclipse IDE'
+    property 'sonar.projectVersion', '14.11.28.DEVEL'
+  }
+}

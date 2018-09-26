@@ -10,7 +10,8 @@ import com.intellij.util.messages.MessageBusConnection;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 public class StoppableEditorFileListener extends AbstractStoppableListener
     implements FileEditorManagerListener {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(StoppableEditorFileListener.class);
 
     private final BeforeEditorActionListener beforeEditorActionListener;

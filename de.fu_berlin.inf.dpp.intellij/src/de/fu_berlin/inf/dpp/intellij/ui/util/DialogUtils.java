@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.intellij.ui.util;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JOptionPane;
@@ -14,7 +15,7 @@ import java.awt.Container;
  * Dialog message helper that shows Dialogs in the current Thread.
  */
 public class DialogUtils {
-    private static final Logger LOG = Logger.getLogger(DialogUtils.class);
+    private static final Logger LOG = LogManager.getLogger(DialogUtils.class);
 
     @Inject
     private static Project project;

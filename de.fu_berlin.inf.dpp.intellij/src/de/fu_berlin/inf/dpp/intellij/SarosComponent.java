@@ -4,13 +4,17 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.helpers.LogLog;
+import org.apache.logging.log4j.status.StatusLogger;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
 import java.io.InputStream;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Component that is initalized when a project is loaded.
@@ -38,7 +42,7 @@ public class SarosComponent
                 .getResourceAsStream("saros.properties");
 
             if (sarosProperties == null) {
-                LogLog.warn("could not initialize Saros properties because "
+                StatusLogger.getLogger().warn("could not initialize Saros properties because "
                     + "the 'saros.properties' file could not be found on the "
                     + "current JAVA class path");
             } else {
@@ -46,7 +50,7 @@ public class SarosComponent
                 sarosProperties.close();
             }
         } catch (Exception e) {
-            LogLog
+           StatusLogger.getLogger() 
                 .error("could not load saros property file 'saros.properties'",
                     e);
         }
@@ -65,13 +69,11 @@ public class SarosComponent
         try {
             // change the context class loader so Log4J will find
             // the SarosLogFileAppender
-            Thread.currentThread()
-                .setContextClassLoader(SarosComponent.class.getClassLoader());
-
-            PropertyConfigurator.configure(SarosComponent.class.getClassLoader()
-                .getResource("saros.log4j.properties"));
-        } catch (RuntimeException e) {
-            LogLog.error("initializing loggers failed", e);
+            ClassLoader sarosClassLoader = SarosComponent.class.getClassLoader();
+            URI log4jPropertyUri = sarosClassLoader.getResource("saros.log4j.properties").toURI();
+            Configurator.initialize(sarosClassLoader, ConfigurationSource.fromUri(log4jPropertyUri));
+        } catch (RuntimeException | URISyntaxException e) {
+            StatusLogger.getLogger().error("initializing loggers failed", e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
