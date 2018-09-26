@@ -12,6 +12,7 @@ import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
 
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,6 +74,28 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
         this.moduleName = module.getName();
         this.referencePoint = new IntelliJReferencePointImpl((IntelliJPathImpl)
             this.getLocation());
+
+        ModuleRootManager moduleRootManager = ModuleRootManager
+            .getInstance(module);
+
+        final VirtualFile[] contentRoots = moduleRootManager.getContentRoots();
+
+        if (contentRoots.length == 0)
+            throw new IllegalArgumentException("module: " + module
+                + " does not have a content root");
+
+        if (contentRoots.length > 1)
+            throw new IllegalArgumentException("module: " + module
+                + " has more than one content root");
+
+        moduleRoot = contentRoots[0];
+    }
+
+    public IntelliJProjectImplV2(@NotNull final Module module, @NotNull
+        IReferencePoint referencePoint) {
+        this.module = module;
+        this.moduleName = module.getName();
+        this.referencePoint = referencePoint;
 
         ModuleRootManager moduleRootManager = ModuleRootManager
             .getInstance(module);

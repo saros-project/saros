@@ -16,7 +16,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -89,6 +89,8 @@ public class SarosSessionManagerTest {
 
     private SarosSessionManager manager;
 
+    private IReferencePointManager referencePointManager;
+
     @Before
     public void setUp() throws Exception {
         SarosSession session = PowerMock.createNiceMock(SarosSession.class);
@@ -105,6 +107,7 @@ public class SarosSessionManagerTest {
         PowerMock.expectNew(SarosSession.class,
             EasyMock.anyObject(String.class),
             EasyMock.anyObject(IPreferenceStore.class),
+            EasyMock.anyObject(IReferencePointManager.class),
             EasyMock.anyObject(IContainerContext.class)).andStubReturn(session);
 
         PowerMock.replayAll();
@@ -116,22 +119,26 @@ public class SarosSessionManagerTest {
     @Test
     public void testStartStopListenerCallback() {
         manager.addSessionLifecycleListener(new StateVerifyListener());
-        manager.startSession(new HashMap<IProject, List<IResource>>());
+        manager.startSession(new HashMap<IReferencePoint, List<IResource>>(),
+            referencePointManager);
         manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Test
     public void testMultipleStarts() {
         manager.addSessionLifecycleListener(new StateVerifyListener());
-        manager.startSession(new HashMap<IProject, List<IResource>>());
-        manager.startSession(new HashMap<IProject, List<IResource>>());
+        manager.startSession(new HashMap<IReferencePoint, List<IResource>>(),
+            referencePointManager);
+        manager.startSession(new HashMap<IReferencePoint, List<IResource>>(),
+            referencePointManager);
         manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Test
     public void testMultipleStops() {
         manager.addSessionLifecycleListener(new StateVerifyListener());
-        manager.startSession(new HashMap<IProject, List<IResource>>());
+        manager.startSession(new HashMap<IReferencePoint, List<IResource>>(),
+            referencePointManager);
         manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
         manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     }
@@ -139,7 +146,8 @@ public class SarosSessionManagerTest {
     @Test(expected = DummyError.class)
     public void testListenerDispatchIsNotCatchingErrors() {
         manager.addSessionLifecycleListener(new ErrorThrowingListener());
-        manager.startSession(new HashMap<IProject, List<IResource>>());
+        manager.startSession(new HashMap<IReferencePoint, List<IResource>>(),
+            referencePointManager);
         manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
@@ -157,7 +165,8 @@ public class SarosSessionManagerTest {
 
         };
         manager.addSessionLifecycleListener(listener);
-        manager.startSession(new HashMap<IProject, List<IResource>>());
+        manager.startSession(new HashMap<IReferencePoint, List<IResource>>(),
+            referencePointManager);
         manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
@@ -170,12 +179,15 @@ public class SarosSessionManagerTest {
             public void sessionStarting(ISarosSession oldSarosSession) {
                 assertTrue("startSession is executed recusive", count == 0);
                 count++;
-                manager.startSession(new HashMap<IProject, List<IResource>>());
+                manager.startSession(
+                    new HashMap<IReferencePoint, List<IResource>>(),
+                    referencePointManager);
             }
 
         };
         manager.addSessionLifecycleListener(listener);
-        manager.startSession(new HashMap<IProject, List<IResource>>());
+        manager.startSession(new HashMap<IReferencePoint, List<IResource>>(),
+            referencePointManager);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -195,7 +207,8 @@ public class SarosSessionManagerTest {
 
         };
         manager.addSessionLifecycleListener(listener);
-        manager.startSession(new HashMap<IProject, List<IResource>>());
+        manager.startSession(new HashMap<IReferencePoint, List<IResource>>(),
+            referencePointManager);
 
         RuntimeException rte = exception.get();
 
@@ -212,8 +225,9 @@ public class SarosSessionManagerTest {
             @Override
             public void sessionEnding(ISarosSession oldSarosSession) {
                 try {
-                    manager
-                        .startSession(new HashMap<IProject, List<IResource>>());
+                    manager.startSession(
+                        new HashMap<IReferencePoint, List<IResource>>(),
+                        referencePointManager);
                 } catch (RuntimeException e) {
                     exception.set(e);
                 }
@@ -221,7 +235,8 @@ public class SarosSessionManagerTest {
 
         };
         manager.addSessionLifecycleListener(listener);
-        manager.startSession(new HashMap<IProject, List<IResource>>());
+        manager.startSession(new HashMap<IReferencePoint, List<IResource>>(),
+            referencePointManager);
         manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
 
         RuntimeException rte = exception.get();

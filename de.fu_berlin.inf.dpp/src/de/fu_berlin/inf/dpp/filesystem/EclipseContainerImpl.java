@@ -14,6 +14,11 @@ public abstract class EclipseContainerImpl extends EclipseResourceImpl
         super(delegate);
     }
 
+    EclipseContainerImpl(org.eclipse.core.resources.IResource delegate,
+        IReferencePoint referencePoint) {
+        super(delegate, referencePoint);
+    }
+
     @Override
     public boolean exists(IPath path) {
         return getDelegate().exists(((EclipsePathImpl) path).getDelegate());

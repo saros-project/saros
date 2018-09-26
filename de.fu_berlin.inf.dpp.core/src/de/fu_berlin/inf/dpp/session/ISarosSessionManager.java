@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -25,10 +25,13 @@ public interface ISarosSessionManager {
     /**
      * Starts a new DPP session with the local user as only participant.
      * 
-     * @param projectResources
-     *            the local project resources which should be shared.
+     * @param referencePointResources
+     *            the local resources from referencePoint which should be
+     *            shared.
      */
-    public void startSession(Map<IProject, List<IResource>> projectResources);
+    public void startSession(
+        Map<IReferencePoint, List<IResource>> referencePointResources,
+        IReferencePointManager referencePointManager);
 
     // FIXME this method is error prone and only used by the IPN, find a better
     // abstraction
@@ -70,13 +73,14 @@ public interface ISarosSessionManager {
         ISessionLifecycleListener listener);
 
     /**
-     * Starts sharing all projects of the current session with the given session
-     * user. This should be called after the user joined the current session.
+     * Starts sharing all resources with referencePoints of the current session
+     * with the given session user. This should be called after the user joined
+     * the current session.
      * 
      * @param user
      *            JID of the user to share projects with
      */
-    public void startSharingProjects(JID user);
+    public void startSharingReferencePoint(JID user);
 
     /**
      * Invites a user to a running session. Does nothing if no session is
@@ -97,13 +101,13 @@ public interface ISarosSessionManager {
     public void invite(Collection<JID> jidsToInvite, String description);
 
     /**
-     * Adds project resources to an existing session.
+     * Adds resources from referencePoint to an existing session.
      * 
-     * @param projectResourcesMapping
+     * @param referencePointResourcesMapping
      * 
      */
     public void addResourcesToSession(
-        Map<IProject, List<IResource>> projectResourcesMapping);
+        Map<IReferencePoint, List<IResource>> referencePointResourcesMapping);
 
     /**
      * Call this before a ISarosSession is started.

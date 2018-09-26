@@ -10,6 +10,11 @@ public class EclipseProjectImpl extends EclipseContainerImpl implements
             delegate.getLocation()));
     }
 
+    EclipseProjectImpl(org.eclipse.core.resources.IProject delegate,
+        IReferencePoint referencePoint) {
+        super(delegate, referencePoint);
+    }
+
     @Override
     public IResource findMember(IPath path) {
         org.eclipse.core.resources.IResource resource = getDelegate()

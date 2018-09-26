@@ -21,6 +21,18 @@ public class EclipseResourceImpl implements IResource {
                 delegate.getProject().getLocation()));
     }
 
+    EclipseResourceImpl(org.eclipse.core.resources.IResource delegate,
+        IReferencePoint referencePoint) {
+        if (delegate == null)
+            throw new NullPointerException("delegate is null");
+
+        if (referencePoint == null)
+            throw new NullPointerException("referencePoint is null");
+
+        this.delegate = delegate;
+        this.referencePoint = referencePoint;
+    }
+
     @Override
     public boolean exists() {
         return delegate.exists();

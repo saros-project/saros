@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
@@ -22,6 +23,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ReferencePointManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
@@ -75,8 +77,9 @@ public class CollaborationUtils {
     public static void startSession(List<IResource> resources,
         final List<JID> contacts) {
 
-        final Map<IProject, List<IResource>> newResources = acquireResources(
-            resources, null);
+        IReferencePointManager referencePointManager = new ReferencePointManager();
+        final Map<IReferencePoint, List<IResource>> newResources = acquireResources(
+            resources, null, referencePointManager);
 
         UIMonitoredJob sessionStartupJob = new UIMonitoredJob(
             "Session Startup") {
@@ -86,7 +89,7 @@ public class CollaborationUtils {
                 monitor
                     .beginTask("Starting session...", IProgressMonitor.UNKNOWN);
                 try {
-                    sessionManager.startSession(newResources);
+                    sessionManager.startSession(newResources, referencePointManager);
                     Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
                     monitor.worked(50);
@@ -176,11 +179,15 @@ public class CollaborationUtils {
             return;
         }
 
-        final Map<IProject, List<IResource>> projectResources;
+        IReferencePointManager referencePointManager = sarosSession.
+            getComponent(IReferencePointManager.class);
 
-        projectResources = acquireResources(resourcesToAdd, sarosSession);
+        final Map<IReferencePoint, List<IResource>> referencePointResources;
 
-        if (projectResources.isEmpty()) {
+        referencePointResources = acquireResources(resourcesToAdd, sarosSession,
+            referencePointManager);
+
+        if (referencePointResources.isEmpty()) {
             return;
         }
 
@@ -189,7 +196,7 @@ public class CollaborationUtils {
             public void run() {
 
                 if (sarosSession.hasWriteAccess()) {
-                    sessionManager.addResourcesToSession(projectResources);
+                    sessionManager.addResourcesToSession(referencePointResources);
                     return;
                 }
 
@@ -301,8 +308,9 @@ public class CollaborationUtils {
      * @param sarosSession
      * @return
      */
-    private static Map<IProject, List<IResource>> acquireResources(
-        List<IResource> selectedResources, ISarosSession sarosSession) {
+    private static Map<IReferencePoint, List<IResource>> acquireResources(
+        List<IResource> selectedResources, ISarosSession sarosSession,
+        IReferencePointManager referencePointManager) {
 
         Map<IProject, Set<IResource>> projectsResources = new HashMap<IProject, Set<IResource>>();
 
@@ -357,6 +365,13 @@ public class CollaborationUtils {
             IProject project = entry.getKey();
             Set<IResource> resources = entry.getValue();
 
+            /**
+             *  Fill referencePoint manager with core.IProjects with reference
+             *  points
+             **/
+
+            referencePointManager.put(project.getReferencePoint(), project);
+
             if (resources == // * full shared *//*
                 null) {
                 continue;
@@ -405,14 +420,16 @@ public class CollaborationUtils {
 
         }
 
-        HashMap<IProject, List<IResource>> resources = new HashMap<IProject, List<IResource>>();
+        HashMap<IReferencePoint, List<IResource>> resources = new HashMap<IReferencePoint, List<IResource>>();
 
         for (Entry<IProject, Set<IResource>> entry : projectsResources
             .entrySet()) {
-            resources.put(entry.getKey(), entry.getValue() == null ?
+            resources.put(entry.getKey().getReferencePoint(), entry.getValue() == null ?
                 null :
                 new ArrayList<IResource>(entry.getValue()));
         }
+
+
 
         return resources;
     }

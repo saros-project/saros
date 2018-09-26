@@ -14,6 +14,11 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
         super(delegate);
     }
 
+    EclipseFileImpl(org.eclipse.core.resources.IFile delegate,
+        IReferencePoint referencePoint) {
+        super(delegate, referencePoint);
+    }
+
     @Override
     public String getCharset() throws IOException {
         try {

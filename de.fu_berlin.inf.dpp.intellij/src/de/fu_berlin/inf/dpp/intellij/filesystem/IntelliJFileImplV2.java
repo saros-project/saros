@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.FileAlreadyExistsException;
 
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,6 +37,13 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
         this.project = project;
         this.path = path;
         this.referencePoint = project.getReferencePoint();
+    }
+
+    public IntelliJFileImplV2(@NotNull final IntelliJProjectImplV2 project,
+        @NotNull final IPath path, IReferencePoint referencePoint) {
+        this.project = project;
+        this.path = path;
+        this.referencePoint = referencePoint;
     }
 
     /**

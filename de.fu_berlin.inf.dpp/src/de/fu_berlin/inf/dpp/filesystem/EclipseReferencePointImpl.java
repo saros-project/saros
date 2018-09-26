@@ -2,10 +2,10 @@ package de.fu_berlin.inf.dpp.filesystem;
 
 public class EclipseReferencePointImpl implements IReferencePoint {
 
-    final EclipsePathImpl path;
+    final IPath path;
     protected IReferencePoint referencePoint;
 
-    public EclipseReferencePointImpl(EclipsePathImpl path) {
+    public EclipseReferencePointImpl(IPath path) {
         this.path = path;
     }
 

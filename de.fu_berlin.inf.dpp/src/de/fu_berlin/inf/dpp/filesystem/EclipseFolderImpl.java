@@ -11,6 +11,11 @@ public class EclipseFolderImpl extends EclipseContainerImpl implements IFolder {
         super(delegate);
     }
 
+    EclipseFolderImpl(org.eclipse.core.resources.IFolder delegate,
+        IReferencePoint referencePoint) {
+        super(delegate, referencePoint);
+    }
+
     @Override
     public void create(int updateFlags, boolean local) throws IOException {
         try {

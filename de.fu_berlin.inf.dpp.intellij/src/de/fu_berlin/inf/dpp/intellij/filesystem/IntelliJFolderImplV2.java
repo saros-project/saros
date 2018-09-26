@@ -6,6 +6,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +36,13 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
         this.project = project;
         this.path = path;
         this.referencePoint = project.getReferencePoint();
+    }
+
+    public IntelliJFolderImplV2(@NotNull final IntelliJProjectImplV2 project,
+        @NotNull final IPath path, @NotNull IReferencePoint referencePoint) {
+        this.project = project;
+        this.path = path;
+        this.referencePoint = referencePoint;
     }
 
     @Override
