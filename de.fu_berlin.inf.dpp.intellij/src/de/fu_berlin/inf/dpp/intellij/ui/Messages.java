@@ -98,6 +98,17 @@ public class Messages {
 
     public static String ShareWithUserAction_description;
 
+    public static String SessionStatusChangeHandler_session_started_title;
+    public static String SessionStatusChangeHandler_session_started_host_message;
+    public static String SessionStatusChangeHandler_session_started_host_empty_message;
+    public static String SessionStatusChangeHandler_session_started_client_message;
+    public static String SessionStatusChangeHandler_session_ended_title;
+    public static String SessionStatusChangeHandler_session_ended_message;
+    public static String SessionStatusChangeHandler_local_user_left;
+    public static String SessionStatusChangeHandler_host_left;
+    public static String SessionStatusChangeHandler_kicked;
+    public static String SessionStatusChangeHandler_connection_lost;
+
     private Messages() {
     }
 }
