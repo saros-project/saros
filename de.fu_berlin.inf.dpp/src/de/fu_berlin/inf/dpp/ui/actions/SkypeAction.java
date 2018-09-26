@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Region;
@@ -38,7 +40,7 @@ public class SkypeAction extends Action implements Disposable {
 
     public static final String ACTION_ID = SkypeAction.class.getName();
 
-    private static final Logger LOG = Logger.getLogger(SkypeAction.class);
+    private static final Logger LOG = LogManager.getLogger(SkypeAction.class);
 
     protected IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
         @Override

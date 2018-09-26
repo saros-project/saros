@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -39,7 +41,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
  */
 public final class XMPPSessionDisplayComposite extends SessionDisplayComposite {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(XMPPSessionDisplayComposite.class);
 
     @Inject

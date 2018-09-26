@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -31,7 +32,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
  */
 public class ConfigurationSummaryWizardPage extends WizardPage {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ConfigurationSummaryWizardPage.class);
 
     public static final String TITLE = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_title;

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.picocontainer.annotations.Inject;
@@ -28,7 +29,7 @@ import de.fu_berlin.inf.dpp.session.User;
 @Component(module = "eclipse")
 public final class SharedDocumentProvider extends TextFileDocumentProvider {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SharedDocumentProvider.class);
 
     private volatile ISarosSession session;

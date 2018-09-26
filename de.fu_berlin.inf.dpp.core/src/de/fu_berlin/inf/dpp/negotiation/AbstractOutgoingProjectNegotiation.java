@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CancellationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
@@ -42,7 +44,7 @@ import de.fu_berlin.inf.dpp.synchronize.StartHandle;
  */
 public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiation {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(AbstractOutgoingProjectNegotiation.class);
 
     protected List<IProject> projects;

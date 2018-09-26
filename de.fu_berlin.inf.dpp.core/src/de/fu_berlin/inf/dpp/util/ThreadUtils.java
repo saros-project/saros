@@ -1,10 +1,11 @@
 package de.fu_berlin.inf.dpp.util;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class ThreadUtils {
 
-    private static final Logger LOG = Logger.getLogger(ThreadUtils.class);
+    private static final Logger LOG = LogManager.getLogger(ThreadUtils.class);
 
     private ThreadUtils() {
         // NOP do not allow object creation

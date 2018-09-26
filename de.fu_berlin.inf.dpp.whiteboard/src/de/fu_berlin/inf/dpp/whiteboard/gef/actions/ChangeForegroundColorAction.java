@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.actions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -25,7 +26,7 @@ public class ChangeForegroundColorAction extends Action implements
 
     public static final String ACTION_ID = "foregroundColor";
     public static final String ACTION_TEXT = "Foreground Color";
-    private static final Logger log = Logger.getLogger(ChangeColorAction.class);
+    private static final Logger log = LogManager.getLogger(ChangeColorAction.class);
 
     /**
      * The Constructor sets the ID, displayed text and the displayed image.

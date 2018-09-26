@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.whiteboard.net;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -20,7 +21,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession;
  */
 public class SXEPacketFilter implements PacketFilter {
 
-    private static final Logger log = Logger.getLogger(SXEPacketFilter.class);
+    private static final Logger log = LogManager.getLogger(SXEPacketFilter.class);
 
     private final List<SXEMessageType> messageTypes;
     private String peer;

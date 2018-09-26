@@ -12,7 +12,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
@@ -42,7 +44,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 @Component(module = "net")
 public class DiscoveryManager implements Disposable {
 
-    private static final Logger LOG = Logger.getLogger(DiscoveryManager.class);
+    private static final Logger LOG = LogManager.getLogger(DiscoveryManager.class);
 
     private static class DiscoverInfoWrapper {
         public DiscoverInfo item;

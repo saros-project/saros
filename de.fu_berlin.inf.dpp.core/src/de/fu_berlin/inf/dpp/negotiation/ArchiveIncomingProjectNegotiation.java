@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
@@ -37,7 +39,7 @@ import de.fu_berlin.inf.dpp.util.CoreUtils;
 public class ArchiveIncomingProjectNegotiation extends
     AbstractIncomingProjectNegotiation {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ArchiveIncomingProjectNegotiation.class);
 
     public ArchiveIncomingProjectNegotiation(

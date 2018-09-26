@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.view;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.ActionRegistry;
@@ -27,7 +28,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor;
 
 public class SarosWhiteboardView extends ViewPart {
 
-    protected static Logger log = Logger.getLogger(SarosWhiteboardView.class);
+    protected static Logger log = LogManager.getLogger(SarosWhiteboardView.class);
 
     private final EmbeddedWhiteboardEditor gEditor;
 

@@ -1,13 +1,14 @@
 package de.fu_berlin.inf.dpp.ui.dialogs;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 public class WarningMessageDialog {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(WarningMessageDialog.class.getName());
 
     /**

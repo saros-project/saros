@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -110,7 +112,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.XMPPSessionDisplayComposit
 @Component(module = "ui")
 public class SarosView extends ViewPart {
 
-    private static final Logger LOG = Logger.getLogger(SarosView.class);
+    private static final Logger LOG = LogManager.getLogger(SarosView.class);
 
     public static final String ID = "de.fu_berlin.inf.dpp.ui.views.SarosView";
 

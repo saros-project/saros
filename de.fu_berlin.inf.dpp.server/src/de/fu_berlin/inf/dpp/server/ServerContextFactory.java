@@ -5,7 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
@@ -41,7 +42,7 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
  */
 public class ServerContextFactory extends CoreContextFactory {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ServerContextFactory.class);
 
     @Override

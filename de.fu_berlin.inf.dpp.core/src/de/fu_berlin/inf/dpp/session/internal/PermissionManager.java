@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.session.internal;
 
 import java.util.concurrent.CancellationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.PermissionActivity;
@@ -26,7 +28,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 @Component(module = "core")
 public class PermissionManager extends AbstractActivityProducer implements
     Startable {
-    private static final Logger LOG = Logger.getLogger(PermissionManager.class);
+    private static final Logger LOG = LogManager.getLogger(PermissionManager.class);
 
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override

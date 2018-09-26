@@ -2,7 +2,10 @@ package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
 import com.intellij.openapi.project.Project;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.annotations.Inject;
 
 import java.awt.event.ActionEvent;
@@ -14,7 +17,7 @@ import java.util.List;
  * Parent class for all Saros actions
  */
 public abstract class AbstractSarosAction {
-    protected static final Logger LOG = Logger
+    protected static final Logger LOG = LogManager
         .getLogger(AbstractSarosAction.class);
 
     private final List<ActionListener> actionListeners = new ArrayList<ActionListener>();

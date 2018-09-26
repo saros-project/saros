@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.bitlet.weupnp.GatewayDevice;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -36,7 +38,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 @Component(module = "net")
 public class XMPPConnectionService {
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(XMPPConnectionService.class);
 
     // DO NOT CHANGE THE CONTENT OF THIS STRING, NEVER NEVER NEVER !!!

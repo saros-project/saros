@@ -4,7 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.commands.operations.DefaultOperationHistory;
@@ -73,7 +74,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 @Component(module = "undo")
 public class UndoManager extends AbstractActivityConsumer implements Disposable {
 
-    private static final Logger log = Logger.getLogger(UndoManager.class);
+    private static final Logger log = LogManager.getLogger(UndoManager.class);
 
     protected List<TextEditActivity> expectedActivities = new LinkedList<TextEditActivity>();
 

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.intellij.util;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -8,7 +9,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class MessageUtils {
-    private static final Logger log = Logger.getLogger(MessageUtils.class);
+    private static final Logger log = LogManager.getLogger(MessageUtils.class);
 
     /**
      * Loads strings in to static variables from property file.

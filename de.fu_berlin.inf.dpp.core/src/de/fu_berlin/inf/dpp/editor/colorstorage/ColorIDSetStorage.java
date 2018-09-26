@@ -14,7 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
@@ -27,7 +28,7 @@ import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 @Component(module = "core")
 public final class ColorIDSetStorage {
 
-    private static final Logger LOG = Logger.getLogger(ColorIDSetStorage.class);
+    private static final Logger LOG = LogManager.getLogger(ColorIDSetStorage.class);
 
     private static final Charset CHARSET = Charset.forName("ISO-8859-1");
 

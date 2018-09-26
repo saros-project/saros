@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.preferences;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -22,7 +23,7 @@ public class EclipsePreferenceInitializer extends AbstractPreferenceInitializer 
     /*
      * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
      */
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(EclipsePreferenceInitializer.class.getName());
 
     @Override

@@ -2,7 +2,8 @@ dependencies {
   compile project(':de.fu_berlin.inf.dpp.core')
   compile project(':de.fu_berlin.inf.dpp')
   compile fileTree(dir: eclipsePluginDir, include: '*.jar', exclude: '*commons.lang*')
-  releaseDep log4jVersion
+  releaseDep log4jVersionCore
+  releaseDep log4jVersionApi
   testCompile configurations.testConfig
 }
 

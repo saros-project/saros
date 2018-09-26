@@ -5,7 +5,9 @@ import gnu.inet.encoding.StringprepException;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketCollector;
@@ -38,7 +40,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
  */
 
 public class XMPPUtils {
-    private static final Logger log = Logger.getLogger(XMPPUtils.class);
+    private static final Logger log = LogManager.getLogger(XMPPUtils.class);
 
     private static volatile XMPPConnectionService defaultConnectionService;
 

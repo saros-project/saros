@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
 
@@ -36,7 +38,7 @@ import com.google.gson.JsonSyntaxException;
  */
 class TypeRefinery {
 
-    private static final Logger LOG = Logger.getLogger(TypeRefinery.class);
+    private static final Logger LOG = LogManager.getLogger(TypeRefinery.class);
 
     private Gson gson;
 

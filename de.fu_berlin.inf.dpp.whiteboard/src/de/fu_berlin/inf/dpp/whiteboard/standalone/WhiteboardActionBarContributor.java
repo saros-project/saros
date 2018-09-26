@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.standalone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.gef.ui.actions.ActionBarContributor;
 import org.eclipse.gef.ui.actions.DeleteRetargetAction;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
@@ -22,7 +23,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
 
 public class WhiteboardActionBarContributor extends ActionBarContributor {
 
-    private static final Logger log = Logger.getLogger(ChangeColorAction.class);
+    private static final Logger log = LogManager.getLogger(ChangeColorAction.class);
 
     @Override
     protected void buildActions() {

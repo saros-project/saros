@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
@@ -28,7 +29,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.util.NodeSet;
  */
 public class ElementRecord extends NodeRecord {
 
-    private static final Logger log = Logger.getLogger(ElementRecord.class);
+    private static final Logger log = LogManager.getLogger(ElementRecord.class);
 
     private final NodeSet<ElementRecord> children = new NodeSet<ElementRecord>();
     private final AttributeSet attributes = new AttributeSet();

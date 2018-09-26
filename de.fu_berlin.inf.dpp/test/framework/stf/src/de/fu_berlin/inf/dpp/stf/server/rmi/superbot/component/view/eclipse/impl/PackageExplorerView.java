@@ -12,7 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -37,7 +39,7 @@ import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 public final class PackageExplorerView extends StfRemoteObject implements
     IPackageExplorerView {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(PackageExplorerView.class);
 
     private static final PackageExplorerView INSTANCE = new PackageExplorerView();

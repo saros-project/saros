@@ -1,10 +1,12 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl;
 
+import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -37,8 +39,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotView;
 public final class RemoteWorkbenchBot extends RemoteBot implements
     IRemoteWorkbenchBot {
 
-    private static final Logger log = Logger
-        .getLogger(RemoteWorkbenchBot.class);
+    private static final Logger log = LogManager.getLogger(RemoteWorkbenchBot.class);
     private static final RemoteWorkbenchBot INSTANCE = new RemoteWorkbenchBot();
 
     private RemoteBotView view;
@@ -65,7 +66,15 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
 
     @Override
     public IRemoteBotView view(String viewTitle) throws RemoteException {
-        view.setWidget(swtWorkBenchBot.viewByTitle(viewTitle));
+        SWTBotView matchingView = null;
+
+        for (SWTBotView i : swtWorkBenchBot.views())
+          if (i.getTitle().equals(viewTitle))
+            matchingView = i;
+
+        if (matchingView == null) throw new RemoteException("Failed to find a view with the title: " + viewTitle);
+
+        view.setWidget(matchingView);
         return view;
     }
 
@@ -100,7 +109,12 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
     public List<String> getTitlesOfOpenedViews() throws RemoteException {
         ArrayList<String> list = new ArrayList<String>();
         for (SWTBotView view : swtWorkBenchBot.views())
+        {  
             list.add(view.getTitle());
+            String t = view.getTitle();
+            String a = String.format("%x", new BigInteger(1, view.getTitle().getBytes()));
+            log.debug("Open view: " + t + ",x: " + a);
+        }
         return list;
     }
 

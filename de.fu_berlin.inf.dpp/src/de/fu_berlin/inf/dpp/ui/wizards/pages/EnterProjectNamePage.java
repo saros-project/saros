@@ -18,7 +18,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -51,7 +52,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.ProjectOptionListener;
  */
 public class EnterProjectNamePage extends WizardPage {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(EnterProjectNamePage.class.getName());
 
     private final JID peer;

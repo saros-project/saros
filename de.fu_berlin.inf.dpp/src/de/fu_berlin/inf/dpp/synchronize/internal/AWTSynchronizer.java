@@ -2,13 +2,14 @@ package de.fu_berlin.inf.dpp.synchronize.internal;
 
 import java.awt.EventQueue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 
 public class AWTSynchronizer implements UISynchronizer {
 
-    private static final Logger LOG = Logger.getLogger(AWTSynchronizer.class);
+    private static final Logger LOG = LogManager.getLogger(AWTSynchronizer.class);
 
     @Override
     public void asyncExec(Runnable runnable) {

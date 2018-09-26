@@ -1,17 +1,20 @@
 package de.fu_berlin.inf.dpp.intellij;
 
+import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.status.StatusLogger;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
 import java.io.InputStream;
+import java.io.File;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,19 +66,20 @@ public class SarosComponent
     }
 
     private void loadLoggers() {
-        final ClassLoader contextClassLoader = Thread.currentThread()
-            .getContextClassLoader();
 
         try {
-            // change the context class loader so Log4J will find
-            // the SarosLogFileAppender
-            ClassLoader sarosClassLoader = SarosComponent.class.getClassLoader();
-            URI log4jPropertyUri = sarosClassLoader.getResource("saros.log4j.properties").toURI();
-            Configurator.initialize(sarosClassLoader, ConfigurationSource.fromUri(log4jPropertyUri));
-        } catch (RuntimeException | URISyntaxException e) {
+            String logDir = PathManager.getLogPath() + File.separator + "SarosLogs";
+
+            System.setProperty("log4j.configurationFile", "saros_log4j2.xml");
+            System.setProperty("logging.logDir", logDir);
+            System.setProperty("logging.consoleLevel", "warn");
+
+            // trigger reconfiguration with new properties
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            context.reconfigure();
+
+        } catch (RuntimeException e) {
             StatusLogger.getLogger().error("initializing loggers failed", e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
 

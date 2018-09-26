@@ -6,7 +6,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
@@ -19,7 +20,7 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 @Component(module = "server")
 public class ServerUISynchronizerImpl implements UISynchronizer {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ServerUISynchronizerImpl.class);
 
     private ExecutorService executor;

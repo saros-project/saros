@@ -10,7 +10,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -92,7 +93,7 @@ import de.fu_berlin.inf.dpp.session.User;
 @Component(module = "feedback")
 public class TextEditCollector extends AbstractStatisticCollector {
 
-    private static final Logger log = Logger.getLogger(TextEditCollector.class);
+    private static final Logger log = LogManager.getLogger(TextEditCollector.class);
 
     private static final String KEY_PERCENT = "percent";
 

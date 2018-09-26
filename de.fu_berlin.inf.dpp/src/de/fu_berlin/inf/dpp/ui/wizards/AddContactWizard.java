@@ -4,7 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -34,7 +35,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.AddContactWizardPage;
  * @author bkahlert
  */
 public class AddContactWizard extends Wizard {
-    private static final Logger log = Logger.getLogger(AddContactWizard.class);
+    private static final Logger log = LogManager.getLogger(AddContactWizard.class);
 
     public static final String TITLE = Messages.AddContactWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_CONTACT;

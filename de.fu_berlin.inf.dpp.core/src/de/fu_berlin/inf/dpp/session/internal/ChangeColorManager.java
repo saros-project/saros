@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChangeColorActivity;
@@ -40,7 +42,7 @@ import de.fu_berlin.inf.dpp.session.User;
 public class ChangeColorManager extends AbstractActivityProducer implements
     Startable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ChangeColorManager.class);
 
     private final SarosSession session;

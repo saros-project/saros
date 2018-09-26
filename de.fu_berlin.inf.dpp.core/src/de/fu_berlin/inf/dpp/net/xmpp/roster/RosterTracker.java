@@ -7,7 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
@@ -26,7 +28,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 @Component(module = "net")
 public class RosterTracker {
 
-    private static final Logger LOG = Logger.getLogger(RosterTracker.class);
+    private static final Logger LOG = LogManager.getLogger(RosterTracker.class);
 
     private Connection connection;
 

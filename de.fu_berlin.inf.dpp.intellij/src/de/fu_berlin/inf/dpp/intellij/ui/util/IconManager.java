@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.intellij.ui.util;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.ImageIcon;
 import java.net.URL;
@@ -9,7 +10,7 @@ import java.net.URL;
  * Class caches all icons used in application
  */
 public class IconManager {
-    public static final Logger LOG = Logger.getLogger(IconManager.class);
+    public static final Logger LOG = LogManager.getLogger(IconManager.class);
 
     public static final ImageIcon SESSIONS_ICON = getIcon(
         "/icons/famfamfam/session_tsk.png", "sessions");

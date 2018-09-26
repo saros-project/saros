@@ -21,14 +21,15 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 
 public final class StunServiceImpl implements IStunService {
 
-    private static final Logger log = Logger.getLogger(StunServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(StunServiceImpl.class);
 
     private boolean isDirectConnection = false;
 

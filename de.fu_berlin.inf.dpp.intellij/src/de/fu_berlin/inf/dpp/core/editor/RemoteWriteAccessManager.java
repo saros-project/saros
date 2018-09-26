@@ -11,7 +11,9 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -32,7 +34,7 @@ import java.util.Set;
  */
 public class RemoteWriteAccessManager {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(RemoteWriteAccessManager.class);
 
     /**

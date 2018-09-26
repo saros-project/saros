@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
@@ -13,7 +14,7 @@ import de.fu_berlin.inf.dpp.session.User;
 public class ServerSynchronizedDocument implements JupiterServer,
     NetworkEventHandler, DocumentTestChecker {
 
-    private static Logger log = Logger
+    private static Logger log = LogManager
         .getLogger(ServerSynchronizedDocument.class);
 
     private Document doc;

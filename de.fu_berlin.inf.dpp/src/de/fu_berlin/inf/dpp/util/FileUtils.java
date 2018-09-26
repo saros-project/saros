@@ -9,7 +9,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -26,7 +29,7 @@ import org.eclipse.core.runtime.IPath;
  */
 public class FileUtils {
 
-    private static Logger LOG = Logger.getLogger(FileUtils.class);
+    private static Logger LOG = LogManager.getLogger(FileUtils.class);
 
     private FileUtils() {
         // no instantiation allowed

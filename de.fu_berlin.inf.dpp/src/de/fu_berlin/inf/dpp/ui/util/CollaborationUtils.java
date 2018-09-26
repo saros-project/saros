@@ -11,7 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -51,7 +53,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class CollaborationUtils {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(CollaborationUtils.class);
 
     @Inject

@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -43,7 +45,7 @@ public class VersionManager {
 
     private static final Random ID_GENERATOR = new Random();
 
-    private static final Logger LOG = Logger.getLogger(VersionManager.class);
+    private static final Logger LOG = LogManager.getLogger(VersionManager.class);
 
     /**
      * The compatibilityChart should contain for each version the list of all

@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.session.internal.timeout;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -22,7 +24,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ClientSessionTimeoutHandler.class);
 
     private boolean shutdown;

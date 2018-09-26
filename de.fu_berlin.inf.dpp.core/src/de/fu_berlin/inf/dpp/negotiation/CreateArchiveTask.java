@@ -13,7 +13,9 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -27,7 +29,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
     private static final int BUFFER_SIZE = 32 * 1024;
 
-    private static final Logger LOG = Logger.getLogger(CreateArchiveTask.class);
+    private static final Logger LOG = LogManager.getLogger(CreateArchiveTask.class);
 
     private final File archive;
     private final List<IFile> files;

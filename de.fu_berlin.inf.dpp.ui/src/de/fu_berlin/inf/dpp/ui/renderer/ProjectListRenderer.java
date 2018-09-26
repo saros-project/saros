@@ -5,7 +5,8 @@ package de.fu_berlin.inf.dpp.ui.renderer;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
@@ -27,7 +28,7 @@ import de.fu_berlin.inf.dpp.ui.model.ProjectTree;
  */
 public class ProjectListRenderer extends Renderer {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ProjectListRenderer.class);
 
     private ProjectListManager projectListManager;

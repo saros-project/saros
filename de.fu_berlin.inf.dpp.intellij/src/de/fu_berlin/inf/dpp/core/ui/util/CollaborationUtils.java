@@ -26,7 +26,10 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.annotations.Inject;
 
 import java.io.IOException;
@@ -49,7 +52,7 @@ import java.util.Set;
  */
 public class CollaborationUtils {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(CollaborationUtils.class);
 
     @Inject

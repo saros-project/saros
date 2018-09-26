@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -51,7 +53,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 public abstract class SessionDisplayComposite extends
     ViewerComposite<TreeViewer> {
 
-    private static final Logger LOGGER = Logger
+    private static final Logger LOGGER = LogManager
         .getLogger(SessionDisplayComposite.class);
 
     @Inject

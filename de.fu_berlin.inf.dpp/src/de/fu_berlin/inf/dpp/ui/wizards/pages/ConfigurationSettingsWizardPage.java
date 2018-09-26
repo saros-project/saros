@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -45,7 +46,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class ConfigurationSettingsWizardPage extends WizardPage {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ConfigurationSettingsWizardPage.class);
 
     public static final String TITLE = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_title;

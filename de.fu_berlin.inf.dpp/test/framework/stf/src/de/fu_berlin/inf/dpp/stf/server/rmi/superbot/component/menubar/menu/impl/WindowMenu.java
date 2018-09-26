@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
@@ -15,7 +16,7 @@ import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 
 public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
 
-    private static final Logger log = Logger.getLogger(WindowMenu.class);
+    private static final Logger log = LogManager.getLogger(WindowMenu.class);
     private static final WindowMenu INSTANCE = new WindowMenu();
 
     public static WindowMenu getInstance() {

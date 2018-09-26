@@ -4,7 +4,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -21,7 +23,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 public class SWTUtils {
 
-    private static final Logger LOG = Logger.getLogger(SWTUtils.class);
+    private static final Logger LOG = LogManager.getLogger(SWTUtils.class);
 
     private static class CallableResult<T> {
         private T result;

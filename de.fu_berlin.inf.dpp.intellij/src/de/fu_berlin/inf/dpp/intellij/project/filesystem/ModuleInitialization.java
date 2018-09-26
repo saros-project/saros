@@ -15,7 +15,10 @@ import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import java.io.IOException;
@@ -40,7 +43,7 @@ import java.io.IOException;
  */
 public class ModuleInitialization implements Startable {
 
-    private static final Logger LOG = Logger.getLogger(
+    private static final Logger LOG = LogManager.getLogger(
         ModuleInitialization.class);
 
     private final ISarosSession session;

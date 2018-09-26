@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.context;
 import java.io.File;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.ComponentMonitor;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
@@ -72,7 +74,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
  */
 public class ContainerContext implements IContainerContext {
 
-    private static final Logger LOG = Logger.getLogger(ContainerContext.class);
+    private static final Logger LOG = LogManager.getLogger(ContainerContext.class);
 
     private static final String SAROS_DATA_DIRECTORY = ".saros";
 

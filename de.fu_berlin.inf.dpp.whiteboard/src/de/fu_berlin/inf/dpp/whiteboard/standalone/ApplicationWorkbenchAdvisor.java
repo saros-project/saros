@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.standalone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -14,7 +15,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
-    protected static Logger log = Logger
+    protected static Logger log = LogManager
         .getLogger(ApplicationWorkbenchAdvisor.class);
     private static final String PERSPECTIVE_ID = "de.fu_berlin.inf.dpp.whiteboard.standalone.perspective";
 

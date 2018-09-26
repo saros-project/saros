@@ -7,7 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Default implementation of the checksum cache {@link IChecksumCache interface}
@@ -30,7 +31,7 @@ import org.apache.log4j.Logger;
 // 2^128)
 public final class FileSystemChecksumCache implements IChecksumCache {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(FileSystemChecksumCache.class);
 
     private static final int SEED = 0xDEADBEEF;

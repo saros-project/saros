@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.PacketListener;
@@ -55,7 +56,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
      */
     private static final long SXE_TIMEOUT_INTERVAL = 500L;
 
-    public static final Logger log = Logger
+    public static final Logger log = LogManager
         .getLogger(SarosSXETransmitter.class);
 
     /* we don't want to block the GUI for sending */

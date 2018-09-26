@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -30,7 +32,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 @Component(module = "net")
 public class XMPPReceiver implements IReceiver {
 
-    private static final Logger LOG = Logger.getLogger(XMPPReceiver.class);
+    private static final Logger LOG = LogManager.getLogger(XMPPReceiver.class);
 
     private final DispatchThreadContext dispatchThreadContext;
 

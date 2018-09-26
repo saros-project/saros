@@ -13,7 +13,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -71,7 +72,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 public class AddProjectToSessionWizard extends Wizard {
 
-    private static Logger LOG = Logger
+    private static Logger LOG = LogManager
         .getLogger(AddProjectToSessionWizard.class);
 
     private EnterProjectNamePage namePage;

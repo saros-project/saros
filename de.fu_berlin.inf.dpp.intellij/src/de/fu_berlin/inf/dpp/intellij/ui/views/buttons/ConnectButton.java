@@ -11,8 +11,10 @@ import de.fu_berlin.inf.dpp.intellij.ui.actions.DisconnectServerAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.NotImplementedAction;
 import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
+
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JMenuItem;
@@ -27,7 +29,7 @@ import java.util.Scanner;
 public class ConnectButton extends ToolbarButton {
     public static final String CONNECT_ICON_PATH = "/icons/famfamfam/connect.png";
 
-    private static final Logger LOG = Logger.getLogger(ConnectButton.class);
+    private static final Logger LOG = LogManager.getLogger(ConnectButton.class);
 
     public static final String USERID_SEPARATOR = "@";
 

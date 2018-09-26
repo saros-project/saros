@@ -31,7 +31,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
@@ -79,7 +82,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public final class SarosSession implements ISarosSession {
 
-    private static final Logger log = Logger.getLogger(SarosSession.class);
+    private static final Logger log = LogManager.getLogger(SarosSession.class);
 
     @Inject
     private UISynchronizer synchronizer;

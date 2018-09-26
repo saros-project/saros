@@ -52,17 +52,22 @@ configure(subprojects - project(':de.fu_berlin.inf.dpp.ui.frontend')) { project 
   }
 
   test {
+    // Disable in order to avoid powermock error logging
+    systemProperty 'log4j2.disableJmx', 'true'
+
     testLogging {
        showStandardStreams = true
-        events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+        events "passed", "skipped", "failed", "standardOut", "standardError"
     }
   }
 
-  
-  project.ext.log4jVersion = 'log4j:log4j:1.2.17'
+  project.ext.log4jVersionApi  = 'org.apache.logging.log4j:log4j-api:2.11.1'
+  project.ext.log4jVersionCore = 'org.apache.logging.log4j:log4j-core:2.11.1'
+  project.ext.junitVersion = 'junit:junit:4.11'
 
   dependencies {
-    compile log4jVersion
+    compile log4jVersionApi
+    compile log4jVersionCore
 
     testConfig junitVersion
     testConfig 'org.easymock:easymock:3.1'

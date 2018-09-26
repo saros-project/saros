@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.ui.browser;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
 
@@ -14,7 +15,7 @@ import de.fu_berlin.inf.dpp.whiteboard.ui.HTMLWhiteboardView;
  */
 public class EclipseWhiteboardBrowser implements IWhiteboardBrowser {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(EclipseWhiteboardBrowser.class);
 
     private final Browser browser;

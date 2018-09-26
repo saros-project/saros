@@ -11,7 +11,8 @@ import java.net.URL;
 import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
@@ -21,7 +22,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
  */
 public class FileSubmitter {
 
-    private static final Logger log = Logger.getLogger(FileSubmitter.class);
+    private static final Logger log = LogManager.getLogger(FileSubmitter.class);
 
     /** Value for connection timeout */
     private static final int TIMEOUT = 30000;

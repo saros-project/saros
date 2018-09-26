@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.server.net;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 
@@ -16,7 +18,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 @Component(module = "server")
 public class ServerFeatureAdvertiser {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ServerFeatureAdvertiser.class);
 
     private IConnectionListener connectionListener = new IConnectionListener() {

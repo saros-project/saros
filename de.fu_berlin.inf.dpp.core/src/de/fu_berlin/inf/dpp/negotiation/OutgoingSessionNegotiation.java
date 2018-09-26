@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.SarosConstants;
@@ -40,7 +41,7 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
  */
 public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(OutgoingSessionNegotiation.class);
 
     private static final boolean IGNORE_VERSION_COMPATIBILITY = Boolean

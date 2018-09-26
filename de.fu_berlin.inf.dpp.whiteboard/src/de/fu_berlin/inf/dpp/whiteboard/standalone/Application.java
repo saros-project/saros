@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.standalone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
@@ -12,7 +13,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class Application implements IApplication {
 
-    protected static Logger log = Logger.getLogger(Application.class);
+    protected static Logger log = LogManager.getLogger(Application.class);
 
     /*
      * (non-Javadoc)

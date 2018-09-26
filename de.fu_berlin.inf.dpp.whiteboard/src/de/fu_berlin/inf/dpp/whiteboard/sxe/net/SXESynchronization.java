@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 
@@ -12,7 +13,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
  */
 public abstract class SXESynchronization {
 
-    public static final Logger log = Logger.getLogger(SXESynchronization.class);
+    public static final Logger log = LogManager.getLogger(SXESynchronization.class);
 
     protected String peer;
     protected SXEController controller;

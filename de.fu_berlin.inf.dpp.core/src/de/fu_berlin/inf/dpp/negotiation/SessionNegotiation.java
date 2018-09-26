@@ -19,7 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.negotiation;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
@@ -39,7 +40,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
  */
 public abstract class SessionNegotiation extends Negotiation {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(SessionNegotiation.class);
 
     /**

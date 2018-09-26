@@ -12,7 +12,10 @@ import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import java.util.List;
@@ -25,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class FollowingActivitiesManager extends AbstractActivityProducer
     implements Startable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(FollowingActivitiesManager.class);
 
     private final List<IFollowModeChangesListener> listeners = new CopyOnWriteArrayList<IFollowModeChangesListener>();

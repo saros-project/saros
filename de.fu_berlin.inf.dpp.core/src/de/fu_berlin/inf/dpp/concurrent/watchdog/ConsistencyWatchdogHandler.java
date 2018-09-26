@@ -5,7 +5,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
@@ -35,7 +37,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
     implements Startable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ConsistencyWatchdogHandler.class);
 
     private final IEditorManager editorManager;

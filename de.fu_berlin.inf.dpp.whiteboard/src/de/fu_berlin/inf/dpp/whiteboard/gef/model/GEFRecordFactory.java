@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.whiteboard.gef.model;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
@@ -24,7 +25,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SXEUtils;
  */
 public class GEFRecordFactory extends SXEDefaultRecordFactory {
 
-    Logger log = Logger.getLogger(GEFRecordFactory.class);
+    Logger log = LogManager.getLogger(GEFRecordFactory.class);
 
     @Override
     public ElementRecord createElementRecord(DocumentRecord documentRecord,

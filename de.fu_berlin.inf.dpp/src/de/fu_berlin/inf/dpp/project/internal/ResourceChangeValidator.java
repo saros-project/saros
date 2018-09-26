@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
@@ -35,7 +36,7 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  * realized this
  */
 public class ResourceChangeValidator extends ModelProvider {
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(ResourceChangeValidator.class.getName());
 
     private static final String ERROR_TEXT = Messages.ResourceChangeValidator_error_no_write_access;

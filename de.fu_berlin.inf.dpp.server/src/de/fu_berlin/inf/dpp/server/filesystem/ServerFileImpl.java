@@ -8,7 +8,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
@@ -19,7 +20,7 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
  */
 public class ServerFileImpl extends ServerResourceImpl implements IFile {
 
-    private static final Logger LOG = Logger.getLogger(ServerFileImpl.class);
+    private static final Logger LOG = LogManager.getLogger(ServerFileImpl.class);
 
     private String charset;
 

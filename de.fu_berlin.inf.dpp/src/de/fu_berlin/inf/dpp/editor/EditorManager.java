@@ -8,7 +8,10 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -109,7 +112,7 @@ public class EditorManager extends AbstractActivityProducer implements
      *               editor when it is received.
      */
 
-    private static final Logger LOG = Logger.getLogger(EditorManager.class);
+    private static final Logger LOG = LogManager.getLogger(EditorManager.class);
 
     boolean hasWriteAccess;
 

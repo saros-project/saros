@@ -13,7 +13,9 @@ import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -32,7 +34,7 @@ import java.util.List;
  */
 public class ShareWithUserAction extends AnAction {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ShareWithUserAction.class);
 
     private final JID userJID;

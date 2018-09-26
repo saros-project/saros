@@ -1,7 +1,8 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.part;
 
 import org.apache.batik.util.SVGConstants;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
@@ -23,7 +24,7 @@ public class SVGTextBoxPart extends ElementRecordPart {
     private static final int TEXT_SIZE = 16;
     private static final String TEXT_TYPE = "Arial";
 
-    private static final Logger log = Logger.getLogger(SVGTextBoxPart.class);
+    private static final Logger log = LogManager.getLogger(SVGTextBoxPart.class);
 
     @Override
     protected IFigure createFigure() {

@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.negotiation;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
@@ -31,7 +33,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
  */
 public abstract class ProjectNegotiation extends Negotiation {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ProjectNegotiation.class);
 
     /**

@@ -4,7 +4,8 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
@@ -43,7 +44,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SetRecordList;
 public abstract class NodeRecord extends AbstractRecord implements
     Comparable<NodeRecord> {
 
-    private static final Logger log = Logger.getLogger(NodeRecord.class);
+    private static final Logger log = LogManager.getLogger(NodeRecord.class);
 
     /**
      * Java Random to generate a unique Record ID

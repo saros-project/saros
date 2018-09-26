@@ -15,7 +15,8 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -32,7 +33,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject
  */
 public class SXEMessageWriter {
 
-    private static final Logger log = Logger.getLogger(SXEMessageWriter.class);
+    private static final Logger log = LogManager.getLogger(SXEMessageWriter.class);
 
     private SXEStreamWriter writer;
     private ByteArrayOutputStream os;

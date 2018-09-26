@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
@@ -24,7 +25,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class AddXMPPAccountWizard extends Wizard {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(AddXMPPAccountWizard.class);
 
     @Inject

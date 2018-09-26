@@ -34,7 +34,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -54,7 +56,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  */
 @Component(module = "account")
 public final class XMPPAccountStore {
-    private static final Logger LOG = Logger.getLogger(XMPPAccountStore.class);
+    private static final Logger LOG = LogManager.getLogger(XMPPAccountStore.class);
 
     private static final int MAX_ACCOUNT_DATA_SIZE = 10 * 1024 * 1024;
 

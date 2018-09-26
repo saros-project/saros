@@ -6,7 +6,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
@@ -30,7 +31,7 @@ import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
  */
 public class FileListFactory {
 
-    private static final Logger LOG = Logger.getLogger(FileListFactory.class);
+    private static final Logger LOG = LogManager.getLogger(FileListFactory.class);
 
     private IChecksumCache checksumCache;
     private IProgressMonitor monitor;

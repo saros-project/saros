@@ -6,7 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -23,7 +24,7 @@ import de.fu_berlin.inf.dpp.util.Predicate;
  */
 public class AnnotationModelHelper {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(AnnotationModelHelper.class);
 
     private static Iterable<Annotation> toIterable(final IAnnotationModel model) {

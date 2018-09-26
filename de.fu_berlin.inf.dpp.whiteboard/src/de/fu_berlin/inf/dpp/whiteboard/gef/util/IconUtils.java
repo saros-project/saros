@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.whiteboard.gef.util;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Polyline;
@@ -24,7 +25,7 @@ import org.eclipse.swt.widgets.Display;
  * 
  */
 public class IconUtils {
-    private static final Logger log = Logger.getLogger(IconUtils.class);
+    private static final Logger log = LogManager.getLogger(IconUtils.class);
 
     private static Image imageBuffer = null;
     private static GC imageGC = null;

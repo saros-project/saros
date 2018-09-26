@@ -3,13 +3,14 @@ package de.fu_berlin.inf.dpp.whiteboard.gef.util;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.swt.graphics.RGB;
 
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ColorListener;
 
 public class ColorUtils {
-    private static final Logger log = Logger.getLogger(ColorUtils.class);
+    private static final Logger log = LogManager.getLogger(ColorUtils.class);
 
     private static RGB rgbFore = new RGB(0, 0, 0);
 

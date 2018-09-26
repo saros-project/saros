@@ -25,7 +25,10 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import java.io.ByteArrayInputStream;
@@ -38,7 +41,7 @@ import java.util.Arrays;
 public class SharedResourcesManager extends AbstractActivityProducer
     implements Startable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SharedResourcesManager.class);
 
     private final ISarosSession sarosSession;

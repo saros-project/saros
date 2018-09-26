@@ -8,7 +8,8 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LocalEditorHandler {
 
-    private final static Logger LOG = Logger
+    private final static Logger LOG = LogManager
         .getLogger(LocalEditorHandler.class);
 
     private final ProjectAPI projectAPI;

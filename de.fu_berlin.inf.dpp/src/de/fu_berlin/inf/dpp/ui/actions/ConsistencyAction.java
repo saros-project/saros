@@ -5,7 +5,9 @@ import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -57,7 +59,7 @@ public class ConsistencyAction extends Action implements Disposable {
 
     public static final String ACTION_ID = ConsistencyAction.class.getName();
 
-    private static final Logger LOG = Logger.getLogger(ConsistencyAction.class);
+    private static final Logger LOG = LogManager.getLogger(ConsistencyAction.class);
 
     private static final int MIN_ALPHA_VALUE = 64;
     private static final int MAX_ALPHA_VALUE = 255;

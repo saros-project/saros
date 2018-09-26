@@ -11,7 +11,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
@@ -59,7 +61,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 @Component(module = "eclipse")
 public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SharedProjectFileDecorator.class.getName());
 
     private static final String IMAGE_PATH = "icons/ovr16/dot.png"; //$NON-NLS-1$

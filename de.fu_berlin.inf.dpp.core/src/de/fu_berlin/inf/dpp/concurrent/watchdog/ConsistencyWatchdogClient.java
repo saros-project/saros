@@ -12,7 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
@@ -48,7 +50,7 @@ import de.fu_berlin.inf.dpp.session.UserFormatUtils;
 public class ConsistencyWatchdogClient extends AbstractActivityProducer
     implements Startable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ConsistencyWatchdogClient.class);
 
     private static final Random RANDOM = new Random();

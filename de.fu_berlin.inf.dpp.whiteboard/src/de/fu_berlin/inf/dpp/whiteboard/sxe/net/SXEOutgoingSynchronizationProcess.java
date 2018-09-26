@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -33,7 +34,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SXEUtils;
  */
 public class SXEOutgoingSynchronizationProcess extends SXESynchronization {
 
-    public static final Logger log = Logger
+    public static final Logger log = LogManager
         .getLogger(SXEOutgoingSynchronizationProcess.class);
 
     public SXEOutgoingSynchronizationProcess(SXEController controller,

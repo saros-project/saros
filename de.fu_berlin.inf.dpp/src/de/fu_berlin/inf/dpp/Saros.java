@@ -2,12 +2,17 @@ package de.fu_berlin.inf.dpp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.helpers.LogLog;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.status.StatusLogger;
+import org.apache.logging.log4j.core.LoggerContext;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -79,7 +84,7 @@ public class Saros extends AbstractUIPlugin {
                 .getResourceAsStream("saros.properties"); //$NON-NLS-1$
 
             if (sarosProperties == null) {
-                LogLog
+               StatusLogger.getLogger()
                     .warn("could not initialize Saros properties because the 'saros.properties'"
                         + " file could not be found on the current JAVA class path");
             } else {
@@ -87,7 +92,7 @@ public class Saros extends AbstractUIPlugin {
                 sarosProperties.close();
             }
         } catch (Exception e) {
-            LogLog.error(
+            StatusLogger.getLogger().error(
                 "could not load saros property file 'saros.properties'", e); //$NON-NLS-1$
         }
 
@@ -220,30 +225,30 @@ public class Saros extends AbstractUIPlugin {
          * HACK this is not the way OSGi works but it currently fulfill its
          * purpose
          */
-        final ClassLoader contextClassLoader = Thread.currentThread()
-            .getContextClassLoader();
-
         final boolean isDebugMode = Boolean
             .getBoolean("de.fu_berlin.inf.dpp.debug") || isDebugging(); //$NON-NLS-1$
 
-        final String log4jPropertyFile = isDebugMode ? "saros_debug.log4j.properties" //$NON-NLS-1$
-            : "saros_release.log4j.properties"; //$NON-NLS-1$
-
         try {
-            // change the context class loader so Log4J will find the appenders
-            Thread.currentThread().setContextClassLoader(
-                Saros.class.getClassLoader());
 
-            PropertyConfigurator.configure(Saros.class.getClassLoader()
-                .getResource(log4jPropertyFile));
+            File mainLogDir = getStateLocation().toFile();
+            String logDir = mainLogDir + File.separator + "SarosLogs";
+
+            String consoleLevel = isDebugMode ? "all" : "warn";
+
+            System.setProperty("log4j.configurationFile", "saros_log4j2.xml");
+            System.setProperty("logging.logDir", logDir);
+            System.setProperty("logging.consoleLevel", consoleLevel);
+
+            // trigger reconfiguration with new properties
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            context.reconfigure();
+
         } catch (RuntimeException e) {
             System.err.println("initializing log support failed"); //$NON-NLS-1$
             e.printStackTrace();
-        } finally {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
-        log = Logger.getLogger(this.getClass());
+        log = LogManager.getLogger(this.getClass());
 
     }
 

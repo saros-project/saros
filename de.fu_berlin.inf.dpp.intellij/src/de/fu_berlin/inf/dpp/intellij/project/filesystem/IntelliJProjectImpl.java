@@ -9,7 +9,9 @@ import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +35,7 @@ import java.util.Map;
 public class IntelliJProjectImpl implements IProject {
     public static final String DEFAULT_CHARSET = "utf8";
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(IntelliJProjectImpl.class);
 
     private String defaultCharset = DEFAULT_CHARSET;

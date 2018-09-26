@@ -15,7 +15,8 @@ import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * MDNS Service using {@link JmDNS} library.
@@ -26,7 +27,7 @@ import org.apache.log4j.Logger;
 // TODO reap dead DNS entries, JmDNSs reaper takes ages.
 public class MDNSService {
 
-    private static final Logger LOG = Logger.getLogger(MDNSService.class);
+    private static final Logger LOG = LogManager.getLogger(MDNSService.class);
 
     private static final Charset CHARSET = Charset.forName("UTF-8");
 

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.swt.graphics.Color;
@@ -17,7 +18,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * Configuration of the annotations is done in the plugin-xml.
  */
 public abstract class SarosAnnotation extends Annotation {
-    private static final Logger log = Logger.getLogger(SarosAnnotation.class);
+    private static final Logger log = LogManager.getLogger(SarosAnnotation.class);
 
     /**
      * Constant representing the amount of configured annotations for each Saros

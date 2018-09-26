@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
@@ -22,7 +23,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 public class DecompressArchiveTask implements IWorkspaceRunnable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(DecompressArchiveTask.class);
 
     private final File file;

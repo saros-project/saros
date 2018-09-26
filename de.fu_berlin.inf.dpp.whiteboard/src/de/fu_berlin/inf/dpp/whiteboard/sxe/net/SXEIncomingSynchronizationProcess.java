@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -29,7 +30,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
  */
 public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 
-    public static final Logger log = Logger
+    public static final Logger log = LogManager
         .getLogger(SXEIncomingSynchronizationProcess.class);
 
     public SXEIncomingSynchronizationProcess(SXEController controller,

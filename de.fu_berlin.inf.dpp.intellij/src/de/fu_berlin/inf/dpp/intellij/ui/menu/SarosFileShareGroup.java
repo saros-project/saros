@@ -11,7 +11,10 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jivesoftware.smack.Roster;
@@ -27,7 +30,7 @@ import java.util.List;
  * Saros action group for the pop-up menu when right-clicking on a module.
  */
 public class SarosFileShareGroup extends ActionGroup {
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SarosFileShareGroup.class);
 
     @Inject

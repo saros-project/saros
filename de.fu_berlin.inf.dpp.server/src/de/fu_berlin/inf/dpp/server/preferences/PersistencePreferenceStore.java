@@ -11,7 +11,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.InvalidPropertiesFormatException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 
@@ -21,7 +22,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
  */
 public final class PersistencePreferenceStore extends PreferenceStore {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(PersistencePreferenceStore.class);
 
     private File preferenceFile;

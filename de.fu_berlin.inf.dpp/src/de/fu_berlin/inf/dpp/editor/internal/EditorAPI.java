@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.editor.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -54,7 +55,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  */
 public class EditorAPI {
 
-    private static final Logger LOG = Logger.getLogger(EditorAPI.class);
+    private static final Logger LOG = LogManager.getLogger(EditorAPI.class);
 
     private static final String[] RESTRICTED_ACTION = {
         ITextEditorActionConstants.CUT_LINE,

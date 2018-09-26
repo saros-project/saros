@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.net.xmpp.subscription;
 import java.text.MessageFormat;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.RosterEntry;
@@ -29,7 +31,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
  */
 @Component(module = "net")
 public class SubscriptionHandler {
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SubscriptionHandler.class);
 
     private Connection connection = null;

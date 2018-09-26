@@ -16,7 +16,10 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.annotations.Inject;
 
 import java.awt.event.ActionEvent;
@@ -33,7 +36,7 @@ import java.util.Set;
  * with session.
  */
 public class ConsistencyButton extends ToolbarButton {
-    private static final Logger LOG = Logger.getLogger(ConsistencyButton.class);
+    private static final Logger LOG = LogManager.getLogger(ConsistencyButton.class);
 
     private static final String IN_SYNC_ICON_PATH = "/icons/famfamfam/in_sync.png";
     private static final String OUT_SYNC_ICON_PATH = "/icons/famfamfam/out_sync.png";

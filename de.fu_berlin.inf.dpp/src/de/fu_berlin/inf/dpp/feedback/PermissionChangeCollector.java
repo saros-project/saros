@@ -5,7 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
@@ -33,7 +34,7 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
 @Component(module = "feedback")
 public class PermissionChangeCollector extends AbstractStatisticCollector {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(PermissionChangeCollector.class.getName());
 
     private static final String KEY_DURATION = "duration";

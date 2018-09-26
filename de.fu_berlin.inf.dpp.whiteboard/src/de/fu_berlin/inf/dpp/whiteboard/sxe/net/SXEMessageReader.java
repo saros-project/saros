@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -33,7 +34,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.SetRecordDataObj
  */
 public class SXEMessageReader {
 
-    private static final Logger log = Logger.getLogger(SXEMessageReader.class);
+    private static final Logger log = LogManager.getLogger(SXEMessageReader.class);
 
     /*
      * factory method

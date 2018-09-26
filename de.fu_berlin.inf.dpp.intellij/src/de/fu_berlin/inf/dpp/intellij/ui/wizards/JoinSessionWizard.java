@@ -12,7 +12,9 @@ import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.awt.Window;
 import java.text.MessageFormat;
@@ -30,7 +32,7 @@ import static de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 public class JoinSessionWizard extends Wizard {
     public static final String PAGE_INFO_ID = "JoinSessionInfo";
 
-    private static final Logger LOG = Logger.getLogger(JoinSessionWizard.class);
+    private static final Logger LOG = LogManager.getLogger(JoinSessionWizard.class);
 
     private final IncomingSessionNegotiation negotiation;
 

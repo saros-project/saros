@@ -17,12 +17,13 @@ import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.project.FileSystemChangeListener;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 
 public class IntelliJWorkspaceImpl implements IWorkspace {
-    public static final Logger LOG = Logger
+    public static final Logger LOG = LogManager
         .getLogger(IntelliJWorkspaceImpl.class);
 
     private LocalFileSystem fileSystem;

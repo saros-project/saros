@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
@@ -12,7 +13,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.IAccountManip
 public class AccountManipulatorImpl extends StfRemoteObject implements
     IAccountManipulator {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(AccountManipulatorImpl.class);
 
     private static final IAccountManipulator INSTANCE = new AccountManipulatorImpl();

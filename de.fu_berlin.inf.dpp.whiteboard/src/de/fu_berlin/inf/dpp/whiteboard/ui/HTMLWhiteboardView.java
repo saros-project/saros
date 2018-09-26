@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.ui;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
@@ -13,7 +14,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class HTMLWhiteboardView extends ViewPart {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(HTMLWhiteboardView.class);
 
     private Browser browser;

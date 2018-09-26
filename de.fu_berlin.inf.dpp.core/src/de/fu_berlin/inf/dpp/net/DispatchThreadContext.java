@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.net;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -16,7 +18,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 @Component(module = "core")
 public class DispatchThreadContext implements Disposable {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(DispatchThreadContext.class);
 
     protected ExecutorService dispatch = Executors

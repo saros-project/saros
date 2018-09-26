@@ -7,7 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -18,7 +19,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  */
 final class ProjectNegotiationObservable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ProjectNegotiationObservable.class);
 
     private final Map<JID, List<ProjectNegotiation>> negotiations = new HashMap<JID, List<ProjectNegotiation>>();

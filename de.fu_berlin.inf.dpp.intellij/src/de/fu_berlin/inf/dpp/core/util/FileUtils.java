@@ -9,7 +9,9 @@ import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +31,7 @@ import java.util.Collection;
  */
 public class FileUtils {
 
-    private static Logger LOG = Logger.getLogger(FileUtils.class);
+    private static Logger LOG = LogManager.getLogger(FileUtils.class);
 
     private FileUtils() {
         // no instantiation allowed

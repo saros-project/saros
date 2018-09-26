@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -14,7 +15,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject
 
 public class MockedSXETransmitter implements ISXETransmitter {
 
-    public static final Logger log = Logger
+    public static final Logger log = LogManager
         .getLogger(MockedSXETransmitter.class);
 
     private final SXENetworkMock network;

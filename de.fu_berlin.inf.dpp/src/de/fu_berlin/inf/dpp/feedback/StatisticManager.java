@@ -7,7 +7,8 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -31,7 +32,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 public class StatisticManager extends AbstractFeedbackManager implements
     Startable {
 
-    private static final Logger log = Logger.getLogger(StatisticManager.class
+    private static final Logger log = LogManager.getLogger(StatisticManager.class
         .getName());
 
     private static final String STATISTIC_UPLOAD_URL = System

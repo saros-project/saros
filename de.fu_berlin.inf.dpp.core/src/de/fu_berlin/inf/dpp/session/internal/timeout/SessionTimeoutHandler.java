@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.session.internal.timeout;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.net.IReceiver;
@@ -22,7 +24,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 abstract class SessionTimeoutHandler implements Startable {
 
-    private final static Logger LOG = Logger
+    private final static Logger LOG = LogManager
         .getLogger(SessionTimeoutHandler.class);
 
     /** Join timeout when stopping this component */

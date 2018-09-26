@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.eventhandler;
 
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.XMPPError;
 
@@ -21,7 +23,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class ConnectingFailureHandler implements IConnectingFailureCallback {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ConnectingFailureHandler.class);
 
     private final ConnectionHandler connectionHandler;

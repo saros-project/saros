@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
@@ -32,7 +33,7 @@ public class Document {
         public String getUser();
     }
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(Document.class.getName());
 
     /** document state. */

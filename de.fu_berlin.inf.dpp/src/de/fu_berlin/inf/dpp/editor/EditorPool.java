@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.IDocument;
@@ -33,7 +34,7 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  */
 final class EditorPool {
 
-    private static final Logger LOG = Logger.getLogger(EditorPool.class);
+    private static final Logger LOG = LogManager.getLogger(EditorPool.class);
 
     /*
      * The values might change over time but we need the original state when an
@@ -101,11 +102,11 @@ final class EditorPool {
      * events needed for tracking of text selection and viewport changes (e.g.
      * mouse events, keyboard events)</li>
      * </ul>
-     * 
+     *
      * This method will return without any effect if the given IEditorPart does
      * not a.) represent an IFile, b.) which can be referred to using an IPath
      * and c.) the IEditorPart can be mapped to an ITextViewer.
-     * 
+     *
      */
     public void add(final IEditorPart editorPart) {
         LOG.trace("adding editor part " + editorPart + " ["
@@ -190,7 +191,7 @@ final class EditorPool {
 
     /**
      * Returns the {@linkplain SPath path} for the corresponding editor.
-     * 
+     *
      * @return the path for the corresponding editor or <code>null</code> if the
      *         editor is not managed by this pool
      */
@@ -221,7 +222,7 @@ final class EditorPool {
      * <li>{@link IDocumentListener} from {@link IDocument}</li>
      * <li>{@link EditorListener} from {@link IEditorPart}</li>
      * </ul>
-     * 
+     *
      * @param editorPart
      *            editorPart to be removed
      */
@@ -268,12 +269,12 @@ final class EditorPool {
     /**
      * Returns all IEditorParts which have been added to this pool which display
      * a file using the given path.
-     * 
+     *
      * @param path
      *            {@link IPath} of the Editor
-     * 
+     *
      * @return set of relating IEditorPart
-     * 
+     *
      */
     public Set<IEditorPart> getEditors(final SPath path) {
         final HashSet<IEditorPart> result = new HashSet<IEditorPart>();
@@ -286,9 +287,9 @@ final class EditorPool {
 
     /**
      * Returns all IEditorParts actually managed by this pool.
-     * 
+     *
      * @return set of all {@link IEditorPart} from the {@link EditorPool}.
-     * 
+     *
      */
     public Set<IEditorPart> getAllEditors() {
         final Set<IEditorPart> result = new HashSet<IEditorPart>();
@@ -303,7 +304,7 @@ final class EditorPool {
      * Removes all {@link IEditorPart} from the EditorPool.
      */
     public void removeAllEditors() {
-        LOG.trace("removing all editors");
+
 
         for (final IEditorPart part : new HashSet<IEditorPart>(getAllEditors()))
             remove(part);
@@ -331,11 +332,11 @@ final class EditorPool {
     /**
      * Changes the state of the <code>ElementStateListener</code> for <b>all</b>
      * editors in this pool.
-     * 
+     *
      * @param enabled
      *            if <code>true</code> element state changes will be reported,
      *            otherwise no element state changes will be reported
-     * 
+     *
      * @see #add(IEditorPart)
      */
     public void setElementStateListenerEnabled(final boolean enabled) {
@@ -345,11 +346,11 @@ final class EditorPool {
     /**
      * Changes the state of the <code>DocumentListener</code> for <b>all</b>
      * editors in this pool.
-     * 
+     *
      * @param enabled
      *            if <code>true</code> document changes will be reported,
      *            otherwise no document changes will be reported
-     * 
+     *
      * @see #add(IEditorPart)
      */
     public void setDocumentListenerEnabled(final boolean enabled) {

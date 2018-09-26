@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
@@ -27,7 +28,7 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 class SharedProjectMapper {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SharedProjectMapper.class);
 
     /**

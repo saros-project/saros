@@ -9,7 +9,9 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
@@ -18,7 +20,7 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
  */
 public class NetworkingUtils {
 
-    private static final Logger LOG = Logger.getLogger(NetworkingUtils.class);
+    private static final Logger LOG = LogManager.getLogger(NetworkingUtils.class);
 
     /**
      * Retrieves all IP addresses from all non-loopback-, running network

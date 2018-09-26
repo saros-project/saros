@@ -4,7 +4,9 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
@@ -28,7 +30,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
 public final class ContextMenusInPEView extends StfRemoteObject implements
     IContextMenusInPEView {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(ContextMenusInPEView.class);
     private static final ContextMenusInPEView INSTANCE = new ContextMenusInPEView();
 
@@ -147,7 +149,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
 
             break;
         default:
-            shell = new SWTBot().shell(CONFIRM_DELETE);
+            shell = new SWTBot().shell(DELETE);
             shell.activate();
             shell.bot().button(OK).click();
             break;

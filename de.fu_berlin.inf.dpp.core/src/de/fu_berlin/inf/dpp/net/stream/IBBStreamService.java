@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.net.stream;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.BytestreamListener;
@@ -23,7 +25,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  */
 public class IBBStreamService implements IStreamService, BytestreamListener {
 
-    private final static Logger LOG = Logger.getLogger(IBBStreamService.class);
+    private final static Logger LOG = LogManager.getLogger(IBBStreamService.class);
 
     private volatile InBandBytestreamManager manager;
     private volatile IByteStreamConnectionListener connectionListener;

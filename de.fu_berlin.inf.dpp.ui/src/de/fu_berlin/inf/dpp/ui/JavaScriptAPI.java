@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.ui;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -25,7 +26,7 @@ import de.fu_berlin.inf.dpp.ui.model.State;
  * here.
  */
 public class JavaScriptAPI {
-    private static final Logger LOG = Logger.getLogger(JavaScriptAPI.class);
+    private static final Logger LOG = LogManager.getLogger(JavaScriptAPI.class);
     private static final Gson GSON = new Gson();
 
     private JavaScriptAPI() {

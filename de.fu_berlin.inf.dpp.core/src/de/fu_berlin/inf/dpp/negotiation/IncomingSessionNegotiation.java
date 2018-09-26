@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.negotiation;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.communication.extensions.ConnectionEstablishedExtension;
@@ -33,7 +35,7 @@ import de.fu_berlin.inf.dpp.session.SessionEndReason;
  */
 public class IncomingSessionNegotiation extends SessionNegotiation {
 
-    private static Logger LOG = Logger
+    private static Logger LOG = LogManager
         .getLogger(IncomingSessionNegotiation.class);
 
     private final String remoteVersion;

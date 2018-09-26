@@ -6,7 +6,9 @@ import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionListener;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.text.MessageFormat;
 
@@ -15,7 +17,7 @@ import java.text.MessageFormat;
  */
 public class XMPPAuthorizationHandler {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(XMPPAuthorizationHandler.class);
     private final SubscriptionListener subscriptionListener = new SubscriptionListener() {
 

@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 
 import com.intellij.util.ui.UIUtil;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -12,7 +14,7 @@ import java.net.URL;
  */
 public abstract class ToolbarButton extends JButton {
 
-    private static final Logger LOG = Logger.getLogger(ToolbarButton.class);
+    private static final Logger LOG = LogManager.getLogger(ToolbarButton.class);
 
     /**
      * Creates a button with the specified actionCommand, Icon and toolTipText.

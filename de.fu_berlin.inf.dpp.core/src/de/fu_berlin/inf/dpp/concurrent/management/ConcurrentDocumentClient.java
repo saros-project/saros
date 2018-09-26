@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.concurrent.management;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
@@ -31,7 +32,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  */
 public class ConcurrentDocumentClient {
 
-    private static Logger log = Logger
+    private static Logger log = LogManager
         .getLogger(ConcurrentDocumentClient.class);
 
     private final ISarosSession sarosSession;

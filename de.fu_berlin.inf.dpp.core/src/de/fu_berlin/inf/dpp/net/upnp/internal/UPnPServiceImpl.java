@@ -14,7 +14,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
 import org.picocontainer.Disposable;
@@ -29,7 +31,7 @@ import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 @Component(module = "net")
 public class UPnPServiceImpl implements IUPnPService, Disposable {
 
-    private static final Logger LOG = Logger.getLogger(UPnPServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(UPnPServiceImpl.class);
 
     private final Map<GatewayDevice, Map<String, Set<Integer>>> currentMappedPorts = new HashMap<GatewayDevice, Map<String, Set<Integer>>>();
 

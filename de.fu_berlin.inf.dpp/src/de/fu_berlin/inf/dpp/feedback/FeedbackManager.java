@@ -6,7 +6,8 @@ package de.fu_berlin.inf.dpp.feedback;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -53,7 +54,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
     public static final int BROWSER_INT = 1;
     public static final int BROWSER_NONE = 2;
 
-    protected static final Logger log = Logger.getLogger(FeedbackManager.class
+    protected static final Logger log = LogManager.getLogger(FeedbackManager.class
         .getName());
 
     private static IPreferenceChangeListener preferenceChangeListener = new IPreferenceChangeListener() {

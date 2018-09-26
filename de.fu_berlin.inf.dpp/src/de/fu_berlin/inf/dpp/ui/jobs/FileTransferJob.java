@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.jobs;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -16,7 +18,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 abstract class FileTransferJob extends Job {
 
-    private static final Logger LOG = Logger.getLogger(FileTransferJob.class);
+    private static final Logger LOG = LogManager.getLogger(FileTransferJob.class);
     final JID jid;
 
     FileTransferJob(String name, JID jid) {

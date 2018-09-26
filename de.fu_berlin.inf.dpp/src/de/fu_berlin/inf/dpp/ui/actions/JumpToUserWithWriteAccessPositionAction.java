@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.ISelectionListener;
@@ -32,7 +34,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
     public static final String ACTION_ID = JumpToUserWithWriteAccessPositionAction.class
         .getName();
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(JumpToUserWithWriteAccessPositionAction.class);
 
     protected ISelectionListener selectionListener = new ISelectionListener() {

@@ -27,7 +27,8 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
@@ -47,7 +48,7 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 public class Jupiter implements Algorithm {
 
-    private static final Logger log = Logger.getLogger(Jupiter.class);
+    private static final Logger log = LogManager.getLogger(Jupiter.class);
 
     /**
      * The inclusion transformation function used to transform operations.

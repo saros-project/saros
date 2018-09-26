@@ -27,7 +27,9 @@ import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.INegotiationHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.awt.Window;
 import java.text.MessageFormat;
@@ -39,7 +41,7 @@ import java.text.MessageFormat;
  */
 public class NegotiationHandler implements INegotiationHandler {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(NegotiationHandler.class);
     private final ISarosSessionManager sessionManager;
 

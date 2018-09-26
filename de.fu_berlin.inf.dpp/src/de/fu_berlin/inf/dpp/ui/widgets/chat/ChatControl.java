@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -84,7 +86,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
  */
 public final class ChatControl extends Composite {
 
-    private static final Logger LOG = Logger.getLogger(ChatControl.class);
+    private static final Logger LOG = LogManager.getLogger(ChatControl.class);
 
     /*
      * This should be configurable by the user so we do not have to think about

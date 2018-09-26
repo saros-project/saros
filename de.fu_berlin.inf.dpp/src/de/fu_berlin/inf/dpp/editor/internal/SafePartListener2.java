@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 

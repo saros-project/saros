@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
@@ -24,7 +26,7 @@ import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
  */
 public class EclipseResourceLocator implements IUIResourceLocator {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(EclipseResourceLocator.class);
 
     // TODO central place

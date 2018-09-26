@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -40,7 +41,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class JoinSessionWizard extends Wizard {
 
-    private static final Logger LOG = Logger.getLogger(JoinSessionWizard.class);
+    private static final Logger LOG = LogManager.getLogger(JoinSessionWizard.class);
 
     private boolean isNegotiationRunning = false;
 

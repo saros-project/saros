@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Nullable;
@@ -35,7 +37,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
  */
 public class MUCNegotiationManager {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(MUCNegotiationManager.class);
 
     private static final String NOT_IN_SESSION = "NOT_IN_SESSION";

@@ -6,7 +6,9 @@ import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widget
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -33,7 +35,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
  */
 public final class SarosSWTBot extends SWTBot {
 
-    private static final Logger log = Logger.getLogger(SarosSWTBot.class);
+    private static final Logger log = LogManager.getLogger(SarosSWTBot.class);
 
     private Widget widget;
 

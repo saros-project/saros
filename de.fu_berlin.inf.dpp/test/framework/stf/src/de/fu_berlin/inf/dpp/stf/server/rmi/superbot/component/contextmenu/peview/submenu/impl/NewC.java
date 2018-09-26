@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.pevie
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
@@ -18,7 +20,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
 
 public final class NewC extends StfRemoteObject implements INewC {
 
-    private static final Logger log = Logger.getLogger(NewC.class);
+    private static final Logger log = LogManager.getLogger(NewC.class);
 
     private static final NewC INSTANCE = new NewC();
 

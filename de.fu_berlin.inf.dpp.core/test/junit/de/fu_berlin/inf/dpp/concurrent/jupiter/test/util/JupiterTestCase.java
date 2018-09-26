@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.log4j.PropertyConfigurator;
+//import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -22,9 +22,9 @@ public abstract class JupiterTestCase {
 
     protected NetworkSimulator network;
 
-    static {
-        PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
-    }
+//    static {
+//        PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
+//    }
 
     @Before
     public void setup() {

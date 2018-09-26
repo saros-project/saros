@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.whiteboard.net;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.swt.graphics.RGB;
 import org.picocontainer.annotations.Inject;
 
@@ -43,7 +44,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEOutgoingSynchronizationProcess
  */
 public class WhiteboardManager {
 
-    private static final Logger LOG = Logger.getLogger(WhiteboardManager.class);
+    private static final Logger LOG = LogManager.getLogger(WhiteboardManager.class);
 
     private static final Object LOCK = new Object();
 

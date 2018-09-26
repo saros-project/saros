@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.eventhandler;
 
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -42,7 +44,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
  */
 public class NegotiationHandler implements INegotiationHandler {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(NegotiationHandler.class);
 
     /**

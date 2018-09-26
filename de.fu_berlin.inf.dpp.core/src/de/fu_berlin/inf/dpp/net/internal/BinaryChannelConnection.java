@@ -13,7 +13,8 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.net.stream.ByteStream;
 import de.fu_berlin.inf.dpp.net.stream.StreamMode;
@@ -36,7 +37,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  */
 public class BinaryChannelConnection implements IByteStreamConnection {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(BinaryChannelConnection.class);
 
     private static final long TERMINATE_TIMEOUT = 10000L;

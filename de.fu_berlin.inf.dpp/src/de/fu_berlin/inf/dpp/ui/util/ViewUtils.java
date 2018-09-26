@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -11,7 +13,7 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 public class ViewUtils {
 
-    private static final Logger LOG = Logger.getLogger(ViewUtils.class);
+    private static final Logger LOG = LogManager.getLogger(ViewUtils.class);
 
     public static void openSarosView() {
         /*

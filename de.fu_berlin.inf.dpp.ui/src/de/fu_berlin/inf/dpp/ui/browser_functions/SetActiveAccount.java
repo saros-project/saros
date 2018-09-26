@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
@@ -14,7 +15,7 @@ import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
  */
 public class SetActiveAccount extends TypedJavascriptFunction {
 
-    private static final Logger LOG = Logger.getLogger(SetActiveAccount.class);
+    private static final Logger LOG = LogManager.getLogger(SetActiveAccount.class);
 
     public static final String JS_NAME = "setActiveAccount";
 

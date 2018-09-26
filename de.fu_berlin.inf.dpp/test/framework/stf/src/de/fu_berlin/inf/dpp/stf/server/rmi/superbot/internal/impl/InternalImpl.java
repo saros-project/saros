@@ -13,7 +13,9 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -36,7 +38,7 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 public final class InternalImpl extends StfRemoteObject implements IInternal {
 
-    private static final Logger LOG = Logger.getLogger(InternalImpl.class);
+    private static final Logger LOG = LogManager.getLogger(InternalImpl.class);
 
     private static final InternalImpl INSTANCE = new InternalImpl();
 

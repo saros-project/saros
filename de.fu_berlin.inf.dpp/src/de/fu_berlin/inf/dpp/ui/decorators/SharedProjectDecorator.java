@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.ui.decorators;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
@@ -52,7 +54,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 @Component(module = "eclipse")
 public final class SharedProjectDecorator implements ILightweightLabelDecorator {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SharedProjectDecorator.class);
 
     private static final ImageDescriptor PROJECT_DESCRIPTOR = ImageManager

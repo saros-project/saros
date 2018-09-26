@@ -22,7 +22,8 @@ package de.fu_berlin.inf.dpp.activities;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
@@ -38,7 +39,7 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 public class TextEditActivity extends AbstractResourceActivity {
 
-    private static final Logger log = Logger.getLogger(TextEditActivity.class);
+    private static final Logger log = LogManager.getLogger(TextEditActivity.class);
 
     protected final int offset;
     protected final String text;

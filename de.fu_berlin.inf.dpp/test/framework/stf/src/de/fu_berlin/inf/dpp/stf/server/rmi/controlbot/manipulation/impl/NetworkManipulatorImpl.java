@@ -8,7 +8,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
@@ -38,7 +39,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
     INetworkManipulator, IActivityConsumer, IActivityProducer,
     ISessionLifecycleListener {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(NetworkManipulatorImpl.class);
 
     private static final Random RANDOM = new Random();

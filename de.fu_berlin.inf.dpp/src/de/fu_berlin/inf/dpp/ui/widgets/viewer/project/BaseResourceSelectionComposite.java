@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -68,7 +69,7 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
 public abstract class BaseResourceSelectionComposite extends
     ViewerComposite<CheckboxTreeViewer> {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(BaseResourceSelectionComposite.class);
 
     private static final String SAROS_RESOURCE_SELECTION_PRESET_NAMES = "Saros.resource_selection.preset_names";

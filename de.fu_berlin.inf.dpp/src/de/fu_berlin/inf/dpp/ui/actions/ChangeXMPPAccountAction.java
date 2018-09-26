@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
@@ -39,7 +41,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
     public static final String ACTION_ID = ChangeXMPPAccountAction.class
         .getName();
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ChangeXMPPAccountAction.class);
 
     private Menu accountMenu;

@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.util;
 
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
@@ -10,7 +12,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogUtils {
 
-    private static Logger log = Logger.getLogger(DialogUtils.class);
+    private static Logger log = LogManager.getLogger(DialogUtils.class);
 
     private DialogUtils() {
         // no instantiation allowed

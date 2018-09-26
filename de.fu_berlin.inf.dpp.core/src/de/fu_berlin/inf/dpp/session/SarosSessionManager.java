@@ -30,7 +30,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -91,7 +93,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      *               "Invitation Process"-Tour.
      */
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(SarosSessionManager.class.getName());
 
     private static final Random SESSION_ID_GENERATOR = new Random();

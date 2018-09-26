@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
@@ -42,7 +43,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  * @author bkahlert
  */
 public class CreateXMPPAccountWizard extends Wizard {
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(CreateXMPPAccountWizard.class);
 
     @Inject

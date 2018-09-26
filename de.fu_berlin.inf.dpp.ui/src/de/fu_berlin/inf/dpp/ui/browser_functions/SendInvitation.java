@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
@@ -21,7 +22,7 @@ import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
  */
 public class SendInvitation extends TypedJavascriptFunction {
 
-    private static final Logger LOG = Logger.getLogger(SendInvitation.class);
+    private static final Logger LOG = LogManager.getLogger(SendInvitation.class);
     private static final String JS_NAME = "sendInvitation";
 
     private final ProjectListManager projectListManager;

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.synchronize.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
@@ -13,7 +14,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 // TODO rename to EclipseSWTSynchronizer
 public class SWTSynchronizer implements UISynchronizer {
 
-    private static final Logger LOG = Logger.getLogger(SWTSynchronizer.class);
+    private static final Logger LOG = LogManager.getLogger(SWTSynchronizer.class);
 
     @Override
     public void asyncExec(Runnable runnable) {

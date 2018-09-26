@@ -7,7 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -18,7 +19,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 // TODO remove the ID part here, there should only be one invitation per JID
 final class SessionNegotiationObservable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SessionNegotiationObservable.class);
 
     private final Map<JID, List<SessionNegotiation>> negotiations = new HashMap<JID, List<SessionNegotiation>>();

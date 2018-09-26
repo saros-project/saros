@@ -22,7 +22,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
 import java.security.InvalidParameterException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -36,7 +37,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  */
 public class GOTOInclusionTransformation implements InclusionTransformation {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(GOTOInclusionTransformation.class.getName());
 
     /**

@@ -3,7 +3,8 @@
  */
 package de.fu_berlin.inf.dpp.editor;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
@@ -30,7 +31,7 @@ import de.fu_berlin.inf.dpp.editor.text.LineRange;
  */
 public class EditorListener {
 
-    private static final Logger log = Logger.getLogger(EditorListener.class
+    private static final Logger log = LogManager.getLogger(EditorListener.class
         .getName());
 
     protected final EditorManager manager;

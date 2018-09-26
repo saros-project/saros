@@ -27,7 +27,10 @@ import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.session.User;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -47,7 +50,7 @@ import java.util.Set;
 public class FileSystemChangeListener extends AbstractStoppableListener
     implements VirtualFileListener {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(FileSystemChangeListener.class);
     private final SharedResourcesManager resourceManager;
 

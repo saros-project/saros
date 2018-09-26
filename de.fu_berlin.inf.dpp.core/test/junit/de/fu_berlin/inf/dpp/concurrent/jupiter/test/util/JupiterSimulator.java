@@ -8,7 +8,8 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -22,7 +23,7 @@ import de.fu_berlin.inf.dpp.session.User;
 
 public class JupiterSimulator {
 
-    private static final Logger log = Logger.getLogger(JupiterSimulator.class
+    private static final Logger log = LogManager.getLogger(JupiterSimulator.class
         .getName());
 
     public Peer client;

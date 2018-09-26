@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -20,7 +22,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 public final class RemoteBotTree extends StfRemoteObject implements
     IRemoteBotTree {
 
-    private static final Logger log = Logger.getLogger(RemoteBotTree.class);
+    private static final Logger log = LogManager.getLogger(RemoteBotTree.class);
 
     private static final RemoteBotTree INSTANCE = new RemoteBotTree();
 

@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
 import com.intellij.ide.plugins.cl.PluginClassLoader;
 import com.intellij.openapi.application.PathManager;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -16,7 +18,7 @@ import java.net.URL;
  */
 public class SwtLibLoader {
 
-    private static final Logger LOG = Logger.getLogger(SwtLibLoader.class);
+    private static final Logger LOG = LogManager.getLogger(SwtLibLoader.class);
 
     private static final String JAR_BASE_FILENAME = "swt-4.4-";
 

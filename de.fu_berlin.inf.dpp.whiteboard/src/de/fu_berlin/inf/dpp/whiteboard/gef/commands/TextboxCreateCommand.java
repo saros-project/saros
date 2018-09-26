@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGTextBoxRecord;
@@ -11,7 +12,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 
 public class TextboxCreateCommand extends ElementRecordCreateCommand {
 
-    Logger log = Logger.getLogger(TextboxCreateCommand.class);
+    Logger log = LogManager.getLogger(TextboxCreateCommand.class);
     private String Text = null;
 
     public TextboxCreateCommand() {

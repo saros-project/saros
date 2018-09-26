@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.eventhandler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -13,7 +15,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 public final class JoinSessionRejectedHandler {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(JoinSessionRejectedHandler.class);
 
     private final IReceiver receiver;

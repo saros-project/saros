@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.views;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.widgets.Composite;
@@ -33,7 +35,7 @@ public class SarosViewBrowserVersion extends ViewPart {
      */
     public static final String ID = "de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion";
     private static final String TROUBLESHOOTING_URL = "http://www.saros-project.org/troubleshooting";
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SarosViewBrowserVersion.class);
 
     private IJQueryBrowser browser;

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.standalone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.ui.actions.ActionRegistry;
@@ -14,7 +15,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
 
 public class WhiteboardContextMenuProvider extends ContextMenuProvider {
 
-    protected static Logger log = Logger
+    protected static Logger log = LogManager
         .getLogger(WhiteboardContextMenuProvider.class);
     private ActionRegistry actionRegistry;
 

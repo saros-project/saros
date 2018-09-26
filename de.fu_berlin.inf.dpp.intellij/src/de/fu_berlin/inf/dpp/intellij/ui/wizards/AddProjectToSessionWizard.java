@@ -43,7 +43,8 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
 
@@ -77,7 +78,7 @@ import java.util.Map;
 //  FIXME: Add facility for more than one project.
 
 public class AddProjectToSessionWizard extends Wizard {
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(AddProjectToSessionWizard.class);
 
     public static final String SELECT_PROJECT_PAGE_ID = "selectProject";

@@ -9,10 +9,12 @@ dependencies {
   releaseDep 'xpp3:xpp3:1.1.4c'
   releaseDep 'com.thoughtworks.xstream:xstream:1.4.10'
   releaseDep 'org.gnu.inet:libidn:1.15'
-  releaseDep log4jVersion
+  releaseDep log4jVersionCore
+  releaseDep log4jVersionApi
   // The used version is a SNAPSHOT version which is not available!
   // TODO: use real release
   releaseDep files('libs/weupnp.jar')
+  releaseDep files('libs/log4j-1.2.15.jar')
 
   compile configurations.releaseDep
   testCompile configurations.testConfig
@@ -24,17 +26,22 @@ sourceSets.test.java.srcDir 'test/junit'
 jar {
   manifest {
     from 'META-INF/MANIFEST.MF'
+    // Avoid that gradle generates import statements into the MANIFEST
     attributes('-removeheaders': 'Import-Package')
   }
 
   from sourceSets.main.output
 
+  // copy release dependencies into jar
   into('lib') {
     from configurations.getByName('releaseDep')
   }
+  from 'log4j2.xml'
+  from 'saros_log4j2.xml'
 }
 
 test {
+  systemProperty 'log4j.configurationFile', 'log4j2.xml'
   exclude '**/Abstract*'
   // Avoid to execute the tests twice
 }

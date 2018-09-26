@@ -4,7 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.MissingRecordException;
@@ -29,7 +30,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.MissingRecordException;
  */
 public class DocumentRecord {
 
-    private static final Logger log = Logger.getLogger(DocumentRecord.class);
+    private static final Logger log = LogManager.getLogger(DocumentRecord.class);
 
     private final SXEController controller;
 

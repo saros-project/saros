@@ -46,7 +46,10 @@ import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,7 +66,7 @@ import java.util.Set;
 public class EditorManager extends AbstractActivityProducer
     implements IEditorManager {
 
-    private static final Logger LOG = Logger.getLogger(EditorManager.class);
+    private static final Logger LOG = LogManager.getLogger(EditorManager.class);
 
     private final Blockable stopManagerListener = new Blockable() {
 

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -34,7 +35,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 @Component(module = "integration")
 public class StartupSaros implements IStartup {
 
-    private static final Logger LOG = Logger.getLogger(StartupSaros.class);
+    private static final Logger LOG = LogManager.getLogger(StartupSaros.class);
 
     @Inject
     private IContainerContext context;

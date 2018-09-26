@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.session.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.Startable;
@@ -21,7 +23,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class LeaveAndKickHandler implements Startable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(LeaveAndKickHandler.class.getName());
 
     private final ISarosSession session;

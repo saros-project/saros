@@ -72,13 +72,15 @@ public class ConcurrentEditingTest extends StfTestCase {
         BOB.remoteBot().editor(FILE).waitUntilIsActive();
 
         Thread.sleep(waitActivate);
-        ALICE.remoteBot().editor(FILE).pressShortcut(IKeyLookup.BACKSPACE_NAME);
+        ALICE.remoteBot().editor(FILE)
+            .pressShortcut(new String[] { IKeyLookup.BACKSPACE_NAME } );
 
         BOB.remoteBot().editor(FILE).typeText("L");
         // both sleep for less than 1000ms
 
         // Alice hits Delete again
-        ALICE.remoteBot().editor(FILE).pressShortcut(IKeyLookup.BACKSPACE_NAME);
+        ALICE.remoteBot().editor(FILE)
+            .pressShortcut(new String[] { IKeyLookup.BACKSPACE_NAME } );
         // Bob enters o
         BOB.remoteBot().editor(FILE).typeText("o");
 

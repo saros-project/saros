@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.gson.Gson;
 
@@ -37,7 +38,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 class TypedJavascriptFunction extends SelfRegisteringJavascriptFunction {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(TypedJavascriptFunction.class);
 
     private static final String JS_NAME_CONVENTION = "__java_{0}";

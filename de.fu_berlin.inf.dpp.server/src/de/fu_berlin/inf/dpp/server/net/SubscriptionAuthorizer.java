@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.server.net;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -14,7 +15,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionListener;
 @Component(module = "server")
 public class SubscriptionAuthorizer implements SubscriptionListener {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SubscriptionAuthorizer.class);
 
     private SubscriptionHandler subscriptionHandler;

@@ -5,7 +5,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
@@ -30,7 +31,7 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements
     IRemoteHTMLView {
 
     private static final RemoteHTMLView INSTANCE = new RemoteHTMLView();
-    private static final Logger log = Logger.getLogger(RemoteHTMLView.class);
+    private static final Logger log = LogManager.getLogger(RemoteHTMLView.class);
 
     public static RemoteHTMLView getInstance() {
         return INSTANCE;

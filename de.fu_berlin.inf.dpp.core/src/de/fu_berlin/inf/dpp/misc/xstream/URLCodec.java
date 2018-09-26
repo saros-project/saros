@@ -4,7 +4,9 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Simple wrapper around {@link org.apache.commons.codec.net.URLCodec} using
@@ -12,7 +14,7 @@ import org.apache.log4j.Logger;
  */
 class URLCodec {
 
-    private static final Logger LOG = Logger.getLogger(URLCodec.class);
+    private static final Logger LOG = LogManager.getLogger(URLCodec.class);
 
     private static final Charset CHARSET = Charset.forName("UTF-8");
 

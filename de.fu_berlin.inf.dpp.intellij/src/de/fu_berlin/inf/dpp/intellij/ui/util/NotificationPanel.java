@@ -9,14 +9,17 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.annotations.Inject;
 
 /**
  * Class uses IntelliJ API to show notifications
  */
 public class NotificationPanel {
-    private static final Logger LOG = Logger.getLogger(NotificationPanel.class);
+    private static final Logger LOG = LogManager.getLogger(NotificationPanel.class);
 
     private static final String GROUP_NOTIFICATION_ID = "sarosNotification";
     private static final NotificationGroup GROUP_DISPLAY_ID_INFO = new NotificationGroup(

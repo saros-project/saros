@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
@@ -40,7 +42,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
     public static final String ACTION_ID = FollowThisPersonAction.class
         .getName();
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(FollowThisPersonAction.class);
 
     protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {

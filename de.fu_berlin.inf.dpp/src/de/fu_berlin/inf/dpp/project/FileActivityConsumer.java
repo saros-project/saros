@@ -4,7 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -22,7 +23,7 @@ import de.fu_berlin.inf.dpp.util.FileUtils;
 public class FileActivityConsumer extends AbstractActivityConsumer implements
     Startable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(FileActivityConsumer.class);
 
     private final ISarosSession session;

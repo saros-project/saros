@@ -7,7 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
@@ -16,7 +17,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 // Accepts incoming TCP connections
 public class TCPServer {
 
-    private static final Logger LOG = Logger.getLogger(TCPServer.class);
+    private static final Logger LOG = LogManager.getLogger(TCPServer.class);
 
     private ServerSocket server;
 

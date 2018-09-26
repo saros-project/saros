@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.eventhandler;
 
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -16,7 +18,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
  */
 public class XMPPAuthorizationHandler {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(XMPPAuthorizationHandler.class);
 
     private final SubscriptionHandler subscriptionHandler;

@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.monitoring.remote;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity.ProgressAction;
@@ -18,7 +19,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  */
 class RemoteProgressMonitor implements IProgressMonitor {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(RemoteProgressMonitor.class);
 
     private final RemoteProgressManager rpm;

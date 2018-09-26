@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.synchronize;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -14,7 +15,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  */
 public class StartHandle {
 
-    private static final Logger log = Logger.getLogger(StartHandle.class);
+    private static final Logger log = LogManager.getLogger(StartHandle.class);
 
     protected StopManager stopManager;
 

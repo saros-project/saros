@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -42,7 +44,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 @Component(module = "net")
 public class SkypeManager implements IConnectionListener {
-    private final Logger log = Logger.getLogger(SkypeManager.class);
+    private final Logger log = LogManager.getLogger(SkypeManager.class);
 
     protected XStreamExtensionProvider<String> skypeProvider = new XStreamExtensionProvider<String>(
         SarosPacketExtension.EXTENSION_NAMESPACE, "skypeInfo");

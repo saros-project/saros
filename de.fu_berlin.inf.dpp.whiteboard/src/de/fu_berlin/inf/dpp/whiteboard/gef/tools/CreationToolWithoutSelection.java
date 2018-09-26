@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.tools;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.tools.CreationTool;
@@ -16,7 +17,7 @@ import org.eclipse.gef.tools.CreationTool;
  */
 public class CreationToolWithoutSelection extends CreationTool {
 
-    Logger log = Logger.getLogger(CreationToolWithoutSelection.class);
+    Logger log = LogManager.getLogger(CreationToolWithoutSelection.class);
 
     @Override
     protected Request createTargetRequest() {

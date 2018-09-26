@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ActivityOptimizer;
@@ -35,7 +37,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public final class ActivityHandler implements Startable {
 
-    private static final Logger LOG = Logger.getLogger(ActivityHandler.class);
+    private static final Logger LOG = LogManager.getLogger(ActivityHandler.class);
 
     /** join timeout when stopping this component */
     private static final long TIMEOUT = 10000;

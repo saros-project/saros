@@ -12,7 +12,8 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +38,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
     private static final String KEY_AVAILABLE_TYPES = "availableModuleTypes";
     private static final String KEY_TYPE_MAPPINGS = "typeMappings";
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ModuleTypeNegotiationHook.class);
 
     private final ISarosSessionManager sessionManager;

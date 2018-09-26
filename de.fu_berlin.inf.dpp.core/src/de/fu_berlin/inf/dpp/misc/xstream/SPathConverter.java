@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.misc.xstream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import com.thoughtworks.xstream.converters.Converter;
@@ -32,7 +34,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 @Component
 public class SPathConverter implements Converter, Startable {
 
-    private static final Logger LOG = Logger.getLogger(SPathConverter.class);
+    private static final Logger LOG = LogManager.getLogger(SPathConverter.class);
 
     private static final String PATH = "p";
     private static final String PROJECT_ID = "i";

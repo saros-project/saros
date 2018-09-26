@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.ui.util;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
@@ -29,7 +31,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.dialogs.ConfigurationWizardDialog;
  * Utility class for {@link IWizard}s
  */
 public class WizardUtils {
-    private static final Logger log = Logger.getLogger(WizardUtils.class
+    private static final Logger log = LogManager.getLogger(WizardUtils.class
         .getName());
 
     /**

@@ -4,15 +4,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.LoggerContext;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -43,7 +48,7 @@ import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 public class ErrorLogManager extends AbstractFeedbackManager implements
     Startable {
 
-    private static final Logger log = Logger.getLogger(ErrorLogManager.class
+    private static final Logger log = LogManager.getLogger(ErrorLogManager.class
         .getName());
 
     private static final String ERROR_LOG_UPLOAD_URL = System
@@ -156,14 +161,16 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      *         determined
      */
     public static String getErrorLogLocation(String appenderName) {
-        Enumeration<?> appenders = Logger.getRootLogger().getAllAppenders();
-
-        while (appenders.hasMoreElements()) {
-            Appender app = (Appender) appenders.nextElement();
+        Map<String, Appender> appenders = ((LoggerContext) LogManager.getContext()).getConfiguration().getAppenders();
+        Iterator it = appenders.entrySet().iterator();
+        
+        while (it.hasNext()) {
+            Map.Entry<String, Appender> pair = (Map.Entry<String, Appender>) it.next();
+            Appender app = pair.getValue();
             if (app instanceof FileAppender) {
                 // find a FileAppender with the given Name
                 if (app.getName().equals(appenderName))
-                    return ((FileAppender) app).getFile();
+                    return ((FileAppender) app).getFileName();
             }
         }
         return null;

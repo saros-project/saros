@@ -10,7 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -45,7 +46,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
  */
 public class ContributionAnnotationManager {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(ContributionAnnotationManager.class);
 
     static final int MAX_HISTORY_LENGTH = 20;

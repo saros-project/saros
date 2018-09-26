@@ -12,7 +12,10 @@ import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JMenu;
@@ -32,7 +35,7 @@ import java.util.List;
  */
 class ContactPopMenu extends JPopupMenu {
 
-    private static final Logger LOG = Logger.getLogger(ContactPopMenu.class);
+    private static final Logger LOG = LogManager.getLogger(ContactPopMenu.class);
 
     @Inject
     private IWorkspace workspace;

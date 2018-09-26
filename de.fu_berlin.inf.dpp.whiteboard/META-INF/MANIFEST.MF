@@ -1,5 +1,4 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
+Manifest-Version: 1.0 Bundle-ManifestVersion: 2
 Bundle-Name: Whiteboard Plug-in
 Bundle-SymbolicName: de.fu_berlin.inf.dpp.whiteboard; singleton:=true
 Bundle-Version: 14.11.28.DEVEL
@@ -14,5 +13,5 @@ Require-Bundle: org.eclipse.ui,
  de.fu_berlin.inf.dpp
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- lib/log4j-1.2.16.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+ lib/log4j-api-2.11.1.jar
+ lib/log4j-core-2.11.1.jar

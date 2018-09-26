@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.eventhandler;
 
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
@@ -20,7 +22,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 public final class SessionStatusRequestHandler {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SessionStatusRequestHandler.class);
 
     private final ISarosSessionManager sessionManager;

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -15,7 +16,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 
 public class SVGTextBoxRecord extends LayoutElementRecord {
 
-    Logger log = Logger.getLogger(SVGTextBoxRecord.class);
+    Logger log = LogManager.getLogger(SVGTextBoxRecord.class);
     private String text;
 
     public String getText() {

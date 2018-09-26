@@ -6,7 +6,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.IControlBot;
@@ -24,7 +25,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
  */
 class RealTester implements AbstractTester {
 
-    private static final Logger log = Logger.getLogger(RealTester.class);
+    private static final Logger log = LogManager.getLogger(RealTester.class);
 
     private IRemoteWorkbenchBot bot;
     private ISuperBot superBot;

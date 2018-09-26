@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.misc.xstream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.thoughtworks.xstream.converters.ConverterMatcher;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
@@ -17,7 +18,7 @@ import com.thoughtworks.xstream.converters.SingleValueConverter;
 class ReplaceableSingleValueConverter extends Replaceable<SingleValueConverter>
     implements SingleValueConverter {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ReplaceableSingleValueConverter.class);
 
     /**

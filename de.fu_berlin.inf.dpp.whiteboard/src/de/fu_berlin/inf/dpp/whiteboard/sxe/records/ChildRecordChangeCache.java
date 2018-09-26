@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 
@@ -38,7 +39,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
  */
 public class ChildRecordChangeCache {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(ChildRecordChangeCache.class);
 
     /**

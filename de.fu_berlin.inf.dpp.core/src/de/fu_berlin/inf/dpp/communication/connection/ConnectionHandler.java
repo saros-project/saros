@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPException;
@@ -31,7 +33,7 @@ import de.fu_berlin.inf.dpp.preferences.Preferences;
 // TODO better name
 public class ConnectionHandler {
 
-    private static final Logger LOG = Logger.getLogger(ConnectionHandler.class);
+    private static final Logger LOG = LogManager.getLogger(ConnectionHandler.class);
 
     private static final boolean MDNS_MODE = Boolean
         .getBoolean("de.fu_berlin.inf.dpp.net.ENABLE_MDNS");

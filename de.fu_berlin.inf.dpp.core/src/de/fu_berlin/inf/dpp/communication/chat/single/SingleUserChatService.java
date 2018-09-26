@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ChatManagerListener;
@@ -25,7 +27,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 public class SingleUserChatService extends AbstractChatService {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(SingleUserChatService.class);
 
     private IConnectionListener connectionLister = new IConnectionListener() {

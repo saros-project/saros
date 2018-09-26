@@ -10,14 +10,16 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * This class applies the logic for activities that were received from remote.
  */
 public class LocalEditorManipulator {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(LocalEditorManipulator.class);
 
     private final ProjectAPI projectAPI;

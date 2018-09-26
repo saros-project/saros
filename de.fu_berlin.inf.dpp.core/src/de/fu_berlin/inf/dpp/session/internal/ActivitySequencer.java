@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -58,7 +60,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class ActivitySequencer implements Startable {
 
-    private static final Logger LOG = Logger.getLogger(ActivitySequencer.class
+    private static final Logger LOG = LogManager.getLogger(ActivitySequencer.class
         .getName());
 
     /** join timeout when stopping this component */

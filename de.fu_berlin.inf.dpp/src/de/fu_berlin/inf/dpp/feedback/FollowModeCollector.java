@@ -5,7 +5,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
@@ -28,7 +29,7 @@ import de.fu_berlin.inf.dpp.session.User;
 @Component(module = "feedback")
 public class FollowModeCollector extends AbstractStatisticCollector {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(FollowModeCollector.class);
 
     /**

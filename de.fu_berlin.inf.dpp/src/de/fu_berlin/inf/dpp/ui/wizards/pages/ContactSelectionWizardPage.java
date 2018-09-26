@@ -2,7 +2,8 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -30,7 +31,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionList
  * @author bkahlert
  */
 public class ContactSelectionWizardPage extends WizardPage {
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ContactSelectionWizardPage.class);
 
     protected static final String TITLE = Messages.ContactSelectionWizardPage_title;

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.draw2d.AbstractPointListShape;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Polyline;
@@ -27,7 +28,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
  * 
  */
 public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy {
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(XYLayoutWithFreehandEditPolicy.class);
 
     public static final String REQ_CREATE_POINTLIST = "create pointlist";

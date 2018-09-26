@@ -4,7 +4,9 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Tracks modifications of documents opened in editors.
@@ -17,7 +19,7 @@ import org.apache.log4j.Logger;
 public class StoppableDocumentListener extends AbstractStoppableListener
     implements DocumentListener {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(StoppableDocumentListener.class);
 
     public StoppableDocumentListener(EditorManager editorManager) {

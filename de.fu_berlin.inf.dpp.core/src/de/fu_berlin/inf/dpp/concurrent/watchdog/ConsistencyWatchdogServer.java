@@ -10,7 +10,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
@@ -43,7 +45,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 public class ConsistencyWatchdogServer extends AbstractActivityProducer
     implements Startable, Blockable {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ConsistencyWatchdogServer.class);
 
     private static final long CHECKSUM_CALCULATION_INTERVAL = 10000;

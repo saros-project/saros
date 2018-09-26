@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.ui.ide_embedding;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.ag_se.browser.IBrowser;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
@@ -20,7 +21,7 @@ import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
  */
 public abstract class DialogManager {
 
-    private static final Logger LOG = Logger.getLogger(DialogManager.class);
+    private static final Logger LOG = LogManager.getLogger(DialogManager.class);
 
     private Map<String, IBrowserDialog> openDialogs = new HashMap<String, IBrowserDialog>();
 

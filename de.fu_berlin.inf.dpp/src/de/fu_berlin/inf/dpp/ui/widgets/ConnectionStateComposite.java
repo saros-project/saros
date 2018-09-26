@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.widgets;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
@@ -25,7 +27,7 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 public class ConnectionStateComposite extends Composite {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(ConnectionStateComposite.class);
 
     private static final String CONNECTED_TOOLTIP = Messages.ConnectionStateComposite_tooltip_connected;

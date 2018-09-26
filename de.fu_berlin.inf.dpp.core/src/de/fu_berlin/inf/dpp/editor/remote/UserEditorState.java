@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -21,7 +22,7 @@ import de.fu_berlin.inf.dpp.session.IActivityConsumer;
  */
 public class UserEditorState {
 
-    private static final Logger LOG = Logger.getLogger(UserEditorState.class);
+    private static final Logger LOG = LogManager.getLogger(UserEditorState.class);
 
     private final LinkedHashMap<SPath, EditorState> openEditors = new LinkedHashMap<SPath, EditorState>();
 

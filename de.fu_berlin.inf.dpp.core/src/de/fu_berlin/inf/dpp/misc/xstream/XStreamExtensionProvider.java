@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
@@ -53,7 +55,7 @@ import com.thoughtworks.xstream.io.xml.CompactWriter;
 public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
     IQProvider {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(XStreamExtensionProvider.class);
 
     private static volatile ClassLoader currentClassloader;

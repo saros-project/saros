@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.commands.CompoundCommand;
 
@@ -18,7 +19,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
  */
 public class SXECompoundCommand extends CompoundCommand {
 
-    private static final Logger log = Logger.getLogger(SXECommand.class);
+    private static final Logger log = LogManager.getLogger(SXECommand.class);
 
     @Override
     public final void execute() {

@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.part.FileEditorInput;
 
@@ -40,7 +41,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  */
 public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
-    private static final Logger log = Logger
+    private static final Logger log = LogManager
         .getLogger(RemoteWriteAccessManager.class);
 
     /** stores users and their opened files (identified by their path) */

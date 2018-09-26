@@ -4,7 +4,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -37,7 +38,7 @@ import de.fu_berlin.inf.dpp.util.Predicate;
  */
 public class LocationAnnotationManager {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(LocationAnnotationManager.class);
 
     private AnnotationModelHelper annotationModelHelper;

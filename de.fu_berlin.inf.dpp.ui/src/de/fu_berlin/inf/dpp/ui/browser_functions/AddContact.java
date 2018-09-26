@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
@@ -14,7 +16,7 @@ import de.fu_berlin.inf.dpp.ui.core_facades.RosterFacade;
  */
 public class AddContact extends TypedJavascriptFunction {
 
-    private static final Logger LOG = Logger.getLogger(AddContact.class);
+    private static final Logger LOG = LogManager.getLogger(AddContact.class);
 
     public static final String JS_NAME = "addContact";
 

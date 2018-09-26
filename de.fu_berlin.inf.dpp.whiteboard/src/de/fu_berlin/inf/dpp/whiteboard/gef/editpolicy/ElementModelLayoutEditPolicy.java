@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy;
 import java.util.Arrays;
 
 import org.apache.batik.util.SVGConstants;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.PointList;
@@ -40,7 +41,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.util.LayoutUtils;
 public class ElementModelLayoutEditPolicy extends
     XYLayoutWithFreehandEditPolicy {
 
-    private static Logger log = Logger
+    private static Logger log = LogManager
         .getLogger(ElementModelLayoutEditPolicy.class);
 
     /* minimum values for resizing and drag creation */

@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -61,7 +63,7 @@ public class SendFileAction extends Action implements Disposable {
 
     public static final String ACTION_ID = SendFileAction.class.getName();
 
-    private static final Logger LOG = Logger.getLogger(SendFileAction.class);
+    private static final Logger LOG = LogManager.getLogger(SendFileAction.class);
 
     // static smack ****
     static {

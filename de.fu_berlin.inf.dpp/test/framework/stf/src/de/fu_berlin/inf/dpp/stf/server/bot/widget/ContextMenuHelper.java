@@ -7,7 +7,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -25,7 +27,7 @@ import org.hamcrest.Matcher;
 
 public class ContextMenuHelper {
 
-    private static final Logger log = Logger.getLogger(ContextMenuHelper.class);
+    private static final Logger log = LogManager.getLogger(ContextMenuHelper.class);
 
     /**
      * Clicks the context menu item matching the text nodes.

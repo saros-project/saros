@@ -5,7 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
@@ -43,7 +44,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SXEUtils;
  */
 public class SXEController extends AbstractSXEMessageHandler {
 
-    private static final Logger log = Logger.getLogger(SXEController.class);
+    private static final Logger log = LogManager.getLogger(SXEController.class);
 
     public enum State {
         DISCONNECTED, INIT, CONNECTING, CONNECTED;

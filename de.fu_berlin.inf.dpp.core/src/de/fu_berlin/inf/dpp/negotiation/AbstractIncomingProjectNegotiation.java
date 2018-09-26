@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
@@ -47,7 +49,7 @@ import de.fu_berlin.inf.dpp.session.SessionEndReason;
  */
 public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiation {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(AbstractIncomingProjectNegotiation.class);
 
     private static int MONITOR_WORK_SCALE = 1000;

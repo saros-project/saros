@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.actions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -22,7 +23,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.util.IconUtils;
  */
 public class ChangeBackgroundColorAction extends Action implements
     ColorListener {
-    private static final Logger log = Logger.getLogger(ChangeColorAction.class);
+    private static final Logger log = LogManager.getLogger(ChangeColorAction.class);
 
     public static final String ACTION_ID = "backgroundColor";
     public static final String ACTION_TEXT = "Background Color";

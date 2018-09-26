@@ -5,7 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
@@ -23,7 +24,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
  */
 public class DirtyStateListener implements IElementStateListener {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(DirtyStateListener.class);
 
     private final EditorManager editorManager;

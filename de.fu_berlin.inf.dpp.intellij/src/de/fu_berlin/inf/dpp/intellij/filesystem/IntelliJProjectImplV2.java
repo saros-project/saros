@@ -13,7 +13,9 @@ import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +45,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
     public static final String RELOAD_STUB_MODULE_TYPE =
         "SAROS_RELOAD_STUB_MODULE";
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(IntelliJProjectImplV2.class);
 
     // Module names are unique (even among different projects)

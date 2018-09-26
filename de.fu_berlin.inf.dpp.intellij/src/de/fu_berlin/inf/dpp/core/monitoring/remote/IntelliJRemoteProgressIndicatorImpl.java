@@ -11,7 +11,9 @@ import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 final class IntelliJRemoteProgressIndicatorImpl
     implements IRemoteProgressIndicator {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(IntelliJRemoteProgressIndicatorImpl.class);
 
     private final RemoteProgressManager rpm;

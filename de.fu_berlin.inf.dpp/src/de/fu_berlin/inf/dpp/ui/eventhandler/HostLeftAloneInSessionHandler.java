@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.eventhandler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -27,7 +29,7 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
  */
 public class HostLeftAloneInSessionHandler {
 
-    private static Logger LOG = Logger
+    private static Logger LOG = LogManager
         .getLogger(HostLeftAloneInSessionHandler.class);
 
     private final ISarosSessionManager sessionManager;

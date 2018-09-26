@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
@@ -22,7 +23,7 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 public class JupiterDocumentServer {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(JupiterDocumentServer.class);
 
     /**

@@ -16,7 +16,9 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Nullable;
 
@@ -47,7 +49,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 public class DataTransferManager implements IConnectionListener,
     IConnectionManager {
 
-    private static final Logger LOG = Logger
+    private static final Logger LOG = LogManager
         .getLogger(DataTransferManager.class);
 
     private static final int CHUNKSIZE = 16 * 1024;
