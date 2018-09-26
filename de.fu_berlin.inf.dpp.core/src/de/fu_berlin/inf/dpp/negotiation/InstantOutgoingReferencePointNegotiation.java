@@ -45,11 +45,11 @@ import de.fu_berlin.inf.dpp.synchronize.StartHandle;
  * Share Projects to display them instant on client side using a stream based
  * solution.
  */
-public class InstantOutgoingProjectNegotiation extends
+public class InstantOutgoingReferencePointNegotiation extends
     AbstractOutgoingReferencePointNegotiation {
 
     private static final Logger log = Logger
-        .getLogger(InstantOutgoingProjectNegotiation.class);
+        .getLogger(InstantOutgoingReferencePointNegotiation.class);
 
     /** used as LIFO queue **/
     private final Deque<SPath> openedFiles = new LinkedBlockingDeque<SPath>();
@@ -68,7 +68,7 @@ public class InstantOutgoingProjectNegotiation extends
     private List<StartHandle> stoppedUsers = null;
     private User remoteUser = null;
 
-    public InstantOutgoingProjectNegotiation(final JID peer, //
+    public InstantOutgoingReferencePointNegotiation(final JID peer, //
         final List<IReferencePoint> referencePoints, //
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //
