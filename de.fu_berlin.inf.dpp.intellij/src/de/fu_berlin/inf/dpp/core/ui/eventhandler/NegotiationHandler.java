@@ -182,7 +182,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
             }
 
-            sessionManager.startSharingProjects(negotiation.getPeer());
+            sessionManager.startSharingReferencePoint(negotiation.getPeer());
 
             return Status.OK_STATUS;
         }

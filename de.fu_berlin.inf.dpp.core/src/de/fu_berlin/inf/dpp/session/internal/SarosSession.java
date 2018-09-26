@@ -222,9 +222,10 @@ public final class SarosSession implements ISarosSession {
      * Constructor for host.
      */
     public SarosSession(final String id, IPreferenceStore properties,
-        IContainerContext containerContext) {
+        IContainerContext containerContext,
+        IReferencePointManager referencePointManager) {
         this(id, containerContext, properties, /* unused */
-        null, /* unused */null);
+        null, /* unused */null, referencePointManager);
     }
 
     /**
@@ -233,7 +234,8 @@ public final class SarosSession implements ISarosSession {
     public SarosSession(final String id, JID hostJID,
         IPreferenceStore localProperties, IPreferenceStore hostProperties,
         IContainerContext containerContext) {
-        this(id, containerContext, localProperties, hostJID, hostProperties);
+        this(id, containerContext, localProperties, hostJID, hostProperties,
+            new ReferencePointManager());
     }
 
     @Override
@@ -1090,7 +1092,8 @@ public final class SarosSession implements ISarosSession {
 
     private SarosSession(final String id, IContainerContext context,
         IPreferenceStore localProperties, JID host,
-        IPreferenceStore hostProperties) {
+        IPreferenceStore hostProperties,
+        IReferencePointManager referencePointManager) {
 
         context.initComponent(this);
 
@@ -1136,7 +1139,7 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(IActivityHandlerCallback.class,
             activityCallback);
         sessionContainer.addComponent(IReferencePointManager.class,
-            new ReferencePointManager());
+            referencePointManager);
         ISarosSessionContextFactory factory = context
             .getComponent(ISarosSessionContextFactory.class);
         factory.createComponents(this, sessionContainer);

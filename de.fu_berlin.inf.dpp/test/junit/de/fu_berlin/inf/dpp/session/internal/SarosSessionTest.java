@@ -64,6 +64,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
 import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.project.internal.SarosEclipseSessionContextFactory;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
@@ -234,6 +235,15 @@ public class SarosSessionTest {
         return receiver;
     }
 
+    private IReferencePointManager createReferencePointManagerMock() {
+        IReferencePointManager referencePointManager;
+
+        referencePointManager = createMock(IReferencePointManager.class);
+        replay(referencePointManager);
+
+        return referencePointManager;
+    }
+
     private void addMockedComponent(Class<?> clazz) {
         Object mock = createNiceMock(clazz);
         replay(mock);
@@ -327,10 +337,11 @@ public class SarosSessionTest {
         createWorkspaceMock(workspaceListeners);
 
         final IContainerContext context = createContextMock(container);
+        final IReferencePointManager referencePointManager = createReferencePointManagerMock();
 
         // Test creating, starting and stopping the session.
         SarosSession session = new SarosSession(SAROS_SESSION_ID,
-            new PreferenceStore(), context);
+            new PreferenceStore(), context, referencePointManager);
 
         assertFalse(session.hasActivityConsumers());
         assertFalse(session.hasActivityProducers());

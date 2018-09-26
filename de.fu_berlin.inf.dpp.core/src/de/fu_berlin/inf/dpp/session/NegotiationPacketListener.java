@@ -140,7 +140,7 @@ final class NegotiationPacketListener {
                 return;
             }
 
-            projectNegotiationRequest(new JID(packet.getFrom()),
+            referencePointNegotiationRequest(new JID(packet.getFrom()),
                 extension.getNegotiationID(), extension.getTransferType(),
                 extension.getProjectNegotiationData());
         }
@@ -279,14 +279,14 @@ final class NegotiationPacketListener {
         }
     }
 
-    private void projectNegotiationRequest(final JID sender,
+    private void referencePointNegotiationRequest(final JID sender,
         final String negotiationID, final TransferType transferType,
         final List<ReferencePointNegotiationData> projectNegotiationData) {
 
         LOG.info("received project negotiation from " + sender
             + " with negotiation id: " + negotiationID);
 
-        sessionManager.projectNegotiationRequestReceived(sender, transferType,
+        sessionManager.referencePointpointNegotiationRequestReceived(sender, transferType,
             projectNegotiationData, negotiationID);
     }
 }
