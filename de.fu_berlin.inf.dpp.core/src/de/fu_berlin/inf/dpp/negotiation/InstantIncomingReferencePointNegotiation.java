@@ -32,13 +32,13 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
  * Receive shared Projects and display them instant using a stream based
  * solution.
  */
-public class InstantIncomingProjectNegotiation extends
+public class InstantIncomingReferencePointNegotiation extends
     AbstractIncomingReferencePointNegotiation {
 
     private static final Logger log = Logger
-        .getLogger(InstantIncomingProjectNegotiation.class);
+        .getLogger(InstantIncomingReferencePointNegotiation.class);
 
-    public InstantIncomingProjectNegotiation(
+    public InstantIncomingReferencePointNegotiation(
         final JID peer, //
         final String negotiationID, //
         final List<ReferencePointNegotiationData> projectNegotiationData, //
