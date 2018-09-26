@@ -125,7 +125,7 @@ public final class NegotiationFactory {
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);
         case INSTANT:
-            return new InstantOutgoingProjectNegotiation(remoteAddress,
+            return new InstantOutgoingReferencePointNegotiation(remoteAddress,
                 referencePoints, sessionManager, session, /* editorManager */
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);
