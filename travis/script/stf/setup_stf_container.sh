@@ -12,12 +12,17 @@ if [[ -z "$ws_dir" || ! -e "$ws_dir" ]]; then
   exit 1
 fi
 
+[ -z "$SCRIPT_DIR" ] && echo "ERROR: Environment variable SCRIPT_DIR is not set" && exit 1
+[ -z "$CONFIG_DIR" ] && echo "ERROR: Environment variable CONFIG_DIR is not set" && exit 1
 
 . $SCRIPT_DIR/shared_vars.sh
 . $SCRIPT_DIR/master_setup_utils.sh
 . $SCRIPT_DIR/slave_setup_utils.sh
 . $SCRIPT_DIR/xmpp_setup_utils.sh
 
+
+[ -d "$STF_HOST_WS" ] && rm -r $STF_HOST_WS
+mkdir -p $STF_HOST_WS
 
 ####### Start required containers
 
