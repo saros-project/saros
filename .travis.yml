@@ -5,6 +5,10 @@ sudo: enabled
 git:
   depth: false
 
+# Override the install default behavior that calls gradle assemble
+install:
+- true
+
 notifications:
   email:
     on_success: never
@@ -26,14 +30,11 @@ _stf_setup_config: &stf_before_script
   env: J_TYPE=STF_TEST
   before_script:
     # Pull required images
-    - docker pull saros/build_test:0.1
-    - docker pull saros/stf_test_master:0.1
-    - docker pull saros/stf_test_slave:0.1
-    - docker pull saros/stf_xmpp_server:0.1
+    - docker pull saros/ci_build:0.2
+    - docker pull saros/stf_test_slave:0.2
+    - docker pull saros/stf_xmpp_server:0.2
     # Create shared workspace dir which is mounted by the build, master and slave containers
     - mkdir stf_ws
-    # Build required artifacts and move them in the shared workspace
-    - docker run -t -v $PWD:/home/saros/ci/saros_src -v $PWD/stf_ws:/home/saros/ci/stf_ws saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/stf/build/provide_testee.sh
     # Start required containers and services
     - export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf; $PWD/travis/script/stf/setup_stf_container.sh $PWD
 
@@ -43,9 +44,9 @@ jobs:
     - env: J_TYPE=STF_TEST
   include:
     - if: type in (push, pull_request)
-      before_script: docker pull saros/build_test:0.1
+      before_script: docker pull saros/ci_build:0.2
       script:
-        - docker run -v $PWD:/home/saros/ci/saros_src saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/build/build_all.sh
+        - docker run -v $PWD:/home/ci/saros_src saros/ci_build:0.2 /home/ci/saros_src/travis/script/build/build_all.sh
       after_success:
         - sonar-scanner
       # set env to avoid multiple build executions

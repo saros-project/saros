@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 # Has to be called within a stf_slave container
 # params DISPLAY, user(e.g: Alice, Bob), PORT
 
@@ -15,7 +15,7 @@ if [ ! -x $java_cmd ]; then
   exit 1
 fi
 
-host_ip=`/sbin/ifconfig eth0 | grep "inet addr" | cut -d ":" -f 2 | cut -d " " -f 1`
+host_ip=`/sbin/ifconfig eth0 | grep "inet" | awk '{print $2}'`
 
 eclipse_dir="/eclipse"
 eclipse_plugin_dir="${eclipse_dir}/plugins"
@@ -27,27 +27,18 @@ plugin_id_prefix="de.fu_berlin.inf.dpp"
 saros_plugin_dir="${STF_WS}/plugins"
 
 # determine (versioned) filename of plugin (_ suppresses .source versions)
-saros_plugin_filename=`ls -1 $saros_plugin_dir | grep "${plugin_id_prefix}_[0-9]*"`
-
-if [ ! -d "$STF_WS/e_plugins" ]; then
-  mkdir $STF_WS/e_plugins
-  cp -r $eclipse_plugin_dir/* $STF_WS/e_plugins/
-fi
+saros_plugin_filename=`ls -1 $saros_plugin_dir | grep "$plugin_id_prefix.jar"`
 
 if [ -z $saros_plugin_filename ]; then
   echo "cannot find Saros plugin in $saros_plugin_dir"
   exit 1
 fi
 
-echo "deleting workspace: ${workspace}"
-rm -rf "${workspace}"
 
-if [ ! -e "${saros_plugin_dir}/.lock" ]; then
-  touch "${saros_plugin_dir}/.lock"
-  echo "deleting old plugin(s)"
-  rm -f "${eclipse_dropin_dir}/de.fu_berlin.inf"*
+dropins_content=$(ls -1 $eclipse_dropin_dir)
+if [ -z "$dropins_content" ]; then
   echo "installing plugins via dropin directory"
-  cp "${saros_plugin_dir}/de.fu_berlin.inf"* "${eclipse_dropin_dir}"
+  cp -v "${saros_plugin_dir}/de.fu_berlin.inf"* "${eclipse_dropin_dir}"
 fi
 
 mkdir -p "${workspace}"
@@ -65,15 +56,12 @@ printf "grant{\npermission java.security.AllPermission;\n};" > "${workspace}/stf
 
 # get path to equinox jar inside eclipse home folder
 
-CLASSPATH=$(find "${eclipse_plugin_dir}" -name "org.eclipse.equinox.launcher_*.jar" | sort | tail -1);
-
-CLASSPATH="${CLASSPATH}:${COBERTURA_HOME}/cobertura.jar"
-
 LD_LIBRARY_PATH=/usr/lib/jni:${LD_LIBRARY_PATH}
 
 export LD_LIBRARY_PATH
 export DISPLAY
 export CLASSPATH
+export SWT_GTK3=0
 
 echo "starting Eclipse for user ${user}"
 
@@ -83,9 +71,13 @@ $java_cmd -version
 
 echo $LD_LIBRARY_PATH
 echo $DISPLAY
-echo $CLASSPATH
 
-$java_cmd \
+$eclipse_dir/eclipse \
+  -name "eclipse_${user}" \
+  -consoleLog \
+  -data "${workspace}" \
+  -vm "$java_cmd" \
+  -vmargs \
   -XX:MaxPermSize=192m -Xms384m -Xmx512m -ea \
   -Djava.rmi.server.codebase="file:${saros_plugin_filename}" \
   -Djava.security.manager \
@@ -97,10 +89,5 @@ $java_cmd \
   -Dorg.eclipse.swtbot.keyboard.strategy=org.eclipse.swtbot.swt.finder.keyboard.MockKeyboardStrategy \
   -Dorg.eclipse.swtbot.keyboard.layout=de.fu_berlin.inf.dpp.stf.server.bot.default \
   -Dfile.encoding=UTF-8 \
-  -Dnet.sourceforge.cobertura.datafile="${workspace}/coverage_${user}.ser" \
   -Dosgi.parentClassloader=app \
-  org.eclipse.equinox.launcher.Main \
-  -name "eclipse_${user}" \
-  -consoleLog \
-  -data "${workspace}"
 
