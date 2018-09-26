@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFactory;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
+import de.fu_berlin.inf.dpp.intellij.ui.eventhandler.SessionStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.XMPPAuthorizationHandler;
 import de.fu_berlin.inf.dpp.core.util.IntelliJCollaborationUtilsImpl;
@@ -86,6 +87,7 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
         Component.create(NegotiationHandler.class),
         Component.create(UserStatusChangeHandler.class),
         Component.create(XMPPAuthorizationHandler.class),
+        Component.create(SessionStatusChangeHandler.class),
 
         Component.create(IChecksumCache.class, NullChecksumCache.class),
 
