@@ -1,0 +1,63 @@
+dependencies { releaseDep 'commons-codec:commons-codec:1.3'
+  releaseDep 'commons-io:commons-io:2.0.1'
+  releaseDep 'commons-lang:commons-lang:2.4'
+  releaseDep 'javax.jmdns:jmdns:3.4.1'
+  releaseDep 'org.picocontainer:picocontainer:2.11.2'
+  releaseDep 'org.igniterealtime.smack:smack:3.4.1'
+  releaseDep 'org.igniterealtime.smack:smackx:3.4.1'
+  releaseDep 'xpp3:xpp3:1.1.4c'
+  releaseDep 'com.thoughtworks.xstream:xstream:1.4.10'
+  releaseDep 'org.gnu.inet:libidn:1.15'
+  releaseDep log4jVersion
+  // The used version is a SNAPSHOT version which is not available!
+  // TODO: use real release
+  releaseDep files('libs/weupnp.jar')
+
+  compile configurations.releaseDep
+  testCompile configurations.testConfig
+}
+
+sourceSets.main.java.srcDirs = ['src', 'patches']
+sourceSets.test.java.srcDir 'test/junit'
+
+jar {
+  manifest {
+      def manif = "${projectDir}/META-INF/MANIFEST.MF"
+      if (new File(manif).exists()) {
+          from (manif) 
+      }
+  }
+
+  from sourceSets.main.output
+
+  into('lib') {
+    from configurations.getByName('releaseDep')
+  }
+}
+
+test {
+  exclude '**/Abstract*'
+  // Avoid to execute the tests twice
+}
+
+// Avoid issue GH issue #98
+tasks.withType(Test) {
+  enableAssertions = false
+}
+
+task testJar(type: Jar) {
+  classifier = 'tests'
+  from sourceSets.test.output
+}
+
+artifacts {
+  testing testJar
+}
+
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/Core'
+    property 'sonar.projectDescription', 'Saros core business logic and utilities'
+    property 'sonar.projectVersion', '0.1.0.DEVEL'
+  }
+}

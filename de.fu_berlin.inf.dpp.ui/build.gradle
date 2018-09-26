@@ -1,0 +1,60 @@
+buildscript {
+  repositories {
+      maven { url 'https://plugins.gradle.org/m2/' }
+  }
+  dependencies {
+    classpath "com.diffplug.gradle:goomph:3.17.0"
+  }
+}
+
+dependencies {
+  compile project(':de.fu_berlin.inf.dpp.core')
+
+  releaseDep files('libs/swt-browser-improved.jar')
+  releaseDep 'com.google.code.gson:gson:2.3'
+  compile "org.eclipse.swt:org.eclipse.swt.${com.diffplug.common.swt.os.SwtPlatform.getNative()}:4.6"
+
+  compile configurations.releaseDep
+
+  testCompile configurations.testConfig
+  testCompile project(path: ':de.fu_berlin.inf.dpp.core', configuration: 'testing')
+}
+
+sourceSets.main.java.srcDir 'src'
+sourceSets.test.java.srcDirs = ['test/junit', 'test/framework/stf/src/']
+
+jar {
+  manifest {
+      def manif = "${projectDir}/META-INF/MANIFEST.MF"
+      if (new File(manif).exists()) {
+          from (manif)
+      }
+  }
+  from sourceSets.main.output
+
+  into('lib') {
+    from configurations.getByName('releaseDep')
+  }
+}
+
+test {
+  exclude '**/Abstract*'
+}
+
+task testJar(type: Jar) {
+  classifier = 'tests'
+  from sourceSets.test.output
+}
+
+artifacts {
+  testing testJar
+}
+
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/UI'
+    property 'sonar.projectDescription', 'Common Saros User Interface (Java part)'
+    property 'sonar.projectVersion', '0.1.0.DEVEL'
+    property 'sonar.exclusions', '**/HTMLUIStrings.java'
+  }
+}

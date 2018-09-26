@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JOptionPane;

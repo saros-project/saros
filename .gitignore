@@ -27,6 +27,17 @@ bin_test/
 /de.fu_berlin.inf.dpp.update_beta/features/
 /de.fu_berlin.inf.dpp.update_beta/plugins/
 /de.fu_berlin.inf.dpp/test/framework/stf/src/de/fu_berlin/inf/dpp/stf/client/configuration.properties
+/de.fu_berlin.inf.dpp/lib
+/de.fu_berlin.inf.dpp.core/lib
+/de.fu_berlin.inf.dpp.ui/lib
+/de.fu_berlin.inf.dpp.whiteboard/lib
+/de.fu_berlin.inf.dpp/build
+/de.fu_berlin.inf.dpp.core/build
+/de.fu_berlin.inf.dpp.ui/build
+/de.fu_berlin.inf.dpp.whiteboard/build
+/de.fu_berlin.inf.dpp.intellij/build
 .DS_Store
 docs/_site
 docs/Gemfile.lock
+/.gradle/
+/build/
