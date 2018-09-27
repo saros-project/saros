@@ -18,6 +18,7 @@ import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
@@ -104,6 +105,9 @@ public class AddProjectToSessionWizard extends Wizard {
     @Inject
     private IWorkspace workspace;
 
+    @Inject
+    private ProjectAPI projectAPI;
+
     private final SelectProjectPage selectProjectPage;
     private final TextAreaPage fileListPage;
 
@@ -120,6 +124,9 @@ public class AddProjectToSessionWizard extends Wizard {
          */
         @Override
         public void next() {
+
+            projectAPI.saveAllDocuments();
+
             //FIXME: Only projects with the same name are supported,
             //because the project name is connected to the name of the .iml file
             //and it is unclear how that resolves.
