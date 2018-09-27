@@ -43,7 +43,7 @@ public class InfoPage extends AbstractWizardPage {
         textItem.setWrapStyleWord(true);
         textItem.setEditable(false);
         textItem.setBackground(infoPanel.getBackground());
-        textItem.setPreferredSize(new Dimension(560, 30));
+        textItem.setPreferredSize(new Dimension(560, 45));
 
         JPanel itemPanel = new JPanel();
         itemPanel.setLayout(new FlowLayout(FlowLayout.LEFT));

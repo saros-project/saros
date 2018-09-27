@@ -1,23 +1,11 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
-import java.awt.Window;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.picocontainer.annotations.Inject;
-
 import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -27,16 +15,14 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.UIUtil;
-
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgessMonitorAdapter;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.HeaderPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.PageActionListener;
@@ -57,6 +43,20 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
+import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.picocontainer.annotations.Inject;
+
+import java.awt.Dimension;
+import java.awt.Window;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Wizard for adding projects to a session.
@@ -105,6 +105,9 @@ public class AddProjectToSessionWizard extends Wizard {
     @Inject
     private IWorkspace workspace;
 
+    @Inject
+    private ProjectAPI projectAPI;
+
     private final SelectProjectPage selectProjectPage;
     private final TextAreaPage fileListPage;
 
@@ -121,6 +124,9 @@ public class AddProjectToSessionWizard extends Wizard {
          */
         @Override
         public void next() {
+
+            projectAPI.saveAllDocuments();
+
             //FIXME: Only projects with the same name are supported,
             //because the project name is connected to the name of the .iml file
             //and it is unclear how that resolves.
@@ -138,16 +144,27 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     cancelNegotiation("Failed to create shared module");
 
-                    SafeDialogUtils.showError("The module " + moduleName +
-                        " could not be created. The project negotiation " +
-                        "was aborted.\n" +
-                        "To get help with this problem, please contact the " +
-                        "Saros development team. You can reach us by writing " +
-                        "to our mailing list " +
-                        "(saros-devel@googlegroups.com) or by using our " +
-                        "contact form " +
-                        "(https://www.saros-project.org/contact/Website%20feedback).",
-                        "Negotiation aborted!");
+                    NotificationPanel.showError(MessageFormat
+                            .format(Messages.Contact_saros_message_conditional,
+                                MessageFormat.format(
+                                    Messages.AddProjectToSessionWizard_module_creation_failed_message_condition,
+                                    moduleName) + "\n" + e),
+                        Messages.AddProjectToSessionWizard_module_creation_failed_title);
+
+                    return;
+
+                } catch (ModuleWithNameAlreadyExists e) {
+                    LOG.warn("Could not create the shared module " + moduleName
+                        + ".", e);
+
+                    cancelNegotiation("Failed to create shared module");
+
+                    NotificationPanel.showError(MessageFormat
+                            .format(Messages.Contact_saros_message_conditional,
+                                MessageFormat.format(
+                                    Messages.AddProjectToSessionWizard_module_already_exists_message_condition,
+                                    moduleName)),
+                        Messages.AddProjectToSessionWizard_module_already_exists_title);
 
                     return;
                 }
@@ -159,7 +176,25 @@ public class AddProjectToSessionWizard extends Wizard {
                 triggerProjectNegotiation();
 
             } else {
-                IProject sharedProject = workspace.getProject(moduleName);
+                IProject sharedProject;
+
+                try {
+                    sharedProject = workspace.getProject(moduleName);
+                } catch(IllegalArgumentException exception) {
+                    LOG.debug("No session is started as an invalid module was "
+                        + "chosen", exception);
+
+                    cancelNegotiation("Invalid module chosen by client");
+
+                    NotificationPanel.showError(MessageFormat
+                            .format(Messages.Contact_saros_message_conditional,
+                                MessageFormat.format(
+                                    Messages.AddProjectToSessionWizard_invalid_module_message_condition,
+                                    moduleName)),
+                        Messages.AddProjectToSessionWizard_invalid_module_title);
+
+                    return;
+                }
 
                 if (sharedProject == null) {
                     LOG.error("Could not find the shared module " + moduleName +
@@ -168,19 +203,12 @@ public class AddProjectToSessionWizard extends Wizard {
                     cancelNegotiation("Could not find chosen local " +
                         "representation of shared module");
 
-                    SafeDialogUtils.showError("The chosen module " +
-                        moduleName + " could not be found. The project " +
-                        "negotiation was aborted.\n" +
-                        "Please make sure that the module is correctly " +
-                        "configured in the current project and exists on " +
-                        "disk.\n" +
-                        "If there seems to be no problem with the module, " +
-                        "please contact the Saros development team. You can " +
-                        "reach us by writing to our mailing list " +
-                        "(saros-devel@googlegroups.com) or by using our " +
-                        "contact form " +
-                        "(https://www.saros-project.org/contact/Website%20feedback).",
-                        "Negotiation aborted!");
+                    NotificationPanel.showError(MessageFormat
+                            .format(Messages.Contact_saros_message_conditional,
+                                MessageFormat.format(
+                                    Messages.AddProjectToSessionWizard_module_not_found_message_condition,
+                                    moduleName)),
+                        Messages.AddProjectToSessionWizard_module_not_found_title);
 
                     return;
                 }
@@ -188,6 +216,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 localProjects.put(remoteProjectID, sharedProject);
 
                 prepareFilesChangedPage(localProjects);
+
+                setTopPanelText(Messages.EnterProjectNamePage_description_changed_files);
             }
         }
 
@@ -244,7 +274,14 @@ public class AddProjectToSessionWizard extends Wizard {
      */
     @NotNull
     private Module createModuleStub(@NotNull final String moduleName)
-        throws IOException {
+        throws IOException, ModuleWithNameAlreadyExists {
+
+        for(Module module : ModuleManager.getInstance(project).getModules()) {
+            if (moduleName.equals(module.getName()))
+                throw new ModuleWithNameAlreadyExists("Could not create stub " +
+                    "module as a module with the chosen name already exists",
+                    moduleName);
+        }
 
         Module module = Filesystem
             .runWriteAction(new ThrowableComputable<Module, IOException>() {
@@ -344,10 +381,13 @@ public class AddProjectToSessionWizard extends Wizard {
         AbstractIncomingProjectNegotiation negotiation) {
 
         super(parent, Messages.AddProjectToSessionWizard_title,
-            new HeaderPanel(Messages.EnterProjectNamePage_title2, ""));
+            new HeaderPanel(Messages.EnterProjectNamePage_title2,
+                Messages.EnterProjectNamePage_description));
 
         this.negotiation = negotiation;
         this.peer = negotiation.getPeer();
+
+        this.setPreferredSize(new Dimension(650,515));
 
 
         List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
@@ -364,7 +404,7 @@ public class AddProjectToSessionWizard extends Wizard {
         registerPage(selectProjectPage);
 
         fileListPage = new TextAreaPage(FILE_LIST_PAGE_ID,
-            "Local file changes:", fileListPageListener);
+            "Changes applied to local modules:", fileListPageListener);
         registerPage(fileListPage);
 
         create();
@@ -390,11 +430,9 @@ public class AddProjectToSessionWizard extends Wizard {
                  *  be displayed in the trigger logic, so do not popup another dialog here
                  */
                 if (!triggered)
-                    DialogUtils
-                        .showInfo(AddProjectToSessionWizard.this, message,
-                            message + (errorMsg != null ?
-                                "\n\n" + errorMsg :
-                                ""));
+                    NotificationPanel.showInformation(
+                        message + (errorMsg != null ? "\n\n" + errorMsg : ""),
+                        message);
 
                 close();
             }
@@ -431,7 +469,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         @Override
                         public void run() {
                             if (status == ProjectNegotiation.Status.ERROR) {
-                                DialogUtils.showError(null,
+                                NotificationPanel.showError(
                                     "Error during project negotiation",
                                     "The project could not be shared: "
                                         + negotiation.getErrorMessage());
@@ -440,7 +478,7 @@ public class AddProjectToSessionWizard extends Wizard {
                                     .showInformation("Project shared",
                                         "Project successfully shared");
                             } else
-                                DialogUtils.showError(null,
+                                NotificationPanel.showError(
                                     "Project negotiation aborted",
                                     "Project negotiation was canceled");
                         }
@@ -580,9 +618,12 @@ public class AddProjectToSessionWizard extends Wizard {
                     data.getFileList(),
                     false);
 
-                if (!diff.getRemovedFolders().isEmpty()
-                    || !diff.getRemovedFiles().isEmpty()
-                    || !diff.getAlteredFiles().isEmpty()) {
+                if (!diff.getRemovedFolders().isEmpty() ||
+                    !diff.getRemovedFiles().isEmpty() ||
+                    !diff.getAlteredFiles().isEmpty() ||
+                    !diff.getAddedFiles().isEmpty() ||
+                    !diff.getAddedFolders().isEmpty()) {
+
                     modifiedResources.put(project.getName(), diff);
                 }
 

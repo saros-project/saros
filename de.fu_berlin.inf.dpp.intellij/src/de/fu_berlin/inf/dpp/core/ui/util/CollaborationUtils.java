@@ -192,9 +192,9 @@ public class CollaborationUtils {
                     return;
                 }
 
-                DialogUtils.showError(null,
-                    Messages.CollaborationUtils_insufficient_privileges,
-                    Messages.CollaborationUtils_insufficient_privileges_text);
+                NotificationPanel.showError(
+                    Messages.CollaborationUtils_insufficient_privileges_text,
+                    Messages.CollaborationUtils_insufficient_privileges);
             }
         });
     }
@@ -260,7 +260,7 @@ public class CollaborationUtils {
                             true, IContainer.FILE);
 
                     result.append(String
-                        .format("\nProject: %s, Files: %d, Size: %s",
+                        .format("\nModule: %s, Files: %d, Size: %s",
                             project.getName(), fileCountAndSize.v,
                             format(fileCountAndSize.p)));
                 } else {
@@ -271,7 +271,7 @@ public class CollaborationUtils {
                         .getFileCountAndSize(resources, false, IResource.NONE);
 
                     result.append(String
-                        .format("\nProject: %s, Files: %s, Size: %s",
+                        .format("\nModule: %s, Files: %s, Size: %s",
                             project.getName() + " "
                                 + Messages.CollaborationUtils_partial,
                             fileCountAndSize.v, format(fileCountAndSize.p)));

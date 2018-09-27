@@ -10,10 +10,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.log4j.Logger;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,8 +38,10 @@ public class ShareWithUserAction extends AnAction {
     private final JID userJID;
     private final String title;
 
-    ShareWithUserAction(JID user) {
-        super(user.getName(), null, IconManager.CONTACT_ONLINE_ICON);
+    ShareWithUserAction(JID user, int userCount) {
+        super("_" + userCount + ": " + user.getRAW(), MessageFormat
+                .format(Messages.ShareWithUserAction_description, user.getRAW()),
+            IconManager.CONTACT_ONLINE_ICON);
         userJID = user;
         title = user.getName();
     }

@@ -1,15 +1,15 @@
 package de.fu_berlin.inf.dpp.intellij.filesystem;
 
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.ThrowableComputable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Provides centralized methods for synchronized write and read actions.
@@ -42,9 +42,6 @@ public class Filesystem {
         @NotNull final ThrowableComputable<T, E> computation,
         @Nullable final ModalityState modalityState) throws E {
 
-        if (application.isDispatchThread())
-            return application.runWriteAction(computation);
-
         final ModalityState chosenModalityState = modalityState != null ? modalityState
             : ModalityState.defaultModalityState();
 
@@ -56,8 +53,7 @@ public class Filesystem {
             @Override
             public void run() {
                 try {
-                    result.set(ApplicationManager.getApplication()
-                        .runWriteAction(computation));
+                    result.set(application.runWriteAction(computation));
 
                 } catch (Throwable t) {
                     throwable.set(t);
@@ -99,7 +95,7 @@ public class Filesystem {
 
             @Override
             public void run() {
-                ApplicationManager.getApplication().runWriteAction(runnable);
+                application.runWriteAction(runnable);
             }
 
         }, chosenModalityState);
