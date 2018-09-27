@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-
 /**
  * Use this annotation to annotate a method of {@link TypedJavascriptFunction}
  * subclasses. The {@linkplain TypedJavascriptFunction#function(Object[])
@@ -15,14 +13,10 @@ import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
  * <p>
  * For consistency, the annotated method should have the same name as the
  * JavaScript function. This is not enforced programmatically.
- * <p>
- * Note: Just because a method is annotated it's not automatically exposed (or
- * "injected") into the JavaScript context. For this, instances of the
- * surrounding class need to be created through the {@link HTMLUIContextFactory}.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BrowserFunction {
+@interface BrowserFunction {
     /**
      * BrowserFunctions will be executed synchronously by default. Set to
      * {@link Policy#ASYNC} to return immediately. Any return value of the

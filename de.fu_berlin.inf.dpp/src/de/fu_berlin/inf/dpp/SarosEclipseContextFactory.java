@@ -19,11 +19,11 @@ import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.filesystem.FileSystemChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.EclipsePathFactory;
 import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceRootImpl;
 import de.fu_berlin.inf.dpp.filesystem.FileContentNotifierBridge;
+import de.fu_berlin.inf.dpp.filesystem.FileSystemChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.ui.eventhandler.XMPPAuthorizationHandler;
 
 /**
  * Factory used for creating the Saros context when running as Eclipse plugin.
- *
+ * 
  * @author srossbach
  */
 public class SarosEclipseContextFactory extends AbstractContextFactory {
@@ -60,7 +60,7 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
     /**
      * Must not be static in order to avoid heavy work during class
      * initialization
-     *
+     * 
      * @see <a
      *      href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
      */

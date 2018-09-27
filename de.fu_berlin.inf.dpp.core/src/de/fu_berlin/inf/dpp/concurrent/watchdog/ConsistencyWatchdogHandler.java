@@ -10,8 +10,10 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
-import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
+import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.TargetedFileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -168,8 +170,11 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
         if (!file.exists()) {
             // Tell the client to delete the file
-            fireActivity(RecoveryFileActivity.removed(user, path, from, null));
-            fireActivity(ChecksumActivity.missing(user, path));
+            fireActivity(new TargetedFileActivity(user, from, Type.REMOVED,
+                path, null, null, null, Purpose.RECOVERY));
+            fireActivity(new ChecksumActivity(user, path,
+                ChecksumActivity.NON_EXISTING_DOC,
+                ChecksumActivity.NON_EXISTING_DOC, null));
             return;
         }
 
@@ -199,8 +204,8 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
             return;
         }
 
-        fireActivity(RecoveryFileActivity.created(user, path, content, from,
-            charset));
+        fireActivity(new TargetedFileActivity(user, from, Type.CREATED, path,
+            null, content, charset, Purpose.RECOVERY));
 
         /*
          * Immediately follow up with a new checksum activity so that the remote

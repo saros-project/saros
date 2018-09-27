@@ -91,6 +91,8 @@ public class SarosIntellijContextFactoryTest {
         IContextFactory factory = new SarosIntellijContextFactory(project);
 
         factory.createComponents(container);
+        container.start();
+
         Assert.assertNotNull(container.getComponents());
     }
 }

@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
  * In order to correctly subclass this implementation in regards of redirection
  * client have to override the {@linkplain #setPreference} <b>AND</b>
  * {@linkplain #getPreference} methods.
- *
+ * 
  */
 public class PreferenceStore implements IPreferenceStore {
 
@@ -193,7 +193,7 @@ public class PreferenceStore implements IPreferenceStore {
     /**
      * Returns the preference for the given name (key). Clients may override
      * this method to redirect the storage.
-     *
+     * 
      * @param name
      *            the preference to look up
      * @return the value of the preference or <code>null</code>.
@@ -205,7 +205,7 @@ public class PreferenceStore implements IPreferenceStore {
     /**
      * Sets the preference for the given name (key). Clients may override this
      * method to redirect the storage.
-     *
+     * 
      * @param name
      *            the preference to set
      * @param value
@@ -217,7 +217,7 @@ public class PreferenceStore implements IPreferenceStore {
 
     /**
      * Broadcasts the preference change to all registered listeners.
-     *
+     * 
      * @param event
      *            containing the details of the preference change
      */

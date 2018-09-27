@@ -34,6 +34,8 @@ public class EclipseHTMLUIContextFactoryTest {
         IContextFactory factory = new EclipseHTMLUIContextFactory();
 
         factory.createComponents(container);
+        container.start();
+
         Assert.assertNotNull(container.getComponents());
     }
 

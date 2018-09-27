@@ -6,7 +6,6 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddContact;
-import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseAccountWizard;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseSessionInvitationWizard;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ConnectAccount;
@@ -27,6 +26,7 @@ import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
 import de.fu_berlin.inf.dpp.ui.pages.AccountPage;
+import de.fu_berlin.inf.dpp.ui.pages.ConfigurationPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 import de.fu_berlin.inf.dpp.ui.pages.SessionWizardPage;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
@@ -59,18 +59,26 @@ public class HTMLUIContextFactory extends AbstractContextFactory {
 
     private void createBrowserfunctions() {
         // please use alphabetic order
-        add(AddContact.class,
-            BrowserFunctions.class, // List of all BFs
-            CloseAccountWizard.class, CloseSessionInvitationWizard.class,
-            ConnectAccount.class, DeleteAccount.class, DeleteContact.class,
-            DisconnectAccount.class, EditAccount.class, GetValidJID.class,
-            RenameContact.class, SaveAccount.class, SendInvitation.class,
-            SetActiveAccount.class, ShowAccountPage.class,
+        add(AddContact.class, //
+            CloseAccountWizard.class, //
+            CloseSessionInvitationWizard.class, //
+            ConnectAccount.class, //
+            DeleteAccount.class, //
+            DeleteContact.class, //
+            DisconnectAccount.class, //
+            EditAccount.class, //
+            GetValidJID.class, //
+            RenameContact.class, //
+            SaveAccount.class, //
+            SendInvitation.class, //
+            SetActiveAccount.class, //
+            ShowAccountPage.class, //
             ShowSessionWizard.class);
     }
 
     private void createPages() {
-        add(AccountPage.class, MainPage.class, SessionWizardPage.class);
+        add(AccountPage.class, MainPage.class, SessionWizardPage.class,
+            ConfigurationPage.class);
     }
 
     private void createRenderer() {

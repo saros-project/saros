@@ -59,7 +59,8 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             getFieldEditorParent(), true));
 
         if (debugMode) {
-            addField(new BooleanFieldEditor(PreferenceConstants.SMACK_DEBUG_MODE,
+            addField(new BooleanFieldEditor(
+                PreferenceConstants.SMACK_DEBUG_MODE,
                 Messages.AdvancedPreferencePage_show_xmpp_debug,
                 getFieldEditorParent()));
         }
@@ -72,10 +73,9 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         }
 
         addField(new BooleanFieldEditor(
-            EclipsePreferenceConstants.CONSOLESHARING_ENABLED,
-            Messages.AdvancedPreferencePage_enable_consolesharing,
+            PreferenceConstants.INSTANT_SESSION_START_PREFERRED,
+            Messages.AdvancedPreferencePage_instant_session_start_preferred,
             getFieldEditorParent()));
-
     }
 
     @Override

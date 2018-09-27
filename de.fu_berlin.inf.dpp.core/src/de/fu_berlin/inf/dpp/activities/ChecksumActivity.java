@@ -70,15 +70,6 @@ public class ChecksumActivity extends AbstractResourceActivity {
     }
 
     /**
-     * Create a ChecksumActivity which indicates that the file is missing on the
-     * host.
-     */
-    public static ChecksumActivity missing(User source, SPath path) {
-        return new ChecksumActivity(source, path, NON_EXISTING_DOC,
-            NON_EXISTING_DOC, null);
-    }
-
-    /**
      * Returns a copy of the ChecksumActivity with a new {@link Timestamp}.
      */
     public ChecksumActivity withTimestamp(Timestamp jupiterTimestamp) {

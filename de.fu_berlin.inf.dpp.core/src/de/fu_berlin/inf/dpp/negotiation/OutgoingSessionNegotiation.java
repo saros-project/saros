@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExten
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -27,6 +26,8 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
@@ -58,11 +59,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     private final VersionManager versionManager;
 
     private final DiscoveryManager discoveryManager;
-
-    // HACK last residue of the direct connection between SessionNegotiation and
-    // the color property of users.
-    private int clientColorID = UserColorID.UNKNOWN;
-    private int clientFavoriteColorID = UserColorID.UNKNOWN;
 
     public OutgoingSessionNegotiation( //
         final JID peer, //
@@ -99,24 +95,24 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     /**
      * @JTourBusStop 4, Invitation Process:
-     *
+     * 
      *               The details of the invitation process are implemented in
      *               the negotiation package. OutgoingSessionNegotiation is an
      *               example of a class that participates in this process.
-     *
+     * 
      *               The host of a session needs negotiations for:
-     *
+     * 
      *               - Sending invitation to a session
      *               (OutgoingSessionNegotiation)
-     *
+     * 
      *               - Sending project resources included in a session
      *               (OutgoingProjectNegotiation)
-     *
+     * 
      *               All other participants need negotiations for:
-     *
+     * 
      *               - Dealing with a received invitation to a session
      *               (IncomingSessionNegotiation)
-     *
+     * 
      *               - Handling incoming shared project resources
      *               (IncomingProjectNegotiation)
      */
@@ -135,45 +131,45 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         try {
             /**
              * @JTourBusStop 5, Invitation Process:
-             *
+             * 
              *               For starting a session, the host does the following
              *               things (see next JTourBusStops for the
              *               corresponding steps on the client side):
-             *
+             * 
              *               (1) Check whether Saros is available on the
              *               client's side (via the DiscoveryManager).
-             *
+             * 
              *               (2) Check whether the client's Saros is compatible
              *               with own version (via the VersionManager).
-             *
+             * 
              *               (3a) Send a session invitation offering to the
              *               client.
-             *
+             * 
              *               (3b) [client side, see subsequent stops]
-             *
+             * 
              *               (3c) Waits until the client automatically responds
              *               to the offering ("acknowledgement").
-             *
+             * 
              *               (4a, 4b) [client side, see subsequent stops]
-             *
+             * 
              *               (4c) Wait until the remote user manually accepted
              *               the session invitation ("acceptance").
-             *
+             * 
              *               (5a) [client side, see subsequent stops]
-             *
+             * 
              *               (5b) Wait for the client's wishlist of the
              *               session's parameters (e.g. his own favorite color).
-             *
+             * 
              *               (6a) Consider these preferences and send the
              *               settled session parameters back to the client.
-             *
+             * 
              *               (6b, 7, 8) [client side, see subsequent stops]
-             *
+             * 
              *               (9) Wait until a connection is established.
-             *
+             * 
              *               (10) Wait until the client signals the session
              *               invitation is complete.
-             *
+             * 
              *               (11) Formally add client to the session so he will
              *               receive activities, then send final acknowledgement
              *               to inform client about this.
@@ -200,7 +196,12 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
             awaitCompletion(monitor);
 
-            User newUser = completeInvitation(monitor);
+            IPreferenceStore clientProperties = new PreferenceStore();
+            applySessionParameters(actualSessionParameters,
+                sarosSession.getUserProperties(sarosSession.getHost()),
+                clientProperties);
+
+            User newUser = completeInvitation(clientProperties, monitor);
 
             monitor.done();
 
@@ -431,16 +432,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
                 continue;
 
             hostParameters.saveHookSettings(hook, finalSettings);
-
-            // HACK A User object representing the client needs to access these
-            // two values in completeInvitation(). Color management should work
-            // differently.
-            if (hook instanceof ColorNegotiationHook) {
-                clientColorID = Integer.parseInt(finalSettings
-                    .get(ColorNegotiationHook.KEY_CLIENT_COLOR));
-                clientFavoriteColorID = Integer.parseInt(finalSettings
-                    .get(ColorNegotiationHook.KEY_CLIENT_FAV_COLOR));
-            }
         }
 
         return hostParameters;
@@ -485,38 +476,59 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : remote side started its Saros session");
     }
 
+    /**
+     * Applies and saves the final session parameters.
+     */
+    private void applySessionParameters(
+        InvitationParameterExchangeExtension clientParameters,
+        IPreferenceStore hostProperties, IPreferenceStore clientProperties) {
+
+        // call each hook to do its magic
+        for (ISessionNegotiationHook hook : hookManager.getHooks()) {
+            Map<String, String> actualSettings = clientParameters
+                .getHookSettings(hook);
+
+            hook.applyActualParameters(actualSettings, hostProperties,
+                clientProperties);
+        }
+    }
+
     private static final Object REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE = new Object();
 
     /**
-     *
+     * 
      * Adds the invited user to the current SarosSession. After the user is
      * added to the session the user list is synchronized and afterwards an
      * acknowledgment is send to the remote side that the remote user can now
      * start working in this session.
-     *
+     * 
      * @throws IOException
      */
-    private User completeInvitation(IProgressMonitor monitor)
-        throws IOException {
+    private User completeInvitation(IPreferenceStore properties,
+        IProgressMonitor monitor) throws IOException {
 
         log.debug(this + " : synchronizing user list");
 
         monitor.setTaskName("Synchronizing user list...");
 
+        int clientColorID = properties
+            .getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
+        int clientFavoriteColorID = properties
+            .getInt(ColorNegotiationHook.KEY_FAV_COLOR);
         User user = new User(getPeer(), false, false, clientColorID,
             clientFavoriteColorID);
 
         synchronized (REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE) {
 
-            sarosSession.addUser(user);
+            sarosSession.addUser(user, properties);
             log.debug(this + " : added " + getPeer()
                 + " to the current session, colorID: " + clientColorID);
 
             /* *
-             *
+             * 
              * @JTourBusStop 7, Creating custom network messages, Sending custom
              * messages:
-             *
+             * 
              * This is pretty straight forward. Create an instance of your
              * extension with the proper arguments and use the provider to
              * create a (marshalled) packet extension. The extension can now be
@@ -536,16 +548,16 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     private void createCollectors() {
 
         /* *
-         *
+         * 
          * @JTourBusStop 9, Creating custom network messages, Receiving custom
          * messages - Part 2:
-         *
+         * 
          * Another way to receive custom message is to use a collector which you
          * can poll instead. The same rules as in step 7 applies to the
          * collector as well. Pay attention to the filter you use and avoid
          * using the collector when the current thread context is the context
          * for dispatching messages.
-         *
+         * 
          * IMPORTANT: Your logic must ensure that the collector is canceled
          * after it is no longer used. Failing to do so will result in memory
          * leaks.

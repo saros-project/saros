@@ -44,59 +44,6 @@ public class FileActivity extends AbstractResourceActivity implements
     protected final byte[] content;
 
     /**
-     * Utility method for creating a FileActivity of type {@link Type#CREATED}
-     * for a given path.
-     * 
-     * @param path
-     *            path referencing the newly created file
-     * @param content
-     *            content of the file denoted by the path
-     * @param encoding
-     *            the encoding the content is encoded with or <code>null</code>
-     */
-    public static FileActivity created(User source, SPath path, byte[] content,
-        String encoding, Purpose purpose) {
-        return new FileActivity(source, Type.CREATED, path, null, content,
-            encoding, purpose);
-    }
-
-    /**
-     * Builder for moving files (type {@link Type#MOVED}).
-     * 
-     * @param source
-     *            JID of the origin user
-     * 
-     * @param destPath
-     *            path where the file moved to
-     * @param sourcePath
-     *            path where the file moved from
-     * @param content
-     *            content of the file denoted by the path, may be
-     *            <code>null</code> to indicate that the file content was not
-     *            changed when moved
-     * @param encoding
-     *            the encoding the content is encoded with or <code>null</code>
-     */
-    public static FileActivity moved(User source, SPath destPath,
-        SPath sourcePath, byte[] content, String encoding) {
-
-        return new FileActivity(source, Type.MOVED, destPath, sourcePath,
-            content, encoding, Purpose.ACTIVITY);
-    }
-
-    /**
-     * Builder for removing files (type {@link Type#REMOVED})
-     * 
-     * @param path
-     *            the path of the file to remove
-     */
-    public static FileActivity removed(User source, SPath path, Purpose purpose) {
-
-        return new FileActivity(source, Type.REMOVED, path, null, null, null,
-            purpose);
-    }
-
-    /**
      * Generic constructor for {@link FileActivity}s
      * 
      * @param source
@@ -114,8 +61,8 @@ public class FileActivity extends AbstractResourceActivity implements
      * @param encoding
      *            the encoding the content is encoded with or <code>null</code>
      */
-    public FileActivity(User source, Type type, SPath newPath, SPath oldPath,
-        byte[] content, String encoding, Purpose purpose) {
+    public FileActivity(User source, Type type, Purpose purpose, SPath newPath,
+        SPath oldPath, byte[] content, String encoding) {
 
         super(source, newPath);
 
@@ -172,9 +119,6 @@ public class FileActivity extends AbstractResourceActivity implements
      *         <p>
      *         <b>Important:</b> the content of the array must <b>not</b> be
      *         changed
-     * 
-     * @see #created(User, SPath, byte[], String, Purpose)
-     * @see #moved(User, SPath, SPath, byte[], String)
      */
     public byte[] getContent() {
         return content;

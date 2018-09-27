@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
@@ -86,7 +86,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private final String remoteProjectID;
     private final String remoteProjectName;
 
-    private final IncomingProjectNegotiation negotiation;
+    private final AbstractIncomingProjectNegotiation negotiation;
     private final JID peer;
 
     private boolean triggered = false;
@@ -335,7 +335,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     return module;
                 }
-            }, ModalityState.any());
+            }, ModalityState.defaultModalityState());
 
         if (module == null) {
             throw new IOException("The creation of the module " + moduleName
@@ -378,7 +378,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
      */
     public AddProjectToSessionWizard(Window parent,
-        IncomingProjectNegotiation negotiation) {
+        AbstractIncomingProjectNegotiation negotiation) {
 
         super(parent, Messages.AddProjectToSessionWizard_title,
             new HeaderPanel(Messages.EnterProjectNamePage_title2,
@@ -441,7 +441,7 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     /**
-     * Runs {@link IncomingProjectNegotiation#run(java.util.Map, IProgressMonitor)}
+     * Runs {@link AbstractIncomingProjectNegotiation#run(java.util.Map, IProgressMonitor)}
      * as a background task through {@link #runTask(Runnable, String)}.
      * <p/>
      * On success, a success notification is displayed, on error, a dialog is shown.

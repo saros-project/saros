@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
@@ -145,6 +146,11 @@ public class WhiteboardManager {
         }
 
         @Override
+        public void setInitialHostPreferences(IPreferenceStore hostPreferences) {
+            // NOP
+        }
+
+        @Override
         public Map<String, String> tellClientPreferences() {
             Map<String, String> map = new HashMap<String, String>();
             map.put(USE_KEY, USE_VAL);
@@ -171,8 +177,10 @@ public class WhiteboardManager {
         }
 
         @Override
-        public void applyActualParameters(Map<String, String> settings) {
-            hostHasWhiteboard = (settings != null && USE_VAL.equals(settings
+        public void applyActualParameters(Map<String, String> input,
+            IPreferenceStore hostPreferences, IPreferenceStore clientPreferences) {
+
+            hostHasWhiteboard = (input != null && USE_VAL.equals(input
                 .get(USE_KEY)));
         }
     };

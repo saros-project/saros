@@ -433,6 +433,7 @@ public class Util {
 
         assertStates(true, null, tester, testers);
 
+        // TODO Remove loop, nobody ever calls this with #testers > 1
         for (AbstractTester contact : testers) {
             if (!tester.superBot().views().sarosView()
                 .isInContactList(contact.getJID())) {
@@ -464,6 +465,7 @@ public class Util {
 
         assertStates(true, null, tester, testers);
 
+        // TODO Remove loop, nobody ever calls this with #testers > 1
         for (AbstractTester contact : testers) {
 
             if (!tester.superBot().views().sarosView()

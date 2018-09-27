@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en-US' }}">
+
+  {% include head.html %}
+
+  <body>
+
+    {% include forkme_banner.html %}
+    {% include navbar.html %}
+
+    {% if page.url contains '/documentation' %}
+      {% assign sidebar_data = site.data.documentation.sidebar %}
+    {% elsif page.url contains '/contribute' %}
+      {% assign sidebar_data = site.data.contribute.sidebar %}
+    {% endif %}
+
+    {% include sidebar.html %}
+
+    <div class="container small-container my-5">
+
+    {{ content }}
+
+    </div>
+
+    {% include footer.html %}
+
+  </body>
+</html>

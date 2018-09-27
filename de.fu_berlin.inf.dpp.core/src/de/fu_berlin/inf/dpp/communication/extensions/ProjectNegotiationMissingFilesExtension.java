@@ -6,8 +6,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 
-//TODO Move to core (package communication.extensions)
-
 @XStreamAlias(/* ProjectNegotiationMissingFiles */"PNMF")
 public class ProjectNegotiationMissingFilesExtension extends
     ProjectNegotiationExtension {

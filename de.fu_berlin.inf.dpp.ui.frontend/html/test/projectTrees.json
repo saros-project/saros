@@ -1,0 +1,74 @@
+[
+  {
+    "root": {
+      "type": "PROJECT",
+      "label": "project1",
+      "isSelectedForSharing": true,
+      "members": [
+        {
+          "type": "FOLDER",
+          "label": "afolder",
+          "isSelectedForSharing": true,
+          "members": [
+            {
+              "type": "FILE",
+              "label": "afile",
+              "isSelectedForSharing": true,
+              "members": [],
+              "hash": -1316634766
+            },
+            {
+              "type": "FILE",
+              "label": "anotherfile",
+              "isSelectedForSharing": true,
+              "members": [],
+              "hash": -532247024
+            }
+          ],
+          "hash": -950491554
+        },
+        {
+          "type": "FOLDER",
+          "label": "anotherfolder",
+          "isSelectedForSharing": true,
+          "members": [
+            {
+              "type": "FILE",
+              "label": "somefile",
+              "isSelectedForSharing": true,
+              "members": [],
+              "hash": -473911617
+            }
+          ],
+          "hash": 715774433
+        }
+      ],
+      "hash": -2049958649
+    }
+  },
+  {
+    "root": {
+      "type": "PROJECT",
+      "label": "project2",
+      "isSelectedForSharing": true,
+      "members": [
+        {
+          "type": "FOLDER",
+          "label": "somefolder",
+          "isSelectedForSharing": true,
+          "members": [
+            {
+              "type": "FILE",
+              "label": "randomfile",
+              "isSelectedForSharing": true,
+              "members": [],
+              "hash": -589543344
+            }
+          ],
+          "hash": -991502237
+        }
+      ],
+      "hash": 1692189818
+    }
+  }
+]

@@ -10,6 +10,7 @@ import org.junit.runners.Suite;
     de.fu_berlin.inf.dpp.stf.test.editing.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.filefolderoperations.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.followmode.TestSuite.class,
+    de.fu_berlin.inf.dpp.stf.test.html.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.invitation.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.partialsharing.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.permissions.TestSuite.class,

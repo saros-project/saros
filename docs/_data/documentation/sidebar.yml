@@ -1,0 +1,23 @@
+- title: Installation
+  url: /documentation/installation.html
+
+- title: Getting Started
+  url: /documentation/getting-started.html
+
+- title: Setup XMPP Server
+  url: /documentation/setup-xmpp.html
+
+- title: Screenshots
+  url: /documentation/screenshots.html
+
+- title: Host Comic
+  url: /documentation/host-comic.html
+
+- title: Features
+  url: /documentation/features.html
+
+- title: Troubleshooting
+  url: /documentation/troubleshooting.html
+
+- title: FAQ
+  url: /documentation/faq.html

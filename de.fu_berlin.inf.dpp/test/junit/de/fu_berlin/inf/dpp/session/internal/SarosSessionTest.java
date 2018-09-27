@@ -46,9 +46,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
+import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
@@ -62,9 +62,11 @@ import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
+import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.project.internal.SarosEclipseSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 import de.fu_berlin.inf.dpp.test.mocks.EclipseMocker;
@@ -327,7 +329,8 @@ public class SarosSessionTest {
         final IContainerContext context = createContextMock(container);
 
         // Test creating, starting and stopping the session.
-        SarosSession session = new SarosSession(SAROS_SESSION_ID, 0, context);
+        SarosSession session = new SarosSession(SAROS_SESSION_ID,
+            new PreferenceStore(), context);
 
         assertFalse(session.hasActivityConsumers());
         assertFalse(session.hasActivityProducers());
@@ -356,7 +359,7 @@ public class SarosSessionTest {
         assertTrue(session.hasActivityProducers());
         assertFalse(workspaceListeners.isEmpty());
 
-        session.stop();
+        session.stop(SessionEndReason.LOCAL_USER_LEFT);
 
         stopManager3 = session.getComponent(StopManager.class);
         assertNull(

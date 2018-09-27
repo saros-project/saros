@@ -9,8 +9,8 @@ import org.powermock.core.classloader.annotations.MockPolicy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.context.CoreContextFactory;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import de.fu_berlin.inf.dpp.test.mocks.EclipseMocker;
 import de.fu_berlin.inf.dpp.test.mocks.PrepareCoreComponents;
@@ -32,8 +32,7 @@ public class SarosEclipseContextFactoryTest {
         container = ContextMocker.emptyContext();
 
         // mock Saros/Core components
-        ContextMocker.addMocksFromFactory(container,
-            new CoreContextFactory());
+        ContextMocker.addMocksFromFactory(container, new CoreContextFactory());
 
         // mock Saros environment
         saros = EclipseMocker.mockSaros();
@@ -48,6 +47,8 @@ public class SarosEclipseContextFactoryTest {
         IContextFactory factory = new SarosEclipseContextFactory(saros);
 
         factory.createComponents(container);
+        container.start();
+
         Assert.assertNotNull(container.getComponents());
     }
 }

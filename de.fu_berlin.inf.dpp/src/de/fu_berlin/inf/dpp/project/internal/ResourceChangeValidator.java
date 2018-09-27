@@ -77,7 +77,7 @@ public class ResourceChangeValidator extends ModelProvider {
 
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see org.eclipse.core.resources.IResourceDeltaVisitor
          */
         @Override

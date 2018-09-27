@@ -1,5 +1,5 @@
 import { observable, action, computed } from 'mobx'
-import { onlineFirst, getJid } from 'Utils'
+import { onlineFirst, getJid } from 'Utils'
 
 export default class SarosStore {
   @observable state = {
@@ -10,13 +10,15 @@ export default class SarosStore {
       server: '',
       port: 0,
       useTLS: false,
-      useSASL: false
+      useSASL: false,
     },
     contactList: [],
-    connectionState: 'INITIALIZING'
+    connectionState: 'INITIALIZING',
   }
 
   @observable accounts = []
+  @observable projectTrees = null
+  @observable runningSession = null
 
   sarosApi = null
 
@@ -41,6 +43,16 @@ export default class SarosStore {
   }
 
   @action.bound
+  doUpdateRunningSession (runningSession) {
+    this.runningSession = runningSession
+  }
+
+  @action.bound
+  doUpdateProjectTrees (projectTrees) {
+    this.projectTrees = projectTrees
+  }
+
+  @action.bound
   doChangeActiveAccount (jid) {
     const account = this.accounts.find(account => getJid(account) === jid)
     this.sarosApi.connect(account)
@@ -49,5 +61,20 @@ export default class SarosStore {
   @action.bound
   doAddContact (jid, displayName) {
     this.sarosApi.addContact(jid, displayName)
+  }
+
+  @action.bound
+  doShowStartSessionWizard () {
+    this.sarosApi.showStartSessionWizard()
+  }
+
+  @action.bound
+  doCloseSessionWizard () {
+    this.sarosApi.closeStartSessionWizard()
+  }
+
+  @action.bound
+  doSendInvitation (projectTrees, contacts) {
+    this.sarosApi.sendInvitation(projectTrees, contacts)
   }
 }

@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  * Abstract base class for implementing specific types of message exchanges
  * within the Saros protocol. It offers a few utility methods, as well as an
  * interface for coordinated cancellation of negotiations.
- *
+ * 
  * @author srossbach
  */
 abstract class Negotiation {
@@ -62,7 +62,7 @@ abstract class Negotiation {
 
     /**
      * Creates a Negotiation.
-     *
+     * 
      * @param id
      *            unique ID of the negotiation
      * @param peer
@@ -83,7 +83,7 @@ abstract class Negotiation {
     /**
      * Returns the unique ID of this negotiation. It is shared between the local
      * and the remote peer instance of the negotiation.
-     *
+     * 
      * @return negotiation ID
      */
     public String getID() {
@@ -92,7 +92,7 @@ abstract class Negotiation {
 
     /**
      * Returns the JID of the peer with which the negotiation takes place.
-     *
+     * 
      * @return peer JID
      */
     public JID getPeer() {
@@ -101,10 +101,10 @@ abstract class Negotiation {
 
     /**
      * Changes the peer to negotiate with.
-     *
+     * 
      * @param peer
      *            new peer JID
-     *
+     * 
      * @deprecated The peer JID should remain constant during the negotiation.
      *             Code using this method should be changed to find out the
      *             correct peer JID before the negotiation starts.
@@ -117,7 +117,7 @@ abstract class Negotiation {
     /**
      * Sets a {@linkplain NegotiationListener negotiation listener} for the
      * negotiation.
-     *
+     * 
      * @param listener
      *            the listener that should be notified
      */
@@ -128,7 +128,7 @@ abstract class Negotiation {
     /**
      * Returns the error message if the exit status of the negotiation was
      * either {@link Status#ERROR} or {@link Status#REMOTE_ERROR}.
-     *
+     * 
      * @return the error message
      */
     public synchronized String getErrorMessage() {
@@ -137,7 +137,7 @@ abstract class Negotiation {
 
     /**
      * Returns the next packet from a collector.
-     *
+     * 
      * @param collector
      *            the collector to monitor
      * @param timeout
@@ -174,7 +174,7 @@ abstract class Negotiation {
      * This method is called after {@link #terminate} decides to cancel the
      * negotiation. It is up to the implementing class to forward this
      * notification.
-     *
+     * 
      * @param cancellationCause
      *            the cause of the cancellation
      */
@@ -184,10 +184,10 @@ abstract class Negotiation {
     /**
      * Registers a monitor which should be observed to determine the status of a
      * local cancellation of the negotiation.
-     *
+     * 
      * @param monitor
      *            the monitor to observer
-     *
+     * 
      * @see #isLocalCancellation
      * @see #checkCancellation(CancelOption)
      */
@@ -200,7 +200,7 @@ abstract class Negotiation {
      * cancellation request is detected this method will invoke
      * {@link #localCancel(String errorMessage, CancelOption cancelOption)} with
      * <code>null</code> as errorMessage argument.
-     *
+     * 
      * @param cancelOption
      *            the cancel option to use when a local cancellation was set
      * @throws SarosCancellationException
@@ -224,7 +224,7 @@ abstract class Negotiation {
      * possible. Calling this method multiple times will <b>NOT</b> override the
      * error message or the cancel option. This method will also have <b>NO</b>
      * effect if a remote cancellation request was already executed.
-     *
+     * 
      * @param errorMessage
      *            the reason to cancel the execution in case of an error or
      *            <code>null</code> if this is a normal cancel request
@@ -234,7 +234,7 @@ abstract class Negotiation {
      *            {@link CancelOption#DO_NOT_NOTIFY_PEER}
      * @return <code>true</code> if this request was the first cancel request,
      *         <code>false</code> otherwise
-     *
+     * 
      * @see #remoteCancel
      * @see #checkCancellation
      * @see #notifyCancellation
@@ -261,13 +261,13 @@ abstract class Negotiation {
      * possible. Calling this method multiple times will <b>NOT</b> override the
      * error message. This method will also have <b>NO</b> effect if a local
      * cancellation request was already executed.
-     *
+     * 
      * @param errorMessage
      *            the reason to cancel the execution in case of an error or
      *            <code>null</code> if this is a cancel abort request
      * @return <code>true</code> if this request was the first cancel request,
      *         <code>false</code> otherwise
-     *
+     * 
      * @see #localCancel
      * @see #checkCancellation
      * @see #notifyCancellation
@@ -292,7 +292,7 @@ abstract class Negotiation {
 
     /**
      * Adds the given listener for cancellation events to this negotiation.
-     *
+     * 
      * @param listener
      *            the listener to add
      */
@@ -303,7 +303,7 @@ abstract class Negotiation {
 
     /**
      * Removes the given listener for cancellation events from this negotiation.
-     *
+     * 
      * @param listener
      *            the listener to remove
      */
@@ -313,7 +313,7 @@ abstract class Negotiation {
 
     /**
      * Returns if this negotiation should be canceled.
-     *
+     * 
      * @return <code>true</code> this negotiation should be canceled,
      *         <code>false</code> otherwise
      */
@@ -324,7 +324,7 @@ abstract class Negotiation {
     /**
      * Returns if the negotiation should be canceled because of a local
      * cancellation request
-     *
+     * 
      * @return <code>true</code> if cancellation is requested on the local side,
      *         <code>false</code> otherwise
      */
@@ -337,7 +337,7 @@ abstract class Negotiation {
     /**
      * Returns if the negotiation should be canceled because of a remote
      * cancellation request.
-     *
+     * 
      * @return <code>true</code> if cancellation is requested on the remote
      *         side, <code>false</code> otherwise
      */
@@ -350,8 +350,8 @@ abstract class Negotiation {
      * only the <b>first</b> call will be taken into account. If the negotiation
      * was canceled in the meantime it will invoke {@link #notifyCancellation}
      * and {@link #executeCancellation} in this order.
-     *
-     *
+     * 
+     * 
      * @param exception
      *            The exception to analyze or <code>null</code>. If the
      *            negotiation had already been canceled by a
@@ -453,7 +453,7 @@ abstract class Negotiation {
      * Informs the listener, that the negotiation is terminated. Otherwise, the
      * SessionManager would block the execution and wait until the negotiation
      * is terminated
-     *
+     * 
      * @param listener
      *            to notify
      */

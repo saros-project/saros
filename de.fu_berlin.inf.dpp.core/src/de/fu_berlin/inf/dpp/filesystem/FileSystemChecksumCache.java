@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
  * <p>
  * <b>Note:</b> This implementation is <b>NOT</b> capable of handling hash
  * collisions.
- *
+ * 
  * @author Stefan Rossbach
  */
 // TODO add probability of hash collisions, lower bound should be 1 / (2^32 *

@@ -17,6 +17,11 @@ export default class Wizard extends React.Component {
     return this.step < this.props.children.length - 1
   }
 
+  @computed
+  get hasPrev () {
+    return this.step > 0
+  }
+
   @action
   onClickNext = () => {
     if (this.hasNext) {
@@ -26,14 +31,24 @@ export default class Wizard extends React.Component {
     }
   }
 
+  @action
+  onClickBack = () => {
+    if (this.hasPrev) {
+      this.step = this.step - 1
+    }
+  }
+
   render () {
     return React.cloneElement(
       this.currentStepInstance,
       {
         wizard: {
           onClickNext: this.onClickNext,
-          hasNext: this.hasNext
-        }
+          hasNext: this.hasNext,
+          onClickCancel: this.props.onClickCancel,
+          onClickBack: this.onClickBack,
+          hasPrev: this.hasPrev,
+        },
       }
     )
   }

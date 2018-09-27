@@ -31,9 +31,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  * Packet used for exchanging data during session negotiation. Can be used on
  * both sides.
  */
-
-// TODO Move to core (package communication.extensions)
-
 @XStreamAlias(/* SessionNegotiationParameterExchange */"SNPE")
 public class InvitationParameterExchangeExtension extends InvitationExtension {
 

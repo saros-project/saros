@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
  * marshaling nor during unmarshaling.
  * <p>
  * <i>SPath</i> objects can be marshaled and unmarshaled.
- *
+ * 
  * @see SPathConverter
  */
 
@@ -26,7 +26,7 @@ public class SPath {
 
     /**
      * @JTourBusStop 4, Some Basics:
-     *
+     * 
      *               Individual IProjects use IPaths to identify their
      *               resources. However, because Saros needs to keep track of
      *               resources across multiple projects, it encapsulates IPaths
@@ -48,7 +48,7 @@ public class SPath {
     /**
      * Default constructor, initializing this SPath as a reference to the
      * resource identified by the given path in the given project.
-     *
+     * 
      * @param path
      * @throws IllegalArgumentException
      *             if project is <code>null</code><br>
@@ -80,7 +80,7 @@ public class SPath {
     /**
      * Returns the project relative path of the resource represented by this
      * SPath.
-     *
+     * 
      * @return project relative path of the resource
      */
     public IPath getProjectRelativePath() {
@@ -89,7 +89,7 @@ public class SPath {
 
     /**
      * Returns a handle for an IFile represented by this SPath.
-     *
+     * 
      * @return the IFile contained in the associated IProject for the given
      *         project relative path
      */
@@ -101,7 +101,7 @@ public class SPath {
      * Returns the IResource represented by this SPath.
      * <p>
      * <b>Note:</b> This operation might perform disk I/O.
-     *
+     * 
      * @return the resource represented by this SPath or <code>null</code> if
      *         such or resource does not exist
      */
@@ -111,10 +111,10 @@ public class SPath {
 
     /**
      * Returns a handle for an IFolder represented by this SPath.
-     *
+     * 
      * @return the IFolder contained in the associated IProject for the given
      *         project relative path
-     *
+     * 
      */
     public IFolder getFolder() {
         return project.getFolder(projectRelativePath);

@@ -41,7 +41,7 @@ module.exports = (env = {}) => {
     },
     devtool: 'source-map',
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
@@ -71,7 +71,9 @@ module.exports = (env = {}) => {
       extractCss,
       // TODO there should be a more elegant way of telling the application which view to show
       createPage('main-page'),
-      createPage('session-wizard')
+      createPage('start-session-wizard'),
+      createPage('configuration-page'),
+      createPage('basic-widget-test')
     ]
     .concat(isProd ? [
       // In Production Mode the global variable process.env.NODE_ENV is set to production
@@ -92,6 +94,7 @@ module.exports = (env = {}) => {
       extensions: ['.js', '.jsx'],
       // This is why we can just import 'Utils' and 'Constants'
       alias: {
+        '~': resolve(__dirname, 'src/'),
         Utils: resolve(__dirname, 'src/utils/'),
         Constants: resolve(__dirname, 'src/constants.jsx')
       }

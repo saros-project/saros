@@ -136,7 +136,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                 return null;
             }
 
-        }, ModalityState.any());
+        }, ModalityState.defaultModalityState());
     }
 
     @Override
@@ -233,7 +233,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                 return null;
             }
 
-        }, ModalityState.any());
+        }, ModalityState.defaultModalityState());
     }
 
     /**
@@ -289,7 +289,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                 return null;
             }
 
-        }, ModalityState.any());
+        }, ModalityState.defaultModalityState());
     }
 
     @Override

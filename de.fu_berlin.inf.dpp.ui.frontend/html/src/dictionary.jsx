@@ -4,7 +4,7 @@ export default {
     'contacts': 'Contacts',
     'selectProjects': 'Select Projects',
     'selectContacts': 'Select Contacts',
-    'error': 'Error'
+    'error': 'Error',
   },
   'action': {
     'manageAccounts': 'Manage Accounts',
@@ -26,13 +26,15 @@ export default {
     'delete': 'Delete',
     'rename': 'Rename',
     'workTogetherOn': 'Work together on...',
-    'startSession': 'Start Session...'
+    'startSession': 'Start Session...',
   },
   'label': {
     'nickname': 'Nickname',
     'optional': 'Optional',
     'jid': 'XMPP/Jabber ID',
-    'online': 'Online'
+    'online': 'Online',
+    'host': 'Host',
+    'password': 'Password',
   },
   'message': {
     'noAccount': 'No account selected',
@@ -40,6 +42,7 @@ export default {
     'deleteContact': 'Do you really want to delete this contact?',
     'selectProjects': 'Select the projects, folders or files you want to work on. You can choose projects completely or partially.',
     'selectContacts': 'Select the contacts(s) to work with.',
-    'addContactInfo': 'Enter the Jabber Identifier of the contact you want to add.'
-  }
+    'addContactInfo': 'Enter the Jabber Identifier of the contact you want to add.',
+    'nonSharedFileOpen': 'non-shared file open',
+  },
 }

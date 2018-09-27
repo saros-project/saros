@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -326,7 +327,7 @@ public class UserInformationHandler implements Startable {
                     userEntry.favoriteColorID);
 
                 user.setPermission(userEntry.permission);
-                session.addUser(user);
+                session.addUser(user, new PreferenceStore());
 
             } else if ((userEntry.flags & UserListEntry.USER_REMOVED) != 0) {
                 user = session.getUser(userEntry.jid);

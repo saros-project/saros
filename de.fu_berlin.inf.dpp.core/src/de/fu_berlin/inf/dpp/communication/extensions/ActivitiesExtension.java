@@ -40,12 +40,11 @@ import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.PermissionActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
-import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.ShareConsoleActivity;
 import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.StopActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
+import de.fu_berlin.inf.dpp.activities.TargetedFileActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
@@ -190,9 +189,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
 
                 ProgressActivity.class,
 
-                RecoveryFileActivity.class,
-
-                ShareConsoleActivity.class,
+                TargetedFileActivity.class,
 
                 StartFollowingActivity.class,
 

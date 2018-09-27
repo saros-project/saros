@@ -71,7 +71,7 @@ public class MultiUserChat extends AbstractChat {
     private MultiUserChatStateManager mucStateManager;
 
     /**
-     * {@link IChatListener} used for {@link ChatState} propagation
+     * {@link IChatListener} used for {@link ChatState} propagation
      */
     private IChatListener mucStateListener = new IChatListener() {
         @Override
@@ -125,7 +125,7 @@ public class MultiUserChat extends AbstractChat {
     };
 
     /**
-     * {@link PacketListener} for processing incoming messages
+     * {@link PacketListener} for processing incoming messages
      */
     private PacketListener packetListener = new PacketListener() {
         @Override
@@ -358,7 +358,7 @@ public class MultiUserChat extends AbstractChat {
     }
 
     /**
-     * Sets the own {@link ChatState} and notifies all participants
+     * Sets the own {@link ChatState} and notifies all participants
      * 
      * @param state
      */

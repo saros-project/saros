@@ -8,6 +8,7 @@
      -->
 
     <!-- Compiler options -->
+    <property name="test.haltonfailure" value="off" />
 
     <property name="compiler.debug" value="on"/>
     <property name="compiler.generate.no.warnings" value="off"/>
@@ -427,8 +428,8 @@
             description="run saros-i unit tests">
 
         <mkdir dir="${saros-i.junit.report.dir}"/>
-        <junit printsummary="yes" fork="yes" forkmode="once"
-               jvm="${jdk.bin}/java">
+        <junit fork="yes" forkmode="once"
+               jvm="${jdk.bin}/java" haltonfailure="${test.haltonfailure}" >
 
             <sysproperty key="net.sourceforge.cobertura.datafile"
                          value="${saros-i.cobertura.datafile}"/>
@@ -442,6 +443,7 @@
             <classpath refid="cobertura.classpath"/>
 
             <formatter type="xml"/>
+            <formatter type="plain" usefile="false"/>
 
             <batchtest todir="${saros-i.junit.report.dir}">
                 <fileset dir="${saros-i.test.dir}">

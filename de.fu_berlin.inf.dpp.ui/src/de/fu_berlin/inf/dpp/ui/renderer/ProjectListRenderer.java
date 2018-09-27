@@ -60,7 +60,8 @@ public class ProjectListRenderer extends Renderer {
         }
 
         // FIXME: Workspaces with a big number of files cause massive
-        // performance problems.See BUG: https://sourceforge.net/p/dpp/bugs/861/
+        // performance problems. See
+        // https://github.com/saros-project/saros/issues/71
         JavaScriptAPI.updateProjects(browser,
             projectListManager.getProjectModels());
     }

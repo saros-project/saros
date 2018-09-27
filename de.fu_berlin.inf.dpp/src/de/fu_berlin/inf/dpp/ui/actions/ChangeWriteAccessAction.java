@@ -131,8 +131,8 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
          * the action enablement cannot be updated.
          */
         if (sessionManager.getSession() != null) {
-            sessionLifecycleListener.sessionStarted(sessionManager
-                .getSession());
+            sessionLifecycleListener
+                .sessionStarted(sessionManager.getSession());
         }
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);

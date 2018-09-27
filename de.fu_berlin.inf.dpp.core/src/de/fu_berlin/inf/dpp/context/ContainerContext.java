@@ -66,7 +66,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
  * <p>
  * <b>Restriction:</b> Instantiating the context <b>multiple</b> times is only
  * allowed by using different class loaders !
- *
+ * 
  * @author pcordes
  * @author srossbach
  */
@@ -110,10 +110,10 @@ public class ContainerContext implements IContainerContext {
     private void installPacketExtensionProviders() {
 
         /* *
-         *
+         * 
          * @JTourBusStop 6, Creating custom network messages, Installing the
          * provider:
-         *
+         * 
          * This should be straight forward. Follow the code pattern below.
          */
 
@@ -169,7 +169,7 @@ public class ContainerContext implements IContainerContext {
     /**
      * Initialize this context and instantiates all components created by the
      * context factories. Does nothing if called more than once.
-     *
+     * 
      * @see #dispose()
      */
     public void initialize() {
@@ -205,6 +205,7 @@ public class ContainerContext implements IContainerContext {
             }
         }
 
+        container.start();
         initialized = true;
 
         LOG.info("successfully initialized context");
@@ -221,6 +222,7 @@ public class ContainerContext implements IContainerContext {
             return;
 
         LOG.info("disposing context...");
+        container.stop();
         disposed = true;
         container.dispose();
         LOG.info("successfully disposed context");

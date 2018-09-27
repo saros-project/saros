@@ -106,7 +106,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
         }
 
         getPreferenceStore().setValue(
-            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
+            PreferenceConstants.FORCE_IBB_CONNECTIONS,
             buttonOnlyAllowIBB.getSelection());
 
         getPreferenceStore().setValue(
@@ -208,11 +208,15 @@ public final class NetworkPreferencePage extends PreferencePage implements
         localSocks5PortText.setText(String.valueOf(getPreferenceStore().getInt(
             PreferenceConstants.FILE_TRANSFER_PORT)));
 
-        buttonOnlyAllowIBB.setSelection(saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
+        boolean ibbIsForced = saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.FORCE_IBB_CONNECTIONS);
+        boolean localSocks5ProxyDisabled = saros.getPreferenceStore()
+            .getBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
 
-        buttonOnlyAllowMediatedSocks5.setSelection(saros.getPreferenceStore()
-            .getBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED));
+        buttonOnlyAllowIBB.setSelection(ibbIsForced);
+
+        buttonOnlyAllowMediatedSocks5.setSelection(!ibbIsForced
+            && localSocks5ProxyDisabled);
 
         buttonAllowAlternativeSocks5Port.setSelection(saros
             .getPreferenceStore().getBoolean(
@@ -248,7 +252,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
             PreferenceConstants.FILE_TRANSFER_PORT)));
 
         buttonOnlyAllowIBB.setSelection(saros.getPreferenceStore()
-            .getDefaultBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
+            .getDefaultBoolean(PreferenceConstants.FORCE_IBB_CONNECTIONS));
 
         buttonOnlyAllowMediatedSocks5
             .setSelection(saros.getPreferenceStore().getDefaultBoolean(

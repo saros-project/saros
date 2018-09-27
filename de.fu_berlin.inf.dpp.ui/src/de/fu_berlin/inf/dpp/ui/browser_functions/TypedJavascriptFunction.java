@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
 
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunction.Policy;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -36,7 +35,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  * }
  * </pre>
  */
-public class TypedJavascriptFunction extends JavascriptFunction {
+class TypedJavascriptFunction extends SelfRegisteringJavascriptFunction {
 
     private static final Logger LOG = Logger
         .getLogger(TypedJavascriptFunction.class);

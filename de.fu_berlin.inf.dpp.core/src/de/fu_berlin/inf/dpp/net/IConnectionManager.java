@@ -16,7 +16,7 @@ public interface IConnectionManager {
 
     /**
      * Sets the services that should be used to establish direct connections.
-     *
+     * 
      * @param serviceMask
      *            bit wise OR mask that contain the service to use, -1 for all
      *            available services or 0 for no service at all
@@ -38,7 +38,7 @@ public interface IConnectionManager {
     /**
      * @deprecated Disconnects {@link IByteStreamConnection} with the specified
      *             peer
-     *
+     * 
      * @param peer
      *            {@link JID} of the peer to disconnect the
      *            {@link IByteStreamConnection}

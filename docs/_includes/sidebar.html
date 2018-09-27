@@ -1,0 +1,27 @@
+<div class="sidenav">
+    <ul>
+        {% assign links = sidebar_data %}
+
+        {% for link in links %}
+        {% assign class = nil %}
+        {% if page.url contains link.url %}
+        {% assign class = 'active' %}
+        {% endif %}
+        {% if link.sublinks %}
+
+        <li class="{{ class }}">
+            <a  href="{{ link.url | absolute_url }}">{{ link.title }}</a>
+            <ul>
+                {% for sublink in link.sublinks %}
+                <li><a href="{{ sublink.url | absolute_url }}">{{ sublink.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% else %}
+        <li  class="nav-item {{ class }}">
+            <a class="nav-link" href="{{ link.url | absolute_url }}">{{ link.title }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>

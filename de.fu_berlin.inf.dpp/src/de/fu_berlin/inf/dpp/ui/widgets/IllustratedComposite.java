@@ -111,7 +111,8 @@ public class IllustratedComposite extends MinSizeComposite {
                     x = (bounds.width - currentImage.getBounds().width) / 2;
                     y = (bounds.height - currentImage.getBounds().height) / 2;
                 } else {
-                    x = clientArea.x - currentImage.getBounds().width - getSpacing();
+                    x = clientArea.x - currentImage.getBounds().width
+                        - getSpacing();
                     y = (bounds.height - currentImage.getBounds().height) / 2;
                 }
 
