@@ -13,6 +13,8 @@ bin_test/
 /de.fu_berlin.inf.dpp.ui/lib/swt-src.zip
 /de.fu_berlin.inf.dpp.ui/lib/swt-debug.jar
 /de.fu_berlin.inf.dpp.ui.frontend/html/node_modules/
+/de.fu_berlin.inf.dpp.ui.frontend/html/.tmp/
+/de.fu_berlin.inf.dpp.ui.frontend/html/test-results.xml
 /de.fu_berlin.inf.dpp.ui.frontend/html/bundle/
 /de.fu_berlin.inf.dpp.ui.frontend/html/dist/
 /de.fu_berlin.inf.dpp.ui.frontend/html/js/templates.js
@@ -26,3 +28,5 @@ bin_test/
 /de.fu_berlin.inf.dpp.update_beta/plugins/
 /de.fu_berlin.inf.dpp/test/framework/stf/src/de/fu_berlin/inf/dpp/stf/client/configuration.properties
 .DS_Store
+docs/_site
+docs/Gemfile.lock

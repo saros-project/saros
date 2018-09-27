@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
+import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
@@ -190,8 +191,8 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             }
 
             // TODO add encoding
-            addActivity(FileActivity.created(user, spath, content, null,
-                Purpose.ACTIVITY));
+            addActivity(new FileActivity(user, Type.CREATED, Purpose.ACTIVITY,
+                spath, null, content, null));
 
         } else if (isFolder(resource)) {
             addActivity(new FolderCreatedActivity(user, spath));
@@ -218,20 +219,20 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             }
         }
 
+        SPath newPath = new SPath(ResourceAdapterFactory.create(resource));
+        SPath oldPath = new SPath(ResourceAdapterFactory.create(oldProject),
+            ResourceAdapterFactory.create(oldFullPath.removeFirstSegments(1)));
         // TODO add encoding
-        addActivity(FileActivity.moved(
-            user,
-            new SPath(ResourceAdapterFactory.create(resource)),
-            new SPath(ResourceAdapterFactory.create(oldProject),
-                ResourceAdapterFactory.create(oldFullPath
-                    .removeFirstSegments(1))), content, null));
+        addActivity(new FileActivity(user, Type.MOVED, Purpose.ACTIVITY,
+            newPath, oldPath, content, null));
     }
 
     private void generateRemoved(IResource resource) {
 
         if (resource instanceof IFile) {
-            addActivity(FileActivity.removed(user, new SPath(
-                ResourceAdapterFactory.create(resource)), Purpose.ACTIVITY));
+            addActivity(new FileActivity(user, Type.REMOVED, Purpose.ACTIVITY,
+                new SPath(ResourceAdapterFactory.create(resource)), null, null,
+                null));
         } else {
             addActivity(new FolderDeletedActivity(user, new SPath(
                 ResourceAdapterFactory.create(resource))));
@@ -268,8 +269,8 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             logResourceReadError(resource);
         // TODO add encoding
         else
-            addActivity(FileActivity.created(user, spath, content, null,
-                Purpose.ACTIVITY));
+            addActivity(new FileActivity(user, Type.CREATED, Purpose.ACTIVITY,
+                spath, null, content, null));
     }
 
     private void addActivity(IResourceActivity activity) {

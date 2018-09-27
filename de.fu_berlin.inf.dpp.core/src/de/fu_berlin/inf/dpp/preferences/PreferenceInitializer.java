@@ -32,7 +32,7 @@ public class PreferenceInitializer {
             true);
 
         store.setDefault(PreferenceConstants.LOCAL_SOCKS5_PROXY_CANDIDATES, "");
-        store.setDefault(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
+        store.setDefault(PreferenceConstants.FORCE_IBB_CONNECTIONS, false);
 
         store.setDefault(PreferenceConstants.STUN, "stunserver.org");
         store.setDefault(PreferenceConstants.STUN_PORT, 0);
@@ -42,5 +42,7 @@ public class PreferenceInitializer {
             UserColorID.UNKNOWN);
 
         store.setDefault(PreferenceConstants.SESSION_NICKNAME, "");
+        store.setDefault(PreferenceConstants.INSTANT_SESSION_START_PREFERRED,
+            false);
     }
 }

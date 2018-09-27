@@ -113,10 +113,4 @@ public class EclipsePreferenceConstants {
     public static final String SHOW_CONTRIBUTION_ANNOTATIONS = "editor.annotation.contribution.enabled";
 
     public static final String SHOW_SELECTIONFILLUP_ANNOTATIONS = "editor.annotation.selectionfillup.enabled";
-
-    /*
-     * ConsoleSharing
-     */
-    public static final String CONSOLESHARING_ENABLED = "consolesharing.enabled";
-
 }

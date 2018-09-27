@@ -86,7 +86,7 @@ public class EclipsePathImpl implements IPath {
 
     /**
      * Returns the original {@link org.eclipse.core.runtime.IPath IPath} object.
-     *
+     * 
      * @return
      */
     public org.eclipse.core.runtime.IPath getDelegate() {

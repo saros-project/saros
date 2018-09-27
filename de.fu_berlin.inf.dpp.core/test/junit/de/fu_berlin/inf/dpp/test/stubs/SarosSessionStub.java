@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
@@ -70,6 +71,11 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
+    public IPreferenceStore getUserProperties(User user) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    @Override
     public JID getResourceQualifiedJID(JID jid) {
         throw new RuntimeException("Unexpected call to Stub");
     }
@@ -125,7 +131,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void addUser(User user) {
+    public void addUser(User user, IPreferenceStore properties) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

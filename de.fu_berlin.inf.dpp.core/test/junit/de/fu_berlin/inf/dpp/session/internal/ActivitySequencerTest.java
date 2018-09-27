@@ -23,6 +23,8 @@ import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
@@ -54,7 +56,7 @@ public class ActivitySequencerTest {
          * needed
          */
         @Override
-        public void addUser(User user) {
+        public void addUser(User user, IPreferenceStore properties) {
             users.add(user);
         }
 
@@ -238,8 +240,8 @@ public class ActivitySequencerTest {
         User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
         User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
 
-        sessionStubAlice.addUser(bobUserInAliceSession);
-        sessionStubBob.addUser(aliceUserInBobSession);
+        sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
+        sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
 
         aliceSequencer.registerUser(bobUserInAliceSession);
         bobSequencer.registerUser(aliceUserInBobSession);
@@ -278,8 +280,8 @@ public class ActivitySequencerTest {
         User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
         User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
 
-        sessionStubAlice.addUser(bobUserInAliceSession);
-        sessionStubBob.addUser(aliceUserInBobSession);
+        sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
+        sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
 
         bobSequencer.registerUser(aliceUserInBobSession);
 
@@ -312,8 +314,8 @@ public class ActivitySequencerTest {
         User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
         User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
 
-        sessionStubAlice.addUser(bobUserInAliceSession);
-        sessionStubBob.addUser(aliceUserInBobSession);
+        sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
+        sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
 
         aliceSequencer.registerUser(bobUserInAliceSession);
 
@@ -347,8 +349,8 @@ public class ActivitySequencerTest {
         User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
         User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
 
-        sessionStubAlice.addUser(bobUserInAliceSession);
-        sessionStubBob.addUser(aliceUserInBobSession);
+        sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
+        sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
 
         aliceSequencer.registerUser(bobUserInAliceSession);
         bobSequencer.registerUser(aliceUserInBobSession);

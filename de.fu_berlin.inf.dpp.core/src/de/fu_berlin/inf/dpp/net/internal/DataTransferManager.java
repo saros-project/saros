@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 /**
  * This class is responsible for handling all transfers of binary data. It
  * maintains a map of established connections and tries to reuse them.
- *
+ * 
  * @author srossbach
  * @author coezbek
  * @author jurke
@@ -301,7 +301,7 @@ public class DataTransferManager implements IConnectionListener,
     /**
      * @deprecated Disconnects {@link IByteStreamConnection} with the specified
      *             peer
-     *
+     * 
      * @param peer
      *            {@link JID} of the peer to disconnect the
      *            {@link IByteStreamConnection}
@@ -344,7 +344,7 @@ public class DataTransferManager implements IConnectionListener,
      * {@inheritDoc} The services will be used on the next successful connection
      * to a XMPP server and will not affect the transports that are currently
      * used.
-     *
+     * 
      */
     @Override
     public synchronized void setServices(int transportMask) {
@@ -532,7 +532,7 @@ public class DataTransferManager implements IConnectionListener,
 
     /**
      * Left over and <b>MUST</b> only used by the STF
-     *
+     * 
      * @param extension
      * @deprecated
      */
@@ -545,7 +545,7 @@ public class DataTransferManager implements IConnectionListener,
      * Returns the current connection for the remote side. If the local side is
      * connected to the remote side as well as the remote side is connected to
      * the local side the local to remote connection will be returned.
-     *
+     * 
      * @param connectionID
      *            identifier for the connection to retrieve or <code>null</code>
      *            to retrieve the default one

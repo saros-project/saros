@@ -1,0 +1,57 @@
+language: java
+sudo: enabled
+
+# git history is not needed during build
+git:
+  depth: false
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+
+services: docker
+
+# Sonar token is encrypted via travis encrypt
+addons:
+  sonarcloud:
+    organization: "saros"
+    token:
+      secure: "i9qx/WK3iDm96WGznDUVIJ7PXSUqwE3qg4ZjGkrbtVQ3wshfya9K4G7A4ll7jLIQ+m1ZhW3H5v1yamNFlOUj1xQ88BJt+sHU674cRASpWePk+TQSTEHvtGut35n17Ibl9rrtQyqxi3TlrqMSlpxiThSoVqJ0XBJnvrGt4dkMO9FWm4f43Jj5MdO0AJKdwthAmJT+bR6xhYFgIOjAwJOYZ3doRNkR8cLBU9QPkzeZC7hUVFwVT8DWNSBQUz3iNuhSzzxfpzX8WBqTJuoytJQTgRcS9SULzJ5xPG/KYt+1xkHvpc8yM1l7fyjxjWL4FP3Q3kaXiy09vfQoLAwsQ18EZ2dulQVx2gI7eDGASNEeM0BWri+pKc/anJRRi7gLM/wKkB3vdoSS3EdEbpxyEIz10wIeVN81izgRAZh0TR/3d22Jjt3usm7DBzBTAtqaKuvsgmE5JVZwc4vU+53guXOoax2ZiLdeKamTTsmWBDvn77poQPhkTDfwBL8/GEkvYJoKjjWdbfhcFeNiGlb4Jq8/7BitFXKN6mWMuIcQTsJ8xX7oA3Ics7mAjKsppw+6w6HXsfrB5rczcbbsp8FQb0n4JPsvz+dAbsWz4OT5Zi9Fy8hOu+bosENrFBUEVc42u4BuCUdWWtY122u4jnr2rHoaHMZwlflm6EuJ9FQTWmyorOM="
+
+# Avoid config duplication via yaml anchors
+_stf_setup_config: &stf_before_script
+  if: type in (cron, api)
+  # variable is only used for allow_failures
+  env: J_TYPE=STF_TEST
+  before_script:
+    # Pull required images
+    - docker pull saros/build_test:0.1
+    - docker pull saros/stf_test_master:0.1
+    - docker pull saros/stf_test_slave:0.1
+    - docker pull saros/stf_xmpp_server:0.1
+    # Create shared workspace dir which is mounted by the build, master and slave containers
+    - mkdir stf_ws
+    # Build required artifacts and move them in the shared workspace
+    - docker run -t -v $PWD:/home/saros/ci/saros_src -v $PWD/stf_ws:/home/saros/ci/stf_ws saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/stf/build/provide_testee.sh
+    # Start required containers and services
+    - export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf; $PWD/travis/script/stf/setup_stf_container.sh $PWD
+
+jobs:
+  # Dont report failures on master branch commits if stf tests fail
+  allow_failures:
+    - env: J_TYPE=STF_TEST
+  include:
+    - if: type in (push, pull_request)
+      before_script: docker pull saros/build_test:0.1
+      script:
+        - docker run -v $PWD:/home/saros/ci/saros_src saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/build/build_all.sh
+      after_success:
+        - sonar-scanner
+      # set env to avoid multiple build executions
+
+    - <<: *stf_before_script
+      script: docker exec -t stf_master scripts/start_stf_tests.sh
+
+    - <<: *stf_before_script
+      script: docker exec -t stf_master scripts/start_stf_self_tests.sh

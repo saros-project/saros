@@ -34,7 +34,7 @@ public interface IResource {
     /**
      * Equivalent to the Eclipse call <code>IResource#isDerived(checkAncestors ?
      * IResource#CHECK_ANCESTORS : IResource#NONE)</code>
-     *
+     * 
      * @param checkAncestors
      * @return
      */

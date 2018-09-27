@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -23,7 +22,8 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
@@ -143,24 +143,24 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
             /**
              * @JTourBusStop 8, Invitation Process:
-             *
+             * 
              *               This method is called by the JoinSessionWizard
              *               after the user clicked on "Finish" (indicating that
              *               he is willing to join the session).
-             *
+             * 
              *               (4b) Send acceptance to host.
-             *
+             * 
              *               (5a) Create "wishlist" with session's parameters
              *               (e.g. preferred color) and send it.
-             *
+             * 
              *               (6b) Wait for host's response.
-             *
+             * 
              *               (7) Initialize the session and related components
              *               (e.g. chat, color management) with the parameters
              *               as defined by the host.
-             *
+             * 
              *               (8) Establish a connection to the host (e.g Socks5)
-             *
+             * 
              *               (9) Start the session accordingly, inform the host
              *               and wait for his final acknowledgement (which
              *               indicates, that this client has been successfully
@@ -309,28 +309,20 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Initializing session...");
 
-        // HACK
-        int clientColor = UserColorID.UNKNOWN;
-        int hostFavoriteColor = UserColorID.UNKNOWN;
+        IPreferenceStore hostPreferences = new PreferenceStore();
+        IPreferenceStore clientPreferences = new PreferenceStore();
 
         for (ISessionNegotiationHook hook : hookManager.getHooks()) {
             Map<String, String> settings = parameters.getHookSettings(hook);
-            hook.applyActualParameters(settings);
+            hook.applyActualParameters(settings, hostPreferences,
+                clientPreferences);
 
             if (settings == null)
                 continue;
-
-            if (hook instanceof ColorNegotiationHook) {
-                clientColor = Integer.parseInt(settings
-                    .get(ColorNegotiationHook.KEY_CLIENT_COLOR));
-                hostFavoriteColor = Integer.parseInt(settings
-                    .get(ColorNegotiationHook.KEY_HOST_FAV_COLOR));
-            }
         }
-        // end of HACK
 
         sarosSession = sessionManager.joinSession(sessionID,
-            parameters.getSessionHost(), clientColor, hostFavoriteColor);
+            parameters.getSessionHost(), hostPreferences, clientPreferences);
     }
 
     /**

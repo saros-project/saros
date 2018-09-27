@@ -22,14 +22,14 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 /**
  * BinaryChannelConnection is a class that encapsulates a bidirectional
  * communication channel between two participants.
- *
+ * 
  * The threading requirements of this class are the following:
- *
+ * 
  * send() is a reentrant method for sending data. Any number of threads can call
  * it in parallel. </p> <b>Note:</b> The maximum number of concurrent threads is
  * 32 !
- *
- *
+ * 
+ * 
  * @author sszuecs
  * @author coezbek
  * @author srossbach
@@ -285,9 +285,9 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     /**
      * Reads the next XMPP extension.
-     *
+     * 
      * @return returns the next incoming transfer object
-     *
+     * 
      * @throws IOException
      *             If the associated socket broke, while reading or if the
      *             socket has already been disposed.

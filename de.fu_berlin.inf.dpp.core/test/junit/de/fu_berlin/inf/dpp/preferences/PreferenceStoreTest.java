@@ -8,10 +8,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.preferences.IPreferenceChangeListener;
-import de.fu_berlin.inf.dpp.preferences.PreferenceChangeEvent;
-import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
-
 public class PreferenceStoreTest {
 
     private PreferenceStore store;

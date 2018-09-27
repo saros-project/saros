@@ -14,25 +14,9 @@ public class ViewUtils {
     private static final Logger LOG = Logger.getLogger(ViewUtils.class);
 
     public static void openSarosView() {
-        createView(SarosView.ID);
-    }
-
-    public static void bringViewToFront(String id) {
-        showView(id, IWorkbenchPage.VIEW_VISIBLE);
-    }
-
-    public static void activateView(String id) {
-        showView(id, IWorkbenchPage.VIEW_ACTIVATE);
-    }
-
-    public static void createView(String id) {
-        showView(id, IWorkbenchPage.VIEW_CREATE);
-    }
-
-    /*
-     * TODO What to do if no WorkbenchWindows are are active?
-     */
-    private static void showView(String id, int mode) {
+        /*
+         * TODO What to do if no WorkbenchWindows are are active?
+         */
         final IWorkbench workbench = PlatformUI.getWorkbench();
 
         if (workbench == null)
@@ -44,10 +28,10 @@ public class ViewUtils {
             return;
 
         try {
-            window.getActivePage().showView(id, null, mode);
+            window.getActivePage().showView(SarosView.ID, null,
+                IWorkbenchPage.VIEW_CREATE);
         } catch (PartInitException e) {
-            LOG.error(
-                "could not access view with id: " + id + " [mode=" + mode + "]", e); //$NON-NLS-1$
+            LOG.error("could not open Saros view (id: " + SarosView.ID + ")", e); //$NON-NLS-1$
         }
     }
 }

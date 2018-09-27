@@ -14,7 +14,7 @@ public abstract class AbstractBrowserPage implements IBrowserPage {
     /**
      * Common HTML document location
      */
-    private static final String PATH = "html/dist/";
+    public static final String PATH = "html/dist/";
     private String relativePageLocation;
 
     /**

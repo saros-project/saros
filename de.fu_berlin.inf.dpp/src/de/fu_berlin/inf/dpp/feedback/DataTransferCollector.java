@@ -67,9 +67,8 @@ public class DataTransferCollector extends AbstractStatisticCollector {
         }
 
         @Override
-        public void received(final StreamMode mode,
-            final long sizeCompressed, final long sizeUncompressed,
-            final long duration) {
+        public void received(final StreamMode mode, final long sizeCompressed,
+            final long sizeUncompressed, final long duration) {
             // TODO differentiate the traffic
             sent(mode, sizeCompressed, sizeUncompressed, duration);
         }

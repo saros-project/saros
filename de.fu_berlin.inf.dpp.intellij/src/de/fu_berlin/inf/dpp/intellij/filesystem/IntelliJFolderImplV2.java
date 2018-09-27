@@ -191,7 +191,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
                 return null;
             }
 
-        }, ModalityState.any());
+        }, ModalityState.defaultModalityState());
     }
 
     @Override
@@ -265,7 +265,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
 
             }
 
-        }, ModalityState.any());
+        }, ModalityState.defaultModalityState());
     }
 
     @Override

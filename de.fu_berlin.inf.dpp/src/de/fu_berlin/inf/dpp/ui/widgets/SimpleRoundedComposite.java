@@ -18,11 +18,11 @@ import de.fu_berlin.inf.dpp.ui.util.FontUtils;
  * sufficient.
  * <p>
  * <img src="doc-files/SimpleRoundedComposite-1.png"/>
- *
+ * 
  * @see RoundedComposite
  * @see Composite
  * @author bkahlert
- *
+ * 
  */
 public class SimpleRoundedComposite extends RoundedComposite {
     public static final int MARGIN_WIDTH = 4;
@@ -41,7 +41,7 @@ public class SimpleRoundedComposite extends RoundedComposite {
      * The added text gets layed out adequately by centering all but the first
      * and last created {@link Label}s.<br/>
      * The first one becomes left wheras the last one becomes right aligned.
-     *
+     * 
      * @param texts
      */
     public void setTexts(String[] texts) {
@@ -98,7 +98,7 @@ public class SimpleRoundedComposite extends RoundedComposite {
     /**
      * Convenience method call for <code>setTexts</code> in case you only want
      * to provide a single text.
-     *
+     * 
      * @param text
      */
     public void setText(String text) {

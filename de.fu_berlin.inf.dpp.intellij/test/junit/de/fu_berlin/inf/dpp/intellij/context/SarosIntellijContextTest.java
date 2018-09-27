@@ -98,6 +98,8 @@ public class SarosIntellijContextTest {
             factory.createComponents(container);
         }
 
+        container.start();
+
         Assert.assertNotNull(container.getComponents());
     }
 
@@ -112,6 +114,8 @@ public class SarosIntellijContextTest {
         for (IContextFactory factory : factories) {
             factory.createComponents(container);
         }
+
+        container.start();
 
         Assert.assertNotNull(container.getComponents());
     }

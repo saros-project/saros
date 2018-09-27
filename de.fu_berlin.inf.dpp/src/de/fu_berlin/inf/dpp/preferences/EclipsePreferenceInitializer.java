@@ -93,10 +93,6 @@ public class EclipsePreferenceInitializer extends AbstractPreferenceInitializer 
         adapter.setDefault(
             EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE, true);
 
-        // consolesharing
-        adapter.setDefault(EclipsePreferenceConstants.CONSOLESHARING_ENABLED,
-            false);
-
         /*
          * Initially 50/50 distribution Roster/Chatpart in saros view
          */

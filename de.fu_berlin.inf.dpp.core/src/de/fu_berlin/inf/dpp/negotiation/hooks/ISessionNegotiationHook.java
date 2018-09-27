@@ -5,6 +5,7 @@ import java.util.Map;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 
 /**
@@ -29,6 +30,20 @@ public interface ISessionNegotiationHook {
      * @return A unique string identifying the hook.
      */
     public String getIdentifier();
+
+    /**
+     * Sets the host preferences that are needed before the session negotiation
+     * is started.
+     * <p>
+     * This method will be called on the <b>host</b> side during the session
+     * creation as part of {@link SarosSessionManager#startSession(Map)}).
+     * 
+     * @param hostPreferences
+     *            The session preference store that corresponds to the host. May
+     *            be used to store the initial host properties so they can be
+     *            accessed by other components.
+     */
+    public void setInitialHostPreferences(IPreferenceStore hostPreferences);
 
     /**
      * Receive the client's preferences for later consideration.
@@ -68,23 +83,34 @@ public interface ISessionNegotiationHook {
         Map<String, String> input);
 
     /**
-     * Duty of the client: Apply the parameters defined by the host.
+     * This will be called on <b>client</b>'s and <b>host</b>'s side upon
+     * determination of the actual session parameters by the host. The hook
+     * itself is responsible for accessing and modifying the according
+     * components (e.g. the {@link SarosSessionManager}) or storing the result
+     * in the given IPreferenceStore, where other components may receive the
+     * parameters.
      * 
-     * This method will be called on the <b>client</b>'s side upon reception of
-     * the actual session parameters determined by the host. The hook itself is
-     * responsible for accessing and modifying the according components (e.g.
-     * the {@link SarosSessionManager}). This method will be called right before
-     * the Session is created on the client side (via
-     * <code>SarosSessionManager.joinSession()</code>) and may not rely on the
-     * effects of other hooks.
+     * This method will be called right before the Session is created and may
+     * not rely on the effects of other hooks.
      * 
-     * @param settings
+     * @param input
      *            The parameters concerning the hook at hand, which were
      *            determined by the host during his
-     *            {@link OutgoingSessionNegotiation} (i.e. the return value of
-     *            {@link #considerClientPreferences(JID, Map)} ). Might be
+     *            {@link OutgoingSessionNegotiation} through
+     *            {@link #considerClientPreferences(JID, Map)}. Might be
      *            <code>null</code>, if the host has no counterpart for this
      *            hook.
+     * 
+     * @param hostPreferences
+     *            The session preference store that corresponds to the host. May
+     *            be used to store the final properties so they can be accessed
+     *            by other components.
+     * 
+     * @param clientPreferences
+     *            The session preference store that corresponds to the client.
+     *            May be used to store the final properties so they can be
+     *            accessed by other components.
      */
-    public void applyActualParameters(Map<String, String> settings);
+    public void applyActualParameters(Map<String, String> input,
+        IPreferenceStore hostPreferences, IPreferenceStore clientPreferences);
 }

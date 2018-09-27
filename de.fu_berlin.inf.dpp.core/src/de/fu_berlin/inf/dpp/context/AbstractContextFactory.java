@@ -21,7 +21,7 @@ package de.fu_berlin.inf.dpp.context;
 /**
  * Abstract base class that only offers syntactic sugar for handling component
  * creation.
- *
+ * 
  * @author srossbach
  */
 public abstract class AbstractContextFactory implements IContextFactory {

@@ -9,10 +9,10 @@ import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
+import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -54,7 +54,9 @@ public class SarosCoreContextFactoryTest {
     @Test
     public void testCreateComponents() {
         IContextFactory factory = new CoreContextFactory();
+
         factory.createComponents(container);
+        container.start();
 
         Assert.assertNotNull(container.getComponents());
     }

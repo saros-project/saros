@@ -149,7 +149,7 @@ public abstract class Preferences {
      * @return true if force In-Band Bytestreams (IBB) transport is enabled.
      */
     public boolean forceIBBTransport() {
-        return store.getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
+        return store.getBoolean(PreferenceConstants.FORCE_IBB_CONNECTIONS);
     }
 
     /**
@@ -195,4 +195,13 @@ public abstract class Preferences {
         return store.getInt(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
     }
 
+    /**
+     * Returns the preference for instant session start feature.
+     * 
+     * @return true if instant session start is preferred
+     */
+    public boolean isInstantSessionStartPreferred() {
+        return store
+            .getBoolean(PreferenceConstants.INSTANT_SESSION_START_PREFERRED);
+    }
 }

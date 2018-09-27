@@ -21,27 +21,27 @@ import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
  * <p>
  * The composite's content is surrounded by a rounded rectangle if a background
  * is set.
- *
+ * 
  * <dl>
  * <dt><b>Styles:</b></dt>
  * <dd>SEPARATOR, and those supported by Composite excluding NO_BACKGROUND</dd>
  * <dt><b>Events:</b></dt>
  * <dd>(none)</dd>
  * </dl>
- *
+ * 
  * <p>
  * Note: If you use SEPARATOR the content gets right aligned and the generated
  * space filled with a small horizontal line.
  * </p>
- *
+ * 
  * <p>
  * This class may be subclassed by custom control implementors who are building
  * controls that are constructed from aggregates of other controls.
  * </p>
- *
+ * 
  * @see Composite
  * @author bkahlert
- *
+ * 
  */
 public class RoundedComposite extends Canvas {
     /**

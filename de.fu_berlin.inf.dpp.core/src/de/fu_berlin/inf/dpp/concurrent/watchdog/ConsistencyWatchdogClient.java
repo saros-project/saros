@@ -160,7 +160,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer
      * The <strong>cancellation</strong> of this method is <strong>not
      * implemented</strong>, so canceling the given monitor does not have any
      * effect.
-     *
+     * 
      * @noSWT This method should not be called from SWT
      * @blocking This method returns after the recovery has finished
      * @client Can only be called on the client!

@@ -59,7 +59,7 @@ public class FileListFactory {
      * <p>
      * <b>Note:</b> This method does not check the input. The caller is
      * <b>responsible</b> for the <b>correct</b> input !
-     *
+     * 
      * @param paths
      *            a list of paths that <b>refers</b> to <b>files</b> that should
      *            be added to this file list.

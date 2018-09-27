@@ -1,0 +1,24 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" >
+  <div class="container w-50">
+    <a href="{{ '/' | absolute_url }}">
+    <div class="logo">
+        <img src="{{ '/assets/images/logo/saros-logo-100x100.png' | relative_url }}"/>
+    </div></a>
+    <a class="navbar-brand" href="{{ '/' | absolute_url }}">{{ site.title }}<small>{{ site.subtitle }}</small></a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        {% assign links = site.data.navigation %}
+        {% for link in links %}
+            {% assign class = nil %}
+            {% if page.url contains link.url %}
+                {% assign class = 'active' %}
+            {% endif %}
+            <li class="nav-item mr-auto {{ class }}">
+              <a class="nav-link" href="{{ link.url | absolute_url }}">{{ link.title }}</a>
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</nav>

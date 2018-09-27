@@ -48,7 +48,7 @@ public class ActivityQueuer {
      * If a flushing of the queue was previously requested by calling
      * {@link #disableQueuing} than the method will return a list of all queued
      * activities.
-     *
+     * 
      * @param activities
      * @return the activities that are not queued
      */
@@ -72,8 +72,8 @@ public class ActivityQueuer {
      * {@link #enableQueuing} and {@link #disableQueuing} can be called
      * multiples time for a given project, increasing or decreasing the internal
      * counter. Activities can be flushed when the counter reaches zero.
-     *
-     *
+     * 
+     * 
      * @param project
      */
     public synchronized void enableQueuing(final IProject project) {
@@ -101,7 +101,7 @@ public class ActivityQueuer {
      * <b>Note: </b> This method <b>MUST</b> be called at the end of an
      * invitation process because it stops the queuing for the given project
      * which at least releases the queued activities to prevent memory leaks.
-     *
+     * 
      * @param project
      */
     public synchronized void disableQueuing(final IProject project) {

@@ -26,8 +26,8 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 /**
- * This abstract class is the superclass for {@link OutgoingProjectNegotiation}
- * and {@link IncomingProjectNegotiation}.
+ * This abstract class is the superclass for {@link AbstractOutgoingProjectNegotiation}
+ * and {@link AbstractIncomingProjectNegotiation}.
  */
 public abstract class ProjectNegotiation extends Negotiation {
 
@@ -37,7 +37,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     /**
      * Prefix part of the id used in the SMACK XMPP file transfer protocol.
      */
-    public static final String ARCHIVE_TRANSFER_ID = "saros-dpp-pn-server-client-archive/";
+    public static final String TRANSFER_ID_PREFIX = "saros-dpp-pn-server-client/";
 
     /**
      * Delimiter for every Zip entry to delimit the project id from the path
@@ -69,7 +69,10 @@ public abstract class ProjectNegotiation extends Negotiation {
      */
     protected FileTransferManager fileTransferManager;
 
+    protected TransferType transferType;
+
     public ProjectNegotiation(final String id, final JID peer,
+        final TransferType transferType,
         final ISarosSessionManager sessionManager, final ISarosSession session,
         final IWorkspace workspace, final IChecksumCache checksumCache,
         final XMPPConnectionService connectionService,
@@ -86,12 +89,14 @@ public abstract class ProjectNegotiation extends Negotiation {
 
         if (connection != null)
             fileTransferManager = new FileTransferManager(connection);
+
+        this.transferType = transferType;
     }
 
     /**
      * Returns the {@linkplain ISarosSession session} id this negotiation
      * belongs to.
-     *
+     * 
      * @return the id of the current session this negotiations belongs to
      */
     public final String getSessionID() {
@@ -127,7 +132,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     /**
      * Monitors a {@link FileTransfer} and waits until it is completed or
      * aborted.
-     *
+     * 
      * @param transfer
      *            the transfer to monitor
      * @param monitor
@@ -137,7 +142,7 @@ public abstract class ProjectNegotiation extends Negotiation {
      *            given monitor. Accepts <code>null</code>, indicating that no
      *            progress should be reported and that the operation cannot be
      *            canceled.
-     *
+     * 
      * @throws SarosCancellationException
      *             if the transfer was aborted either on local side or remote
      *             side, see also {@link LocalCancellationException} and
@@ -175,5 +180,14 @@ public abstract class ProjectNegotiation extends Negotiation {
     @Override
     protected void notifyTerminated(NegotiationListener listener) {
         listener.negotiationTerminated(this);
+    }
+
+    /**
+     * Returns the {@link TransferType} used for this negotiation
+     *
+     * @return the {@link TransferType} used for this negotiation
+     */
+    public TransferType getTransferType() {
+        return transferType;
     }
 }

@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.ag_se.browser.IBrowser;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
+import de.fu_berlin.inf.dpp.ui.pages.AbstractBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 /**
@@ -86,13 +87,14 @@ public abstract class DialogManager {
         uiSynchronizer.asyncExec(new Runnable() {
             @Override
             public void run() {
-                if (!dialogIsOpen(pageId)) {
-                    LOG.warn(pageId + "could not be found");
+                if (!dialogIsOpen(AbstractBrowserPage.PATH + pageId)) {
+                    LOG.warn(AbstractBrowserPage.PATH + pageId
+                        + "could not be found");
                     return;
                 }
 
                 // shell is removed in the ShellLister
-                openDialogs.get(pageId).close();
+                openDialogs.get(AbstractBrowserPage.PATH + pageId).close();
             }
         });
     }

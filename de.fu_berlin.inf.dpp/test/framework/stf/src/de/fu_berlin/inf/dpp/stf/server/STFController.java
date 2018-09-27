@@ -31,7 +31,17 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.AccountManipulatorImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.NetworkManipulatorImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.EclipseHTMLWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.HTMLBotImpl;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.impl.HTMLBotImpl;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLButton;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLCheckbox;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLInputField;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLMultiSelect;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLProgressBar;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLRadioGroup;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLSelect;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLTextElement;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLTree;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCCombo;
@@ -189,6 +199,20 @@ public class STFController {
              */
             exportObject(EclipseHTMLWorkbenchBot.getInstance(), "htmlViewBot");
             exportObject(HTMLBotImpl.getInstance(), "htmlBot");
+
+            /*
+             * export HTML widgets
+             */
+            exportObject(RemoteHTMLView.getInstance(), "htmlView");
+            exportObject(RemoteHTMLButton.getInstance(), "htmlButton");
+            exportObject(RemoteHTMLInputField.getInstance(), "htmlInputField");
+            exportObject(RemoteHTMLCheckbox.getInstance(), "htmlCheckbox");
+            exportObject(RemoteHTMLRadioGroup.getInstance(), "htmlRadioGroup");
+            exportObject(RemoteHTMLSelect.getInstance(), "htmlSelect");
+            exportObject(RemoteHTMLMultiSelect.getInstance(), "htmlMultiSelect");
+            exportObject(RemoteHTMLProgressBar.getInstance(), "htmlProgressBar");
+            exportObject(RemoteHTMLTextElement.getInstance(), "htmlTextElement");
+            exportObject(RemoteHTMLTree.getInstance(), "htmlTree");
         }
 
         /*

@@ -290,7 +290,7 @@ public class ActivityHandlerTest {
     /**
      * Specifies the roles of participants in the session. Should be called at
      * the start of every test case
-     *
+     * 
      * @param target
      *            The target for targeted Activities
      * @param source

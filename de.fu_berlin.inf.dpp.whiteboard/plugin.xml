@@ -10,6 +10,17 @@
             icon="icons/view16/whiteboard_misc.png"
             name="Saros Whiteboard"/>
 	</extension>
+	<!-- HTML Whiteboard
+	<extension 
+		point="org.eclipse.ui.views">
+		<view
+			id="de.fu_berlin.inf.dpp.whiteboard.ui.HTMLWhiteboardView"
+			category="de.fu_berlin.inf.dpp.Saros"
+			class="de.fu_berlin.inf.dpp.whiteboard.ui.HTMLWhiteboardView"
+			icon="icons/view16/whiteboard_misc.png"
+			name="Saros HTML Whiteboard"/>
+	</extension>
+	end HTML Whiteboard -->
 	<extension
          	id="de.fu_berlin.inf.dpp.startup"
          	point="org.eclipse.ui.startup">

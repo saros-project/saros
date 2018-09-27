@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 /**
  * This manager is responsible for handling {@link Permission} changes. It both
  * produces and consumes activities.
- *
+ * 
  * @author rdjemili
  */
 @Component(module = "core")
@@ -59,7 +59,7 @@ public class PermissionManager extends AbstractActivityProducer implements
     /**
      * This method is responsible for handling incoming permission changes from
      * other clients
-     *
+     * 
      * @param activity
      */
     private void handlePermissionChange(PermissionActivity activity) {
@@ -71,19 +71,19 @@ public class PermissionManager extends AbstractActivityProducer implements
 
     /**
      * Initiates a {@link Permission} change for a specific user.
-     *
+     * 
      * @param target
      *            The user who's {@link Permission} has to be changed
      * @param permission
      *            The new {@link Permission} of the user
-     *
+     * 
      * @throws CancellationException
      * @throws InterruptedException
      * @throws IllegalStateException
      *             if called inside the application/session thread
      * @throws IllegalStateException
      *             if the local user is not the host of the session
-     *
+     * 
      */
     public void changePermission(final User target, final Permission permission)
         throws CancellationException, InterruptedException {

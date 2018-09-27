@@ -1,14 +1,14 @@
+import { Contact as ContactProps } from 'Utils/propTypes'
 import React from 'react'
 import { Text } from 'react-localize'
-import { Contact as ContactProps } from 'Utils/propTypes'
 
 const Contact = ({
   displayName,
   presence,
-  addition
+  addition,
 }) => (
   <div className='contact-item'>
-    <span>{displayName}</span>
+    <span className='contact-item-display-name'>{displayName}</span>
     <span className='text-muted ml-1'>{ addition && `(${addition})`}</span>
     {presence === 'Online' &&
       <span className='badge badge-success'>

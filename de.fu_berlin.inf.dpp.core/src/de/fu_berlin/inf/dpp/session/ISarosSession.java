@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -39,14 +40,14 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
  * A Saros session consists of one or more shared projects, which are the
  * central concept of the Saros plugin. They are associated with projects and
  * make them available for synchronous/real-time collaboration.
- *
+ * 
  * @author rdjemili
  */
 public interface ISarosSession {
 
     /**
      * @JTourBusStop 3, Architecture Overview, Session Management:
-     *
+     * 
      *               This Interface is the main entrance Point for the "Session
      *               Management"-Component. The Session Management is
      *               responsible for managing a Session and keeping the shared
@@ -79,14 +80,14 @@ public interface ISarosSession {
      * <b>Restriction: </b> This method may only called by the host.<br>
      * <b>Restriction: </b> This method has to be invoked from a background
      * thread.
-     *
-     *
+     * 
+     * 
      * @param user
      *            The user whose {@link Permission} has to be changed
      * @param permission
      *            The new {@link Permission} of the user
-     *
-     *
+     * 
+     * 
      * @throws CancellationException
      * @throws InterruptedException
      */
@@ -102,7 +103,7 @@ public interface ISarosSession {
 
     /**
      * Returns the host of this session.
-     *
+     * 
      * @immutable This method will always return the same value for this session
      */
     public User getHost();
@@ -110,23 +111,25 @@ public interface ISarosSession {
     /**
      * @return <code>true</code> if the local user is the host of this session,
      *         <code>false</code> otherwise.
-     *
+     * 
      */
     public boolean isHost();
 
     /**
      * Adds the user to this session. If the session currently serves as host
      * all other session users will be noticed about the new user.
-     *
+     * 
      * @param user
      *            the user that is to be added
+     * @param preferences
+     *            the initial properties of the new user
      */
-    public void addUser(User user);
+    public void addUser(User user, IPreferenceStore preferences);
 
     /**
      * Informs all listeners that a user now has Projects and can process
      * {@link IResourceActivity}s.
-     *
+     * 
      * @host This method may only called by the host.
      * @param user
      */
@@ -135,26 +138,26 @@ public interface ISarosSession {
     /**
      * Informs all participants and listeners that a user now has finished the
      * Project Negotiation.
-     *
+     * 
      * @param user
      */
     public void userFinishedProjectNegotiation(final User user);
 
     /**
      * Removes a user from this session.
-     *
+     * 
      * @param user
      *            the user that is to be removed
-     *
+     * 
      */
     public void removeUser(User user);
 
     /**
      * Kicks and removes the user out of the session.
-     *
+     * 
      * @param user
      *            the user that should be kicked from the session
-     *
+     * 
      * @throws IllegalStateException
      *             if the local user is not the host of the session
      * @throws IllegalArgumentException
@@ -165,7 +168,7 @@ public interface ISarosSession {
     /**
      * Adds the given session listener. This call is ignored if the listener is
      * already a listener of this session.
-     *
+     * 
      * @param listener
      *            the listener to add
      */
@@ -174,7 +177,7 @@ public interface ISarosSession {
     /**
      * Removes the given session listener. This call is ignored if the listener
      * does not belong to the current listeners of this session.
-     *
+     * 
      * @param listener
      *            the listener to remove
      */
@@ -188,7 +191,7 @@ public interface ISarosSession {
 
     /**
      * FOR INTERNAL USE ONLY !
-     *
+     * 
      * @deprecated only the session manager should be able to call this
      */
     @Deprecated
@@ -203,17 +206,29 @@ public interface ISarosSession {
      * Use getResourceQualifiedJID(JID) in the case if you do not know the
      * RQ-JID.
      * </p>
-     *
+     * 
      * @return the user with the given fully qualified JID or <code>null</code>
      *         if not user with such a JID exists in the session
      */
     public User getUser(JID jid);
 
     /**
+     * <p>
+     * Given a user, this method will return this users session properties.
+     * </p>
+     * 
+     * @param user
+     *            the user to get the preferences for
+     * @return Properties of the given user or <code>null</code> if the user is
+     *         not known to the session
+     */
+    public IPreferenceStore getUserProperties(User user);
+
+    /**
      * Given a JID (resource qualified or not), will return the resource
      * qualified JID associated with this user or <code>null</code> if no user
      * for the given JID exists in the session.
-     *
+     * 
      * <pre>
      * E.g:
      * <code>
@@ -221,14 +236,14 @@ public interface ISarosSession {
      * System.out.println(rqJID);
      * </code>
      * </pre>
-     *
+     * 
      * <p>
      * Will print out something like alice@foo.com/Saros*****
      * </p>
-     *
+     * 
      * @param jid
      *            the JID to retrieve the resource qualified JID for
-     *
+     * 
      * @return the resource qualified JID or <code>null</code> if no user is
      *         found with this JID
      * @deprecated Do not use this method in new code, ensure you can obtain a
@@ -239,8 +254,8 @@ public interface ISarosSession {
 
     /**
      * Returns the local user of this session.
-     *
-     *
+     * 
+     * 
      * @immutable This method will always return the same value for this session
      */
     public User getLocalUser();
@@ -248,7 +263,7 @@ public interface ISarosSession {
     /**
      * the concurrent document manager is responsible for all jupiter controlled
      * documents
-     *
+     * 
      * @return the concurrent document manager
      */
     public ConcurrentDocumentServer getConcurrentDocumentServer();
@@ -256,14 +271,14 @@ public interface ISarosSession {
     /**
      * the concurrent document manager is responsible for all jupiter controlled
      * documents
-     *
+     * 
      * @return the concurrent document manager
      */
     public ConcurrentDocumentClient getConcurrentDocumentClient();
 
     /**
      * Returns a snapshot of the currently unavailable (in use) color ids.
-     *
+     * 
      * @return
      */
     public Set<Integer> getUnavailableColors();
@@ -276,25 +291,25 @@ public interface ISarosSession {
     /**
      * Adds an {@link IActivityProducer} so the production of its activities
      * will be noticed.
-     *
+     * 
      * @param producer
      *            The session will register an {@link IActivityListener} on this
      *            producer. It is expected that the producer will inform that
      *            listener about new activities via
      *            {@link IActivityListener#created(IActivity) created()}.
-     *
+     * 
      * @see #removeActivityProducer(IActivityProducer)
      */
     public void addActivityProducer(IActivityProducer producer);
 
     /**
      * Removes an {@link IActivityProducer} from the session.
-     *
+     * 
      * @param producer
      *            The session will unregister its {@link IActivityListener} from
      *            this producer and it is expected that the producer no longer
      *            calls {@link IActivityListener#created(IActivity) created()}.
-     *
+     * 
      * @see #addActivityProducer(IActivityProducer)
      */
     public void removeActivityProducer(IActivityProducer producer);
@@ -302,7 +317,7 @@ public interface ISarosSession {
     /**
      * Adds an {@link IActivityConsumer} so it will be called when an activity
      * is to be executed locally.
-     *
+     * 
      * @param consumer
      *            The {@link IActivityConsumer#exec(IActivity) exec()} method of
      *            this consumer will be called. "Consume" is not meant in a
@@ -316,7 +331,7 @@ public interface ISarosSession {
      *            Adding the same consumer multiple times with different
      *            priorities will assume the last one is correct. Use individual
      *            consumers if you want to get notified multiple times.
-     *
+     * 
      * @see #removeActivityConsumer(IActivityConsumer)
      */
     public void addActivityConsumer(IActivityConsumer consumer,
@@ -324,11 +339,11 @@ public interface ISarosSession {
 
     /**
      * Removes an {@link IActivityConsumer} from the session
-     *
+     * 
      * @param consumer
      *            This consumer will no longer be called when an activity is to
      *            be executed locally.
-     *
+     * 
      * @see #addActivityConsumer(IActivityConsumer, Priority)
      */
     public void removeActivityConsumer(IActivityConsumer consumer);
@@ -347,7 +362,7 @@ public interface ISarosSession {
 
     /**
      * Checks if selected project is a complete shared one or partial shared.
-     *
+     * 
      * @param project
      * @return <code>true</code> if complete, <code>false</code> if partial
      */
@@ -355,7 +370,7 @@ public interface ISarosSession {
 
     /**
      * Returns the global ID of the project.
-     *
+     * 
      * @return the global ID of the project or <code>null</code> if this project
      *         is not shared
      */
@@ -363,7 +378,7 @@ public interface ISarosSession {
 
     /**
      * Returns the project with the given ID.
-     *
+     * 
      * @return the project with the given ID or <code>null</code> if no project
      *         with this ID is shared
      */
@@ -371,7 +386,7 @@ public interface ISarosSession {
 
     /**
      * Adds the specified project and/or resources to this session.
-     *
+     * 
      * @param project
      *            The project to share.
      * @param projectID
@@ -384,7 +399,7 @@ public interface ISarosSession {
 
     /**
      * Returns all shared resources in this session.
-     *
+     * 
      * @return a list of all shared resources (excluding projects) from this
      *         session.
      */
@@ -392,14 +407,14 @@ public interface ISarosSession {
 
     /**
      * Returns a map with the mapping of shared resources to their project.
-     *
+     * 
      * @return project-->resource mapping
      */
     public Map<IProject, List<IResource>> getProjectResourcesMapping();
 
     /**
      * Returns the shared resources of the project in this session.
-     *
+     * 
      * @param project
      * @return the shared resources or <code>null</code> if this project is not
      *         or fully shared.
@@ -412,12 +427,12 @@ public interface ISarosSession {
      * <p>
      * This information is necessary for receiving (unserializing)
      * resource-related activities.
-     *
+     * 
      * @param projectID
      *            Session-wide ID of the project
      * @param project
      *            the local representation of the project
-     *
+     * 
      * @see #removeProjectMapping(String, IProject)
      */
     public void addProjectMapping(String projectID, IProject project);
@@ -430,7 +445,7 @@ public interface ISarosSession {
      * TODO Why is the project parameter needed here? This forces callers to
      * store the mapping themselves (or retrieve it just before calling this
      * method).
-     *
+     * 
      * @param projectID
      *            Session-wide ID of the project
      * @param project
@@ -440,7 +455,7 @@ public interface ISarosSession {
 
     /**
      * Return the stop manager of this session.
-     *
+     * 
      * @return
      */
     public StopManager getStopManager();
@@ -448,7 +463,7 @@ public interface ISarosSession {
     /**
      * Changes the color for the current session. The color change is performed
      * on the session host and may therefore result in a different color id.
-     *
+     * 
      * @param colorID
      *            the new color id that should be used during the session
      */
@@ -464,11 +479,11 @@ public interface ISarosSession {
      * That queuing relies on an existing project-to-projectID mapping (see
      * {@link #addProjectMapping(String, IProject)}), otherwise incoming
      * activities cannot be queued and will be lost.
-     *
+     * 
      * @param project
      *            the project for which project-related activities should be
      *            queued
-     *
+     * 
      * @see #disableQueuing
      */
     public void enableQueuing(IProject project);
@@ -482,7 +497,7 @@ public interface ISarosSession {
 
     /**
      * Returns the id of the current session.
-     *
+     * 
      * @return the id of the current session
      */
     public String getID();
@@ -494,7 +509,7 @@ public interface ISarosSession {
      * to the caller to ensure that the returned reference can be garbage
      * collected when the session has stopped, i.e by setting the reference to
      * <code>null</code>
-     *
+     * 
      * @param key
      *            the key of the component
      * @return the runtime component or <code>null</code> if the component is

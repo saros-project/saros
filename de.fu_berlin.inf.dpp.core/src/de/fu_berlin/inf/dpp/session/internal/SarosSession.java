@@ -55,6 +55,8 @@ import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
@@ -63,6 +65,7 @@ import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -109,6 +112,8 @@ public final class SarosSession implements ISarosSession {
     private final User localUser;
 
     private final ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
+
+    private final ConcurrentHashMap<User, IPreferenceStore> userProperties = new ConcurrentHashMap<User, IPreferenceStore>();
 
     private final SessionListenerDispatch listenerDispatch = new SessionListenerDispatch();
 
@@ -213,19 +218,19 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for host.
      */
-    public SarosSession(final String id, int colorID,
+    public SarosSession(final String id, IPreferenceStore properties,
         IContainerContext containerContext) {
-        this(id, containerContext, /* unused */null, colorID, /* unused */
-        -1);
+        this(id, containerContext, properties, /* unused */
+        null, /* unused */null);
     }
 
     /**
      * Constructor for client.
      */
-    public SarosSession(final String id, JID hostJID, int clientColorID,
-        int hostColorID, IContainerContext containerContext) {
-
-        this(id, containerContext, hostJID, clientColorID, hostColorID);
+    public SarosSession(final String id, JID hostJID,
+        IPreferenceStore localProperties, IPreferenceStore hostProperties,
+        IContainerContext containerContext) {
+        this(id, containerContext, localProperties, hostJID, hostProperties);
     }
 
     @Override
@@ -363,7 +368,7 @@ public final class SarosSession implements ISarosSession {
      * proper initialization etc. of User objects !
      */
     @Override
-    public void addUser(final User user) {
+    public void addUser(final User user, IPreferenceStore properties) {
 
         // TODO synchronize this method !
 
@@ -379,6 +384,9 @@ public final class SarosSession implements ISarosSession {
             log.error("user " + user + " added twice to SarosSession",
                 new StackTrace());
             throw new IllegalArgumentException();
+        }
+        if (this.userProperties.putIfAbsent(user, properties) != null) {
+            log.warn("user " + user + " already has properties");
         }
 
         /*
@@ -482,6 +490,10 @@ public final class SarosSession implements ISarosSession {
             log.error("tried to remove user " + user
                 + " who was never added to the session");
             return;
+        }
+        if (userProperties.remove(user) == null) {
+            log.error("tried to remove properties of user " + user
+                + " that were never initialized");
         }
 
         activitySequencer.unregisterUser(user);
@@ -587,7 +599,7 @@ public final class SarosSession implements ISarosSession {
      *             if the session is already stopped or was not started at all
      */
     // FIXME synchronization
-    public void stop() {
+    public void stop(SessionEndReason reason) {
         if (!started || stopped) {
             throw new IllegalStateException();
         }
@@ -600,6 +612,26 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.stop();
         sessionContainer.dispose();
 
+        if (reason == SessionEndReason.LOCAL_USER_LEFT) {
+            notifyParticipants();
+        }
+
+        for (User user : getRemoteUsers())
+            connectionManager.closeConnection(
+                ISarosSession.SESSION_CONNECTION_ID, user.getJID());
+
+        synchronized (componentAccessLock) {
+            stopping = false;
+            stopped = true;
+        }
+    }
+
+    /**
+     * Notifies other participants that the local session has ended. If the
+     * local user is the host, all other participants are notified. Otherwise,
+     * only the host is notified.
+     */
+    private void notifyParticipants() {
         List<User> usersToNotify;
 
         if (isHost())
@@ -616,15 +648,6 @@ public final class SarosSession implements ISarosSession {
                 log.warn("failed to notify user " + user
                     + " about local session stop", e);
             }
-        }
-
-        for (User user : getRemoteUsers())
-            connectionManager.closeConnection(
-                ISarosSession.SESSION_CONNECTION_ID, user.getJID());
-
-        synchronized (componentAccessLock) {
-            stopping = false;
-            stopped = true;
         }
     }
 
@@ -644,6 +667,14 @@ public final class SarosSession implements ISarosSession {
             return null;
 
         return user;
+    }
+
+    @Override
+    public IPreferenceStore getUserProperties(User user) {
+        if (user == null)
+            throw new IllegalArgumentException("user is null");
+
+        return userProperties.get(user);
     }
 
     @Override
@@ -1032,8 +1063,9 @@ public final class SarosSession implements ISarosSession {
             localUser, localUser, 0));
     }
 
-    private SarosSession(final String id, IContainerContext context, JID host,
-        int localColorID, int hostColorID) {
+    private SarosSession(final String id, IContainerContext context,
+        IPreferenceStore localProperties, JID host,
+        IPreferenceStore hostProperties) {
 
         context.initComponent(this);
 
@@ -1047,19 +1079,31 @@ public final class SarosSession implements ISarosSession {
 
         assert localUserJID != null;
 
+        int localColorID = localProperties
+            .getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
+        int localFavoriteColorID = localProperties
+            .getInt(ColorNegotiationHook.KEY_FAV_COLOR);
         localUser = new User(localUserJID, host == null, true, localColorID,
-            localColorID);
+            localFavoriteColorID);
 
         localUser.setInSession(true);
 
         if (host == null) {
             hostUser = localUser;
             participants.put(hostUser.getJID(), hostUser);
+            userProperties.put(hostUser, localProperties);
         } else {
-            hostUser = new User(host, true, false, hostColorID, hostColorID);
+            int hostColorID = hostProperties
+                .getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
+            int hostFavoriteColorID = hostProperties
+                .getInt(ColorNegotiationHook.KEY_FAV_COLOR);
+            hostUser = new User(host, true, false, hostColorID,
+                hostFavoriteColorID);
             hostUser.setInSession(true);
             participants.put(hostUser.getJID(), hostUser);
             participants.put(localUser.getJID(), localUser);
+            userProperties.put(hostUser, hostProperties);
+            userProperties.put(localUser, localProperties);
         }
 
         sessionContainer = context.createChildContainer();

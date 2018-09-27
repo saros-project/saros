@@ -188,7 +188,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     /**
      * Checks if the project options for the given project id are valid.
-     *
+     * 
      * @return an error message if the options are not valid, otherwise the
      *         error message is <code>null</code>
      */
@@ -321,7 +321,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     /**
      * Scans the current Eclipse Workspace for project artifacts.
-     *
+     * 
      * @return string containing a warning message if artifacts are found,
      *         <code>null</code> otherwise
      */
@@ -521,7 +521,7 @@ public class EnterProjectNamePage extends WizardPage {
     /**
      * Tests if the given project name does not already exist in the current
      * workspace.
-     *
+     * 
      * @param projectName
      *            the name of the project
      * @param reservedProjectNames
@@ -557,7 +557,7 @@ public class EnterProjectNamePage extends WizardPage {
     /**
      * Proposes a project name based on the existing project names in the
      * current workspace. The proposed project name is unique.
-     *
+     * 
      * @param projectName
      *            project name which shall be checked
      * @param reservedProjectNames

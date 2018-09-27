@@ -1,17 +1,15 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
+import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 
 /**
- * Marks text selected by both users with {@link Permission#WRITE_ACCESS} and
- * {@link Permission#READONLY_ACCESS}.
- * 
- * Configuration of this annotation is done in the plugin-xml.
- * 
- * @author coezbek
+ * Mimics the text cursor and selection of other session participants.
+ * <p>
+ * Such annotations are organized by the {@link LocationAnnotationManager};
+ * their visual appearance is configured in <code>plugin.xml</code>.
  */
 public class SelectionAnnotation extends SarosAnnotation {
 

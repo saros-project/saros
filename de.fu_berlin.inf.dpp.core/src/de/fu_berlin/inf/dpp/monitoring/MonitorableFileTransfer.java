@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.monitoring;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
@@ -10,6 +9,8 @@ import de.fu_berlin.inf.dpp.util.CoreUtils;
 
 public class MonitorableFileTransfer {
     private static final int INTERVAL = 200;
+
+    private static final long SAMPLE_DELTA = 1000;
 
     private FileTransfer transfer;
     private IProgressMonitor monitor;
@@ -44,7 +45,7 @@ public class MonitorableFileTransfer {
      * Monitors the running file transfer in fixed intervals {@link #INTERVAL
      * interval} and reports on current throughput and remaining time. The file
      * transfer can be canceled through the monitor.
-     * 
+     *
      * @return Returns an {@link TransferStatus} with code
      *         {@link TransferStatus#OK} if and when the transfer is
      *         successfully completed.<br>
@@ -60,8 +61,8 @@ public class MonitorableFileTransfer {
 
         int lastWorked = 0;
 
-        StopWatch watch = new StopWatch();
-        watch.start();
+        long bytesWritten = 0;
+        long startTime = System.currentTimeMillis();
 
         while (!transfer.isDone()) {
             if (monitor.isCanceled()) {
@@ -70,38 +71,47 @@ public class MonitorableFileTransfer {
             }
 
             // may return -1 if the transfer has not yet started
-            long bytesWritten = transfer.getAmountWritten();
+            long bytesWrittenDelta = transfer.getAmountWritten() - bytesWritten;
 
-            if (bytesWritten < 0)
-                bytesWritten = 0;
+            if (bytesWrittenDelta < 0)
+                bytesWrittenDelta = 0;
 
-            int worked = (int) ((100 * bytesWritten) / (fileSize == 0 ? 1
-                : fileSize));
+            long currentTime = System.currentTimeMillis();
 
-            int delta = worked - lastWorked;
-
-            if (delta > 0) {
-                lastWorked = worked;
-                monitor.worked(delta);
-            }
-
-            long bytesPerSecond = watch.getTime();
-
-            if (bytesPerSecond > 0)
-                bytesPerSecond = (bytesWritten * 1000) / bytesPerSecond;
+            long deltaTime = currentTime - startTime;
 
             long secondsLeft = 0;
+            long bytesPerSecond = 0;
 
-            if (bytesPerSecond > 0)
-                secondsLeft = (fileSize - bytesWritten) / bytesPerSecond;
+            if (deltaTime >= SAMPLE_DELTA && bytesWrittenDelta > 0) {
 
-            String remainingTime = "Remaining time: "
-                + (bytesPerSecond == 0 ? "N/A" : CoreUtils
-                    .formatDuration(secondsLeft)
-                    + " ("
-                    + CoreUtils.formatByte(bytesPerSecond) + "/s)");
+                startTime = currentTime;
+                bytesWritten += bytesWrittenDelta;
 
-            monitor.subTask(remainingTime);
+                bytesPerSecond = (bytesWrittenDelta * 1000) / deltaTime;
+
+                int worked = (int) ((100 * (bytesWritten)) / (fileSize == 0 ? 1
+                    : fileSize));
+
+                int delta = worked - lastWorked;
+
+                if (delta > 0) {
+                    lastWorked = worked;
+                    monitor.worked(delta);
+                }
+
+                if (bytesPerSecond > 0)
+                    secondsLeft = (fileSize - bytesWritten) / bytesPerSecond;
+
+                String remainingTime = "Remaining time: "
+                    + (bytesPerSecond == 0 ? "N/A" : CoreUtils
+                        .formatDuration(secondsLeft)
+                        + " ("
+                        + CoreUtils.formatByte(bytesPerSecond) + "/s)");
+
+                monitor.subTask(remainingTime);
+
+            }
 
             try {
                 Thread.sleep(INTERVAL);

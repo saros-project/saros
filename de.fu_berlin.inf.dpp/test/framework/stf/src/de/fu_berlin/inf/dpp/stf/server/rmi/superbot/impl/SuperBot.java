@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -288,21 +289,29 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
         shell.bot().button(FINISH).click();
 
-        bot.sleep(500);
+        try {
+            bot.waitUntil(Conditions.shellCloses(shell));
+        } catch (TimeoutException e) {
+            // If the dialog didn't close in time, close any message boxes that
+            // a you can answer with "Yes, I want to add the contact anyway"
 
-        for (SWTBotShell currentShell : bot.shells()) {
-            // FIXME HARDCODED !
-            if (currentShell.getText().equals("Contact Unknown")) {
-                currentShell.bot().button(YES).click();
-                break;
+            // FIXME Hard-coded message titles (see AddContactWizard)
+            List<String> messagesToIgnore = Arrays.asList("Contact Unknown",
+                "Server Not Found", "Unsupported Contact Status Check",
+                "Unknown Contact Status", "Server Not Responding",
+                "Unknown Error");
+
+            for (SWTBotShell currentShell : bot.shells()) {
+                String text = currentShell.getText();
+
+                if (messagesToIgnore.contains(text)) {
+                    currentShell.bot().button(YES).click();
+                }
             }
-
         }
-        bot.waitUntil(Conditions.shellCloses(shell));
 
         // wait for tree update in the saros session view
         bot.sleep(500);
-
     }
 
     @Override

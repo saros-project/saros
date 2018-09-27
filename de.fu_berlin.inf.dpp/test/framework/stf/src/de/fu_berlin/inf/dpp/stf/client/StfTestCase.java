@@ -361,17 +361,8 @@ public abstract class StfTestCase {
 
         Util.workAll(connectTasks);
 
-        for (AbstractTester tester : currentTesters) {
-            try {
-                resetNicknames(tester);
-                resetContacts(tester);
-            } catch (Exception e) {
-                exception = e;
-            }
-        }
-
-        if (exception != null)
-            throw exception;
+        resetNicknames();
+        resetContacts();
     }
 
     /**
@@ -481,8 +472,13 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Resets the contacts for all active testers to their original by
-     * sequentially calling {@link #resetContacts(AbstractTester)}
+     * Resets the contacts of the testers involved in this test case to their
+     * original states.
+     * <p>
+     * This method will only add connections between testers, but not remove
+     * them. Example: If the test case involves ALICE, BOB, and CARL, this
+     * method will make sure that all three of them are pair-wise contacts, but
+     * it will neither create nor cut any connection to DAVE.
      * 
      * @throws IllegalStateException
      *             if one of the current testers is not connected
@@ -490,30 +486,12 @@ public abstract class StfTestCase {
      *             for any other (internal) failure
      * */
     public static void resetContacts() throws Exception {
-        for (AbstractTester tester : currentTesters)
-            resetContacts(tester);
-    }
-
-    /**
-     * Resets the contacts of the tester to their original states as defined in
-     * the configuration file. E.g if the test case included ALICE, BOB and CARL
-     * and ALICE removed BOB from her contact list then after the method returns
-     * ALICE will have BOB again in her contact list and also BOB will have
-     * ALICE back in his contact list.
-     * 
-     * @param tester
-     *            the tester
-     * @throws IllegalStateException
-     *             if one of the current testers is not connected
-     * @throws Exception
-     *             for any other (internal) failure
-     */
-
-    public static void resetContacts(AbstractTester tester) throws Exception {
-        for (int i = 0; i < currentTesters.size(); i++) {
-            if (tester == currentTesters.get(i))
-                continue;
-            Util.addTestersToContactList(tester, currentTesters.get(i));
+        // Create all unique pairs of distinct testers
+        for (int first = 0; first < currentTesters.size(); first++) {
+            for (int second = first + 1; second < currentTesters.size(); second++) {
+                Util.addTestersToContactList(currentTesters.get(first),
+                    currentTesters.get(second));
+            }
         }
     }
 

@@ -155,8 +155,7 @@ public class CollaborationUtils {
         ThreadUtils.runSafeAsync("StopSession", LOG, new Runnable() {
             @Override
             public void run() {
-                sessionManager
-                    .stopSession(SessionEndReason.LOCAL_USER_LEFT);
+                sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
             }
         });
     }

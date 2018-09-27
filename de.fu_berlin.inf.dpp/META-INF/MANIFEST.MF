@@ -22,7 +22,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.launching;resolution:=optional,
  org.eclipse.gef;bundle-version="3.6.0";resolution:=optional,
  de.fu_berlin.inf.dpp.core,
- de.fu_berlin.inf.dpp.ui;resolution:=optional
+ de.fu_berlin.inf.dpp.ui
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/org.hamcrest_1.1.0.v20090501071000.jar,
@@ -52,7 +52,6 @@ Export-Package: de.fu_berlin.inf.dpp;
    org.osgi.framework,
    org.jivesoftware.smackx,
    de.fu_berlin.inf.dpp.net",
- de.fu_berlin.inf.dpp.accountManagement,
  de.fu_berlin.inf.dpp.communication.chat.muc.negotiation,
  de.fu_berlin.inf.dpp.editor;
   uses:="org.eclipse.jface.text,

@@ -1,0 +1,29 @@
+<project name="stf.self.test" basedir="." default="test">
+
+
+	<target name="test">
+		<mkdir dir="${junit.dir}" />
+		<mkdir dir="${src.dir}" />
+
+		<junit reloading="false" haltonfailure="on">
+			<sysproperty key="de.fu_berlin.inf.dpp.stf.client.configuration.files" value="${stf.client.config.files}" />
+			<classpath>
+				<fileset dir="${saros.plugin.dir}">
+					<include name="de.fu_berlin.inf.dpp*.jar" />
+				</fileset>
+				<fileset dir="${eclipse.plugin.dir}">
+					<include name="*.jar" />
+				</fileset>
+				<fileset dir="${lib.dir}" />
+			</classpath>
+
+			<formatter type="plain" usefile="false" />
+
+			<batchtest todir="${junit.dir}">
+				<fileset dir="${src.dir}">
+					<include name="**/stf/test/stf/**/*Test.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+</project>

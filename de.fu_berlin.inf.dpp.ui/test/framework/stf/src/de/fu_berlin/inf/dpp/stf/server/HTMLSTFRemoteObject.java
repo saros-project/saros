@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server;
 
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 
@@ -10,6 +12,9 @@ import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 public abstract class HTMLSTFRemoteObject {
 
     private static IContainerContext context;
+
+    protected IJQueryBrowser browser;
+    protected ISelector selector;
 
     /**
      * This method must be called at the start of the test framework in order
@@ -32,5 +37,13 @@ public abstract class HTMLSTFRemoteObject {
      */
     protected BrowserManager getBrowserManager() {
         return getContext().getComponent(BrowserManager.class);
+    }
+
+    public void setBrowser(IJQueryBrowser browser) {
+        this.browser = browser;
+    }
+
+    public void setSelector(ISelector selector) {
+        this.selector = selector;
     }
 }

@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
  * prepared by PowerMock because they are final.
  * <p>
  * Usage:
- *
+ * 
  * <pre>
  * {@literal @}RunWith(PowerMockRunner.class)
  * {@literal @}MockPolicy( { PrepareFinalCoreComponents.class } )

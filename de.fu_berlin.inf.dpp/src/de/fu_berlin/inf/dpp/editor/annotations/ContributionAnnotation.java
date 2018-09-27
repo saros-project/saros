@@ -2,17 +2,18 @@ package de.fu_berlin.inf.dpp.editor.annotations;
 
 import org.eclipse.jface.text.source.IAnnotationModel;
 
+import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 
 /**
- * Marks text contributions done by a user with {@link Permission#WRITE_ACCESS}.
- * 
- * Configuration of this annotation is done in the plugin-xml.
- * 
- * @author rdjemili
+ * Marks textual additions and changes of other users. They are meant to inform
+ * the user of recent changes made by the other session participants.
+ * <p>
+ * The {@link ContributionAnnotationManager} takes care of adding and removing
+ * these annotations. Their visual appearance is configured in
+ * <code>plugin.xml</code>.
  */
 public class ContributionAnnotation extends SarosAnnotation {
 
