@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
-import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
+import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 
 /**
  * Class used to report that an action is not implemented yet.
@@ -22,9 +22,9 @@ public class NotImplementedAction extends AbstractSarosAction {
     public void execute() {
         LOG.info("Not implemented action [" + name + "]");
 
-        SafeDialogUtils.showError(
-            "We are sorry, but action [" + name + "] not implemented yet!",
-            "Not Implemented");
+        NotificationPanel.showError(
+            "The action [" + name + "] is not " +
+            "implemented yet.", "Not Implemented");
 
         actionPerformed();
     }

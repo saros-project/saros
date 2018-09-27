@@ -286,12 +286,11 @@ public class FileUtils {
                 totalFileCount++;
 
                 try {
-                    long filesize = -1; // todo //
-                    // EFS.getStore(resource.getLocationURI()).fetchInfo().getLength();
+                    IFile file = (IFile) resource.getAdapter(IFile.class);
 
-                    totalFileSize += filesize;
-                } catch (Exception e) {
-                    LOG.warn("failed to retrieve file size of file " + resource, e);
+                    totalFileSize += file.getSize();
+                } catch (IOException e) {
+                    LOG.warn("failed to retrieve size of file " + resource, e);
                 }
                 break;
             case IResource.PROJECT:

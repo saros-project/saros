@@ -10,10 +10,11 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
+import java.io.InputStream;
 
 /**
  * Component that is initalized when a project is loaded.
- * It initializes the logging, shortcuts and the {@link IntelliJSarosLifecycle} singleton.
+ * It initializes the logging, shortcuts and the {@link IntellijProjectLifecycle} singleton.
  */
 public class SarosComponent
     implements com.intellij.openapi.components.ProjectComponent {
@@ -31,6 +32,24 @@ public class SarosComponent
         keymap.addShortcut("ActivateSarosToolWindow", new KeyboardShortcut(
             KeyStroke.getKeyStroke(KeyEvent.VK_F11,
                 java.awt.event.InputEvent.ALT_DOWN_MASK), null));
+
+        try {
+            InputStream sarosProperties = SarosComponent.class.getClassLoader()
+                .getResourceAsStream("saros.properties");
+
+            if (sarosProperties == null) {
+                LogLog.warn("could not initialize Saros properties because "
+                    + "the 'saros.properties' file could not be found on the "
+                    + "current JAVA class path");
+            } else {
+                System.getProperties().load(sarosProperties);
+                sarosProperties.close();
+            }
+        } catch (Exception e) {
+            LogLog
+                .error("could not load saros property file 'saros.properties'",
+                    e);
+        }
 
         IntellijProjectLifecycle.getInstance(project).start();
     }

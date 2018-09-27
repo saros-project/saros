@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.JobWithStatus;
+import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.HeaderPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.InfoPage;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.PageActionListener;
@@ -134,28 +134,24 @@ public class JoinSessionWizard extends Wizard {
         if (errorMsg != null) {
             switch (cancelLocation) {
             case LOCAL:
-                DialogUtils
-                    .showError(this, Messages.JoinSessionWizard_inv_canceled,
-                        Messages.JoinSessionWizard_inv_canceled_text
-                            + Messages.JoinSessionWizard_8 + errorMsg);
+                NotificationPanel.showError(
+                    Messages.JoinSessionWizard_inv_canceled_text
+                        + Messages.JoinSessionWizard_8 + errorMsg,
+                    Messages.JoinSessionWizard_inv_canceled);
                 break;
             case REMOTE:
-                DialogUtils
-                    .showError(this, Messages.JoinSessionWizard_inv_canceled,
-                        MessageFormat.format(
-                            Messages.JoinSessionWizard_inv_canceled_text2, peer,
-                            errorMsg));
+                NotificationPanel.showError(MessageFormat
+                    .format(Messages.JoinSessionWizard_inv_canceled_text2, peer,
+                        errorMsg), Messages.JoinSessionWizard_inv_canceled);
             }
         } else {
             switch (cancelLocation) {
             case LOCAL:
                 break;
             case REMOTE:
-                DialogUtils
-                    .showInfo(this, Messages.JoinSessionWizard_inv_canceled,
-                        MessageFormat.format(
-                            Messages.JoinSessionWizard_inv_canceled_text3,
-                            peer));
+                NotificationPanel.showInformation(MessageFormat
+                    .format(Messages.JoinSessionWizard_inv_canceled_text3,
+                        peer), Messages.JoinSessionWizard_inv_canceled);
             }
         }
     }
