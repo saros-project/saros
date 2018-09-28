@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -10,11 +9,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import org.apache.log4j.Logger;
-
-import java.awt.Color;
 
 /**
  * This class applies the logic for activities that were received from remote.
@@ -151,10 +147,8 @@ public class LocalEditorManipulator {
      *
      * @param path
      * @param operations
-     * @param color
      */
-    public void applyTextOperations(SPath path, Operation operations,
-        Color color) {
+    public void applyTextOperations(SPath path, Operation operations) {
         Document doc = editorPool.getDocument(path);
 
         /*
@@ -205,36 +199,10 @@ public class LocalEditorManipulator {
                 if (!writePermission) {
                     doc.setReadOnly(true);
                 }
-                Editor editor = editorPool.getEditor(path);
-                if (editor != null) {
-                    editorAPI.textMarkAdd(editor, op.getPosition(),
-                        op.getPosition() + op.getTextLength(), color);
-                }
             }
         }
 
         manager.enableDocumentListener();
-    }
-
-    /**
-     * Selects the specified range for the editor of the given path.
-     *
-     * @param path
-     * @param position
-     * @param length
-     * @param colorModel
-     */
-    public void selectText(SPath path, int position, int length,
-        ColorModel colorModel) {
-        Editor editor = editorPool.getEditor(path);
-        if (editor != null) {
-            editorAPI.textMarkRemove(editor, colorModel.getSelect());
-            RangeHighlighter highlighter = editorAPI
-                .textMarkAdd(editor, position, position + length,
-                    colorModel.getSelectColor());
-            colorModel.setSelect(highlighter);
-            //editorAPI.setSelection(editor, position, position + length,color); //todo: calculate new line char win and unix differences
-        }
     }
 
     /**
@@ -249,18 +217,6 @@ public class LocalEditorManipulator {
         Editor editor = editorPool.getEditor(path);
         if (editor != null) {
             editorAPI.setViewPort(editor, lineStart, lineEnd);
-        }
-    }
-
-    /**
-     * Removes all text marks from the path.
-     *
-     * @param path
-     */
-    public void clearSelection(SPath path) {
-        Editor editor = editorPool.getEditor(path);
-        if (editor != null) {
-            editorAPI.textMarkRemove(editor, null);
         }
     }
 

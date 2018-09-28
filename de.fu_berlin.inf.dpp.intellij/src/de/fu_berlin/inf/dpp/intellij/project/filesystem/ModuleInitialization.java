@@ -149,7 +149,7 @@ public class ModuleInitialization implements Startable {
                         LOG.error("Failed to refresh the module object for " +
                             project + " as it it not disposed.");
                     }
-                } catch (ModuleNotFoundException e){
+                } catch (ModuleNotFoundException | IllegalArgumentException | IllegalStateException e) {
                     LOG.error("Failed to refresh the module object for " +
                         project, e);
                 }

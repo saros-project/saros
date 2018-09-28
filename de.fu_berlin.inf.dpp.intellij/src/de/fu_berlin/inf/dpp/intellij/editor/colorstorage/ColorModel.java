@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.intellij.editor.colorstorage;
 
-import com.intellij.openapi.editor.markup.RangeHighlighter;
-
 import java.awt.Color;
 
 /**
@@ -10,7 +8,6 @@ import java.awt.Color;
 public class ColorModel {
     private Color selectColor;
     private Color editColor;
-    private RangeHighlighter select;
 
     /**
      * Creates a ColorModel with editColor and selectColor.
@@ -29,13 +26,5 @@ public class ColorModel {
 
     public Color getEditColor() {
         return editColor;
-    }
-
-    public RangeHighlighter getSelect() {
-        return select;
-    }
-
-    public void setSelect(RangeHighlighter select) {
-        this.select = select;
     }
 }

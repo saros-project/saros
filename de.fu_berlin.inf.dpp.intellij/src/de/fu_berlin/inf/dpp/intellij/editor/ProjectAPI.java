@@ -187,8 +187,16 @@ public class ProjectAPI {
         }, ModalityState.NON_MODAL);
     }
 
-    public void addFileEditorManagerListener(
-        StoppableEditorFileListener listener) {
-        editorFileManager.addFileEditorManagerListener(listener);
+    /**
+     * Subscribes the given <code>StoppableEditorFileListener</code> to the
+     * current project.
+     *
+     * @param listener the listener that should subscribe to the current project
+     */
+    void addFileEditorManagerListener(
+        @NotNull
+            StoppableEditorFileListener listener) {
+
+        listener.subscribe(project);
     }
 }

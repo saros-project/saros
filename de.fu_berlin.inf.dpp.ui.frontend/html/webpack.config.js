@@ -73,7 +73,7 @@ module.exports = (env = {}) => {
       createPage('main-page'),
       createPage('start-session-wizard'),
       createPage('configuration-page'),
-      createPage('component-test')
+      createPage('basic-widget-test')
     ]
     .concat(isProd ? [
       // In Production Mode the global variable process.env.NODE_ENV is set to production

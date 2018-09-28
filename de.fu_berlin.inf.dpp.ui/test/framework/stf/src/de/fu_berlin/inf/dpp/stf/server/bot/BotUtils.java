@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
+import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 
 public class BotUtils {
 
@@ -26,6 +27,15 @@ public class BotUtils {
         return getListItems(browser, selector, code);
     }
 
+    public static List<String> getSelectOptions(IJQueryBrowser browser,
+        ISelector selector) {
+        String code = "var options = []; " + "$('" + selector
+            + " option').each(function (i) { "
+            + "options[i] = $(this).val(); }); " + "return options; ";
+
+        return getListItems(browser, selector, code);
+    }
+
     private static List<String> getListItems(IJQueryBrowser browser,
         ISelector selector, String code) {
 
@@ -38,6 +48,13 @@ public class BotUtils {
 
         return strings;
 
+    }
+
+    public static String getSelectorName(ISelector selector) {
+        if (selector instanceof NameSelector) {
+            return ((NameSelector) selector).getName();
+        }
+        return null;
     }
 
 }

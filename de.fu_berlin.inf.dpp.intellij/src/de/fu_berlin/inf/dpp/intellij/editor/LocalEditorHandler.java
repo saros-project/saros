@@ -7,7 +7,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 
 import org.apache.log4j.Logger;
 
@@ -24,6 +23,8 @@ public class LocalEditorHandler {
         .getLogger(LocalEditorHandler.class);
 
     private final ProjectAPI projectAPI;
+    private final VirtualFileConverter virtualFileConverter;
+
     /**
      * This is just a reference to {@link EditorManager}'s editorPool and not a
      * separate pool.
@@ -32,8 +33,11 @@ public class LocalEditorHandler {
 
     private EditorManager manager;
 
-    public LocalEditorHandler(ProjectAPI projectAPI) {
+    public LocalEditorHandler(ProjectAPI projectAPI,
+        VirtualFileConverter virtualFileConverter) {
+
         this.projectAPI = projectAPI;
+        this.virtualFileConverter = virtualFileConverter;
     }
 
     /**
@@ -60,22 +64,32 @@ public class LocalEditorHandler {
      * {@link EditorManager#startEditor(Editor)} with it.
      * <p>
      * <b>Note:</b> This only works for shared resources.
+     * </p>
      *
      * @param virtualFile path of the file to open
-     * @param activate activate editor after opening
+     * @param activate    activate editor after opening
+     * @return the opened <code>Editor</code> or <code>null</code> if the given
+     * file does not belong to a shared module
      */
-    public void openEditor(VirtualFile virtualFile, boolean activate) {
-        SPath path = toPath(virtualFile);
+    @Nullable
+    public Editor openEditor(
+        @NotNull
+            VirtualFile virtualFile, boolean activate) {
+
+        if (!manager.hasSession()) {
+            return null;
+        }
+
+        SPath path = virtualFileConverter.convertToPath(virtualFile);
 
         if (path == null) {
             LOG.debug("Ignored open editor request for file " + virtualFile +
                 " as it does not belong to a shared module");
 
-            return;
-
+            return null;
         }
 
-        openEditor(virtualFile,path,activate);
+        return openEditor(virtualFile,path,activate);
     }
 
     /**
@@ -85,27 +99,33 @@ public class LocalEditorHandler {
      * <p>
      * <b>Note:</b> This only works for shared resources that belong to the
      * given module.
+     * </p>
      *
      * @param virtualFile path of the file to open
-     * @param project module the file belongs to
-     * @param activate activate editor after opening
+     * @param project     module the file belongs to
+     * @param activate    activate editor after opening
+     * @return the opened <code>Editor</code> or <code>null</code> if the given
+     * file does not belong to a shared module
      */
-    public void openEditor(VirtualFile virtualFile, IProject project,
-        boolean activate){
+    @Nullable
+    public Editor openEditor(
+        @NotNull
+            VirtualFile virtualFile,
+        @NotNull
+            IProject project, boolean activate) {
 
-        IResource resource = getResource(virtualFile, project);
+        IResource resource = virtualFileConverter
+            .getResource(virtualFile, project);
 
         if (resource == null) {
             LOG.debug("Could not open Editor for file " + virtualFile +
                 " as it does not belong to the given module " + project);
 
-            return;
+            return null;
         }
 
-        openEditor(virtualFile, new SPath(resource), activate);
+        return openEditor(virtualFile, new SPath(resource), activate);
     }
-
-
 
     /**
      * Opens an editor for the passed virtualFile, adds it to the pool of
@@ -113,28 +133,33 @@ public class LocalEditorHandler {
      * {@link EditorManager#startEditor(Editor)} with it.
      * <p>
      * <b>Note:</b> This only works for shared resources.
+     * </p>
      * <p>
      * <b>Note:</b> This method expects the VirtualFile and the SPath to point
      * to the same resource.
+     * </p>
      *
      * @param virtualFile path of the file to open
-     * @param path saros resource representation of the file
-     * @param activate activate editor after opening
+     * @param path        saros resource representation of the file
+     * @param activate    activate editor after opening
+     * @return the opened <code>Editor</code> or <code>null</code> if the given
+     * file does not exist or does not belong to a shared module
      */
-    private void openEditor(@NotNull VirtualFile virtualFile,
+    @Nullable
+    private Editor openEditor(@NotNull VirtualFile virtualFile,
         @NotNull SPath path, boolean activate){
 
         if(!virtualFile.exists()){
             LOG.debug("Could not open Editor for file " + virtualFile +
                 " as it does not exist");
 
-            return;
+            return null;
 
         }else if (!manager.getSession().isShared(path.getResource())) {
             LOG.debug("Ignored open editor request for file " + virtualFile +
                 " as it is not shared");
 
-            return;
+            return null;
         }
 
         Editor editor = projectAPI.openEditor(virtualFile, activate);
@@ -143,6 +168,8 @@ public class LocalEditorHandler {
         manager.startEditor(editor);
 
         LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
+
+        return editor;
     }
 
     /**
@@ -151,8 +178,8 @@ public class LocalEditorHandler {
      *
      * @param virtualFile
      */
-    public void closeEditor(VirtualFile virtualFile) {
-        SPath path = toPath(virtualFile);
+    public void closeEditor(@NotNull VirtualFile virtualFile) {
+        SPath path = virtualFileConverter.convertToPath(virtualFile);
         if (path != null) {
             editorPool.removeEditor(path);
             manager.generateEditorClosed(path);
@@ -165,7 +192,7 @@ public class LocalEditorHandler {
      * @param path path
      */
     public void removeEditor(@NotNull SPath path){
-        editorPool.removeAll(path);
+        editorPool.removeEditor(path);
     }
 
     /**
@@ -187,8 +214,8 @@ public class LocalEditorHandler {
      *
      * @param file
      */
-    public void activateEditor(VirtualFile file) {
-        SPath path = toPath(file);
+    public void activateEditor(@NotNull VirtualFile file) {
+        SPath path = virtualFileConverter.convertToPath(file);
         if (path != null) {
             manager.generateEditorActivated(path);
         }
@@ -209,53 +236,5 @@ public class LocalEditorHandler {
         }
 
         return projectAPI.isOpen(doc);
-    }
-
-    /**
-     * Returns an <code>SPath</code> representing the passed file.
-     *
-     * @param virtualFile file to get the <code>SPath</code> for
-     *
-     * @return an <code>SPath</code> representing the passed file or
-     *         <code>null</code> if the passed file is null or does not exist,
-     *         there currently is no session, or the file does not belong to a
-     *         shared module
-     */
-    @Nullable
-    private SPath toPath(VirtualFile virtualFile) {
-        if (virtualFile == null || !virtualFile.exists() || !manager
-            .hasSession()) {
-            return null;
-        }
-
-        IResource resource = null;
-
-        for (IProject project : manager.getSession().getProjects()) {
-            resource = getResource(virtualFile, project);
-
-            if(resource != null){
-                break;
-            }
-        }
-
-        return resource == null ? null : new SPath(resource);
-    }
-
-    /**
-     * Returns an <code>IResource</code> for the passed VirtualFile.
-     *
-     * @param virtualFile file to get the <code>IResource</code> for
-     * @param project module the file belongs to
-     * @return an <code>IResource</code> for the passed file or
-     *         <code>null</code> it does not belong to the passed module.
-     */
-    @Nullable
-    private static IResource getResource(@NotNull VirtualFile virtualFile,
-        @NotNull IProject project) {
-
-        IntelliJProjectImplV2 module = (IntelliJProjectImplV2) project
-            .getAdapter(IntelliJProjectImplV2.class);
-
-        return module.getResource(virtualFile);
     }
 }

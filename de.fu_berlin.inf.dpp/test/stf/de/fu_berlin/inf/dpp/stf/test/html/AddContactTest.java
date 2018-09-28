@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.stf.test.html;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View.ADD_CONTACT;
-import static de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View.MAIN_VIEW;
+import static de.fu_berlin.inf.dpp.ui.View.ADD_CONTACT;
+import static de.fu_berlin.inf.dpp.ui.View.MAIN_VIEW;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -30,8 +30,9 @@ public class AddContactTest extends StfHtmlTestCase {
     @Test
     public void addBobAsContact() throws Exception {
         // Precondition
-        List<String> aliceContactList = ALICE.htmlBot().getContactList();
-        List<String> bobContactList = BOB.htmlBot().getContactList();
+        List<String> aliceContactList = ALICE.htmlBot().getContactList(
+            MAIN_VIEW);
+        List<String> bobContactList = BOB.htmlBot().getContactList(MAIN_VIEW);
         assertFalse("Alice still has Bob as contact",
             aliceContactList.contains(BOB.getBaseJid()));
         assertFalse("Bob still has Alice as contact",
@@ -53,8 +54,8 @@ public class AddContactTest extends StfHtmlTestCase {
         ALICE.superBot().confirmShellRequestOfSubscriptionReceived();
 
         // check new contact
-        aliceContactList = ALICE.htmlBot().getContactList();
-        bobContactList = BOB.htmlBot().getContactList();
+        aliceContactList = ALICE.htmlBot().getContactList(MAIN_VIEW);
+        bobContactList = BOB.htmlBot().getContactList(MAIN_VIEW);
         assertTrue("Alice has Bob not as contact",
             aliceContactList.contains(BOB.getBaseJid()));
         assertTrue("Bob has Alice not as contact",
