@@ -258,11 +258,14 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
          * files that no longer exist locally.
          */
         if (!docPath.getFile().exists()) {
-            checksum.markDirty();
-
             LOG.debug("Marking checksum for " + docPath
                     + " as dirty as the file no longer exists locally: "
                     + checksum);
+
+            checksum.markDirty();
+            checksum.update(null);
+
+            return;
 
         } else if (!checksum.isDirty()) {
             return;
