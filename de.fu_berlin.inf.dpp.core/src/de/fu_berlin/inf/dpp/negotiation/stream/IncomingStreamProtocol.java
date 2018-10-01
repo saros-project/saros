@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
@@ -49,16 +49,17 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol {
         BoundedInputStream fileIn = null;
         try {
             while (true) {
-                String projectID = in.readUTF();
+                String referencePointID = in.readUTF();
 
                 /* check stream end */
-                if (projectID.isEmpty())
+                if (referencePointID.isEmpty())
                     break;
 
                 String fileName = in.readUTF();
-                IProject project = referencePointManager.get(session
-                    .getReferencePoint(projectID));
-                IFile file = project.getFile(fileName);
+                IReferencePoint referencePoint = session
+                    .getReferencePoint(referencePointID);
+                IFile file = referencePointManager.get(referencePoint).getFile(
+                    fileName);
 
                 String message = "receiving " + displayName(file);
                 log.debug(message);

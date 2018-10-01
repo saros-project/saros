@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.filesystem;
 import java.io.IOException;
 
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 
 /**
  * This interface is under development. It currently equals its Eclipse
@@ -33,11 +34,12 @@ public interface IWorkspace {
      * {@linkplain #run(IWorkspaceRunnable)}.
      * 
      * @param runnable
-     * @param resources
+     * @param referencePoints
+     * @param referencePointManager TODO
      * @throws IOException
      * @throws OperationCanceledException
      */
-    public void run(IWorkspaceRunnable runnable, IResource[] resources)
+    public void run(IWorkspaceRunnable runnable, IReferencePoint[] referencePoints, IReferencePointManager referencePointManager)
         throws IOException, OperationCanceledException;
 
     public IProject getProject(String project);

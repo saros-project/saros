@@ -5,10 +5,11 @@ import java.io.IOException;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 
 /**
  * Server implementation of the {@link IWorkspace} interface.
@@ -41,11 +42,11 @@ public class ServerWorkspaceImpl implements IWorkspace {
     public void run(IWorkspaceRunnable runnable) throws IOException,
         OperationCanceledException {
 
-        run(runnable, null);
+        run(runnable, null, null);
     }
 
     @Override
-    public void run(IWorkspaceRunnable runnable, IResource[] resources)
+    public void run(IWorkspaceRunnable runnable, IReferencePoint[] referencePoints, IReferencePointManager referencePointManager)
         throws IOException, OperationCanceledException {
 
         /*

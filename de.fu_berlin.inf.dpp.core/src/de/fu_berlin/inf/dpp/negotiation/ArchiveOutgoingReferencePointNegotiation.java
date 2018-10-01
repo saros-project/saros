@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
@@ -31,8 +30,8 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 
 /**
- * Implementation of {@link AbstractOutgoingReferencePointNegotiation} utilizing a
- * transferred zip archive to exchange differences in the project files.
+ * Implementation of {@link AbstractOutgoingReferencePointNegotiation} utilizing
+ * a transferred zip archive to exchange differences in the project files.
  */
 public class ArchiveOutgoingReferencePointNegotiation extends
     AbstractOutgoingReferencePointNegotiation {
@@ -57,9 +56,9 @@ public class ArchiveOutgoingReferencePointNegotiation extends
         final ITransmitter transmitter, //
         final IReceiver receiver//
     ) {
-        super(peer, TransferType.ARCHIVE, referencePoints, sessionManager, session,
-            editorManager, workspace, checksumCache, connectionService,
-            transmitter, receiver);
+        super(peer, TransferType.ARCHIVE, referencePoints, sessionManager,
+            session, editorManager, workspace, checksumCache,
+            connectionService, transmitter, receiver);
     }
 
     @Override
@@ -150,28 +149,29 @@ public class ArchiveOutgoingReferencePointNegotiation extends
         final List<IFile> filesToCompress = new ArrayList<IFile>(fileCount);
         final List<String> fileAlias = new ArrayList<String>(fileCount);
 
-        final List<IResource> projectsToLock = new ArrayList<IResource>();
+        final List<IReferencePoint> referencePointsToLock = new ArrayList<IReferencePoint>();
 
         for (final FileList list : fileLists) {
             final String referencePointID = list.getReferencePointID();
 
-            final IProject project = referencePointManager.get(session
-                .getReferencePoint(referencePointID));
+            final IReferencePoint referencePoint = session
+                .getReferencePoint(referencePointID);
 
-            if (project == null)
+            if (referencePoint == null)
                 throw new LocalCancellationException(
                     "reference point with id " + referencePointID
                         + " was unshared during synchronization",
                     CancelOption.NOTIFY_PEER);
 
-            projectsToLock.add(project);
+            referencePointsToLock.add(referencePoint);
 
             /*
              * force editor buffer flush because we read the files from the
              * underlying storage
              */
             if (editorManager != null)
-                editorManager.saveEditors(project);
+                editorManager.saveEditors(referencePointManager
+                    .get(referencePoint));
 
             final StringBuilder aliasBuilder = new StringBuilder();
 
@@ -182,6 +182,7 @@ public class ArchiveOutgoingReferencePointNegotiation extends
             for (final String path : list.getPaths()) {
 
                 // assert path is relative !
+                IProject project = referencePointManager.get(referencePoint);
                 filesToCompress.add(project.getFile(path));
                 aliasBuilder.append(path);
                 fileAlias.add(aliasBuilder.toString());
@@ -195,8 +196,10 @@ public class ArchiveOutgoingReferencePointNegotiation extends
 
         try {
             tempArchive = File.createTempFile("saros_" + getID(), ".zip");
+
             workspace.run(new CreateArchiveTask(tempArchive, filesToCompress,
-                fileAlias, monitor), projectsToLock.toArray(new IResource[0]));
+                fileAlias, monitor), referencePointsToLock
+                .toArray(new IReferencePoint[0]), referencePointManager);
         } catch (OperationCanceledException e) {
             LocalCancellationException canceled = new LocalCancellationException();
             canceled.initCause(e);
