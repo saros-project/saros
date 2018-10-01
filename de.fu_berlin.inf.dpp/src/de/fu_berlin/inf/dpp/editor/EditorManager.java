@@ -57,7 +57,6 @@ import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -66,6 +65,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -534,7 +534,8 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        SPath path = EditorAPI.getEditorPath(part);
+        SPath path = EditorAPI.getEditorPath(part,
+            session.getComponent(IReferencePointManager.class));
         if (path == null) {
             LOG.warn("Could not find path for editor " + part.getTitle());
             return;
@@ -564,7 +565,8 @@ public class EditorManager extends AbstractActivityProducer implements
      */
     void generateSelection(IEditorPart part, TextSelection newSelection) {
 
-        SPath path = EditorAPI.getEditorPath(part);
+        SPath path = EditorAPI.getEditorPath(part,
+            session.getComponent(IReferencePointManager.class));
         if (path == null) {
             LOG.warn("Could not find path for editor " + part.getTitle());
             return;
@@ -627,7 +629,8 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        SPath path = EditorAPI.getEditorPath(changedEditor);
+        SPath path = EditorAPI.getEditorPath(changedEditor,
+            session.getComponent(IReferencePointManager.class));
         if (path == null) {
             LOG.warn("Could not find path for editor "
                 + changedEditor.getTitle());
@@ -886,7 +889,8 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        SPath editorPath = EditorAPI.getEditorPath(editorPart);
+        SPath editorPath = EditorAPI.getEditorPath(editorPart,
+            session.getComponent(IReferencePointManager.class));
         TextSelection selection = EditorAPI.getSelection(editorPart);
 
         // Set (and thus send) in this order:
@@ -954,7 +958,8 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        SPath path = EditorAPI.getEditorPath(editorPart);
+        SPath path = EditorAPI.getEditorPath(editorPart,
+            session.getComponent(IReferencePointManager.class));
 
         partClosedOfPath(editorPart, path);
     }
@@ -1344,7 +1349,8 @@ public class EditorManager extends AbstractActivityProducer implements
         IEditorPart activeEditor = EditorAPI.getActiveEditor();
 
         if (activeEditor != null) {
-            locallyActiveEditor = EditorAPI.getEditorPath(activeEditor);
+            locallyActiveEditor = EditorAPI.getEditorPath(activeEditor,
+                session.getComponent(IReferencePointManager.class));
             partActivated(activeEditor);
         }
     }
@@ -1364,7 +1370,8 @@ public class EditorManager extends AbstractActivityProducer implements
      */
     private void refreshAnnotations(IEditorPart editorPart) {
 
-        SPath path = EditorAPI.getEditorPath(editorPart);
+        SPath path = EditorAPI.getEditorPath(editorPart,
+            session.getComponent(IReferencePointManager.class));
         if (path == null) {
             LOG.warn("Could not find path for editor " + editorPart.getTitle());
             return;
@@ -1499,7 +1506,7 @@ public class EditorManager extends AbstractActivityProducer implements
     }
 
     @Override
-    public void saveEditors(final IProject project) {
+    public void saveEditors(final IReferencePoint referencePoint) {
         SWTUtils.runSafeSWTSync(LOG, new Runnable() {
 
             @Override
@@ -1518,7 +1525,9 @@ public class EditorManager extends AbstractActivityProducer implements
                 editorPaths.addAll(openEditorPaths);
 
                 for (final SPath path : editorPaths) {
-                    if (project == null || project.equals(path.getProject()))
+                    if (referencePoint == null
+                        || referencePoint.equals(path.getProject()
+                            .getReferencePoint()))
                         saveLazy(path);
                 }
             }
@@ -1851,5 +1860,9 @@ public class EditorManager extends AbstractActivityProducer implements
     private void checkThreadAccess() {
         if (!SWTUtils.isSWT())
             throw new IllegalStateException("method must be invoked from EDT");
+    }
+
+    public ISarosSession getSession() {
+        return this.session;
     }
 }

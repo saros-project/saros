@@ -169,8 +169,7 @@ public class ArchiveOutgoingReferencePointNegotiation extends
              * underlying storage
              */
             if (editorManager != null)
-                editorManager.saveEditors(referencePointManager
-                    .get(referencePoint));
+                editorManager.saveEditors(referencePoint);
 
             final StringBuilder aliasBuilder = new StringBuilder();
 

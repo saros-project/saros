@@ -340,8 +340,7 @@ public abstract class AbstractOutgoingReferencePointNegotiation extends
                  * underlying storage
                  */
                 if (editorManager != null)
-                    editorManager.saveEditors(referencePointManager
-                        .get(referencePoint));
+                    editorManager.saveEditors(referencePoint);
 
                 FileList referencePointFileList = FileListFactory
                     .createFileList(referencePointManager, referencePoint,

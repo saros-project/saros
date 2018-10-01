@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -418,13 +419,15 @@ public class EditorAPI {
     }
 
     /**
+     * @param refernencePointManager
+     *            TODO
      * @return the path of the file the given editor is displaying or null if
      *         the given editor is not showing a file or the file is not
      *         referenced via a path in the project.
      */
-    public static SPath getEditorPath(IEditorPart editorPart) {
+    public static SPath getEditorPath(IEditorPart editorPart,
+        IReferencePointManager refernencePointManager) {
         IResource resource = getEditorResource(editorPart);
-
         return (resource == null) ? null : new SPath(
             ResourceAdapterFactory.create(resource));
     }

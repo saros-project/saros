@@ -5,7 +5,7 @@ import java.util.Set;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -63,14 +63,14 @@ public interface IEditorManager {
 
     /**
      * Saves the local editors of all shared files belonging to the given
-     * project. If <code>null</code> is passed, the shared files of all projects
-     * will be saved.
+     * referencePoint. If <code>null</code> is passed, the shared files of all
+     * referencePoints will be saved.
      * 
-     * @param project
-     *            the project whose editors should be saved, or
+     * @param referencePoint
+     *            the referencePoint whose editors should be saved, or
      *            <code>null</code> to save all editors
      */
-    public void saveEditors(IProject project);
+    public void saveEditors(IReferencePoint referencePoint);
 
     /**
      * Close the editor of given {@link SPath}.

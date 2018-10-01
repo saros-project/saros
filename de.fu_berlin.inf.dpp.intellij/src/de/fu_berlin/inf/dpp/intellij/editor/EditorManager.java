@@ -865,7 +865,7 @@ public class EditorManager extends AbstractActivityProducer
     }
 
     @Override
-    public void saveEditors(final IProject project) {
+    public void saveEditors(final IReferencePoint referencePoint) {
         executeInUIThreadSynchronous(new Runnable() {
             @Override
             public void run() {
@@ -880,7 +880,8 @@ public class EditorManager extends AbstractActivityProducer
                 editorPaths.addAll(openEditorPaths);
 
                 for (final SPath path : editorPaths) {
-                    if (project == null || project.equals(path.getProject())) {
+                    if (referencePoint == null || referencePoint.equals(path.getProject().
+                        getReferencePoint())) {
                         saveFile(path);
                     }
                 }
