@@ -214,4 +214,27 @@ class AnnotationStore<E extends AbstractEditorAnnotation> {
 
         return removedAnnotations;
     }
+
+    /**
+     * Sets the given new file as the file for all annotations belonging to the
+     * given old file.
+     * <p></p>
+     * This method should be used to update the annotation store when a file is
+     * moved.
+     *
+     * @param oldFile the old file of the annotations
+     * @param newFile the new file of the annotations
+     */
+    void updateAnnotationPath(
+        @NotNull
+            IFile oldFile,
+        @NotNull
+            IFile newFile) {
+
+        Map<User, List<E>> oldMapping = annotationMap.remove(oldFile);
+
+        if (oldMapping != null) {
+            annotationMap.put(newFile, oldMapping);
+        }
+    }
 }

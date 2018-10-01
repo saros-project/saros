@@ -28,7 +28,7 @@ import java.util.List;
  */
 abstract class AbstractEditorAnnotation {
     private final User user;
-    private final IFile file;
+    private IFile file;
     private final List<AnnotationRange> annotationRanges;
 
     private Editor editor;
@@ -221,6 +221,18 @@ abstract class AbstractEditorAnnotation {
             AnnotationRange annotationRange) {
 
         annotationRanges.remove(annotationRange);
+    }
+
+    /**
+     * Changes the file the annotation belongs to.
+     *
+     * @param newFile the new file of the annotation
+     */
+    void updateFile(
+        @NotNull
+            IFile newFile) {
+
+        file = newFile;
     }
 
     @NotNull
