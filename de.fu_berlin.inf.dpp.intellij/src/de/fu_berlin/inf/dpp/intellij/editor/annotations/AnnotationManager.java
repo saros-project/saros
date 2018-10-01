@@ -628,47 +628,49 @@ public class AnnotationManager {
      * <p></p>
      * This method should be used when a file is moved.
      * <p>
-     * Whether or not the move was caused locally should be specified using the
-     * boolean <code>causedLocally</code>.
+     * <b>NOTE:</b> If the move was caused by a received Saros activity, the
+     * local representation has to be removed from the corresponding
+     * annotations. This method assumes that such local representations were
+     * already removed if necessary. This can be done by closing the old editor
+     * before calling this method. The local representation for all annotations
+     * will then be re-created once an editor for the new file is opened.
+     * </p>
      * If the move was caused by a local action, the editor and range
      * highlighters contained in the stored annotations can still be used as
-     * they will get updated by the internal Intellij logic. If the move was
-     * caused by a received Saros activity, the local representation has to be
-     * removed. It will be re-created once an editor for the new file is opened.
-     * </p>
+     * they will get updated by the internal Intellij logic.
      *
-     * @param oldFile       the old file of the annotations
-     * @param newFile       the new file of the annotations
-     * @param causedLocally whether the file move was caused locally or received
-     *                      from another participant
+     * @param oldFile the old file of the annotations
+     * @param newFile the new file of the annotations
      */
     public void updateAnnotationPath(
         @NotNull
             IFile oldFile,
         @NotNull
-            IFile newFile, boolean causedLocally) {
+            IFile newFile) {
 
         updateAnnotationPath(newFile,
-            selectionAnnotationStore.getAnnotations(oldFile), causedLocally);
+            selectionAnnotationStore.getAnnotations(oldFile));
 
         selectionAnnotationStore.updateAnnotationPath(oldFile, newFile);
 
         updateAnnotationPath(newFile,
-            contributionAnnotationQueue.getAnnotations(oldFile), causedLocally);
+            contributionAnnotationQueue.getAnnotations(oldFile));
 
         contributionAnnotationQueue.updateAnnotationPath(oldFile, newFile);
     }
 
     /**
      * Sets the given file as the new file for the given annotations to
-     * correctly store the new path of a moved file. If the move was not
-     * triggered locally, also removes the local representation of the given
-     * annotations.
+     * correctly store the new path of a moved file.
+     * <p>
+     * <b>NOTE:</b> If the move was caused by a received Saros activity, the
+     * local representation has to be removed from the corresponding
+     * annotations. This method assumes that such local representations were
+     * already removed if necessary.
+     * </p>
      *
      * @param newFile        the new file of the annotations
      * @param oldAnnotations the annotations for the old file
-     * @param causedLocally  whether the file move was caused locally or
-     *                       received from another participant
      * @param <E>            the type of annotations stored in the given
      *                       annotation store
      */
@@ -676,16 +678,10 @@ public class AnnotationManager {
         @NotNull
             IFile newFile,
         @NotNull
-            List<E> oldAnnotations, boolean causedLocally) {
+            List<E> oldAnnotations) {
 
         for (E oldAnnotation : oldAnnotations) {
             oldAnnotation.updateFile(newFile);
-
-            if (!causedLocally) {
-                removeRangeHighlighter(oldAnnotation);
-
-                oldAnnotation.removeLocalRepresentation();
-            }
         }
     }
 
