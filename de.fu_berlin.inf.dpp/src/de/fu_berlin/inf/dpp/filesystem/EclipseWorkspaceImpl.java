@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -14,6 +15,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 
 /**
  * Eclipse implementation of {@link IWorkspace}. Lets you execute
@@ -79,12 +81,14 @@ public class EclipseWorkspaceImpl implements IWorkspace {
     @Override
     public void run(final IWorkspaceRunnable runnable) throws IOException,
         OperationCanceledException {
-        run(runnable, null);
+        run(runnable, null, null);
     }
 
     @Override
-    public void run(IWorkspaceRunnable runnable, IResource[] resources)
-        throws IOException, OperationCanceledException {
+    public void run(IWorkspaceRunnable runnable,
+        IReferencePoint[] referencePoints,
+        IReferencePointManager referencePointManager) throws IOException,
+        OperationCanceledException {
 
         final org.eclipse.core.resources.IWorkspaceRunnable eclipseRunnable;
 
@@ -98,6 +102,11 @@ public class EclipseWorkspaceImpl implements IWorkspace {
         } else {
             eclipseRunnable = new EclipseRunnableAdapter(runnable);
         }
+
+        IResource[] resources = referencePoints == null ? null
+            : referencePointManager.getProjects(
+                new HashSet<IReferencePoint>(Arrays.asList(referencePoints)))
+                .toArray(new IResource[0]);
 
         final List<org.eclipse.core.resources.IResource> eclipseResources = ResourceAdapterFactory
             .convertBack(resources != null ? Arrays.asList(resources) : null);

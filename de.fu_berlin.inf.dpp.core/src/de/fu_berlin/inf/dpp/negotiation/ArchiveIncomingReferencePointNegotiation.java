@@ -15,9 +15,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRespons
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
@@ -27,6 +25,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
@@ -87,8 +86,6 @@ public class ArchiveIncomingReferencePointNegotiation extends
              * functionality. This will enable a specific Queuing mechanism per
              * TransferType (see github issue #137).
              */
-            // referencePointManager.put(referencePoint.getReferencePoint(),
-            // referencePoint);
             session.addReferencePointMapping(referencePointID, referencePoint);
             session.enableQueuing(referencePoint);
         }
@@ -150,15 +147,17 @@ public class ArchiveIncomingReferencePointNegotiation extends
         final File archiveFile, final IProgressMonitor monitor)
         throws LocalCancellationException, IOException {
 
-        final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
+        final Map<String, IReferencePoint> referencePointMapping = new HashMap<String, IReferencePoint>();
 
         for (Entry<String, IReferencePoint> entry : localReferencePointMapping
             .entrySet())
-            projectMapping.put(entry.getKey(),
-                referencePointManager.get(entry.getValue()));
+            referencePointMapping.put(entry.getKey(), entry.getValue());
 
+        IReferencePointManager referencePointManager = session
+            .getComponent(IReferencePointManager.class);
         final DecompressArchiveTask decompressTask = new DecompressArchiveTask(
-            archiveFile, projectMapping, PATH_DELIMITER, monitor);
+            archiveFile, referencePointMapping, PATH_DELIMITER, monitor,
+            referencePointManager);
 
         long startTime = System.currentTimeMillis();
 
@@ -173,8 +172,8 @@ public class ArchiveIncomingReferencePointNegotiation extends
          */
 
         try {
-            workspace.run(decompressTask,
-                projectMapping.values().toArray(new IResource[0]));
+            workspace.run(decompressTask, referencePointMapping.values()
+                .toArray(new IReferencePoint[0]), referencePointManager);
         } catch (de.fu_berlin.inf.dpp.exceptions.OperationCanceledException e) {
             LocalCancellationException canceled = new LocalCancellationException(
                 null, CancelOption.DO_NOT_NOTIFY_PEER);
