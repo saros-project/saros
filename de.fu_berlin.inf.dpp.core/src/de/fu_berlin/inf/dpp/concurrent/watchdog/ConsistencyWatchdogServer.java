@@ -257,8 +257,8 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
          * Ensures that the watchdog server doesn't use outdated checksums for
          * files that no longer exist locally.
          */
-        if (!docPath.getFile().exists()
-                && checksum.getHash() != DocumentChecksum.NOT_AVAILABLE) {
+        if (checksum.getHash() != DocumentChecksum.NOT_AVAILABLE && !docPath
+                .getFile().exists()) {
 
             LOG.debug("Updating checksum for " + docPath + " to correctly "
                     + "represent that the file no longer exists locally: "
