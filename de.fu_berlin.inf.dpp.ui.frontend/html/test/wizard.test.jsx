@@ -33,7 +33,7 @@ describe('<Wizard />', () => {
   })
 
   //TODO: fix the test and unignore it
-  xit('calls onFinish on last page', () => {
+  it('calls onFinish on last page', () => {
     shouldRender(wrap.find('.btn-finish'))
     wrap.find('.btn-finish').simulate('click')
     expect(onFinish.calledOnce).to.equal(true)

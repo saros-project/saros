@@ -75,7 +75,7 @@ export default class Step extends React.Component {
           <button disabled={!hasPrev} className={cn('btn', 'btn-default', !hasPrev && 'disabled')} onClick={wizard.onClickBack}>
             <Text message='action.back' />
           </button>
-          <button className={cn('wizard-next-btn', 'btn', hasNext ? 'btn-next' : 'btn-primary')} onClick={this.onClickNext}>
+          <button className={cn('wizard-next-btn', 'btn', hasNext ? 'btn-next' : 'btn-finish')} onClick={this.onClickNext}>
             <Text message={hasNext ? 'action.next' : 'action.finish'} />
           </button>
         </nav>
