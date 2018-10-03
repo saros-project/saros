@@ -24,8 +24,7 @@ describe('<Wizard />', () => {
 
   const nextPage = () => wrap.find('.btn-next').simulate('click')
 
-  //TODO: fix the test and unignore it
-  xit('goes to nextPage when clicking Next', () => {
+  it('goes to nextPage when clicking Next', () => {
     shouldRender(wrap.find('.step-1'))
     nextPage()
     shouldRender(wrap.find('.step-2'))
