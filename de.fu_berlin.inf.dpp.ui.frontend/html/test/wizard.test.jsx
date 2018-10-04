@@ -32,7 +32,6 @@ describe('<Wizard />', () => {
     shouldRender(wrap.find('.step-3'))
   })
 
-  //TODO: fix the test and unignore it
   it('calls onFinish on last page', () => {
     shouldRender(wrap.find('.btn-finish'))
     wrap.find('.btn-finish').simulate('click')
