@@ -1,6 +1,6 @@
-import React from 'react'
-import { observable, computed, action } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { observer } from 'mobx-react'
+import React from 'react'
 export { default as Step } from './Step'
 
 @observer

@@ -1,10 +1,10 @@
-import React from 'react'
 import './style.css'
 import { Text } from 'react-localize'
 import { action, observable } from 'mobx'
 import { noop } from 'Utils'
 import { observer } from 'mobx-react'
 import P from 'prop-types'
+import React from 'react'
 import cn from 'classnames'
 
 @observer

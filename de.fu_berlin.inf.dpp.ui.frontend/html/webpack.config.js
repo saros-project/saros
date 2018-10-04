@@ -13,7 +13,7 @@ const createPage = (name) => {
   return new HtmlWebpackPlugin({
     filename: `${name}.html`,
     title: name,
-    template: 'template.ejs'
+    template: 'template.ejs',
   })
 }
 
@@ -23,7 +23,7 @@ module.exports = (env = {}) => {
 
   const extractCss = new ExtractTextPlugin({
     filename: 'css/[name].[hash].css',
-    disable: !isProd
+    disable: !isProd,
   })
 
   return {
@@ -32,12 +32,12 @@ module.exports = (env = {}) => {
       // We need this polyfill so that native functions defined in JavaScript ES6 can be used
       'babel-polyfill/dist/polyfill.js',
       // The entry point of our application
-      './index.jsx'
+      './index.jsx',
     ],
     output: {
       path: resolve(__dirname, 'dist'),
       // We need the [hash] for cache breaking
-      filename: 'js/bundle.[hash].js'
+      filename: 'js/bundle.[hash].js',
     },
     devtool: 'source-map',
     module: {
@@ -46,7 +46,7 @@ module.exports = (env = {}) => {
           test: /\.jsx?$/,
           exclude: /node_modules/,
           // We use babel for transpiling our scripts into old ES5 javascript
-          use: 'babel-loader'
+          use: 'babel-loader',
         },
         // CSS loader as described in https://github.com/webpack-contrib/sass-loader
         // Modified to only work with plain css
@@ -54,18 +54,18 @@ module.exports = (env = {}) => {
           test: /\.css$/,
           use: extractCss.extract({
             use: [
-                { loader: 'css-loader' }
+                { loader: 'css-loader' },
             ],
               // use style-loader in development
-            fallback: 'style-loader'
-          })
+            fallback: 'style-loader',
+          }),
         },
         // Those loaders are for using the bootstrap node package
         { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, use: 'file-loader?name=assets/[name].[ext]' },
         { test: /\.(woff|woff2)$/, use: 'url-loader?prefix=font/&limit=5000&name=assets/[name].[ext]' },
         { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=application/octet-stream&name=assets/[name].[ext]' },
-        { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=image/svg+xml&name=assets/[name].[ext]' }
-      ]
+        { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=image/svg+xml&name=assets/[name].[ext]' },
+      ],
     },
     plugins: [
       extractCss,
@@ -73,22 +73,22 @@ module.exports = (env = {}) => {
       createPage('main-page'),
       createPage('start-session-wizard'),
       createPage('configuration-page'),
-      createPage('basic-widget-test')
+      createPage('basic-widget-test'),
     ]
     .concat(isProd ? [
       // In Production Mode the global variable process.env.NODE_ENV is set to production
       // Causing some code to be optimized away
       new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('production')
+        'process.env.NODE_ENV': JSON.stringify('production'),
       }),
       // This optimizes and minifies the javascript code
       new webpack.optimize.UglifyJsPlugin({
         compress: {
           warnings: false,
-          drop_console: true
+          drop_console: true,
         },
-        mangle: true
-      })
+        mangle: true,
+      }),
     ] : []),
     resolve: {
       extensions: ['.js', '.jsx'],
@@ -96,8 +96,8 @@ module.exports = (env = {}) => {
       alias: {
         '~': resolve(__dirname, 'src/'),
         Utils: resolve(__dirname, 'src/utils/'),
-        Constants: resolve(__dirname, 'src/constants.jsx')
-      }
-    }
+        Constants: resolve(__dirname, 'src/constants.jsx'),
+      },
+    },
   }
 }

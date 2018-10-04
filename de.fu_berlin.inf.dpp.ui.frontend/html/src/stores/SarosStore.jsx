@@ -1,5 +1,5 @@
-import { observable, action, computed } from 'mobx'
-import { onlineFirst, getJid } from 'Utils'
+import { action, computed, observable } from 'mobx'
+import { getJid, onlineFirst } from 'Utils'
 
 export default class SarosStore {
   @observable state = {

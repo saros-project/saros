@@ -1,19 +1,19 @@
-import React from 'react'
-import $ from 'jquery'
 import { inject, observer } from 'mobx-react'
 import { views } from 'Constants'
-import MainView from './MainView'
+import $ from 'jquery'
 import AddContactView from './AddContactView'
-import StartSessionWizardView from './StartSessionWizardView'
-import ConfigurationWizardView from './ConfigurationWizardView'
 import BasicWidgetTestView from './BasicWidgetTestView'
+import ConfigurationWizardView from './ConfigurationWizardView'
+import MainView from './MainView'
+import React from 'react'
+import StartSessionWizardView from './StartSessionWizardView'
 
 const viewComponents = {
   [views.MAIN]: MainView,
   [views.ADD_CONTACT]: AddContactView,
   [views.START_SESSION_WIZARD]: StartSessionWizardView,
   [views.CONFIGURATION_WIZARD]: ConfigurationWizardView,
-  [views.BASIC_WIDGET_TEST]: BasicWidgetTestView
+  [views.BASIC_WIDGET_TEST]: BasicWidgetTestView,
 }
 
 @inject('view')

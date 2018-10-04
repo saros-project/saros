@@ -1,8 +1,8 @@
-import SarosStore from './SarosStore'
-import ViewStore from './ViewStore'
-import MainUIStore from './MainUIStore'
-import SessionUIStore from './SessionUIStore'
 import ConfigurationUIStore from './ConfigurationUIStore'
+import MainUIStore from './MainUIStore'
+import SarosStore from './SarosStore'
+import SessionUIStore from './SessionUIStore'
+import ViewStore from './ViewStore'
 
 /**
  * creates all stores, which store the application data

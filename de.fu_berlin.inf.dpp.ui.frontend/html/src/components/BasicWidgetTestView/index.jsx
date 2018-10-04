@@ -1,7 +1,7 @@
+import { Button, Checkbox, Col, ControlLabel, DropdownButton, Form, FormControl, FormGroup, Grid, MenuItem, ProgressBar, Radio, Row, SplitButton } from 'react-bootstrap'
+import { action, observable } from 'mobx'
+import { inject, observer } from 'mobx-react'
 import React from 'react'
-import { observable, action } from 'mobx'
-import { observer, inject } from 'mobx-react'
-import { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button, DropdownButton, SplitButton, MenuItem, Checkbox, Radio, ProgressBar } from 'react-bootstrap'
 
 @inject('mainUI')
 @observer

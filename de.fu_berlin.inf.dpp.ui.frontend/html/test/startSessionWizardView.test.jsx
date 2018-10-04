@@ -6,7 +6,6 @@ import {
 } from './utils'
 import { mount } from 'enzyme'
 import { spy } from 'sinon'
-import { traverse } from 'Utils'
 import React from 'react'
 import StartSessionWizardView from '~/components/StartSessionWizardView'
 import initStores from '~/stores'

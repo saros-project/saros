@@ -1,6 +1,6 @@
 import { Contact as ContactProps } from 'Utils/propTypes'
-import React from 'react'
 import { Text } from 'react-localize'
+import React from 'react'
 
 const Contact = ({
   displayName,
