@@ -57,8 +57,8 @@ export default class BasicWidgetTestView extends React.Component {
     } else {
       value = e.target.id
     }
-    $('#button-display-text').html(value)
-    console.log(value)
+    document.querySelector('#button-display-text').innerHtml = value
+    window.console.log(value)
   }
 
   render () {
