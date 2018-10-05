@@ -11,5 +11,5 @@ if [ -f "$ui_package_json" ]; then
   npm cache verify
   npm install
   npm run build
-  npm run test
+  npm run test:log
 fi
