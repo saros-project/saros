@@ -8,13 +8,15 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 
 /**
- * A <i>SPath</i> points to a {@link IResource resource} in a {@link IProject
- * project}. The specific resource does not need to exist, neither during the
- * marshaling nor during unmarshaling.
+ * A <i>SPath</i> points to a {@link IResource resource} in a
+ * {@link IReferencePoint project}. The specific resource does not need to
+ * exist, neither during the marshaling nor during unmarshaling.
  * <p>
  * <i>SPath</i> objects can be marshaled and unmarshaled.
  * 
@@ -34,29 +36,35 @@ public class SPath {
      *               information.
      */
 
-    /**
-     * The local IProject in which the resource is contained which this SPath
-     * represents
-     */
-    private final IProject project;
+    private IReferencePointManager referencePointManager;
 
     /**
-     * The project relative path of the resource this SPath represents.
+     * The local IReferencePoint on which the resource referenced to which this
+     * SPath represents
      */
-    private final IPath projectRelativePath;
+    private IReferencePoint referencePoint;
+
+    /**
+     * The relative path of the resource from the referencePoint this SPath
+     * represents.
+     */
+    private final IPath relativePathFromReferencePoint;
 
     /**
      * Default constructor, initializing this SPath as a reference to the
-     * resource identified by the given path in the given project.
+     * resource identified by the given path in the given referencePoint.
      * 
-     * @param path
+     * 
      * @throws IllegalArgumentException
-     *             if project is <code>null</code><br>
+     *             if referencePoint is <code>null</code><br>
+     * @throws IllegalArgumentException
+     *             if referencePointManager is <code>null</code><br>
      * @throws IllegalArgumentException
      *             if the path is <code>null</code> or is not relative
      */
-    public SPath(IProject project, IPath path) {
-        if (project == null)
+    public SPath(IReferencePoint referencePoint, IPath path,
+        IReferencePointManager referencePointManager) {
+        if (referencePoint == null)
             throw new IllegalArgumentException("project is null");
 
         if (path == null)
@@ -65,36 +73,45 @@ public class SPath {
         if (path.isAbsolute())
             throw new IllegalArgumentException("path is absolute: " + path);
 
-        this.project = project;
-        this.projectRelativePath = path;
+        if (referencePointManager == null)
+            throw new IllegalArgumentException("referencePointManager is null");
+
+        this.referencePoint = referencePoint;
+        this.referencePointManager = referencePointManager;
+        this.relativePathFromReferencePoint = path;
     }
 
     /**
-     * Convenience constructor, which retrieves path and project from the given
-     * resource
-     */
-    public SPath(IResource resource) {
-        this(resource.getProject(), resource.getProjectRelativePath());
-    }
-
-    /**
-     * Returns the project relative path of the resource represented by this
-     * SPath.
+     * Convenience constructor, which retrieves path and referencePoint from the
+     * given resource
      * 
-     * @return project relative path of the resource
      */
-    public IPath getProjectRelativePath() {
-        return projectRelativePath;
+    public SPath(IResource resource,
+        IReferencePointManager referencePointmanager) {
+        this(resource.getProject().getReferencePoint(), resource
+            .getProjectRelativePath(), referencePointmanager);
+
+    }
+
+    /**
+     * Returns the relative path of the resource from the referencePoint
+     * represented by this SPath.
+     * 
+     * @return relative path of the resource from the referencePoint
+     */
+    public IPath getRelativePathFromReferencePoint() {
+        return relativePathFromReferencePoint;
     }
 
     /**
      * Returns a handle for an IFile represented by this SPath.
      * 
-     * @return the IFile contained in the associated IProject for the given
-     *         project relative path
+     * @return the IFile contained in the associated referencePoint for the
+     *         given relative path from referencePoint
      */
     public IFile getFile() {
-        return project.getFile(projectRelativePath);
+        return referencePointManager.getFile(referencePoint,
+            relativePathFromReferencePoint);
     }
 
     /**
@@ -106,25 +123,34 @@ public class SPath {
      *         such or resource does not exist
      */
     public IResource getResource() {
-        return project.findMember(projectRelativePath);
+        return referencePointManager.findMember(referencePoint,
+            relativePathFromReferencePoint);
     }
 
     /**
      * Returns a handle for an IFolder represented by this SPath.
      * 
-     * @return the IFolder contained in the associated IProject for the given
-     *         project relative path
+     * @return the IFolder contained in the associated referencePoint for the
+     *         given relative path from referencePoint
      * 
      */
     public IFolder getFolder() {
-        return project.getFolder(projectRelativePath);
+        return referencePointManager.getFolder(referencePoint,
+            relativePathFromReferencePoint);
     }
 
     /**
      * Returns the project in which the referenced resource is located.
      */
     public IProject getProject() {
-        return project;
+        return referencePointManager.get(referencePoint);
+    }
+
+    /**
+     * Returns the referencePoint in which the resource referenced to.
+     */
+    public IReferencePoint getReferencePoint() {
+        return referencePoint;
     }
 
     /**
@@ -132,16 +158,18 @@ public class SPath {
      * this SPath.
      */
     public IPath getFullPath() {
-        final IPath fullProjectPath = project.getFullPath();
-        return fullProjectPath.append(projectRelativePath);
+        final IPath pathToReferencePoint = referencePointManager.get(
+            referencePoint).getFullPath();
+        return pathToReferencePoint.append(relativePathFromReferencePoint);
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ObjectUtils.hashCode(project);
-        result = prime * result + ObjectUtils.hashCode(projectRelativePath);
+        result = prime * result + ObjectUtils.hashCode(referencePoint);
+        result = prime * result
+            + ObjectUtils.hashCode(relativePathFromReferencePoint);
         return result;
     }
 
@@ -158,14 +186,14 @@ public class SPath {
 
         SPath other = (SPath) obj;
 
-        return ObjectUtils.equals(project, other.project)
-            && ObjectUtils.equals(projectRelativePath,
-                other.projectRelativePath);
+        return ObjectUtils.equals(referencePoint, other.referencePoint)
+            && ObjectUtils.equals(relativePathFromReferencePoint,
+                other.relativePathFromReferencePoint);
     }
 
     @Override
     public String toString() {
-        return "SPath [project=" + project + ", projectRelativePath="
-            + projectRelativePath + "]";
+        return "SPath [referencePoint=" + referencePoint
+            + ", projectRelativePath=" + relativePathFromReferencePoint + "]";
     }
 }

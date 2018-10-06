@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -279,10 +280,12 @@ public class ConsistencyAction extends Action implements Disposable {
                 + "The affected files and folders may be either modified, created, or deleted.\n\n"
                 + "Press 'Details' for the affected files and folders.", null);
 
+        IReferencePointManager referencePointManager = sarosSession
+            .getComponent(IReferencePointManager.class);
         for (SPath path : paths)
             multiStatus.add(new Status(IStatus.WARNING, pluginID, "project: "
-                + path.getProject().getName() + ", file:"
-                + path.getProjectRelativePath().toOSString()));
+                + referencePointManager.get(path.getReferencePoint()).getName()
+                + ", file:" + path.getRelativePathFromReferencePoint().toOSString()));
 
         class OkCancelErrorDialog extends ErrorDialog {
             public OkCancelErrorDialog(Shell parentShell, String dialogTitle,

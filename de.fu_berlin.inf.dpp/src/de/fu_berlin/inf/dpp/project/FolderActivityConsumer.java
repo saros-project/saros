@@ -62,9 +62,7 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer
 
         SPath path = activity.getPath();
 
-        IFolder folder = ((EclipseFolderImpl) path.getProject().getFolder(
-            path.getProjectRelativePath())).getDelegate();
-
+        IFolder folder = ((EclipseFolderImpl) path.getFolder()).getDelegate();
         try {
             FileUtils.create(folder);
         } catch (CoreException e) {
@@ -77,8 +75,7 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer
 
         SPath path = activity.getPath();
 
-        IFolder folder = ((EclipseFolderImpl) path.getProject().getFolder(
-            path.getProjectRelativePath())).getDelegate();
+        IFolder folder = ((EclipseFolderImpl) path.getFolder()).getDelegate();
 
         try {
             if (folder.exists())

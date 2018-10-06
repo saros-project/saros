@@ -76,8 +76,8 @@ public class Document {
     public void execOperation(Operation op) {
         User dummy = JupiterTestCase.createUser("dummy");
 
-        List<TextEditActivity> activities = op.toTextEdit(new SPath(project,
-            path), dummy);
+        List<TextEditActivity> activities = op.toTextEdit(
+            new SPath(project.getReferencePoint(), path, null), dummy);
 
         for (TextEditActivity activity : activities) {
 

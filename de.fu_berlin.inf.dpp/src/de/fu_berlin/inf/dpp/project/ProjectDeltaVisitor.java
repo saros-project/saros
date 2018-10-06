@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.FileUtils;
@@ -178,8 +179,11 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     private void generateCreated(IResource resource) {
+        IReferencePointManager referencePointManager = session
+            .getComponent(IReferencePointManager.class);
 
-        final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
+        final SPath spath = new SPath(ResourceAdapterFactory.create(resource),
+            referencePointManager);
 
         if (isFile(resource)) {
             byte[] content = FileUtils.getLocalFileContent((IFile) resource
@@ -219,23 +223,30 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             }
         }
 
-        SPath newPath = new SPath(ResourceAdapterFactory.create(resource));
-        SPath oldPath = new SPath(ResourceAdapterFactory.create(oldProject),
-            ResourceAdapterFactory.create(oldFullPath.removeFirstSegments(1)));
+        IReferencePointManager referencePointManager = session
+            .getComponent(IReferencePointManager.class);
+
+        SPath newPath = new SPath(ResourceAdapterFactory.create(resource),
+            referencePointManager);
+        SPath oldPath = new SPath(ResourceAdapterFactory.create(oldProject)
+            .getReferencePoint(), ResourceAdapterFactory.create(oldFullPath
+            .removeFirstSegments(1)), referencePointManager);
         // TODO add encoding
         addActivity(new FileActivity(user, Type.MOVED, Purpose.ACTIVITY,
             newPath, oldPath, content, null));
     }
 
     private void generateRemoved(IResource resource) {
+        IReferencePointManager referencePointManager = session
+            .getComponent(IReferencePointManager.class);
 
         if (resource instanceof IFile) {
             addActivity(new FileActivity(user, Type.REMOVED, Purpose.ACTIVITY,
-                new SPath(ResourceAdapterFactory.create(resource)), null, null,
-                null));
+                new SPath(ResourceAdapterFactory.create(resource),
+                    referencePointManager), null, null, null));
         } else {
             addActivity(new FolderDeletedActivity(user, new SPath(
-                ResourceAdapterFactory.create(resource))));
+                ResourceAdapterFactory.create(resource), referencePointManager)));
         }
     }
 
@@ -252,7 +263,11 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
         assert resource.getType() == IResource.FILE;
 
-        final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
+        IReferencePointManager referencePointManager = session
+            .getComponent(IReferencePointManager.class);
+
+        final SPath spath = new SPath(ResourceAdapterFactory.create(resource),
+            referencePointManager);
 
         if (!session.isShared(ResourceAdapterFactory.create(resource)))
             return;

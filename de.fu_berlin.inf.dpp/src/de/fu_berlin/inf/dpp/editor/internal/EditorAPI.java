@@ -419,17 +419,16 @@ public class EditorAPI {
     }
 
     /**
-     * @param refernencePointManager
-     *            TODO
      * @return the path of the file the given editor is displaying or null if
      *         the given editor is not showing a file or the file is not
      *         referenced via a path in the project.
      */
     public static SPath getEditorPath(IEditorPart editorPart,
-        IReferencePointManager refernencePointManager) {
+        IReferencePointManager referencePointManager) {
         IResource resource = getEditorResource(editorPart);
+
         return (resource == null) ? null : new SPath(
-            ResourceAdapterFactory.create(resource));
+            ResourceAdapterFactory.create(resource), referencePointManager);
     }
 
     /**

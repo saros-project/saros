@@ -23,6 +23,7 @@ import org.eclipse.ui.texteditor.IElementStateListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
@@ -154,7 +155,8 @@ final class EditorPool {
         documentProvider.getDocument(input).addDocumentListener(
             documentListener);
 
-        final SPath path = new SPath(ResourceAdapterFactory.create(file));
+        final SPath path = new SPath(ResourceAdapterFactory.create(file),
+            editorManager.getReferencePointManager());
 
         Set<IEditorPart> parts = editorParts.get(path);
 
@@ -260,7 +262,8 @@ final class EditorPool {
 
         editorManager.disconnect(file);
 
-        final SPath path = new SPath(ResourceAdapterFactory.create(file));
+        final SPath path = new SPath(ResourceAdapterFactory.create(file),
+            editorManager.getReferencePointManager());
 
         editorParts.get(path).remove(editorPart);
     }
@@ -301,8 +304,11 @@ final class EditorPool {
 
     /**
      * Removes all {@link IEditorPart} from the EditorPool.
+     * 
+     * @param referencePointManager
+     *            TODO
      */
-    public void removeAllEditors() {
+    public void removeAllEditors(IReferencePointManager referencePointManager) {
         LOG.trace("removing all editors");
 
         for (final IEditorPart part : new HashSet<IEditorPart>(getAllEditors()))

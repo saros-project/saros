@@ -56,7 +56,7 @@ public class DirtyStateListener implements IElementStateListener {
         final IFile file = ((FileEditorInput) element).getFile();
 
         final IReferencePointManager referencePointManager = editorManager
-            .getSession().getComponent(IReferencePointManager.class);
+            .getReferencePointManager();
 
         /*
          * FIXME why must we sync on SWT ? This should only be called in SWT
@@ -78,7 +78,7 @@ public class DirtyStateListener implements IElementStateListener {
 
                 LOG.debug("Dirty state reset for: " + file);
                 editorManager.sendEditorActivitySaved(new SPath(
-                    ResourceAdapterFactory.create(file)));
+                    ResourceAdapterFactory.create(file), referencePointManager));
             }
         });
     }

@@ -100,7 +100,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         resourceManager.internalFireActivity(removeActivity);
 
         project.addFile(newSPath.getFile().getLocation().toFile());
-        project.removeResource(oldSPath.getProjectRelativePath());
+        project.removeResource(oldSPath.getRelativePathFromReferencePoint());
     }
 
     private void generateFileMove(SPath oldSPath, SPath newSPath,
@@ -128,7 +128,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             editorManager.saveFile(newSPath);
         }
 
-        oldProject.removeResource(oldSPath.getProjectRelativePath());
+        oldProject.removeResource(oldSPath.getRelativePathFromReferencePoint());
 
         byte[] bytes = FileUtils.getLocalFileContent(file);
         String charset = getEncoding(file);
@@ -168,7 +168,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             return;
         }
 
-        SPath spath = new SPath(project, file.getProjectRelativePath());
+        IReferencePointManager referencePointManager = resourceManager.getSession().
+            getComponent(IReferencePointManager.class);
+
+        SPath spath = new SPath(project.getReferencePoint(), file.getProjectRelativePath(), referencePointManager);
 
         //FIXME does not work as it takes the file content, which has the wrong line separators
         //Files created from templates have initial content and are opened in
@@ -231,7 +234,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         path = makeAbsolutePathProjectRelative(path, project);
 
-        SPath spath = new SPath(project, path);
+        IReferencePointManager referencePointManager = resourceManager.getSession().
+            getComponent(IReferencePointManager.class);
+
+        SPath spath = new SPath(project.getReferencePoint(), path, referencePointManager);
         User user = resourceManager.getSession().getLocalUser();
         IActivity activity;
 
@@ -277,7 +283,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         path = makeAbsolutePathProjectRelative(path, project);
 
-        SPath spath = new SPath(project, path);
+        IReferencePointManager referencePointManager = resourceManager.getSession().
+            getComponent(IReferencePointManager.class);
+
+        SPath spath = new SPath(project.getReferencePoint(), path, referencePointManager);
         User user = resourceManager.getSession().getLocalUser();
 
         IActivity activity;
@@ -317,7 +326,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         path = makeAbsolutePathProjectRelative(path, project);
 
-        SPath newSPath = new SPath(project, path);
+        IReferencePointManager referencePointManager = resourceManager.getSession().
+            getComponent(IReferencePointManager.class);
+
+        SPath newSPath = new SPath(project.getReferencePoint(), path, referencePointManager);
 
         IPath oldParent = IntelliJPathImpl
             .fromString(virtualFileMoveEvent.getOldParent().getPath());
@@ -325,7 +337,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         IProject oldProject = getProjectForResource(oldPath);
 
         oldPath = makeAbsolutePathProjectRelative(oldPath, project);
-        SPath oldSPath = new SPath(oldProject, oldPath);
+
+        SPath oldSPath = new SPath(oldProject.getReferencePoint(), oldPath, referencePointManager);
 
         //FIXME: Handle cases where files are moved from outside the shared project
         //into the shared project
@@ -367,13 +380,16 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             return;
         }
 
+        IReferencePointManager referencePointManager = resourceManager.getSession().
+            getComponent(IReferencePointManager.class);
+
         oldPath = makeAbsolutePathProjectRelative(oldPath, project);
-        SPath oldSPath = new SPath(project, oldPath);
+        SPath oldSPath = new SPath(project.getReferencePoint(), oldPath, referencePointManager);
 
         IPath newPath = IntelliJPathImpl.fromString(newFile.getPath());
         newPath = makeAbsolutePathProjectRelative(newPath, project);
 
-        SPath newSPath = new SPath(project, newPath);
+        SPath newSPath = new SPath(project.getReferencePoint(), newPath, referencePointManager);
         //we handle this as a move activity
         if (newFile.isFile()) {
             generateFileMove(oldSPath, newSPath, false);
@@ -407,7 +423,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         path = makeAbsolutePathProjectRelative(path, project);
 
-        SPath spath = new SPath(project, path);
+        IReferencePointManager referencePointManager = resourceManager.getSession().
+            getComponent(IReferencePointManager.class);
+
+        SPath spath = new SPath(project.getReferencePoint(), path, referencePointManager);
 
         User user = resourceManager.getSession().getLocalUser();
         IActivity activity;

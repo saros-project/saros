@@ -20,7 +20,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.PathFake;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -28,7 +29,9 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 public class SplitOperationTest {
 
-    protected IProject project;
+    // protected IProject project;
+    protected IReferencePoint referencePoint;
+    protected IReferencePointManager referencePointManager;
 
     protected SPath path;
     protected User source = JupiterTestCase.createUser("source");
@@ -51,9 +54,12 @@ public class SplitOperationTest {
 
     @Before
     public void setUp() {
-        project = createMock(IProject.class);
-        replay(project);
-        path = new SPath(project, new PathFake("path"));
+        // project = createMock(IProject.class);
+        referencePoint = createMock(IReferencePoint.class);
+        referencePointManager = createMock(IReferencePointManager.class);
+        replay(referencePoint, referencePointManager);
+        path = new SPath(referencePoint, new PathFake("path"),
+            referencePointManager);
     }
 
     @Test

@@ -103,7 +103,10 @@ public class LocalEditorHandler {
             return;
         }
 
-        openEditor(virtualFile, new SPath(resource), activate);
+        IReferencePointManager referencePointManager = manager.getSession().
+            getComponent(IReferencePointManager.class);
+        
+        openEditor(virtualFile, new SPath(resource, referencePointManager), activate);
     }
 
 
@@ -241,9 +244,9 @@ public class LocalEditorHandler {
             if(resource != null){
                 break;
             }
-        }
-
-        return resource == null ? null : new SPath(resource);
+        }        
+        
+        return resource == null ? null : new SPath(resource, referencePointManager);
     }
 
     /**

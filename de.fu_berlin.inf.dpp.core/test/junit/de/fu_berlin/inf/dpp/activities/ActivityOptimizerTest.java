@@ -12,7 +12,9 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.User;
 
 public class ActivityOptimizerTest {
@@ -26,6 +28,9 @@ public class ActivityOptimizerTest {
 
     private IProject fooProject;
     private IProject barProject;
+    private IReferencePoint referencePointOfFoo;
+    private IReferencePoint referencePointOfBar;
+    private IReferencePointManager referencePointManager;
 
     private final NOPActivity nop = new NOPActivity(alice, bob, 0);
 
@@ -35,22 +40,33 @@ public class ActivityOptimizerTest {
         fooProject = EasyMock.createNiceMock(IProject.class);
         barProject = EasyMock.createNiceMock(IProject.class);
 
+        referencePointOfFoo = EasyMock.createNiceMock(IReferencePoint.class);
+        referencePointOfBar = EasyMock.createNiceMock(IReferencePoint.class);
+
+        referencePointManager = EasyMock
+            .createNiceMock(IReferencePointManager.class);
+
         fooPath = EasyMock.createNiceMock(IPath.class);
         barPath = EasyMock.createNiceMock(IPath.class);
 
-        EasyMock.replay(fooProject, barProject, fooPath, barPath);
+        EasyMock.replay(fooProject, barProject, fooPath, barPath,
+            referencePointOfFoo, referencePointOfBar, referencePointManager);
     }
 
     @Test
     public void testOptimize() {
 
-        SPath foofooSPath = new SPath(fooProject, fooPath);
+        SPath foofooSPath = new SPath(referencePointOfFoo, fooPath,
+            referencePointManager);
 
-        SPath foobarSPath = new SPath(fooProject, barPath);
+        SPath foobarSPath = new SPath(referencePointOfFoo, barPath,
+            referencePointManager);
 
-        SPath barfooSPath = new SPath(barProject, fooPath);
+        SPath barfooSPath = new SPath(referencePointOfBar, fooPath,
+            referencePointManager);
 
-        SPath barbarSPath = new SPath(barProject, barPath);
+        SPath barbarSPath = new SPath(referencePointOfBar, barPath,
+            referencePointManager);
 
         TextSelectionActivity tsChange0 = new TextSelectionActivity(alice, 0,
             1, foofooSPath);

@@ -21,7 +21,8 @@ import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.User;
 
 public class UserEditorStateTest {
@@ -43,12 +44,16 @@ public class UserEditorStateTest {
         IPath pathMockA = mockPath("/foo/src/Main.java", pathFactory);
         IPath pathMockB = mockPath("/foo/src/Second.java", pathFactory);
 
-        IProject project = EasyMock.createNiceMock(IProject.class);
+        IReferencePoint referencePoint = EasyMock
+            .createNiceMock(IReferencePoint.class);
 
-        EasyMock.replay(pathFactory, project);
+        IReferencePointManager referencePointManager = EasyMock
+            .createNiceMock(IReferencePointManager.class);
 
-        pathA = new SPath(project, pathMockA);
-        pathB = new SPath(project, pathMockB);
+        EasyMock.replay(pathFactory, referencePoint);
+
+        pathA = new SPath(referencePoint, pathMockA, referencePointManager);
+        pathB = new SPath(referencePoint, pathMockB, referencePointManager);
 
         /***/
 

@@ -219,7 +219,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         FileUtils.mkdirs(new IntelliJFileImpl(newProject,newFilePath.toFile()));
         FileUtils.move(newFilePath, oldPath.getResource());
 
-        oldProject.removeResource(oldPath.getProjectRelativePath());
+        oldProject.removeResource(oldPath.getRelativePathFromReferencePoint());
         newProject.addFile(newFilePath.toFile());
 
         localEditorManipulator.openEditor(newPath,false);
@@ -298,7 +298,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         SPath path = activity.getPath();
 
         IFolder folder = path.getProject()
-            .getFolder(path.getProjectRelativePath());
+            .getFolder(path.getRelativePathFromReferencePoint());
         fileSystemListener.setEnabled(false);
         //HACK: It does not work to disable the fileSystemListener temporarly,
         //because a fileCreated event will be fired asynchronously,

@@ -82,7 +82,7 @@ public abstract class IntelliJResourceImpl implements IResource {
     }
 
     public SPath getSPath() {
-        return new SPath(project, getProjectRelativePath());
+        return null;//new SPath(project, getProjectRelativePath(), null);
     }
 
     @Override

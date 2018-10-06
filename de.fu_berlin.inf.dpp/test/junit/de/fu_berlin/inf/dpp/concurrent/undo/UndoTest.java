@@ -15,8 +15,9 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 
 /**
  * testing TextOperationHistory and UndoManager
@@ -25,7 +26,9 @@ public class UndoTest {
 
     // private static final Logger log = Logger.getLogger(UndoTest.class);
 
-    protected IProject project;
+    protected IReferencePoint referencePoint;
+
+    protected IReferencePointManager referencePointManager;
 
     protected SPath path1;
     protected SPath path2;
@@ -35,14 +38,18 @@ public class UndoTest {
 
     @Before
     public void setUp() {
-        project = createMock(IProject.class);
-        replay(project);
+        referencePoint = createMock(IReferencePoint.class);
+        referencePointManager = createMock(IReferencePointManager.class);
+
+        replay(referencePoint, referencePointManager);
         undoManager = new UndoManager();
         history = undoManager.getHistory();
-        path1 = new SPath(project, ResourceAdapterFactory.create(new Path(
-            "path1")));
-        path2 = new SPath(project, ResourceAdapterFactory.create(new Path(
-            "path2")));
+        path1 = new SPath(referencePoint,
+            ResourceAdapterFactory.create(new Path("path1")),
+            referencePointManager);
+        path2 = new SPath(referencePoint,
+            ResourceAdapterFactory.create(new Path("path2")),
+            referencePointManager);
     }
 
     protected Operation nop() {

@@ -197,7 +197,7 @@ public final class ActivityHandler implements Startable {
             } else {
                 for (User user : item.recipients) {
                     if (session.userHasReferencePoint(user, activity.getPath()
-                        .getProject().getReferencePoint())) {
+                        .getReferencePoint())) {
                         recipients.add(user);
                     }
                 }

@@ -38,9 +38,9 @@ public class SPathConverterTest {
     }
 
     private static IPath path;
-    private static IProject project;
     private static IReferencePoint referencePoint;
     private static IPathFactory pathFactory;
+    private static IProject project;
     private static IReferencePointManager referencePointManager;
 
     @BeforeClass
@@ -55,13 +55,13 @@ public class SPathConverterTest {
         expect(pathFactory.fromString("/foo/src/Main.java"))
             .andStubReturn(path);
 
+        project = EasyMock.createNiceMock(IProject.class);        
+        
         referencePoint = EasyMock.createNiceMock(IReferencePoint.class);
-        project = EasyMock.createNiceMock(IProject.class);
-        expect(project.getReferencePoint()).andStubReturn(referencePoint);
         referencePointManager = EasyMock
             .createNiceMock(IReferencePointManager.class);
-        expect(referencePointManager.get(referencePoint))
-            .andStubReturn(project);
+         expect(referencePointManager.get(referencePoint))
+         .andStubReturn(project);
         EasyMock.replay(pathFactory, referencePoint, path, project,
             referencePointManager);
     }
@@ -86,7 +86,7 @@ public class SPathConverterTest {
         receiver.registerConverter(new SPathConverter(session, pathFactory));
 
         /* Test */
-        SPath spath = new SPath(project, path);
+        SPath spath = new SPath(referencePoint, path, referencePointManager);
         SPath copy = (SPath) receiver.fromXML(sender.toXML(spath));
         assertEquals(spath, copy);
 
@@ -131,7 +131,7 @@ public class SPathConverterTest {
             pathFactory));
 
         /* Test */
-        SPath spath = new SPath(project, path);
+        SPath spath = new SPath(referencePoint, path, referencePointManager);
 
         // first call on running session on receiver side
         receiver.fromXML(sender.toXML(spath));
@@ -180,7 +180,8 @@ public class SPathConverterTest {
             pathFactory));
 
         /* Test */
-        Dummy dummy = new Dummy(new SPath(project, path));
+        Dummy dummy = new Dummy(new SPath(referencePoint, path,
+            referencePointManager));
         Dummy copy = (Dummy) receiver.fromXML(sender.toXML(dummy));
         assertEquals(dummy, copy);
 

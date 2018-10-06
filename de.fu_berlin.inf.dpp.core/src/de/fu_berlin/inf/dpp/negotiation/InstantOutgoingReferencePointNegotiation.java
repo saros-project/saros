@@ -195,7 +195,7 @@ public class InstantOutgoingReferencePointNegotiation extends
                 .getReferencePointID());
             for (String file : list.getPaths()) {
                 files.add(new SPath(referencePointManager.get(referencePoint)
-                    .getFile(file)));
+                    .getFile(file), referencePointManager));
             }
         }
 
@@ -203,8 +203,8 @@ public class InstantOutgoingReferencePointNegotiation extends
         Collections.sort(files, new Comparator<SPath>() {
             @Override
             public int compare(SPath a, SPath b) {
-                int lenA = a.getProjectRelativePath().segmentCount();
-                int lenB = b.getProjectRelativePath().segmentCount();
+                int lenA = a.getRelativePathFromReferencePoint().segmentCount();
+                int lenB = b.getRelativePathFromReferencePoint().segmentCount();
                 return Integer.valueOf(lenA).compareTo(Integer.valueOf(lenB));
             }
         });
@@ -233,7 +233,7 @@ public class InstantOutgoingReferencePointNegotiation extends
         for (String string : eclipseProjFiles) {
             for (IReferencePoint referencePoint : referencePoints) {
                 SPath file = new SPath(referencePointManager
-                    .get(referencePoint).getFile(string));
+                    .get(referencePoint).getFile(string), referencePointManager);
                 sendIfRequired(osp, file);
             }
         }
@@ -245,8 +245,7 @@ public class InstantOutgoingReferencePointNegotiation extends
             while (!openedFiles.isEmpty()) {
                 SPath openFile = openedFiles.poll();
                 /* open files could be changed meanwhile */
-                editorManager.saveEditors(openFile.getProject()
-                    .getReferencePoint());
+                editorManager.saveEditors(openFile.getReferencePoint());
                 sendIfRequired(osp, openFile);
             }
 

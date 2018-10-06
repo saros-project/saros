@@ -141,6 +141,8 @@ public class EditorManager extends AbstractActivityProducer implements
 
     private LineRange localViewport;
 
+    private IReferencePointManager referencePointManager;
+
     /** all files that have connected document providers */
     private final Set<IFile> connectedFiles = new HashSet<IFile>();
 
@@ -1526,8 +1528,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
                 for (final SPath path : editorPaths) {
                     if (referencePoint == null
-                        || referencePoint.equals(path.getProject()
-                            .getReferencePoint()))
+                        || referencePoint.equals(path.getReferencePoint()))
                         saveLazy(path);
                 }
             }
@@ -1772,7 +1773,6 @@ public class EditorManager extends AbstractActivityProducer implements
         assert editorPool.getAllEditors().size() == 0 : "EditorPool was not correctly reset!";
 
         session = newSession;
-
         session.getStopManager().addBlockable(stopManagerListener);
 
         hasWriteAccess = session.hasWriteAccess();
@@ -1803,6 +1803,9 @@ public class EditorManager extends AbstractActivityProducer implements
 
         if (window != null)
             window.getPartService().addPartListener(partListener);
+
+        referencePointManager = session
+            .getComponent(IReferencePointManager.class);
     }
 
     /**
@@ -1834,7 +1837,7 @@ public class EditorManager extends AbstractActivityProducer implements
             }
         });
 
-        editorPool.removeAllEditors();
+        editorPool.removeAllEditors(this.referencePointManager);
 
         customAnnotationManager.uninstallAllPainters(true);
 
@@ -1862,7 +1865,7 @@ public class EditorManager extends AbstractActivityProducer implements
             throw new IllegalStateException("method must be invoked from EDT");
     }
 
-    public ISarosSession getSession() {
-        return this.session;
+    public IReferencePointManager getReferencePointManager() {
+        return this.referencePointManager;
     }
 }

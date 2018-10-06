@@ -116,7 +116,9 @@ public class AwarenessInformationTreeElement extends TreeElement {
              * 
              * TODO: make this configurable?
              */
-            details.add(activeFile.getProject().getName() + ": "
+            details.add(editorManager.getReferencePointManager()
+                .get(activeFile.getReferencePoint()).getName()
+                + ": "
                 + activeFile.getFile().getProjectRelativePath().toString());
         }
 

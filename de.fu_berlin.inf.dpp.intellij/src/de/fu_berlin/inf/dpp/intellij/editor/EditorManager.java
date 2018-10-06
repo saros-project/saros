@@ -464,7 +464,7 @@ public class EditorManager extends AbstractActivityProducer
                         .getProject().getAdapter(IntelliJProjectImplV2.class);
 
                     VirtualFile virtualFile = module
-                        .findVirtualFile(path.getProjectRelativePath());
+                        .findVirtualFile(path.getRelativePathFromReferencePoint());
 
                     if (virtualFile == null || !virtualFile.exists() ||
                         virtualFile.isDirectory()) {
