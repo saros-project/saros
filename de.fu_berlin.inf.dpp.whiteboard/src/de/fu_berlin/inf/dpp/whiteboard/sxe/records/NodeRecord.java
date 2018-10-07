@@ -6,6 +6,8 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+import com.google.gson.annotations.Expose;
+
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
@@ -51,17 +53,23 @@ public abstract class NodeRecord extends AbstractRecord implements
     private static final Random RANDOM = new Random();
 
     /* immutable fields */
+    @Expose
     private String rid;
-    private final NodeType nodeType;
+    @Expose
+    private final NodeType type;
+    @Expose
+    protected String name;
     protected int version;
     protected String ns;
-    protected String name;
     protected String creator;
 
     /* mutable fields */
+    @Expose
     protected boolean visible = true;
-    protected ElementRecord currentParent;
     protected Float currentPrimaryWeight;
+
+    // Don't expose parent, avoids circular references
+    protected ElementRecord currentParent;
 
     /** a initial SetRecord as initial state **/
     protected SetRecord initialSet;
@@ -76,7 +84,7 @@ public abstract class NodeRecord extends AbstractRecord implements
      * Constructor for locally created records with version == 0.
      * 
      * @param documentRecord
-     * @param nodeType
+     * @param type
      */
     protected NodeRecord(DocumentRecord documentRecord, NodeType nodeType) {
         this(documentRecord, nodeType, 0);
@@ -86,13 +94,13 @@ public abstract class NodeRecord extends AbstractRecord implements
      * Constructor for received remote records
      * 
      * @param documentRecord
-     * @param nodeType
+     * @param type
      * @param version
      */
     protected NodeRecord(DocumentRecord documentRecord, NodeType nodeType,
         int version) {
         this.rid = getNextRandomUniqueID();
-        this.nodeType = nodeType;
+        this.type = nodeType;
         this.documentRecord = documentRecord;
         this.version = version;
         initialSet = new SetRecord(this, version);
@@ -198,7 +206,7 @@ public abstract class NodeRecord extends AbstractRecord implements
      * @see NodeType
      */
     public NodeType getNodeType() {
-        return nodeType;
+        return type;
     }
 
     public String getRid() {
