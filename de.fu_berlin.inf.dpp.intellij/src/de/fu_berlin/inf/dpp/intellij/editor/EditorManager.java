@@ -50,7 +50,6 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -446,7 +445,6 @@ public class EditorManager extends AbstractActivityProducer
             remoteWriteAccessManager.dispose();
             remoteWriteAccessManager = null;
             activeEditor = null;
-            openEditorPaths.clear();
         }
 
 
@@ -474,7 +472,6 @@ public class EditorManager extends AbstractActivityProducer
     private User followedUser = null;
     private boolean hasWriteAccess;
     private boolean isLocked;
-    private final Set<SPath> openEditorPaths = new HashSet<SPath>();
     private SelectionEvent localSelection;
     private LineRange localViewport;
     private SPath activeEditor;
@@ -660,17 +657,16 @@ public class EditorManager extends AbstractActivityProducer
 
         activeEditor = path;
 
-        if (path != null && session.isShared(path.getResource())) {
-            openEditorPaths.add(path);
+        if (path == null || session.isShared(path.getResource())) {
+            editorListenerDispatch
+                .editorActivated(session.getLocalUser(), path);
+
+            fireActivity(new EditorActivity(session.getLocalUser(),
+                EditorActivity.Type.ACTIVATED, path));
+
+            //  generateSelection(path, selection);  //FIXME: add this feature
+            //  generateViewport(path, viewport);    //FIXME:s add this feature
         }
-
-        editorListenerDispatch.editorActivated(session.getLocalUser(), path);
-        fireActivity(new EditorActivity(session.getLocalUser(),
-            EditorActivity.Type.ACTIVATED, path));
-
-        //  generateSelection(path, selection);  //FIXME: add this feature
-        //  generateViewport(path, viewport);    //FIXME:s add this feature
-
     }
 
     /**
@@ -926,18 +922,11 @@ public class EditorManager extends AbstractActivityProducer
             @Override
             public void run() {
 
-                if (userEditorStateManager == null) {
-                    return;
-                }
+                for (SPath editorPath : editorPool.getFiles()) {
+                    if (project == null || project
+                        .equals(editorPath.getProject())) {
 
-                final Set<SPath> editorPaths = userEditorStateManager
-                    .getOpenEditors();
-
-                editorPaths.addAll(openEditorPaths);
-
-                for (final SPath path : editorPaths) {
-                    if (project == null || project.equals(path.getProject())) {
-                        saveFile(path);
+                        saveFile(editorPath);
                     }
                 }
             }
