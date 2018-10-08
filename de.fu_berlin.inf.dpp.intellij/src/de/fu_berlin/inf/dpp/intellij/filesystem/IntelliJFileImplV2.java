@@ -7,7 +7,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.FileAlreadyExistsException;
 
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,6 +26,9 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 
 public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
     IFile {
+
+    private static final Logger log = Logger
+        .getLogger(IntelliJFileImplV2.class);
 
     private static final int BUFFER_SIZE = 32 * 1024;
 
@@ -174,7 +180,20 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
             throw new FileNotFoundException(this + " does not exist or is " +
                 "derived");
 
-        return file.getInputStream();
+        Document document = Filesystem.runReadAction(
+            () -> FileDocumentManager.getInstance().getDocument(file));
+
+        if (document == null) {
+            log.debug("Could not get Document for file " + file
+                + ", using file content on disk instead. This content might "
+                + "not correctly represent the current state of the file in "
+                + "Intellij.");
+
+            return file.getInputStream();
+        }
+
+        return IOUtils
+            .toInputStream(document.getText(), file.getCharset().name());
     }
 
     /**
