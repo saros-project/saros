@@ -762,12 +762,11 @@ public final class SarosSession implements ISarosSession {
          * other recipients.
          */
         // handle IFileSystemModificationActivities to update ProjectMapper
-        if (activity instanceof IFileSystemModificationActivity) {
-            if (!isHost() || (isHost() && recipients
-                .contains(getLocalUser()))) {
-                send = updatePartialSharedResources(
-                    (IFileSystemModificationActivity) activity);
-            }
+        if (activity instanceof IFileSystemModificationActivity
+            && (!isHost() || (isHost() && recipients.contains(getLocalUser())))) {
+
+            send = updatePartialSharedResources((IFileSystemModificationActivity) activity);
+
         }
 
         if (!send)
