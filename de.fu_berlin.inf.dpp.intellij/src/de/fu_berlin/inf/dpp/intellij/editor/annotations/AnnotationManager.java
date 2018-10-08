@@ -582,6 +582,35 @@ public class AnnotationManager {
     }
 
     /**
+     * Removes all annotations belonging to the given file from all annotation
+     * stores and from the editor for the file.
+     * <p></p>
+     * This method should be used when a file is deleted or removed from the
+     * session scope.
+     *
+     * @param file the file to remove from the annotation store
+     */
+    public void removeAnnotations(
+        @NotNull
+            IFile file) {
+
+        for (SelectionAnnotation selectionAnnotation : selectionAnnotationStore
+            .getAnnotations(file)) {
+
+            removeRangeHighlighter(selectionAnnotation);
+            selectionAnnotationStore.removeAnnotation(selectionAnnotation);
+        }
+
+        for (ContributionAnnotation contributionAnnotation : contributionAnnotationQueue
+            .getAnnotations(file)) {
+
+            removeRangeHighlighter(contributionAnnotation);
+            contributionAnnotationQueue
+                .removeAnnotation(contributionAnnotation);
+        }
+    }
+
+    /**
      * Removes all annotations from all open editors and removes all the stored
      * annotations from all annotation stores.
      */
@@ -591,6 +620,69 @@ public class AnnotationManager {
 
         contributionAnnotationQueue.removeAllAnnotations()
             .forEach(this::removeRangeHighlighter);
+    }
+
+    /**
+     * Sets the given new file as the file for all annotations belonging to the
+     * given old file and updates the mapping of all annotation stores.
+     * <p></p>
+     * This method should be used when a file is moved.
+     * <p>
+     * <b>NOTE:</b> If the move was caused by a received Saros activity, the
+     * local representation has to be removed from the corresponding
+     * annotations. This method assumes that such local representations were
+     * already removed if necessary. This can be done by closing the old editor
+     * before calling this method. The local representation for all annotations
+     * will then be re-created once an editor for the new file is opened.
+     * </p>
+     * If the move was caused by a local action, the editor and range
+     * highlighters contained in the stored annotations can still be used as
+     * they will get updated by the internal Intellij logic.
+     *
+     * @param oldFile the old file of the annotations
+     * @param newFile the new file of the annotations
+     */
+    public void updateAnnotationPath(
+        @NotNull
+            IFile oldFile,
+        @NotNull
+            IFile newFile) {
+
+        updateAnnotationPath(newFile,
+            selectionAnnotationStore.getAnnotations(oldFile));
+
+        selectionAnnotationStore.updateAnnotationPath(oldFile, newFile);
+
+        updateAnnotationPath(newFile,
+            contributionAnnotationQueue.getAnnotations(oldFile));
+
+        contributionAnnotationQueue.updateAnnotationPath(oldFile, newFile);
+    }
+
+    /**
+     * Sets the given file as the new file for the given annotations to
+     * correctly store the new path of a moved file.
+     * <p>
+     * <b>NOTE:</b> If the move was caused by a received Saros activity, the
+     * local representation has to be removed from the corresponding
+     * annotations. This method assumes that such local representations were
+     * already removed if necessary.
+     * </p>
+     *
+     * @param newFile        the new file of the annotations
+     * @param oldAnnotations the annotations for the old file
+     * @param <E>            the type of annotations stored in the given
+     *                       annotation store
+     */
+    private <E extends AbstractEditorAnnotation> void updateAnnotationPath(
+        @NotNull
+            IFile newFile,
+        @NotNull
+            List<E> oldAnnotations) {
+
+        for (E oldAnnotation : oldAnnotations) {
+            oldAnnotation.updateFile(newFile);
+        }
     }
 
     /**
