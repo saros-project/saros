@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 
 import org.apache.log4j.Logger;
 
@@ -196,17 +197,41 @@ public class LocalEditorHandler {
     }
 
     /**
-     * Saves the document under path..
+     * Saves the document under path, thereby flushing its contents to disk.
      *
-     * @param path
+     * @param path the path for the document to save
      */
-    public void saveFile(SPath path) {
-        Document doc = editorPool.getDocument(path);
-        if (doc != null) {
-            projectAPI.saveDocument(doc);
-        } else {
-            LOG.warn("Document does not exist: " + path);
+    public void saveFile(
+        @NotNull
+            SPath path) {
+
+        Document document = editorPool.getDocument(path);
+
+        if (document == null) {
+            IntelliJProjectImplV2 project = (IntelliJProjectImplV2) path
+                .getProject().getAdapter(IntelliJProjectImplV2.class);
+
+            VirtualFile file = project
+                .findVirtualFile(path.getProjectRelativePath());
+
+            if (file == null || !file.exists()) {
+                LOG.warn("Failed to save document for " + path
+                    + " - could not get a valid VirtualFile");
+
+                return;
+            }
+
+            document = projectAPI.getDocument(file);
+
+            if (document == null) {
+                LOG.warn("Failed to save document for " + file
+                    + " - could not get a matching Document");
+
+                return;
+            }
         }
+
+        projectAPI.saveDocument(document);
     }
 
     /**

@@ -50,6 +50,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -922,9 +923,15 @@ public class EditorManager extends AbstractActivityProducer
             @Override
             public void run() {
 
-                for (SPath editorPath : editorPool.getFiles()) {
+                Set<SPath> editorPaths = new HashSet<>(editorPool.getFiles());
+
+                if (userEditorStateManager != null) {
+                    editorPaths.addAll(userEditorStateManager.getOpenEditors());
+                }
+
+                for (SPath editorPath : editorPaths) {
                     if (project == null || project
-                        .equals(editorPath.getProject())) {
+                            .equals(editorPath.getProject())) {
 
                         saveFile(editorPath);
                     }
