@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
@@ -54,11 +54,12 @@ import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -76,7 +77,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
     private EnterProjectNamePage namePage;
     private WizardDialogAccessable wizardDialog;
-    private AbstractIncomingProjectNegotiation negotiation;
+    private AbstractIncomingReferencePointNegotiation negotiation;
     private JID peer;
 
     private boolean isExceptionCancel;
@@ -92,6 +93,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
     @Inject
     private ISarosSessionManager sessionManager;
+
+    private IReferencePointManager referencePointManager;
 
     private static class OverwriteErrorDialog extends ErrorDialog {
 
@@ -123,7 +126,7 @@ public class AddProjectToSessionWizard extends Wizard {
     };
 
     public AddProjectToSessionWizard(
-        AbstractIncomingProjectNegotiation negotiation) {
+        AbstractIncomingReferencePointNegotiation negotiation) {
 
         SarosPluginContext.initComponent(this);
 
@@ -157,7 +160,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         namePage = new EnterProjectNamePage(session, connectionManager,
-            preferences, peer, negotiation.getProjectNegotiationData());
+            preferences, peer, negotiation.getReferencePointNegotiationData());
 
         addPage(namePage);
     }
@@ -303,17 +306,22 @@ public class AddProjectToSessionWizard extends Wizard {
                         }
                     }
 
-                    final Map<String, de.fu_berlin.inf.dpp.filesystem.IProject> convertedMapping = new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IProject>();
+                    final Map<String, de.fu_berlin.inf.dpp.filesystem.IReferencePoint> convertedMapping = new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IReferencePoint>();
 
                     for (final Entry<String, IProject> entry : targetProjectMapping
                         .entrySet()) {
+                        de.fu_berlin.inf.dpp.filesystem.IProject convertedProject = ResourceAdapterFactory
+                            .create(entry.getValue());
                         convertedMapping.put(entry.getKey(),
-                            ResourceAdapterFactory.create(entry.getValue()));
+                            convertedProject.getReferencePoint());
+                        referencePointManager.put(
+                            convertedProject.getReferencePoint(),
+                            convertedProject);
                     }
 
-                    final ProjectNegotiation.Status status = negotiation.run(
-                        convertedMapping,
-                        ProgressMonitorAdapterFactory.convert(monitor));
+                    final ReferencePointNegotiation.Status status = negotiation
+                        .run(convertedMapping,
+                            ProgressMonitorAdapterFactory.convert(monitor));
 
                     if (isAutoBuilding) {
                         description.setAutoBuilding(true);
@@ -324,7 +332,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         }
                     }
 
-                    if (status != ProjectNegotiation.Status.OK)
+                    if (status != ReferencePointNegotiation.Status.OK)
                         return Status.CANCEL_STATUS;
 
                     final List<String> projectNames = new ArrayList<String>();
@@ -542,6 +550,9 @@ public class AddProjectToSessionWizard extends Wizard {
         if (session == null)
             throw new IllegalStateException("no session running");
 
+        referencePointManager = session
+            .getComponent(IReferencePointManager.class);
+
         final SubMonitor subMonitor = SubMonitor.convert(monitor,
             "Searching for files that will be modified...",
             projectMapping.size());
@@ -569,7 +580,11 @@ public class AddProjectToSessionWizard extends Wizard {
              */
 
             try {
-                localFileList = FileListFactory.createFileList(adaptedProject,
+
+                referencePointManager.put(adaptedProject.getReferencePoint(),
+                    adaptedProject);
+                localFileList = FileListFactory.createFileList(
+                    referencePointManager, adaptedProject.getReferencePoint(),
                     null, checksumCache, ProgressMonitorAdapterFactory
                         .convert(subMonitor.newChild(1,
                             SubMonitor.SUPPRESS_ALL_LABELS)));
@@ -584,8 +599,8 @@ public class AddProjectToSessionWizard extends Wizard {
                     "failed to compute local file list", e));
             }
 
-            final ProjectNegotiationData data = negotiation
-                .getProjectNegotiationData(projectID);
+            final ReferencePointNegotiationData data = negotiation
+                .getReferencePointNegotiationData(projectID);
 
             final FileListDiff diff = FileListDiff.diff(localFileList,
                 data.getFileList(), data.isPartial());
@@ -628,8 +643,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
         final Map<String, IProject> result = new HashMap<String, IProject>();
 
-        for (final ProjectNegotiationData data : negotiation
-            .getProjectNegotiationData()) {
+        for (final ReferencePointNegotiationData data : negotiation
+            .getReferencePointNegotiationData()) {
             final String projectID = data.getProjectID();
 
             result.put(projectID, ResourcesPlugin.getWorkspace().getRoot()

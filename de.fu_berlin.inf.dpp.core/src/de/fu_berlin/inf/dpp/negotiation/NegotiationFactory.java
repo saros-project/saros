@@ -5,7 +5,7 @@ import java.util.List;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -109,9 +109,9 @@ public final class NegotiationFactory {
             connectionManager, transmitter, receiver);
     }
 
-    public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
+    public AbstractOutgoingReferencePointNegotiation newOutgoingReferencePointNegotiation(
         final JID remoteAddress, final TransferType transferType,
-        final List<IProject> resources,
+        final List<IReferencePoint> referencePoints,
         final ISarosSessionManager sessionManager, final ISarosSession session) {
 
         if (transferType == null) {
@@ -120,13 +120,13 @@ public final class NegotiationFactory {
 
         switch (transferType) {
         case ARCHIVE:
-            return new ArchiveOutgoingProjectNegotiation(remoteAddress,
-                resources, sessionManager, session, /* editorManager */
+            return new ArchiveOutgoingReferencePointNegotiation(remoteAddress,
+                referencePoints, sessionManager, session, /* editorManager */
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);
         case INSTANT:
-            return new InstantOutgoingProjectNegotiation(remoteAddress,
-                resources, sessionManager, session, /* editorManager */
+            return new InstantOutgoingReferencePointNegotiation(remoteAddress,
+                referencePoints, sessionManager, session, /* editorManager */
                 context.getComponent(IEditorManager.class), workspace,
                 checksumCache, connectionService, transmitter, receiver);
         default:
@@ -135,10 +135,10 @@ public final class NegotiationFactory {
         }
     }
 
-    public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
+    public AbstractIncomingReferencePointNegotiation newIncomingReferencePointNegotiation(
         final JID remoteAddress, final TransferType transferType,
         final String negotiationID,
-        final List<ProjectNegotiationData> projectNegotiationData,
+        final List<ReferencePointNegotiationData> referencePointNegotiationData,
         final ISarosSessionManager sessionManager, final ISarosSession session) {
 
         if (transferType == null) {
@@ -147,13 +147,13 @@ public final class NegotiationFactory {
 
         switch (transferType) {
         case ARCHIVE:
-            return new ArchiveIncomingProjectNegotiation(remoteAddress,
-                negotiationID, projectNegotiationData, sessionManager, session,
+            return new ArchiveIncomingReferencePointNegotiation(remoteAddress,
+                negotiationID, referencePointNegotiationData, sessionManager, session,
                 fileReplacementInProgressObservable, workspace, checksumCache,
                 connectionService, transmitter, receiver);
         case INSTANT:
-            return new InstantIncomingProjectNegotiation(remoteAddress,
-                negotiationID, projectNegotiationData, sessionManager, session,
+            return new InstantIncomingReferencePointNegotiation(remoteAddress,
+                negotiationID, referencePointNegotiationData, sessionManager, session,
                 fileReplacementInProgressObservable, workspace, checksumCache,
                 connectionService, transmitter, receiver);
         default:

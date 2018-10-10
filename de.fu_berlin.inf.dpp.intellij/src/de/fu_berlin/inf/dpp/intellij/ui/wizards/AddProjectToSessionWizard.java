@@ -5,10 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
@@ -49,10 +52,10 @@ import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -86,7 +89,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private final String remoteProjectID;
     private final String remoteProjectName;
 
-    private final AbstractIncomingProjectNegotiation negotiation;
+    private final AbstractIncomingReferencePointNegotiation negotiation;
     private final JID peer;
 
     private boolean triggered = false;
@@ -341,7 +344,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
      */
     public AddProjectToSessionWizard(Window parent,
-        AbstractIncomingProjectNegotiation negotiation) {
+        AbstractIncomingReferencePointNegotiation negotiation) {
 
         super(parent, Messages.AddProjectToSessionWizard_title,
             new HeaderPanel(Messages.EnterProjectNamePage_title2, ""));
@@ -350,7 +353,7 @@ public class AddProjectToSessionWizard extends Wizard {
         this.peer = negotiation.getPeer();
 
 
-        List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
+        List<ReferencePointNegotiationData> data = negotiation.getReferencePointNegotiationData();
 
         localProjects = new HashMap<String, IProject>();
 
@@ -403,7 +406,7 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     /**
-     * Runs {@link AbstractIncomingProjectNegotiation#run(java.util.Map, IProgressMonitor)}
+     * Runs {@link AbstractIncomingReferencePointNegotiation#run(Map, IProgressMonitor)}
      * as a background task through {@link #runTask(Runnable, String)}.
      * <p/>
      * On success, a success notification is displayed, on error, a dialog is shown.
@@ -414,6 +417,15 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         triggered = true;
+        IReferencePointManager referencePointManager = sessionManager.getSession().
+            getComponent(IReferencePointManager.class);
+        Map<String, IReferencePoint> localReferencePoints = new HashMap<>();
+
+        for(String key : localProjects.keySet()){
+            IProject project = localProjects.get(key);
+            referencePointManager.put(project.getReferencePoint(), project);
+            localReferencePoints.put(key, project.getReferencePoint());
+        }
 
         ProgressManager.getInstance().run(
             new Task.Backgroundable(project, "Sharing project...", true,
@@ -421,8 +433,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
                 @Override
                 public void run(ProgressIndicator indicator) {
-                    final ProjectNegotiation.Status status = negotiation
-                        .run(localProjects,
+                    final ReferencePointNegotiation.Status status = negotiation
+                        .run(localReferencePoints,
                             new ProgessMonitorAdapter(indicator));
 
                     indicator.stop();
@@ -430,12 +442,12 @@ public class AddProjectToSessionWizard extends Wizard {
                     UIUtil.invokeLaterIfNeeded(new Runnable() {
                         @Override
                         public void run() {
-                            if (status == ProjectNegotiation.Status.ERROR) {
+                            if (status == ReferencePointNegotiation.Status.ERROR) {
                                 DialogUtils.showError(null,
                                     "Error during project negotiation",
                                     "The project could not be shared: "
                                         + negotiation.getErrorMessage());
-                            } else if (status == ProjectNegotiation.Status.OK) {
+                            } else if (status == ReferencePointNegotiation.Status.OK) {
                                 NotificationPanel
                                     .showInformation("Project shared",
                                         "Project successfully shared");
@@ -566,13 +578,18 @@ public class AddProjectToSessionWizard extends Wizard {
 
             try {
 
-                final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
+                final ReferencePointNegotiationData data = negotiation.getReferencePointNegotiationData(projectID);
 
                 if (data.isPartial())
                     throw new IllegalStateException("partial sharing is not supported");
 
+                IReferencePointManager referencePointManager = session.
+                    getComponent(IReferencePointManager.class);
+                referencePointManager.put(project.getReferencePoint(), project);
+
                 FileList localFileList = FileListFactory
-                    .createFileList(project, null, checksumCache,
+                    .createFileList(referencePointManager, project.getReferencePoint(),
+                        null, checksumCache,
                         new SubProgressMonitor(monitor, 1,
                             SubProgressMonitor.SUPPRESS_SETTASKNAME));
 

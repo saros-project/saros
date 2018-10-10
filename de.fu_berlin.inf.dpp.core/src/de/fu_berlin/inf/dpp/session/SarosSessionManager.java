@@ -36,17 +36,18 @@ import org.jivesoftware.smack.Connection;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.TransferType;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
@@ -112,7 +113,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final SessionNegotiationObservable currentSessionNegotiations;
 
-    private final ProjectNegotiationObservable currentProjectNegotiations;
+    private final ReferencePointNegotiationObservable currentProjectNegotiations;
 
     private XMPPConnectionService connectionService;
 
@@ -135,7 +136,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         @Override
-        public void negotiationTerminated(final ProjectNegotiation negotiation) {
+        public void negotiationTerminated(
+            final ReferencePointNegotiation negotiation) {
             currentProjectNegotiations.remove(negotiation);
         }
     };
@@ -160,7 +162,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.context = context;
         this.connectionService = connectionService;
         this.currentSessionNegotiations = new SessionNegotiationObservable();
-        this.currentProjectNegotiations = new ProjectNegotiationObservable();
+        this.currentProjectNegotiations = new ReferencePointNegotiationObservable();
         this.connectionService.addListener(connectionListener);
 
         this.negotiationFactory = negotiationFactory;
@@ -425,7 +427,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     void projectNegotiationRequestReceived(JID remoteAddress,
         TransferType transferType,
-        List<ProjectNegotiationData> projectNegotiationData,
+        List<ReferencePointNegotiationData> projectNegotiationData,
         String negotiationID) {
 
         INegotiationHandler handler = negotiationHandler;
@@ -435,7 +437,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        AbstractIncomingProjectNegotiation negotiation;
+        AbstractIncomingReferencePointNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -444,7 +446,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
 
             try {
-                negotiation = negotiationFactory.newIncomingProjectNegotiation(
+                negotiation = negotiationFactory.newIncomingReferencePointNegotiation(
                     remoteAddress, transferType, negotiationID,
                     projectNegotiationData, this, session);
 
@@ -538,7 +540,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        List<IProject> projectsToShare = new ArrayList<IProject>();
+        List<IReferencePoint> referencePointsToShare = new ArrayList<IReferencePoint>();
 
         for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
             .entrySet()) {
@@ -559,11 +561,11 @@ public class SarosSessionManager implements ISarosSessionManager {
                 currentSession.addSharedResources(project.getReferencePoint(),
                     projectID, resourcesList);
 
-                projectsToShare.add(project);
+                referencePointsToShare.add(project.getReferencePoint());
             }
         }
 
-        if (projectsToShare.isEmpty()) {
+        if (referencePointsToShare.isEmpty()) {
             log.warn("skipping project negotiation because no new projects were added to the current session");
             return;
         }
@@ -575,7 +577,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        List<AbstractOutgoingProjectNegotiation> negotiations = new ArrayList<AbstractOutgoingProjectNegotiation>();
+        List<AbstractOutgoingReferencePointNegotiation> negotiations = new ArrayList<AbstractOutgoingReferencePointNegotiation>();
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -589,9 +591,9 @@ public class SarosSessionManager implements ISarosSessionManager {
                     TransferType type = TransferType.valueOf(currentSession
                         .getUserProperties(user).getString(
                             ProjectNegotiationTypeHook.KEY_TYPE));
-                    AbstractOutgoingProjectNegotiation negotiation = negotiationFactory
-                        .newOutgoingProjectNegotiation(user.getJID(), type,
-                            projectsToShare, this, currentSession);
+                    AbstractOutgoingReferencePointNegotiation negotiation = negotiationFactory
+                        .newOutgoingReferencePointNegotiation(user.getJID(), type,
+                            referencePointsToShare, this, currentSession);
 
                     negotiation.setNegotiationListener(negotiationListener);
                     currentProjectNegotiations.add(negotiation);
@@ -602,7 +604,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
         }
 
-        for (AbstractOutgoingProjectNegotiation negotiation : negotiations)
+        for (AbstractOutgoingReferencePointNegotiation negotiation : negotiations)
             handler.handleOutgoingProjectNegotiation(negotiation);
     }
 
@@ -620,11 +622,10 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        List<IProject> currentSharedProjects = new ArrayList<IProject>(
-            referencePointManager.getProjects(currentSession
-                .getReferencePoints()));
+        List<IReferencePoint> currentSharedReferencePoints = new ArrayList<IReferencePoint>(
+            currentSession.getReferencePoints());
 
-        if (currentSharedProjects.isEmpty())
+        if (currentSharedReferencePoints.isEmpty())
             return;
 
         INegotiationHandler handler = negotiationHandler;
@@ -635,7 +636,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        AbstractOutgoingProjectNegotiation negotiation;
+        AbstractOutgoingReferencePointNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -655,8 +656,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                 TransferType type = TransferType.valueOf(currentSession
                     .getUserProperties(remoteUser).getString(
                         ProjectNegotiationTypeHook.KEY_TYPE));
-                negotiation = negotiationFactory.newOutgoingProjectNegotiation(
-                    user, type, currentSharedProjects, this, currentSession);
+                negotiation = negotiationFactory.newOutgoingReferencePointNegotiation(
+                    user, type, currentSharedReferencePoints, this, currentSession);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentProjectNegotiations.add(negotiation);
@@ -742,7 +743,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
         }
 
-        for (ProjectNegotiation negotiation : currentProjectNegotiations.list())
+        for (ReferencePointNegotiation negotiation : currentProjectNegotiations
+            .list())
             negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
 
         log.trace("waiting for all session and project negotiations to terminate");

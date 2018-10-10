@@ -98,8 +98,6 @@ public final class SarosSession implements ISarosSession {
     @Inject
     private IConnectionManager connectionManager;
 
-    private IReferencePointManager referencePointManager;
-
     private final IContainerContext containerContext;
 
     private final ConcurrentDocumentClient concurrentDocumentClient;
@@ -452,7 +450,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void userFinishedProjectNegotiation(final User user) {
+    public void userFinishedReferencePointNegotiation(final User user) {
 
         log.info("user " + user
             + " now has Projects and can process IResourceActivities");
@@ -1069,13 +1067,12 @@ public final class SarosSession implements ISarosSession {
 
     @Override
     public void enableQueuing(IReferencePoint referencePoint) {
-        activityQueuer.enableQueuing(referencePointManager.get(referencePoint));
+        activityQueuer.enableQueuing(referencePoint);
     }
 
     @Override
     public void disableQueuing(IReferencePoint referencePoint) {
-        activityQueuer
-            .disableQueuing(referencePointManager.get(referencePoint));
+        activityQueuer.disableQueuing(referencePoint);
         // send us a dummy activity to ensure the queues get flushed
         sendActivity(Collections.singletonList(localUser), new NOPActivity(
             localUser, localUser, 0));
@@ -1158,9 +1155,6 @@ public final class SarosSession implements ISarosSession {
 
         userListHandler = sessionContainer
             .getComponent(UserInformationHandler.class);
-
-        referencePointManager = sessionContainer
-            .getComponent(IReferencePointManager.class);
 
         // ensure that the container uses caching
         assert sessionContainer.getComponent(ActivityHandler.class) == sessionContainer

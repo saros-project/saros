@@ -29,7 +29,9 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 
 /*
  *Project Layout for test
@@ -52,17 +54,25 @@ public class FileListTest {
     }
 
     private IProject project;
+    private IReferencePoint referencePoint;
+    private IReferencePointManager referencePointManager;
 
     @Before
     public void setUp() throws Exception {
         project = createProjectLayout();
+        referencePointManager = EasyMock
+            .createMock(IReferencePointManager.class);
+        referencePoint = EasyMock.createMock(IReferencePoint.class);
+        EasyMock.expect(referencePointManager.get(referencePoint))
+            .andStubReturn(project);
+        EasyMock.replay(referencePoint, referencePointManager);
     }
 
     @Test
     public void testCreateFileListForProject() throws IOException {
 
-        final FileList fileList = FileListFactory.createFileList(project, null,
-            null, null);
+        final FileList fileList = FileListFactory.createFileList(
+            referencePointManager, referencePoint, null, null, null);
 
         final List<String> paths = fileList.getPaths();
 

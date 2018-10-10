@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
@@ -34,19 +34,20 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 
 /**
- * Handles outgoing ProjectNegotiations except for the actual file transfer.
+ * Handles outgoing ReferencePointNegotiations except for the actual file
+ * transfer.
  * 
  * Concrete implementations need to provide an implementation to exchange the
  * calculated differences. This class only provides the initial setup and
  * calculation.
  */
-public abstract class AbstractOutgoingProjectNegotiation extends
-    ProjectNegotiation {
+public abstract class AbstractOutgoingReferencePointNegotiation extends
+    ReferencePointNegotiation {
 
     private static final Logger LOG = Logger
-        .getLogger(AbstractOutgoingProjectNegotiation.class);
+        .getLogger(AbstractOutgoingReferencePointNegotiation.class);
 
-    protected List<IProject> projects;
+    protected List<IReferencePoint> referencePoints;
 
     private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 
@@ -56,10 +57,10 @@ public abstract class AbstractOutgoingProjectNegotiation extends
 
     private PacketCollector startActivityQueuingResponseCollector;
 
-    protected AbstractOutgoingProjectNegotiation( //
+    protected AbstractOutgoingReferencePointNegotiation( //
         final JID peer, //
         final TransferType transferType, //
-        final List<IProject> projects, //
+        final List<IReferencePoint> referencePoints, //
 
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //
@@ -77,7 +78,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
             transferType, sessionManager, session, workspace, checksumCache,
             connectionService, transmitter, receiver);
 
-        this.projects = projects;
+        this.referencePoints = referencePoints;
 
         this.editorManager = editorManager;
     }
@@ -93,8 +94,9 @@ public abstract class AbstractOutgoingProjectNegotiation extends
         try {
             setup(monitor);
 
-            sendFileList(createProjectNegotiationDataList(projects, monitor),
-                monitor);
+            sendFileList(
+                createReferencePointNegotiationDataList(referencePoints,
+                    monitor), monitor);
 
             monitor.subTask("");
 
@@ -112,7 +114,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
                 throw new LocalCancellationException(null,
                     CancelOption.DO_NOT_NOTIFY_PEER);
 
-            session.userFinishedProjectNegotiation(user);
+            session.userFinishedReferencePointNegotiation(user);
         } catch (Exception e) {
             exception = e;
         } finally {
@@ -123,8 +125,8 @@ public abstract class AbstractOutgoingProjectNegotiation extends
     }
 
     /**
-     * Preparation for the Project Negotiation. The negotiation can be aborted
-     * by canceling the given monitor.
+     * Preparation for the Reference Point Negotiation. The negotiation can be
+     * aborted by canceling the given monitor.
      * 
      * @param monitor
      *            monitor to show progress to the user
@@ -180,7 +182,8 @@ public abstract class AbstractOutgoingProjectNegotiation extends
         monitor.done();
     }
 
-    protected void sendFileList(List<ProjectNegotiationData> projectInfos,
+    protected void sendFileList(
+        List<ReferencePointNegotiationData> referencePointInfos,
         IProgressMonitor monitor) throws IOException,
         SarosCancellationException {
 
@@ -207,7 +210,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
          * current implementation opens a wizard on the remote side)
          */
         ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
-            getSessionID(), getID(), projectInfos, getTransferType());
+            getSessionID(), getID(), referencePointInfos, getTransferType());
 
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
             ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
@@ -309,9 +312,10 @@ public abstract class AbstractOutgoingProjectNegotiation extends
         startActivityQueuingResponseCollector.cancel();
     }
 
-    protected List<ProjectNegotiationData> createProjectNegotiationDataList(
-        final List<IProject> projectsToShare, final IProgressMonitor monitor)
-        throws IOException, LocalCancellationException {
+    protected List<ReferencePointNegotiationData> createReferencePointNegotiationDataList(
+        final List<IReferencePoint> referencePointsToShare,
+        final IProgressMonitor monitor) throws IOException,
+        LocalCancellationException {
 
         // *stretch* progress bar so it will increment smoothly
         final int scale = 1000;
@@ -319,12 +323,12 @@ public abstract class AbstractOutgoingProjectNegotiation extends
         monitor
             .beginTask(
                 "Creating file list and calculating file checksums. This may take a while...",
-                projectsToShare.size() * scale);
+                referencePointsToShare.size() * scale);
 
-        List<ProjectNegotiationData> negData = new ArrayList<ProjectNegotiationData>(
-            projectsToShare.size());
+        List<ReferencePointNegotiationData> negData = new ArrayList<ReferencePointNegotiationData>(
+            referencePointsToShare.size());
 
-        for (IProject project : projectsToShare) {
+        for (IReferencePoint referencePoint : referencePointsToShare) {
 
             if (monitor.isCanceled())
                 throw new LocalCancellationException(null,
@@ -336,24 +340,25 @@ public abstract class AbstractOutgoingProjectNegotiation extends
                  * underlying storage
                  */
                 if (editorManager != null)
-                    editorManager.saveEditors(project);
+                    editorManager.saveEditors(referencePointManager
+                        .get(referencePoint));
 
-                FileList projectFileList = FileListFactory.createFileList(
-                    project, session.getSharedResources(project
-                        .getReferencePoint()), checksumCache,
-                    new SubProgressMonitor(monitor, 1 * scale,
-                        SubProgressMonitor.SUPPRESS_BEGINTASK
-                            | SubProgressMonitor.SUPPRESS_SETTASKNAME));
+                FileList referencePointFileList = FileListFactory
+                    .createFileList(referencePointManager, referencePoint,
+                        session.getSharedResources(referencePoint),
+                        checksumCache, new SubProgressMonitor(monitor,
+                            1 * scale, SubProgressMonitor.SUPPRESS_BEGINTASK
+                                | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-                boolean partial = !session.isCompletelyShared(project
-                    .getReferencePoint());
+                boolean partial = !session.isCompletelyShared(referencePoint);
 
-                String projectID = session.getReferencePointID(project
-                    .getReferencePoint());
-                projectFileList.setProjectID(projectID);
+                String referencePointID = session
+                    .getReferencePointID(referencePoint);
+                referencePointFileList.setReferencePointID(referencePointID);
 
-                ProjectNegotiationData data = new ProjectNegotiationData(
-                    projectID, project.getName(), partial, projectFileList);
+                ReferencePointNegotiationData data = new ReferencePointNegotiationData(
+                    referencePointID, referencePointManager.get(referencePoint)
+                        .getName(), partial, referencePointFileList);
 
                 negData.add(data);
 
@@ -361,7 +366,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
                 /*
                  * avoid that the error is send to remote side (which is default
                  * for IOExceptions) at this point because the remote side has
-                 * no existing project negotiation yet
+                 * no existing reference point negotiation yet
                  */
                 localCancel(e.getMessage(), CancelOption.DO_NOT_NOTIFY_PEER);
                 // throw to LOG this error in the Negotiation class

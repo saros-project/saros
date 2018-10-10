@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -31,19 +32,19 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 
 /**
- * Implementation of {@link AbstractIncomingProjectNegotiation} utilizing a
- * transferred zip archive to exchange differences in the project files.
+ * Implementation of {@link AbstractIncomingReferencePointNegotiation} utilizing
+ * a transferred zip archive to exchange differences in the project files.
  */
-public class ArchiveIncomingProjectNegotiation extends
-    AbstractIncomingProjectNegotiation {
+public class ArchiveIncomingReferencePointNegotiation extends
+    AbstractIncomingReferencePointNegotiation {
 
     private static final Logger LOG = Logger
-        .getLogger(ArchiveIncomingProjectNegotiation.class);
+        .getLogger(ArchiveIncomingReferencePointNegotiation.class);
 
-    public ArchiveIncomingProjectNegotiation(
+    public ArchiveIncomingReferencePointNegotiation(
         final JID peer, //
         final String negotiationID, //
-        final List<ProjectNegotiationData> projectNegotiationData, //
+        final List<ReferencePointNegotiationData> projectNegotiationData, //
 
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //
@@ -64,30 +65,32 @@ public class ArchiveIncomingProjectNegotiation extends
 
     @Override
     protected void transfer(IProgressMonitor monitor,
-        Map<String, IProject> projectMapping, List<FileList> missingFiles)
-        throws IOException, SarosCancellationException {
+        Map<String, IReferencePoint> referencePointMapping,
+        List<FileList> missingFiles) throws IOException,
+        SarosCancellationException {
 
         awaitActivityQueueingActivation(monitor);
         monitor.subTask("");
 
         /*
-         * the user who sends this ProjectNegotiation is now responsible for the
-         * resources of the contained projects
+         * the user who sends this ReferencePointNegotiation is now responsible
+         * for the resources of the contained referencePoint
          */
-        for (Entry<String, IProject> entry : projectMapping.entrySet()) {
+        for (Entry<String, IReferencePoint> entry : referencePointMapping
+            .entrySet()) {
 
-            final String projectID = entry.getKey();
-            final IProject project = entry.getValue();
+            final String referencePointID = entry.getKey();
+            final IReferencePoint referencePoint = entry.getValue();
             /*
-             * TODO Queuing responsibility should be moved to Project
+             * TODO Queuing responsibility should be moved to ReferencePoint
              * Negotiation, since its the only consumer of queuing
              * functionality. This will enable a specific Queuing mechanism per
              * TransferType (see github issue #137).
              */
-            referencePointManager.put(project.getReferencePoint(), project);
-            session.addReferencePointMapping(projectID,
-                project.getReferencePoint());
-            session.enableQueuing(project.getReferencePoint());
+            // referencePointManager.put(referencePoint.getReferencePoint(),
+            // referencePoint);
+            session.addReferencePointMapping(referencePointID, referencePoint);
+            session.enableQueuing(referencePoint);
         }
 
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
@@ -104,7 +107,8 @@ public class ArchiveIncomingProjectNegotiation extends
 
         // the host do not send an archive if we do not need any files
         if (filesMissing) {
-            receiveAndUnpackArchive(projectMapping, transferListener, monitor);
+            receiveAndUnpackArchive(referencePointMapping, transferListener,
+                monitor);
         }
     }
 
@@ -112,7 +116,7 @@ public class ArchiveIncomingProjectNegotiation extends
      * Receives the archive with all missing files and unpacks it.
      */
     private void receiveAndUnpackArchive(
-        final Map<String, IProject> localProjectMapping,
+        final Map<String, IReferencePoint> localReferencePointMapping,
         final TransferListener archiveTransferListener,
         final IProgressMonitor monitor) throws IOException,
         SarosCancellationException {
@@ -130,7 +134,7 @@ public class ArchiveIncomingProjectNegotiation extends
          */
 
         try {
-            unpackArchive(localProjectMapping, archiveFile,
+            unpackArchive(localReferencePointMapping, archiveFile,
                 new SubProgressMonitor(monitor, 50));
             monitor.done();
         } finally {
@@ -141,14 +145,17 @@ public class ArchiveIncomingProjectNegotiation extends
         }
     }
 
-    private void unpackArchive(final Map<String, IProject> localProjectMapping,
+    private void unpackArchive(
+        final Map<String, IReferencePoint> localReferencePointMapping,
         final File archiveFile, final IProgressMonitor monitor)
         throws LocalCancellationException, IOException {
 
         final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
 
-        for (Entry<String, IProject> entry : localProjectMapping.entrySet())
-            projectMapping.put(entry.getKey(), entry.getValue());
+        for (Entry<String, IReferencePoint> entry : localReferencePointMapping
+            .entrySet())
+            projectMapping.put(entry.getKey(),
+                referencePointManager.get(entry.getValue()));
 
         final DecompressArchiveTask decompressTask = new DecompressArchiveTask(
             archiveFile, projectMapping, PATH_DELIMITER, monitor);

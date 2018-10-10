@@ -21,12 +21,12 @@ import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -78,7 +78,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     @Override
     public void handleOutgoingProjectNegotiation(
-        AbstractOutgoingProjectNegotiation negotiation) {
+        AbstractOutgoingReferencePointNegotiation negotiation) {
 
         OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
         job.schedule();
@@ -86,7 +86,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     @Override
     public void handleIncomingProjectNegotiation(
-        AbstractIncomingProjectNegotiation negotiation) {
+        AbstractIncomingReferencePointNegotiation negotiation) {
         showIncomingProjectUI(negotiation);
     }
 
@@ -105,7 +105,7 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     private void showIncomingProjectUI(
-        final AbstractIncomingProjectNegotiation negotiation) {
+        final AbstractIncomingReferencePointNegotiation negotiation) {
 
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
@@ -199,11 +199,11 @@ public class NegotiationHandler implements INegotiationHandler {
 
     private class OutgoingProjectJob extends UIMonitoredJob {
 
-        private final AbstractOutgoingProjectNegotiation negotiation;
+        private final AbstractOutgoingReferencePointNegotiation negotiation;
         private final String peer;
 
         public OutgoingProjectJob(
-            AbstractOutgoingProjectNegotiation outgoingProjectNegotiation) {
+            AbstractOutgoingReferencePointNegotiation outgoingProjectNegotiation) {
             super(Messages.NegotiationHandler_sharing_project);
             negotiation = outgoingProjectNegotiation;
             peer = negotiation.getPeer().getBase();
@@ -212,7 +212,7 @@ public class NegotiationHandler implements INegotiationHandler {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-                ProjectNegotiation.Status status = negotiation.run(monitor);
+                ReferencePointNegotiation.Status status = negotiation.run(monitor);
                 String peerName = getNickname(new JID(peer));
 
                 final String message;

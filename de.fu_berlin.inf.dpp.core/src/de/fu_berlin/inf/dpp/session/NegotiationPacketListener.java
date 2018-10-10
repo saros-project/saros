@@ -12,8 +12,8 @@ import de.fu_berlin.inf.dpp.communication.extensions.CancelProjectNegotiationExt
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.TransferType;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.IReceiver;
@@ -39,7 +39,7 @@ final class NegotiationPacketListener {
     private final SarosSessionManager sessionManager;
 
     private final SessionNegotiationObservable sessionNegotiations;
-    private final ProjectNegotiationObservable projectNegotiations;
+    private final ReferencePointNegotiationObservable projectNegotiations;
 
     private boolean rejectSessionNegotiationRequests;
 
@@ -152,7 +152,7 @@ final class NegotiationPacketListener {
 
     NegotiationPacketListener(final SarosSessionManager sessionManager,
         final SessionNegotiationObservable sessionNegotiations,
-        final ProjectNegotiationObservable projectNegotiations,
+        final ReferencePointNegotiationObservable projectNegotiations,
         final ITransmitter transmitter, final IReceiver receiver) {
         this.sessionManager = sessionManager;
 
@@ -265,7 +265,7 @@ final class NegotiationPacketListener {
     private void projectNegotiationCanceled(final JID sender,
         final String negotiationID, final String errorMessage) {
 
-        final ProjectNegotiation negotiation = projectNegotiations.get(sender,
+        final ReferencePointNegotiation negotiation = projectNegotiations.get(sender,
             negotiationID);
 
         if (negotiation != null) {
@@ -281,7 +281,7 @@ final class NegotiationPacketListener {
 
     private void projectNegotiationRequest(final JID sender,
         final String negotiationID, final TransferType transferType,
-        final List<ProjectNegotiationData> projectNegotiationData) {
+        final List<ReferencePointNegotiationData> projectNegotiationData) {
 
         LOG.info("received project negotiation from " + sender
             + " with negotiation id: " + negotiationID);

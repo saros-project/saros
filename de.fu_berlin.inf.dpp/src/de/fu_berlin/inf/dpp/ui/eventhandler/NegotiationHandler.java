@@ -12,11 +12,11 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -140,11 +140,11 @@ public class NegotiationHandler implements INegotiationHandler {
 
     private class OutgoingProjectJob extends Job {
 
-        private AbstractOutgoingProjectNegotiation negotiation;
+        private AbstractOutgoingReferencePointNegotiation negotiation;
         private String peer;
 
         public OutgoingProjectJob(
-            AbstractOutgoingProjectNegotiation outgoingProjectNegotiation) {
+            AbstractOutgoingReferencePointNegotiation outgoingProjectNegotiation) {
             super(Messages.NegotiationHandler_sharing_project);
             negotiation = outgoingProjectNegotiation;
             peer = negotiation.getPeer().getBase();
@@ -158,7 +158,7 @@ public class NegotiationHandler implements INegotiationHandler {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-                ProjectNegotiation.Status status = negotiation
+                ReferencePointNegotiation.Status status = negotiation
                     .run(ProgressMonitorAdapterFactory.convert(monitor));
 
                 String peerName = getNickname(new JID(peer));
@@ -239,7 +239,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     @Override
     public void handleOutgoingProjectNegotiation(
-        AbstractOutgoingProjectNegotiation negotiation) {
+        AbstractOutgoingReferencePointNegotiation negotiation) {
 
         OutgoingProjectJob job = new OutgoingProjectJob(negotiation);
         job.setPriority(Job.SHORT);
@@ -248,7 +248,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     @Override
     public void handleIncomingProjectNegotiation(
-        AbstractIncomingProjectNegotiation negotiation) {
+        AbstractIncomingReferencePointNegotiation negotiation) {
         showIncomingProjectUI(negotiation);
     }
 
@@ -295,7 +295,7 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     private void showIncomingProjectUI(
-        final AbstractIncomingProjectNegotiation negotiation) {
+        final AbstractIncomingReferencePointNegotiation negotiation) {
 
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 

@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -30,19 +31,19 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 
 /**
- * Implementation of {@link AbstractOutgoingProjectNegotiation} utilizing a
+ * Implementation of {@link AbstractOutgoingReferencePointNegotiation} utilizing a
  * transferred zip archive to exchange differences in the project files.
  */
-public class ArchiveOutgoingProjectNegotiation extends
-    AbstractOutgoingProjectNegotiation {
+public class ArchiveOutgoingReferencePointNegotiation extends
+    AbstractOutgoingReferencePointNegotiation {
 
     private static final Logger LOG = Logger
-        .getLogger(ArchiveOutgoingProjectNegotiation.class);
+        .getLogger(ArchiveOutgoingReferencePointNegotiation.class);
     private File zipArchive = null;
 
-    public ArchiveOutgoingProjectNegotiation( //
+    public ArchiveOutgoingReferencePointNegotiation( //
         final JID peer, //
-        final List<IProject> projects, //
+        final List<IReferencePoint> referencePoints, //
 
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //
@@ -56,7 +57,7 @@ public class ArchiveOutgoingProjectNegotiation extends
         final ITransmitter transmitter, //
         final IReceiver receiver//
     ) {
-        super(peer, TransferType.ARCHIVE, projects, sessionManager, session,
+        super(peer, TransferType.ARCHIVE, referencePoints, sessionManager, session,
             editorManager, workspace, checksumCache, connectionService,
             transmitter, receiver);
     }
@@ -152,7 +153,7 @@ public class ArchiveOutgoingProjectNegotiation extends
         final List<IResource> projectsToLock = new ArrayList<IResource>();
 
         for (final FileList list : fileLists) {
-            final String projectID = list.getProjectID();
+            final String projectID = list.getReferencePointID();
 
             final IProject project = referencePointManager.get(session
                 .getReferencePoint(projectID));

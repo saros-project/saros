@@ -28,13 +28,13 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 /**
  * This abstract class is the superclass for
- * {@link AbstractOutgoingProjectNegotiation} and
- * {@link AbstractIncomingProjectNegotiation}.
+ * {@link AbstractOutgoingReferencePointNegotiation} and
+ * {@link AbstractIncomingReferencePointNegotiation}.
  */
-public abstract class ProjectNegotiation extends Negotiation {
+public abstract class ReferencePointNegotiation extends Negotiation {
 
     private static final Logger LOG = Logger
-        .getLogger(ProjectNegotiation.class);
+        .getLogger(ReferencePointNegotiation.class);
 
     /**
      * Prefix part of the id used in the SMACK XMPP file transfer protocol.
@@ -75,7 +75,7 @@ public abstract class ProjectNegotiation extends Negotiation {
 
     protected IReferencePointManager referencePointManager;
 
-    public ProjectNegotiation(final String id, final JID peer,
+    public ReferencePointNegotiation(final String id, final JID peer,
         final TransferType transferType,
         final ISarosSessionManager sessionManager, final ISarosSession session,
         final IWorkspace workspace, final IChecksumCache checksumCache,
