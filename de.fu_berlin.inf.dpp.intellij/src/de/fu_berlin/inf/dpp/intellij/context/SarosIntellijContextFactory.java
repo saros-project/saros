@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFactory;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
+import de.fu_berlin.inf.dpp.intellij.ui.eventhandler.SessionStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.XMPPAuthorizationHandler;
 import de.fu_berlin.inf.dpp.core.util.IntelliJCollaborationUtilsImpl;
@@ -25,6 +26,8 @@ import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
+import de.fu_berlin.inf.dpp.intellij.editor.VirtualFileConverter;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.negotiation.hooks.ModuleTypeNegotiationHook;
 import de.fu_berlin.inf.dpp.intellij.preferences.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.preferences.PropertiesComponentAdapter;
@@ -74,10 +77,17 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
         Component.create(ISarosSessionContextFactory.class,
             SarosIntellijSessionContextFactory.class),
 
+        // Utility to create Saros resources from a VirtualFile
+        Component.create(VirtualFileConverter.class),
+
+        // Annotation utility to create, remove, and manage annotations
+        Component.create(AnnotationManager.class),
+
         // UI handlers
         Component.create(NegotiationHandler.class),
         Component.create(UserStatusChangeHandler.class),
         Component.create(XMPPAuthorizationHandler.class),
+        Component.create(SessionStatusChangeHandler.class),
 
         Component.create(IChecksumCache.class, NullChecksumCache.class),
 
@@ -128,12 +138,13 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
                 component.getImplementation());
         }
 
-        container.addComponent(BindKey.bindKey(String.class,
-                IContextKeyBindings.SarosVersion.class),
-            "14.1.31.DEVEL"); // todo
+        container.addComponent(BindKey
+            .bindKey(String.class, IContextKeyBindings.SarosVersion.class),
+            IntelliJVersionProvider.getPluginVersion());
 
-        container.addComponent(BindKey.bindKey(String.class,
-                IContextKeyBindings.PlatformVersion.class), "4.3.2"); // todo
+        container.addComponent(BindKey
+            .bindKey(String.class, IContextKeyBindings.PlatformVersion.class),
+            IntelliJVersionProvider.getBuildNumber());
 
         container.addComponent(ModuleTypeNegotiationHook.class);
     }

@@ -15,6 +15,14 @@ public class Messages {
     }
 
     public static String AddProjectToSessionWizard_title;
+    public static String AddProjectToSessionWizard_module_creation_failed_title;
+    public static String AddProjectToSessionWizard_module_creation_failed_message_condition;
+    public static String AddProjectToSessionWizard_module_already_exists_title;
+    public static String AddProjectToSessionWizard_module_already_exists_message_condition;
+    public static String AddProjectToSessionWizard_module_not_found_title;
+    public static String AddProjectToSessionWizard_module_not_found_message_condition;
+    public static String AddProjectToSessionWizard_invalid_module_title;
+    public static String AddProjectToSessionWizard_invalid_module_message_condition;
 
     public static String CollaborationUtils_confirm_closing;
     public static String CollaborationUtils_confirm_closing_text;
@@ -26,6 +34,7 @@ public class Messages {
 
     public static String ConsistencyAction_confirm_dialog_title;
     public static String ConsistencyAction_message_inconsistency_detected;
+    public static String ConsistencyAction_message_inconsistency_detected_no_files;
     public static String ConsistencyAction_progress_perform_recovery;
     public static String ConsistencyAction_title_inconsistency_detected;
     public static String ConsistencyAction_tooltip_inconsistency_detected;
@@ -44,6 +53,8 @@ public class Messages {
     public static String EnterProjectNamePage_create_new_project;
     public static String EnterProjectNamePage_project_name;
     public static String EnterProjectNamePage_title2;
+    public static String EnterProjectNamePage_description;
+    public static String EnterProjectNamePage_description_changed_files;
     public static String EnterProjectNamePage_use_existing_project;
 
     public static String ShowDescriptionPage_description;
@@ -70,6 +81,33 @@ public class Messages {
 
     public static String SubscriptionManager_incoming_subscription_request_title;
     public static String SubscriptionManager_incoming_subscription_request_message;
+
+    public static String ConnectButton_connect_to_new_account_title;
+    public static String ConnectButton_connect_to_new_account_message;
+
+    public static String Contact_saros_message_conditional;
+
+    public static String ContactPopMenu_unsupported_ide_title;
+    public static String ContactPopMenu_unsupported_ide_message_condition;
+    public static String ContactPopMenu_module_not_found_title;
+    public static String ContactPopMenu_module_not_found_message_condition;
+    public static String ContactPopMenu_invalid_module_title;
+    public static String ContactPopMenu_invalid_module_message_condition;
+    public static String ContactPopMenu_error_creating_module_object_title;
+    public static String ContactPopMenu_error_creating_module_object_message;
+
+    public static String ShareWithUserAction_description;
+
+    public static String SessionStatusChangeHandler_session_started_title;
+    public static String SessionStatusChangeHandler_session_started_host_message;
+    public static String SessionStatusChangeHandler_session_started_host_empty_message;
+    public static String SessionStatusChangeHandler_session_started_client_message;
+    public static String SessionStatusChangeHandler_session_ended_title;
+    public static String SessionStatusChangeHandler_session_ended_message;
+    public static String SessionStatusChangeHandler_local_user_left;
+    public static String SessionStatusChangeHandler_host_left;
+    public static String SessionStatusChangeHandler_kicked;
+    public static String SessionStatusChangeHandler_connection_lost;
 
     private Messages() {
     }

@@ -6,16 +6,12 @@ import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.openapi.wm.ex.WindowManagerEx;
-import com.intellij.openapi.wm.impl.IdeFrameImpl;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.JoinSessionWizard;
@@ -26,7 +22,6 @@ import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -36,8 +31,6 @@ import org.apache.log4j.Logger;
 
 import java.awt.Window;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This handler is responsible for presenting and running the session and
@@ -161,11 +154,9 @@ public class NegotiationHandler implements INegotiationHandler {
                 case OK:
                     break;
                 case REMOTE_CANCEL:
-                    NotificationPanel.showInformation(
-                        Messages.NegotiationHandler_canceled_invitation,
-                        MessageFormat.format(
-                            Messages.NegotiationHandler_canceled_invitation_text,
-                            peer));
+                    NotificationPanel.showInformation(MessageFormat.format(
+                        Messages.NegotiationHandler_canceled_invitation_text,
+                        peer), Messages.NegotiationHandler_canceled_invitation);
 
                     return new Status(IStatus.CANCEL, SarosComponent.PLUGIN_ID,
                         MessageFormat.format(
@@ -173,11 +164,10 @@ public class NegotiationHandler implements INegotiationHandler {
                             peer));
 
                 case REMOTE_ERROR:
-                    NotificationPanel.showError(
-                        Messages.NegotiationHandler_error_during_invitation,
-                        MessageFormat.format(
-                            Messages.NegotiationHandler_error_during_invitation_text,
-                            peer, negotiation.getErrorMessage()));
+                    NotificationPanel.showError(MessageFormat.format(
+                        Messages.NegotiationHandler_error_during_invitation_text,
+                        peer, negotiation.getErrorMessage()),
+                        Messages.NegotiationHandler_error_during_invitation);
 
                     return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
                         MessageFormat.format(
@@ -234,8 +224,8 @@ public class NegotiationHandler implements INegotiationHandler {
                         .invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                DialogUtils.showInfo(null, message,
-                                    Messages.NegotiationHandler_project_sharing_canceled_text);
+                                NotificationPanel.showInformation(message,
+                                    "Project sharing canceled remotely");
                             }
                         });
 
@@ -246,9 +236,8 @@ public class NegotiationHandler implements INegotiationHandler {
                     message = MessageFormat.format(
                         Messages.NegotiationHandler_sharing_project_canceled_remotely,
                         peerName, negotiation.getErrorMessage());
-                    NotificationPanel.showError(
-                        Messages.NegotiationHandler_sharing_project_canceled_remotely_text,
-                        message);
+                    NotificationPanel.showError(message,
+                        Messages.NegotiationHandler_sharing_project_canceled_remotely_text);
 
                     return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
                         message);

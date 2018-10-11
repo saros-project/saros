@@ -27,7 +27,7 @@ public class IntellijProjectLifecycle extends AbstractContextLifecycle {
     private static IntellijProjectLifecycle instance;
 
     /**
-     * Creates a new IntelliJSarosLifecycle singleton instance from a project.
+     * Creates a new IntellijProjectLifecycle singleton instance from a project.
      *
      * @param project
      * @return

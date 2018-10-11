@@ -63,8 +63,8 @@ export default class Step extends React.Component {
     const { title, Component, wizard } = this.props
     const { hasNext, hasPrev } = wizard
     return (
-      <div className='wizard-step'>
-        <nav className='header navbar navbar-default'>{title}</nav>
+      <div className='wizard-step' id='session-wizard'>
+        <nav className='header navbar navbar-default' id='header'>{title}</nav>
         <div className='wizard-body'>
           <Component ref={this.setComponentRef} setIsValid={this.setIsValid} />
         </div>
@@ -75,7 +75,7 @@ export default class Step extends React.Component {
           <button disabled={!hasPrev} className={cn('btn', 'btn-default', !hasPrev && 'disabled')} onClick={wizard.onClickBack}>
             <Text message='action.back' />
           </button>
-          <button className={cn('wizard-next-btn', 'btn', hasNext ? 'btn-default' : 'btn-primary')} onClick={this.onClickNext}>
+          <button id='next-button' className={cn('wizard-next-btn', 'btn', hasNext ? 'btn-default' : 'btn-primary')} onClick={this.onClickNext}>
             <Text message={hasNext ? 'action.next' : 'action.finish'} />
           </button>
         </nav>
