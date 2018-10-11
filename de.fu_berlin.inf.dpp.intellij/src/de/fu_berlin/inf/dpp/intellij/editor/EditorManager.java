@@ -491,7 +491,8 @@ public class EditorManager extends AbstractActivityProducer
         this.localEditorManipulator = localEditorManipulator;
         this.annotationManager = annotationManager;
 
-        documentListener = new StoppableDocumentListener(this);
+        documentListener = new StoppableDocumentListener(this,
+                virtualFileConverter);
         fileListener = new StoppableEditorFileListener(this,
                 virtualFileConverter, annotationManager);
 
