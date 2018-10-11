@@ -16,7 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfHtmlTestCase;
-import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
+import de.fu_berlin.inf.dpp.stf.selftest.Constants;
 
 public class StartSessionWizardTest extends StfHtmlTestCase {
 

@@ -18,13 +18,13 @@
            id="de.fu_berlin.inf.dpp.ui.views.SarosView"
            name="Saros">
      </view>
-     <view
+     <!-- <view
 			category="de.fu_berlin.inf.dpp.Saros"
 			class="de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion"
 			icon="icons/view16/saros_misc.png"
 			id="de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion"
 			name="Saros HTML GUI">
-			</view>
+			</view> -->
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

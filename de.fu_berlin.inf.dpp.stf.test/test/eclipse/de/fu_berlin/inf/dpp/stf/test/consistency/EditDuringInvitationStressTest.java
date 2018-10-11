@@ -16,8 +16,8 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.tester.SarosTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.selftest.Constants;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 public class EditDuringInvitationStressTest extends StfTestCase {

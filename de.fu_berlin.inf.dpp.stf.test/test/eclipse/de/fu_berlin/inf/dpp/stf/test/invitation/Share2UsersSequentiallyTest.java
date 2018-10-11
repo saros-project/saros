@@ -11,8 +11,8 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.selftest.Constants;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 
 public class Share2UsersSequentiallyTest extends StfTestCase {
 
