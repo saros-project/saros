@@ -3,8 +3,15 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/html"/>
+	<classpathentry kind="src" path="test/eclipse"/>
+	<classpathentry kind="src" path="test/html"/>
+	<classpathentry kind="src" path="src/eclipse"/>
 	<classpathentry kind="src" path="src/intellij"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.swt.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.hamcrest.library_1.1.0.v20090501071000.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.gef.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.fu_berlin.inf.dpp.intellij"/>
 	<classpathentry kind="lib" path="/de.fu_berlin.inf.dpp.intellij/lib/fest-swing-1.2.1.jar"/>
 	<classpathentry kind="output" path="bin"/>

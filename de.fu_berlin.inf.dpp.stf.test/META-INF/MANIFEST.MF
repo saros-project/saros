@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Saros STF Test
+Bundle-SymbolicName: de.fu_berlin.inf.dpp.stf.test
+Bundle-Version: 0.1.0.DEVEL
+Bundle-Vendor: FU-Berlin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle:  org.eclipse.core.runtime,
+ org.eclipse.jface,
+ de.fu_berlin.inf.dpp.stf,
+ de.fu_berlin.inf.dpp.ui,
+ de.fu_berlin.inf.dpp.core
+Bundle-ClassPath: .
+Export-Package: .
+Import-Package: de.fu_berlin.inf.dpp.test.util
