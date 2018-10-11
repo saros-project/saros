@@ -24,7 +24,7 @@ public class StoppableDocumentListener extends AbstractStoppableListener
 
     private final VirtualFileConverter virtualFileConverter;
 
-    public StoppableDocumentListener(EditorManager editorManager,
+    StoppableDocumentListener(EditorManager editorManager,
         VirtualFileConverter virtualFileConverter) {
 
         super(editorManager);
@@ -72,16 +72,6 @@ public class StoppableDocumentListener extends AbstractStoppableListener
 
         editorManager
             .generateTextEdit(event.getOffset(), newText, replacedText, path);
-    }
-
-    /**
-     * Does nothing.
-     *
-     * @param event
-     */
-    @Override
-    public void documentChanged(DocumentEvent event) {
-        // do nothing. We handled everything in documentAboutToBeChanged
     }
 
     @Override
