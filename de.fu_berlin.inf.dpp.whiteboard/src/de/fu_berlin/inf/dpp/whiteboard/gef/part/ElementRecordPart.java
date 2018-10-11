@@ -1,9 +1,11 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.part;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.batik.util.SVGConstants;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.GraphicalEditPart;
@@ -55,9 +57,24 @@ public abstract class ElementRecordPart extends AbstractGraphicalEditPart
             new ElementModelDeletePolicy());
     }
 
+    /**
+     * @return supported children models that can be rendered by the GEF based
+     *         whiteboard
+     */
     @Override
     public List<ElementRecord> getModelChildren() {
-        return getElementRecord().getVisibleChildElements();
+        List<ElementRecord> filtered = new ArrayList<ElementRecord>();
+        for (ElementRecord r : getElementRecord().getVisibleChildElements()) {
+            String tag = r.getName();
+            if (tag.equals(SVGConstants.SVG_RECT_TAG)
+                || tag.equals(SVGConstants.SVG_POLYLINE_TAG)
+                || tag.equals(SVGConstants.SVG_ELLIPSE_TAG)
+                || tag.equals(SVGConstants.SVG_TEXT_TAG)
+                || tag.equals(SVGConstants.SVG_SVG_TAG)) {
+                filtered.add(r);
+            }
+        }
+        return filtered;
     }
 
     @Override
