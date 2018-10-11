@@ -25,6 +25,7 @@ export default class ChooseFilesStep extends React.Component {
     if (!initialProjectTrees) return null
     return (
       <Tree
+        className='project-tree'
         showLine checkable defaultExpandAll
         selectable={false}
         checkedKeys={Array.from(checkedKeys)}

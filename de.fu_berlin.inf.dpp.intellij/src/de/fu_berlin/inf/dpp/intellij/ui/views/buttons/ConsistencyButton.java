@@ -38,6 +38,8 @@ public class ConsistencyButton extends ToolbarButton {
     private static final String IN_SYNC_ICON_PATH = "/icons/famfamfam/in_sync.png";
     private static final String OUT_SYNC_ICON_PATH = "/icons/famfamfam/out_sync.png";
 
+    private boolean previouslyInConsistentState = true;
+
     private final ActionListener actionListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -55,8 +57,10 @@ public class ConsistencyButton extends ToolbarButton {
 
             String inconsistentFiles = createConfirmationMessage(paths);
 
-            if (!DialogUtils.showQuestion(null, inconsistentFiles,
-                Messages.ConsistencyAction_confirm_dialog_title)) {
+            if (!DialogUtils.showQuestion(null,
+                Messages.ConsistencyAction_confirm_dialog_title,
+                inconsistentFiles)) {
+
                 setEnabledFromUIThread(true);
                 return;
             }
@@ -149,10 +153,16 @@ public class ConsistencyButton extends ToolbarButton {
 
         if (isInconsistent) {
             setEnabledFromUIThread(true);
+            /*
+             * TODO tooltip should be set using messages.properties
+             * use ConsistencyAction_tooltip_inconsistency_detected
+             * this also requires the inconsistent files
+             */
             setIcon(OUT_SYNC_ICON_PATH, "Files are NOT consistent");
         } else {
             setEnabledFromUIThread(false);
-            setIcon(IN_SYNC_ICON_PATH, "Files are consistent");
+            setIcon(IN_SYNC_ICON_PATH,
+                Messages.ConsistencyAction_tooltip_no_inconsistency);
         }
     }
 
@@ -187,9 +197,19 @@ public class ConsistencyButton extends ToolbarButton {
         });
 
         if (!isInconsistent) {
-            showNotification(
-                Messages.ConsistencyAction_tooltip_no_inconsistency);
+            if(!previouslyInConsistentState) {
+                previouslyInConsistentState = true;
+
+                NotificationPanel
+                    .showInformation("No inconsistencies remaining",
+                        "Inconsistencies resolved");
+            }
+
             return;
+        }
+
+        if (previouslyInConsistentState) {
+            previouslyInConsistentState = false;
         }
 
         final Set<SPath> paths = new HashSet<SPath>(
@@ -201,16 +221,18 @@ public class ConsistencyButton extends ToolbarButton {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                // set tooltip
-                showNotification(MessageFormat.format(
-                    Messages.ConsistencyAction_tooltip_inconsistency_detected,
-                    files));
+                if (files.isEmpty()) {
+                    NotificationPanel.showWarning(
+                        Messages.ConsistencyAction_message_inconsistency_detected_no_files,
+                        Messages.ConsistencyAction_title_inconsistency_detected);
 
-                NotificationPanel.showWarning(
-                    Messages.ConsistencyAction_title_inconsistency_detected,
-                    MessageFormat.format(
-                        Messages.ConsistencyAction_message_inconsistency_detected,
-                        files));
+                    return;
+                }
+
+                NotificationPanel.showWarning(MessageFormat.format(
+                    Messages.ConsistencyAction_message_inconsistency_detected,
+                    files),
+                    Messages.ConsistencyAction_title_inconsistency_detected);
             }
         });
     }
@@ -254,9 +276,5 @@ public class ConsistencyButton extends ToolbarButton {
         }
 
         return sb.toString();
-    }
-
-    private void showNotification(String text) {
-        NotificationPanel.showInformation(text, "Consistency warning");
     }
 }

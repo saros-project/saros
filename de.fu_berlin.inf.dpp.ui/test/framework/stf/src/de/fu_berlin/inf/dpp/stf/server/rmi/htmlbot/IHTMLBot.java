@@ -4,10 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View;
-import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
+import de.fu_berlin.inf.dpp.ui.View;
 
 /**
  * This interface is part of the HTML GUI test framework. It provides methods to
@@ -26,17 +24,6 @@ public interface IHTMLBot extends Remote {
     IRemoteHTMLView view(View view) throws RemoteException;
 
     /**
-     * Get a remote representation of a HTML dialog.
-     * 
-     * @param pageClass
-     *            the class of the dialog's browser page
-     * @return an instance of {@link IRemoteBotDialog}
-     * @throws RemoteException
-     */
-    IRemoteBotDialog getDialogWindow(Class<? extends IBrowserPage> pageClass)
-        throws RemoteException;
-
-    /**
      * Returns the currently displayed list of accounts.
      * 
      * @return a list of strings in the form 'user@domain'
@@ -47,9 +34,11 @@ public interface IHTMLBot extends Remote {
     /**
      * Returns the currently displayed list of contacts.
      * 
+     * @param view
+     *            The part of the Saros GUI on which the contact list is
+     *            displayed.
      * @return a list of diplayNames of contacts
      * @throws RemoteException
      */
-    List<String> getContactList() throws RemoteException;
-
+    List<String> getContactList(View view) throws RemoteException;
 }

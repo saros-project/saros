@@ -9,11 +9,9 @@ import de.fu_berlin.inf.ag_se.browser.html.ISelector.CssClassSelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.BotUtils;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLView.View;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotDialog;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLView;
+import de.fu_berlin.inf.dpp.ui.View;
 import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 
@@ -28,10 +26,7 @@ public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 
     private RemoteHTMLView view;
 
-    private RemoteBotDialog dialog;
-
     public HTMLBotImpl() {
-        dialog = RemoteBotDialog.getInstance();
         view = RemoteHTMLView.getInstance();
     }
 
@@ -42,26 +37,20 @@ public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
     }
 
     @Override
-    public IRemoteBotDialog getDialogWindow(
-        Class<? extends IBrowserPage> pageClass) throws RemoteException {
-        dialog.setBrowserPage(pageClass);
-        return dialog;
-    }
-
-    @Override
     public List<String> getAccountList() throws RemoteException {
-        return BotUtils.getListItemsWithSelector(getBrowser(),
+        return BotUtils.getListItemsText(getBrowser(MainPage.class),
             SELECTOR_ACCOUNT_ENTRY);
     }
 
     @Override
-    public List<String> getContactList() throws RemoteException {
-        return BotUtils.getListItemsWithSelector(getBrowser(),
+    public List<String> getContactList(View view) throws RemoteException {
+        return BotUtils.getListItemsText(getBrowser(view.getPageClass()),
             SELECTOR_CONTACT_ITEM_DISPLAY_NAME);
     }
 
-    private IJQueryBrowser getBrowser() {
-        return getBrowserManager().getBrowser(MainPage.class);
+    private IJQueryBrowser getBrowser(
+        Class<? extends IBrowserPage> browserPageClass) {
+        return getBrowserManager().getBrowser(browserPageClass);
     }
 
     public static IHTMLBot getInstance() {

@@ -24,21 +24,19 @@ public class UserStatusChangeHandler {
         public void permissionChanged(User user) {
 
             if (user.isLocal()) {
-                NotificationPanel.showInformation(
-                    Messages.UserStatusChangeHandler_permission_changed,
-                    ModelFormatUtils.format(
-                        Messages.UserStatusChangeHandler_you_have_now_access,
-                        user, user.hasWriteAccess() ?
-                            Messages.UserStatusChangeHandler_write :
-                            Messages.UserStatusChangeHandler_read_only));
+                NotificationPanel.showInformation(ModelFormatUtils.format(
+                    Messages.UserStatusChangeHandler_you_have_now_access, user,
+                    user.hasWriteAccess() ?
+                        Messages.UserStatusChangeHandler_write :
+                        Messages.UserStatusChangeHandler_read_only),
+                    Messages.UserStatusChangeHandler_permission_changed);
             } else {
-                NotificationPanel.showInformation(
-                    Messages.UserStatusChangeHandler_permission_changed,
-                    ModelFormatUtils.format(
-                        Messages.UserStatusChangeHandler_he_has_now_access,
+                NotificationPanel.showInformation(ModelFormatUtils
+                    .format(Messages.UserStatusChangeHandler_he_has_now_access,
                         user, user.hasWriteAccess() ?
-                            Messages.UserStatusChangeHandler_write :
-                            Messages.UserStatusChangeHandler_read_only));
+                        Messages.UserStatusChangeHandler_write :
+                        Messages.UserStatusChangeHandler_read_only),
+                    Messages.UserStatusChangeHandler_permission_changed);
 
             }
         }
@@ -46,20 +44,16 @@ public class UserStatusChangeHandler {
         @Override
         public void userJoined(User user) {
 
-            NotificationPanel
-                .showInformation(Messages.UserStatusChangeHandler_user_joined,
-                    ModelFormatUtils.format(
-                        Messages.UserStatusChangeHandler_user_joined_text,
-                        user));
+            NotificationPanel.showInformation(ModelFormatUtils
+                .format(Messages.UserStatusChangeHandler_user_joined_text,
+                    user), Messages.UserStatusChangeHandler_user_joined);
         }
 
         @Override
         public void userLeft(User user) {
-            NotificationPanel
-                .showInformation(Messages.UserStatusChangeHandler_user_left,
-                    ModelFormatUtils
-                        .format(Messages.UserStatusChangeHandler_user_left_text,
-                            user));
+            NotificationPanel.showInformation(ModelFormatUtils
+                    .format(Messages.UserStatusChangeHandler_user_left_text,
+                        user), Messages.UserStatusChangeHandler_user_left);
         }
     };
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {

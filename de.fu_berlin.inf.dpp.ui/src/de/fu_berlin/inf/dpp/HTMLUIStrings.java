@@ -16,6 +16,7 @@ public class HTMLUIStrings {
     public static final String TITLE_MAIN_PAGE = "Main page";
     public static final String TITLE_START_SESSION_WIZARD = "Share Project";
     public static final String TITLE_ADD_ACCOUNT_PAGE = "Add Account";
+    public static final String TITLE_CONFIGURATION_PAGE = "Configure Saros";
 
     // error messages
     public static final String ERR_ACCOUNT_ALREADY_PRESENT = "Couldn't create account. Account already present";
