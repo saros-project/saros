@@ -413,7 +413,7 @@ public class EditorManager extends AbstractActivityProducer
             session.addActivityProducer(EditorManager.this);
             session.addActivityConsumer(consumer, Priority.ACTIVE);
 
-            documentListener.startListening();
+            documentListener.setEnabled(true);
 
             userEditorStateManager = session
                 .getComponent(UserEditorStateManager.class);
@@ -438,7 +438,7 @@ public class EditorManager extends AbstractActivityProducer
             session.removeActivityProducer(EditorManager.this);
             session.removeActivityConsumer(consumer);
 
-            documentListener.stopListening();
+            documentListener.setEnabled(false);
 
             session = null;
 
