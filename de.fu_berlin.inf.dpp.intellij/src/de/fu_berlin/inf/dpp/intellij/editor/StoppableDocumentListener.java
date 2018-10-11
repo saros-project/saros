@@ -50,7 +50,7 @@ public class StoppableDocumentListener extends AbstractStoppableListener
                 .getFile(document);
 
             if (virtualFile == null) {
-                LOG.debug("Ignoring event for document " + document
+                LOG.trace("Ignoring event for document " + document
                     + " - document is not known to the editor pool and a "
                     + "VirtualFile for the document could not be found");
 
@@ -60,15 +60,9 @@ public class StoppableDocumentListener extends AbstractStoppableListener
             path = virtualFileConverter.convertToPath(virtualFile);
 
             if (path == null) {
-                LOG.debug("Ignoring event for document " + document
-                    + " - document is not known to the editor pool and an "
-                    + "SPath for the document could not be found");
+                LOG.trace("Ignoring Event for document " + document
+                        + " - document is not shared");
 
-                return;
-            } else if (!editorManager.getSession()
-                .isShared(path.getResource())) {
-                LOG.debug("Ignoring Event for document " + document
-                    + " - document is not shared");
                 return;
             }
         }
