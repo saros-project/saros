@@ -31,7 +31,7 @@ public class ColorManager {
      */
     public static ColorModel getColorModel(int userID) {
 
-        if (userID <= 0 || userID >= 5) {
+        if (userID < 0 || userID >= 5) {
             return new ColorModel(DEFAULT_COLOR, DEFAULT_COLOR);
         }
 

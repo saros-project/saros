@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,138 +12,161 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * IntelliJ editor pool
+ * The Intellij editor pool. It is used to store a mapping of
+ * <code>SPath</code>s onto <code>Editor</code>s for all shared files that are
+ * open locally.
  */
-//FIXME: Document instances should not be stored.
-// (see http://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview#IntelliJIDEAArchitecturalOverview-Documents)
-// Maybe just store editors here, load all non-opened files on the fly?
 public class EditorPool {
-    private Map<SPath, Editor> editors = new HashMap<SPath, Editor>();
-    private Map<SPath, Document> documents = new HashMap<SPath, Document>();
-    private Map<Document, SPath> files = new HashMap<Document, SPath>();
+    private final Map<SPath, Editor> editors;
 
     public EditorPool() {
+        this.editors = new HashMap<>();
     }
 
     /**
-     * Adds editor and its documents.
+     * Adds the given <code>SPath</code> <code>Editor</code> mapping to the
+     * editor pool.
      *
-     * @param file
-     * @param editor
+     * @param file   the path for the file
+     * @param editor the editor for the file
      */
-    public void add(SPath file, Editor editor) {
+    public void add(
+        @NotNull
+            SPath file,
+        @NotNull
+            Editor editor) {
+
         editors.put(file, editor);
-        add(file, editor.getDocument());
     }
 
     /**
-     * Adds this to files and documents.
+     * Removes the given path from the editor pool.
      *
-     * @param file
-     * @param document
+     * @param file the path that is removed from the editor pool
      */
-    public void add(SPath file, Document document) {
-        documents.put(file, document);
-        files.put(document, file);
+    public void removeEditor(
+        @NotNull
+            SPath file) {
+
+        editors.remove(file);
     }
 
     /**
-     * Removes the editor for this file, all documents and the file.
+     * Replaces the path of the editor pool mapping for the old path with the
+     * new path. Does nothing if the editor pool does not contain a mapping for
+     * the given old path.
      *
-     * @param file
+     * @param oldPath the old path
+     * @param newPath the new path
      */
-    public void removeAll(SPath file) {
+    public void replacePath(
+        @NotNull
+            SPath oldPath,
+        @NotNull
+            SPath newPath) {
 
-        removeEditor(file);
+        Editor editor = editors.remove(oldPath);
 
-        Document doc = null;
-        if (documents.containsKey(file)) {
-            doc = documents.remove(file);
-        }
-
-        if (doc != null) {
-            files.remove(doc);
-        }
-    }
-
-    /**
-     * Removes the editor.
-     *
-     * @param file
-     */
-    public void removeEditor(SPath file) {
-        if (editors.containsKey(file)) {
-            editors.remove(file);
+        if (editor != null) {
+            editors.put(newPath, editor);
         }
     }
 
     /**
-     * Replaces all occurences of editors and documents with key oldPath with
-     * newPath.
-     *
-     * @param oldPath
-     * @param newPath
+     * Sets all editors in the editor pool to read/write.
      */
-    public void replaceAll(SPath oldPath, SPath newPath) {
-        if (editors.containsKey(oldPath)) {
-            Editor editor = editors.remove(oldPath);
-            if (editor != null)
-                editors.put(newPath, editor);
-        }
-
-        if (documents.containsKey(oldPath)) {
-            Document doc = documents.remove(oldPath);
-
-            if (doc != null) {
-                documents.put(newPath, doc);
-                files.put(doc, newPath);
-            }
-        }
-    }
-
     public void unlockAllDocuments() {
-        for (Document doc : documents.values()) {
-            doc.setReadOnly(false);
+        for (Editor editor : editors.values()) {
+            editor.getDocument().setReadOnly(false);
         }
     }
 
+    /**
+     * Sets all editors in the editor pool to read only.
+     */
     public void lockAllDocuments() {
-        for (Document doc : documents.values()) {
-            doc.setReadOnly(true);
+        for (Editor editor : editors.values()) {
+            editor.getDocument().setReadOnly(true);
         }
     }
 
-    public Collection<Document> getDocuments() {
-        return documents.values();
+    /**
+     * Returns the <code>Document</code> for the given path.
+     *
+     * @param file the <code>SPath</code> to get the document for
+     * @return the <code>Document</code> for the given path or
+     * <code>null</code> if the given path is not contained in the editor pool
+     */
+    @Nullable
+    public Document getDocument(
+        @NotNull
+            SPath file) {
+
+        Editor editor = editors.get(file);
+
+        return editor == null ? null : editor.getDocument();
     }
 
-    public Document getDocument(SPath file) {
-        return documents.get(file);
-    }
+    /**
+     * Returns the <code>Editor</code> for the given path.
+     *
+     * @param file the <code>SPath</code> to get the editor for
+     * @return the <code>Editor</code> for the given path or <code>null</code>
+     * if the given path is not contained in the editor pool
+     */
+    @Nullable
+    public Editor getEditor(
+        @NotNull
+            SPath file) {
 
-    public Editor getEditor(SPath file) {
         return editors.get(file);
     }
 
-    public SPath getFile(Document doc) {
-        return files.get(doc);
+    /**
+     * Returns the <code>SPath</code> for the given document.
+     *
+     * @param doc the <code>Document</code> to get the path for
+     * @return the <code>SPath</code> for the given document or
+     * <code>null</code> if no matching path could be found in the editor pool
+     */
+    @Nullable
+    public SPath getFile(
+        @NotNull
+            Document doc) {
+
+        for (Map.Entry<SPath, Editor> entry : editors.entrySet()) {
+            if (entry.getValue().getDocument().equals(doc)) {
+                return entry.getKey();
+            }
+        }
+
+        return null;
     }
 
+    /**
+     * Return all editors contained in the editor pool.
+     *
+     * @return all editors contained in the editor pool
+     */
+    @NotNull
     public Collection<Editor> getEditors() {
         return editors.values();
     }
 
+    /**
+     * Returns all paths contained in the editor pool.
+     *
+     * @return all paths contained in the editor pool
+     */
+    @NotNull
     public Set<SPath> getFiles() {
-        return documents.keySet();
+        return editors.keySet();
     }
 
     /**
-     * Clears all state.
+     * Removes all mappings from the editor pool.
      */
     public void clear() {
-        documents.clear();
         editors.clear();
-        files.clear();
     }
-
 }
