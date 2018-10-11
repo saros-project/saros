@@ -86,36 +86,22 @@ public class StoppableDocumentListener extends AbstractStoppableListener
 
     @Override
     public void setEnabled(boolean enabled) {
-        if (enabled) {
-            startListening();
-        } else {
-            stopListening();
-        }
-    }
-
-    /**
-     * Stop listening for document modifications.
-     */
-    public void stopListening() {
-        if (enabled) {
-            EditorFactory.getInstance().getEventMulticaster()
-                .removeDocumentListener(this);
-            LOG.debug("Stopped listening for document events");
-        }
-
-        super.setEnabled(false);
-    }
-
-    /**
-     * Start listening for document modifications.
-     */
-    public void startListening() {
-        if (!enabled) {
-            EditorFactory.getInstance().getEventMulticaster()
-                .addDocumentListener(this);
+        if (!this.enabled && enabled) {
             LOG.debug("Started listening for document events");
-        }
 
-        super.setEnabled(true);
+            EditorFactory.getInstance().getEventMulticaster()
+                    .addDocumentListener(this);
+
+            this.enabled = true;
+
+        } else if (this.enabled && !enabled) {
+
+            LOG.debug("Stopped listening for document events");
+
+            EditorFactory.getInstance().getEventMulticaster()
+                    .removeDocumentListener(this);
+
+            this.enabled = false;
+        }
     }
 }
