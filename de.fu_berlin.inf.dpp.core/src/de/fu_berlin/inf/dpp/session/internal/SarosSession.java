@@ -754,9 +754,19 @@ public final class SarosSession implements ISarosSession {
         }
 
         boolean send = true;
-        // handle FileActivities and FolderActivities to update ProjectMapper
-        if (activity instanceof IFileSystemModificationActivity) {
+
+        /*
+         * To explain some magic: When the host generates an activity this
+         * method will be called multiple times. It is first called with the
+         * host as it is only recipient and then it is called again for the
+         * other recipients.
+         */
+        // handle IFileSystemModificationActivities to update ProjectMapper
+        if (activity instanceof IFileSystemModificationActivity
+            && (!isHost() || (isHost() && recipients.contains(getLocalUser())))) {
+
             send = updatePartialSharedResources((IFileSystemModificationActivity) activity);
+
         }
 
         if (!send)
