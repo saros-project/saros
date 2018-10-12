@@ -35,13 +35,11 @@ describe('<StartSessionWizardView />', () => {
     ]
 
     const treeNodes = wrap.find('TreeNode')
-    //TODO: fix the test and unignore it
-    xit('renders the tree', () => {
+    it('renders the tree', () => {
       expect(!!treeNodes.length).to.equal(true)
     })
 
-    //TODO: fix the test and unignore it
-    xit('adds files to checked list if checkbox is clicked', () => {
+    it('adds files to checked list if checkbox is clicked', () => {
       files.forEach(file => {
         // selecting by title alone will select the wrong element (a child of the actual treenode)
         const fileNode = treeNodes.findWhere(node => node.prop('title') === file && !!node.prop('eventKey'))
