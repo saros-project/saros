@@ -38,6 +38,7 @@ jar {
 }
 
 test {
+  systemProperty 'log4j.configurationFile', '../de.fu_berlin.inf.dpp.core/log4j2.xml'
   exclude '**/Abstract*'
 }
 

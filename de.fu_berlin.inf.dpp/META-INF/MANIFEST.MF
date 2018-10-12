@@ -1,5 +1,4 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
+Manifest-Version: 1.0 Bundle-ManifestVersion: 2
 Bundle-Name: Saros Plug-in
 Bundle-SymbolicName: de.fu_berlin.inf.dpp;singleton:=true
 Bundle-Version: 14.11.28.DEVEL
@@ -20,25 +19,34 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.security,
  org.junit;resolution:=optional,
  org.eclipse.jdt.launching;resolution:=optional,
- org.eclipse.gef;bundle-version="3.6.0";resolution:=optional,
+ org.eclipse.gef;bundle-version="3.11.0";resolution:=optional,
  org.eclipse.core.net;resolution:=optional,
  de.fu_berlin.inf.dpp.core,
  de.fu_berlin.inf.dpp.ui
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- lib/org.hamcrest_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.core_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.integration_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.library_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.text_1.1.0.v20090501071000.jar,
- lib/org.eclipse.swtbot.eclipse.core_2.0.5.20110922_1046-258a521-dev-e36.jar,
- lib/org.eclipse.swtbot.eclipse.finder_2.0.5.20110922_1046-258a521-dev-e36.jar,
- lib/org.eclipse.swtbot.eclipse.gef.finder_2.0.5.20110922_1046-258a521-dev-e36.jar,
- lib/org.eclipse.swtbot.eclipse.spy_2.0.5.20110922_1046-258a521-dev-e36.jar,
- lib/org.eclipse.swtbot.forms.finder_2.0.5.20110922_1046-258a521-dev-e36.jar,
- lib/org.eclipse.swtbot.go_2.0.5.20110922_1046-258a521-dev-e36.jar,
- lib/org.eclipse.swtbot.junit4_x_2.0.5.20110922_1046-258a521-dev-e36.jar,
- lib/org.eclipse.swtbot.swt.finder_2.0.5.20110922_1046-258a521-dev-e36.jar
+ lib/log4j-1.2.15.jar,
+ lib/org.eclipse.swtbot.ant.junit_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.e4.finder_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.eclipse.core_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.eclipse.finder_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.eclipse.gef.finder_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.eclipse.junit.headless_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.eclipse.spy_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.eclipse.ui_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.forms.finder_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.generator_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.generator.client_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.generator.jdt_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.generator.rules.workbench_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.generator.ui_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.go_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.junit4_x_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.nebula.gallery.finder_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.nebula.nattable.finder_2.7.0.201806111355.jar,
+ lib/org.eclipse.swtbot.swt.finder_2.7.0.201806111355.jar,
+ lib/org.hamcrest.core_1.3.0.v20180420-1519.jar,
+ lib/org.hamcrest.library_1.3.0.v20180524-2246.jar
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,
@@ -136,6 +144,5 @@ Export-Package: de.fu_berlin.inf.dpp;
  de.fu_berlin.inf.dpp.ui.wizards.pages,
  de.fu_berlin.inf.dpp.util;uses:="org.eclipse.core.resources,org.jivesoftware.smack.packet"
 Bundle-Vendor: FU-Berlin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.eclipse.core.filesystem,
  org.eclipse.core.net.proxy

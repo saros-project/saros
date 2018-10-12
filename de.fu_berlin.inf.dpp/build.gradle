@@ -78,7 +78,10 @@ dependencies {
   compile project(path: ':de.fu_berlin.inf.dpp.core', configuration: 'testing')
   compile project(path: ':de.fu_berlin.inf.dpp.ui', configuration: 'testing')
 
-  releaseDep log4jVersion
+  releaseDep log4jVersionApi
+  releaseDep log4jVersionCore
+  releaseDep log4jVersionBridge
+
   releaseDep fileTree(dir: 'libs', include: '*.jar', exclude: '*source*.jar')
 
   // This is very ugly but necessary in order to build stf together with saros eclipse
@@ -99,6 +102,7 @@ dependencies {
 }
 
 test {
+  systemProperty 'log4j.configurationFile', '../de.fu_berlin.inf.dpp.core/log4j2.xml'
   exclude '**/Abstract*'
 }
 
@@ -113,8 +117,8 @@ task stfTest (type: Test, dependsOn: [':de.fu_berlin.inf.dpp:build']) {
   classpath = sourceSets.stfTest.runtimeClasspath
 
   testLogging {
-       showStandardStreams = true
-        events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+    showStandardStreams = true
+    events "started", "passed", "skipped", "failed", "standardOut", "standardError"
   }
 
   include '**/stf/test/**/*Test.*'
@@ -158,8 +162,6 @@ jar {
     include 'LICENSE'
     include 'CHANGELOG'
   }
-
-  from('test/framework/stf/src/saros_stf.log4j.properties')
 
   into('META-INF')
   {

@@ -1,16 +1,20 @@
 package de.fu_berlin.inf.dpp.intellij;
 
+import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.helpers.LogLog;
+import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.status.StatusLogger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
 import java.io.InputStream;
+import java.io.File;
 
 /**
  * Component that is initalized when a project is loaded.
@@ -38,7 +42,7 @@ public class SarosComponent
                 .getResourceAsStream("saros.properties");
 
             if (sarosProperties == null) {
-                LogLog.warn("could not initialize Saros properties because "
+                StatusLogger.getLogger().warn("could not initialize Saros properties because "
                     + "the 'saros.properties' file could not be found on the "
                     + "current JAVA class path");
             } else {
@@ -46,7 +50,7 @@ public class SarosComponent
                 sarosProperties.close();
             }
         } catch (Exception e) {
-            LogLog
+            StatusLogger.getLogger()
                 .error("could not load saros property file 'saros.properties'",
                     e);
         }
@@ -59,21 +63,19 @@ public class SarosComponent
     }
 
     private void loadLoggers() {
-        final ClassLoader contextClassLoader = Thread.currentThread()
-            .getContextClassLoader();
 
         try {
-            // change the context class loader so Log4J will find
-            // the SarosLogFileAppender
-            Thread.currentThread()
-                .setContextClassLoader(SarosComponent.class.getClassLoader());
+            String logDir = PathManager.getLogPath() + File.separator + "SarosLogs";
 
-            PropertyConfigurator.configure(SarosComponent.class.getClassLoader()
-                .getResource("saros.log4j.properties"));
+            System.setProperty("log4j.configurationFile", "release_log4j2.xml");
+            System.setProperty("logging.logDir", logDir);
+
+            // trigger reconfiguration with new properties
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            context.reconfigure();
+
         } catch (RuntimeException e) {
-            LogLog.error("initializing loggers failed", e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
+            StatusLogger.getLogger().error("initializing loggers failed", e);
         }
     }
 

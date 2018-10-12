@@ -15,9 +15,12 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -102,7 +105,7 @@ import de.fu_berlin.inf.dpp.stf.shared.Constants;
  */
 public class STFController {
 
-    private static final transient Logger log = Logger
+    private static final transient Logger log = LogManager
         .getLogger(STFController.class);
 
     private static Registry registry;
@@ -119,24 +122,6 @@ public class STFController {
                 }
 
             });
-
-        /*
-         * HACK this is not the way OSGi works but it currently fulfill its
-         * purpose
-         */
-        final ClassLoader contextClassLoader = Thread.currentThread()
-            .getContextClassLoader();
-
-        try {
-            // change the context class loader so Log4J will find the appenders
-            Thread.currentThread().setContextClassLoader(
-                STFController.class.getClassLoader());
-
-            PropertyConfigurator.configure(STFController.class.getClassLoader()
-                .getResource("saros_stf.log4j.properties"));
-        } finally {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
-        }
 
         performConfigurationCheck();
 

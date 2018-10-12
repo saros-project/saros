@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="error">
+
+  <Appenders>
+    <Console name="SarosConsoleAppender" target="SYSTEM_OUT">
+      <PatternLayout pattern="%-5p %d{HH:mm:ss,SSS} [%t] (%F:%L) %m%n"/>
+      <ThresholdFilter level="all" onMatch="ACCEPT" onMismatch="DENY"/>
+    </Console>
+
+    <RollingFile name="FileLogAppender" fileName="${sys:logging.logDir}/saros.log"
+                   filePattern="${sys:logging.logDir}/archive/saros-%d{MM-dd-yyyy_HH-mm-ss}-%i.log.gz">
+      <PatternLayout pattern="%-5p %d{HH:mm:ss,SSS} [%t] (%F:%L) %m%n" />
+      <Policies>
+        <OnStartupTriggeringPolicy />
+      </Policies>
+      <DefaultRolloverStrategy max="5"/>
+    </RollingFile>
+
+    <RollingFile name="ErrorFileAppender" fileName="${sys:logging.logDir}/saros-errors.log"
+                   filePattern="${sys:logging.logDir}/archive/saros-errors-%d{MM-dd-yyyy_HH-mm-ss}-%i.log.gz">
+      <PatternLayout pattern="%-5p %d{HH:mm:ss,SSS} [%t] (%F:%L) %m%n" />
+      <Policies>
+        <OnStartupTriggeringPolicy />
+      </Policies>
+      <DefaultRolloverStrategy max="5"/>
+      <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+    </RollingFile>
+  </Appenders>
+
+  <Loggers>
+    <Logger name="org.jivesoftware" level="debug" />
+    <Logger name="de.fu_berlin.inf.dpp" level="trace" />
+    <Logger name="de.fu_berlin.inf.ag_se" level="debug" />
+
+    <Root level="all">
+      <AppenderRef ref="SarosConsoleAppender"/>
+      <AppenderRef ref="FileLogAppender"/>
+      <AppenderRef ref="ErrorFileAppender"/>
+    </Root>
+  </Loggers>
+
+</Configuration>

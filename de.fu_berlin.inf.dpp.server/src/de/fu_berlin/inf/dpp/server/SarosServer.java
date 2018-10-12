@@ -4,8 +4,8 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import de.fu_berlin.inf.dpp.server.console.ServerConsole;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
@@ -26,8 +26,7 @@ import de.fu_berlin.inf.dpp.session.SessionEndReason;
  */
 public class SarosServer {
 
-    private static final Logger LOG = Logger.getLogger(SarosServer.class);
-    private static final String LOGGING_CONFIG_FILE = "/log4j.properties";
+    private static final Logger LOG = LogManager.getLogger(SarosServer.class);
 
     private ContainerContext context;
 
@@ -44,11 +43,6 @@ public class SarosServer {
     }
 
     public void start() {
-
-        // Logging
-        URL log4jProperties = SarosServer.class
-            .getResource(LOGGING_CONFIG_FILE);
-        PropertyConfigurator.configure(log4jProperties);
 
         // Context
         ArrayList<IContextFactory> factories = new ArrayList<IContextFactory>();

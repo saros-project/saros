@@ -27,7 +27,9 @@ manifestDependencies {
 dependencies {
   compile project(':de.fu_berlin.inf.dpp.core')
   compile project(':de.fu_berlin.inf.dpp')
-  releaseDep log4jVersion
+  releaseDep log4jVersionCore
+  releaseDep log4jVersionApi
+  releaseDep log4jVersionBridge
   testCompile configurations.testConfig
 }
 
