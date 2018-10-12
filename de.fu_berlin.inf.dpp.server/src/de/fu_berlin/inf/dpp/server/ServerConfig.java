@@ -9,6 +9,7 @@ class ServerConfig {
     private static final String JID_KEY = "de.fu_berlin.inf.dpp.server.jid";
     private static final String PASSWORD_KEY = "de.fu_berlin.inf.dpp.server.password";
     private static final String WORKSPACE_PATH_KEY = "de.fu_berlin.inf.dpp.server.workspace";
+    private static final String INTERACTIVE_KEY = "de.fu_berlin.inf.dpp.server.interactive";
 
     /**
      * Returns the JID that the Saros server should use to connect to the XMPP
@@ -40,5 +41,17 @@ class ServerConfig {
      */
     public static String getWorkspacePath() {
         return System.getProperty(WORKSPACE_PATH_KEY);
+    }
+
+    /**
+     * Returns if the user has requested an interactive console.
+     *
+     * @return if the user has requested an interactive console
+     */
+    public static boolean isInteractive() {
+        String value = System.getProperty(INTERACTIVE_KEY);
+        return value.equalsIgnoreCase("true")
+            || value.equalsIgnoreCase("yes")
+            || value.equalsIgnoreCase("y");
     }
 }
