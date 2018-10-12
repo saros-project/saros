@@ -48,6 +48,8 @@ public class GEFRecordFactory extends SXEDefaultRecordFactory {
             r = new SVGTextBoxRecord(documentRecord);
         } else if (tag.equals(SVGConstants.SVG_SVG_TAG)) {
             r = new SVGRootRecord(documentRecord);
+        } else {
+            r = new ElementRecord(documentRecord);
         }
         return r;
 
