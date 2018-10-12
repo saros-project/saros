@@ -27,23 +27,8 @@ public class StoppableDocumentListenerTest {
     @Before
     public void before() {
         mockEditorFactory();
-        listener = new StoppableDocumentListener(dummyEditorManager());
+        listener = new StoppableDocumentListener(dummyEditorManager(), null);
         listening = false;
-    }
-
-    @Test
-    public void testStart() {
-        listener.startListening();
-
-        assertListening();
-    }
-
-    @Test
-    public void testStop() {
-        listener.startListening();
-        listener.stopListening();
-
-        assertNotListening();
     }
 
     @Test
@@ -55,7 +40,7 @@ public class StoppableDocumentListenerTest {
 
     @Test
     public void testDisable() {
-        listener.startListening();
+        listener.setEnabled(true);
         listener.setEnabled(false);
 
         assertNotListening();
