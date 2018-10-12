@@ -147,7 +147,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
 
             break;
         default:
-            shell = new SWTBot().shell(CONFIRM_DELETE);
+            shell = new SWTBot().shell(DELETE);
             shell.activate();
             shell.bot().button(OK).click();
             break;

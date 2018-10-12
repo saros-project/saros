@@ -65,7 +65,15 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
 
     @Override
     public IRemoteBotView view(String viewTitle) throws RemoteException {
-        view.setWidget(swtWorkBenchBot.viewByTitle(viewTitle));
+       SWTBotView matchingView = null;
+
+        for (SWTBotView i : swtWorkBenchBot.views())
+          if (i.getTitle().equals(viewTitle))
+            matchingView = i;
+
+        if (matchingView == null) throw new RemoteException("Failed to find a view with the title: " + viewTitle);
+
+        view.setWidget(matchingView);
         return view;
     }
 
