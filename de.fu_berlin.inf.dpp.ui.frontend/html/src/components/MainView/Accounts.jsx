@@ -9,13 +9,13 @@ import React from 'react'
 const AccountsProps = {
   activeAccount: Account.isRequired,
   accounts: PM.observableArrayOf(Account).isRequired,
-  onChangeActiveAccount: P.func.isRequired,
+  onChangeActiveAccount: P.func.isRequired
 }
 
 const Accounts = ({
   activeAccount,
   accounts,
-  onChangeActiveAccount,
+  onChangeActiveAccount
 }) => (
   <div>
     { (typeof activeAccount === 'object' && activeAccount.username && activeAccount.domain)

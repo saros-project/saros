@@ -10,10 +10,10 @@ export default class SarosStore {
       server: '',
       port: 0,
       useTLS: false,
-      useSASL: false,
+      useSASL: false
     },
     contactList: [],
-    connectionState: 'INITIALIZING',
+    connectionState: 'INITIALIZING'
   }
 
   @observable accounts = []

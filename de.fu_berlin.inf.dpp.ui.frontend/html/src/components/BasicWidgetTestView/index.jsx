@@ -20,7 +20,7 @@ export default class BasicWidgetTestView extends React.Component {
     radioGroup: '1',
     select: 'option1', // Default value
     multiSelect: [],
-    progressBar: 50,
+    progressBar: 50
   }
 
   @action setFieldValue = (field, value) => {

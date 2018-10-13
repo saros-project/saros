@@ -8,7 +8,7 @@ import React from 'react'
 export default class AddContactView extends React.Component {
   @observable fields = {
     jid: '',
-    displayName: '',
+    displayName: ''
   }
 
   @action onChangeField = (e) => {

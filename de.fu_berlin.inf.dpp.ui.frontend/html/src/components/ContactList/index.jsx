@@ -7,7 +7,7 @@ import cn from 'classnames'
 const ContactList = ({
   contactList,
   selectedContacts = new Set(),
-  onClickContact = noop,
+  onClickContact = noop
 }) => (
   <div className='contact-list-container'>
     <h6><Text message='headline.contacts' /></h6>

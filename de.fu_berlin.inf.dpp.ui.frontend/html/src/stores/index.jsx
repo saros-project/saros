@@ -21,6 +21,6 @@ export default function initStores (initialPage, api) {
     core,
     mainUI: new MainUIStore(core, view),
     sessionUI: new SessionUIStore(core, view),
-    configurationUI: new ConfigurationUIStore(core, view),
+    configurationUI: new ConfigurationUIStore(core, view)
   }
 }

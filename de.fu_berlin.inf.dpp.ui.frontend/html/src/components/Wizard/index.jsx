@@ -47,8 +47,8 @@ export default class Wizard extends React.Component {
           hasNext: this.hasNext,
           onClickCancel: this.props.onClickCancel,
           onClickBack: this.onClickBack,
-          hasPrev: this.hasPrev,
-        },
+          hasPrev: this.hasPrev
+        }
       }
     )
   }

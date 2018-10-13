@@ -14,13 +14,13 @@ export default class Step extends React.Component {
     title: P.string,
     wizard: P.shape({
       hasNext: P.boolean,
-      onClickNext: P.func,
-    }),
+      onClickNext: P.func
+    })
   }
 
   static defaultProps = {
     onClickNext: noop,
-    title: '',
+    title: ''
   }
 
   @observable isValid = true

@@ -13,7 +13,7 @@ const viewComponents = {
   [views.ADD_CONTACT]: AddContactView,
   [views.START_SESSION_WIZARD]: StartSessionWizardView,
   [views.CONFIGURATION_WIZARD]: ConfigurationWizardView,
-  [views.BASIC_WIDGET_TEST]: BasicWidgetTestView,
+  [views.BASIC_WIDGET_TEST]: BasicWidgetTestView
 }
 
 @inject('view')

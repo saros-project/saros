@@ -5,5 +5,5 @@ export const views = {
   ADD_CONTACT: 'add-contact',
   START_SESSION_WIZARD: 'start-session-wizard',
   CONFIGURATION_WIZARD: 'configuration-page',
-  BASIC_WIDGET_TEST: 'basic-widget-test',
+  BASIC_WIDGET_TEST: 'basic-widget-test'
 }

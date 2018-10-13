@@ -5,7 +5,7 @@ import React from 'react'
 const Contact = ({
   displayName,
   presence,
-  addition,
+  addition
 }) => (
   <div className='contact-item'>
     <span className='contact-item-display-name'>{displayName}</span>

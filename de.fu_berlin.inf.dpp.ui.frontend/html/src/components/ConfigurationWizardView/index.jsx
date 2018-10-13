@@ -12,20 +12,20 @@ const noop = () => {}
 const configurationDict = {
   account: {
     title: 'Enter Jabber Identifier',
-    description: 'In order to use Saros you need to configure a XMPP account',
+    description: 'In order to use Saros you need to configure a XMPP account'
   },
   generalSettings: {
     title: 'General Settings',
-    description: 'Configure your settings for use with Saros',
+    description: 'Configure your settings for use with Saros'
   },
   color: {
     title: 'Favorite Session Color',
-    description: 'Please choose your favorite color that should be used during a Saros session',
+    description: 'Please choose your favorite color that should be used during a Saros session'
   },
   review: {
     title: 'Configuration Complete',
-    description: 'Please click finish to complete the Saros configuration',
-  },
+    description: 'Please click finish to complete the Saros configuration'
+  }
 }
 
 @inject('configurationUI')
