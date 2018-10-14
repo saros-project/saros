@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -8,7 +11,8 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -40,7 +44,9 @@ public class Document {
 
     protected IPath path;
 
-    protected IProject project;
+    protected IReferencePoint referencePoint;
+
+    protected IReferencePointManager referencePointManager;
 
     /**
      * constructor to init doc.
@@ -48,10 +54,12 @@ public class Document {
      * @param initState
      *            start document state.
      */
-    public Document(String initState, IProject project, IPath path) {
+    public Document(String initState, IReferencePoint referencePoint, IPath path) {
         doc = new StringBuffer(initState);
-        this.project = project;
+        this.referencePoint = referencePoint;
         this.path = path;
+        this.referencePointManager = createMock(IReferencePointManager.class);
+        replay(referencePointManager);
     }
 
     /**
@@ -76,8 +84,8 @@ public class Document {
     public void execOperation(Operation op) {
         User dummy = JupiterTestCase.createUser("dummy");
 
-        List<TextEditActivity> activities = op.toTextEdit(
-            new SPath(project.getReferencePoint(), path, null), dummy);
+        List<TextEditActivity> activities = op.toTextEdit(new SPath(
+            referencePoint, path, referencePointManager), dummy);
 
         for (TextEditActivity activity : activities) {
 

@@ -17,7 +17,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.User;
 
 public class JupiterSimulator {
@@ -31,12 +32,12 @@ public class JupiterSimulator {
 
     public JupiterSimulator(String document) {
 
-        IProject project = createMock(IProject.class);
-        replay(project);
+        IReferencePoint referencePoint = createMock(IReferencePoint.class);
+        replay(referencePoint);
         IPath path = new PathFake("test");
 
-        client = new Peer(new Jupiter(true), document, project, path);
-        server = new Peer(new Jupiter(false), document, project, path);
+        client = new Peer(new Jupiter(true), document, referencePoint, path);
+        server = new Peer(new Jupiter(false), document, referencePoint, path);
     }
 
     public class Peer {
@@ -49,13 +50,13 @@ public class JupiterSimulator {
 
         protected IPath path;
 
-        protected IProject project;
+        protected IReferencePoint referencePoint;
 
-        public Peer(Algorithm algorithm, String document, IProject project,
-            IPath path) {
+        public Peer(Algorithm algorithm, String document,
+            IReferencePoint referencePoint, IPath path) {
             this.algorithm = algorithm;
-            this.document = new Document(document, project, path);
-            this.project = project;
+            this.document = new Document(document, referencePoint, path);
+            this.referencePoint = referencePoint;
             this.path = path;
         }
 
@@ -65,10 +66,11 @@ public class JupiterSimulator {
             document.execOperation(operation);
 
             User user = JupiterTestCase.createUser("DUMMY");
-
+            IReferencePointManager referencePointManager = createMock(IReferencePointManager.class);
+            replay(referencePointManager);
             JupiterActivity jupiterActivity = algorithm
-                .generateJupiterActivity(operation, user,
-                    new SPath(project.getReferencePoint(), path, null));
+                .generateJupiterActivity(operation, user, new SPath(
+                    referencePoint, path, referencePointManager));
 
             if (this == client) {
                 server.inQueue.add(jupiterActivity);

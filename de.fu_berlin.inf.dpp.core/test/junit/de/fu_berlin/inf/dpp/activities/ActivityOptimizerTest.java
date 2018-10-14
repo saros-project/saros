@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
@@ -26,8 +25,6 @@ public class ActivityOptimizerTest {
     private IPath fooPath;
     private IPath barPath;
 
-    private IProject fooProject;
-    private IProject barProject;
     private IReferencePoint referencePointOfFoo;
     private IReferencePoint referencePointOfBar;
     private IReferencePointManager referencePointManager;
@@ -36,9 +33,6 @@ public class ActivityOptimizerTest {
 
     @Before
     public void setup() {
-
-        fooProject = EasyMock.createNiceMock(IProject.class);
-        barProject = EasyMock.createNiceMock(IProject.class);
 
         referencePointOfFoo = EasyMock.createNiceMock(IReferencePoint.class);
         referencePointOfBar = EasyMock.createNiceMock(IReferencePoint.class);
@@ -49,8 +43,8 @@ public class ActivityOptimizerTest {
         fooPath = EasyMock.createNiceMock(IPath.class);
         barPath = EasyMock.createNiceMock(IPath.class);
 
-        EasyMock.replay(fooProject, barProject, fooPath, barPath,
-            referencePointOfFoo, referencePointOfBar, referencePointManager);
+        EasyMock.replay(fooPath, barPath, referencePointOfFoo,
+            referencePointOfBar, referencePointManager);
     }
 
     @Test

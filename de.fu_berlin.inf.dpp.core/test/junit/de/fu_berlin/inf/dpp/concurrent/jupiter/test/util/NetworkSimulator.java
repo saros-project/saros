@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -19,7 +19,7 @@ public class NetworkSimulator {
 
     private HashMap<User, NetworkEventHandler> clients;
 
-    public IProject project;
+    public IReferencePoint referencePoint;
 
     public IPath path = new PathFake("dummy");
 
@@ -28,8 +28,8 @@ public class NetworkSimulator {
     protected int presentTime = -1;
 
     public NetworkSimulator() {
-        project = createMock(IProject.class);
-        replay(project);
+        referencePoint = createMock(IReferencePoint.class);
+        replay(referencePoint);
         clients = new HashMap<User, NetworkEventHandler>();
     }
 

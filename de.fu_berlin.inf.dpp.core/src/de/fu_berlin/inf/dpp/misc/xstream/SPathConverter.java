@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -24,11 +23,11 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  * representations, and vice versa.
  * <p>
  * <b>Example:</b> The XML representation of an {@link SPath} for a
- * {@linkplain IProject project} with id <code>"projA"</code> and a
+ * {@linkplain IReferencePoint referencePoint} with id <code>"refA"</code> and a
  * {@linkplain IPath relative path} <code>"src/Main.java"</code>:
  * 
  * <pre>
- * &lt;SPath i="projA" p="src/Main.java" /&gt;
+ * &lt;SPath i="refA" p="src/Main.java" /&gt;
  * </pre>
  */
 @Component
@@ -76,8 +75,7 @@ public class SPathConverter implements Converter, Startable {
         String i = session.getReferencePointID(spath.getReferencePoint());
         if (i == null) {
             LOG.error("Could not retrieve project id for project '"
-                + referencePointManager.get(spath.getReferencePoint())
-                    .getName()
+                + spath.getReferencePoint()
                 + "'. Make sure you don't create activities for non-shared projects");
             return;
         }
