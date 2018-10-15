@@ -200,8 +200,9 @@ public class LocalEditorHandler {
      * Saves the document under path, thereby flushing its contents to disk.
      *
      * @param path the path for the document to save
+     * @see Document
      */
-    public void saveFile(
+    public void saveDocument(
         @NotNull
             SPath path) {
 

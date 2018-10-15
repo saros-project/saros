@@ -147,7 +147,7 @@ public class EditorManager extends AbstractActivityProducer
                 editorListenerDispatch.editorClosed(user, path);
                 break;
             case SAVED:
-                localEditorHandler.saveFile(path);
+                localEditorHandler.saveDocument(path);
                 break;
             default:
                 LOG.warn("Unexpected type: " + editorActivity.getType());
@@ -547,8 +547,15 @@ public class EditorManager extends AbstractActivityProducer
         editorListenerDispatch.remove(listener);
     }
 
-    public void saveFile(SPath path) {
-        localEditorHandler.saveFile(path);
+    /**
+     * Saves the document under path, thereby flushing its contents to disk.
+     *
+     * @param path the path for the document to save
+     * @see Document
+     * @see LocalEditorHandler#saveDocument(SPath)
+     */
+    public void saveDocument(SPath path) {
+        localEditorHandler.saveDocument(path);
     }
 
     public boolean isOpenedInEditor(SPath path) {
@@ -934,7 +941,7 @@ public class EditorManager extends AbstractActivityProducer
                     if (project == null || project
                             .equals(editorPath.getProject())) {
 
-                        saveFile(editorPath);
+                        saveDocument(editorPath);
                     }
                 }
             }
