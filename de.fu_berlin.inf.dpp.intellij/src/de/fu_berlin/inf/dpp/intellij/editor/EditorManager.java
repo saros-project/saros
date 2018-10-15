@@ -778,6 +778,12 @@ public class EditorManager extends AbstractActivityProducer
          * activities during the project negotiation
          */
         if (fileReplacementInProgressObservable.isReplacementInProgress()) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace(
+                    "File replacement in progress - Ignoring local activity "
+                        + textEdit);
+            }
+
             return;
         }
 

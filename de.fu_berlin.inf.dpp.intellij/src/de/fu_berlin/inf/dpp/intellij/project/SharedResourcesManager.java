@@ -322,8 +322,15 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     void internalFireActivity(IActivity activity) {
         // HACK for now
-        if (fileReplacementInProgressObservable.isReplacementInProgress())
+        if (fileReplacementInProgressObservable.isReplacementInProgress()) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace(
+                    "File replacement in progress - Ignoring local activity "
+                        + activity);
+            }
+
             return;
+        }
 
         fireActivity(activity);
     }
