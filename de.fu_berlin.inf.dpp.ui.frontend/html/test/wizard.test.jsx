@@ -24,8 +24,7 @@ describe('<Wizard />', () => {
 
   const nextPage = () => wrap.find('.btn-next').simulate('click')
 
-  //TODO: fix the test and unignore it
-  xit('goes to nextPage when clicking Next', () => {
+  it('goes to nextPage when clicking Next', () => {
     shouldRender(wrap.find('.step-1'))
     nextPage()
     shouldRender(wrap.find('.step-2'))
@@ -33,8 +32,7 @@ describe('<Wizard />', () => {
     shouldRender(wrap.find('.step-3'))
   })
 
-  //TODO: fix the test and unignore it
-  xit('calls onFinish on last page', () => {
+  it('calls onFinish on last page', () => {
     shouldRender(wrap.find('.btn-finish'))
     wrap.find('.btn-finish').simulate('click')
     expect(onFinish.calledOnce).to.equal(true)
