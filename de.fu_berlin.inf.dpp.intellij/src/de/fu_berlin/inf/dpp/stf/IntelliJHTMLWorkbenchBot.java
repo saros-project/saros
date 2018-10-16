@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot;
+package de.fu_berlin.inf.dpp.stf;
 
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.SwtBrowserPanel;
 import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;

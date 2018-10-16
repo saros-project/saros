@@ -10,9 +10,7 @@ Require-Bundle: de.fu_berlin.inf.dpp.core,
  org.eclipse.swt
 Bundle-ClassPath: .,
  lib/swt-browser-improved.jar
-Export-Package: 
- de.fu_berlin.inf.dpp.stf.server,
- de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot,
- de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.impl,
- de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget,
- de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl
+Export-Package: de.fu_berlin.inf.ag_se.browser,
+ de.fu_berlin.inf.ag_se.browser.extensions,
+ de.fu_berlin.inf.ag_se.browser.functions,
+ de.fu_berlin.inf.ag_se.browser.swt
