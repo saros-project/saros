@@ -23,7 +23,7 @@
     <property name="test.haltonfailure" value="off" />
 
     <property name="src.dir" value="${basedir}/src" />
-    <property name="src.test.dir" value="${basedir}/test" />
+    <property name="src.test.dir" value="${basedir}/test/junit" />
     <property name="bin.dir" value="${basedir}/bin" />
     <property name="lib.dir" value="${basedir}/lib" />
     <property name="test.lib.dir" value="${basedir}/test/lib" />
