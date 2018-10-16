@@ -1,11 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Saros STF
-Bundle-SymbolicName: de.fu_berlin.inf.dpp.stf;singleton:=true
+Bundle-SymbolicName: de.fu_berlin.inf.dpp.stf
 Bundle-Version: 0.1.0.DEVEL
 Bundle-Vendor: FU-Berlin
-Bundle-Activator: de.fu_berlin.inf.dpp.Saros
-Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -24,13 +22,9 @@ Bundle-ClassPath: .,
  lib/org.eclipse.swtbot.eclipse.finder_2.0.5.20110922_1046-258a521-dev-e36.jar,
  lib/org.eclipse.swtbot.swt.finder_2.0.5.20110922_1046-258a521-dev-e36.jar,
  lib/org.eclipse.swtbot.eclipse.gef.finder_2.0.5.20110922_1046-258a521-dev-e36.jar,
- lib/org.hamcrest_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.core_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.integration_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.library_1.1.0.v20090501071000.jar,
- lib/org.hamcrest.text_1.1.0.v20090501071000.jar
-Export-Package: de.fu_berlin.inf.dpp.stf,
- de.fu_berlin.inf.dpp.stf.annotation,
+ lib/org.hamcrest.library_1.1.0.v20090501071000.jar
+ org.eclipse.swt
+Export-Package: de.fu_berlin.inf.dpp.stf.annotation,
  de.fu_berlin.inf.dpp.stf.client,
  de.fu_berlin.inf.dpp.stf.client.tester,
  de.fu_berlin.inf.dpp.stf.client.util,

@@ -73,9 +73,16 @@ public class StartupSaros implements IStartup {
         if (xmppAccountStore.isEmpty())
             showSarosView();
 
-        Integer testmode = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
+        Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
 
-        if (testmode == null) {
+        if (port != null && port > 0 && port <= 65535) {
+            LOG.info("starting STF controller on port " + port);
+            startSTFController(port);
+
+        } else if (port != null) {
+            LOG.error("could not start STF controller: port " + port
+                + " is not a valid port number");
+        } else {
             /*
              * Only show configuration wizard if no accounts are configured. If
              * Saros is already configured, do not show the tutorial because the
@@ -122,6 +129,21 @@ public class StartupSaros implements IStartup {
                     new GettingStartedHandler().execute(new ExecutionEvent());
                 } catch (ExecutionException e) {
                     LOG.warn("failed to execute tutorial handler", e);
+                }
+            }
+        });
+    }
+
+    private void startSTFController(final int port) {
+
+        ThreadUtils.runSafeAsync("dpp-stf-startup", LOG, new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // TODO FIX Project dependency
+                    // STFController.start(port, context);
+                } catch (Exception e) {
+                    LOG.error("starting STF controller failed", e);
                 }
             }
         });

@@ -100,7 +100,6 @@ Export-Package: de.fu_berlin.inf.dpp;
    org.eclipse.jface.viewers,
    de.fu_berlin.inf.dpp.invitation,
    de.fu_berlin.inf.dpp.net",
- de.fu_berlin.inf.dpp.ui.commandHandlers,
  de.fu_berlin.inf.dpp.ui.decorators;
   uses:="org.eclipse.core.runtime,
    de.fu_berlin.inf.dpp.project,
