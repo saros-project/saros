@@ -1,8 +1,8 @@
-import React from 'react'
 import { Text } from 'react-localize'
-import Contact from './Contact'
-import cn from 'classnames'
 import { noop } from 'Utils'
+import Contact from './Contact'
+import React from 'react'
+import cn from 'classnames'
 
 const ContactList = ({
   contactList,

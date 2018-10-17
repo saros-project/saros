@@ -1,7 +1,7 @@
+import { Button, Checkbox, Col, ControlLabel, DropdownButton, Form, FormControl, FormGroup, Grid, MenuItem, ProgressBar, Radio, Row, SplitButton } from 'react-bootstrap'
+import { action, observable } from 'mobx'
+import { inject, observer } from 'mobx-react'
 import React from 'react'
-import { observable, action } from 'mobx'
-import { observer, inject } from 'mobx-react'
-import { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button, DropdownButton, SplitButton, MenuItem, Checkbox, Radio, ProgressBar } from 'react-bootstrap'
 
 @inject('mainUI')
 @observer
@@ -20,7 +20,7 @@ export default class BasicWidgetTestView extends React.Component {
     radioGroup: '1',
     select: 'option1', // Default value
     multiSelect: [],
-    progressBar: 50,
+    progressBar: 50
   }
 
   @action setFieldValue = (field, value) => {
@@ -57,8 +57,8 @@ export default class BasicWidgetTestView extends React.Component {
     } else {
       value = e.target.id
     }
-    $('#button-display-text').html(value)
-    console.log(value)
+    document.querySelector('#button-display-text').innerHtml = value
+    window.console.log(value)
   }
 
   render () {

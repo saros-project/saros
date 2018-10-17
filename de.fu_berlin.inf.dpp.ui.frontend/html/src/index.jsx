@@ -5,9 +5,9 @@ import App from './components/App'
 import Localization from 'react-localize'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import initStores from './stores'
 import SarosApi from './SarosApi'
 import dictionary from './dictionary'
+import initStores from './stores'
 
 // The initialView is injected via the html page
 const api = new SarosApi()

@@ -9,7 +9,7 @@ export default class ReviewStep extends React.Component {
     autoConnect: 'Connect automatically',
     isSkypeUsernameVisible: 'Show my Skype username',
     allowSubmitAnalytics: 'Send anonymous statistical data',
-    allowSubmitCrashReports: 'Send crash reports',
+    allowSubmitCrashReports: 'Send crash reports'
   }
 
   getLabel = (key) => {
