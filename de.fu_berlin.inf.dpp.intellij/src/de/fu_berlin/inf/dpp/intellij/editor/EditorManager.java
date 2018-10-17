@@ -147,7 +147,7 @@ public class EditorManager extends AbstractActivityProducer
                 editorListenerDispatch.editorClosed(user, path);
                 break;
             case SAVED:
-                localEditorHandler.saveFile(path);
+                localEditorHandler.saveDocument(path);
                 break;
             default:
                 LOG.warn("Unexpected type: " + editorActivity.getType());
@@ -446,7 +446,6 @@ public class EditorManager extends AbstractActivityProducer
             remoteWriteAccessManager.dispose();
             remoteWriteAccessManager = null;
             activeEditor = null;
-            openEditorPaths.clear();
         }
 
 
@@ -474,7 +473,6 @@ public class EditorManager extends AbstractActivityProducer
     private User followedUser = null;
     private boolean hasWriteAccess;
     private boolean isLocked;
-    private final Set<SPath> openEditorPaths = new HashSet<SPath>();
     private SelectionEvent localSelection;
     private LineRange localViewport;
     private SPath activeEditor;
@@ -549,8 +547,15 @@ public class EditorManager extends AbstractActivityProducer
         editorListenerDispatch.remove(listener);
     }
 
-    public void saveFile(SPath path) {
-        localEditorHandler.saveFile(path);
+    /**
+     * Saves the document under path, thereby flushing its contents to disk.
+     *
+     * @param path the path for the document to save
+     * @see Document
+     * @see LocalEditorHandler#saveDocument(SPath)
+     */
+    public void saveDocument(SPath path) {
+        localEditorHandler.saveDocument(path);
     }
 
     public boolean isOpenedInEditor(SPath path) {
@@ -661,17 +666,16 @@ public class EditorManager extends AbstractActivityProducer
 
         activeEditor = path;
 
-        if (path != null && session.isShared(path.getResource())) {
-            openEditorPaths.add(path);
+        if (path == null || session.isShared(path.getResource())) {
+            editorListenerDispatch
+                .editorActivated(session.getLocalUser(), path);
+
+            fireActivity(new EditorActivity(session.getLocalUser(),
+                EditorActivity.Type.ACTIVATED, path));
+
+            //  generateSelection(path, selection);  //FIXME: add this feature
+            //  generateViewport(path, viewport);    //FIXME:s add this feature
         }
-
-        editorListenerDispatch.editorActivated(session.getLocalUser(), path);
-        fireActivity(new EditorActivity(session.getLocalUser(),
-            EditorActivity.Type.ACTIVATED, path));
-
-        //  generateSelection(path, selection);  //FIXME: add this feature
-        //  generateViewport(path, viewport);    //FIXME:s add this feature
-
     }
 
     /**
@@ -927,18 +931,17 @@ public class EditorManager extends AbstractActivityProducer
             @Override
             public void run() {
 
-                if (userEditorStateManager == null) {
-                    return;
+                Set<SPath> editorPaths = new HashSet<>(editorPool.getFiles());
+
+                if (userEditorStateManager != null) {
+                    editorPaths.addAll(userEditorStateManager.getOpenEditors());
                 }
 
-                final Set<SPath> editorPaths = userEditorStateManager
-                    .getOpenEditors();
+                for (SPath editorPath : editorPaths) {
+                    if (project == null || project
+                            .equals(editorPath.getProject())) {
 
-                editorPaths.addAll(openEditorPaths);
-
-                for (final SPath path : editorPaths) {
-                    if (project == null || project.equals(path.getProject())) {
-                        saveFile(path);
+                        saveDocument(editorPath);
                     }
                 }
             }
