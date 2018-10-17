@@ -72,8 +72,6 @@ public class ServerContextFactory extends CoreContextFactory {
             ServerSessionContextFactory.class);
 
         // Other
-        // FIXME put to session scope
-        // c.addComponent(IEditorManager.class, ServerEditorManagerImpl.class);
         c.addComponent(IRemoteProgressIndicatorFactory.class,
             NullRemoteProgressIndicatorFactory.class);
 

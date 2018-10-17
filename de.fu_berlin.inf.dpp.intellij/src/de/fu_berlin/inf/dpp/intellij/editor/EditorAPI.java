@@ -2,20 +2,16 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.VisualPosition;
-import com.intellij.openapi.editor.markup.HighlighterLayer;
-import com.intellij.openapi.editor.markup.HighlighterTargetArea;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
-
-import java.awt.Color;
+import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.
@@ -62,7 +58,7 @@ public class EditorAPI {
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
+        application.invokeAndWait(action, ModalityState.defaultModalityState());
     }
 
     /**
@@ -79,20 +75,18 @@ public class EditorAPI {
             @Override
             public void run() {
                 commandProcessor.executeCommand(project, new Runnable() {
+
                     @Override
                     public void run() {
-                        application.runWriteAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                doc.insertString(position, text);
-                            }
-                        });
+                        doc.insertString(position, text);
                     }
-                }, "insertText()", commandProcessor.getCurrentCommandGroupId());
+                }, "Saros text insertion at index " + position + " of \""
+                    + text + "\"", commandProcessor.getCurrentCommandGroupId(),
+                    UndoConfirmationPolicy.REQUEST_CONFIRMATION, doc);
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
+        Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
     }
 
     /**
@@ -106,72 +100,18 @@ public class EditorAPI {
             @Override
             public void run() {
                 commandProcessor.executeCommand(project, new Runnable() {
+
                     @Override
                     public void run() {
-                        application.runWriteAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                doc.setText(text);
-                            }
-                        });
+                        doc.setText(text);
                     }
-                }, "setText()", commandProcessor.getCurrentCommandGroupId());
+                }, "Saros text set to \"" + text + "\"",
+                    commandProcessor.getCurrentCommandGroupId(),
+                    UndoConfirmationPolicy.REQUEST_CONFIRMATION, doc);
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
-    }
-
-    /**
-     * Adds text mark on the editor for the specified line range.
-     *
-     * @param editor
-     * @param start
-     * @param end
-     * @param color
-     * @return
-     */
-    public RangeHighlighter textMarkAdd(final Editor editor, final int start,
-        final int end, Color color) {
-        if (color == null || editor == null) {
-            return null;
-        }
-
-        TextAttributes textAttr = new TextAttributes();
-        textAttr.setBackgroundColor(color);
-
-        RangeHighlighter highlighter = editor.getMarkupModel()
-            .addRangeHighlighter(start, end, HighlighterLayer.LAST, textAttr,
-                HighlighterTargetArea.EXACT_RANGE);
-        highlighter.setGreedyToLeft(false);
-        highlighter.setGreedyToRight(false);
-
-        return highlighter;
-    }
-
-    /**
-     * Removes text mark of the <code>highlighter</code> from editor.
-     * When <code>highlighter</code> is <code>null</code>, it removes all marks.
-     *
-     * @param editor
-     * @param highlighter when <code>highlighter</code> is <code>null</code>,
-     *                    it removes all marks.
-     */
-    public void textMarkRemove(final Editor editor,
-        RangeHighlighter highlighter) {
-        if (editor == null) {
-            return;
-        }
-
-        //TODO: Check if this is necessary at all.
-        if (highlighter != null) {
-            editor.getMarkupModel().removeHighlighter(highlighter);
-        } else {
-            for (RangeHighlighter myHighlighter : editor.getMarkupModel()
-                .getAllHighlighters()) {
-                editor.getMarkupModel().removeHighlighter(myHighlighter);
-            }
-        }
+        Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
     }
 
     /**
@@ -186,21 +126,18 @@ public class EditorAPI {
             @Override
             public void run() {
                 commandProcessor.executeCommand(project, new Runnable() {
-                        @Override
+
+                    @Override
                         public void run() {
-                            application.runWriteAction(new Runnable() {
-                                @Override
-                                public void run() {
-                                    doc.deleteString(start, end);
-                                }
-                            });
+                            doc.deleteString(start, end);
                         }
-                    }, "deleteText(" + start + "," + end + ")",
-                    commandProcessor.getCurrentCommandGroupId());
+                    }, "Saros text deletion from index " + start + " to "
+                    + end, commandProcessor.getCurrentCommandGroupId(),
+                    UndoConfirmationPolicy.REQUEST_CONFIRMATION, doc);
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
+        Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
     }
 
     /**
@@ -247,7 +184,7 @@ public class EditorAPI {
             }
         };
 
-        UIUtil.invokeAndWaitIfNeeded(action);
+        application.invokeAndWait(action, ModalityState.defaultModalityState());
 
     }
 }

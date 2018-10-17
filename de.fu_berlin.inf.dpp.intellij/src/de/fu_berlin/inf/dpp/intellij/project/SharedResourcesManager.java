@@ -212,7 +212,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
         IPath newFilePath = newPath.getFullPath();
 
-        localEditorHandler.saveFile(oldPath);
+        localEditorHandler.saveDocument(oldPath);
         localEditorHandler.removeEditor(oldPath);
         localEditorManipulator.closeEditor(oldPath);
 
@@ -264,7 +264,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
             if (replaceSuccessful) {
                 //If the content of the existing document was replaced
                 //successfully, save the file
-                localEditorHandler.saveFile(activity.getPath());
+                localEditorHandler.saveDocument(activity.getPath());
                 return;
             }
         }

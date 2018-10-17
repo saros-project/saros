@@ -83,6 +83,19 @@ class SarosApi {
   sendInvitation (projectTrees, contacts) {
     window.__java_sendInvitation(JSON.stringify(projectTrees), JSON.stringify(contacts))
   }
+
+  /**
+   * @returns {Object} a map of the colors the user can choose in the config wizard
+   */
+  getUserColorSet () {
+    // TODO implement an actual Browser Function for this
+    return {
+      lightblue: '#9CCFE4',
+      brown: '#BEBB88',
+      green: '#BEDA69',
+      darkcyan: '#8DB4B1'
+    }
+  }
 }
 
 export default SarosApi

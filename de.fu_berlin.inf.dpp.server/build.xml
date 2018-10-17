@@ -50,6 +50,7 @@
             </src>
             <classpath>
                 <fileset dir="${core.libdir}" includes="*.jar" />
+                <fileset dir="${server.libdir}" includes="*.jar" />
             </classpath>
         </javac>
 

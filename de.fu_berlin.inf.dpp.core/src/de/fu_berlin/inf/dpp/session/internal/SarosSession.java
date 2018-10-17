@@ -65,6 +65,7 @@ import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -598,7 +599,7 @@ public final class SarosSession implements ISarosSession {
      *             if the session is already stopped or was not started at all
      */
     // FIXME synchronization
-    public void stop() {
+    public void stop(SessionEndReason reason) {
         if (!started || stopped) {
             throw new IllegalStateException();
         }
@@ -611,6 +612,26 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.stop();
         sessionContainer.dispose();
 
+        if (reason == SessionEndReason.LOCAL_USER_LEFT) {
+            notifyParticipants();
+        }
+
+        for (User user : getRemoteUsers())
+            connectionManager.closeConnection(
+                ISarosSession.SESSION_CONNECTION_ID, user.getJID());
+
+        synchronized (componentAccessLock) {
+            stopping = false;
+            stopped = true;
+        }
+    }
+
+    /**
+     * Notifies other participants that the local session has ended. If the
+     * local user is the host, all other participants are notified. Otherwise,
+     * only the host is notified.
+     */
+    private void notifyParticipants() {
         List<User> usersToNotify;
 
         if (isHost())
@@ -627,15 +648,6 @@ public final class SarosSession implements ISarosSession {
                 log.warn("failed to notify user " + user
                     + " about local session stop", e);
             }
-        }
-
-        for (User user : getRemoteUsers())
-            connectionManager.closeConnection(
-                ISarosSession.SESSION_CONNECTION_ID, user.getJID());
-
-        synchronized (componentAccessLock) {
-            stopping = false;
-            stopped = true;
         }
     }
 
@@ -742,9 +754,19 @@ public final class SarosSession implements ISarosSession {
         }
 
         boolean send = true;
-        // handle FileActivities and FolderActivities to update ProjectMapper
-        if (activity instanceof IFileSystemModificationActivity) {
+
+        /*
+         * To explain some magic: When the host generates an activity this
+         * method will be called multiple times. It is first called with the
+         * host as it is only recipient and then it is called again for the
+         * other recipients.
+         */
+        // handle IFileSystemModificationActivities to update ProjectMapper
+        if (activity instanceof IFileSystemModificationActivity
+            && (!isHost() || (isHost() && recipients.contains(getLocalUser())))) {
+
             send = updatePartialSharedResources((IFileSystemModificationActivity) activity);
+
         }
 
         if (!send)

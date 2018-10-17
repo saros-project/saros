@@ -32,4 +32,4 @@ rules:
   valid-jsdoc: error
   comma-dangle:
   - error
-  - always-multiline
+  - never

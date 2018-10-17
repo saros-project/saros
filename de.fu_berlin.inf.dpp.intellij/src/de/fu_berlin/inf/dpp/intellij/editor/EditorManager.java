@@ -15,8 +15,10 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.core.editor.RemoteWriteAccessManager;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
@@ -25,9 +27,10 @@ import de.fu_berlin.inf.dpp.editor.remote.EditorState;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
-import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -44,6 +47,8 @@ import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -142,7 +147,7 @@ public class EditorManager extends AbstractActivityProducer
                 editorListenerDispatch.editorClosed(user, path);
                 break;
             case SAVED:
-                localEditorHandler.saveFile(path);
+                localEditorHandler.saveDocument(path);
                 break;
             default:
                 LOG.warn("Unexpected type: " + editorActivity.getType());
@@ -153,17 +158,77 @@ public class EditorManager extends AbstractActivityProducer
 
             SPath path = editorActivity.getPath();
 
+            if (path == null) {
+                return;
+            }
+
             LOG.debug(path + " text edit activity received " + editorActivity);
 
             User user = editorActivity.getSource();
-            ColorModel colorModel = ColorManager
-                .getColorModel(user.getColorID());
 
-            localEditorManipulator
-                .applyTextOperations(path, editorActivity.toOperation(),
-                    colorModel.getEditColor());
+            Operation operation = editorActivity.toOperation();
+
+            localEditorManipulator.applyTextOperations(path, operation);
+
+            adjustAnnotationsAfterEdit(user, path.getFile(),
+                editorPool.getEditor(path), operation);
 
             editorListenerDispatch.textEdited(editorActivity);
+        }
+
+        /**
+         * Adjusts the currently present notifications.
+         * <p></p>
+         * <p>
+         * If the given operation is an <code>InsertOperation</code>, a
+         * <code>ContributionAnnotation</code> is added for the inserted
+         * text and all existing annotations for the file are adjusted through
+         * {@link AnnotationManager#moveAnnotationsAfterAddition(IFile, int, int)}.
+         * </p>
+         * <p>
+         * If the given operation is a <code>DeleteOperation</code>, all
+         * existing annotations for the file are adjusted through
+         * {@link AnnotationManager#moveAnnotationsAfterDeletion(IFile, int, int)}.
+         * </p>
+         *
+         * @param user       the user for the given operation
+         * @param file       the file for the given operation
+         * @param editor     the editor for the given file
+         * @param operations the received operation
+         */
+        private void adjustAnnotationsAfterEdit(
+            @NotNull
+                User user,
+            @NotNull
+                IFile file,
+            @Nullable
+                Editor editor,
+            @NotNull
+                Operation operations) {
+
+            operations.getTextOperations().forEach(textOperation -> {
+                int start = textOperation.getPosition();
+                int end =
+                    textOperation.getPosition() + textOperation.getTextLength();
+
+                if (textOperation instanceof InsertOperation) {
+                    if (editor == null) {
+                        annotationManager
+                            .moveAnnotationsAfterAddition(file, start, end);
+                    }
+
+                    annotationManager
+                        .addContributionAnnotation(user, file, start, end,
+                            editor);
+
+                } else if (textOperation instanceof DeleteOperation
+                        && editor == null) {
+
+                    annotationManager
+                            .moveAnnotationsAfterDeletion(file, start, end);
+
+                }
+            });
         }
 
         private void execTextSelection(TextSelectionActivity selection) {
@@ -174,16 +239,19 @@ public class EditorManager extends AbstractActivityProducer
                 return;
             }
 
+            IFile file = path.getFile();
+
             LOG.debug(
                 "Text selection activity received: " + path + ", " + selection);
 
             User user = selection.getSource();
-            ColorModel colorModel = ColorManager
-                .getColorModel(user.getColorID());
+            int start = selection.getOffset();
+            int end = start + selection.getLength();
 
-            localEditorManipulator
-                .selectText(path, selection.getOffset(), selection.getLength(),
-                    colorModel);
+            Editor editor = editorPool.getEditor(path);
+
+            annotationManager
+                .addSelectionAnnotation(user, file, start, end, editor);
 
             editorListenerDispatch.textSelectionChanged(selection);
         }
@@ -267,6 +335,8 @@ public class EditorManager extends AbstractActivityProducer
 
         @Override
         public void userLeft(final User user) {
+            annotationManager.removeAnnotations(user);
+
             // TODO: Let the FollowModeManager handle this
             if (user.equals(followedUser)) {
                 setFollowing(null);
@@ -296,6 +366,7 @@ public class EditorManager extends AbstractActivityProducer
 
         for(VirtualFile openFile: openFiles){
             localEditorHandler.openEditor(openFile, project,false);
+            //TODO create selection activity if there is a current selection
         }
 
         //TODO consider duplicated open editors during screen splitting
@@ -342,7 +413,7 @@ public class EditorManager extends AbstractActivityProducer
             session.addActivityProducer(EditorManager.this);
             session.addActivityConsumer(consumer, Priority.ACTIVE);
 
-            documentListener.startListening();
+            documentListener.setEnabled(true);
 
             userEditorStateManager = session
                 .getComponent(UserEditorStateManager.class);
@@ -354,6 +425,8 @@ public class EditorManager extends AbstractActivityProducer
         }
 
         private void endSession() {
+            annotationManager.removeAllAnnotations();
+
             setFollowing(null);
 
             //This sets all editors, that were set to read only, writeable
@@ -365,7 +438,7 @@ public class EditorManager extends AbstractActivityProducer
             session.removeActivityProducer(EditorManager.this);
             session.removeActivityConsumer(consumer);
 
-            documentListener.stopListening();
+            documentListener.setEnabled(false);
 
             session = null;
 
@@ -373,31 +446,14 @@ public class EditorManager extends AbstractActivityProducer
             remoteWriteAccessManager.dispose();
             remoteWriteAccessManager = null;
             activeEditor = null;
-            openEditorPaths.clear();
         }
 
 
-    };
-
-    private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
-
-        @Override
-        public void editorActivated(User user, SPath filePath) {
-
-            // We only need to react to remote users changing editor
-            if (user.isLocal()) {
-                return;
-            }
-
-            // Clear all viewport annotations of this user.
-            for (SPath editorPath : getOpenEditors()) {
-                localEditorManipulator.clearSelection(editorPath);
-            }
-        }
     };
 
     private final LocalEditorHandler localEditorHandler;
     private final LocalEditorManipulator localEditorManipulator;
+    private final AnnotationManager annotationManager;
 
     private final EditorPool editorPool = new EditorPool();
 
@@ -417,7 +473,6 @@ public class EditorManager extends AbstractActivityProducer
     private User followedUser = null;
     private boolean hasWriteAccess;
     private boolean isLocked;
-    private final Set<SPath> openEditorPaths = new HashSet<SPath>();
     private SelectionEvent localSelection;
     private LineRange localViewport;
     private SPath activeEditor;
@@ -425,15 +480,20 @@ public class EditorManager extends AbstractActivityProducer
 
     public EditorManager(ISarosSessionManager sessionManager,
         LocalEditorHandler localEditorHandler,
-        LocalEditorManipulator localEditorManipulator, ProjectAPI projectAPI) {
+        LocalEditorManipulator localEditorManipulator, ProjectAPI projectAPI,
+        VirtualFileConverter virtualFileConverter,
+        AnnotationManager annotationManager) {
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-        addSharedEditorListener(sharedEditorListener);
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
+        this.annotationManager = annotationManager;
 
-        documentListener = new StoppableDocumentListener(this);
-        fileListener = new StoppableEditorFileListener(this);
+        documentListener = new StoppableDocumentListener(this,
+                virtualFileConverter);
+        fileListener = new StoppableEditorFileListener(this,
+                virtualFileConverter, annotationManager);
+
         selectionListener = new StoppableSelectionListener(this);
         viewportListener = new StoppableViewPortListener(this);
 
@@ -450,8 +510,7 @@ public class EditorManager extends AbstractActivityProducer
 
     @Override
     public String getContent(final SPath path) {
-        return ApplicationManager.getApplication()
-            .runReadAction(new Computable<String>() {
+        return Filesystem.runReadAction(new Computable<String>() {
 
                 @Override
                 public String compute() {
@@ -488,8 +547,15 @@ public class EditorManager extends AbstractActivityProducer
         editorListenerDispatch.remove(listener);
     }
 
-    public void saveFile(SPath path) {
-        localEditorHandler.saveFile(path);
+    /**
+     * Saves the document under path, thereby flushing its contents to disk.
+     *
+     * @param path the path for the document to save
+     * @see Document
+     * @see LocalEditorHandler#saveDocument(SPath)
+     */
+    public void saveDocument(SPath path) {
+        localEditorHandler.saveDocument(path);
     }
 
     public boolean isOpenedInEditor(SPath path) {
@@ -497,11 +563,11 @@ public class EditorManager extends AbstractActivityProducer
     }
 
     public void removeAllEditorsForPath(SPath path) {
-        editorPool.removeAll(path);
+        editorPool.removeEditor(path);
     }
 
     public void replaceAllEditorsForPath(SPath oldPath, SPath newPath) {
-        editorPool.replaceAll(oldPath, newPath);
+        editorPool.replacePath(oldPath, newPath);
     }
 
     /**
@@ -600,17 +666,16 @@ public class EditorManager extends AbstractActivityProducer
 
         activeEditor = path;
 
-        if (path != null && session.isShared(path.getResource())) {
-            openEditorPaths.add(path);
+        if (path == null || session.isShared(path.getResource())) {
+            editorListenerDispatch
+                .editorActivated(session.getLocalUser(), path);
+
+            fireActivity(new EditorActivity(session.getLocalUser(),
+                EditorActivity.Type.ACTIVATED, path));
+
+            //  generateSelection(path, selection);  //FIXME: add this feature
+            //  generateViewport(path, viewport);    //FIXME:s add this feature
         }
-
-        editorListenerDispatch.editorActivated(session.getLocalUser(), path);
-        fireActivity(new EditorActivity(session.getLocalUser(),
-            EditorActivity.Type.ACTIVATED, path));
-
-        //  generateSelection(path, selection);  //FIXME: add this feature
-        //  generateViewport(path, viewport);    //FIXME:s add this feature
-
     }
 
     /**
@@ -627,8 +692,9 @@ public class EditorManager extends AbstractActivityProducer
                 // follower closed the followed editor (no other editor gets
                 // activated)
                 setFollowing(null);
-                NotificationPanel.showInformation("Follow Mode stopped!",
-                    "You closed the followed editor.");
+                NotificationPanel
+                    .showInformation("You closed the followed editor.",
+                        "Follow Mode stopped!");
             }
         }
 
@@ -865,18 +931,17 @@ public class EditorManager extends AbstractActivityProducer
             @Override
             public void run() {
 
-                if (userEditorStateManager == null) {
-                    return;
+                Set<SPath> editorPaths = new HashSet<>(editorPool.getFiles());
+
+                if (userEditorStateManager != null) {
+                    editorPaths.addAll(userEditorStateManager.getOpenEditors());
                 }
 
-                final Set<SPath> editorPaths = userEditorStateManager
-                    .getOpenEditors();
+                for (SPath editorPath : editorPaths) {
+                    if (project == null || project
+                            .equals(editorPath.getProject())) {
 
-                editorPaths.addAll(openEditorPaths);
-
-                for (final SPath path : editorPaths) {
-                    if (project == null || project.equals(path.getProject())) {
-                        saveFile(path);
+                        saveDocument(editorPath);
                     }
                 }
             }

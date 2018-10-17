@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.server;
 import java.net.URL;
 import java.util.ArrayList;
 
+import de.fu_berlin.inf.dpp.server.console.ServerConsole;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -63,6 +64,10 @@ public class SarosServer {
         connectToXMPPServer();
     }
 
+    public void initConsole(ServerConsole console) {
+        // no commands (yet) to register
+    }
+
     public void stop() {
         context.getComponent(ISarosSessionManager.class).stopSession(
             SessionEndReason.LOCAL_USER_LEFT);
@@ -106,17 +111,24 @@ public class SarosServer {
      * 
      * @param args
      *            command-line arguments
-     * @throws Exception
      */
-    public static void main(String[] args) throws Exception {
-        SarosServer server = new SarosServer();
+    public static void main(String[] args) {
+        final SarosServer server = new SarosServer();
 
         LOG.info("Starting server...");
         server.start();
 
-        System.in.read();
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override public void run() {
+                LOG.info("Stopping server...");
+                server.stop();
+            }
+        }));
 
-        LOG.info("Stopping server...");
-        server.stop();
+        if (ServerConfig.isInteractive()) {
+            ServerConsole console = new ServerConsole(System.in, System.out);
+            server.initConsole(console);
+            console.run();
+        }
     }
 }

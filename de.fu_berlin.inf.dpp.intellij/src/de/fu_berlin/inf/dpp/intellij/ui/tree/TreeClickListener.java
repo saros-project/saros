@@ -15,6 +15,9 @@ import java.awt.event.MouseEvent;
  * Tree click listener for showing {@link ContactPopMenu} or {@link SessionPopMenu}.
  */
 public class TreeClickListener extends MouseAdapter {
+    private static final boolean ENABLE_FOLLOW_MODE = Boolean
+        .getBoolean("saros.intellij.ENABLE_FOLLOW_MODE");
+
     private JTree tree;
 
     @Inject
@@ -56,10 +59,13 @@ public class TreeClickListener extends MouseAdapter {
                     ContactPopMenu menu = new ContactPopMenu(contactInfo);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
-            } else if (
-                node.getUserObject() instanceof SessionTreeRootNode.UserInfo
-                    || node
-                    .getUserObject() instanceof SessionTreeRootNode.SessionInfo) {
+            } else if (node
+                .getUserObject() instanceof SessionTreeRootNode.UserInfo) {
+
+                if (!ENABLE_FOLLOW_MODE) {
+                    return;
+                }
+
                 SessionTreeRootNode.UserInfo userInfo = (SessionTreeRootNode.UserInfo) node
                     .getUserObject();
                 User user = userInfo.getUser();
@@ -68,6 +74,10 @@ public class TreeClickListener extends MouseAdapter {
                     SessionPopMenu menu = new SessionPopMenu(user);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
+            } else if (node
+                .getUserObject() instanceof SessionTreeRootNode.SessionInfo) {
+
+                //TODO implement behavior when clicking on session entry
             }
         }
     }

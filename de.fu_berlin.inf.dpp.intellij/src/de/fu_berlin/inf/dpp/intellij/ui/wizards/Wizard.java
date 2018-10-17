@@ -110,6 +110,15 @@ public abstract class Wizard extends JDialog {
     }
 
     /**
+     * Sets new text for the top panel of the wizard.
+     *
+     * @param text new text of the top panel
+     */
+    void setTopPanelText(String text){
+        headerPanel.setText(text);
+    }
+
+    /**
      * Creates UI. Must only be called explicitly after all pages for the wizard are
      * registered.
      */

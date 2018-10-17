@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>de.fu_berlin.inf.dpp.intellij</id>
     <name>Saros</name>
-    <version>14.1.31.DEVEL</version>
+    <version>0.1.0</version>
     <vendor url="http://www.saros-project.org">Saros Project</vendor>
 
     <description><![CDATA[
@@ -35,18 +35,19 @@
 
     <actions>
         <!-- Add your actions here -->
-        <group id="saros.MainMenu" text="Saros" description="Saros menu">
-            <add-to-group group-id="MainMenu" anchor="last"/>
+        <group id="saros.MainMenu" text="S_aros" description="Saros menu">
+            <add-to-group group-id="MainMenu" relative-to-action="HelpMenu" anchor="before"/>
             <action id="saros.about"
                     class="de.fu_berlin.inf.dpp.intellij.ui.menu.AboutSarosHandler"
-                    text="About Saros"/>
+                    text="_About Saros"/>
         </group>
 
         <group keep-content="true" compact="false" popup="true"
                id="saros.ShareWith"
-               icon="/icons/famfamfam/session_tsk.png" text="Share With..."
+               icon="/icons/famfamfam/session_tsk.png" text="_Share With..."
+               description="Share this module using Saros"
                class="de.fu_berlin.inf.dpp.intellij.ui.menu.SarosFileShareGroup">
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </group>
 
     </actions>

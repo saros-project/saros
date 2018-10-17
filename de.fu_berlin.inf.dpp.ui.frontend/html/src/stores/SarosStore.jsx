@@ -1,5 +1,5 @@
-import { observable, action, computed } from 'mobx'
-import { onlineFirst, getJid } from 'Utils'
+import { action, computed, observable } from 'mobx'
+import { getJid, onlineFirst } from 'Utils'
 
 export default class SarosStore {
   @observable state = {
@@ -10,10 +10,10 @@ export default class SarosStore {
       server: '',
       port: 0,
       useTLS: false,
-      useSASL: false,
+      useSASL: false
     },
     contactList: [],
-    connectionState: 'INITIALIZING',
+    connectionState: 'INITIALIZING'
   }
 
   @observable accounts = []

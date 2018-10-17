@@ -13,7 +13,7 @@ function renderTreeNode (root) {
 @inject(({ core, sessionUI }) => ({
   initialProjectTrees: core.projectTrees,
   setCheckedKeys: sessionUI.setCheckedKeys,
-  checkedKeys: sessionUI.checkedKeys,
+  checkedKeys: sessionUI.checkedKeys
 }))
 @observer
 export default class ChooseFilesStep extends React.Component {
@@ -25,6 +25,7 @@ export default class ChooseFilesStep extends React.Component {
     if (!initialProjectTrees) return null
     return (
       <Tree
+        className='project-tree'
         showLine checkable defaultExpandAll
         selectable={false}
         checkedKeys={Array.from(checkedKeys)}
