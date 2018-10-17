@@ -2,11 +2,10 @@ import 'jsdom-global/register'
 import {
   FakeSarosApi,
   itRendersWithoutExploding,
-  wrapWithContextProvider,
+  wrapWithContextProvider
 } from './utils'
 import { mount } from 'enzyme'
 import { spy } from 'sinon'
-import { traverse } from 'Utils'
 import React from 'react'
 import StartSessionWizardView from '~/components/StartSessionWizardView'
 import initStores from '~/stores'
@@ -31,7 +30,7 @@ describe('<StartSessionWizardView />', () => {
 
     const files = [
       'afile',
-      'somefile',
+      'somefile'
     ]
 
     const treeNodes = wrap.find('TreeNode')
