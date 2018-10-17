@@ -4,18 +4,18 @@ export default class ConfigurationUIStore {
   @observable data = {
     account: {
       jid: '',
-      password: '',
+      password: ''
     },
     settings: {
       autoConnect: true,
       isSkypeUsernameVisible: false,
       skypeUsername: '',
       allowSubmitAnalytics: false,
-      allowSubmitCrashReports: false,
+      allowSubmitCrashReports: false
     },
     color: {
-      selected: null,
-    },
+      selected: null
+    }
   }
 
   assertFieldExists (page, field) {

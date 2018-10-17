@@ -4,14 +4,14 @@ import React from 'react'
 const dict = {
   autoConnect: {
     description: 'Automatically connect to XMPP server on startup?',
-    label: 'Connect automatically',
+    label: 'Connect automatically'
   },
   skype: {
     description: 'Shall your contacts see your Skype username?',
-    label: 'Yes, use:',
+    label: 'Yes, use:'
   },
   gateway: {
-    description: 'TODO',
+    description: 'TODO'
   },
   analytics: {
     description: (
@@ -22,11 +22,11 @@ const dict = {
         We will not collect any personal data. <a href='#'>Tell me more</a>
       </span>
     ),
-    label: 'Allow submission of anonymous statistical data',
+    label: 'Allow submission of anonymous statistical data'
   },
   crashReport: {
-    label: 'Allow submission of crash reports',
-  },
+    label: 'Allow submission of crash reports'
+  }
 }
 
 @inject('configurationUI')

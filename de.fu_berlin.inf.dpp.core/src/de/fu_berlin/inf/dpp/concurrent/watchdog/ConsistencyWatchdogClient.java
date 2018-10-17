@@ -296,6 +296,14 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer
             return true;
         }
 
+        if (!checksum.existsFile() && !existsFileLocally) {
+            LOG.debug(
+                    "Ignoring checksum activity for file that does not exist on both sides: "
+                            + path);
+
+            return false;
+        }
+
         final String editorContent = editorManager.getContent(path);
 
         if (editorContent == null) {

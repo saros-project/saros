@@ -1,8 +1,8 @@
-import React from 'react'
 import { inject } from 'mobx-react'
-import Wizard, { Step } from '../Wizard'
-import ChooseFilesStep from './ChooseFilesStep'
 import ChooseContactsStep from './ChooseContactsStep'
+import ChooseFilesStep from './ChooseFilesStep'
+import React from 'react'
+import Wizard, { Step } from '../Wizard'
 
 @inject('core', 'sessionUI')
 export default class StartSessionWizardView extends React.Component {

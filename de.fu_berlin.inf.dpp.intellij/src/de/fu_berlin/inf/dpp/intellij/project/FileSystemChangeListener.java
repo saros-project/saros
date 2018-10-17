@@ -117,14 +117,14 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         //TODO what happens if the other participant is working on the now renamed file
         if (before) {
             file = oldProject.getFile(oldSPath.getFullPath());
-            editorManager.saveFile(oldSPath);
+            editorManager.saveDocument(oldSPath);
 
             editorManager.replaceAllEditorsForPath(oldSPath, newSPath);
         } else {
             editorManager.replaceAllEditorsForPath(oldSPath, newSPath);
 
             file = project.getFile(newSPath.getFullPath());
-            editorManager.saveFile(newSPath);
+            editorManager.saveDocument(newSPath);
         }
 
         oldProject.removeResource(oldSPath.getProjectRelativePath());

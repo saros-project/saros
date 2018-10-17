@@ -1,10 +1,10 @@
-import React from 'react'
 import './style.css'
 import { Text } from 'react-localize'
 import { action, observable } from 'mobx'
 import { noop } from 'Utils'
 import { observer } from 'mobx-react'
 import P from 'prop-types'
+import React from 'react'
 import cn from 'classnames'
 
 @observer
@@ -14,13 +14,13 @@ export default class Step extends React.Component {
     title: P.string,
     wizard: P.shape({
       hasNext: P.boolean,
-      onClickNext: P.func,
-    }),
+      onClickNext: P.func
+    })
   }
 
   static defaultProps = {
     onClickNext: noop,
-    title: '',
+    title: ''
   }
 
   @observable isValid = true
@@ -75,7 +75,7 @@ export default class Step extends React.Component {
           <button disabled={!hasPrev} className={cn('btn', 'btn-default', !hasPrev && 'disabled')} onClick={wizard.onClickBack}>
             <Text message='action.back' />
           </button>
-          <button id='next-button' className={cn('wizard-next-btn', 'btn', hasNext ? 'btn-default' : 'btn-primary')} onClick={this.onClickNext}>
+          <button className={cn('wizard-next-btn', 'btn', hasNext ? 'btn-next' : 'btn-finish')} onClick={this.onClickNext}>
             <Text message={hasNext ? 'action.next' : 'action.finish'} />
           </button>
         </nav>

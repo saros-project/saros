@@ -5,7 +5,6 @@ import React from 'react'
 @inject('configurationUI')
 @observer
 export default class AccountStep extends React.Component {
-
   onChangeField = (e) => {
     this.props.configurationUI.changeWizardData('account', e.target.name, e.target.value)
   }
