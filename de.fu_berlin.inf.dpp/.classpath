@@ -4,13 +4,24 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry excluding="**/package-info.java" kind="src" path="src"/>
+	<classpathentry kind="src" path="test/stf"/>
 	<classpathentry kind="src" path="test/junit"/>
 	<classpathentry kind="src" path="ext-src"/>
+	<classpathentry kind="src" path="test/framework/stf/src"/>
+	<classpathentry kind="src" path="test/framework/stf/test"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.integration_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.library_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.text_1.1.0.v20090501071000.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.core_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.gef.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.spy_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.forms.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.go_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.junit4_x_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.swt.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
 	<classpathentry kind="lib" path="test/lib/cglib-nodep-2.2.2.jar"/>
 	<classpathentry kind="lib" path="test/lib/easymock-3.1.jar"/>
 	<classpathentry kind="lib" path="test/lib/javassist-3.18.0-GA.jar"/>
