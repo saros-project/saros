@@ -1,6 +1,6 @@
-import React from 'react'
 import { inject, observer } from 'mobx-react'
 import ContactList from '../ContactList'
+import React from 'react'
 
 @inject('sessionUI')
 @observer

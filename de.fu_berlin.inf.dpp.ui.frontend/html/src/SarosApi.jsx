@@ -93,7 +93,7 @@ class SarosApi {
       lightblue: '#9CCFE4',
       brown: '#BEBB88',
       green: '#BEDA69',
-      darkcyan: '#8DB4B1',
+      darkcyan: '#8DB4B1'
     }
   }
 }
