@@ -1,0 +1,9 @@
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/Ui.Frontend'
+    property 'sonar.projectDescription', 'Common Saros User Interface (HTML/JS part)'
+    property 'sonar.projectVersion', '0.1.0.DEVEL'
+    property 'sonar.sources', 'html/src'
+    property 'sonar.exclusion', 'html/src/styles/bootstrap-theme.css'
+  }
+}

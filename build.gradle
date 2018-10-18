@@ -1,0 +1,188 @@
+buildscript
+{
+  repositories {
+    mavenCentral()
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+}
+
+plugins {
+  id "de.monkeyworks.buildmonkey.mavenizer.MavenizerPlugin" version "0.4.2"
+  id 'com.gradle.build-scan' version '1.16'
+  id 'org.sonarqube' version '2.6.2'
+}
+
+// avoid that the buildmonkey plugin triggers verbose ant logging
+ant.lifecycleLogLevel = "ERROR"
+
+(6..8).each { jdkVersion ->
+  if (!project.hasProperty("javaHome$jdkVersion")) {
+    throw new GradleException("Missing gradle property -PjavaHome$jdkVersion that defined the JDK $jdkVersion home directory")
+  }
+}
+
+// Use gradle scan plugin and service in order to visualize build/test failures
+buildScan {
+ termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+ termsOfServiceAgree = 'yes'
+ publishOnFailure()
+}
+
+// Configuration that leads to the conversion of the eclipse home dir
+// (which is also a P2 repository) to a maven repository.
+mavenize {
+  mavenizeTask {
+    useP2MirrorOutput = false
+    sourceP2Repository = System.getenv('ECLIPSE_HOME')
+    targetDir = rootProject.file('build/maven')
+    groupId = 'eclipse-deps'
+  }
+}
+
+sonarqube {
+  properties {
+    property 'sonar.preview.excludePlugins', 'devcockpit, jira, pdfreport, views, report, buildstability, scmactivity, buildbreaker, scmstats'
+    property 'sonar.projectName', 'Saros/Complete'
+    property 'sonar.projectKey', 'saros_complete'
+    property 'sonar.projectDescription', 'The whole Saros product family'
+    property 'sonar.projectVersion', '14.11.28.DEVEL'
+    property 'sonar.cpd.cross_project', 'true'
+  }
+}
+
+ext.projectsToConfigure = subprojects - project(':de.fu_berlin.inf.dpp.ui.frontend')
+// Configurations that are specific to all subprojects
+// de.fu_berlin.inf.dpp.ui.frontend is not a real subproject and contains
+// only a build.gradle in order to allow to scan the sources of this subproject
+configure(projectsToConfigure) { project ->
+
+  apply plugin: 'eclipse'
+  apply plugin: 'java' // default java build plugin
+  apply plugin: 'jacoco' // code coverage tool
+
+  repositories {
+    // required for ui build
+    maven { url 'https://maven.atlassian.com/3rdparty/' }
+    mavenCentral()
+    maven { url 'https://raw.githubusercontent.com/maven-eclipse/swt-repo/master' }
+  }
+
+  configurations {
+    testing // used to reference the testJar
+    testConfig // contains test dependencies that are used by all java subprojects
+    releaseDep // contains all dependencies which has to be included into the release jar/zip
+    // avoid that the whole dependency tree is released
+    releaseDep.transitive = false
+  }
+
+  test {
+
+    // Exclude test suites if property is set. Otherwise tests are executed multiple times
+    // in the ci server (via test class and suite).
+    if (project.hasProperty('skipTestSuites') && skipTestSuites.equalsIgnoreCase("true")) {
+      exclude '**/*TestSuite*'
+    }
+    exclude '**/Abstract*'
+
+    testLogging {
+       showStandardStreams = true
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+  }
+
+  project.ext.log4jVersionBridge = 'org.apache.logging.log4j:log4j-1.2-api:2.11.1' // log4j -> log4j2 bridge
+  project.ext.log4jVersionApi  = 'org.apache.logging.log4j:log4j-api:2.11.1'
+  project.ext.log4jVersionCore = 'org.apache.logging.log4j:log4j-core:2.11.1'
+  project.ext.junitVersion = 'junit:junit:4.11'
+  project.ext.log4jVersion = 'log4j:log4j:1.2.15'
+
+  dependencies {
+    compile (log4jVersion) {
+      exclude group: 'com.sun.jmx', module: 'jmxri'
+      exclude group: 'com.sun.jdmk', module: 'jmxtools'
+      exclude group: 'javax.jms', module: 'jms'
+    }
+
+    testConfig junitVersion
+    testConfig 'org.easymock:easymock:3.1'
+    testConfig 'org.powermock:powermock-easymock-release-full:1.5.1'
+  }
+
+  // generate lib directory that contains all release dependencies
+  // This is necessary to enable eclipse to run the stf tests, because
+  // eclipse uses the path of the MANIFEST.MF and is not compatible with
+  // gradle dependency resolution
+  task generateLib(type: Copy) {
+    into "${project.projectDir}/lib"
+    from project.configurations.releaseDep
+  }
+
+  (6..8).each { jdkVersion ->
+    project.ext."javaHome$jdkVersion" = project.properties."javaHome$jdkVersion"
+  }
+
+  project.ext.eclipseHome = project.hasProperty('eclipseHome') ? eclipseHome : System.getenv('ECLIPSE_HOME')
+  project.ext.intellijHome = project.hasProperty('intellijHome') ? intellijHome : System.getenv('INTELLIJ_HOME')
+}
+
+task clean(type: Delete) {
+  delete 'build'
+}
+
+// remove all build dirs. The frontend package has no build directory
+task cleanAll(dependsOn: projectsToConfigure.collect{":${it.name}:clean"} << 'clean')
+
+task prepareEclipse(dependsOn: projectsToConfigure.collect { [":${it.name}:cleanEclipseProject", ":${it.name}:cleanEclipseClasspath"] }.flatten() +
+                               projectsToConfigure.collect { [":${it.name}:eclipseProject", ":${it.name}:eclipseClasspath"]}.flatten() +
+                               ['mavenizeP2Repository', 'generateLibAll'])
+
+task prepareIntellij(dependsOn: ['mavenizeP2Repository'])
+
+// generate all lib dirs in order to run stf tests
+task generateLibAll(dependsOn:[':de.fu_berlin.inf.dpp.core:generateLib',
+                               ':de.fu_berlin.inf.dpp.ui:generateLib',
+                               ':de.fu_berlin.inf.dpp:generateLib',
+                               ':de.fu_berlin.inf.dpp.whiteboard:generateLib'])
+
+task sarosEclipse(type: Copy, dependsOn: [
+  'mavenizeP2Repository',
+  ':de.fu_berlin.inf.dpp.core:test',
+  ':de.fu_berlin.inf.dpp.ui:test',
+  ':de.fu_berlin.inf.dpp:test',
+  ':de.fu_berlin.inf.dpp:jar',
+  ':de.fu_berlin.inf.dpp.whiteboard:test',
+  ':de.fu_berlin.inf.dpp.whiteboard:jar'
+  ]) {
+  group 'Delivery'
+  description 'Builds and tests all modules required by Saros for Eclipse'
+
+  from project(':de.fu_berlin.inf.dpp.core').jar
+  from project(':de.fu_berlin.inf.dpp.ui').jar
+  from project(':de.fu_berlin.inf.dpp').jar
+  from project(':de.fu_berlin.inf.dpp.whiteboard').jar
+  into 'build/distribution/eclipse'
+}
+
+task sarosServer(type: Copy, dependsOn: [
+  ':de.fu_berlin.inf.dpp.core:test',
+  ':de.fu_berlin.inf.dpp.server:test'
+  ]) {
+  group 'Delivery'
+  description 'Builds and tests all modules required by the Saros Server'
+}
+
+task sarosIntellij(type: Copy, dependsOn: [
+  ':de.fu_berlin.inf.dpp.core:test',
+  ':de.fu_berlin.inf.dpp.ui:test',
+  ':de.fu_berlin.inf.dpp.intellij:test',
+  ':de.fu_berlin.inf.dpp.intellij:buildPlugin'
+  ]) {
+  group 'Delivery'
+  description 'Builds and tests all modules required by Saros for Intellij'
+
+  from project(':de.fu_berlin.inf.dpp.intellij').configurations.archives.artifacts.files
+  include '*.zip'
+  into 'build/distribution/intellij'
+}
