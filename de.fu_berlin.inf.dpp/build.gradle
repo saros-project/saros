@@ -173,12 +173,6 @@ jar {
     include 'LICENSE'
     include 'CHANGELOG'
   }
-
-  into('META-INF')
-  {
-    from 'META-INF'
-    include 'stun-config.xml'
-  }
 }
 
 sonarqube {
