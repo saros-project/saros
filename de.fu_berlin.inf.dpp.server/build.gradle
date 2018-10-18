@@ -1,0 +1,25 @@
+dependencies {
+  compile project(':de.fu_berlin.inf.dpp.core')
+  compile 'org.apache.commons:commons-collections4:4.2'
+  testCompile configurations.testConfig
+}
+
+sourceCompatibility = '1.7'
+tasks.withType(JavaCompile) {
+  options.fork = true
+  options.encoding = 'UTF-8'
+  options.forkOptions.executable = project.ext.javaHome7 + File.separator + 'bin' + File.separator + 'javac'
+}
+
+sourceSets {
+  main.java.srcDir 'src'
+  test.java.srcDir 'test/junit'
+}
+
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/Server'
+    property 'sonar.projectDescription', 'Standalone Saros Server'
+    property 'sonar.projectVersion', '0.1.0.DEVEL'
+  }
+}

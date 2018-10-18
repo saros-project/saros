@@ -5,6 +5,10 @@ sudo: enabled
 git:
   depth: false
 
+# Override the install default behavior that calls gradle assemble
+install:
+- true
+
 notifications:
   email:
     on_success: never
@@ -13,11 +17,11 @@ notifications:
 services: docker
 
 # Sonar token is encrypted via travis encrypt
-addons:
-  sonarcloud:
-    organization: "saros"
-    token:
-      secure: "i9qx/WK3iDm96WGznDUVIJ7PXSUqwE3qg4ZjGkrbtVQ3wshfya9K4G7A4ll7jLIQ+m1ZhW3H5v1yamNFlOUj1xQ88BJt+sHU674cRASpWePk+TQSTEHvtGut35n17Ibl9rrtQyqxi3TlrqMSlpxiThSoVqJ0XBJnvrGt4dkMO9FWm4f43Jj5MdO0AJKdwthAmJT+bR6xhYFgIOjAwJOYZ3doRNkR8cLBU9QPkzeZC7hUVFwVT8DWNSBQUz3iNuhSzzxfpzX8WBqTJuoytJQTgRcS9SULzJ5xPG/KYt+1xkHvpc8yM1l7fyjxjWL4FP3Q3kaXiy09vfQoLAwsQ18EZ2dulQVx2gI7eDGASNEeM0BWri+pKc/anJRRi7gLM/wKkB3vdoSS3EdEbpxyEIz10wIeVN81izgRAZh0TR/3d22Jjt3usm7DBzBTAtqaKuvsgmE5JVZwc4vU+53guXOoax2ZiLdeKamTTsmWBDvn77poQPhkTDfwBL8/GEkvYJoKjjWdbfhcFeNiGlb4Jq8/7BitFXKN6mWMuIcQTsJ8xX7oA3Ics7mAjKsppw+6w6HXsfrB5rczcbbsp8FQb0n4JPsvz+dAbsWz4OT5Zi9Fy8hOu+bosENrFBUEVc42u4BuCUdWWtY122u4jnr2rHoaHMZwlflm6EuJ9FQTWmyorOM="
+env:
+  global:
+    # SONAR_TOKEN
+    secure: "aMWLDDcMN1uxvIHbYK5Tl8Rk7/QkbxSQ21K3S/ZSUIfTnHxZL0mcPbXOuqqwBxD1cTNXf2MeZK96+xzNbesNzWEe2iM0h5MWz8kgjOTAU0a+Hd0giMq+Gb9PWinJDjLTNryK88nG/MSaya9hwMPQJaNH1wwAaCMpfzLa5BxN0GxKBiIF5Kpk3qLpkwGRq6UPgsL8nZ65KYfh2O3uJ5vv4dtEIEEqzsXGTZHi1o0oEbn6dOnRg+8yE8cYgx4GUfHJ9bGNUMr4KCBejCOgMRxXvp5UUh9l0pZnCHqAorSGPr2CS1jq4JxVTrYP6p8Zj4K5w72VcXaEij6lbcPXoGzB+tOKgIEvlKMzXtIiIKCcyEir6/OCoK0U0CuzK1X76sK/JW3tgC9jQxaxqt6GymqicNUFm8dnGv6F2WtMexmViedLTLzsBmg2Uw8WqbsHW8vSUpH0kumvpnZ8pp4Vl9tXqiMOsQ7Z0FOuRHZIPY2eCGaBtpTe2ORUPrCVjB58iYGwfDjbdaZYtR6O+7a895+UEGlnIcpgN4rS1uihC4Nm3GBQFUnJBw7izSvkzqN2qJAjU3MrwJXawUB1bKtrRSPih9RNYyJxID1E7NW7TxNL78ZriKI8Zv/GVQgBo82Oq7UDypgMpK2HqN6utwgiq6tZ40JRpmBS8n2EsYrFAGd/GsE="
+
 
 # Avoid config duplication via yaml anchors
 _stf_setup_config: &stf_before_script
@@ -27,13 +31,10 @@ _stf_setup_config: &stf_before_script
   before_script:
     # Pull required images
     - docker pull saros/build_test:0.1
-    - docker pull saros/stf_test_master:0.1
     - docker pull saros/stf_test_slave:0.1
     - docker pull saros/stf_xmpp_server:0.1
     # Create shared workspace dir which is mounted by the build, master and slave containers
     - mkdir stf_ws
-    # Build required artifacts and move them in the shared workspace
-    - docker run -t -v $PWD:/home/saros/ci/saros_src -v $PWD/stf_ws:/home/saros/ci/stf_ws saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/stf/build/provide_testee.sh
     # Start required containers and services
     - export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf; $PWD/travis/script/stf/setup_stf_container.sh $PWD
 
@@ -45,13 +46,10 @@ jobs:
     - if: type in (push, pull_request)
       before_script: docker pull saros/build_test:0.1
       script:
-        - docker run -v $PWD:/home/saros/ci/saros_src saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/build/build_all.sh
+        - docker run -td --name build -v $PWD:/home/ci/saros_src saros/build_test:0.1 bash
+        - docker exec -t build /home/ci/saros_src/travis/script/build/build_all.sh
       after_success:
-        - sonar-scanner
-      # set env to avoid multiple build executions
+        - docker exec -t build /home/ci/saros_src/travis/script/scan/scan_all.sh $SONAR_TOKEN $TRAVIS_PULL_REQUEST
 
     - <<: *stf_before_script
-      script: docker exec -t stf_master scripts/start_stf_tests.sh
-
-    - <<: *stf_before_script
-      script: docker exec -t stf_master scripts/start_stf_self_tests.sh
+      script: docker exec -t stf_master /home/ci/saros_src/travis/script/stf/master/start_stf_tests.sh
