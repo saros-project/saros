@@ -85,7 +85,12 @@ echo $LD_LIBRARY_PATH
 echo $DISPLAY
 echo $CLASSPATH
 
-$java_cmd \
+$eclipse_dir/eclipse \
+  -name "eclipse_${user}" \
+  -consoleLog \
+  -data "${workspace}" \
+  -vm "$java_cmd" \
+  -vmargs \
   -XX:MaxPermSize=192m -Xms384m -Xmx512m -ea \
   -Djava.rmi.server.codebase="file:${saros_plugin_filename}" \
   -Djava.security.manager \
