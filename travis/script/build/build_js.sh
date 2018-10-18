@@ -1,9 +1,7 @@
 #!/bin/bash -e
 
 [ ! -z "$DEBUG_BASH" ] && set -x
-
-cd $WORKSPACE
-. $SCRIPT_DIR/build/build_utils.sh
+cd /home/ci/saros_src
 
 ui_package_json="de.fu_berlin.inf.dpp.ui.frontend/html/package.json"
 if [ -f "$ui_package_json" ]; then
