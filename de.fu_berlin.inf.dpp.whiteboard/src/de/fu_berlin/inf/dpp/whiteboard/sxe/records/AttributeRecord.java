@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
 
+import com.google.gson.annotations.Expose;
+
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.CommittedRecordException;
 
@@ -22,14 +24,15 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.CommittedRecordException;
  */
 public class AttributeRecord extends NodeRecord {
 
-    protected String currentChdata;
+    @Expose
+    protected String chdata;
 
     public AttributeRecord(DocumentRecord documentRecord) {
         super(documentRecord, NodeType.ATTR);
     }
 
     public String getChdata() {
-        return currentChdata;
+        return chdata;
 
     }
 
@@ -37,15 +40,15 @@ public class AttributeRecord extends NodeRecord {
         if (isCommitted())
             throw new CommittedRecordException();
 
-        currentChdata = chdata;
+        this.chdata = chdata;
         initialSet.setChdata(chdata);
     }
 
     @Override
     public void setValuesTo(SetRecord setRecord) {
         if (setRecord.getChdata() != null
-            && !setRecord.getChdata().equals(currentChdata)) {
-            currentChdata = setRecord.getChdata();
+            && !setRecord.getChdata().equals(chdata)) {
+            chdata = setRecord.getChdata();
         }
         super.setValuesTo(setRecord);
     }
@@ -100,7 +103,7 @@ public class AttributeRecord extends NodeRecord {
     @Override
     protected SetRecord getCurrentMutableFields() {
         SetRecord currentState = super.getCurrentMutableFields();
-        currentState.setChdata(currentChdata);
+        currentState.setChdata(chdata);
         return currentState;
     }
 

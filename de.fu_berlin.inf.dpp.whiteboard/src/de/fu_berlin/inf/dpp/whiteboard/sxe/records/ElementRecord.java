@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.google.gson.annotations.Expose;
+
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.XMLNotWellFormedException;
@@ -30,7 +32,9 @@ public class ElementRecord extends NodeRecord {
 
     private static final Logger log = Logger.getLogger(ElementRecord.class);
 
+    @Expose
     private final NodeSet<ElementRecord> children = new NodeSet<ElementRecord>();
+    @Expose
     private final AttributeSet attributes = new AttributeSet();
 
     /**
