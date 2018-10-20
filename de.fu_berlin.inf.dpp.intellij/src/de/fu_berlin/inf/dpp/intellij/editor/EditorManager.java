@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
+import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
@@ -454,6 +455,7 @@ public class EditorManager extends AbstractActivityProducer
     private final LocalEditorHandler localEditorHandler;
     private final LocalEditorManipulator localEditorManipulator;
     private final AnnotationManager annotationManager;
+    private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
     private final EditorPool editorPool = new EditorPool();
 
@@ -482,12 +484,14 @@ public class EditorManager extends AbstractActivityProducer
         LocalEditorHandler localEditorHandler,
         LocalEditorManipulator localEditorManipulator, ProjectAPI projectAPI,
         VirtualFileConverter virtualFileConverter,
-        AnnotationManager annotationManager) {
+        AnnotationManager annotationManager,
+        FileReplacementInProgressObservable fileReplacementInProgressObservable) {
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
         this.annotationManager = annotationManager;
+        this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
 
         documentListener = new StoppableDocumentListener(this,
                 virtualFileConverter);
@@ -770,6 +774,20 @@ public class EditorManager extends AbstractActivityProducer
             LOG.warn("local user caused text changes: " + textEdit
                 + " | write access : " + hasWriteAccess + ", session locked : "
                 + isLocked);
+            return;
+        }
+
+        /*
+         * hack to avoid sending activities for changes caused by received
+         * activities during the project negotiation
+         */
+        if (fileReplacementInProgressObservable.isReplacementInProgress()) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace(
+                    "File replacement in progress - Ignoring local activity "
+                        + textEdit);
+            }
+
             return;
         }
 
