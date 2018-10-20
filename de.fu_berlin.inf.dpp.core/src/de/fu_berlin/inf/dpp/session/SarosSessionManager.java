@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationCollector;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.TransferType;
@@ -47,6 +48,7 @@ import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -104,6 +106,10 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   private final ProjectNegotiationObservable currentProjectNegotiations;
 
+  private final ProjectNegotiationCollector nextProjectNegotiation =
+      new ProjectNegotiationCollector();
+  private Thread nextProjectNegotiationWorker;
+
   private XMPPConnectionService connectionService;
 
   private final List<ISessionLifecycleListener> sessionLifecycleListeners =
@@ -127,6 +133,12 @@ public class SarosSessionManager implements ISarosSessionManager {
         @Override
         public void negotiationTerminated(final ProjectNegotiation negotiation) {
           currentProjectNegotiations.remove(negotiation);
+
+          if (currentProjectNegotiations.isEmpty()) {
+            synchronized (nextProjectNegotiation) {
+              nextProjectNegotiation.notifyAll();
+            }
+          }
         }
       };
 
@@ -485,8 +497,56 @@ public class SarosSessionManager implements ISarosSessionManager {
    * @param projectResourcesMapping
    */
   @Override
-  public void addResourcesToSession(Map<IProject, List<IResource>> projectResourcesMapping) {
+  public synchronized void addResourcesToSession(
+      Map<IProject, List<IResource>> projectResourcesMapping) {
+    if (projectResourcesMapping == null) {
+      return;
+    }
 
+    /*
+     * To prevent multiple concurrent negotiations per user. 1. Collect all
+     * new mappings, 2. If active negotiations are running wait till they
+     * finish (collect new mappings in the meantime), 3. Create one
+     * negotiation with all collected resources.
+     */
+
+    nextProjectNegotiation.add(projectResourcesMapping);
+
+    if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
+      return;
+    } else if (currentProjectNegotiations.isEmpty()) {
+      /* shortcut to direct handling */
+      startNextProjectNegotiation();
+      return;
+    }
+
+    /* else create a worker thread */
+    Runnable worker =
+        new Runnable() {
+          @Override
+          public void run() {
+            synchronized (nextProjectNegotiation) {
+              while (!currentProjectNegotiations.isEmpty()) {
+                try {
+                  nextProjectNegotiation.wait();
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+                  return;
+                }
+              }
+            }
+
+            startNextProjectNegotiation();
+          }
+        };
+    nextProjectNegotiationWorker = ThreadUtils.runSafeAsync(log, worker);
+  }
+
+  /**
+   * This method handles new project negotiations for already invited user (not the first in the
+   * process of inviting to the session).
+   */
+  private synchronized void startNextProjectNegotiation() {
     ISarosSession currentSession = session;
 
     if (currentSession == null) {
@@ -506,9 +566,9 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     List<IProject> projectsToShare = new ArrayList<IProject>();
+    Map<IProject, List<IResource>> mapping = nextProjectNegotiation.get();
 
-    for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping.entrySet()) {
-
+    for (Entry<IProject, List<IResource>> mapEntry : mapping.entrySet()) {
       final IProject project = mapEntry.getKey();
       final List<IResource> resourcesList = mapEntry.getValue();
 
@@ -516,8 +576,9 @@ public class SarosSessionManager implements ISarosSessionManager {
       if (!currentSession.isCompletelyShared(project)) {
         String projectID = currentSession.getProjectID(project);
 
-        if (projectID == null)
+        if (projectID == null) {
           projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+        }
 
         currentSession.addSharedResources(project, projectID, resourcesList);
 
@@ -532,7 +593,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     INegotiationHandler handler = negotiationHandler;
-
     if (handler == null) {
       log.warn("could not start a project negotiation because no handler is installed");
       return;
@@ -541,32 +601,30 @@ public class SarosSessionManager implements ISarosSessionManager {
     List<AbstractOutgoingProjectNegotiation> negotiations =
         new ArrayList<AbstractOutgoingProjectNegotiation>();
 
-    synchronized (this) {
-      if (!startStopSessionLock.tryLock()) {
-        log.warn(
-            "could not start a project negotiation because the current session is about to stop");
-        return;
+    if (!startStopSessionLock.tryLock()) {
+      log.warn(
+          "could not start a project negotiation because the current session is about to stop");
+      return;
+    }
+
+    try {
+      for (User user : currentSession.getRemoteUsers()) {
+
+        TransferType type =
+            TransferType.valueOf(
+                currentSession
+                    .getUserProperties(user)
+                    .getString(ProjectNegotiationTypeHook.KEY_TYPE));
+        AbstractOutgoingProjectNegotiation negotiation =
+            negotiationFactory.newOutgoingProjectNegotiation(
+                user.getJID(), type, projectsToShare, this, currentSession);
+
+        negotiation.setNegotiationListener(negotiationListener);
+        currentProjectNegotiations.add(negotiation);
+        negotiations.add(negotiation);
       }
-
-      try {
-        for (User user : currentSession.getRemoteUsers()) {
-
-          TransferType type =
-              TransferType.valueOf(
-                  currentSession
-                      .getUserProperties(user)
-                      .getString(ProjectNegotiationTypeHook.KEY_TYPE));
-          AbstractOutgoingProjectNegotiation negotiation =
-              negotiationFactory.newOutgoingProjectNegotiation(
-                  user.getJID(), type, projectsToShare, this, currentSession);
-
-          negotiation.setNegotiationListener(negotiationListener);
-          currentProjectNegotiations.add(negotiation);
-          negotiations.add(negotiation);
-        }
-      } finally {
-        startStopSessionLock.unlock();
-      }
+    } finally {
+      startStopSessionLock.unlock();
     }
 
     for (AbstractOutgoingProjectNegotiation negotiation : negotiations)
@@ -715,8 +773,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     boolean terminated = false;
 
     while (System.currentTimeMillis() - startTime < NEGOTIATION_TIMEOUT) {
-      if (currentSessionNegotiations.list().isEmpty()
-          && currentProjectNegotiations.list().isEmpty()) {
+      if (currentSessionNegotiations.list().isEmpty() && currentProjectNegotiations.isEmpty()) {
         terminated = true;
         break;
       }
