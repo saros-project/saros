@@ -283,25 +283,38 @@ public class SharedResourcesManager extends AbstractActivityProducer
         //TODO reset the vector time for the old file
     }
 
-    private void handleFileDeletion(FileActivity activity) throws IOException {
-        IFile file = activity.getPath().getFile();
+    private void handleFileDeletion(
+        @NotNull
+            FileActivity activity) throws IOException {
+
+        SPath path = activity.getPath();
+        IFile file = path.getFile();
 
         if (!file.exists()) {
             LOG.warn(
-                "could not delete file " + file + " because it does not exist");
+                "Could not delete file " + file + " as it does not exist.");
+
+            return;
+        }
+
+        if (localEditorHandler.isOpenEditor(path)) {
+            localEditorManipulator.closeEditor(path);
         }
 
         try {
             fileSystemListener.setEnabled(false);
-            FileUtils.delete(file);
-            //HACK: It does not work to disable the fileSystemListener temporarly,
-            //because a fileCreated event will be fired asynchronously,
-            //so we have to add this file to the filter list
-            fileSystemListener
-                .addIncomingFileToFilterFor(file.getLocation().toFile());
+
+            localEditorHandler.saveDocument(path);
+
+            file.delete(DELETION_FLAGS);
+
         } finally {
             fileSystemListener.setEnabled(true);
         }
+
+        annotationManager.removeAnnotations(file);
+
+        //TODO reset the vector time for the deleted file
     }
 
     private void handleFileCreation(FileActivity activity) throws IOException {
