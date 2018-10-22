@@ -65,30 +65,23 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     @Override
     public void start() {
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+        ApplicationManager.getApplication().invokeAndWait(() -> {
 
-            @Override
-            public void run() {
-                sarosSession.addActivityProducer(SharedResourcesManager.this);
-                sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
-                intelliJWorkspaceImpl.addResourceListener(fileSystemListener);
+            sarosSession.addActivityProducer(SharedResourcesManager.this);
+            sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
+            intelliJWorkspaceImpl.addResourceListener(fileSystemListener);
 
-            }
         }, ModalityState.defaultModalityState());
     }
 
     @Override
     public void stop() {
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+        ApplicationManager.getApplication().invokeAndWait(() -> {
 
-            @Override
-            public void run() {
-                intelliJWorkspaceImpl
-                    .removeResourceListener(fileSystemListener);
-                sarosSession
-                    .removeActivityProducer(SharedResourcesManager.this);
-                sarosSession.removeActivityConsumer(consumer);
-            }
+            intelliJWorkspaceImpl.removeResourceListener(fileSystemListener);
+            sarosSession.removeActivityProducer(SharedResourcesManager.this);
+            sarosSession.removeActivityConsumer(consumer);
+
         }, ModalityState.defaultModalityState());
     }
 
@@ -187,7 +180,10 @@ public class SharedResourcesManager extends AbstractActivityProducer
         }
     }
 
-    private void handleFileRecovery(FileActivity activity) throws IOException {
+    private void handleFileRecovery(
+        @NotNull
+            FileActivity activity) throws IOException {
+
         SPath path = activity.getPath();
 
         LOG.debug("performing recovery for file: " + activity.getPath()
@@ -197,9 +193,9 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
         try {
             if (type == FileActivity.Type.CREATED) {
+                //TODO handle case if file already exists and only content needs to be recovered
                 handleFileCreation(activity);
             } else if (type == FileActivity.Type.REMOVED) {
-                localEditorManipulator.closeEditor(path);
                 handleFileDeletion(activity);
             } else {
                 LOG.warn("performing recovery for type " + type
@@ -208,7 +204,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         } finally {
             /*
              * always reset Jupiter or we will get into trouble because the
-             * vector time is already reseted on the host
+             * vector time has already been reset on the host
              */
             sarosSession.getConcurrentDocumentClient().reset(path);
         }
