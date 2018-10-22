@@ -6,11 +6,13 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
+
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +21,6 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class SarosFileShareGroup extends ActionGroup {
     @Override
     public AnAction[] getChildren(
         @Nullable
-        AnActionEvent e) {
+            AnActionEvent e) {
         // This has to be initialized here, because doing it in the
         // constructor would be too early. The lifecycle is not
         // running yet when this class is instantiated.
@@ -85,6 +86,7 @@ public class SarosFileShareGroup extends ActionGroup {
     }
 
     private boolean isSharableResource(AnActionEvent e) {
+        //FIXME also returns null when a module with multiple roots is selected
         // Don't allow to share any file or folder other than a module
         if (e.getDataContext().getData(DataKeys.MODULE_CONTEXT.getName())
             == null) {
@@ -94,24 +96,35 @@ public class SarosFileShareGroup extends ActionGroup {
         Project project = e.getData(DataKeys.PROJECT);
         Module module = e.getData(DataKeys.MODULE);
 
-        if (project == null || module == null)
+        if (project == null || module == null || project.getName()
+            .equalsIgnoreCase(module.getName())) {
+
+            return false;
+        }
+
+        String moduleName = module.getName();
+
+        try {
+            new IntelliJProjectImplV2(module);
+
+        } catch (IllegalArgumentException exception) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Ignoring module " + moduleName + " as it does "
+                    + "not meet the current release restrictions.", exception);
+            }
+
             return false;
 
-        // Only allow modules to be shared, that are directly in the project folder
+        } catch (IllegalStateException exception) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Ignoring module " + moduleName + " as an error "
+                        + "occurred while trying to create an IProject object.",
+                    exception);
+            }
 
-        /*
-            FIXME module.getModuleFile() always returns  null for new created modules
-            Only switching to another Application Window will resolve the issue
-         */
-
-        VirtualFile moduleFile = module.getModuleFile();
-
-        if (moduleFile == null)
             return false;
+        }
 
-        // FIXME do not play with the filesystem here, there should be a better way
-        return project.getName()
-            .equals(moduleFile.getParent().getParent().getName());
-
+        return true;
     }
 }
