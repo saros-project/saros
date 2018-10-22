@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.intellij.project;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.vfs.encoding.EncodingProjectManager;
 
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
@@ -32,7 +31,7 @@ import org.picocontainer.Startable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
 
 /**
  * The SharedResourcesManager creates and handles file and folder activities.
@@ -317,47 +316,27 @@ public class SharedResourcesManager extends AbstractActivityProducer
         //TODO reset the vector time for the deleted file
     }
 
-    private void handleFileCreation(FileActivity activity) throws IOException {
+    private void handleFileCreation(
+        @NotNull
+            FileActivity activity) throws IOException {
 
-        String encodingString = activity.getEncoding() == null ?
-            EncodingProjectManager.getInstance().getDefaultCharset().name() :
-            activity.getEncoding();
+        SPath path = activity.getPath();
+        IFile file = path.getFile();
 
-        //FIXME: Test if updateEncoding method will be necessary
-        String newText = new String(activity.getContent(), encodingString);
+        if (file.exists()) {
+            LOG.warn(
+                "Could not create file " + file + " as it already exists.");
 
-        //if the file exists, try to replace the content completely
-        if (!newText.isEmpty()) {
-            //this is true only when the file already existed
-            boolean replaceSuccessful = localEditorManipulator
-                .replaceText(activity.getPath(), newText);
-
-            if (replaceSuccessful) {
-                //If the content of the existing document was replaced
-                //successfully, save the file
-                localEditorHandler.saveDocument(activity.getPath());
-                return;
-            }
-        }
-
-        //If the file did not exist, create it
-        IFile file = activity.getPath().getFile();
-        byte[] actualContent = FileUtils.getLocalFileContent(file);
-        byte[] newContent = activity.getContent();
-
-        if (Arrays.equals(newContent, actualContent)) {
-            LOG.info("FileActivity " + activity + " dropped (same content)");
             return;
         }
 
+        InputStream contents = new ByteArrayInputStream(activity.getContent());
+
         try {
             fileSystemListener.setEnabled(false);
-            FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
-            //HACK: It does not work to disable the fileSystemListener temporarily,
-            //because a fileCreated event will be fired asynchronously,
-            //so we have to add this file to the filter list
-            fileSystemListener
-                .addIncomingFileToFilterFor(file.getLocation().toFile());
+
+            file.create(contents, FORCE);
+
         } finally {
             fileSystemListener.setEnabled(true);
         }
