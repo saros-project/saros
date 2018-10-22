@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.intellij.project;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.vfs.encoding.EncodingProjectManager;
+
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
@@ -12,12 +13,11 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.intellij.editor.SelectedEditorState;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -25,7 +25,9 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.picocontainer.Startable;
 
 import java.io.ByteArrayInputStream;
@@ -40,6 +42,9 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     private static final Logger LOG = Logger
         .getLogger(SharedResourcesManager.class);
+
+    private static final int DELETION_FLAGS = 0;
+    private static final boolean FORCE = false;
 
     private final ISarosSession sarosSession;
 
@@ -56,6 +61,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
     private final LocalEditorManipulator localEditorManipulator;
 
     private final IntelliJWorkspaceImpl intelliJWorkspaceImpl;
+
+    private final AnnotationManager annotationManager;
 
     @Override
     public void start() {
@@ -91,7 +98,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
         FileReplacementInProgressObservable fileReplacementInProgressObservable,
         LocalEditorHandler localEditorHandler,
         LocalEditorManipulator localEditorManipulator,
-        IntelliJWorkspaceImpl intelliJWorkspaceImpl) {
+        IntelliJWorkspaceImpl intelliJWorkspaceImpl,
+        AnnotationManager annotationManager) {
 
         this.sarosSession = sarosSession;
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
@@ -99,6 +107,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         this.localEditorManipulator = localEditorManipulator;
         fileSystemListener = new FileSystemChangeListener(this, editorManager);
         this.intelliJWorkspaceImpl = intelliJWorkspaceImpl;
+        this.annotationManager = annotationManager;
     }
 
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
@@ -153,14 +162,15 @@ public class SharedResourcesManager extends AbstractActivityProducer
         }
     };
 
-    private void handleFileActivity(FileActivity activity) throws IOException {
+    private void handleFileActivity(
+        @NotNull
+            FileActivity activity) throws IOException {
 
         if (activity.isRecovery()) {
             handleFileRecovery(activity);
             return;
         }
 
-        // TODO check if we should open / close existing editors here too
         switch (activity.getType()) {
         case CREATED:
             handleFileCreation(activity);
@@ -171,6 +181,10 @@ public class SharedResourcesManager extends AbstractActivityProducer
         case MOVED:
             handleFileMove(activity);
             break;
+        default:
+            throw new UnsupportedOperationException(
+                "FileActivity type " + activity.getType()
+                    + " not supported. Dropped activity: " + activity);
         }
     }
 
@@ -201,28 +215,72 @@ public class SharedResourcesManager extends AbstractActivityProducer
         }
     }
 
-    private void handleFileMove(FileActivity activity) throws IOException {
+    /**
+     * Applies the given move FileActivity. Subsequently cleans up the
+     * EditorPool and AnnotationManager for the moved file if necessary.
+     *
+     * @param activity the move activity to execute
+     * @throws IOException if the creation of the new file or the deletion of
+     *                     the old file fails
+     */
+    private void handleFileMove(
+        @NotNull
+            FileActivity activity) throws IOException {
+
         SPath oldPath = activity.getOldPath();
         SPath newPath = activity.getPath();
 
-        IntelliJProjectImpl oldProject =
-            (IntelliJProjectImpl) oldPath.getProject();
-        IntelliJProjectImpl newProject =
-            (IntelliJProjectImpl) newPath.getProject();
+        IFile oldFile = oldPath.getFile();
+        IFile newFile = newPath.getFile();
 
-        IPath newFilePath = newPath.getFullPath();
+        if (!oldFile.exists()) {
+            LOG.warn("Could not move file " + oldFile + " as it does not exist."
+                + " source: " + oldFile + " destination: " + newFile);
 
-        localEditorHandler.saveDocument(oldPath);
-        localEditorHandler.removeEditor(oldPath);
+            return;
+        }
+
+        boolean fileOpen = localEditorHandler.isOpenEditor(oldPath);
+
+        SelectedEditorState selectedEditorState = null;
+
+        if (fileOpen) {
+            selectedEditorState = new SelectedEditorState();
+            selectedEditorState.captureState();
+        }
+
         localEditorManipulator.closeEditor(oldPath);
 
-        FileUtils.mkdirs(new IntelliJFileImpl(newProject,newFilePath.toFile()));
-        FileUtils.move(newFilePath, oldPath.getResource());
+        annotationManager.updateAnnotationPath(oldFile, newFile);
 
-        oldProject.removeResource(oldPath.getProjectRelativePath());
-        newProject.addFile(newFilePath.toFile());
+        try {
+            fileSystemListener.setEnabled(false);
 
-        localEditorManipulator.openEditor(newPath,false);
+            localEditorHandler.saveDocument(oldPath);
+
+            newFile.create(oldFile.getContents(), FORCE);
+
+            if (fileOpen) {
+                localEditorManipulator.openEditor(newPath, false);
+
+                try {
+                    selectedEditorState.replaceSelectedFile(oldFile, newFile);
+                } catch (IllegalStateException e) {
+                    LOG.warn(
+                        "Failed to update the captured selected editor state",
+                        e);
+                }
+
+                selectedEditorState.applyCapturedState();
+            }
+
+            oldFile.delete(DELETION_FLAGS);
+
+        } finally {
+            fileSystemListener.setEnabled(true);
+        }
+
+        //TODO reset the vector time for the old file
     }
 
     private void handleFileDeletion(FileActivity activity) throws IOException {
