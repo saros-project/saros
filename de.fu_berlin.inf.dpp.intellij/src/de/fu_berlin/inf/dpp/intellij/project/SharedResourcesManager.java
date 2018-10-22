@@ -109,21 +109,12 @@ public class SharedResourcesManager extends AbstractActivityProducer
                 return;
             }
 
-        /*
-         * FIXME this will lockout everything. File changes made in the
-         * meantime from another background job are not recognized. See
-         * AddMultipleFilesTest STF test which fails randomly.
-         */
-            fileReplacementInProgressObservable.startReplacement();
-            fileSystemListener.setEnabled(false);
-            super.exec(activity);
-
-            LOG.trace("execing " + activity + " in " + Thread.currentThread()
+            LOG.trace("executing " + activity + " in " + Thread.currentThread()
                 .getName());
 
-            fileReplacementInProgressObservable.replacementDone();
-            fileSystemListener.setEnabled(true);
-            LOG.trace("done execing " + activity);
+            super.exec(activity);
+
+            LOG.trace("done executing " + activity);
         }
 
         @Override
