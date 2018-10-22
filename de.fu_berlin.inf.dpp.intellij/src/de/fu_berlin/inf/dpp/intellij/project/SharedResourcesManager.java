@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
@@ -44,6 +43,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     private static final int DELETION_FLAGS = 0;
     private static final boolean FORCE = false;
+    private static final boolean LOCAL = false;
 
     private final ISarosSession sarosSession;
 
@@ -145,7 +145,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         @Override
         public void receive(FolderCreatedActivity activity) {
             try {
-                handleFolderActivity(activity);
+                handleFolderCreation(activity);
             } catch (IOException e) {
                 LOG.error("Failed to execute activity: " + activity, e);
             }
@@ -154,7 +154,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         @Override
         public void receive(FolderDeletedActivity activity) {
             try {
-                handleFolderActivity(activity);
+                handleFolderDeletion(activity);
             } catch (IOException e) {
                 LOG.error("Failed to execute activity: " + activity, e);
             }
@@ -342,29 +342,60 @@ public class SharedResourcesManager extends AbstractActivityProducer
         }
     }
 
-    private void handleFolderActivity(IFileSystemModificationActivity activity)
-        throws IOException {
+    private void handleFolderCreation(
+        @NotNull
+            FolderCreatedActivity activity) throws IOException {
 
-        SPath path = activity.getPath();
+        IFolder folder = activity.getPath().getFolder();
 
-        IFolder folder = path.getProject()
-            .getFolder(path.getProjectRelativePath());
-        fileSystemListener.setEnabled(false);
-        //HACK: It does not work to disable the fileSystemListener temporarly,
-        //because a fileCreated event will be fired asynchronously,
-        //so we have to add this file to the filter list
+        if (folder.exists()) {
+            LOG.warn(
+                "Could not create folder " + folder + " as it already exist.");
+
+            return;
+        }
+
         try {
-            if (activity instanceof FolderCreatedActivity) {
-                FileUtils.create(folder);
-            } else if (activity instanceof FolderDeletedActivity) {
+            fileSystemListener.setEnabled(false);
 
-                if (folder.exists()) {
-                    FileUtils.delete(folder);
-                }
+            folder.create(FORCE, LOCAL);
 
-            }
-            fileSystemListener
-                .addIncomingFileToFilterFor(folder.getLocation().toFile());
+        } finally {
+            fileSystemListener.setEnabled(true);
+        }
+    }
+
+    /**
+     * Applies the given FolderDeletedActivity.
+     * <p>
+     * <b>NOTE:</b> This currently does not check whether the deleted folder
+     * contains resources outside the session scope. As a result, submodules of
+     * the shared module that are not present for a different participant can be
+     * deleted accidentally through remote activities.
+     * </p>
+     *
+     * @param activity the FolderDeletedActivity to execute
+     * @throws IOException if the folder deletion fails
+     */
+    //TODO deal with children that are not part of the current session (submodules)
+    private void handleFolderDeletion(
+        @NotNull
+            FolderDeletedActivity activity) throws IOException {
+
+        IFolder folder = activity.getPath().getFolder();
+
+        if (!folder.exists()) {
+            LOG.warn(
+                "Could not delete folder " + folder + " as it does not exist.");
+
+            return;
+        }
+
+        try {
+            fileSystemListener.setEnabled(false);
+
+            folder.delete(DELETION_FLAGS);
+
         } finally {
             fileSystemListener.setEnabled(true);
         }
