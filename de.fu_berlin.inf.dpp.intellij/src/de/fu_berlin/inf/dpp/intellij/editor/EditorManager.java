@@ -363,19 +363,16 @@ public class EditorManager extends AbstractActivityProducer
      */
     private void addProjectResources(IProject project) {
         VirtualFile[] openFiles = projectAPI.getOpenFiles();
-        VirtualFile[] activeFiles = projectAPI.getSelectedFiles();
+
+        SelectedEditorState selectedEditorState = new SelectedEditorState();
+        selectedEditorState.captureState();
 
         for(VirtualFile openFile: openFiles){
             localEditorHandler.openEditor(openFile, project,false);
             //TODO create selection activity if there is a current selection
         }
 
-        //TODO consider duplicated open editors during screen splitting
-        //activate editors that were last selected before session start
-        for(int i = activeFiles.length-1; i >= 0; i--) {
-            projectAPI.openEditor(activeFiles[i],true);
-        }
-
+        selectedEditorState.applyCapturedState();
     }
 
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
