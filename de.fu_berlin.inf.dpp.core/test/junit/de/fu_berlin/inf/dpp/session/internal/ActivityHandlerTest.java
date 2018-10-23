@@ -409,7 +409,7 @@ public class ActivityHandlerTest {
         activities.add(EasyMock.createNiceMock(ChecksumActivity.class));
 
         path = EasyMock.createMock(SPath.class);
-        EasyMock.expect(path.getProject()).andStubReturn(project);
+        EasyMock.expect(path.getReferencePoint()).andStubReturn(referencePoint);
         EasyMock.replay(path);
 
         // Assign Targets and Source to activities
