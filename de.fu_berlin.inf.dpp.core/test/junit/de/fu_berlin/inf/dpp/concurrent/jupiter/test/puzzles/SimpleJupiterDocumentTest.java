@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.PathFake;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 
 public class SimpleJupiterDocumentTest extends JupiterTestCase {
@@ -32,12 +32,12 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
     @Test
     public void testExecuteLocalOperations() {
         Algorithm algo = new Jupiter(true);
-        IProject project = createMock(IProject.class);
-        replay(project);
+        IReferencePoint referencePoint = createMock(IReferencePoint.class);
+        replay(referencePoint);
 
         IPath path = new PathFake("dummy");
 
-        Document doc = new Document("abc", project, path);
+        Document doc = new Document("abc", referencePoint, path);
         assertEquals("abc", doc.getDocument());
 
         /* insert one char. */

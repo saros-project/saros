@@ -13,7 +13,6 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -40,7 +39,6 @@ public class SPathConverterTest {
     private static IPath path;
     private static IReferencePoint referencePoint;
     private static IPathFactory pathFactory;
-    private static IProject project;
     private static IReferencePointManager referencePointManager;
 
     @BeforeClass
@@ -55,14 +53,10 @@ public class SPathConverterTest {
         expect(pathFactory.fromString("/foo/src/Main.java"))
             .andStubReturn(path);
 
-        project = EasyMock.createNiceMock(IProject.class);        
-        
         referencePoint = EasyMock.createNiceMock(IReferencePoint.class);
         referencePointManager = EasyMock
             .createNiceMock(IReferencePointManager.class);
-         expect(referencePointManager.get(referencePoint))
-         .andStubReturn(project);
-        EasyMock.replay(pathFactory, referencePoint, path, project,
+        EasyMock.replay(pathFactory, referencePoint, path,
             referencePointManager);
     }
 
