@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
@@ -205,10 +206,13 @@ public class SharedResourcesManager extends AbstractActivityProducer
         SPath oldPath = activity.getOldPath();
         SPath newPath = activity.getPath();
 
+        IReferencePointManager referencePointManager = sarosSession.
+            getComponent(IReferencePointManager.class);
+
         IntelliJProjectImpl oldProject =
-            (IntelliJProjectImpl) oldPath.getProject();
+            (IntelliJProjectImpl) referencePointManager.get(oldPath.getReferencePoint());
         IntelliJProjectImpl newProject =
-            (IntelliJProjectImpl) newPath.getProject();
+            (IntelliJProjectImpl) referencePointManager.get(newPath.getReferencePoint());
 
         IPath newFilePath = newPath.getFullPath();
 
@@ -297,8 +301,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
         SPath path = activity.getPath();
 
-        IFolder folder = path.getProject()
-            .getFolder(path.getRelativePathFromReferencePoint());
+        IFolder folder = path.getFolder();
         fileSystemListener.setEnabled(false);
         //HACK: It does not work to disable the fileSystemListener temporarly,
         //because a fileCreated event will be fired asynchronously,

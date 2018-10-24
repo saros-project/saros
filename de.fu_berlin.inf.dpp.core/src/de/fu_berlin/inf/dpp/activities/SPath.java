@@ -7,7 +7,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
@@ -137,13 +136,6 @@ public class SPath {
     public IFolder getFolder() {
         return referencePointManager.getFolder(referencePoint,
             relativePathFromReferencePoint);
-    }
-
-    /**
-     * Returns the project in which the referenced resource is located.
-     */
-    public IProject getProject() {
-        return referencePointManager.get(referencePoint);
     }
 
     /**

@@ -67,8 +67,13 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     private void generateFolderMove(SPath oldSPath, SPath newSPath,
         boolean before) {
         User user = resourceManager.getSession().getLocalUser();
-        IntelliJProjectImpl project = (IntelliJProjectImpl) oldSPath
-            .getProject();
+
+        IReferencePointManager referencePointManager = resourceManager.getSession()
+            .getComponent(IReferencePointManager.class);
+
+        IntelliJProjectImpl project = (IntelliJProjectImpl) referencePointManager.get(oldSPath
+            .getReferencePoint());
+
         IActivity createActivity = new FolderCreatedActivity(user, newSPath);
         resourceManager.internalFireActivity(createActivity);
 
@@ -86,8 +91,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
                 oldSPath.getFullPath().toOSString() + File.separator + resource
                     .getName())).getSPath();
             SPath newChildSPath = new IntelliJFileImpl(
-                (IntelliJProjectImpl) newSPath.getProject(), new File(
-                newSPath.getFullPath().toOSString() + File.separator + resource
+                (IntelliJProjectImpl) referencePointManager.get(newSPath.getReferencePoint()),
+                new File(newSPath.getFullPath().toOSString() + File.separator + resource
                     .getName())).getSPath();
             if (resource.getType() == IResource.FOLDER) {
                 generateFolderMove(oldChildSPath, newChildSPath, before);
@@ -106,10 +111,15 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     private void generateFileMove(SPath oldSPath, SPath newSPath,
         boolean before) {
         User user = resourceManager.getSession().getLocalUser();
-        IntelliJProjectImpl project = (IntelliJProjectImpl) newSPath
-            .getProject();
-        IntelliJProjectImpl oldProject = (IntelliJProjectImpl) oldSPath
-            .getProject();
+
+        IReferencePointManager referencePointManager = resourceManager.getSession()
+            .getComponent(IReferencePointManager.class);
+
+        IntelliJProjectImpl project = (IntelliJProjectImpl) referencePointManager
+            .get(newSPath.getReferencePoint());
+
+        IntelliJProjectImpl oldProject = (IntelliJProjectImpl) referencePointManager
+            .get(oldSPath.getReferencePoint());
 
         IFile file;
 

@@ -10,8 +10,10 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import org.apache.log4j.Logger;
 
 import java.awt.Color;
@@ -68,8 +70,14 @@ public class LocalEditorManipulator {
             return null;
         }
 
+        IReferencePointManager referencePointManager = manager.getSession()
+            .getComponent(IReferencePointManager.class);
+
+        IReferencePoint referencePoint = path.getReferencePoint();
+
         IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
-            path.getProject().getAdapter(IntelliJProjectImplV2.class);
+            referencePointManager.get(referencePoint).getAdapter(IntelliJProjectImplV2.class);
+
 
         VirtualFile virtualFile = intelliJProject
             .findVirtualFile(path.getRelativePathFromReferencePoint());
@@ -102,8 +110,13 @@ public class LocalEditorManipulator {
 
         LOG.debug("Removed editor for path " + path + " from EditorPool");
 
+        IReferencePointManager referencePointManager = manager.getSession()
+            .getComponent(IReferencePointManager.class);
+
+        IReferencePoint referencePoint = path.getReferencePoint();
+
         IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
-            path.getProject().getAdapter(IntelliJProjectImplV2.class);
+            referencePointManager.get(referencePoint).getAdapter(IntelliJProjectImplV2.class);
 
         VirtualFile virtualFile = intelliJProject
             .findVirtualFile(path.getRelativePathFromReferencePoint());
@@ -162,8 +175,13 @@ public class LocalEditorManipulator {
          * editorPool so we have to create it temporarily here.
          */
         if (doc == null) {
+            IReferencePointManager referencePointManager = manager.getSession()
+                .getComponent(IReferencePointManager.class);
+
+            IReferencePoint referencePoint = path.getReferencePoint();
+
             IntelliJProjectImplV2 module = (IntelliJProjectImplV2)
-                path.getProject().getAdapter(IntelliJProjectImplV2.class);
+                referencePointManager.get(referencePoint).getAdapter(IntelliJProjectImplV2.class);
 
             VirtualFile virtualFile = module
                 .findVirtualFile(path.getRelativePathFromReferencePoint());
