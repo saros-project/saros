@@ -62,9 +62,9 @@ public class StopManagerTest {
             });
     alicesSession.removeActivityConsumer(isA(IActivityConsumer.class));
 
-    alicesAlice = new User(new JID("alice"), true, true, 1, -1);
-    alicesBob = new User(new JID("bob"), false, false, 2, -1);
-    alicesCarl = new User(new JID("carl"), false, false, 3, -1);
+    alicesAlice = new User(new JID("alice"), true, true, false, 1, -1);
+    alicesBob = new User(new JID("bob"), false, false, false, 2, -1);
+    alicesCarl = new User(new JID("carl"), false, false, false, 3, -1);
 
     alicesAlice.setInSession(true);
     alicesBob.setInSession(true);
@@ -102,9 +102,9 @@ public class StopManagerTest {
             });
     bobsSession.removeActivityConsumer(isA(IActivityConsumer.class));
 
-    bobsAlice = new User(new JID("alice"), true, false, 1, -1);
-    bobsBob = new User(new JID("bob"), false, true, 2, -1);
-    bobsCarl = new User(new JID("carl"), false, false, 3, -1);
+    bobsAlice = new User(new JID("alice"), true, false, false, 1, -1);
+    bobsBob = new User(new JID("bob"), false, true, false, 2, -1);
+    bobsCarl = new User(new JID("carl"), false, false, false, 3, -1);
 
     bobsAlice.setInSession(true);
     bobsBob.setInSession(true);
@@ -141,9 +141,9 @@ public class StopManagerTest {
             });
     carlsSession.removeActivityConsumer(isA(IActivityConsumer.class));
 
-    carlsAlice = new User(new JID("alice"), true, false, 1, -1);
-    carlsBob = new User(new JID("bob"), false, false, 2, -1);
-    carlsCarl = new User(new JID("carl"), false, true, 3, -1);
+    carlsAlice = new User(new JID("alice"), true, false, false, 1, -1);
+    carlsBob = new User(new JID("bob"), false, false, false, 2, -1);
+    carlsCarl = new User(new JID("carl"), false, true, false, 3, -1);
 
     carlsAlice.setInSession(true);
     carlsBob.setInSession(true);
@@ -536,7 +536,9 @@ public class StopManagerTest {
   }
 
   private static User rewriteUser(User user) {
-    User copy = new User(user.getJID(), user.isHost(), !user.isLocal(), user.getColorID(), -1);
+    User copy =
+        new User(
+            user.getJID(), user.isHost(), !user.isLocal(), user.isServer(), user.getColorID(), -1);
     copy.setInSession(true);
     return copy;
   }

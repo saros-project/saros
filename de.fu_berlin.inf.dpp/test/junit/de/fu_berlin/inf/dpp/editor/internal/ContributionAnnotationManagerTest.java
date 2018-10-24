@@ -46,7 +46,7 @@ public class ContributionAnnotationManagerTest {
   @Test
   public void testHistoryRemoval() {
 
-    User alice = new User(new JID("alice@test"), false, false, 0, 0);
+    User alice = new User(new JID("alice@test"), false, false, false, 0, 0);
 
     AnnotationModel model = new AnnotationModel();
 
@@ -66,7 +66,7 @@ public class ContributionAnnotationManagerTest {
 
   @Test
   public void testHistoryRemovalAfterRefresh() {
-    User alice = new User(new JID("alice@test"), false, false, 0, 0);
+    User alice = new User(new JID("alice@test"), false, false, false, 0, 0);
 
     AnnotationModel model = new AnnotationModel();
 
@@ -85,8 +85,8 @@ public class ContributionAnnotationManagerTest {
   @Test
   public void testAnnotationSplit() {
 
-    final User alice = new User(new JID("alice@test"), false, false, 0, 0);
-    final User bob = new User(new JID("bob@test"), false, false, 0, 0);
+    final User alice = new User(new JID("alice@test"), false, false, false, 0, 0);
+    final User bob = new User(new JID("bob@test"), false, false, false, 0, 0);
 
     final AnnotationModel model = new AnnotationModel();
 

@@ -48,6 +48,8 @@ public class User {
 
   private final boolean isLocal;
 
+  private final boolean isServer;
+
   private final JID jid;
 
   private volatile int colorID;
@@ -58,11 +60,18 @@ public class User {
 
   private volatile boolean isInSession;
 
-  public User(JID jid, boolean isHost, boolean isLocal, int colorID, int favoriteColorID) {
+  public User(
+      JID jid,
+      boolean isHost,
+      boolean isLocal,
+      boolean isServer,
+      int colorID,
+      int favoriteColorID) {
 
     this.jid = jid;
     this.isHost = isHost;
     this.isLocal = isLocal;
+    this.isServer = isServer;
     this.colorID = colorID;
     this.favoriteColorID = favoriteColorID;
   }
@@ -184,6 +193,11 @@ public class User {
   /** Returns true if this user is not the host. */
   public boolean isClient() {
     return !isHost();
+  }
+
+  /** Returns true if this user is a server instance. */
+  public boolean isServer() {
+    return isServer;
   }
 
   /**

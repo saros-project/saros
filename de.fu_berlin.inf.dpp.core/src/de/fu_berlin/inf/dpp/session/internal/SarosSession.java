@@ -49,6 +49,7 @@ import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
+import de.fu_berlin.inf.dpp.session.ServerStatusHook;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
@@ -1069,7 +1070,10 @@ public final class SarosSession implements ISarosSession {
 
     int localColorID = localProperties.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
     int localFavoriteColorID = localProperties.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
-    localUser = new User(localUserJID, host == null, true, localColorID, localFavoriteColorID);
+    boolean localIsServer = localProperties.getBoolean(ServerStatusHook.KEY_IS_SERVER);
+    localUser =
+        new User(
+            localUserJID, host == null, true, localIsServer, localColorID, localFavoriteColorID);
 
     localUser.setInSession(true);
 
@@ -1080,7 +1084,8 @@ public final class SarosSession implements ISarosSession {
     } else {
       int hostColorID = hostProperties.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
       int hostFavoriteColorID = hostProperties.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
-      hostUser = new User(host, true, false, hostColorID, hostFavoriteColorID);
+      boolean hostIsServer = hostProperties.getBoolean(ServerStatusHook.KEY_IS_SERVER);
+      hostUser = new User(host, true, false, hostIsServer, hostColorID, hostFavoriteColorID);
       hostUser.setInSession(true);
       participants.put(hostUser.getJID(), hostUser);
       participants.put(localUser.getJID(), localUser);

@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ServerStatusHook;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.versioning.Compatibility;
 import de.fu_berlin.inf.dpp.versioning.VersionCompatibilityResult;
@@ -461,7 +462,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     int clientColorID = properties.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
     int clientFavoriteColorID = properties.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
-    User user = new User(getPeer(), false, false, clientColorID, clientFavoriteColorID);
+    boolean isServer = properties.getBoolean(ServerStatusHook.KEY_IS_SERVER);
+    User user = new User(getPeer(), false, false, isServer, clientColorID, clientFavoriteColorID);
 
     synchronized (REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE) {
       sarosSession.addUser(user, properties);

@@ -48,8 +48,8 @@ public class SessionNegotiationTest {
   private static final JID ALICE = new JID("alice@test/Saros");
   private static final JID BOB = new JID("bob@test/Saros");
 
-  private static final User HOST = new User(ALICE, true, true, 0, 0);
-  private static final User INVITEE = new User(BOB, true, true, 0, 0);
+  private static final User HOST = new User(ALICE, true, true, false, 0, 0);
+  private static final User INVITEE = new User(BOB, true, true, false, 0, 0);
 
   private volatile Thread aliceNegotiationThread;
   private volatile Thread bobNegotiationThread;
