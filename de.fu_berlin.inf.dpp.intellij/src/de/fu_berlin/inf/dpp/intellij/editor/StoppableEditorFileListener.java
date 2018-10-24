@@ -134,6 +134,8 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
      */
     void unsubscribe(){
         messageBusConnection.disconnect();
+
+        messageBusConnection = null;
     }
 
     /**
