@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.0"?>
+<?eclipse version="4.6"?>
 
 <plugin>
     <extension
@@ -569,7 +569,7 @@
       <handler
       class="de.fu_berlin.inf.dpp.ui.commandHandlers.ShareProjectHandler"
             commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource">
-         <activeWhen>
+         <enabledWhen>
             <and>
                <reference
                      definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
@@ -580,7 +580,7 @@
                   </reference>
                </not>
             </and>
-         </activeWhen>
+         </enabledWhen>
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionLeaveHandler"

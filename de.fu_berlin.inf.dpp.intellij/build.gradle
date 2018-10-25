@@ -11,14 +11,6 @@ buildscript {
 
 apply plugin: 'org.jetbrains.intellij'
 
-sourceCompatibility = '1.8'
-tasks.withType(JavaCompile) {
-  options.fork = true
-  options.encoding = 'UTF-8'
-  options.forkOptions.executable = project.ext.javaHome8 + File.separator + 'bin' + File.separator + 'javac'
-}
-
-
 dependencies {
   compile project(':de.fu_berlin.inf.dpp.core')
   compile project(':de.fu_berlin.inf.dpp.ui')
@@ -89,25 +81,33 @@ intellij {
   configureDefaultDependencies = false
 
   // determine new sandbox dir that is not locked
-//  Integer sandboxCount = 1
-//  File currentSandboxDir = getSandboxDir(sandboxCount)
-//  while (isSandboxLocked(currentSandboxDir)) {
-//    sandboxCount++
-//    currentSandboxDir = getSandboxDir(sandboxCount)
-//  }
-//  lockSandbox(currentSandboxDir)
-//  project.ext.intellijSandboxDir = currentSandboxDir
-//  sandboxDirectory = currentSandboxDir
+  Integer sandboxCount = 1
+  File currentSandboxDir = getSandboxDir(sandboxCount)
+  while (isSandboxLocked(currentSandboxDir)) {
+    sandboxCount++
+    currentSandboxDir = getSandboxDir(sandboxCount)
+  }
+  project.ext.intellijSandboxDir = currentSandboxDir
+  sandboxDirectory = currentSandboxDir
 }
 
-// remove lock file if sandbox is closed
-task cleanIntellijSandbox {
+task lockIntellijSandbox {
   doLast {
-    new File(intellijSandboxDir, intellijLockFileName).delete()
+    File sandboxDir = project.ext.intellijSandboxDir
+    sandboxDir.mkdirs()
+    new File(sandboxDir, intellijLockFileName).createNewFile()
   }
 }
 
-runIde.finalizedBy(cleanIntellijSandbox)
+// remove lock file if sandbox is closed
+task unlockIntellijSandbox {
+  doLast {
+    new File(project.ext.intellijSandboxDir, intellijLockFileName).delete()
+  }
+}
+
+runIde.dependsOn(lockIntellijSandbox)
+runIde.finalizedBy(unlockIntellijSandbox)
 
 afterEvaluate {
   dependencies {
