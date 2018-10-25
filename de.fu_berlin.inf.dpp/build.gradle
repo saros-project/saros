@@ -38,13 +38,6 @@ configurations {
   stfTest
 }
 
-sourceCompatibility = '1.6'
-tasks.withType(JavaCompile) {
-  options.fork = true
-  options.encoding = 'UTF-8'
-  options.forkOptions.executable = project.ext.javaHome6 + File.separator + 'bin' + File.separator + 'javac'
-}
-
 sourceSets {
   main.java.srcDirs = ['src',
                        'ext-src',
@@ -130,6 +123,19 @@ task stfTest (type: Test, dependsOn: [':de.fu_berlin.inf.dpp:build']) {
     showStandardStreams = true
     events "started", "passed", "skipped", "failed", "standardOut", "standardError"
   }
+  // Print summary of failed tests
+  ext.failedStfTests = []
+  afterTest { descriptor, result ->
+    if(result.resultType == org.gradle.api.tasks.testing.TestResult.ResultType.FAILURE){
+      ext.failedStfTests << "${descriptor.className}.${descriptor.name}"
+    }
+  }
+  afterSuite { suite, result ->
+    if (!suite.parent && !ext.failedStfTests.isEmpty()) {
+      logger.lifecycle("Failed tests:")
+      ext.failedStfTests.each { logger.lifecycle(it) }
+    }
+  }
 
   include '**/stf/test/**/*Test.*'
   exclude '**/stf/test/stf/**'
@@ -174,6 +180,8 @@ jar {
     include 'CHANGELOG'
   }
 }
+
+compileJava.dependsOn rootProject.mavenizeP2Repository
 
 sonarqube {
   properties {

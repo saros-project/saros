@@ -16,6 +16,7 @@ public interface Constants {
     }
 
     public static final String CONFIRM_DELETE = "Confirm Delete";
+    public static final String DELETE = "Delete";
     public static final String SHELL_COPY_PROJECT = "Copy Project";
     public static final String SHELL_DELETING_ACTIVE_ACCOUNT = "Deleting active account";
 

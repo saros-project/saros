@@ -16,4 +16,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/log4j-1.2.15.jar,
  lib/gson-2.3.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

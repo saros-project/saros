@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Saros Core
 Bundle-SymbolicName: de.fu_berlin.inf.dpp.core
 Bundle-Version: 0.1.0
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.thoughtworks.xstream,
  com.thoughtworks.xstream.annotations,
  com.thoughtworks.xstream.converters,

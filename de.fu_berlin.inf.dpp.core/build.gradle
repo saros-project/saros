@@ -27,13 +27,6 @@ dependencies {
   testCompile configurations.testConfig
 }
 
-sourceCompatibility = '1.6'
-tasks.withType(JavaCompile) {
-  options.fork = true
-  options.encoding = 'UTF-8'
-  options.forkOptions.executable = project.ext.javaHome6 + File.separator + 'bin' + File.separator + 'javac'
-}
-
 sourceSets.main.java.srcDirs = ['src', 'patches']
 sourceSets.test.java.srcDir 'test/junit'
 

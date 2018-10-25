@@ -138,7 +138,7 @@ function setup_container_slave()
 
     for i in "${!users[@]}"; do
       echo "Starting vnc server on $slave_name with display $display"
-      docker exec -d "$slave_name" vncserver
+      docker exec -d "$slave_name" vncserver -geometry 1280x960
       wait_for_xfwm 100 10 $display $slave_name
 
       echo "Starting eclipse on $slave_name with display $display, user ${users[$i]} and port ${ports[$i]}"
