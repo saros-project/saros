@@ -65,7 +65,7 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
 
     @Override
     public IRemoteBotView view(String viewTitle) throws RemoteException {
-        view.setWidget(swtWorkBenchBot.viewByTitle(viewTitle));
+        view.setWidget(swtWorkBenchBot.viewByPartName(viewTitle));
         return view;
     }
 

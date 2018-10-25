@@ -133,10 +133,12 @@ public final class NewC extends StfRemoteObject implements INewC {
      **************************************************************/
 
     private void confirmShellNewJavaClass(String className) {
+        final String defaultPkg = "";
 
         SWTBotShell shell = new SWTBot().shell(SHELL_NEW_JAVA_CLASS);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NAME).setText(className);
+        shell.bot().textWithLabel(LABEL_PACKAGE).setText(defaultPkg);
         shell.bot().button(FINISH).click();
         shell.bot().waitUntil(Conditions.shellCloses(shell),
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);

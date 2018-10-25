@@ -2,5 +2,5 @@
 
 [ ! -z "$DEBUG_BASH" ] && set -x
 
-/home/ci/saros_src/travis/script/build/build_java.sh
-/home/ci/saros_src/travis/script/build/build_js.sh
+$SCRIPT_DIR/build/build_java.sh
+$SCRIPT_DIR/build/build_js.sh

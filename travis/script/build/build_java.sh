@@ -2,11 +2,9 @@
 
 [ ! -z "$DEBUG_BASH" ] && set -x
 
-# TODO: workaround for intermedia gradle solution
-cd /home/ci/saros_src/
-update-java-alternatives -s /usr/lib/jvm/java-1.8.0-openjdk-amd64
+cd $WORKSPACE
 
-./gradlew -PskipTestSuites=true -PeclipsePluginDir=$ECLIPSE_HOME/plugins -PintellijLibDir=$INTELLIJ_HOME/lib --parallel \
+./gradlew -PskipTestSuites=true -DmaxParallelForks=4 --no-daemon --parallel \
   clean cleanAll \
   sarosEclipse \
   sarosServer \

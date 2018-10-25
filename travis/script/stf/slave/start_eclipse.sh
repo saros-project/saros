@@ -15,7 +15,7 @@ if [ ! -x $java_cmd ]; then
   exit 1
 fi
 
-host_ip=`/sbin/ifconfig eth0 | grep "inet addr" | cut -d ":" -f 2 | cut -d " " -f 1`
+host_ip=`/sbin/ifconfig eth0 | grep "inet" | awk '{print $2}'`
 
 STF_WS=/stf_ws
 eclipse_dir="/eclipse"

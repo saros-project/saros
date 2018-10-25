@@ -17,12 +17,6 @@ plugins {
 // avoid that the buildmonkey plugin triggers verbose ant logging
 ant.lifecycleLogLevel = "ERROR"
 
-(6..8).each { jdkVersion ->
-  if (!project.hasProperty("javaHome$jdkVersion")) {
-    throw new GradleException("Missing gradle property -PjavaHome$jdkVersion that defined the JDK $jdkVersion home directory")
-  }
-}
-
 // Use gradle scan plugin and service in order to visualize build/test failures
 buildScan {
  termsOfServiceUrl = 'https://gradle.com/terms-of-service'
@@ -66,7 +60,7 @@ configure(projectsToConfigure) { project ->
     // required for ui build
     maven { url 'https://maven.atlassian.com/3rdparty/' }
     mavenCentral()
-    maven { url 'https://raw.githubusercontent.com/maven-eclipse/swt-repo/master' }
+    maven { url 'http://maven-eclipse.github.io/maven' }
   }
 
   configurations {
@@ -92,9 +86,6 @@ configure(projectsToConfigure) { project ->
     }
   }
 
-  project.ext.log4jVersionBridge = 'org.apache.logging.log4j:log4j-1.2-api:2.11.1' // log4j -> log4j2 bridge
-  project.ext.log4jVersionApi  = 'org.apache.logging.log4j:log4j-api:2.11.1'
-  project.ext.log4jVersionCore = 'org.apache.logging.log4j:log4j-core:2.11.1'
   project.ext.junitVersion = 'junit:junit:4.11'
   project.ext.log4jVersion = 'log4j:log4j:1.2.15'
 
@@ -119,17 +110,10 @@ configure(projectsToConfigure) { project ->
     from project.configurations.releaseDep
   }
 
-  (6..8).each { jdkVersion ->
-    project.ext."javaHome$jdkVersion" = project.properties."javaHome$jdkVersion"
-  }
-
   project.ext.eclipseHome = project.hasProperty('eclipseHome') ? eclipseHome : System.getenv('ECLIPSE_HOME')
   project.ext.intellijHome = project.hasProperty('intellijHome') ? intellijHome : System.getenv('INTELLIJ_HOME')
 }
 
-task clean(type: Delete) {
-  delete 'build'
-}
 
 // remove all build dirs. The frontend package has no build directory
 task cleanAll(dependsOn: projectsToConfigure.collect{":${it.name}:clean"} << 'clean')
@@ -140,8 +124,18 @@ task prepareEclipse(dependsOn: projectsToConfigure.collect { [":${it.name}:clean
 
 task prepareIntellij(dependsOn: ['mavenizeP2Repository'])
 
+task cleanGenerateLibAll {
+  doLast {
+    project(':de.fu_berlin.inf.dpp').file('lib').deleteDir()
+    project(':de.fu_berlin.inf.dpp.core').file('lib').deleteDir()
+    project(':de.fu_berlin.inf.dpp.whiteboard').file('lib').deleteDir()
+    project(':de.fu_berlin.inf.dpp.ui').file('lib').deleteDir()
+  }
+}
+
 // generate all lib dirs in order to run stf tests
-task generateLibAll(dependsOn:[':de.fu_berlin.inf.dpp.core:generateLib',
+task generateLibAll(dependsOn:['cleanGenerateLibAll',
+                               ':de.fu_berlin.inf.dpp.core:generateLib',
                                ':de.fu_berlin.inf.dpp.ui:generateLib',
                                ':de.fu_berlin.inf.dpp:generateLib',
                                ':de.fu_berlin.inf.dpp.whiteboard:generateLib'])

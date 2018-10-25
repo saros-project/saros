@@ -5,7 +5,7 @@
 login=$1
 pull_request=$2
 
-cd /home/ci/saros_src
+cd $WORKSPACE
 
 if [ -z "$login" ]; then
   echo "Skipping sonar scan, because the login token is not available"
@@ -19,8 +19,6 @@ fi
 properties+="-Dsonar.login=$login "
 properties+="-Dsonar.verbose=true "
 properties+="-PskipTestSuites=true "
-properties+="-PeclipsePluginDir=$ECLIPSE_HOME/plugins "
-properties+="-PintellijLibDir=$INTELLIJ_HOME/lib "
 
 ./gradlew \
  $properties \
