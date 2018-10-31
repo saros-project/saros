@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.server.filesystem.ServerWorkspaceImpl;
 import de.fu_berlin.inf.dpp.server.net.SubscriptionAuthorizer;
 import de.fu_berlin.inf.dpp.server.preferences.PersistencePreferenceStore;
 import de.fu_berlin.inf.dpp.server.preferences.ServerPreferences;
+import de.fu_berlin.inf.dpp.server.session.JoinSessionRequestHandler;
 import de.fu_berlin.inf.dpp.server.session.NegotiationHandler;
 import de.fu_berlin.inf.dpp.server.session.ServerSessionContextFactory;
 import de.fu_berlin.inf.dpp.server.synchronize.ServerUISynchronizerImpl;
@@ -84,10 +85,10 @@ public class ServerContextFactory extends CoreContextFactory {
   }
 
   private void addAdditionalComponents(MutablePicoContainer c) {
-    // c.addComponent(JoinSessionRequestHandler.class);
     // c.addComponent(ServerFeatureAdvertiser.class);
     c.addComponent(SubscriptionAuthorizer.class);
     c.addComponent(NegotiationHandler.class);
+    c.addComponent(JoinSessionRequestHandler.class);
   }
 
   private IWorkspace createWorkspace() {
