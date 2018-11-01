@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 
 import org.apache.log4j.Logger;
 
@@ -156,7 +157,7 @@ public class LocalEditorHandler {
 
             return null;
 
-        }else if (!manager.getSession().isShared(path.getResource())) {
+        }else if (!SessionUtils.isShared(path)) {
             LOG.debug("Ignored open editor request for file " + virtualFile +
                 " as it is not shared");
 
