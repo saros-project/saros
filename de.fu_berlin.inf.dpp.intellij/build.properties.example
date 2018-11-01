@@ -1,4 +1,0 @@
-idea.home=/var/lib/jenkins/tools/intellij-13.1.1
-jdk.home=/usr/lib/jvm/java-7-oracle
-eclipse.dir=/var/lib/jenkins/tools/eclipse-3.6
-cobertura.dir=/var/lib/jenkins/tools/cobertura-2.1.1
