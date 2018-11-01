@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
@@ -10,6 +11,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -57,7 +60,7 @@ public class LocalEditorManipulator {
      * or <code>null</code> if the file does not exist or is not shared
      */
     public Editor openEditor(SPath path, boolean activate) {
-        if (!manager.getSession().isShared(path.getResource())) {
+        if (!SessionUtils.isShared(path.getResource())) {
             LOG.warn("Ignored open editor request for path " + path +
                 " as it is not shared");
 
