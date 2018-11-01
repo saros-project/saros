@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="smackx">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../de.fu_berlin.inf.dpp.core/lib/smackx-3.4.1-0cec571.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
