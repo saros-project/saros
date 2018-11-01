@@ -27,7 +27,7 @@ public class StoppableDocumentListenerTest {
     @Before
     public void before() {
         mockEditorFactory();
-        listener = new StoppableDocumentListener(dummyEditorManager(), null);
+        listener = new StoppableDocumentListener(dummyEditorManager());
         listening = false;
     }
 

@@ -10,6 +10,7 @@ import com.intellij.util.messages.MessageBusConnection;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,18 +25,15 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
 
     private final BeforeEditorActionListener beforeEditorActionListener;
 
-    private final VirtualFileConverter virtualFileConverter;
     private final AnnotationManager annotationManager;
 
     private MessageBusConnection messageBusConnection;
 
     StoppableEditorFileListener(EditorManager manager,
-        VirtualFileConverter virtualFileConverter,
         AnnotationManager annotationManager) {
 
         super(manager);
 
-        this.virtualFileConverter = virtualFileConverter;
         this.annotationManager = annotationManager;
 
         this.beforeEditorActionListener = new BeforeEditorActionListener();
@@ -60,9 +58,9 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
         Editor editor = editorManager.getLocalEditorHandler()
             .openEditor(virtualFile, false);
 
-        SPath sPath = virtualFileConverter.convertToPath(virtualFile);
+        SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
 
-        if (sPath != null && editor != null) {
+        if (sPath != null && SessionUtils.isShared(sPath) && editor != null) {
             annotationManager.applyStoredAnnotations(sPath.getFile(), editor);
         }
     }
@@ -152,9 +150,9 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
             @NotNull
                 VirtualFile virtualFile) {
 
-            SPath sPath = virtualFileConverter.convertToPath(virtualFile);
+            SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
 
-            if (sPath != null) {
+            if (sPath != null && SessionUtils.isShared(sPath)) {
                 IFile file = sPath.getFile();
 
                 annotationManager.updateAnnotationStore(file);
