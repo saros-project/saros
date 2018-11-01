@@ -1,70 +1,52 @@
 package de.fu_berlin.inf.dpp.intellij.editor;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
+
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.picocontainer.annotations.Inject;
 
 /**
- * Class to convert a VirtualFile of a shared module to a saros resource.
+ * Provides static methods to convert VirtualFiles to Saros resource objects.
  */
 public class VirtualFileConverter {
 
-    private volatile ISarosSession session;
+    private static final Logger log = Logger
+        .getLogger(VirtualFileConverter.class);
 
-    /**
-     * Registers a <code>ISessionLifecycleListener</code> with the given session
-     * manager. This listener is used to obtain the current session object.
-     *
-     * @param sessionManager the session manager
-     */
-    public VirtualFileConverter(
-        @NotNull
-            ISarosSessionManager sessionManager) {
+    @Inject
+    private static Project project;
 
-        sessionManager
-            .addSessionLifecycleListener(new NullSessionLifecycleListener() {
-                @Override
-                public void sessionStarted(ISarosSession session) {
-
-                    setSession(session);
-                }
-
-                @Override
-                public void sessionEnded(ISarosSession session,
-                    SessionEndReason reason) {
-
-                    removeSession();
-                }
-            });
+    static {
+        SarosPluginContext.initComponent(new VirtualFileConverter());
     }
 
-    private void setSession(@NotNull ISarosSession session) {
-        this.session = session;
-    }
-
-    private void removeSession(){
-        this.session = null;
+    private VirtualFileConverter() {
+        //NOP
     }
 
     /**
-     * Returns an <code>SPath</code> representing the passed file.
+     * Returns an <code>SPath</code> representing the given file.
      *
      * @param virtualFile file to get the <code>SPath</code> for
-     * @return an <code>SPath</code> representing the passed file or
-     * <code>null</code> if the passed file is null or does not exist,
-     * there currently is no session, or the file does not belong to a
-     * shared module
+     * @return an <code>SPath</code> representing the given file or
+     * <code>null</code> if given file does not exist, no module could be found
+     * for the file or the found module can not be shared through saros, or the
+     * relative path between the module root and the file could not be
+     * constructed
      */
     @Nullable
-    public SPath convertToPath(
+    public static SPath convertToSPath(
         @NotNull
             VirtualFile virtualFile) {
 
@@ -74,36 +56,43 @@ public class VirtualFileConverter {
     }
 
     /**
-     * Returns an <code>IResource</code> representing the passed file.
+     * Returns an <code>IResource</code> representing the given
+     * <code>VirtualFile</code>.
      *
      * @param virtualFile file to get the <code>IResource</code> for
-     * @return an <code>IResource</code> representing the passed file or
-     * <code>null</code> if the passed file is null or does not exist,
-     * there currently is no session, or the file does not belong to a
-     * shared module
+     * @return an <code>IResource</code> representing the given file or
+     * <code>null</code> if given file does not exist, no module could be found
+     * for the file or the found module can not be shared through saros, or the
+     * relative path between the module root and the file could not be
+     * constructed
      */
     @Nullable
-    public IResource convertToResource(
+    public static IResource convertToResource(
         @NotNull
             VirtualFile virtualFile) {
 
-        ISarosSession currentSession = session;
+        Module module = ModuleUtil.findModuleForFile(virtualFile, project);
 
-        if (!virtualFile.exists() || currentSession == null) {
+        if (module == null) {
+            log.debug("Could not convert VirtualFile " + virtualFile
+                + " as no module could be found for the file.");
+
             return null;
         }
 
-        IResource resource = null;
+        try {
+            IntelliJProjectImplV2 wrappedModule = new IntelliJProjectImplV2(
+                module);
 
-        for (IProject project : currentSession.getProjects()) {
-            resource = getResource(virtualFile, project);
+            return wrappedModule.getResource(virtualFile);
 
-            if (resource != null) {
-                break;
-            }
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            log.debug("Could not convert VirtualFile " + virtualFile
+                + " as the creation of an IProject object for its module "
+                + module + " failed.", e);
+
+            return null;
         }
-
-        return resource;
     }
 
     /**
@@ -115,7 +104,7 @@ public class VirtualFileConverter {
      * <code>null</code> it does not belong to the passed module.
      */
     @Nullable
-    public IResource getResource(
+    public static IResource getResource(
         @NotNull
             VirtualFile virtualFile,
         @NotNull

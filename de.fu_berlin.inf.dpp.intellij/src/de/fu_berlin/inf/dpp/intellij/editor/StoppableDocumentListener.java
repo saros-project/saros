@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,15 +23,10 @@ public class StoppableDocumentListener extends AbstractStoppableListener
     private static final Logger LOG = Logger
         .getLogger(StoppableDocumentListener.class);
 
-    private final VirtualFileConverter virtualFileConverter;
-
-    StoppableDocumentListener(EditorManager editorManager,
-        VirtualFileConverter virtualFileConverter) {
+    StoppableDocumentListener(EditorManager editorManager) {
 
         super(editorManager);
         super.setEnabled(false);
-
-        this.virtualFileConverter = virtualFileConverter;
     }
 
     /**
@@ -57,9 +53,10 @@ public class StoppableDocumentListener extends AbstractStoppableListener
                 return;
             }
 
-            path = virtualFileConverter.convertToPath(virtualFile);
+            path = VirtualFileConverter.convertToSPath(virtualFile);
 
-            if (path == null) {
+            if (path == null || !SessionUtils.isShared(path)) {
+
                 LOG.trace("Ignoring Event for document " + document
                         + " - document is not shared");
 

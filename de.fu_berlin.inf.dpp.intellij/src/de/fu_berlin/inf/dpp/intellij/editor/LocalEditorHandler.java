@@ -25,7 +25,6 @@ public class LocalEditorHandler {
         .getLogger(LocalEditorHandler.class);
 
     private final ProjectAPI projectAPI;
-    private final VirtualFileConverter virtualFileConverter;
 
     /**
      * This is just a reference to {@link EditorManager}'s editorPool and not a
@@ -35,11 +34,9 @@ public class LocalEditorHandler {
 
     private EditorManager manager;
 
-    public LocalEditorHandler(ProjectAPI projectAPI,
-        VirtualFileConverter virtualFileConverter) {
+    public LocalEditorHandler(ProjectAPI projectAPI) {
 
         this.projectAPI = projectAPI;
-        this.virtualFileConverter = virtualFileConverter;
     }
 
     /**
@@ -82,9 +79,9 @@ public class LocalEditorHandler {
             return null;
         }
 
-        SPath path = virtualFileConverter.convertToPath(virtualFile);
+        SPath path = VirtualFileConverter.convertToSPath(virtualFile);
 
-        if (path == null) {
+        if (path == null || !SessionUtils.isShared(path)) {
             LOG.debug("Ignored open editor request for file " + virtualFile +
                 " as it does not belong to a shared module");
 
@@ -116,10 +113,10 @@ public class LocalEditorHandler {
         @NotNull
             IProject project, boolean activate) {
 
-        IResource resource = virtualFileConverter
+        IResource resource = VirtualFileConverter
             .getResource(virtualFile, project);
 
-        if (resource == null) {
+        if (resource == null || !SessionUtils.isShared(resource)) {
             LOG.debug("Could not open Editor for file " + virtualFile +
                 " as it does not belong to the given module " + project);
 
@@ -181,8 +178,9 @@ public class LocalEditorHandler {
      * @param virtualFile
      */
     public void closeEditor(@NotNull VirtualFile virtualFile) {
-        SPath path = virtualFileConverter.convertToPath(virtualFile);
-        if (path != null) {
+        SPath path = VirtualFileConverter.convertToSPath(virtualFile);
+
+        if (path != null && SessionUtils.isShared(path)) {
             editorPool.removeEditor(path);
             manager.generateEditorClosed(path);
         }
@@ -242,8 +240,9 @@ public class LocalEditorHandler {
      * @param file
      */
     public void activateEditor(@NotNull VirtualFile file) {
-        SPath path = virtualFileConverter.convertToPath(file);
-        if (path != null) {
+        SPath path = VirtualFileConverter.convertToSPath(file);
+
+        if (path != null && SessionUtils.isShared(path)) {
             manager.generateEditorActivated(path);
         }
     }

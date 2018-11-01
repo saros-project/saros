@@ -480,7 +480,6 @@ public class EditorManager extends AbstractActivityProducer
     public EditorManager(ISarosSessionManager sessionManager,
         LocalEditorHandler localEditorHandler,
         LocalEditorManipulator localEditorManipulator, ProjectAPI projectAPI,
-        VirtualFileConverter virtualFileConverter,
         AnnotationManager annotationManager,
         FileReplacementInProgressObservable fileReplacementInProgressObservable) {
 
@@ -490,10 +489,8 @@ public class EditorManager extends AbstractActivityProducer
         this.annotationManager = annotationManager;
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
 
-        documentListener = new StoppableDocumentListener(this,
-                virtualFileConverter);
-        fileListener = new StoppableEditorFileListener(this,
-                virtualFileConverter, annotationManager);
+        documentListener = new StoppableDocumentListener(this);
+        fileListener = new StoppableEditorFileListener(this, annotationManager);
 
         selectionListener = new StoppableSelectionListener(this);
         viewportListener = new StoppableViewPortListener(this);
