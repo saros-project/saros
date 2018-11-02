@@ -97,24 +97,27 @@ public class VirtualFileConverter {
     }
 
     /**
-     * Returns an <code>IResource</code> for the passed VirtualFile and module.
+     * Returns an <code>IResource</code> representing the given
+     * <code>VirtualFile</code>.
      *
      * @param virtualFile file to get the <code>IResource</code> for
      * @param project     module the file belongs to
-     * @return an <code>IResource</code> for the passed file or
-     * <code>null</code> it does not belong to the passed module.
+     * @return an <code>IResource</code> for the given file or
+     * <code>null</code> if the given file does not exist, does not belong to
+     * the passed module, or the relative path path between the module root and
+     * the file could not be constructed
      */
     @Nullable
-    public static IResource getResource(
+    public static IResource convertToResource(
         @NotNull
             VirtualFile virtualFile,
         @NotNull
             IProject project) {
 
-        IntelliJProjectImplV2 module = (IntelliJProjectImplV2) project
+        IntelliJProjectImplV2 wrappedModule = (IntelliJProjectImplV2) project
             .getAdapter(IntelliJProjectImplV2.class);
 
-        return module.getResource(virtualFile);
+        return wrappedModule.getResource(virtualFile);
     }
 
     /**
