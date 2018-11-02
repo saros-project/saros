@@ -181,28 +181,32 @@ public class LocalEditorManipulator {
             }
         }
 
-         /*
-         * Disable documentListener temporarily to avoid being notified of the
-         * change
-         */
-        manager.disableDocumentListener();
-        for (ITextOperation op : operations.getTextOperations()) {
-            if (op instanceof DeleteOperation) {
-                editorAPI.deleteText(doc, op.getPosition(),
-                    op.getPosition() + op.getTextLength());
-            } else {
-                boolean writePermission = doc.isWritable();
-                if (!writePermission) {
-                    doc.setReadOnly(false);
-                }
-                editorAPI.insertText(doc, op.getPosition(), op.getText());
-                if (!writePermission) {
-                    doc.setReadOnly(true);
+        try {
+            /*
+             * Disable documentListener temporarily to avoid being notified of
+             * the change
+             */
+            manager.disableDocumentListener();
+
+            for (ITextOperation op : operations.getTextOperations()) {
+                if (op instanceof DeleteOperation) {
+                    editorAPI.deleteText(doc, op.getPosition(),
+                        op.getPosition() + op.getTextLength());
+                } else {
+                    boolean writePermission = doc.isWritable();
+                    if (!writePermission) {
+                        doc.setReadOnly(false);
+                    }
+                    editorAPI.insertText(doc, op.getPosition(), op.getText());
+                    if (!writePermission) {
+                        doc.setReadOnly(true);
+                    }
                 }
             }
-        }
 
-        manager.enableDocumentListener();
+        } finally {
+            manager.enableDocumentListener();
+        }
     }
 
     /**
