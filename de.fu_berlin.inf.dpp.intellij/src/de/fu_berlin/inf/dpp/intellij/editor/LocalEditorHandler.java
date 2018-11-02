@@ -113,7 +113,7 @@ public class LocalEditorHandler {
             IProject project, boolean activate) {
 
         IResource resource = VirtualFileConverter
-            .getResource(virtualFile, project);
+            .convertToResource(virtualFile, project);
 
         if (resource == null || !SessionUtils.isShared(resource)) {
             LOG.debug("Could not open Editor for file " + virtualFile +
