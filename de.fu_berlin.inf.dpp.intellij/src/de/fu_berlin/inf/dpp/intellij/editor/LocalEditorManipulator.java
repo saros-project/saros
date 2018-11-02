@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 
 import org.apache.log4j.Logger;
@@ -67,11 +66,8 @@ public class LocalEditorManipulator {
             return null;
         }
 
-        IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
-            path.getProject().getAdapter(IntelliJProjectImplV2.class);
-
-        VirtualFile virtualFile = intelliJProject
-            .findVirtualFile(path.getProjectRelativePath());
+        VirtualFile virtualFile = VirtualFileConverter
+            .convertToVirtualFile(path);
 
         if (virtualFile == null || !virtualFile.exists()) {
             LOG.warn("Could not open Editor for path " + path + " as a " +
@@ -101,11 +97,8 @@ public class LocalEditorManipulator {
 
         LOG.debug("Removed editor for path " + path + " from EditorPool");
 
-        IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
-            path.getProject().getAdapter(IntelliJProjectImplV2.class);
-
-        VirtualFile virtualFile = intelliJProject
-            .findVirtualFile(path.getProjectRelativePath());
+        VirtualFile virtualFile = VirtualFileConverter
+            .convertToVirtualFile(path);
 
         if (virtualFile == null || !virtualFile.exists()) {
             LOG.warn("Could not close Editor for path " + path + " as a " +
@@ -159,11 +152,8 @@ public class LocalEditorManipulator {
          * editorPool so we have to create it temporarily here.
          */
         if (doc == null) {
-            IntelliJProjectImplV2 module = (IntelliJProjectImplV2)
-                path.getProject().getAdapter(IntelliJProjectImplV2.class);
-
-            VirtualFile virtualFile = module
-                .findVirtualFile(path.getProjectRelativePath());
+            VirtualFile virtualFile = VirtualFileConverter
+                .convertToVirtualFile(path);
 
             if (virtualFile == null || !virtualFile.exists()) {
                 LOG.warn("Could not apply TextOperations " + operations

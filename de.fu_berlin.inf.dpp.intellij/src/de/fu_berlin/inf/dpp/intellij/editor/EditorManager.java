@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -512,11 +511,8 @@ public class EditorManager extends AbstractActivityProducer
 
                 @Override
                 public String compute() {
-                    IntelliJProjectImplV2 module = (IntelliJProjectImplV2) path
-                        .getProject().getAdapter(IntelliJProjectImplV2.class);
-
-                    VirtualFile virtualFile = module
-                        .findVirtualFile(path.getProjectRelativePath());
+                    VirtualFile virtualFile = VirtualFileConverter
+                        .convertToVirtualFile(path);
 
                     if (virtualFile == null || !virtualFile.exists() ||
                         virtualFile.isDirectory()) {

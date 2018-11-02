@@ -5,7 +5,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -140,13 +139,11 @@ public class SelectedEditorState {
         @NotNull
             IFile newFile) {
 
-        VirtualFile oldVirtualFile = ((IntelliJProjectImplV2) oldFile
-            .getProject().getAdapter(IntelliJProjectImplV2.class))
-            .findVirtualFile(oldFile.getProjectRelativePath());
+        VirtualFile oldVirtualFile = VirtualFileConverter
+            .convertToVirtualFile(oldFile);
 
-        VirtualFile newVirtualFile = ((IntelliJProjectImplV2) newFile
-            .getProject().getAdapter(IntelliJProjectImplV2.class))
-            .findVirtualFile(newFile.getProjectRelativePath());
+        VirtualFile newVirtualFile = VirtualFileConverter
+            .convertToVirtualFile(newFile);
 
         if (oldVirtualFile == null) {
             throw new IllegalStateException(

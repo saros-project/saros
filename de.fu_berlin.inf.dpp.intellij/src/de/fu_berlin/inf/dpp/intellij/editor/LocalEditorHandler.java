@@ -7,7 +7,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 
 import org.apache.log4j.Logger;
@@ -208,11 +207,7 @@ public class LocalEditorHandler {
         Document document = editorPool.getDocument(path);
 
         if (document == null) {
-            IntelliJProjectImplV2 project = (IntelliJProjectImplV2) path
-                .getProject().getAdapter(IntelliJProjectImplV2.class);
-
-            VirtualFile file = project
-                .findVirtualFile(path.getProjectRelativePath());
+            VirtualFile file = VirtualFileConverter.convertToVirtualFile(path);
 
             if (file == null || !file.exists()) {
                 LOG.warn("Failed to save document for " + path
