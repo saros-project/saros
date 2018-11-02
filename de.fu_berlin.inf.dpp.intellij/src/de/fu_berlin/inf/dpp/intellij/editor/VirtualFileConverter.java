@@ -17,7 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import org.picocontainer.annotations.Inject;
 
 /**
- * Provides static methods to convert VirtualFiles to Saros resource objects.
+ * Provides static methods to convert VirtualFiles to Saros resource objects
+ * or Saros resources objects to VirtualFiles.
  */
 public class VirtualFileConverter {
 
@@ -114,5 +115,52 @@ public class VirtualFileConverter {
             .getAdapter(IntelliJProjectImplV2.class);
 
         return module.getResource(virtualFile);
+    }
+
+    /**
+     * Returns a <code>VirtualFile</code> for the given resource.
+     *
+     * @param path the SPath representing the resource to get a VirtualFile for
+     * @return a VirtualFile for the given resource or <code>null</code> if the
+     * given resource does not exists in the VFS snapshot, is derived, or
+     * belongs to a sub-module
+     */
+    @Nullable
+    public static VirtualFile convertToVirtualFile(
+        @NotNull
+            SPath path) {
+
+        IResource resource = path.getResource();
+
+        if (resource == null) {
+            return null;
+        }
+
+        return convertToVirtualFile(resource);
+    }
+
+    /**
+     * Returns a <code>VirtualFile</code> for the given resource.
+     *
+     * @param resource the resource to get a VirtualFile for
+     * @return a VirtualFile for the given resource or <code>null</code> if the
+     * given resource does not exists in the VFS snapshot, is derived, or
+     * belongs to a sub-module
+     */
+    @Nullable
+    public static VirtualFile convertToVirtualFile(
+        @NotNull
+            IResource resource) {
+
+        if (resource instanceof IProject) {
+            throw new IllegalArgumentException(
+                "The given resource must be a file or a folder. resource: "
+                    + resource);
+        }
+
+        IntelliJProjectImplV2 wrappedModule = (IntelliJProjectImplV2) resource
+            .getProject().getAdapter(IntelliJProjectImplV2.class);
+
+        return wrappedModule.findVirtualFile(resource.getProjectRelativePath());
     }
 }
