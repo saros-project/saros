@@ -26,6 +26,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
 import org.picocontainer.annotations.Inject;
+import de.fu_berlin.inf.dpp.whiteboard.ui.browser.BrowserSXEBridge;
+import de.fu_berlin.inf.dpp.whiteboard.ui.browser.IWhiteboardBrowser;
 
 /**
  * This class makes the interconnection between Saros and SXE.
@@ -51,6 +53,18 @@ public class WhiteboardManager {
   /** Only used by the client */
   private boolean hostHasWhiteboard;
   /** Only used by the Host, for representing which client has a whiteboard */
+  private final Map<JID, Boolean> hasWhiteboard = new HashMap<JID, Boolean>();
+
+  // this bridge will connect the sxe controller with the browser
+  private BrowserSXEBridge bridge;
+
+  /**
+    * Only used by the client
+    */
+  private boolean hostHasWhiteboard;
+  /**
+    * Only used by the Host, for representing which client has a whiteboard
+    */
   private final Map<JID, Boolean> hasWhiteboard = new HashMap<JID, Boolean>();
 
   public static WhiteboardManager getInstance() {
@@ -222,6 +236,28 @@ public class WhiteboardManager {
 
   private void dispose() {
     controller.clear();
-    if (sxeTransmitter != null) sxeTransmitter.dispose();
+    if (bridge != null) {
+        bridge.dispose();
+    }
+    if (sxeTransmitter != null)
+        sxeTransmitter.dispose();
+  }
+
+  /**
+    * Instantiates the bridge with the given browser.
+    * <p>
+    * note: it would be best to call this function after the browser has fully
+    * loaded the document to guarantee proper browser function initialisation
+    *
+    * @param browser
+    *            the browser created in the view which displays the whiteboard
+    *            html document
+    */
+  public void createBridge(IWhiteboardBrowser browser) {
+      if (bridge != null) {
+          bridge.dispose();
+      }
+      bridge = new BrowserSXEBridge(controller, browser);
+      bridge.init();
   }
 }
