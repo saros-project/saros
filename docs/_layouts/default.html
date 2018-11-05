@@ -8,7 +8,7 @@
     {% include forkme_banner.html %}
     {% include navbar.html %}
 
-    {% if page.url contains '/documentation' %}
+    {% if page.url contains '/documentation/'  %}
       {% assign sidebar_data = site.data.documentation.sidebar %}
     {% elsif page.url contains '/contribute' %}
       {% assign sidebar_data = site.data.contribute.sidebar %}
