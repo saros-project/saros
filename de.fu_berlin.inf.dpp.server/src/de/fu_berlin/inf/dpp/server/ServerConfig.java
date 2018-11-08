@@ -4,7 +4,7 @@ package de.fu_berlin.inf.dpp.server;
  * A facade for accessing the configuration properties that were passed to the
  * Saros server on startup.
  */
-class ServerConfig {
+public class ServerConfig {
 
     private static final String JID_KEY = "de.fu_berlin.inf.dpp.server.jid";
     private static final String PASSWORD_KEY = "de.fu_berlin.inf.dpp.server.password";
