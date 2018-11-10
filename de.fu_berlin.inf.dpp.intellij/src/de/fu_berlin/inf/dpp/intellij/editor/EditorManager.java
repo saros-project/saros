@@ -297,7 +297,7 @@ public class EditorManager extends AbstractActivityProducer
         }
 
         @Override
-        public void userFinishedReferencePointNegotiation(User user) {
+        public void userFinishedProjectNegotiation(User user) {
 
             // Send awareness-information
             User localUser = session.getLocalUser();

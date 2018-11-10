@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -99,21 +100,19 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void projectAdded(
-            de.fu_berlin.inf.dpp.filesystem.IProject project) {
+        public void referencePointAdded(IReferencePoint referencePoint) {
             synchronized (projectStates) {
                 IProject eclipseProject = (IProject) ResourceAdapterFactory
-                    .convertBack(project);
+                    .convertBack(referencePointManager.get(referencePoint));
                 projectStates.put(eclipseProject, eclipseProject.isOpen());
             }
         }
 
         @Override
-        public void projectRemoved(
-            de.fu_berlin.inf.dpp.filesystem.IProject project) {
+        public void referencePointRemoved(IReferencePoint referencePoint) {
             synchronized (projectStates) {
                 IProject eclipseProject = (IProject) ResourceAdapterFactory
-                    .convertBack(project);
+                    .convertBack(referencePointManager.get(referencePoint));
                 projectStates.remove(eclipseProject);
             }
         }
