@@ -51,7 +51,7 @@ import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
 import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -391,12 +391,12 @@ public class AddProjectToSessionWizard extends Wizard {
         this.setPreferredSize(new Dimension(650,515));
 
 
-        List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
+        List<ReferencePointNegotiationData> data = negotiation.getProjectNegotiationData();
 
         localProjects = new HashMap<String, IProject>();
 
-        remoteProjectID = data.get(0).getProjectID();
-        remoteProjectName = data.get(0).getProjectName();
+        remoteProjectID = data.get(0).getReferencePointID();
+        remoteProjectName = data.get(0).getReferencePointName();
 
         selectProjectPage = new SelectProjectPage(SELECT_PROJECT_PAGE_ID,
             remoteProjectName, remoteProjectName,
@@ -614,7 +614,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
             try {
 
-                final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
+                final ReferencePointNegotiationData data = negotiation.getProjectNegotiationData(projectID);
 
                 if (data.isPartial())
                     throw new IllegalStateException("partial sharing is not supported");

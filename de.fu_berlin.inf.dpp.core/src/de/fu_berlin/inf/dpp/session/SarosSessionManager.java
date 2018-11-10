@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.TransferType;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
@@ -425,7 +425,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     void projectNegotiationRequestReceived(JID remoteAddress,
         TransferType transferType,
-        List<ProjectNegotiationData> projectNegotiationData,
+        List<ReferencePointNegotiationData> projectNegotiationData,
         String negotiationID) {
 
         INegotiationHandler handler = negotiationHandler;

@@ -148,7 +148,7 @@ public final class NegotiationFactory {
     public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
         final JID remoteAddress, final TransferType transferType,
         final String negotiationID,
-        final List<ProjectNegotiationData> projectNegotiationData,
+        final List<ReferencePointNegotiationData> projectNegotiationData,
         final ISarosSessionManager sessionManager, final ISarosSession session) {
 
         if (transferType == null) {

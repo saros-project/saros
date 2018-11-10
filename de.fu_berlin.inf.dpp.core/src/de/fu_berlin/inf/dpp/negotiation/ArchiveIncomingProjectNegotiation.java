@@ -44,7 +44,7 @@ public class ArchiveIncomingProjectNegotiation extends
     public ArchiveIncomingProjectNegotiation(
         final JID peer, //
         final String negotiationID, //
-        final List<ProjectNegotiationData> projectNegotiationData, //
+        final List<ReferencePointNegotiationData> projectNegotiationData, //
 
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //

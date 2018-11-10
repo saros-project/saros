@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ReferencePointNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
@@ -77,7 +77,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     public EnterProjectNamePage(ISarosSession session,
         IConnectionManager connectionManager, Preferences preferences,
-        JID peer, List<ProjectNegotiationData> projectNegotiationData) {
+        JID peer, List<ReferencePointNegotiationData> projectNegotiationData) {
 
         super(Messages.EnterProjectNamePage_title);
         this.session = session;
@@ -88,10 +88,10 @@ public class EnterProjectNamePage extends WizardPage {
             .getComponent(IReferencePointManager.class);
         remoteProjectMapping = new HashMap<String, String>();
 
-        for (final ProjectNegotiationData data : projectNegotiationData) {
+        for (final ReferencePointNegotiationData data : projectNegotiationData) {
 
-            remoteProjectMapping
-                .put(data.getProjectID(), data.getProjectName());
+            remoteProjectMapping.put(data.getReferencePointID(),
+                data.getReferencePointName());
 
             unsupportedCharsets.addAll(getUnsupportedCharsets(data
                 .getFileList().getEncodings()));
