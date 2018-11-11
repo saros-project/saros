@@ -30,19 +30,21 @@ public class SelectedEditorState {
     private boolean hasCapturedState;
 
     @Inject
-    private ProjectAPI projectAPI;
+    private static ProjectAPI projectAPI;
 
     @Inject
-    private EditorManager editorManager;
+    private static EditorManager editorManager;
 
     @Inject
-    private Project project;
+    private static Project project;
+
+    static {
+        SarosPluginContext.initComponent(new SelectedEditorState());
+    }
 
     public SelectedEditorState() {
         this.selectedEditors = new ArrayList<>();
         this.hasCapturedState = false;
-
-        SarosPluginContext.initComponent(this);
     }
 
     /**
