@@ -112,7 +112,7 @@ public final class NegotiationFactory {
             connectionManager, transmitter, receiver);
     }
 
-    public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
+    public AbstractOutgoingReferencePointNegotiation newOutgoingProjectNegotiation(
         final JID remoteAddress, final TransferType transferType,
         final List<IProject> resources,
         final ISarosSessionManager sessionManager, final ISarosSession session) {

@@ -34,17 +34,17 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 
 /**
- * Handles outgoing ProjectNegotiations except for the actual file transfer.
+ * Handles outgoing ReferencePointNegotiations except for the actual file transfer.
  * 
  * Concrete implementations need to provide an implementation to exchange the
  * calculated differences. This class only provides the initial setup and
  * calculation.
  */
-public abstract class AbstractOutgoingProjectNegotiation extends
+public abstract class AbstractOutgoingReferencePointNegotiation extends
     ReferencePointNegotiation {
 
     private static final Logger LOG = Logger
-        .getLogger(AbstractOutgoingProjectNegotiation.class);
+        .getLogger(AbstractOutgoingReferencePointNegotiation.class);
 
     protected List<IReferencePoint> referencePoints;
 
@@ -56,7 +56,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
 
     private PacketCollector startActivityQueuingResponseCollector;
 
-    protected AbstractOutgoingProjectNegotiation( //
+    protected AbstractOutgoingReferencePointNegotiation( //
         final JID peer, //
         final TransferType transferType, //
         final List<IReferencePoint> referencePoints, //
@@ -94,7 +94,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
             setup(monitor);
 
             sendFileList(
-                createProjectNegotiationDataList(referencePoints, monitor),
+                createReferencePointNegotiationDataList(referencePoints, monitor),
                 monitor);
 
             monitor.subTask("");
@@ -311,7 +311,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends
         startActivityQueuingResponseCollector.cancel();
     }
 
-    protected List<ReferencePointNegotiationData> createProjectNegotiationDataList(
+    protected List<ReferencePointNegotiationData> createReferencePointNegotiationDataList(
         final List<IReferencePoint> referencePointsToShare,
         final IProgressMonitor monitor) throws IOException,
         LocalCancellationException {

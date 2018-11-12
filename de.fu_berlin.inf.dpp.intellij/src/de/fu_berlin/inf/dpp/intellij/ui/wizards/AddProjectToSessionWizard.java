@@ -391,7 +391,7 @@ public class AddProjectToSessionWizard extends Wizard {
         this.setPreferredSize(new Dimension(650,515));
 
 
-        List<ReferencePointNegotiationData> data = negotiation.getProjectNegotiationData();
+        List<ReferencePointNegotiationData> data = negotiation.getReferencePointNegotiationData();
 
         localProjects = new HashMap<String, IProject>();
 
@@ -614,7 +614,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
             try {
 
-                final ReferencePointNegotiationData data = negotiation.getProjectNegotiationData(projectID);
+                final ReferencePointNegotiationData data = negotiation.getReferencePointNegotiationData(projectID);
 
                 if (data.isPartial())
                     throw new IllegalStateException("partial sharing is not supported");

@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
@@ -575,7 +575,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        List<AbstractOutgoingProjectNegotiation> negotiations = new ArrayList<AbstractOutgoingProjectNegotiation>();
+        List<AbstractOutgoingReferencePointNegotiation> negotiations = new ArrayList<AbstractOutgoingReferencePointNegotiation>();
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -589,7 +589,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     TransferType type = TransferType.valueOf(currentSession
                         .getUserProperties(user).getString(
                             ProjectNegotiationTypeHook.KEY_TYPE));
-                    AbstractOutgoingProjectNegotiation negotiation = negotiationFactory
+                    AbstractOutgoingReferencePointNegotiation negotiation = negotiationFactory
                         .newOutgoingProjectNegotiation(user.getJID(), type,
                             projectsToShare, this, currentSession);
 
@@ -602,7 +602,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
         }
 
-        for (AbstractOutgoingProjectNegotiation negotiation : negotiations)
+        for (AbstractOutgoingReferencePointNegotiation negotiation : negotiations)
             handler.handleOutgoingProjectNegotiation(negotiation);
     }
 
@@ -635,7 +635,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        AbstractOutgoingProjectNegotiation negotiation;
+        AbstractOutgoingReferencePointNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {

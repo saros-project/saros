@@ -645,10 +645,16 @@ public class AddProjectToSessionWizard extends Wizard {
 
         for (final ReferencePointNegotiationData data : negotiation
             .getProjectNegotiationData()) {
-            final String projectID = data.getReferencePointID();
+            final String referencePointID = data.getReferencePointID();
 
-            result.put(projectID, ResourcesPlugin.getWorkspace().getRoot()
-                .getProject(namePage.getTargetProjectName(projectID)));
+            result
+                .put(
+                    referencePointID,
+                    ResourcesPlugin
+                        .getWorkspace()
+                        .getRoot()
+                        .getProject(
+                            namePage.getTargetProjectName(referencePointID)));
         }
 
         return result;
