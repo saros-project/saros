@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
  * solution.
  */
 public class InstantIncomingProjectNegotiation extends
-    AbstractIncomingProjectNegotiation {
+    AbstractIncomingReferencePointNegotiation {
 
     private static final Logger log = Logger
         .getLogger(InstantIncomingProjectNegotiation.class);

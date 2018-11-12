@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
@@ -80,7 +80,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     @Override
     public void handleIncomingProjectNegotiation(
-        AbstractIncomingProjectNegotiation negotiation) {
+        AbstractIncomingReferencePointNegotiation negotiation) {
         showIncomingProjectUI(negotiation);
     }
 
@@ -99,7 +99,7 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     private void showIncomingProjectUI(
-        final AbstractIncomingProjectNegotiation negotiation) {
+        final AbstractIncomingReferencePointNegotiation negotiation) {
 
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override

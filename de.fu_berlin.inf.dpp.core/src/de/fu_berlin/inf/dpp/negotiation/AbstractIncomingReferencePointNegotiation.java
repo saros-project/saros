@@ -39,21 +39,22 @@ import de.fu_berlin.inf.dpp.session.SessionEndReason;
 // MAJOR TODO refactor this class !!!
 
 /**
- * Handles incoming ProjectNegotiations except for the actual file transfer.
+ * Handles incoming ReferencePointNegotiations except for the actual file
+ * transfer.
  * 
  * Concrete implementations need to provide an implementation to exchange the
  * calculated differences. This class only provides the initial setup and
  * calculation.
  */
-public abstract class AbstractIncomingProjectNegotiation extends
+public abstract class AbstractIncomingReferencePointNegotiation extends
     ReferencePointNegotiation {
 
     private static final Logger LOG = Logger
-        .getLogger(AbstractIncomingProjectNegotiation.class);
+        .getLogger(AbstractIncomingReferencePointNegotiation.class);
 
     private static int MONITOR_WORK_SCALE = 1000;
 
-    private final Map<String, ReferencePointNegotiationData> projectNegotiationData;
+    private final Map<String, ReferencePointNegotiationData> referencePointNegotiationData;
 
     protected final FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
@@ -64,11 +65,11 @@ public abstract class AbstractIncomingProjectNegotiation extends
     /** used to handle file transmissions **/
     protected TransferListener transferListener = null;
 
-    public AbstractIncomingProjectNegotiation(
+    public AbstractIncomingReferencePointNegotiation(
         final JID peer, //
         final TransferType transferType, //
         final String negotiationID, //
-        final List<ReferencePointNegotiationData> projectNegotiationData, //
+        final List<ReferencePointNegotiationData> referencePointNegotiationData, //
 
         final ISarosSessionManager sessionManager, //
         final ISarosSession session, //
@@ -84,10 +85,11 @@ public abstract class AbstractIncomingProjectNegotiation extends
         super(negotiationID, peer, transferType, sessionManager, session,
             workspace, checksumCache, connectionService, transmitter, receiver);
 
-        this.projectNegotiationData = new HashMap<String, ReferencePointNegotiationData>();
+        this.referencePointNegotiationData = new HashMap<String, ReferencePointNegotiationData>();
 
-        for (final ReferencePointNegotiationData data : projectNegotiationData)
-            this.projectNegotiationData.put(data.getReferencePointID(), data);
+        for (final ReferencePointNegotiationData data : referencePointNegotiationData)
+            this.referencePointNegotiationData.put(data.getReferencePointID(),
+                data);
 
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     }
@@ -105,8 +107,8 @@ public abstract class AbstractIncomingProjectNegotiation extends
      *            reference points
      * 
      * @throws IllegalArgumentException
-     *             if either a project id is not valid or the referenced project
-     *             for that id does not exist
+     *             if either a referencePoint id is not valid or the referenced
+     *             referencePoint for that id does not exist
      */
     public Status run(Map<String, IReferencePoint> referencePointMapping,
         final IProgressMonitor monitor) {
@@ -154,15 +156,15 @@ public abstract class AbstractIncomingProjectNegotiation extends
                 final String referencePointID = entry.getKey();
                 final IReferencePoint referencePoint = entry.getValue();
 
-                final boolean isPartialRemoteProject = getProjectNegotiationData(
+                final boolean isPartialRemoteReferencePoint = getReferencePointNegotiationData(
                     referencePointID).isPartial();
 
-                final FileList remoteFileList = getProjectNegotiationData(
+                final FileList remoteFileList = getReferencePointNegotiationData(
                     referencePointID).getFileList();
 
                 List<IResource> resources = null;
 
-                if (isPartialRemoteProject) {
+                if (isPartialRemoteReferencePoint) {
 
                     final List<String> paths = remoteFileList.getPaths();
 
@@ -185,8 +187,8 @@ public abstract class AbstractIncomingProjectNegotiation extends
     }
 
     /**
-     * In preparation of the Project Negotiation, this setups a File Transfer
-     * Handler, used to receive the incoming negotiation data.
+     * In preparation of the ReferencePoint Negotiation, this setups a File
+     * Transfer Handler, used to receive the incoming negotiation data.
      * 
      * @param monitor
      *            monitor to show progress to the user
@@ -228,12 +230,13 @@ public abstract class AbstractIncomingProjectNegotiation extends
         SarosCancellationException;
 
     /**
-     * Cleanup ends the negotiation process, by disabling the project based
-     * queue and removes acquired handlers during {@link #setup} and
+     * Cleanup ends the negotiation process, by disabling the reference point
+     * based queue and removes acquired handlers during {@link #setup} and
      * {@link #transfer}.
      * 
      * @param monitor
-     *            mapping from remote project ids to the target local projects
+     *            mapping from remote referencePoint ids to the target local
+     *            referencePoint
      * 
      * @param referencePointMapping
      *            mapping of referencePoint
@@ -243,10 +246,10 @@ public abstract class AbstractIncomingProjectNegotiation extends
         fileReplacementInProgressObservable.replacementDone();
 
         /*
-         * TODO Queuing responsibility should be moved to Project Negotiation,
-         * since its the only consumer of queuing functionality. This will
-         * enable a specific Queuing mechanism per TransferType (see github
-         * issue #137).
+         * TODO Queuing responsibility should be moved to ReferencePoint
+         * Negotiation, since its the only consumer of queuing functionality.
+         * This will enable a specific Queuing mechanism per TransferType (see
+         * github issue #137).
          */
         for (IReferencePoint referencePoint : referencePointMapping.values())
             session.disableQueuing(referencePoint);
@@ -262,24 +265,25 @@ public abstract class AbstractIncomingProjectNegotiation extends
      * Returns the {@link ReferencePointNegotiationData negotiation data} for
      * all projects which are part of this negotiation.
      * 
-     * @return negotiation data for all projects which are part of this
+     * @return negotiation data for all referencePoints which are part of this
      *         negotiation.
      */
-    public List<ReferencePointNegotiationData> getProjectNegotiationData() {
+    public List<ReferencePointNegotiationData> getReferencePointNegotiationData() {
         return new ArrayList<ReferencePointNegotiationData>(
-            projectNegotiationData.values());
+            referencePointNegotiationData.values());
     }
 
     /**
      * Returns the {@link ReferencePointNegotiationData negotiation data} for
-     * the given project id.
+     * the given reference point id.
      * 
-     * @return negotiation data for the given project id or <code>null</code> if
-     *         no negotiation data exists for the given project id.
+     * @return negotiation data for the given referencePoint id or
+     *         <code>null</code> if no negotiation data exists for the given
+     *         referencePoint id.
      */
-    public ReferencePointNegotiationData getProjectNegotiationData(
+    public ReferencePointNegotiationData getReferencePointNegotiationData(
         final String id) {
-        return projectNegotiationData.get(id);
+        return referencePointNegotiationData.get(id);
     }
 
     @Override
@@ -333,13 +337,13 @@ public abstract class AbstractIncomingProjectNegotiation extends
 
     /**
      * Computes the differences (files and folders) between the local and the
-     * remote side for the given project mapping.
+     * remote side for the given referencePoint mapping.
      * 
      * @param localReferencePointMapping
-     *            the local project mapping to use
+     *            the local referencePoint mapping to use
      * @param monitor
-     * @return list of differences (one for each project) between the local and
-     *         the remote side.
+     * @return list of differences (one for each referenecPoint) between the
+     *         local and the remote side.
      * @throws SarosCancellationException
      * @throws IOException
      */
@@ -350,7 +354,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
 
         LOG.debug(this + " : computing file and folder differences");
 
-        monitor.beginTask("Computing project(s) difference(s)...",
+        monitor.beginTask("Computing reference points(s) difference(s)...",
             localReferencePointMapping.size() * MONITOR_WORK_SCALE);
 
         final Map<String, FileListDiff> result = new HashMap<String, FileListDiff>();
@@ -369,7 +373,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
                         1 * MONITOR_WORK_SCALE,
                         SubProgressMonitor.SUPPRESS_BEGINTASK));
 
-            final ReferencePointNegotiationData data = getProjectNegotiationData(id);
+            final ReferencePointNegotiationData data = getReferencePointNegotiationData(id);
 
             final FileListDiff diff = FileListDiff.diff(localProjectFileList,
                 data.getFileList(), data.isPartial());
@@ -391,14 +395,14 @@ public abstract class AbstractIncomingProjectNegotiation extends
     }
 
     /**
-     * Synchronize the project structures, deleting files and folders that are
-     * not present on the remote side and creating empty folders that do not
-     * exists and the local side.
+     * Synchronize the reference point structures, deleting files and folders
+     * that are not present on the remote side and creating empty folders that
+     * do not exists and the local side.
      * 
      * @param localReferencePointMapping
      * @param diffs
-     * @return list of file lists (each for every project) containing the
-     *         missing files that are not present on the local side.
+     * @return list of file lists (each for every reference point) containing
+     *         the missing files that are not present on the local side.
      * @throws IOException
      */
     protected List<FileList> synchronizeReferencePointStructures(
@@ -462,7 +466,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
 
             /*
              * We send an empty file list to the host as a notification that we
-             * do not need any files for the given project.
+             * do not need any files for the given referencePoint.
              */
             final FileList fileList = missingFiles.isEmpty() ? FileListFactory
                 .createEmptyFileList() : FileListFactory
@@ -486,7 +490,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
         throws SarosCancellationException {
 
         monitor.beginTask("Waiting for " + getPeer().getName()
-            + " to continue the project negotiation...",
+            + " to continue the reference point negotiation...",
             IProgressMonitor.UNKNOWN);
 
         Packet packet = collectPacket(startActivityQueuingRequestCollector,
@@ -495,7 +499,7 @@ public abstract class AbstractIncomingProjectNegotiation extends
         if (packet == null)
             throw new LocalCancellationException("received no response from "
                 + getPeer()
-                + " while waiting to continue the project negotiation",
+                + " while waiting to continue the reference point negotiation",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
         monitor.done();
@@ -519,10 +523,11 @@ public abstract class AbstractIncomingProjectNegotiation extends
             final String id = entry.getKey();
             final IReferencePoint referencePoint = entry.getValue();
 
-            final ReferencePointNegotiationData data = getProjectNegotiationData(id);
+            final ReferencePointNegotiationData data = getReferencePointNegotiationData(id);
 
             if (data == null)
-                throw new IllegalArgumentException("invalid project id: " + id);
+                throw new IllegalArgumentException(
+                    "invalid referencePoint id: " + id);
 
             if (!referencePointManager.get(referencePoint).exists())
                 throw new IllegalArgumentException(

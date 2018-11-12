@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
@@ -134,7 +134,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     @Override
     public void handleIncomingProjectNegotiation(
-        final AbstractIncomingProjectNegotiation negotiation) {
+        final AbstractIncomingReferencePointNegotiation negotiation) {
 
         projectExecutor.execute(new Runnable() {
             @Override

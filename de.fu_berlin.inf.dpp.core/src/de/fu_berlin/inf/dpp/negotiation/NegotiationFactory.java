@@ -145,7 +145,7 @@ public final class NegotiationFactory {
         }
     }
 
-    public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
+    public AbstractIncomingReferencePointNegotiation newIncomingProjectNegotiation(
         final JID remoteAddress, final TransferType transferType,
         final String negotiationID,
         final List<ReferencePointNegotiationData> projectNegotiationData,

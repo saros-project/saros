@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
@@ -435,7 +435,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        AbstractIncomingProjectNegotiation negotiation;
+        AbstractIncomingReferencePointNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {

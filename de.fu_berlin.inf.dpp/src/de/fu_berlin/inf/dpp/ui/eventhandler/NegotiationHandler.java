@@ -12,7 +12,7 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingReferencePointNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
@@ -248,7 +248,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     @Override
     public void handleIncomingProjectNegotiation(
-        AbstractIncomingProjectNegotiation negotiation) {
+        AbstractIncomingReferencePointNegotiation negotiation) {
         showIncomingProjectUI(negotiation);
     }
 
@@ -295,7 +295,7 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     private void showIncomingProjectUI(
-        final AbstractIncomingProjectNegotiation negotiation) {
+        final AbstractIncomingReferencePointNegotiation negotiation) {
 
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
