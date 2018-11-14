@@ -2,22 +2,20 @@ package de.fu_berlin.inf.dpp.intellij.project;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.vfs.encoding.EncodingProjectManager;
+
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.intellij.editor.SelectedEditorState;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -25,12 +23,14 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.picocontainer.Startable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
 
 /**
  * The SharedResourcesManager creates and handles file and folder activities.
@@ -40,6 +40,10 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     private static final Logger LOG = Logger
         .getLogger(SharedResourcesManager.class);
+
+    private static final int DELETION_FLAGS = 0;
+    private static final boolean FORCE = false;
+    private static final boolean LOCAL = false;
 
     private final ISarosSession sarosSession;
 
@@ -57,32 +61,27 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     private final IntelliJWorkspaceImpl intelliJWorkspaceImpl;
 
+    private final AnnotationManager annotationManager;
+
     @Override
     public void start() {
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+        ApplicationManager.getApplication().invokeAndWait(() -> {
 
-            @Override
-            public void run() {
-                sarosSession.addActivityProducer(SharedResourcesManager.this);
-                sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
-                intelliJWorkspaceImpl.addResourceListener(fileSystemListener);
+            sarosSession.addActivityProducer(SharedResourcesManager.this);
+            sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
+            intelliJWorkspaceImpl.addResourceListener(fileSystemListener);
 
-            }
         }, ModalityState.defaultModalityState());
     }
 
     @Override
     public void stop() {
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+        ApplicationManager.getApplication().invokeAndWait(() -> {
 
-            @Override
-            public void run() {
-                intelliJWorkspaceImpl
-                    .removeResourceListener(fileSystemListener);
-                sarosSession
-                    .removeActivityProducer(SharedResourcesManager.this);
-                sarosSession.removeActivityConsumer(consumer);
-            }
+            intelliJWorkspaceImpl.removeResourceListener(fileSystemListener);
+            sarosSession.removeActivityProducer(SharedResourcesManager.this);
+            sarosSession.removeActivityConsumer(consumer);
+
         }, ModalityState.defaultModalityState());
     }
 
@@ -91,7 +90,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
         FileReplacementInProgressObservable fileReplacementInProgressObservable,
         LocalEditorHandler localEditorHandler,
         LocalEditorManipulator localEditorManipulator,
-        IntelliJWorkspaceImpl intelliJWorkspaceImpl) {
+        IntelliJWorkspaceImpl intelliJWorkspaceImpl,
+        AnnotationManager annotationManager) {
 
         this.sarosSession = sarosSession;
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
@@ -99,6 +99,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         this.localEditorManipulator = localEditorManipulator;
         fileSystemListener = new FileSystemChangeListener(this, editorManager);
         this.intelliJWorkspaceImpl = intelliJWorkspaceImpl;
+        this.annotationManager = annotationManager;
     }
 
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
@@ -108,21 +109,12 @@ public class SharedResourcesManager extends AbstractActivityProducer
                 return;
             }
 
-        /*
-         * FIXME this will lockout everything. File changes made in the
-         * meantime from another background job are not recognized. See
-         * AddMultipleFilesTest STF test which fails randomly.
-         */
-            fileReplacementInProgressObservable.startReplacement();
-            fileSystemListener.setEnabled(false);
-            super.exec(activity);
-
-            LOG.trace("execing " + activity + " in " + Thread.currentThread()
+            LOG.trace("executing " + activity + " in " + Thread.currentThread()
                 .getName());
 
-            fileReplacementInProgressObservable.replacementDone();
-            fileSystemListener.setEnabled(true);
-            LOG.trace("done execing " + activity);
+            super.exec(activity);
+
+            LOG.trace("done executing " + activity);
         }
 
         @Override
@@ -137,7 +129,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         @Override
         public void receive(FolderCreatedActivity activity) {
             try {
-                handleFolderActivity(activity);
+                handleFolderCreation(activity);
             } catch (IOException e) {
                 LOG.error("Failed to execute activity: " + activity, e);
             }
@@ -146,21 +138,22 @@ public class SharedResourcesManager extends AbstractActivityProducer
         @Override
         public void receive(FolderDeletedActivity activity) {
             try {
-                handleFolderActivity(activity);
+                handleFolderDeletion(activity);
             } catch (IOException e) {
                 LOG.error("Failed to execute activity: " + activity, e);
             }
         }
     };
 
-    private void handleFileActivity(FileActivity activity) throws IOException {
+    private void handleFileActivity(
+        @NotNull
+            FileActivity activity) throws IOException {
 
         if (activity.isRecovery()) {
             handleFileRecovery(activity);
             return;
         }
 
-        // TODO check if we should open / close existing editors here too
         switch (activity.getType()) {
         case CREATED:
             handleFileCreation(activity);
@@ -171,10 +164,17 @@ public class SharedResourcesManager extends AbstractActivityProducer
         case MOVED:
             handleFileMove(activity);
             break;
+        default:
+            throw new UnsupportedOperationException(
+                "FileActivity type " + activity.getType()
+                    + " not supported. Dropped activity: " + activity);
         }
     }
 
-    private void handleFileRecovery(FileActivity activity) throws IOException {
+    private void handleFileRecovery(
+        @NotNull
+            FileActivity activity) throws IOException {
+
         SPath path = activity.getPath();
 
         LOG.debug("performing recovery for file: " + activity.getPath()
@@ -184,9 +184,9 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
         try {
             if (type == FileActivity.Type.CREATED) {
+                //TODO handle case if file already exists and only content needs to be recovered
                 handleFileCreation(activity);
             } else if (type == FileActivity.Type.REMOVED) {
-                localEditorManipulator.closeEditor(path);
                 handleFileDeletion(activity);
             } else {
                 LOG.warn("performing recovery for type " + type
@@ -195,126 +195,194 @@ public class SharedResourcesManager extends AbstractActivityProducer
         } finally {
             /*
              * always reset Jupiter or we will get into trouble because the
-             * vector time is already reseted on the host
+             * vector time has already been reset on the host
              */
             sarosSession.getConcurrentDocumentClient().reset(path);
         }
     }
 
-    private void handleFileMove(FileActivity activity) throws IOException {
+    /**
+     * Applies the given move FileActivity. Subsequently cleans up the
+     * EditorPool and AnnotationManager for the moved file if necessary.
+     *
+     * @param activity the move activity to execute
+     * @throws IOException if the creation of the new file or the deletion of
+     *                     the old file fails
+     */
+    private void handleFileMove(
+        @NotNull
+            FileActivity activity) throws IOException {
+
         SPath oldPath = activity.getOldPath();
         SPath newPath = activity.getPath();
 
-        IntelliJProjectImpl oldProject =
-            (IntelliJProjectImpl) oldPath.getProject();
-        IntelliJProjectImpl newProject =
-            (IntelliJProjectImpl) newPath.getProject();
+        IFile oldFile = oldPath.getFile();
+        IFile newFile = newPath.getFile();
 
-        IPath newFilePath = newPath.getFullPath();
+        if (!oldFile.exists()) {
+            LOG.warn("Could not move file " + oldFile + " as it does not exist."
+                + " source: " + oldFile + " destination: " + newFile);
 
-        localEditorHandler.saveDocument(oldPath);
-        localEditorHandler.removeEditor(oldPath);
+            return;
+        }
+
+        boolean fileOpen = localEditorHandler.isOpenEditor(oldPath);
+
+        SelectedEditorState selectedEditorState = null;
+
+        if (fileOpen) {
+            selectedEditorState = new SelectedEditorState();
+            selectedEditorState.captureState();
+        }
+
         localEditorManipulator.closeEditor(oldPath);
 
-        FileUtils.mkdirs(new IntelliJFileImpl(newProject,newFilePath.toFile()));
-        FileUtils.move(newFilePath, oldPath.getResource());
+        annotationManager.updateAnnotationPath(oldFile, newFile);
 
-        oldProject.removeResource(oldPath.getProjectRelativePath());
-        newProject.addFile(newFilePath.toFile());
+        try {
+            fileSystemListener.setEnabled(false);
 
-        localEditorManipulator.openEditor(newPath,false);
+            localEditorHandler.saveDocument(oldPath);
+
+            newFile.create(oldFile.getContents(), FORCE);
+
+            if (fileOpen) {
+                localEditorManipulator.openEditor(newPath, false);
+
+                try {
+                    selectedEditorState.replaceSelectedFile(oldFile, newFile);
+                } catch (IllegalStateException e) {
+                    LOG.warn(
+                        "Failed to update the captured selected editor state",
+                        e);
+                }
+
+                selectedEditorState.applyCapturedState();
+            }
+
+            oldFile.delete(DELETION_FLAGS);
+
+        } finally {
+            fileSystemListener.setEnabled(true);
+        }
+
+        //TODO reset the vector time for the old file
     }
 
-    private void handleFileDeletion(FileActivity activity) throws IOException {
-        IFile file = activity.getPath().getFile();
+    private void handleFileDeletion(
+        @NotNull
+            FileActivity activity) throws IOException {
+
+        SPath path = activity.getPath();
+        IFile file = path.getFile();
 
         if (!file.exists()) {
             LOG.warn(
-                "could not delete file " + file + " because it does not exist");
+                "Could not delete file " + file + " as it does not exist.");
+
+            return;
+        }
+
+        if (localEditorHandler.isOpenEditor(path)) {
+            localEditorManipulator.closeEditor(path);
         }
 
         try {
             fileSystemListener.setEnabled(false);
-            FileUtils.delete(file);
-            //HACK: It does not work to disable the fileSystemListener temporarly,
-            //because a fileCreated event will be fired asynchronously,
-            //so we have to add this file to the filter list
-            fileSystemListener
-                .addIncomingFileToFilterFor(file.getLocation().toFile());
+
+            localEditorHandler.saveDocument(path);
+
+            file.delete(DELETION_FLAGS);
+
+        } finally {
+            fileSystemListener.setEnabled(true);
+        }
+
+        annotationManager.removeAnnotations(file);
+
+        //TODO reset the vector time for the deleted file
+    }
+
+    private void handleFileCreation(
+        @NotNull
+            FileActivity activity) throws IOException {
+
+        SPath path = activity.getPath();
+        IFile file = path.getFile();
+
+        if (file.exists()) {
+            LOG.warn(
+                "Could not create file " + file + " as it already exists.");
+
+            return;
+        }
+
+        InputStream contents = new ByteArrayInputStream(activity.getContent());
+
+        try {
+            fileSystemListener.setEnabled(false);
+
+            file.create(contents, FORCE);
+
         } finally {
             fileSystemListener.setEnabled(true);
         }
     }
 
-    private void handleFileCreation(FileActivity activity) throws IOException {
+    private void handleFolderCreation(
+        @NotNull
+            FolderCreatedActivity activity) throws IOException {
 
-        String encodingString = activity.getEncoding() == null ?
-            EncodingProjectManager.getInstance().getDefaultCharset().name() :
-            activity.getEncoding();
+        IFolder folder = activity.getPath().getFolder();
 
-        //FIXME: Test if updateEncoding method will be necessary
-        String newText = new String(activity.getContent(), encodingString);
+        if (folder.exists()) {
+            LOG.warn(
+                "Could not create folder " + folder + " as it already exist.");
 
-        //if the file exists, try to replace the content completely
-        if (!newText.isEmpty()) {
-            //this is true only when the file already existed
-            boolean replaceSuccessful = localEditorManipulator
-                .replaceText(activity.getPath(), newText);
-
-            if (replaceSuccessful) {
-                //If the content of the existing document was replaced
-                //successfully, save the file
-                localEditorHandler.saveDocument(activity.getPath());
-                return;
-            }
-        }
-
-        //If the file did not exist, create it
-        IFile file = activity.getPath().getFile();
-        byte[] actualContent = FileUtils.getLocalFileContent(file);
-        byte[] newContent = activity.getContent();
-
-        if (Arrays.equals(newContent, actualContent)) {
-            LOG.info("FileActivity " + activity + " dropped (same content)");
             return;
         }
 
         try {
             fileSystemListener.setEnabled(false);
-            FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
-            //HACK: It does not work to disable the fileSystemListener temporarily,
-            //because a fileCreated event will be fired asynchronously,
-            //so we have to add this file to the filter list
-            fileSystemListener
-                .addIncomingFileToFilterFor(file.getLocation().toFile());
+
+            folder.create(FORCE, LOCAL);
+
         } finally {
             fileSystemListener.setEnabled(true);
         }
     }
 
-    private void handleFolderActivity(IFileSystemModificationActivity activity)
-        throws IOException {
+    /**
+     * Applies the given FolderDeletedActivity.
+     * <p>
+     * <b>NOTE:</b> This currently does not check whether the deleted folder
+     * contains resources outside the session scope. As a result, submodules of
+     * the shared module that are not present for a different participant can be
+     * deleted accidentally through remote activities.
+     * </p>
+     *
+     * @param activity the FolderDeletedActivity to execute
+     * @throws IOException if the folder deletion fails
+     */
+    //TODO deal with children that are not part of the current session (submodules)
+    private void handleFolderDeletion(
+        @NotNull
+            FolderDeletedActivity activity) throws IOException {
 
-        SPath path = activity.getPath();
+        IFolder folder = activity.getPath().getFolder();
 
-        IFolder folder = path.getProject()
-            .getFolder(path.getProjectRelativePath());
-        fileSystemListener.setEnabled(false);
-        //HACK: It does not work to disable the fileSystemListener temporarly,
-        //because a fileCreated event will be fired asynchronously,
-        //so we have to add this file to the filter list
+        if (!folder.exists()) {
+            LOG.warn(
+                "Could not delete folder " + folder + " as it does not exist.");
+
+            return;
+        }
+
         try {
-            if (activity instanceof FolderCreatedActivity) {
-                FileUtils.create(folder);
-            } else if (activity instanceof FolderDeletedActivity) {
+            fileSystemListener.setEnabled(false);
 
-                if (folder.exists()) {
-                    FileUtils.delete(folder);
-                }
+            folder.delete(DELETION_FLAGS);
 
-            }
-            fileSystemListener
-                .addIncomingFileToFilterFor(folder.getLocation().toFile());
         } finally {
             fileSystemListener.setEnabled(true);
         }
