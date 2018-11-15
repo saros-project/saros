@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.project;
 
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileCopyEvent;
 import com.intellij.openapi.vfs.VirtualFileEvent;
@@ -8,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFileMoveEvent;
 import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import com.intellij.openapi.vfs.encoding.EncodingProjectManager;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
@@ -23,16 +25,20 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,6 +67,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
     private final SharedResourcesManager resourceManager;
     private final IntelliJWorkspaceImpl intellijWorkspace;
+    private final ISarosSession session;
+
+    @Inject
+    private ProjectAPI projectAPI;
 
     //HACK: This list is used to filter events for files that were created from
     //remote, because we can not disable the listener for them
@@ -69,11 +79,16 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     private final Set<VirtualFile> newFiles = new HashSet<VirtualFile>();
 
     public FileSystemChangeListener(SharedResourcesManager resourceManager,
-        EditorManager editorManager, IntelliJWorkspaceImpl intellijWorkspace) {
+        EditorManager editorManager, IntelliJWorkspaceImpl intellijWorkspace,
+        ISarosSession session) {
+
         super(editorManager);
 
         this.resourceManager = resourceManager;
         this.intellijWorkspace = intellijWorkspace;
+        this.session = session;
+
+        SarosPluginContext.initComponent(this);
 
         intellijWorkspace.addResourceListener(this);
     }
@@ -204,68 +219,55 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     }
 
     /**
-     * This is called after a file was created on disk, but before optional content
-     * (e.g. templates) are inserted.
+     * {@inheritDoc}
+     * <p></p>
+     * Generates and dispatches a creation activity for the new resource.
      *
-     * @param virtualFileEvent
+     * @param virtualFileEvent {@inheritDoc}
      */
     @Override
     public void fileCreated(
-        @NotNull
-        VirtualFileEvent virtualFileEvent) {
-        if (!enabled) {
-            return;
+            @NotNull
+                    VirtualFileEvent virtualFileEvent) {
+
+        assert enabled : "the file created listener was triggered while it was disabled";
+
+        VirtualFile createdVirtualFile = virtualFileEvent.getFile();
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Reacting to resource creation: " + createdVirtualFile);
         }
 
-        File file = convertVirtualFileEventToFile(virtualFileEvent);
-        IPath path = IntelliJPathImpl.fromString(file.getPath());
-        IntelliJProjectImpl project = getProjectForResource(path);
+        SPath path = VirtualFileConverter.convertToSPath(createdVirtualFile);
 
-        if (project == null || !isValidProject(project)) {
-            return;
-        }
-
-        //This is true, when a new folder for an incoming project was created.
-        //If this is the case, we do not want to send an FolderActivity back.
-
-        if (path.equals(project.getLocation())) {
-            return;
-        }
-
-        if (incomingFilesToFilterFor.remove(file)) {
-            project.addFile(file);
-            return;
-        }
-
-        if (path.equals(project.getFullPath())) {
-            if (!isCompletelyShared(project)) {
-                return;
+        if (path == null || !session.isShared(path.getResource())) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Ignoring non-shared resource creation: "
+                        + createdVirtualFile);
             }
+
+            return;
         }
 
-        path = makeAbsolutePathProjectRelative(path, project);
+        User user = session.getLocalUser();
 
-        SPath spath = new SPath(project, path);
-        User user = resourceManager.getSession().getLocalUser();
         IActivity activity;
 
-        if (file.isFile()) {
-            byte[] bytes = new byte[0];
-            String charset;
-            charset = virtualFileEvent.getFile().getCharset().name();
-            activity = new FileActivity(user, Type.CREATED, Purpose.ACTIVITY,
-                spath, null, bytes, charset);
+        if (createdVirtualFile.isDirectory()) {
+            activity = new FolderCreatedActivity(user, path);
 
-            //If the file was created with a template, it is filled only later
-            //so we check for newly created files' content in {@link #contentsChanged},
-            newFiles.add(virtualFileEvent.getFile());
         } else {
-            activity = new FolderCreatedActivity(user, spath);
+            String charset = createdVirtualFile.getCharset().name();
+
+            byte[] content = getContent(createdVirtualFile);
+
+            activity = new FileActivity(user, Type.CREATED,
+                    FileActivity.Purpose.ACTIVITY, path, null, content, charset);
+
+            editorManager.openEditor(path, false);
         }
 
-        project.addFile(file);
-
-        resourceManager.internalFireActivity(activity);
+        fireActivity(activity);
     }
 
     @Override
@@ -478,16 +480,6 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         //Do nothing
     }
 
-    /**
-     * Adds a file to the filter list for incoming files (for which no activities
-     * should be generated).
-     *
-     * @param file
-     */
-    public void addIncomingFileToFilterFor(File file) {
-        incomingFilesToFilterFor.add(file);
-    }
-
     private IPath makeAbsolutePathProjectRelative(IPath path,
         IProject project) {
         return path.removeFirstSegments(project.getLocation().segmentCount());
@@ -540,6 +532,57 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
         
         return null;
+    }
+
+    /**
+     * Returns the content of the given file. If available, the cached document
+     * content representing the file held by Intellij will be used. Otherwise,
+     * the file content on disk (obtained using the <code>VirtualFile</code>)
+     * will be used.
+     *
+     * @param file the file to get the content for
+     * @return the content for the given file (cached by Intellij or read from
+     * disk if no cache is available) or an empty byte array if the content of
+     * the file could not be obtained.
+     * @see Document
+     * @see VirtualFile
+     */
+    private byte[] getContent(VirtualFile file) {
+        Document document = projectAPI.getDocument(file);
+
+        try {
+            if (document != null) {
+                return document.getText().getBytes(file.getCharset().name());
+
+            } else {
+                LOG.debug("Could not get Document for file " + file
+                        + ", using file content on disk instead. This content might"
+                        + " not correctly represent the current state of the file"
+                        + " in Intellij.");
+
+                return file.contentsToByteArray();
+            }
+
+        } catch (IOException e) {
+            LOG.warn("Could not get content for file " + file, e);
+
+            return new byte[0];
+        }
+    }
+
+    /**
+     * Dispatches the given activity.
+     *
+     * @param activity the activity to fire
+     * @see SharedResourcesManager#internalFireActivity(IActivity)
+     */
+    private void fireActivity(
+            @NotNull
+                    IActivity activity) {
+
+        LOG.debug("Dispatching resource activity " + activity);
+
+        resourceManager.internalFireActivity(activity);
     }
 
     /**

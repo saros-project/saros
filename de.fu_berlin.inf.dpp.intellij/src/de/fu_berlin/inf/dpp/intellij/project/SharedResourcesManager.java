@@ -96,7 +96,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
         fileSystemListener = new FileSystemChangeListener(this, editorManager,
-            intelliJWorkspaceImpl);
+            intelliJWorkspaceImpl, sarosSession);
         this.annotationManager = annotationManager;
     }
 
