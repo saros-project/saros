@@ -76,8 +76,6 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     //remote, because we can not disable the listener for them
     private final List<File> incomingFilesToFilterFor = new ArrayList<File>();
 
-    private final Set<VirtualFile> newFiles = new HashSet<VirtualFile>();
-
     public FileSystemChangeListener(SharedResourcesManager resourceManager,
         EditorManager editorManager, IntelliJWorkspaceImpl intellijWorkspace,
         ISarosSession session) {
@@ -168,54 +166,64 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     }
 
     /**
-     * Calls {@link EditorManager#sendTemplateContent(SPath, String)} for files
-     * that were created with initial content. For other content changes itm
-     * {@link StoppableDocumentListener} is used.
-     * <p/>
-     * This gets called for all files in the application, after they were changed.
-     * This includes meta-files like workspace.xml.
+     * {@inheritDoc}
+     * Works for all files in the application scope, including meta-files like
+     * Intellij configuration files.
+     * <p></p>
+     * File changes done though an Intellij editor are processed in the
+     * {@link StoppableDocumentListener} instead.
      *
-     * @param virtualFileEvent
+     * @param virtualFileEvent {@inheritDoc}
+     * @see StoppableDocumentListener
      */
     @Override
-    public void contentsChanged(
-        @NotNull
-        VirtualFileEvent virtualFileEvent) {
-        VirtualFile virtualFile = virtualFileEvent.getFile();
-        IntelliJProjectImpl project = getProjectForResource(
-            IntelliJPathImpl.fromString(virtualFile.getPath()));
+    public void beforeContentsChange(
+            @NotNull
+                    VirtualFileEvent virtualFileEvent) {
 
-        if (project == null || !isValidProject(project)) {
-            return;
+        assert enabled : "the before contents change listener was triggered while it was disabled";
+
+        VirtualFile file = virtualFileEvent.getFile();
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Reacting before resource contents changed: " + file);
         }
 
-        IFile file = new IntelliJFileImpl(project,
-            new File(virtualFile.getPath()));
+        SPath path = VirtualFileConverter.convertToSPath(file);
 
-        if (!resourceManager.getSession().isShared(file) && !newFiles
-            .remove(virtualFile)) {
-            return;
-        }
-
-        SPath spath = new SPath(project, file.getProjectRelativePath());
-
-        //FIXME does not work as it takes the file content, which has the wrong line separators
-        //Files created from templates have initial content and are opened in
-        // an editor, but do not have a DocumentListener. Their initial content
-        // is transferred here, because the DocumentListener is added after
-        // it was inserted
-        if (editorManager.isOpenedInEditor(spath)) {
-            try {
-                byte[] content = virtualFile.contentsToByteArray();
-                String initialContent = new String(content, getEncoding(file));
-
-                if (!initialContent.isEmpty()) {
-                    editorManager.sendTemplateContent(spath, initialContent);
-                }
-            } catch (IOException e) {
-                LOG.error("Could not access newly created file: " + file, e);
+        if (path == null || !session.isShared(path.getResource())) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace(
+                        "Ignoring non-shared resource's contents change: " + file);
             }
+
+            return;
         }
+
+        if (virtualFileEvent.isFromSave()) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Ignoring contents change for " + file
+                        + " as they were caused by a document save.");
+            }
+
+            //TODO dispatch save activity for saved file
+            return;
+        }
+
+        if (virtualFileEvent.isFromRefresh()) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Ignoring contents change for " + file
+                        + " as they were caused by a filesystem snapshot refresh. "
+                        + "This is already handled by the document listener.");
+            }
+
+            return;
+        }
+
+        //TODO figure out if this can happen
+        LOG.warn("Detected unhandled content change on the virtual file level "
+                + "for " + file + ", requested by: " + virtualFileEvent
+                .getRequestor());
     }
 
     /**
@@ -450,19 +458,6 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         @NotNull
         VirtualFilePropertyEvent filePropertyEvent) {
         // Not interested
-    }
-
-    /**
-     * This method is called for files that already exist and that are modified,
-     * but before the file is modified on disk.
-     *
-     * @param virtualFileEvent
-     */
-    @Override
-    public void beforeContentsChange(
-        @NotNull
-        VirtualFileEvent virtualFileEvent) {
-        //Do nothing
     }
 
     @Override
