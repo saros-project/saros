@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 
-public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
+public final class IntelliJProjectImpl extends IntelliJResourceImpl
     implements IProject {
 
     /*
@@ -44,7 +44,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
         "SAROS_RELOAD_STUB_MODULE";
 
     private static final Logger LOG = Logger
-        .getLogger(IntelliJProjectImplV2.class);
+        .getLogger(IntelliJProjectImpl.class);
 
     // Module names are unique (even among different projects)
     private final String moduleName;
@@ -78,7 +78,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
      *                                  or the directory containing the module
      *                                  file could not be found
      */
-    public IntelliJProjectImplV2(@NotNull final Module module) {
+    public IntelliJProjectImpl(@NotNull final Module module) {
         this.module = module;
         this.moduleName = module.getName();
 
@@ -306,8 +306,8 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
             final IPath childPath = IntelliJPathImpl
                 .fromString(child.getName());
 
-            result.add(child.isDirectory() ? new IntelliJFolderImplV2(this,
-                childPath) : new IntelliJFileImplV2(this, childPath));
+            result.add(child.isDirectory() ? new IntelliJFolderImpl(this,
+                childPath) : new IntelliJFileImpl(this, childPath));
 
         }
 
@@ -440,8 +440,8 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
         if (file == null)
             return null;
 
-        return file.isDirectory() ? new IntelliJFolderImplV2(this, path)
-            : new IntelliJFileImplV2(this, path);
+        return file.isDirectory() ? new IntelliJFolderImpl(this, path)
+            : new IntelliJFileImpl(this, path);
     }
 
     @NotNull
@@ -458,7 +458,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
             throw new IllegalArgumentException(
                 "cannot create file handle for an empty path");
 
-        return new IntelliJFileImplV2(this, path);
+        return new IntelliJFileImpl(this, path);
     }
 
     /**
@@ -480,7 +480,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
         IPath relativePath = getProjectRelativePath(file);
 
         return relativePath != null ?
-            new IntelliJFileImplV2(this, relativePath) :
+            new IntelliJFileImpl(this, relativePath) :
             null;
     }
 
@@ -498,7 +498,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
             throw new IllegalArgumentException(
                 "cannot create folder handle for an empty path");
 
-        return new IntelliJFolderImplV2(this, path);
+        return new IntelliJFolderImpl(this, path);
     }
 
     /**
@@ -520,7 +520,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
         IPath relativePath = getProjectRelativePath(file);
 
         return relativePath != null ?
-            new IntelliJFolderImplV2(this, relativePath) :
+            new IntelliJFolderImpl(this, relativePath) :
             null;
     }
 
@@ -592,7 +592,7 @@ public final class IntelliJProjectImplV2 extends IntelliJResourceImplV2
         if (getClass() != obj.getClass())
             return false;
 
-        IntelliJProjectImplV2 other = (IntelliJProjectImplV2) obj;
+        IntelliJProjectImpl other = (IntelliJProjectImpl) obj;
 
         return moduleName.equals(other.moduleName);
     }

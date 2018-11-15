@@ -1,12 +1,14 @@
 package de.fu_berlin.inf.dpp.exceptions;
 
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
+
 /**
  * Signals that a needed module object could not be found in the current
  * project.
  * <p>
  * This exception will be thrown if no module with the same name could be found
  * when trying to reload a module by calling
- * {@link de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2#refreshModule()}
+ * {@link IntelliJProjectImpl#refreshModule()}
  * </p>
  */
 public class ModuleNotFoundException extends Exception{

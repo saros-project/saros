@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.project.FileSystemChangeListener;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 
@@ -57,7 +57,7 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
             }
         });
 
-        return module != null ? new IntelliJProjectImplV2(module) : null;
+        return module != null ? new IntelliJProjectImpl(module) : null;
     }
 
     @Override

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 
-public abstract class IntelliJResourceImplV2 implements IResource {
+public abstract class IntelliJResourceImpl implements IResource {
 
     @Nullable
     @Override

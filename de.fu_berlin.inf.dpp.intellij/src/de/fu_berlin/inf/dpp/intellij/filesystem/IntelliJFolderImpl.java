@@ -22,15 +22,15 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 
-public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
+public final class IntelliJFolderImpl extends IntelliJResourceImpl
     implements IFolder {
 
     /** Relative path from the given project */
     private final IPath path;
 
-    private final IntelliJProjectImplV2 project;
+    private final IntelliJProjectImpl project;
 
-    public IntelliJFolderImplV2(@NotNull final IntelliJProjectImplV2 project,
+    public IntelliJFolderImpl(@NotNull final IntelliJProjectImpl project,
         @NotNull final IPath path) {
         this.project = project;
         this.path = path;
@@ -72,8 +72,8 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
             final IPath childPath = path.append(IntelliJPathImpl
                 .fromString(child.getName()));
 
-            result.add(child.isDirectory() ? new IntelliJFolderImplV2(project,
-                childPath) : new IntelliJFileImplV2(project, childPath));
+            result.add(child.isDirectory() ? new IntelliJFolderImpl(project,
+                childPath) : new IntelliJFileImpl(project, childPath));
 
         }
 
@@ -139,7 +139,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
         if (path.segmentCount() == 1)
             return project;
 
-        return new IntelliJFolderImplV2(project, path.removeLastSegments(1));
+        return new IntelliJFolderImpl(project, path.removeLastSegments(1));
     }
 
     @NotNull
@@ -180,13 +180,13 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
                 final VirtualFile file = project.findVirtualFile(path);
 
                 if (file == null)
-                    throw new FileNotFoundException(IntelliJFolderImplV2.this
+                    throw new FileNotFoundException(IntelliJFolderImpl.this
                         + " does not exist or is derived");
 
                 if (!file.isDirectory())
                     throw new IOException(this + " is not a folder");
 
-                file.delete(IntelliJFolderImplV2.this);
+                file.delete(IntelliJFolderImpl.this);
 
                 return null;
             }
@@ -244,13 +244,13 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
                 if (parentFile == null)
                     throw new FileNotFoundException(parent
                         + " does not exist or is derived, cannot create folder "
-                        + IntelliJFolderImplV2.this);
+                        + IntelliJFolderImpl.this);
 
                 final VirtualFile file = parentFile.findChild(getName());
 
                 if (file != null) {
                     String exceptionText =
-                        IntelliJFolderImplV2.this + " already exists";
+                        IntelliJFolderImpl.this + " already exists";
 
                     if (force)
                         exceptionText += ", force option is not supported";
@@ -258,7 +258,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
                     throw new FileAlreadyExistsException(exceptionText);
                 }
 
-                parentFile.createChildDirectory(IntelliJFolderImplV2.this,
+                parentFile.createChildDirectory(IntelliJFolderImpl.this,
                     getName());
 
                 return null;
@@ -285,7 +285,7 @@ public final class IntelliJFolderImplV2 extends IntelliJResourceImplV2
         if (getClass() != obj.getClass())
             return false;
 
-        IntelliJFolderImplV2 other = (IntelliJFolderImplV2) obj;
+        IntelliJFolderImpl other = (IntelliJFolderImpl) obj;
 
         return project.equals(other.project) && path.equals(other.path);
     }

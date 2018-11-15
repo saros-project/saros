@@ -4,7 +4,7 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
@@ -112,8 +112,8 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
         for (final IProject project : sessionManager.getSession()
             .getProjects()) {
 
-            IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
-                project.getAdapter(IntelliJProjectImplV2.class);
+            IntelliJProjectImpl intelliJProject = (IntelliJProjectImpl)
+                project.getAdapter(IntelliJProjectImpl.class);
 
             String moduleType = ModuleType.get(intelliJProject.getModule())
                 .getId();

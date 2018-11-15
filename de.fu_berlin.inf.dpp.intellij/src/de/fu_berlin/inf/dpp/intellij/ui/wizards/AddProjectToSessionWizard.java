@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgessMonitorAdapter;
@@ -169,7 +169,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     return;
                 }
 
-                IProject sharedProject = new IntelliJProjectImplV2(module);
+                IProject sharedProject = new IntelliJProjectImpl(module);
 
                 localProjects.put(remoteProjectID, sharedProject);
 
@@ -256,7 +256,7 @@ public class AddProjectToSessionWizard extends Wizard {
      * the current project.
      * <p>
      * The created module has the module type
-     * {@link IntelliJProjectImplV2#RELOAD_STUB_MODULE_TYPE} which allows us to
+     * {@link IntelliJProjectImpl#RELOAD_STUB_MODULE_TYPE} which allows us to
      * easily identify it as stub.
      *
      * @param moduleName name of the module
@@ -306,7 +306,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     Module module = modifiableModuleModel
                         .newModule(moduleFilePath.toString(),
-                            IntelliJProjectImplV2.RELOAD_STUB_MODULE_TYPE);
+                            IntelliJProjectImpl.RELOAD_STUB_MODULE_TYPE);
 
                     modifiableModuleModel.commit();
                     project.save();
