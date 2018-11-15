@@ -400,8 +400,4 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
         fireActivity(activity);
     }
-
-    public ISarosSession getSession() {
-        return sarosSession;
-    }
 }

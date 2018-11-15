@@ -1,49 +1,50 @@
 package de.fu_berlin.inf.dpp.intellij.project;
 
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentIterator;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileCopyEvent;
 import com.intellij.openapi.vfs.VirtualFileEvent;
+import com.intellij.openapi.vfs.VirtualFileFilter;
 import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileMoveEvent;
 import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
-import com.intellij.openapi.vfs.encoding.EncodingProjectManager;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.core.util.FileUtils;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.picocontainer.annotations.Inject;
 
-import javax.inject.Inject;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Virtual file system listener. It receives events for all files in all
@@ -74,9 +75,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     @Inject
     private AnnotationManager annotationManager;
 
-    //HACK: This list is used to filter events for files that were created from
-    //remote, because we can not disable the listener for them
-    private final List<File> incomingFilesToFilterFor = new ArrayList<File>();
+    @Inject
+    private Project project;
 
     public FileSystemChangeListener(SharedResourcesManager resourceManager,
         EditorManager editorManager, IntelliJWorkspaceImpl intellijWorkspace,
@@ -91,80 +91,6 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         SarosPluginContext.initComponent(this);
 
         intellijWorkspace.addResourceListener(this);
-    }
-
-    private void generateFolderMove(SPath oldSPath, SPath newSPath,
-        boolean before) {
-        User user = resourceManager.getSession().getLocalUser();
-        IntelliJProjectImpl project = (IntelliJProjectImpl) oldSPath
-            .getProject();
-        IActivity createActivity = new FolderCreatedActivity(user, newSPath);
-        resourceManager.internalFireActivity(createActivity);
-
-        IFolder folder = before ? oldSPath.getFolder() : newSPath.getFolder();
-
-        IResource[] members = new IResource[0];
-        try {
-            members = folder.members();
-        } catch (IOException e) {
-            LOG.error("error reading folder: " + folder, e);
-        }
-
-        for (IResource resource : members) {
-            SPath oldChildSPath = new IntelliJFileImpl(project, new File(
-                oldSPath.getFullPath().toOSString() + File.separator + resource
-                    .getName())).getSPath();
-            SPath newChildSPath = new IntelliJFileImpl(
-                (IntelliJProjectImpl) newSPath.getProject(), new File(
-                newSPath.getFullPath().toOSString() + File.separator + resource
-                    .getName())).getSPath();
-            if (resource.getType() == IResource.FOLDER) {
-                generateFolderMove(oldChildSPath, newChildSPath, before);
-            } else {
-                generateFileMove(oldChildSPath, newChildSPath, before);
-            }
-        }
-
-        IActivity removeActivity = new FolderDeletedActivity(user, oldSPath);
-        resourceManager.internalFireActivity(removeActivity);
-
-        project.addFile(newSPath.getFile().getLocation().toFile());
-        project.removeResource(oldSPath.getProjectRelativePath());
-    }
-
-    private void generateFileMove(SPath oldSPath, SPath newSPath,
-        boolean before) {
-        User user = resourceManager.getSession().getLocalUser();
-        IntelliJProjectImpl project = (IntelliJProjectImpl) newSPath
-            .getProject();
-        IntelliJProjectImpl oldProject = (IntelliJProjectImpl) oldSPath
-            .getProject();
-
-        IFile file;
-
-        project.addFile(newSPath.getFile().getLocation().toFile());
-
-        //TODO what happens if the other participant is working on the now renamed file
-        if (before) {
-            file = oldProject.getFile(oldSPath.getFullPath());
-            editorManager.saveDocument(oldSPath);
-
-            editorManager.replaceAllEditorsForPath(oldSPath, newSPath);
-        } else {
-            editorManager.replaceAllEditorsForPath(oldSPath, newSPath);
-
-            file = project.getFile(newSPath.getFullPath());
-            editorManager.saveDocument(newSPath);
-        }
-
-        oldProject.removeResource(oldSPath.getProjectRelativePath());
-
-        byte[] bytes = FileUtils.getLocalFileContent(file);
-        String charset = getEncoding(file);
-        IActivity activity = new FileActivity(user, Type.MOVED,
-            Purpose.ACTIVITY, newSPath, oldSPath, bytes, charset);
-
-        resourceManager.internalFireActivity(activity);
     }
 
     /**
@@ -337,91 +263,440 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         //TODO reset the vector time for the deleted file or contained files if folder
     }
 
+    /**
+     * {@inheritDoc}
+     * <p></p>
+     * Generates and dispatches activities handling resources moves.
+     * <p></p>
+     * Intellij offers multiple ways of moving resources through the UI that
+     * are handled in different ways internally:
+     * <li> <i>Move file to other package:</i></li>
+     * <p>
+     * Triggers the move listener for the file.
+     *
+     * <li><i>Move package to other package</i> and <i>Move package to other
+     * source root:</i></li>
+     * <p>
+     * Just triggers the move listener for the package directory, does not
+     * trigger a listener event for the contained files or folders.
+     * This means the listener has to iterate the contained resources and
+     * create matching actions in the right order.
+     *
+     * <li><i>Move package to other directory:</i></li>
+     * <p>
+     * Triggers the create listener for the new path of the contained
+     * directories in right order. Then triggers the move listener for the
+     * contained files. Then triggers the delete listener for the old path of
+     * the contained directories.
+     *
+     * @param virtualFileMoveEvent {@inheritDoc}
+     * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
+     * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
+     * @see #fileCreated(VirtualFileEvent)
+     * @see #fileDeleted(VirtualFileEvent)
+     */
     @Override
-    public void fileMoved(
-        @NotNull
-        VirtualFileMoveEvent virtualFileMoveEvent) {
-        if (!enabled) {
-            return;
+    public void beforeFileMovement(
+            @NotNull
+                    VirtualFileMoveEvent virtualFileMoveEvent) {
+
+        assert enabled : "the before file move listener was triggered while it was disabled";
+
+        VirtualFile oldFile = virtualFileMoveEvent.getFile();
+        VirtualFile oldParent = virtualFileMoveEvent.getOldParent();
+        VirtualFile newParent = virtualFileMoveEvent.getNewParent();
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Reacting before resource move - resource: " + oldFile
+                    + ", old parent: " + oldParent + ", new Parent: " + newParent);
         }
 
-        File newFile = convertVirtualFileEventToFile(virtualFileMoveEvent);
-        if (incomingFilesToFilterFor.remove(newFile)) {
-            return;
-        }
+        if (oldFile.isDirectory()) {
+            generateFolderMove(oldFile, oldParent, newParent, null);
 
-        IPath path = IntelliJPathImpl.fromString(newFile.getPath());
-        IntelliJProjectImpl project = getProjectForResource(path);
-
-        if (project == null || !isValidProject(project) ||
-            !isCompletelyShared(project)) {
-            return;
-        }
-
-        path = makeAbsolutePathProjectRelative(path, project);
-
-        SPath newSPath = new SPath(project, path);
-
-        IPath oldParent = IntelliJPathImpl
-            .fromString(virtualFileMoveEvent.getOldParent().getPath());
-        IPath oldPath = oldParent.append(virtualFileMoveEvent.getFileName());
-        IProject oldProject = getProjectForResource(oldPath);
-
-        oldPath = makeAbsolutePathProjectRelative(oldPath, project);
-        SPath oldSPath = new SPath(oldProject, oldPath);
-
-        //FIXME: Handle cases where files are moved from outside the shared project
-        //into the shared project
-        if (oldProject == null) {
-            LOG.error(
-                " can not move files from unshared project to shared project");
-            return;
-        }
-        if (project.equals(oldProject)) {
-            if (newFile.isFile()) {
-                generateFileMove(oldSPath, newSPath, false);
-            } else {
-                generateFolderMove(oldSPath, newSPath, false);
-            }
+        } else {
+            generateFileMove(oldFile, oldParent, newParent, null, null);
         }
     }
 
-    @Override
-    public void propertyChanged(
-        @NotNull
-        VirtualFilePropertyEvent filePropertyEvent) {
-        if (!enabled) {
+    /**
+     * Generates and dispatches matching creation and deletion activities
+     * replicating moving the given directory. Also dispatches activities for
+     * all contained resources belonging to the same module.
+     * <p></p>
+     * How the resources (including the given directory) are handled depends on
+     * whether the source and target directory is shared.
+     * <ul>
+     * <li>
+     * If only the source directory is shared, only deletion activities for the
+     * old resources are dispatched.
+     * </li>
+     * <li>
+     * If only the target directory is shared, only creation activities for the
+     * new resources are dispatched.
+     * </li>
+     * <li>
+     * If both directories are shared, the resources are moved as follows:
+     * <p>
+     * Creation activities for the new directories (located in the target
+     * directory) and move activities for the contained files are dispatched in
+     * increasing depth order. Then, deletion activities for the old directories
+     * (in the source directory) are dispatched in decreasing depth order. This
+     * ensures that any resource move is already handled correctly before one of
+     * its parent resources is deleted.
+     * </li>
+     * </ul>
+     *
+     * <p></p>
+     * Renaming directories is also handled as a move activity. This can be done
+     * with the optional parameter <code>newFolderName</code>.
+     *
+     * @param oldFile       the directory that is about to be moved
+     * @param oldParent     the old parent of the moved file
+     * @param newParent     the new parent of the moved file
+     * @param newFolderName the new name for the folder or null if the folder
+     *                      was not renamed
+     * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
+     */
+    private void generateFolderMove(
+            @NotNull
+                    VirtualFile oldFile,
+            @NotNull
+                    VirtualFile oldParent,
+            @NotNull
+                    VirtualFile newParent,
+            @Nullable
+                    String newFolderName) {
+
+        String folderName =
+                newFolderName != null ? newFolderName : oldFile.getName();
+
+        SPath oldPath = VirtualFileConverter.convertToSPath(oldFile);
+        SPath newParentPath = VirtualFileConverter.convertToSPath(newParent);
+
+        User user = session.getLocalUser();
+
+        boolean oldPathIsShared =
+                oldPath != null && session.isShared(oldPath.getResource());
+        boolean newPathIsShared = newParentPath != null && session
+                .isShared(newParentPath.getResource());
+
+        if (!oldPathIsShared && !newPathIsShared) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace(
+                        "Ignoring non-shared resource move - resource: " + oldFile
+                                + ", old parent: " + oldParent + ", new Parent: "
+                                + newParent);
+            }
+
             return;
         }
 
-        File oldFile = new File(
-            filePropertyEvent.getFile().getParent().getPath() + File.separator
-                + filePropertyEvent.getOldValue());
-        File newFile = convertVirtualFileEventToFile(filePropertyEvent);
+        Deque<IActivity> queuedDeletionActivities = new ConcurrentLinkedDeque<>();
 
-        if (incomingFilesToFilterFor.remove(newFile)) {
+        /*
+         * Filter determining which child resources to iterate over.
+         * It only iterated over resources belonging to the same module as the
+         * base directory. This is needed to exclude submodules.
+         *
+         * TODO once sharing multiple modules is possible, introduce logic to handle deleted submodules if they are shared
+         */
+        VirtualFileFilter virtualFileFilter = file -> {
+            Module baseModule = ModuleUtil.findModuleForFile(oldFile, project);
+            Module module = ModuleUtil.findModuleForFile(file, project);
+
+            return baseModule != null && baseModule.equals(module);
+        };
+
+        /*
+         * Defines the actions executed on the base directory and every valid
+         * child resource (defined through the virtualFileFilter).
+         *
+         * Returns whether the content iteration should be continued.
+         */
+        ContentIterator contentIterator = fileOrDir -> {
+
+            IPath relativePath = getRelativePath(oldFile, fileOrDir);
+
+            if (relativePath == null) {
+                return true;
+            }
+
+            if (!fileOrDir.isDirectory()) {
+                generateFileMove(fileOrDir, oldParent, newParent, newFolderName,
+                        null);
+
+                return true;
+            }
+
+            if (newPathIsShared) {
+                SPath newFolderPath = new SPath(newParentPath.getProject(),
+                        newParentPath.getProjectRelativePath().append(folderName)
+                                .append(relativePath));
+
+                IActivity newFolderCreatedActivity = new FolderCreatedActivity(
+                        user, newFolderPath);
+
+                fireActivity(newFolderCreatedActivity);
+            }
+
+            if (oldPathIsShared) {
+                SPath oldFolderPath = new SPath(oldPath.getProject(),
+                        oldPath.getProjectRelativePath().append(relativePath));
+
+                IActivity newFolderDeletedActivity = new FolderDeletedActivity(
+                        user, oldFolderPath);
+
+                queuedDeletionActivities.addFirst(newFolderDeletedActivity);
+            }
+
+            return true;
+        };
+
+        /*
+         * Calls the above defined contentIterator on the base directory and
+         * every contained resource.
+         * Directories are only stepped into if they match the above defined
+         * virtualFileFilter. This also applies to the base directory.
+         */
+        VfsUtilCore.iterateChildrenRecursively(oldFile, virtualFileFilter,
+                contentIterator);
+
+        while (!queuedDeletionActivities.isEmpty()) {
+            fireActivity(queuedDeletionActivities.pop());
+        }
+    }
+
+    /**
+     * How the moved file is handled depends on whether the source and target
+     * directory are shared:
+     * <ul>
+     * <li>
+     * If only the source directory is shared, a deletion activity for the
+     * old file is created and dispatched. Subsequently removes any editor for
+     * the file from the editor pool and drops any annotation held for the file.
+     * </li>
+     * <li>
+     * If only the target directory is shared, a creation activity for the new
+     * file is created and dispatched. Subsequently adds an entry for the new
+     * file to the editor pool if it is currently open in an editor.
+     * </li>
+     * <li>
+     * If both the source and target directory are shared, a move activity for
+     * the file is created and dispatched. Subsequently updates the path of any
+     * editor for the file in the editor pool and updates the path for any held
+     * annotations for the file.
+     * </li>
+     * </ul>
+     * If the source directory is shared, an editor closed activity is also
+     * dispatched. If the target directory is shared, an editor opened activity
+     * is also dispatched. This is necessary as Intellij does not close and
+     * re-open the editors of moved files but rather changes the path of the
+     * editor internally, meaning the <code>UserEditorState</code> held by the
+     * other participants would not be updated correctly.
+     * <p></p>
+     * Renaming files is also handled as a move activity. This can be done
+     * with the optional parameter <code>newFileName</code>.
+     * <p></p>
+     * The optional parameter <code>newBaseName</code> can be used to handle
+     * cases where a parent file is renamed. The renamed directory has to be the
+     * directory located under <code>oldBaseParent</code> in the old path.
+     *
+     * @param oldFile       the file that is about to be moved
+     * @param oldBaseParent the old base parent of the file
+     * @param newBaseParent the new base parent of the file
+     * @param newBaseName   the new name for the base parent or null if it was
+     *                      not renamed
+     * @param newFileName   the new name for the file or null if it was not
+     *                      renamed
+     * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
+     */
+    private void generateFileMove(
+            @NotNull
+                    VirtualFile oldFile,
+            @NotNull
+                    VirtualFile oldBaseParent,
+            @NotNull
+                    VirtualFile newBaseParent,
+            @Nullable
+                    String newBaseName,
+            @Nullable
+                    String newFileName) {
+
+        String encoding = oldFile.getCharset().name();
+
+        SPath oldFilePath = VirtualFileConverter.convertToSPath(oldFile);
+        SPath newParentPath = VirtualFileConverter
+                .convertToSPath(newBaseParent);
+
+        User user = session.getLocalUser();
+
+        boolean oldPathIsShared =
+                oldFilePath != null && session.isShared(oldFilePath.getResource());
+        boolean newPathIsShared = newParentPath != null && session
+                .isShared(newParentPath.getResource());
+
+        boolean fileIsOpen = projectAPI.isOpen(oldFile);
+
+        IPath relativePath = getRelativePath(oldBaseParent, oldFile);
+
+        if (relativePath == null) {
             return;
         }
 
-        IPath oldPath = IntelliJPathImpl.fromString(oldFile.getPath());
-        IntelliJProjectImpl project = getProjectForResource(oldPath);
-
-        if (project == null || !isValidProject(project)) {
-            return;
+        if (newBaseName != null) {
+            relativePath = IntelliJPathImpl.fromString(newBaseName)
+                    .append(relativePath.removeFirstSegments(1));
         }
 
-        oldPath = makeAbsolutePathProjectRelative(oldPath, project);
-        SPath oldSPath = new SPath(project, oldPath);
+        if (newFileName != null) {
+            relativePath = relativePath.removeLastSegments(1)
+                    .append(IntelliJPathImpl.fromString(newFileName));
+        }
 
-        IPath newPath = IntelliJPathImpl.fromString(newFile.getPath());
-        newPath = makeAbsolutePathProjectRelative(newPath, project);
+        IActivity activity;
 
-        SPath newSPath = new SPath(project, newPath);
-        //we handle this as a move activity
-        if (newFile.isFile()) {
-            generateFileMove(oldSPath, newSPath, false);
+        if (oldPathIsShared && newPathIsShared) {
+            //moved file inside shared modules
+            SPath newFilePath = new SPath(newParentPath.getProject(),
+                    newParentPath.getProjectRelativePath().append(relativePath));
+
+            activity = new FileActivity(user, Type.MOVED,
+                    FileActivity.Purpose.ACTIVITY, newFilePath, oldFilePath, null,
+                    encoding);
+
+            editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
+
+            annotationManager.updateAnnotationPath(oldFilePath.getFile(),
+                    newFilePath.getFile());
+
+        } else if (newPathIsShared) {
+            //moved file into shared module
+            byte[] fileContent = getContent(oldFile);
+
+            SPath newFilePath = new SPath(newParentPath.getProject(),
+                    newParentPath.getProjectRelativePath().append(relativePath));
+
+            activity = new FileActivity(user, Type.CREATED,
+                    FileActivity.Purpose.ACTIVITY, newFilePath, null, fileContent,
+                    encoding);
+
+            if (fileIsOpen) {
+                Editor editor = projectAPI.openEditor(oldFile, false);
+
+                editorManager.addEditorMapping(newFilePath, editor);
+            }
+
+        } else if (oldPathIsShared) {
+            //moved file out of shared module
+            activity = new FileActivity(user, Type.REMOVED,
+                    FileActivity.Purpose.ACTIVITY, oldFilePath, null, null, null);
+
+            editorManager.removeAllEditorsForPath(oldFilePath);
+
+            annotationManager.removeAnnotations(oldFilePath.getFile());
+
         } else {
-            generateFolderMove(oldSPath, newSPath, false);
+            //neither source nor destination are shared
+            if (LOG.isTraceEnabled()) {
+                LOG.trace(
+                        "Ignoring non-shared resource move - resource: " + oldFile
+                                + ", old base parent: " + oldBaseParent
+                                + ", new base parent: " + newBaseParent);
+            }
+
+            return;
+        }
+
+        fireActivity(activity);
+
+        if (oldPathIsShared) {
+            if (fileIsOpen) {
+                EditorActivity closeOldEditorActivity = new EditorActivity(user,
+                        EditorActivity.Type.CLOSED, oldFilePath);
+
+                fireActivity(closeOldEditorActivity);
+            }
+
+            //TODO reset the vector time for the old file
+        }
+
+        if (newPathIsShared && fileIsOpen) {
+            SPath newFilePath = new SPath(newParentPath.getProject(),
+                newParentPath.getProjectRelativePath().append(relativePath));
+
+            EditorActivity openNewEditorActivity = new EditorActivity(user,
+                EditorActivity.Type.ACTIVATED, newFilePath);
+
+            fireActivity(openNewEditorActivity);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p></p>
+     * Handles name changes for resource as resource moves. Generates and
+     * dispatches the needed activities. For directories, the listener is not
+     * called for all contained resources, meaning these resources are also
+     * handled by the call for the directory.
+     * <p></p>
+     * Other property changes are ignored.
+     *
+     * @param filePropertyEvent {@inheritDoc}
+     * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
+     * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
+     */
+    @Override
+    public void beforePropertyChange(
+            @NotNull
+                    VirtualFilePropertyEvent filePropertyEvent) {
+
+        assert enabled : "the before property change listener was triggered while it was disabled";
+
+        VirtualFile file = filePropertyEvent.getFile();
+        String propertyName = filePropertyEvent.getPropertyName();
+        Object oldValue = filePropertyEvent.getOldValue();
+        Object newValue = filePropertyEvent.getNewValue();
+
+        switch (propertyName) {
+        case (VirtualFile.PROP_NAME):
+            String oldName = (String) oldValue;
+            String newName = (String) newValue;
+
+            if (LOG.isTraceEnabled()) {
+                LOG.trace(
+                        "Reacting before resource name change - resource: " + file
+                                + ", old name: " + oldName + ", new name: " + newName);
+            }
+
+            VirtualFile parent = file.getParent();
+
+            if (parent == null) {
+
+                SPath path = VirtualFileConverter.convertToSPath(file);
+
+                if (path != null && session.isShared(path.getResource())) {
+                    LOG.error("Renamed resource is a root directory. "
+                            + "Such an activity can not be shared through Saros.");
+                }
+
+                return;
+            }
+
+            if (file.isDirectory()) {
+                generateFolderMove(file, parent, parent, newName);
+            } else {
+                generateFileMove(file, parent, parent, null, newName);
+            }
+
+            break;
+
+        default:
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Ignoring change of property + " + propertyName
+                        + " for file " + file + " - old value: " + oldValue
+                        + ", new value: " + newValue);
+            }
         }
     }
 
@@ -472,72 +747,34 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         fireActivity(activity);
     }
 
-    @Override
-    public void beforePropertyChange(
-        @NotNull
-        VirtualFilePropertyEvent filePropertyEvent) {
-        // Not interested
-    }
-
-    @Override
-    public void beforeFileMovement(
-        @NotNull
-        VirtualFileMoveEvent virtualFileMoveEvent) {
-        //Do nothing
-    }
-
-    private IPath makeAbsolutePathProjectRelative(IPath path,
-        IProject project) {
-        return path.removeFirstSegments(project.getLocation().segmentCount());
-    }
-
-    private File convertVirtualFileEventToFile(
-        VirtualFileEvent virtualFileEvent) {
-        return new File(virtualFileEvent.getFile().getPath());
-    }
-
-    private String getEncoding(IFile file) {
-        String charset = null;
+    /**
+     * Returns the relative path between the given root and the given file.
+     *
+     * @param root the root file
+     * @param file the file to get a relative path for
+     * @return the relative path between the given root and the given file or
+     * <code>null</code> if such a path could not be found
+     */
+    @Nullable
+    private IPath getRelativePath(
+            @NotNull
+                    VirtualFile root,
+            @NotNull
+                    VirtualFile file) {
 
         try {
-            charset = file.getCharset();
-        } catch (IOException e) {
-            LOG.warn("could not determine encoding for file: " + file, e);
+            Path relativePath = Paths.get(root.getPath())
+                    .relativize(Paths.get(file.getPath()));
+
+            return IntelliJPathImpl.fromString(relativePath.toString());
+
+        } catch (IllegalArgumentException e) {
+            LOG.warn(
+                    "Could not find a relative path from the content root " + root
+                            + " to the file " + file, e);
+
+            return null;
         }
-        if (charset == null)
-            return EncodingProjectManager.getInstance().getDefaultCharset()
-                .name();
-
-        return charset;
-    }
-
-    private boolean isCompletelyShared(IntelliJProjectImpl project) {
-        return resourceManager.getSession().isCompletelyShared(project);
-    }
-
-    private boolean isValidProject(IntelliJProjectImpl project) {
-        return project != null && project.exists();
-    }
-
-    /**
-     * Searches for a resource with the passed path in the resources of all
-     * currently with the session registered projects.
-     *
-     * @param path path to the resource
-     * @return project with which the passed resources is registered or
-     * <b>null</b> if no such project exists
-     */
-    private IntelliJProjectImpl getProjectForResource(IPath path){
-        for(IProject sessionProject: resourceManager.getSession().getProjects()){
-
-            IntelliJProjectImpl project = (IntelliJProjectImpl)sessionProject;
-
-            if(project.isMember(path)){
-                return project;
-            }
-        }
-        
-        return null;
     }
 
     /**
