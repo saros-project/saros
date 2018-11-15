@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 
-public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
+public final class IntelliJFileImpl extends IntelliJResourceImpl implements
     IFile {
 
     private static final int BUFFER_SIZE = 32 * 1024;
@@ -29,9 +29,9 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
     /** Relative path from the given project */
     private final IPath path;
 
-    private final IntelliJProjectImplV2 project;
+    private final IntelliJProjectImpl project;
 
-    public IntelliJFileImplV2(@NotNull final IntelliJProjectImplV2 project,
+    public IntelliJFileImpl(@NotNull final IntelliJProjectImpl project,
         @NotNull final IPath path) {
         this.project = project;
         this.path = path;
@@ -84,7 +84,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
         if (path.segmentCount() == 1)
             return project;
 
-        return new IntelliJFolderImplV2(project, path.removeLastSegments(1));
+        return new IntelliJFolderImpl(project, path.removeLastSegments(1));
     }
 
     @NotNull
@@ -125,13 +125,13 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                 final VirtualFile file = project.findVirtualFile(path);
 
                 if (file == null)
-                    throw new FileNotFoundException(IntelliJFileImplV2.this
+                    throw new FileNotFoundException(IntelliJFileImpl.this
                         + " does not exist or is derived");
 
                 if (file.isDirectory())
                     throw new IOException(this + " is not a file");
 
-                file.delete(IntelliJFileImplV2.this);
+                file.delete(IntelliJFileImpl.this);
 
                 return null;
             }
@@ -201,7 +201,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                 final VirtualFile file = project.findVirtualFile(path);
 
                 if (file == null) {
-                    String exceptionText = IntelliJFileImplV2.this
+                    String exceptionText = IntelliJFileImpl.this
                         + " does not exist or is derived";
 
                     if (force)
@@ -211,7 +211,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                 }
 
                 final OutputStream out = file
-                    .getOutputStream(IntelliJFileImplV2.this);
+                    .getOutputStream(IntelliJFileImpl.this);
 
                 final InputStream in = input == null ? new ByteArrayInputStream(
                     new byte[0]) : input;
@@ -267,13 +267,13 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                 if (parentFile == null)
                     throw new FileNotFoundException(parent
                         + " does not exist or is derived, cannot create file "
-                        + IntelliJFileImplV2.this);
+                        + IntelliJFileImpl.this);
 
                 final VirtualFile file = parentFile.findChild(getName());
 
                 if (file != null) {
                     String exceptionText =
-                        IntelliJFileImplV2.this + " already exists";
+                        IntelliJFileImpl.this + " already exists";
 
                     if (force)
                         exceptionText += ", force option is not supported";
@@ -281,7 +281,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
                     throw new FileAlreadyExistsException(exceptionText);
                 }
 
-                parentFile.createChildData(IntelliJFileImplV2.this, getName());
+                parentFile.createChildData(IntelliJFileImpl.this, getName());
 
                 if (input != null)
                     setContents(input, force, true);
@@ -316,7 +316,7 @@ public final class IntelliJFileImplV2 extends IntelliJResourceImplV2 implements
         if (getClass() != obj.getClass())
             return false;
 
-        IntelliJFileImplV2 other = (IntelliJFileImplV2) obj;
+        IntelliJFileImpl other = (IntelliJFileImpl) obj;
 
         return project.equals(other.project) && path.equals(other.path);
     }

@@ -10,7 +10,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -83,27 +83,27 @@ public class ModuleInitialization implements Startable {
      * synchronously.
      * <p>
      * After the module is reloaded,
-     * {@link IntelliJProjectImplV2#refreshModule()}
+     * {@link IntelliJProjectImpl#refreshModule()}
      * is called to replace the old <code>Module</code> object held by the given
      * <code>IProject</code>. This is needed as calls on disposed modules result
      * in an exception and the <code>IProject</code> object is at this point
      * already held by other classes.
      *
-     * @see IntelliJProjectImplV2#refreshModule()
+     * @see IntelliJProjectImpl#refreshModule()
      */
     private class ModuleReloader implements Runnable {
-        private IntelliJProjectImplV2 project;
+        private IntelliJProjectImpl project;
 
         public ModuleReloader(IProject project) {
-            this.project = (IntelliJProjectImplV2) project
-                .getAdapter(IntelliJProjectImplV2.class);
+            this.project = (IntelliJProjectImpl) project
+                .getAdapter(IntelliJProjectImpl.class);
         }
 
         @Override
         public void run() {
             Module module = project.getModule();
 
-            if (IntelliJProjectImplV2.RELOAD_STUB_MODULE_TYPE
+            if (IntelliJProjectImpl.RELOAD_STUB_MODULE_TYPE
                 .equals(ModuleType.get(module).getId())) {
 
                 String moduleName = module.getName();

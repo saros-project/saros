@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
@@ -367,8 +367,8 @@ public class CollaborationUtils {
              * we need the .iml file, otherwise the project type will not be set
              * correctly on the other side
              */
-            IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
-                project.getAdapter(IntelliJProjectImplV2.class);
+            IntelliJProjectImpl intelliJProject = (IntelliJProjectImpl)
+                project.getAdapter(IntelliJProjectImpl.class);
 
             Module module = intelliJProject.getModule();
             VirtualFile moduleFile = module.getModuleFile();

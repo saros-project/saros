@@ -81,7 +81,7 @@ public class VirtualFileConverter {
         }
 
         try {
-            IntelliJProjectImplV2 wrappedModule = new IntelliJProjectImplV2(
+            IntelliJProjectImpl wrappedModule = new IntelliJProjectImpl(
                 module);
 
             return wrappedModule.getResource(virtualFile);
@@ -113,8 +113,8 @@ public class VirtualFileConverter {
         @NotNull
             IProject project) {
 
-        IntelliJProjectImplV2 wrappedModule = (IntelliJProjectImplV2) project
-            .getAdapter(IntelliJProjectImplV2.class);
+        IntelliJProjectImpl wrappedModule = (IntelliJProjectImpl) project
+            .getAdapter(IntelliJProjectImpl.class);
 
         return wrappedModule.getResource(virtualFile);
     }
@@ -160,8 +160,8 @@ public class VirtualFileConverter {
                     + resource);
         }
 
-        IntelliJProjectImplV2 wrappedModule = (IntelliJProjectImplV2) resource
-            .getProject().getAdapter(IntelliJProjectImplV2.class);
+        IntelliJProjectImpl wrappedModule = (IntelliJProjectImpl) resource
+            .getProject().getAdapter(IntelliJProjectImpl.class);
 
         return wrappedModule.findVirtualFile(resource.getProjectRelativePath());
     }

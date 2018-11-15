@@ -9,7 +9,7 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -75,7 +75,7 @@ public class ShareWithUserAction extends AnAction {
             throw new UnsupportedOperationException();
         }
 
-        return new IntelliJProjectImplV2(module);
+        return new IntelliJProjectImpl(module);
     }
 
     @Override
