@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
@@ -42,9 +43,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Virtual file system listener. It receives events for all files in all
@@ -71,6 +70,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
     @Inject
     private ProjectAPI projectAPI;
+
+    @Inject
+    private AnnotationManager annotationManager;
 
     //HACK: This list is used to filter events for files that were created from
     //remote, because we can not disable the listener for them
@@ -278,44 +280,61 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         fireActivity(activity);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p></p>
+     * Generates and dispatches a deletion activity for the deleted resource. If
+     * the resource was a file, subsequently removes any editors for the file
+     * from the editor pool and drops any held annotations for the file.
+     *
+     * @param virtualFileEvent {@inheritDoc}
+     */
     @Override
-    public void fileDeleted(
-        @NotNull
-        VirtualFileEvent virtualFileEvent) {
-        if (!enabled) {
+    public void beforeFileDeletion(
+            @NotNull
+                    VirtualFileEvent virtualFileEvent) {
+
+        assert enabled : "the before file deletion listener was triggered while it was disabled";
+
+        VirtualFile deletedVirtualFile = virtualFileEvent.getFile();
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace(
+                    "Reacting before resource deletion: " + deletedVirtualFile);
+        }
+
+        SPath path = VirtualFileConverter.convertToSPath(deletedVirtualFile);
+
+        if (path == null || !session.isShared(path.getResource())) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Ignoring non-shared resource deletion: "
+                        + deletedVirtualFile);
+            }
+
             return;
         }
 
-        File file = convertVirtualFileEventToFile(virtualFileEvent);
-        if (incomingFilesToFilterFor.remove(file)) {
-            return;
-        }
-
-        IPath path = IntelliJPathImpl.fromString(file.getPath());
-        IntelliJProjectImpl project = getProjectForResource(path);
-
-        if (project == null || !isValidProject(project) ||
-            !isCompletelyShared(project)) {
-            return;
-        }
-
-        path = makeAbsolutePathProjectRelative(path, project);
-
-        SPath spath = new SPath(project, path);
-        User user = resourceManager.getSession().getLocalUser();
+        User user = session.getLocalUser();
 
         IActivity activity;
-        if (virtualFileEvent.getFile().isDirectory()) {
-            activity = new FolderDeletedActivity(user, spath);
+
+        if (deletedVirtualFile.isDirectory()) {
+            //TODO create deletion activities for child resources
+            //TODO clean up editor pool and annotations for child resources
+            activity = new FolderDeletedActivity(user, path);
+
         } else {
-            activity = new FileActivity(user, Type.REMOVED, Purpose.ACTIVITY,
-                spath, null, null, null);
+            activity = new FileActivity(user, Type.REMOVED,
+                    FileActivity.Purpose.ACTIVITY, path, null, null, null);
+
+            editorManager.removeAllEditorsForPath(path);
+
+            annotationManager.removeAnnotations(path.getFile());
         }
 
-        project.removeResource(path);
-        editorManager.removeAllEditorsForPath(spath);
+        fireActivity(activity);
 
-        resourceManager.internalFireActivity(activity);
+        //TODO reset the vector time for the deleted file or contained files if folder
     }
 
     @Override
@@ -458,13 +477,6 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         @NotNull
         VirtualFilePropertyEvent filePropertyEvent) {
         // Not interested
-    }
-
-    @Override
-    public void beforeFileDeletion(
-        @NotNull
-        VirtualFileEvent virtualFileEvent) {
-        //Do nothing
     }
 
     @Override
