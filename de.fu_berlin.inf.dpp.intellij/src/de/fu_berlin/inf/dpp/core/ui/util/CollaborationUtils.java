@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFolderImpl;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
@@ -413,22 +412,6 @@ public class CollaborationUtils {
         }
 
         return resources;
-    }
-
-    private static void addRecursively(List<IResource> fileList,
-        IResource resource) throws Exception {
-
-        if (resource.getType() == IResource.FILE) {
-            fileList.add(resource);
-        }
-        if (resource.getType() == IResource.FOLDER) {
-            fileList.add(resource);
-            for (IResource myResource : ((IntelliJFolderImpl) resource)
-                .members()) {
-                addRecursively(fileList, myResource);
-            }
-        }
-
     }
 
     private static String format(long size) {
