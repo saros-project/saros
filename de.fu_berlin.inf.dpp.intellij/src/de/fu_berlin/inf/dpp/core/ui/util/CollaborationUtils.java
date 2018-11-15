@@ -5,7 +5,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
-import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -31,6 +30,7 @@ import org.picocontainer.annotations.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -254,9 +254,9 @@ public class CollaborationUtils {
                 Pair<Long, Long> fileCountAndSize;
 
                 if (sarosSession.isCompletelyShared(project)) {
-                    fileCountAndSize = FileUtils
-                        .getFileCountAndSize(Arrays.asList(project.members()),
-                            true, IContainer.FILE);
+                    fileCountAndSize = getFileCountAndSize(
+                        Arrays.asList(project.members()), true,
+                        IContainer.FILE);
 
                     result.append(String
                         .format("\nModule: %s, Files: %d, Size: %s",
@@ -266,8 +266,8 @@ public class CollaborationUtils {
                     List<IResource> resources = sarosSession
                         .getSharedResources(project);
 
-                    fileCountAndSize = FileUtils
-                        .getFileCountAndSize(resources, false, IResource.NONE);
+                    fileCountAndSize = getFileCountAndSize(resources, false,
+                        IResource.NONE);
 
                     result.append(String
                         .format("\nModule: %s, Files: %s, Size: %s",
@@ -432,4 +432,66 @@ public class CollaborationUtils {
             .format(Locale.US, "%.2f GB", size / (1000F * 1000F * 1000F));
     }
 
+    /**
+     * Calculates the total file count and size for all resources.
+     *
+     * @param resources      collection containing the resources that file sizes and file
+     *                       count should be calculated
+     * @param includeMembers <code>true</code> to include the members of resources that
+     *                       represents a {@linkplain IContainer container}
+     * @param flags          additional flags on how to process the members of containers
+     * @return a pair containing the
+     * {@linkplain de.fu_berlin.inf.dpp.util.Pair#p file size} and
+     * {@linkplain de.fu_berlin.inf.dpp.util.Pair#v file count} for the
+     * given resources
+     */
+    private static Pair<Long, Long> getFileCountAndSize(
+        Collection<? extends IResource> resources, boolean includeMembers,
+        int flags) {
+        long totalFileSize = 0;
+        long totalFileCount = 0;
+
+        Pair<Long, Long> fileCountAndSize = new Pair<>(0L, 0L);
+
+        for (IResource resource : resources) {
+            switch (resource.getType()) {
+            case IResource.FILE:
+                totalFileCount++;
+
+                try {
+                    IFile file = (IFile) resource.getAdapter(IFile.class);
+
+                    totalFileSize += file.getSize();
+                } catch (IOException e) {
+                    LOG.warn("failed to retrieve size of file " + resource, e);
+                }
+                break;
+            case IResource.PROJECT:
+            case IResource.FOLDER:
+                if (!includeMembers) {
+                    break;
+                }
+
+                try {
+                    IContainer container = ((IContainer) resource
+                        .getAdapter(IContainer.class));
+
+                    Pair<Long, Long> subFileCountAndSize = getFileCountAndSize(
+                        Arrays.asList(container.members(flags)), true, flags);
+
+                    totalFileSize += subFileCountAndSize.p;
+                    totalFileCount += subFileCountAndSize.v;
+
+                } catch (Exception e) {
+                    LOG.warn("failed to process container: " + resource, e);
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        fileCountAndSize.p = totalFileSize;
+        fileCountAndSize.v = totalFileCount;
+        return fileCountAndSize;
+    }
 }
