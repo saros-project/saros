@@ -59,8 +59,6 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     private final LocalEditorManipulator localEditorManipulator;
 
-    private final IntelliJWorkspaceImpl intelliJWorkspaceImpl;
-
     private final AnnotationManager annotationManager;
 
     @Override
@@ -69,7 +67,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
             sarosSession.addActivityProducer(SharedResourcesManager.this);
             sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
-            intelliJWorkspaceImpl.addResourceListener(fileSystemListener);
+            fileSystemListener.setEnabled(true);
 
         }, ModalityState.defaultModalityState());
     }
@@ -78,7 +76,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
     public void stop() {
         ApplicationManager.getApplication().invokeAndWait(() -> {
 
-            intelliJWorkspaceImpl.removeResourceListener(fileSystemListener);
+            fileSystemListener.setEnabled(false);
             sarosSession.removeActivityProducer(SharedResourcesManager.this);
             sarosSession.removeActivityConsumer(consumer);
 
@@ -97,8 +95,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
-        fileSystemListener = new FileSystemChangeListener(this, editorManager);
-        this.intelliJWorkspaceImpl = intelliJWorkspaceImpl;
+        fileSystemListener = new FileSystemChangeListener(this, editorManager,
+            intelliJWorkspaceImpl);
         this.annotationManager = annotationManager;
     }
 

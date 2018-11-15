@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileMoveEvent;
 import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import com.intellij.openapi.vfs.encoding.EncodingProjectManager;
+
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
@@ -26,7 +27,9 @@ import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.session.User;
+
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,18 +41,26 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Virtual file system listener. It receives events for all files in all projects
- * opened by the user.
- * <p/>
- * It filters for files that are shared and calls the corresponding methods for
- * {@link IActivity}-creation on the {@link SharedResourcesManager}.
+ * Virtual file system listener. It receives events for all files in all
+ * projects opened by the user.
+ * It filters for files that are shared and creates the corresponding activities
+ * dispatches these activities using
+ * {@link SharedResourcesManager#fireActivity(IActivity)}.
+ * <p>
+ * The listener is enabled by default when the session context is created.
+ * </p>
+ *
+ * @see VirtualFileListener
  */
+//TODO decouple from SharedResourceManager and add to session context instead
 public class FileSystemChangeListener extends AbstractStoppableListener
     implements VirtualFileListener {
 
     private static final Logger LOG = Logger
         .getLogger(FileSystemChangeListener.class);
+
     private final SharedResourcesManager resourceManager;
+    private final IntelliJWorkspaceImpl intellijWorkspace;
 
     //HACK: This list is used to filter events for files that were created from
     //remote, because we can not disable the listener for them
@@ -58,9 +69,13 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     private final Set<VirtualFile> newFiles = new HashSet<VirtualFile>();
 
     public FileSystemChangeListener(SharedResourcesManager resourceManager,
-        EditorManager editorManager) {
+        EditorManager editorManager, IntelliJWorkspaceImpl intellijWorkspace) {
         super(editorManager);
+
         this.resourceManager = resourceManager;
+        this.intellijWorkspace = intellijWorkspace;
+
+        intellijWorkspace.addResourceListener(this);
     }
 
     private void generateFolderMove(SPath oldSPath, SPath newSPath,
@@ -525,5 +540,34 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
         
         return null;
+    }
+
+    /**
+     * Enables or disables the filesystem listener. This is done by registering
+     * or unregistering the listener.
+     * <p>
+     * This method does nothing if the given state already matches the
+     * current state.
+     * </p>
+     *
+     * @param enabled <code>true</code> to enable the listener,
+     *                <code>false</code> to disable the listener
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (this.enabled && !enabled) {
+            LOG.trace("Disabling filesystem listener");
+
+            this.enabled = false;
+
+            intellijWorkspace.removeResourceListener(this);
+
+        } else if (!this.enabled && enabled) {
+            LOG.trace("Enabling filesystem listener");
+
+            this.enabled = true;
+
+            intellijWorkspace.addResourceListener(this);
+        }
     }
 }
