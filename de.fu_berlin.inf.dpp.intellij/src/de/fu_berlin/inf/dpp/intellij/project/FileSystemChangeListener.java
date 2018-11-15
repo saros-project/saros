@@ -209,6 +209,53 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     /**
      * {@inheritDoc}
      * <p></p>
+     * Generates and dispatches creation activities for copied files. Copied
+     * directories are handled by {@link #fileCreated(VirtualFileEvent)} and
+     * contained files are subsequently handled by this listener.
+     *
+     * @param virtualFileCopyEvent {@inheritDoc}
+     */
+    @Override
+    public void fileCopied(
+        @NotNull
+            VirtualFileCopyEvent virtualFileCopyEvent) {
+
+        assert enabled : "the file copied listener was triggered while it was disabled";
+
+        VirtualFile copy = virtualFileCopyEvent.getFile();
+
+        assert !copy
+            .isDirectory() : "Unexpected copying event for directory. This should have been handled by the creation listener.";
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Reacting to resource copying - original: "
+                + virtualFileCopyEvent.getOriginalFile() + ", copy: " + copy);
+        }
+
+        SPath copyPath = VirtualFileConverter.convertToSPath(copy);
+
+        if (copyPath == null || !session.isShared(copyPath.getResource())) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Ignoring non-shared resource copy: " + copy);
+            }
+
+            return;
+        }
+
+        User user = session.getLocalUser();
+        String charset = copy.getCharset().name();
+
+        byte[] content = getContent(copy);
+
+        IActivity activity = new FileActivity(user, Type.CREATED,
+            FileActivity.Purpose.ACTIVITY, copyPath, null, content, charset);
+
+        fireActivity(activity);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p></p>
      * Generates and dispatches a deletion activity for the deleted resource. If
      * the resource was a file, subsequently removes any editors for the file
      * from the editor pool and drops any held annotations for the file.
@@ -698,53 +745,6 @@ public class FileSystemChangeListener extends AbstractStoppableListener
                     + ", new value: " + newValue);
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p></p>
-     * Generates and dispatches creation activities for copied files. Copied
-     * directories are handled by {@link #fileCreated(VirtualFileEvent)} and
-     * contained files are subsequently handled by this listener.
-     *
-     * @param virtualFileCopyEvent {@inheritDoc}
-     */
-    @Override
-    public void fileCopied(
-        @NotNull
-            VirtualFileCopyEvent virtualFileCopyEvent) {
-
-        assert enabled : "the file copied listener was triggered while it was disabled";
-
-        VirtualFile copy = virtualFileCopyEvent.getFile();
-
-        assert !copy
-            .isDirectory() : "Unexpected copying event for directory. This should have been handled by the creation listener.";
-
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Reacting to resource copying - original: "
-                + virtualFileCopyEvent.getOriginalFile() + ", copy: " + copy);
-        }
-
-        SPath copyPath = VirtualFileConverter.convertToSPath(copy);
-
-        if (copyPath == null || !session.isShared(copyPath.getResource())) {
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Ignoring non-shared resource copy: " + copy);
-            }
-
-            return;
-        }
-
-        User user = session.getLocalUser();
-        String charset = copy.getCharset().name();
-
-        byte[] content = getContent(copy);
-
-        IActivity activity = new FileActivity(user, Type.CREATED,
-            FileActivity.Purpose.ACTIVITY, copyPath, null, content, charset);
-
-        fireActivity(activity);
     }
 
     /**
