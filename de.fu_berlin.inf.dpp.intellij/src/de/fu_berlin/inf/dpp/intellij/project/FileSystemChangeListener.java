@@ -106,8 +106,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      */
     @Override
     public void beforeContentsChange(
-            @NotNull
-                    VirtualFileEvent virtualFileEvent) {
+        @NotNull
+            VirtualFileEvent virtualFileEvent) {
 
         assert enabled : "the before contents change listener was triggered while it was disabled";
 
@@ -122,7 +122,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (path == null || !session.isShared(path.getResource())) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace(
-                        "Ignoring non-shared resource's contents change: " + file);
+                    "Ignoring non-shared resource's contents change: " + file);
             }
 
             return;
@@ -131,7 +131,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (virtualFileEvent.isFromSave()) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Ignoring contents change for " + file
-                        + " as they were caused by a document save.");
+                    + " as they were caused by a document save.");
             }
 
             //TODO dispatch save activity for saved file
@@ -141,8 +141,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (virtualFileEvent.isFromRefresh()) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Ignoring contents change for " + file
-                        + " as they were caused by a filesystem snapshot refresh. "
-                        + "This is already handled by the document listener.");
+                    + " as they were caused by a filesystem snapshot refresh. "
+                    + "This is already handled by the document listener.");
             }
 
             return;
@@ -150,8 +150,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         //TODO figure out if this can happen
         LOG.warn("Detected unhandled content change on the virtual file level "
-                + "for " + file + ", requested by: " + virtualFileEvent
-                .getRequestor());
+            + "for " + file + ", requested by: " + virtualFileEvent
+            .getRequestor());
     }
 
     /**
@@ -163,8 +163,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      */
     @Override
     public void fileCreated(
-            @NotNull
-                    VirtualFileEvent virtualFileEvent) {
+        @NotNull
+            VirtualFileEvent virtualFileEvent) {
 
         assert enabled : "the file created listener was triggered while it was disabled";
 
@@ -179,7 +179,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (path == null || !session.isShared(path.getResource())) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Ignoring non-shared resource creation: "
-                        + createdVirtualFile);
+                    + createdVirtualFile);
             }
 
             return;
@@ -198,7 +198,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             byte[] content = getContent(createdVirtualFile);
 
             activity = new FileActivity(user, Type.CREATED,
-                    FileActivity.Purpose.ACTIVITY, path, null, content, charset);
+                FileActivity.Purpose.ACTIVITY, path, null, content, charset);
 
             editorManager.openEditor(path, false);
         }
@@ -217,8 +217,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      */
     @Override
     public void beforeFileDeletion(
-            @NotNull
-                    VirtualFileEvent virtualFileEvent) {
+        @NotNull
+            VirtualFileEvent virtualFileEvent) {
 
         assert enabled : "the before file deletion listener was triggered while it was disabled";
 
@@ -226,7 +226,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         if (LOG.isTraceEnabled()) {
             LOG.trace(
-                    "Reacting before resource deletion: " + deletedVirtualFile);
+                "Reacting before resource deletion: " + deletedVirtualFile);
         }
 
         SPath path = VirtualFileConverter.convertToSPath(deletedVirtualFile);
@@ -234,7 +234,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (path == null || !session.isShared(path.getResource())) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Ignoring non-shared resource deletion: "
-                        + deletedVirtualFile);
+                    + deletedVirtualFile);
             }
 
             return;
@@ -251,7 +251,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         } else {
             activity = new FileActivity(user, Type.REMOVED,
-                    FileActivity.Purpose.ACTIVITY, path, null, null, null);
+                FileActivity.Purpose.ACTIVITY, path, null, null, null);
 
             editorManager.removeAllEditorsForPath(path);
 
@@ -297,8 +297,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      */
     @Override
     public void beforeFileMovement(
-            @NotNull
-                    VirtualFileMoveEvent virtualFileMoveEvent) {
+        @NotNull
+            VirtualFileMoveEvent virtualFileMoveEvent) {
 
         assert enabled : "the before file move listener was triggered while it was disabled";
 
@@ -308,7 +308,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("Reacting before resource move - resource: " + oldFile
-                    + ", old parent: " + oldParent + ", new Parent: " + newParent);
+                + ", old parent: " + oldParent + ", new Parent: " + newParent);
         }
 
         if (oldFile.isDirectory()) {
@@ -359,17 +359,17 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
      */
     private void generateFolderMove(
-            @NotNull
-                    VirtualFile oldFile,
-            @NotNull
-                    VirtualFile oldParent,
-            @NotNull
-                    VirtualFile newParent,
-            @Nullable
-                    String newFolderName) {
+        @NotNull
+            VirtualFile oldFile,
+        @NotNull
+            VirtualFile oldParent,
+        @NotNull
+            VirtualFile newParent,
+        @Nullable
+            String newFolderName) {
 
         String folderName =
-                newFolderName != null ? newFolderName : oldFile.getName();
+            newFolderName != null ? newFolderName : oldFile.getName();
 
         SPath oldPath = VirtualFileConverter.convertToSPath(oldFile);
         SPath newParentPath = VirtualFileConverter.convertToSPath(newParent);
@@ -377,16 +377,16 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         User user = session.getLocalUser();
 
         boolean oldPathIsShared =
-                oldPath != null && session.isShared(oldPath.getResource());
+            oldPath != null && session.isShared(oldPath.getResource());
         boolean newPathIsShared = newParentPath != null && session
-                .isShared(newParentPath.getResource());
+            .isShared(newParentPath.getResource());
 
         if (!oldPathIsShared && !newPathIsShared) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace(
-                        "Ignoring non-shared resource move - resource: " + oldFile
-                                + ", old parent: " + oldParent + ", new Parent: "
-                                + newParent);
+                    "Ignoring non-shared resource move - resource: " + oldFile
+                        + ", old parent: " + oldParent + ", new Parent: "
+                        + newParent);
             }
 
             return;
@@ -424,28 +424,28 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
             if (!fileOrDir.isDirectory()) {
                 generateFileMove(fileOrDir, oldParent, newParent, newFolderName,
-                        null);
+                    null);
 
                 return true;
             }
 
             if (newPathIsShared) {
                 SPath newFolderPath = new SPath(newParentPath.getProject(),
-                        newParentPath.getProjectRelativePath().append(folderName)
-                                .append(relativePath));
+                    newParentPath.getProjectRelativePath().append(folderName)
+                        .append(relativePath));
 
                 IActivity newFolderCreatedActivity = new FolderCreatedActivity(
-                        user, newFolderPath);
+                    user, newFolderPath);
 
                 fireActivity(newFolderCreatedActivity);
             }
 
             if (oldPathIsShared) {
                 SPath oldFolderPath = new SPath(oldPath.getProject(),
-                        oldPath.getProjectRelativePath().append(relativePath));
+                    oldPath.getProjectRelativePath().append(relativePath));
 
                 IActivity newFolderDeletedActivity = new FolderDeletedActivity(
-                        user, oldFolderPath);
+                    user, oldFolderPath);
 
                 queuedDeletionActivities.addFirst(newFolderDeletedActivity);
             }
@@ -460,7 +460,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
          * virtualFileFilter. This also applies to the base directory.
          */
         VfsUtilCore.iterateChildrenRecursively(oldFile, virtualFileFilter,
-                contentIterator);
+            contentIterator);
 
         while (!queuedDeletionActivities.isEmpty()) {
             fireActivity(queuedDeletionActivities.pop());
@@ -512,29 +512,29 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
      */
     private void generateFileMove(
-            @NotNull
-                    VirtualFile oldFile,
-            @NotNull
-                    VirtualFile oldBaseParent,
-            @NotNull
-                    VirtualFile newBaseParent,
-            @Nullable
-                    String newBaseName,
-            @Nullable
-                    String newFileName) {
+        @NotNull
+            VirtualFile oldFile,
+        @NotNull
+            VirtualFile oldBaseParent,
+        @NotNull
+            VirtualFile newBaseParent,
+        @Nullable
+            String newBaseName,
+        @Nullable
+            String newFileName) {
 
         String encoding = oldFile.getCharset().name();
 
         SPath oldFilePath = VirtualFileConverter.convertToSPath(oldFile);
         SPath newParentPath = VirtualFileConverter
-                .convertToSPath(newBaseParent);
+            .convertToSPath(newBaseParent);
 
         User user = session.getLocalUser();
 
         boolean oldPathIsShared =
-                oldFilePath != null && session.isShared(oldFilePath.getResource());
+            oldFilePath != null && session.isShared(oldFilePath.getResource());
         boolean newPathIsShared = newParentPath != null && session
-                .isShared(newParentPath.getResource());
+            .isShared(newParentPath.getResource());
 
         boolean fileIsOpen = projectAPI.isOpen(oldFile);
 
@@ -546,12 +546,12 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         if (newBaseName != null) {
             relativePath = IntelliJPathImpl.fromString(newBaseName)
-                    .append(relativePath.removeFirstSegments(1));
+                .append(relativePath.removeFirstSegments(1));
         }
 
         if (newFileName != null) {
             relativePath = relativePath.removeLastSegments(1)
-                    .append(IntelliJPathImpl.fromString(newFileName));
+                .append(IntelliJPathImpl.fromString(newFileName));
         }
 
         IActivity activity;
@@ -559,27 +559,27 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (oldPathIsShared && newPathIsShared) {
             //moved file inside shared modules
             SPath newFilePath = new SPath(newParentPath.getProject(),
-                    newParentPath.getProjectRelativePath().append(relativePath));
+                newParentPath.getProjectRelativePath().append(relativePath));
 
             activity = new FileActivity(user, Type.MOVED,
-                    FileActivity.Purpose.ACTIVITY, newFilePath, oldFilePath, null,
-                    encoding);
+                FileActivity.Purpose.ACTIVITY, newFilePath, oldFilePath, null,
+                encoding);
 
             editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
 
             annotationManager.updateAnnotationPath(oldFilePath.getFile(),
-                    newFilePath.getFile());
+                newFilePath.getFile());
 
         } else if (newPathIsShared) {
             //moved file into shared module
             byte[] fileContent = getContent(oldFile);
 
             SPath newFilePath = new SPath(newParentPath.getProject(),
-                    newParentPath.getProjectRelativePath().append(relativePath));
+                newParentPath.getProjectRelativePath().append(relativePath));
 
             activity = new FileActivity(user, Type.CREATED,
-                    FileActivity.Purpose.ACTIVITY, newFilePath, null, fileContent,
-                    encoding);
+                FileActivity.Purpose.ACTIVITY, newFilePath, null, fileContent,
+                encoding);
 
             if (fileIsOpen) {
                 Editor editor = projectAPI.openEditor(oldFile, false);
@@ -590,7 +590,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         } else if (oldPathIsShared) {
             //moved file out of shared module
             activity = new FileActivity(user, Type.REMOVED,
-                    FileActivity.Purpose.ACTIVITY, oldFilePath, null, null, null);
+                FileActivity.Purpose.ACTIVITY, oldFilePath, null, null, null);
 
             editorManager.removeAllEditorsForPath(oldFilePath);
 
@@ -600,9 +600,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             //neither source nor destination are shared
             if (LOG.isTraceEnabled()) {
                 LOG.trace(
-                        "Ignoring non-shared resource move - resource: " + oldFile
-                                + ", old base parent: " + oldBaseParent
-                                + ", new base parent: " + newBaseParent);
+                    "Ignoring non-shared resource move - resource: " + oldFile
+                        + ", old base parent: " + oldBaseParent
+                        + ", new base parent: " + newBaseParent);
             }
 
             return;
@@ -613,7 +613,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         if (oldPathIsShared) {
             if (fileIsOpen) {
                 EditorActivity closeOldEditorActivity = new EditorActivity(user,
-                        EditorActivity.Type.CLOSED, oldFilePath);
+                    EditorActivity.Type.CLOSED, oldFilePath);
 
                 fireActivity(closeOldEditorActivity);
             }
@@ -648,8 +648,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      */
     @Override
     public void beforePropertyChange(
-            @NotNull
-                    VirtualFilePropertyEvent filePropertyEvent) {
+        @NotNull
+            VirtualFilePropertyEvent filePropertyEvent) {
 
         assert enabled : "the before property change listener was triggered while it was disabled";
 
@@ -665,8 +665,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
             if (LOG.isTraceEnabled()) {
                 LOG.trace(
-                        "Reacting before resource name change - resource: " + file
-                                + ", old name: " + oldName + ", new name: " + newName);
+                    "Reacting before resource name change - resource: " + file
+                        + ", old name: " + oldName + ", new name: " + newName);
             }
 
             VirtualFile parent = file.getParent();
@@ -677,7 +677,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
                 if (path != null && session.isShared(path.getResource())) {
                     LOG.error("Renamed resource is a root directory. "
-                            + "Such an activity can not be shared through Saros.");
+                        + "Such an activity can not be shared through Saros.");
                 }
 
                 return;
@@ -694,8 +694,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         default:
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Ignoring change of property + " + propertyName
-                        + " for file " + file + " - old value: " + oldValue
-                        + ", new value: " + newValue);
+                    + " for file " + file + " - old value: " + oldValue
+                    + ", new value: " + newValue);
             }
         }
     }
@@ -711,19 +711,19 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      */
     @Override
     public void fileCopied(
-            @NotNull
-                    VirtualFileCopyEvent virtualFileCopyEvent) {
+        @NotNull
+            VirtualFileCopyEvent virtualFileCopyEvent) {
 
         assert enabled : "the file copied listener was triggered while it was disabled";
 
         VirtualFile copy = virtualFileCopyEvent.getFile();
 
         assert !copy
-                .isDirectory() : "Unexpected copying event for directory. This should have been handled by the creation listener.";
+            .isDirectory() : "Unexpected copying event for directory. This should have been handled by the creation listener.";
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("Reacting to resource copying - original: "
-                    + virtualFileCopyEvent.getOriginalFile() + ", copy: " + copy);
+                + virtualFileCopyEvent.getOriginalFile() + ", copy: " + copy);
         }
 
         SPath copyPath = VirtualFileConverter.convertToSPath(copy);
@@ -742,7 +742,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         byte[] content = getContent(copy);
 
         IActivity activity = new FileActivity(user, Type.CREATED,
-                FileActivity.Purpose.ACTIVITY, copyPath, null, content, charset);
+            FileActivity.Purpose.ACTIVITY, copyPath, null, content, charset);
 
         fireActivity(activity);
     }
@@ -757,21 +757,21 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      */
     @Nullable
     private IPath getRelativePath(
-            @NotNull
-                    VirtualFile root,
-            @NotNull
-                    VirtualFile file) {
+        @NotNull
+            VirtualFile root,
+        @NotNull
+            VirtualFile file) {
 
         try {
             Path relativePath = Paths.get(root.getPath())
-                    .relativize(Paths.get(file.getPath()));
+                .relativize(Paths.get(file.getPath()));
 
             return IntelliJPathImpl.fromString(relativePath.toString());
 
         } catch (IllegalArgumentException e) {
             LOG.warn(
-                    "Could not find a relative path from the content root " + root
-                            + " to the file " + file, e);
+                "Could not find a relative path from the content root " + root
+                    + " to the file " + file, e);
 
             return null;
         }
@@ -799,9 +799,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
             } else {
                 LOG.debug("Could not get Document for file " + file
-                        + ", using file content on disk instead. This content might"
-                        + " not correctly represent the current state of the file"
-                        + " in Intellij.");
+                    + ", using file content on disk instead. This content might"
+                    + " not correctly represent the current state of the file"
+                    + " in Intellij.");
 
                 return file.contentsToByteArray();
             }
@@ -820,8 +820,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
      * @see SharedResourcesManager#internalFireActivity(IActivity)
      */
     private void fireActivity(
-            @NotNull
-                    IActivity activity) {
+        @NotNull
+            IActivity activity) {
 
         LOG.debug("Dispatching resource activity " + activity);
 
