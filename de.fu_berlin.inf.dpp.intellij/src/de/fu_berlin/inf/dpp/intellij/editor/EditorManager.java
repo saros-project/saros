@@ -553,10 +553,6 @@ public class EditorManager extends AbstractActivityProducer
         localEditorHandler.saveDocument(path);
     }
 
-    public boolean isOpenedInEditor(SPath path) {
-        return editorPool.getEditor(path) != null;
-    }
-
     public void removeAllEditorsForPath(SPath path) {
         editorPool.removeEditor(path);
     }
@@ -586,19 +582,6 @@ public class EditorManager extends AbstractActivityProducer
 
     public boolean isActiveEditorShared() {
         return activeEditor != null && isSharedEditor(activeEditor);
-    }
-
-    /**
-     * This method is only for sending the initial content of a file
-     * created with a template.
-     *
-     * @param spath
-     * @param initialContent
-     */
-    public void sendTemplateContent(SPath spath, String initialContent) {
-        //An Editor has to be activated, before it can be edited.
-        generateEditorActivated(spath);
-        generateTextEdit(0, initialContent, "", spath);
     }
 
     /**
