@@ -398,52 +398,51 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p></p>
+     * Generates and dispatches creation activities for copied files. Copied
+     * directories are handled by {@link #fileCreated(VirtualFileEvent)} and
+     * contained files are subsequently handled by this listener.
+     *
+     * @param virtualFileCopyEvent {@inheritDoc}
+     */
     @Override
     public void fileCopied(
-        @NotNull
-        VirtualFileCopyEvent virtualFileCopyEvent) {
-        if (!enabled) {
+            @NotNull
+                    VirtualFileCopyEvent virtualFileCopyEvent) {
+
+        assert enabled : "the file copied listener was triggered while it was disabled";
+
+        VirtualFile copy = virtualFileCopyEvent.getFile();
+
+        assert !copy
+                .isDirectory() : "Unexpected copying event for directory. This should have been handled by the creation listener.";
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Reacting to resource copying - original: "
+                    + virtualFileCopyEvent.getOriginalFile() + ", copy: " + copy);
+        }
+
+        SPath copyPath = VirtualFileConverter.convertToSPath(copy);
+
+        if (copyPath == null || !session.isShared(copyPath.getResource())) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Ignoring non-shared resource copy: " + copy);
+            }
+
             return;
         }
 
-        VirtualFile virtualFile = virtualFileCopyEvent.getFile();
-        File newFile = new File(virtualFile.getPath());
+        User user = session.getLocalUser();
+        String charset = copy.getCharset().name();
 
-        if (incomingFilesToFilterFor.remove(newFile)) {
-            return;
-        }
+        byte[] content = getContent(copy);
 
-        IPath path = IntelliJPathImpl.fromString(newFile.getPath());
-        IntelliJProjectImpl project = getProjectForResource(path);
+        IActivity activity = new FileActivity(user, Type.CREATED,
+                FileActivity.Purpose.ACTIVITY, copyPath, null, content, charset);
 
-        if (project == null || !isValidProject(project) ||
-            !isCompletelyShared(project)) {
-            return;
-        }
-
-        path = makeAbsolutePathProjectRelative(path, project);
-
-        SPath spath = new SPath(project, path);
-
-        User user = resourceManager.getSession().getLocalUser();
-        IActivity activity;
-
-        byte[] bytes = new byte[0];
-        try {
-            bytes = virtualFileCopyEvent.getOriginalFile()
-                .contentsToByteArray();
-        } catch (IOException e) {
-            LOG.error("could not read content of original file "
-                + virtualFileCopyEvent.getOriginalFile(), e);
-            return;
-        }
-
-        activity = new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath,
-            null, bytes, virtualFile.getCharset().name());
-
-        project.addFile(newFile);
-
-        resourceManager.internalFireActivity(activity);
+        fireActivity(activity);
     }
 
     @Override
