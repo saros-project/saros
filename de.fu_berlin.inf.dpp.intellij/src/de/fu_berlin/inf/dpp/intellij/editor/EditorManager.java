@@ -989,4 +989,24 @@ public class EditorManager extends AbstractActivityProducer
             }
         });
     }
+
+    /**
+     * Starts the listeners for the given editor and adds it to the editor pool
+     * with the given path.
+     * <p></p>
+     * <b>NOTE:</b> This method should only be used when adding editors for
+     * files that are not yet part of the session scope. This can be the case
+     * when an open file is moved into the session scope. If the file is already
+     * part of the session scope, {@link #openEditor(SPath, boolean)}} should be
+     * used instead as it ensures that the right editor for the path is used.
+     *
+     * @param file   the file to add to the editor pool
+     * @param editor the editor representing the given file
+     * @see #openEditor(SPath, boolean)
+     * @see #startEditor(Editor)
+     */
+    public void addEditorMapping(SPath file, Editor editor) {
+        startEditor(editor);
+        editorPool.add(file, editor);
+    }
 }
