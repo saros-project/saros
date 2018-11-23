@@ -1,4 +1,4 @@
-language: java
+language: java 
 sudo: enabled
 
 # git history is not needed during build
@@ -42,13 +42,19 @@ jobs:
   allow_failures:
     - env: J_TYPE=STF_TEST
   include:
-    - if: type in (push, pull_request)
+    - stage: formatting
+      if: type in (push, pull_request)
+      # Use javascript image in order to use node/npm
+      script:
+        - $PWD/travis/script/format/check_java.sh $PWD
+
+    - stage: build
+      if: type in (push, pull_request)
       before_script: docker pull saros/build_test:0.1
       script:
         - docker run -v $PWD:/home/saros/ci/saros_src saros/build_test:0.1 /home/saros/ci/saros_src/travis/script/build/build_all.sh
       after_success:
         - sonar-scanner
-      # set env to avoid multiple build executions
 
     - <<: *stf_before_script
       script: docker exec -t stf_master scripts/start_stf_tests.sh
