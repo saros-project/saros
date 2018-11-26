@@ -1,101 +1,99 @@
 package de.fu_berlin.inf.dpp.server.progress;
 
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-
 import java.io.PrintStream;
 
 /**
  * Progress indicator supposed to be use for terminal output.
  *
- * Refreshes the same line over and it over again with the current
- * progress until the task is done to avoid flooding the output, but
- * still be up-to-date.
+ * <p>Refreshes the same line over and it over again with the current progress until the task is
+ * done to avoid flooding the output, but still be up-to-date.
  *
- * Redraws in the next line if stdout is used in the meantime
- * (e.g. by a logger). Avoid excessive logging while this is in use.
+ * <p>Redraws in the next line if stdout is used in the meantime (e.g. by a logger). Avoid excessive
+ * logging while this is in use.
  *
- * Alternatively use {@link de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor}
- * to disable progress reporting.
+ * <p>Alternatively use {@link de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor} to disable
+ * progress reporting.
  */
 public class ConsoleProgressIndicator implements IProgressMonitor {
-    private PrintStream out;
-    private boolean canceled = false;
-    
-    private int total = 0;
-    private int worked = 0;
+  private PrintStream out;
+  private boolean canceled = false;
 
-    private String task;
-    private String subTask;
+  private int total = 0;
+  private int worked = 0;
 
-    private int animationFrameId = 0;
-    private String[] animationFrames = {"[-] ", "[\\] ", "[|] ", "[/] "};
+  private String task;
+  private String subTask;
 
-    public ConsoleProgressIndicator(PrintStream out) {
-        this.out = out;
+  private int animationFrameId = 0;
+  private String[] animationFrames = {"[-] ", "[\\] ", "[|] ", "[/] "};
+
+  public ConsoleProgressIndicator(PrintStream out) {
+    this.out = out;
+  }
+
+  @Override
+  public void done() {
+    out.print('\n');
+  }
+
+  @Override
+  public void subTask(String name) {
+    if (!name.equals(subTask)) {
+      subTask = name;
+      print();
     }
+  }
 
-    @Override
-    public void done() {
-        out.print('\n');
+  @Override
+  public void setTaskName(String name) {
+    if (!name.equals(task)) {
+      task = name;
+      print();
     }
+  }
 
-    @Override
-    public void subTask(String name) {
-        if (!name.equals(subTask)) {
-            subTask = name;
-            print();
-        }
+  @Override
+  public void worked(int amount) {
+    if (amount != worked) {
+      worked = amount;
+      print();
     }
+  }
 
-    @Override
-    public void setTaskName(String name) {
-        if (!name.equals(task)) {
-            task = name;
-            print();
-        }
+  @Override
+  public void setCanceled(boolean canceled) {
+    if (canceled != this.canceled) {
+      this.canceled = canceled;
+      print();
     }
+  }
 
-    @Override
-    public void worked(int amount) {
-        if (amount != worked) {
-            worked = amount;
-            print();
-        }
-    }
+  @Override
+  public boolean isCanceled() {
+    return canceled;
+  }
 
-    @Override
-    public void setCanceled(boolean canceled) {
-        if (canceled != this.canceled) {
-            this.canceled = canceled;
-            print();
-        }
-    }
+  @Override
+  public void beginTask(String name, int size) {
+    task = name;
+    total = size;
+    print();
+  }
 
-    @Override
-    public boolean isCanceled() {
-        return canceled;
+  private void print() {
+    if (canceled) {
+      out.print("[CANCELED] ");
+    } else if (total == IProgressMonitor.UNKNOWN) {
+      out.print(animationFrames[animationFrameId]);
+      animationFrameId = (animationFrameId + 1) % animationFrames.length;
+    } else {
+      out.printf("[%2d%%] ", worked / total);
     }
-
-    @Override
-    public void beginTask(String name, int size) {
-        task = name;
-        total = size;
-        print();
+    out.print(task);
+    if (subTask != null) {
+      out.printf(" - %s", subTask);
     }
-
-    private void print() {
-        if (canceled) {
-            out.print("[CANCELED] ");
-        } else if (total == IProgressMonitor.UNKNOWN) {
-            out.print(animationFrames[animationFrameId]);
-            animationFrameId = (animationFrameId + 1) % animationFrames.length;
-        } else {
-            out.printf("[%2d%%] ", worked / total);
-        }
-        out.print(task);
-        if (subTask != null) {
-            out.printf(" - %s", subTask);
-        }
-        out.print('\r');
-    }
+    out.print('\r');
+  }
 }

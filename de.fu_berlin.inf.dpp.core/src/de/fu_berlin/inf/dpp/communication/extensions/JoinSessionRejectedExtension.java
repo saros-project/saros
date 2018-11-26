@@ -5,13 +5,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("JSRj")
 public class JoinSessionRejectedExtension extends SarosPacketExtension {
 
-    public static final Provider PROVIDER = new Provider();
+  public static final Provider PROVIDER = new Provider();
 
-    public static class Provider extends
-        SarosPacketExtension.Provider<JoinSessionRejectedExtension> {
+  public static class Provider extends SarosPacketExtension.Provider<JoinSessionRejectedExtension> {
 
-        private Provider() {
-            super("joinRequestRejected", JoinSessionRejectedExtension.class);
-        }
+    private Provider() {
+      super("joinRequestRejected", JoinSessionRejectedExtension.class);
     }
+  }
 }

@@ -7,35 +7,30 @@ import org.junit.Test;
 
 public class IResourceTest {
 
-    @Test
-    public void testGetAdapter() {
+  @Test
+  public void testGetAdapter() {
 
-        org.eclipse.core.resources.IFolder folder = EasyMock
-            .createMock(org.eclipse.core.resources.IFolder.class);
+    org.eclipse.core.resources.IFolder folder =
+        EasyMock.createMock(org.eclipse.core.resources.IFolder.class);
 
-        Capture<Class<Object>> mappedAdapterClassCapture = new Capture<Class<Object>>();
+    Capture<Class<Object>> mappedAdapterClassCapture = new Capture<Class<Object>>();
 
-        EasyMock
-            .expect(
-                folder.getAdapter(EasyMock.capture(mappedAdapterClassCapture)))
-            .andStubReturn(folder);
+    EasyMock.expect(folder.getAdapter(EasyMock.capture(mappedAdapterClassCapture)))
+        .andStubReturn(folder);
 
-        EasyMock.expect(folder.getType())
-            .andStubReturn(org.eclipse.core.resources.IResource.FOLDER);
+    EasyMock.expect(folder.getType()).andStubReturn(org.eclipse.core.resources.IResource.FOLDER);
 
-        EasyMock.replay(folder);
+    EasyMock.replay(folder);
 
-        final IFolder coreFolder = new EclipseFolderImpl(folder);
+    final IFolder coreFolder = new EclipseFolderImpl(folder);
 
-        final Object adapted = coreFolder.getAdapter(IFolder.class);
+    final Object adapted = coreFolder.getAdapter(IFolder.class);
 
-        EasyMock.verify(folder);
+    EasyMock.verify(folder);
 
-        Assert.assertEquals(org.eclipse.core.resources.IFolder.class,
-            mappedAdapterClassCapture.getValue());
+    Assert.assertEquals(
+        org.eclipse.core.resources.IFolder.class, mappedAdapterClassCapture.getValue());
 
-        Assert.assertTrue("returned adapter is not a folder",
-            adapted instanceof IFolder);
-
-    }
+    Assert.assertTrue("returned adapter is not a folder", adapted instanceof IFolder);
+  }
 }

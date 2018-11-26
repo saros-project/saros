@@ -5,6 +5,5 @@ import org.jivesoftware.smack.RosterListener;
 
 public interface IRosterListener extends RosterListener {
 
-    public void rosterChanged(Roster roster);
-
+  public void rosterChanged(Roster roster);
 }

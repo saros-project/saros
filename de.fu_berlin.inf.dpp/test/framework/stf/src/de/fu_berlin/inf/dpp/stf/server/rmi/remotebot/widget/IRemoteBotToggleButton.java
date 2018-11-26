@@ -5,42 +5,46 @@ import java.rmi.RemoteException;
 
 public interface IRemoteBotToggleButton extends Remote {
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-    public void click() throws RemoteException;
+  /**
+   * ********************************************
+   *
+   * <p>actions
+   *
+   * <p>********************************************
+   */
+  public void click() throws RemoteException;
 
-    public void press() throws RemoteException;
+  public void press() throws RemoteException;
 
-    public void clickAndWait() throws RemoteException;
+  public void clickAndWait() throws RemoteException;
 
-    public void setFocus() throws RemoteException;
+  public void setFocus() throws RemoteException;
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
+  /**
+   * ********************************************
+   *
+   * <p>states
+   *
+   * <p>********************************************
+   */
+  public boolean isPressed() throws RemoteException;
 
-    public boolean isPressed() throws RemoteException;
+  public boolean isEnabled() throws RemoteException;
 
-    public boolean isEnabled() throws RemoteException;
+  public boolean isVisible() throws RemoteException;
 
-    public boolean isVisible() throws RemoteException;
+  public boolean isActive() throws RemoteException;
 
-    public boolean isActive() throws RemoteException;
+  public String getText() throws RemoteException;
 
-    public String getText() throws RemoteException;
+  public String getToolTipText() throws RemoteException;
 
-    public String getToolTipText() throws RemoteException;
-
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
-    public void waitUntilIsEnabled() throws RemoteException;
-
+  /**
+   * ********************************************
+   *
+   * <p>waits until
+   *
+   * <p>********************************************
+   */
+  public void waitUntilIsEnabled() throws RemoteException;
 }

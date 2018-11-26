@@ -1,36 +1,31 @@
 package de.fu_berlin.inf.dpp.communication.extensions;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import de.fu_berlin.inf.dpp.negotiation.FileList;
 import java.util.List;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+@XStreamAlias(/* ProjectNegotiationMissingFiles */ "PNMF")
+public class ProjectNegotiationMissingFilesExtension extends ProjectNegotiationExtension {
 
-import de.fu_berlin.inf.dpp.negotiation.FileList;
+  public static final Provider PROVIDER = new Provider();
 
-@XStreamAlias(/* ProjectNegotiationMissingFiles */"PNMF")
-public class ProjectNegotiationMissingFilesExtension extends
-    ProjectNegotiationExtension {
+  private final List<FileList> fileLists;
 
-    public static final Provider PROVIDER = new Provider();
+  public ProjectNegotiationMissingFilesExtension(
+      String sessionID, String negotiationID, List<FileList> fileLists) {
+    super(sessionID, negotiationID);
+    this.fileLists = fileLists;
+  }
 
-    private final List<FileList> fileLists;
+  public List<FileList> getFileLists() {
+    return fileLists;
+  }
 
-    public ProjectNegotiationMissingFilesExtension(String sessionID,
-        String negotiationID, List<FileList> fileLists) {
-        super(sessionID, negotiationID);
-        this.fileLists = fileLists;
+  public static class Provider
+      extends ProjectNegotiationExtension.Provider<ProjectNegotiationMissingFilesExtension> {
+
+    private Provider() {
+      super("pnmf", ProjectNegotiationMissingFilesExtension.class, FileList.class);
     }
-
-    public List<FileList> getFileLists() {
-        return fileLists;
-    }
-
-    public static class Provider
-        extends
-        ProjectNegotiationExtension.Provider<ProjectNegotiationMissingFilesExtension> {
-
-        private Provider() {
-            super("pnmf", ProjectNegotiationMissingFilesExtension.class,
-                FileList.class);
-        }
-    }
+  }
 }

@@ -25,35 +25,34 @@ package de.fu_berlin.inf.dpp.session;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 
 /**
- * An {@link ISessionLifecycleListener} which does nothing by default. Extend
- * this class if you only want to react to specific lifecycle events.
+ * An {@link ISessionLifecycleListener} which does nothing by default. Extend this class if you only
+ * want to react to specific lifecycle events.
  */
 public class NullSessionLifecycleListener implements ISessionLifecycleListener {
 
-    @Override
-    public void sessionStarting(ISarosSession session) {
-        // NOP
-    }
+  @Override
+  public void sessionStarting(ISarosSession session) {
+    // NOP
+  }
 
-    @Override
-    public void sessionStarted(ISarosSession session) {
-        // NOP
-    }
+  @Override
+  public void sessionStarted(ISarosSession session) {
+    // NOP
+  }
 
-    @Override
-    public void sessionEnding(ISarosSession session) {
-        // NOP
-    }
+  @Override
+  public void sessionEnding(ISarosSession session) {
+    // NOP
+  }
 
-    @Override
-    public void sessionEnded(ISarosSession session, SessionEndReason reason) {
-        // NOP
-    }
+  @Override
+  public void sessionEnded(ISarosSession session, SessionEndReason reason) {
+    // NOP
+  }
 
-    @Override
-    public void postOutgoingInvitationCompleted(ISarosSession session,
-        User user, IProgressMonitor monitor) {
-        // NOP
-    }
-
+  @Override
+  public void postOutgoingInvitationCompleted(
+      ISarosSession session, User user, IProgressMonitor monitor) {
+    // NOP
+  }
 }

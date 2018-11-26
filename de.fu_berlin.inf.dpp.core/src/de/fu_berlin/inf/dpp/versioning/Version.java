@@ -4,153 +4,142 @@ import java.util.StringTokenizer;
 
 public class Version implements Comparable<Version> {
 
-    /**
-     * Unique version instance representing an invalid version.
-     */
-    public static final Version INVALID = new Version(0, 0, 0, "invalid");
+  /** Unique version instance representing an invalid version. */
+  public static final Version INVALID = new Version(0, 0, 0, "invalid");
 
-    private static final String SEPARATOR = ".";
+  private static final String SEPARATOR = ".";
 
-    private final int major;
+  private final int major;
 
-    private final int minor;
+  private final int minor;
 
-    private final int micro;
+  private final int micro;
 
-    private final String qualifier;
+  private final String qualifier;
 
-    private final String asString;
+  private final String asString;
 
-    private Version(final int major, final int minor, final int micro,
-        final String qualifier) {
+  private Version(final int major, final int minor, final int micro, final String qualifier) {
 
-        if (major < 0 || minor < 0 || micro < 0)
-            throw new IllegalArgumentException(
-                "version contains negative numbers major: " + major
-                    + " minor: " + minor + " micro: " + micro);
+    if (major < 0 || minor < 0 || micro < 0)
+      throw new IllegalArgumentException(
+          "version contains negative numbers major: "
+              + major
+              + " minor: "
+              + minor
+              + " micro: "
+              + micro);
 
-        this.major = major;
-        this.minor = minor;
-        this.micro = micro;
-        this.qualifier = (qualifier == null) ? "" : qualifier;
+    this.major = major;
+    this.minor = minor;
+    this.micro = micro;
+    this.qualifier = (qualifier == null) ? "" : qualifier;
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(major);
-        builder.append(SEPARATOR);
-        builder.append(minor);
-        builder.append(SEPARATOR);
-        builder.append(micro);
+    StringBuilder builder = new StringBuilder();
+    builder.append(major);
+    builder.append(SEPARATOR);
+    builder.append(minor);
+    builder.append(SEPARATOR);
+    builder.append(micro);
 
-        if (!this.qualifier.isEmpty()) {
-            builder.append(SEPARATOR);
-            builder.append(qualifier);
-        }
-
-        this.asString = builder.toString();
+    if (!this.qualifier.isEmpty()) {
+      builder.append(SEPARATOR);
+      builder.append(qualifier);
     }
 
-    /**
-     * Parses a version identifier from the specified string. Identifier that
-     * cannot be parsed will return the {@link #INVALID} version instance.
-     * 
-     * @param version
-     *            string representation of the version identifier
-     * @return a Version object representing the version identifier
-     */
-    public static Version parseVersion(String version) {
-        if (version == null)
-            throw new NullPointerException("version is null");
+    this.asString = builder.toString();
+  }
 
-        version = version.trim();
+  /**
+   * Parses a version identifier from the specified string. Identifier that cannot be parsed will
+   * return the {@link #INVALID} version instance.
+   *
+   * @param version string representation of the version identifier
+   * @return a Version object representing the version identifier
+   */
+  public static Version parseVersion(String version) {
+    if (version == null) throw new NullPointerException("version is null");
 
-        int major = 0;
-        int minor = 0;
-        int micro = 0;
-        String qualifier = "";
+    version = version.trim();
 
-        if (version.isEmpty())
-            return INVALID;
+    int major = 0;
+    int minor = 0;
+    int micro = 0;
+    String qualifier = "";
 
-        StringTokenizer tokenizer = new StringTokenizer(version, SEPARATOR,
-            true);
+    if (version.isEmpty()) return INVALID;
 
-        parse: try {
+    StringTokenizer tokenizer = new StringTokenizer(version, SEPARATOR, true);
 
-            major = Integer.parseInt(tokenizer.nextToken());
+    parse:
+    try {
 
-            if (!tokenizer.hasMoreTokens())
-                break parse;
+      major = Integer.parseInt(tokenizer.nextToken());
 
-            tokenizer.nextToken(); // delim
-            minor = Integer.parseInt(tokenizer.nextToken());
+      if (!tokenizer.hasMoreTokens()) break parse;
 
-            if (!tokenizer.hasMoreTokens())
-                break parse;
+      tokenizer.nextToken(); // delim
+      minor = Integer.parseInt(tokenizer.nextToken());
 
-            tokenizer.nextToken(); // delim
-            micro = Integer.parseInt(tokenizer.nextToken());
+      if (!tokenizer.hasMoreTokens()) break parse;
 
-            if (!tokenizer.hasMoreTokens())
-                break parse;
+      tokenizer.nextToken(); // delim
+      micro = Integer.parseInt(tokenizer.nextToken());
 
-            tokenizer.nextToken(); // delim
-            qualifier = tokenizer.nextToken(""); // rest
+      if (!tokenizer.hasMoreTokens()) break parse;
 
-        } catch (RuntimeException e) {
-            return INVALID;
-        }
+      tokenizer.nextToken(); // delim
+      qualifier = tokenizer.nextToken(""); // rest
 
-        if (major < 0 || minor < 0 || micro < 0)
-            return INVALID;
-
-        return new Version(major, minor, micro, qualifier);
+    } catch (RuntimeException e) {
+      return INVALID;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + major;
-        result = prime * result + micro;
-        result = prime * result + minor;
-        return result;
-    }
+    if (major < 0 || minor < 0 || micro < 0) return INVALID;
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Version other = (Version) obj;
+    return new Version(major, minor, micro, qualifier);
+  }
 
-        return this.compareTo(other) == 0;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + major;
+    result = prime * result + micro;
+    result = prime * result + minor;
+    return result;
+  }
 
-    @Override
-    public int compareTo(Version other) {
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    Version other = (Version) obj;
 
-        int result;
+    return this.compareTo(other) == 0;
+  }
 
-        result = major - other.major;
+  @Override
+  public int compareTo(Version other) {
 
-        if (result != 0)
-            return result;
+    int result;
 
-        result = minor - other.minor;
+    result = major - other.major;
 
-        if (result != 0)
-            return result;
+    if (result != 0) return result;
 
-        result = micro - other.micro;
+    result = minor - other.minor;
 
-        return result;
-    }
+    if (result != 0) return result;
 
-    @Override
-    public String toString() {
-        return asString;
-    }
+    result = micro - other.micro;
+
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return asString;
+  }
 }

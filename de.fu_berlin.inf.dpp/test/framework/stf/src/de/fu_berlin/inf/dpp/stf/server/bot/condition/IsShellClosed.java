@@ -5,21 +5,21 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 public class IsShellClosed extends DefaultCondition {
 
-    private SWTBotShell shell;
+  private SWTBotShell shell;
 
-    IsShellClosed(SWTBotShell shell) {
+  IsShellClosed(SWTBotShell shell) {
 
-        this.shell = shell;
-    }
+    this.shell = shell;
+  }
 
-    @Override
-    public String getFailureMessage() {
+  @Override
+  public String getFailureMessage() {
 
-        return "shell '" + shell.getText() + "' is still open";
-    }
+    return "shell '" + shell.getText() + "' is still open";
+  }
 
-    @Override
-    public boolean test() throws Exception {
-        return !shell.isOpen();
-    }
+  @Override
+  public boolean test() throws Exception {
+    return !shell.isOpen();
+  }
 }

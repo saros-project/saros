@@ -25,34 +25,27 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * This interface is under development. It currently equals its Eclipse
- * counterpart. If not mentioned otherwise all offered methods are equivalent to
- * their Eclipse counterpart.
+ * This interface is under development. It currently equals its Eclipse counterpart. If not
+ * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
  */
 public interface IFile extends IResource {
-    public String getCharset() throws IOException;
+  public String getCharset() throws IOException;
 
-    public InputStream getContents() throws IOException;
+  public InputStream getContents() throws IOException;
 
-    /**
-     * Equivalent to the Eclipse call
-     * <code>IFile#setContents(input, force, keepHistory, null)</code>
-     */
-    public void setContents(InputStream input, boolean force,
-        boolean keepHistory) throws IOException;
+  /**
+   * Equivalent to the Eclipse call <code>IFile#setContents(input, force, keepHistory, null)</code>
+   */
+  public void setContents(InputStream input, boolean force, boolean keepHistory) throws IOException;
 
-    /**
-     * Equivalent to the Eclipse call
-     * <code>IFile#create(input, force, null)</code>
-     */
-    public void create(InputStream input, boolean force) throws IOException;
+  /** Equivalent to the Eclipse call <code>IFile#create(input, force, null)</code> */
+  public void create(InputStream input, boolean force) throws IOException;
 
-    /**
-     * Returns the size of the file.
-     * 
-     * @return the size of the file in bytes
-     * @throws IOException
-     *             if an I/O error occurred
-     */
-    public long getSize() throws IOException;
+  /**
+   * Returns the size of the file.
+   *
+   * @return the size of the file in bytes
+   * @throws IOException if an I/O error occurred
+   */
+  public long getSize() throws IOException;
 }

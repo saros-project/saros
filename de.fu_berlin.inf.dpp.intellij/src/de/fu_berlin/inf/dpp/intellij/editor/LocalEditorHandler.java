@@ -3,260 +3,234 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
-
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
-
 import org.apache.log4j.Logger;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Class for handling activities on local editors and transforming them to calls to
- * {@link EditorManager} for generating activities .
+ * Class for handling activities on local editors and transforming them to calls to {@link
+ * EditorManager} for generating activities .
  */
 public class LocalEditorHandler {
 
-    private final static Logger LOG = Logger
-        .getLogger(LocalEditorHandler.class);
+  private static final Logger LOG = Logger.getLogger(LocalEditorHandler.class);
 
-    private final ProjectAPI projectAPI;
+  private final ProjectAPI projectAPI;
 
-    /**
-     * This is just a reference to {@link EditorManager}'s editorPool and not a
-     * separate pool.
-     */
-    private EditorPool editorPool;
+  /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
+  private EditorPool editorPool;
 
-    private EditorManager manager;
+  private EditorManager manager;
 
-    public LocalEditorHandler(ProjectAPI projectAPI) {
+  public LocalEditorHandler(ProjectAPI projectAPI) {
 
-        this.projectAPI = projectAPI;
+    this.projectAPI = projectAPI;
+  }
+
+  /**
+   * Initializes all fields that require an EditorManager. It has to be called after the constructor
+   * and before the object is used, otherwise it will not work.
+   *
+   * <p>The reason for this late initialization is that this way the LocalEditorHandler can be
+   * instantiated by the PicoContainer, otherwise there would be a cyclic dependency.
+   *
+   * @param editorManager - an EditorManager
+   */
+  public void initialize(EditorManager editorManager) {
+    this.editorPool = editorManager.getEditorPool();
+    this.manager = editorManager;
+    projectAPI.addFileEditorManagerListener(editorManager.getFileListener());
+  }
+
+  /**
+   * Opens an editor for the passed virtualFile, adds it to the pool of currently open editors and
+   * calls {@link EditorManager#startEditor(Editor)} with it.
+   *
+   * <p><b>Note:</b> This only works for shared resources.
+   *
+   * @param virtualFile path of the file to open
+   * @param activate activate editor after opening
+   * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
+   *     to a shared module
+   */
+  @Nullable
+  public Editor openEditor(@NotNull VirtualFile virtualFile, boolean activate) {
+
+    if (!manager.hasSession()) {
+      return null;
     }
 
-    /**
-     * Initializes all fields that require an EditorManager. It has to be called
-     * after the constructor and before the object is used, otherwise it will not
-     * work.
-     * <p/>
-     * The reason for this late initialization is that this way the LocalEditorHandler
-     * can be instantiated by the PicoContainer, otherwise there would be a cyclic
-     * dependency.
-     *
-     * @param editorManager - an EditorManager
-     */
-    public void initialize(EditorManager editorManager) {
-        this.editorPool = editorManager.getEditorPool();
-        this.manager = editorManager;
-        projectAPI
-            .addFileEditorManagerListener(editorManager.getFileListener());
+    SPath path = VirtualFileConverter.convertToSPath(virtualFile);
+
+    if (path == null || !SessionUtils.isShared(path)) {
+      LOG.debug(
+          "Ignored open editor request for file "
+              + virtualFile
+              + " as it does not belong to a shared module");
+
+      return null;
     }
 
-    /**
-     * Opens an editor for the passed virtualFile, adds it to the pool of
-     * currently open editors and calls
-     * {@link EditorManager#startEditor(Editor)} with it.
-     * <p>
-     * <b>Note:</b> This only works for shared resources.
-     * </p>
-     *
-     * @param virtualFile path of the file to open
-     * @param activate    activate editor after opening
-     * @return the opened <code>Editor</code> or <code>null</code> if the given
-     * file does not belong to a shared module
-     */
-    @Nullable
-    public Editor openEditor(
-        @NotNull
-            VirtualFile virtualFile, boolean activate) {
+    return openEditor(virtualFile, path, activate);
+  }
 
-        if (!manager.hasSession()) {
-            return null;
-        }
+  /**
+   * Opens an editor for the passed virtualFile, adds it to the pool of currently open editors and
+   * calls {@link EditorManager#startEditor(Editor)} with it.
+   *
+   * <p><b>Note:</b> This only works for shared resources that belong to the given module.
+   *
+   * @param virtualFile path of the file to open
+   * @param project module the file belongs to
+   * @param activate activate editor after opening
+   * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
+   *     to a shared module
+   */
+  @Nullable
+  public Editor openEditor(
+      @NotNull VirtualFile virtualFile, @NotNull IProject project, boolean activate) {
 
-        SPath path = VirtualFileConverter.convertToSPath(virtualFile);
+    IResource resource = VirtualFileConverter.convertToResource(virtualFile, project);
 
-        if (path == null || !SessionUtils.isShared(path)) {
-            LOG.debug("Ignored open editor request for file " + virtualFile +
-                " as it does not belong to a shared module");
+    if (resource == null || !SessionUtils.isShared(resource)) {
+      LOG.debug(
+          "Could not open Editor for file "
+              + virtualFile
+              + " as it does not belong to the given module "
+              + project);
 
-            return null;
-        }
-
-        return openEditor(virtualFile,path,activate);
+      return null;
     }
 
-    /**
-     * Opens an editor for the passed virtualFile, adds it to the pool of
-     * currently open editors and calls
-     * {@link EditorManager#startEditor(Editor)} with it.
-     * <p>
-     * <b>Note:</b> This only works for shared resources that belong to the
-     * given module.
-     * </p>
-     *
-     * @param virtualFile path of the file to open
-     * @param project     module the file belongs to
-     * @param activate    activate editor after opening
-     * @return the opened <code>Editor</code> or <code>null</code> if the given
-     * file does not belong to a shared module
-     */
-    @Nullable
-    public Editor openEditor(
-        @NotNull
-            VirtualFile virtualFile,
-        @NotNull
-            IProject project, boolean activate) {
+    return openEditor(virtualFile, new SPath(resource), activate);
+  }
 
-        IResource resource = VirtualFileConverter
-            .convertToResource(virtualFile, project);
+  /**
+   * Opens an editor for the passed virtualFile, adds it to the pool of currently open editors and
+   * calls {@link EditorManager#startEditor(Editor)} with it.
+   *
+   * <p><b>Note:</b> This only works for shared resources.
+   *
+   * <p><b>Note:</b> This method expects the VirtualFile and the SPath to point to the same
+   * resource.
+   *
+   * @param virtualFile path of the file to open
+   * @param path saros resource representation of the file
+   * @param activate activate editor after opening
+   * @return the opened <code>Editor</code> or <code>null</code> if the given file does not exist or
+   *     does not belong to a shared module
+   */
+  @Nullable
+  private Editor openEditor(
+      @NotNull VirtualFile virtualFile, @NotNull SPath path, boolean activate) {
 
-        if (resource == null || !SessionUtils.isShared(resource)) {
-            LOG.debug("Could not open Editor for file " + virtualFile +
-                " as it does not belong to the given module " + project);
+    if (!virtualFile.exists()) {
+      LOG.debug("Could not open Editor for file " + virtualFile + " as it does not exist");
 
-            return null;
-        }
+      return null;
 
-        return openEditor(virtualFile, new SPath(resource), activate);
+    } else if (!SessionUtils.isShared(path)) {
+      LOG.debug("Ignored open editor request for file " + virtualFile + " as it is not shared");
+
+      return null;
     }
 
-    /**
-     * Opens an editor for the passed virtualFile, adds it to the pool of
-     * currently open editors and calls
-     * {@link EditorManager#startEditor(Editor)} with it.
-     * <p>
-     * <b>Note:</b> This only works for shared resources.
-     * </p>
-     * <p>
-     * <b>Note:</b> This method expects the VirtualFile and the SPath to point
-     * to the same resource.
-     * </p>
-     *
-     * @param virtualFile path of the file to open
-     * @param path        saros resource representation of the file
-     * @param activate    activate editor after opening
-     * @return the opened <code>Editor</code> or <code>null</code> if the given
-     * file does not exist or does not belong to a shared module
-     */
-    @Nullable
-    private Editor openEditor(@NotNull VirtualFile virtualFile,
-        @NotNull SPath path, boolean activate){
+    Editor editor = projectAPI.openEditor(virtualFile, activate);
 
-        if(!virtualFile.exists()){
-            LOG.debug("Could not open Editor for file " + virtualFile +
-                " as it does not exist");
+    editorPool.add(path, editor);
+    manager.startEditor(editor);
 
-            return null;
+    LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
 
-        }else if (!SessionUtils.isShared(path)) {
-            LOG.debug("Ignored open editor request for file " + virtualFile +
-                " as it is not shared");
+    return editor;
+  }
 
-            return null;
-        }
+  /**
+   * Removes a file from the editorPool and calls {@link EditorManager#generateEditorClosed(SPath)}
+   *
+   * @param virtualFile
+   */
+  public void closeEditor(@NotNull VirtualFile virtualFile) {
+    SPath path = VirtualFileConverter.convertToSPath(virtualFile);
 
-        Editor editor = projectAPI.openEditor(virtualFile, activate);
+    if (path != null && SessionUtils.isShared(path)) {
+      editorPool.removeEditor(path);
+      manager.generateEditorClosed(path);
+    }
+  }
 
-        editorPool.add(path, editor);
-        manager.startEditor(editor);
+  /**
+   * Removes the resource belonging to the given path from the editor pool
+   *
+   * @param path path
+   */
+  public void removeEditor(@NotNull SPath path) {
+    editorPool.removeEditor(path);
+  }
 
-        LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
+  /**
+   * Saves the document under path, thereby flushing its contents to disk.
+   *
+   * @param path the path for the document to save
+   * @see Document
+   */
+  public void saveDocument(@NotNull SPath path) {
 
-        return editor;
+    Document document = editorPool.getDocument(path);
+
+    if (document == null) {
+      VirtualFile file = VirtualFileConverter.convertToVirtualFile(path);
+
+      if (file == null || !file.exists()) {
+        LOG.warn("Failed to save document for " + path + " - could not get a valid VirtualFile");
+
+        return;
+      }
+
+      document = projectAPI.getDocument(file);
+
+      if (document == null) {
+        LOG.warn("Failed to save document for " + file + " - could not get a matching Document");
+
+        return;
+      }
     }
 
-    /**
-     * Removes a file from the editorPool and calls
-     * {@link EditorManager#generateEditorClosed(SPath)}
-     *
-     * @param virtualFile
-     */
-    public void closeEditor(@NotNull VirtualFile virtualFile) {
-        SPath path = VirtualFileConverter.convertToSPath(virtualFile);
+    projectAPI.saveDocument(document);
+  }
 
-        if (path != null && SessionUtils.isShared(path)) {
-            editorPool.removeEditor(path);
-            manager.generateEditorClosed(path);
-        }
+  /**
+   * Calls {@link EditorManager#generateEditorActivated(SPath)}.
+   *
+   * @param file
+   */
+  public void activateEditor(@NotNull VirtualFile file) {
+    SPath path = VirtualFileConverter.convertToSPath(file);
+
+    if (path != null && SessionUtils.isShared(path)) {
+      manager.generateEditorActivated(path);
+    }
+  }
+
+  public void sendEditorActivitySaved(SPath path) {
+    // FIXME: not sure how to do it intelliJ
+  }
+
+  /**
+   * @param path
+   * @return <code>true</code>, if the path is opened in an editor.
+   */
+  public boolean isOpenEditor(SPath path) {
+    Document doc = editorPool.getDocument(path);
+    if (doc == null) {
+      return false;
     }
 
-    /**
-     * Removes the resource belonging to the given path from the editor pool
-     *
-     * @param path path
-     */
-    public void removeEditor(@NotNull SPath path){
-        editorPool.removeEditor(path);
-    }
-
-    /**
-     * Saves the document under path, thereby flushing its contents to disk.
-     *
-     * @param path the path for the document to save
-     * @see Document
-     */
-    public void saveDocument(
-        @NotNull
-            SPath path) {
-
-        Document document = editorPool.getDocument(path);
-
-        if (document == null) {
-            VirtualFile file = VirtualFileConverter.convertToVirtualFile(path);
-
-            if (file == null || !file.exists()) {
-                LOG.warn("Failed to save document for " + path
-                    + " - could not get a valid VirtualFile");
-
-                return;
-            }
-
-            document = projectAPI.getDocument(file);
-
-            if (document == null) {
-                LOG.warn("Failed to save document for " + file
-                    + " - could not get a matching Document");
-
-                return;
-            }
-        }
-
-        projectAPI.saveDocument(document);
-    }
-
-    /**
-     * Calls {@link EditorManager#generateEditorActivated(SPath)}.
-     *
-     * @param file
-     */
-    public void activateEditor(@NotNull VirtualFile file) {
-        SPath path = VirtualFileConverter.convertToSPath(file);
-
-        if (path != null && SessionUtils.isShared(path)) {
-            manager.generateEditorActivated(path);
-        }
-    }
-
-    public void sendEditorActivitySaved(SPath path) {
-        // FIXME: not sure how to do it intelliJ
-    }
-
-    /**
-     * @param path
-     * @return <code>true</code>, if the path is opened in an editor.
-     */
-    public boolean isOpenEditor(SPath path) {
-        Document doc = editorPool.getDocument(path);
-        if (doc == null) {
-            return false;
-        }
-
-        return projectAPI.isOpen(doc);
-    }
+    return projectAPI.isOpen(doc);
+  }
 }

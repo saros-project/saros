@@ -12,93 +12,87 @@ import java.util.logging.Logger;
 
 public final class Configuration {
 
-    private static final Logger LOGGER = Logger.getLogger(Configuration.class
-        .getName());
+  private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
 
-    private final static String DEFAULT_CONFIGURATION_FILE = "de/fu_berlin/inf/dpp/stf/client/configuration.properties";
-    private final static String OPTIONAL_CONFIGURATION_FILES_PROPERTY = "de.fu_berlin.inf.dpp.stf.client.configuration.files";
+  private static final String DEFAULT_CONFIGURATION_FILE =
+      "de/fu_berlin/inf/dpp/stf/client/configuration.properties";
+  private static final String OPTIONAL_CONFIGURATION_FILES_PROPERTY =
+      "de.fu_berlin.inf.dpp.stf.client.configuration.files";
 
-    private final static Configuration INSTANCE = new Configuration();
+  private static final Configuration INSTANCE = new Configuration();
 
-    private Properties properties;
+  private Properties properties;
 
-    private Configuration() {
-        properties = new Properties();
-        loadProperties();
-    }
+  private Configuration() {
+    properties = new Properties();
+    loadProperties();
+  }
 
-    public static Configuration getInstance() {
-        return INSTANCE;
-    }
+  public static Configuration getInstance() {
+    return INSTANCE;
+  }
 
-    public Object get(Object key) {
-        return properties.get(key);
-    }
+  public Object get(Object key) {
+    return properties.get(key);
+  }
 
-    private void loadProperties() {
-        InputStream in = Thread.currentThread().getContextClassLoader()
+  private void loadProperties() {
+    InputStream in =
+        Thread.currentThread()
+            .getContextClassLoader()
             .getResourceAsStream(DEFAULT_CONFIGURATION_FILE);
 
-        LOGGER.info("loading internal property file");
-        if (in != null) {
-            try {
-                loadProperties(in);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE,
-                    "error while reading internal property file", e);
-            } finally {
-                try {
-                    in.close();
-                } catch (IOException ignore) {
-                    LOGGER.log(Level.WARNING, ignore.getMessage(), ignore);
-                }
-            }
-        } else
-            LOGGER.log(Level.WARNING, "could not find internal property file: "
-                + DEFAULT_CONFIGURATION_FILE);
-
-        String configurationFiles = System.getProperty(
-            OPTIONAL_CONFIGURATION_FILES_PROPERTY, "");
-
-        for (String configurationFile : configurationFiles
-            .split(File.pathSeparator)) {
-
-            configurationFile = configurationFile.trim();
-
-            if (configurationFile.length() == 0)
-                continue;
-
-            in = null;
-            LOGGER.info("loading external property file: " + configurationFile);
-            try {
-                in = new FileInputStream(new File(configurationFile));
-                loadProperties(in);
-            } catch (FileNotFoundException e) {
-                LOGGER.log(Level.WARNING,
-                    "could not find external property file "
-                        + configurationFile, e);
-            } catch (IOException e) {
-                LOGGER
-                    .log(Level.SEVERE, "error while reading property file", e);
-            } finally {
-                try {
-                    if (in != null)
-                        in.close();
-                } catch (IOException ignore) {
-                    LOGGER.log(Level.WARNING, ignore.getMessage(), ignore);
-                }
-            }
+    LOGGER.info("loading internal property file");
+    if (in != null) {
+      try {
+        loadProperties(in);
+      } catch (IOException e) {
+        LOGGER.log(Level.SEVERE, "error while reading internal property file", e);
+      } finally {
+        try {
+          in.close();
+        } catch (IOException ignore) {
+          LOGGER.log(Level.WARNING, ignore.getMessage(), ignore);
         }
+      }
+    } else
+      LOGGER.log(
+          Level.WARNING, "could not find internal property file: " + DEFAULT_CONFIGURATION_FILE);
+
+    String configurationFiles = System.getProperty(OPTIONAL_CONFIGURATION_FILES_PROPERTY, "");
+
+    for (String configurationFile : configurationFiles.split(File.pathSeparator)) {
+
+      configurationFile = configurationFile.trim();
+
+      if (configurationFile.length() == 0) continue;
+
+      in = null;
+      LOGGER.info("loading external property file: " + configurationFile);
+      try {
+        in = new FileInputStream(new File(configurationFile));
+        loadProperties(in);
+      } catch (FileNotFoundException e) {
+        LOGGER.log(Level.WARNING, "could not find external property file " + configurationFile, e);
+      } catch (IOException e) {
+        LOGGER.log(Level.SEVERE, "error while reading property file", e);
+      } finally {
+        try {
+          if (in != null) in.close();
+        } catch (IOException ignore) {
+          LOGGER.log(Level.WARNING, ignore.getMessage(), ignore);
+        }
+      }
     }
+  }
 
-    private void loadProperties(InputStream in) throws IOException {
+  private void loadProperties(InputStream in) throws IOException {
 
-        Properties temp = new Properties();
+    Properties temp = new Properties();
 
-        temp.load(in);
+    temp.load(in);
 
-        for (Entry<Object, Object> entry : temp.entrySet())
-            properties.put(entry.getKey().toString().toUpperCase(), entry
-                .getValue().toString());
-    }
+    for (Entry<Object, Object> entry : temp.entrySet())
+      properties.put(entry.getKey().toString().toUpperCase(), entry.getValue().toString());
+  }
 }

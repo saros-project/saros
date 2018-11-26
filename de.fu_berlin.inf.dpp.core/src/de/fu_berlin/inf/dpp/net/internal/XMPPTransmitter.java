@@ -19,132 +19,121 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.PacketExtension;
-
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import java.io.IOException;
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.PacketExtension;
 
 /**
- * ITransmitter implementation using XMPP, IBB streams and Socks5 streams for
- * sending packet extensions and packets.
+ * ITransmitter implementation using XMPP, IBB streams and Socks5 streams for sending packet
+ * extensions and packets.
  */
 @Component(module = "net")
 public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
-    private static final Logger log = Logger.getLogger(XMPPTransmitter.class);
+  private static final Logger log = Logger.getLogger(XMPPTransmitter.class);
 
-    /** size in bytes that a packet extension must exceed to be compressed */
-    private static final int PACKET_EXTENSION_COMPRESS_THRESHOLD = Integer
-        .getInteger(
-            "de.fu_berlin.inf.dpp.net.transmitter.PACKET_EXTENSION_COMPRESS_THRESHOLD",
-            32);
+  /** size in bytes that a packet extension must exceed to be compressed */
+  private static final int PACKET_EXTENSION_COMPRESS_THRESHOLD =
+      Integer.getInteger(
+          "de.fu_berlin.inf.dpp.net.transmitter.PACKET_EXTENSION_COMPRESS_THRESHOLD", 32);
 
-    private final DataTransferManager dataManager;
+  private final DataTransferManager dataManager;
 
-    private Connection connection;
+  private Connection connection;
 
-    public XMPPTransmitter(DataTransferManager dataManager,
-        XMPPConnectionService connectionService) {
-        connectionService.addListener(this);
-        this.dataManager = dataManager;
-    }
+  public XMPPTransmitter(DataTransferManager dataManager, XMPPConnectionService connectionService) {
+    connectionService.addListener(this);
+    this.dataManager = dataManager;
+  }
 
-    @Override
-    public void send(JID recipient, PacketExtension extension)
-        throws IOException {
-        send(null, recipient, extension);
-    }
+  @Override
+  public void send(JID recipient, PacketExtension extension) throws IOException {
+    send(null, recipient, extension);
+  }
 
-    @Override
-    public void send(String connectionID, JID recipient,
-        PacketExtension extension) throws IOException {
-        /*
-         * The TransferDescription can be created out of the session, the name
-         * and namespace of the packet extension and standard values and thus
-         * transparent to users of this method.
-         */
-        TransferDescription transferDescription = TransferDescription
-            .newDescription().setRecipient(recipient)
+  @Override
+  public void send(String connectionID, JID recipient, PacketExtension extension)
+      throws IOException {
+    /*
+     * The TransferDescription can be created out of the session, the name
+     * and namespace of the packet extension and standard values and thus
+     * transparent to users of this method.
+     */
+    TransferDescription transferDescription =
+        TransferDescription.newDescription()
+            .setRecipient(recipient)
             // .setSender(set by DataTransferManager)
             .setElementName(extension.getElementName())
             .setNamespace(extension.getNamespace());
 
-        byte[] data = extension.toXML().getBytes("UTF-8");
+    byte[] data = extension.toXML().getBytes("UTF-8");
 
-        if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD)
-            transferDescription.setCompressContent(true);
+    if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD)
+      transferDescription.setCompressContent(true);
 
-        // recipient is included in the transfer description
-        if (connectionID == null)
-            dataManager.sendData(transferDescription, data);
-        else
-            dataManager.sendData(connectionID, transferDescription, data);
+    // recipient is included in the transfer description
+    if (connectionID == null) dataManager.sendData(transferDescription, data);
+    else dataManager.sendData(connectionID, transferDescription, data);
+  }
 
+  @Override
+  public void sendPacketExtension(JID recipient, PacketExtension extension) {
+    Message message = new Message();
+    message.addExtension(extension);
+    message.setTo(recipient.toString());
+
+    assert recipient.toString().equals(message.getTo());
+
+    try {
+      sendPacket(message);
+    } catch (IOException e) {
+      log.error("could not send message to " + recipient, e);
     }
+  }
 
-    @Override
-    public void sendPacketExtension(JID recipient, PacketExtension extension) {
-        Message message = new Message();
-        message.addExtension(extension);
-        message.setTo(recipient.toString());
+  @Override
+  public synchronized void sendPacket(Packet packet) throws IOException {
 
-        assert recipient.toString().equals(message.getTo());
+    if (isConnectionInvalid()) throw new IOException("not connected to a XMPP server");
 
-        try {
-            sendPacket(message);
-        } catch (IOException e) {
-            log.error("could not send message to " + recipient, e);
-        }
+    try {
+      connection.sendPacket(packet);
+    } catch (Exception e) {
+      throw new IOException("could not send packet " + packet + " : " + e.getMessage(), e);
     }
+  }
 
-    @Override
-    public synchronized void sendPacket(Packet packet) throws IOException {
+  /**
+   * Determines if the connection can be used. Helper method for error handling.
+   *
+   * @return false if the connection can be used, true otherwise.
+   */
+  private synchronized boolean isConnectionInvalid() {
+    return connection == null || !connection.isConnected();
+  }
 
-        if (isConnectionInvalid())
-            throw new IOException("not connected to a XMPP server");
+  @Override
+  public synchronized void connectionStateChanged(Connection connection, ConnectionState state) {
 
-        try {
-            connection.sendPacket(packet);
-        } catch (Exception e) {
-            throw new IOException("could not send packet " + packet + " : "
-                + e.getMessage(), e);
-        }
+    switch (state) {
+      case CONNECTING:
+        this.connection = connection;
+        break;
+      case ERROR:
+      case NOT_CONNECTED:
+        this.connection = null;
+        break;
+      default:
+        break; // NOP
     }
-
-    /**
-     * Determines if the connection can be used. Helper method for error
-     * handling.
-     * 
-     * @return false if the connection can be used, true otherwise.
-     */
-    private synchronized boolean isConnectionInvalid() {
-        return connection == null || !connection.isConnected();
-    }
-
-    @Override
-    public synchronized void connectionStateChanged(Connection connection,
-        ConnectionState state) {
-
-        switch (state) {
-        case CONNECTING:
-            this.connection = connection;
-            break;
-        case ERROR:
-        case NOT_CONNECTED:
-            this.connection = null;
-            break;
-        default:
-            break; // NOP
-        }
-    }
+  }
 }
