@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.editor.internal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.AnnotationPainter;
@@ -14,105 +13,95 @@ import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 // TODO support color changes for annotations
 public class CustomAnnotationManager {
 
-    private Map<ISourceViewer, AnnotationPainter> installedPainters = new HashMap<ISourceViewer, AnnotationPainter>();
+  private Map<ISourceViewer, AnnotationPainter> installedPainters =
+      new HashMap<ISourceViewer, AnnotationPainter>();
 
-    private Map<String, IDrawingStrategy> drawingStrategyForAnnotationType = new HashMap<String, IDrawingStrategy>();
+  private Map<String, IDrawingStrategy> drawingStrategyForAnnotationType =
+      new HashMap<String, IDrawingStrategy>();
 
-    private Map<String, Integer> customAnnotationTypes = new HashMap<String, Integer>();
+  private Map<String, Integer> customAnnotationTypes = new HashMap<String, Integer>();
 
-    private static class CustomMarkerAnnotationAccess extends
-        DefaultMarkerAnnotationAccess {
+  private static class CustomMarkerAnnotationAccess extends DefaultMarkerAnnotationAccess {
 
-        private Map<String, Integer> annotationLayerInformation;
+    private Map<String, Integer> annotationLayerInformation;
 
-        public CustomMarkerAnnotationAccess(
-            Map<String, Integer> annotationLayerInformation) {
-            this.annotationLayerInformation = new HashMap<String, Integer>(
-                annotationLayerInformation);
-        }
-
-        @Override
-        public int getLayer(Annotation annotation) {
-            Integer layer = annotationLayerInformation
-                .get(annotation.getType());
-
-            return layer == null ? 0 : layer;
-        }
+    public CustomMarkerAnnotationAccess(Map<String, Integer> annotationLayerInformation) {
+      this.annotationLayerInformation = new HashMap<String, Integer>(annotationLayerInformation);
     }
 
-    /**
-     * Installs a custom {@link AnnotationPainter annotation painter} to the
-     * given source viewer. If there is already an custom annotation painter
-     * installed this method just returns.
-     * 
-     * @param sourceViewer
-     */
-    public void installPainter(ISourceViewer sourceViewer) {
+    @Override
+    public int getLayer(Annotation annotation) {
+      Integer layer = annotationLayerInformation.get(annotation.getType());
 
-        AnnotationPainter painter = installedPainters.get(sourceViewer);
+      return layer == null ? 0 : layer;
+    }
+  }
 
-        if (painter != null)
-            return;
+  /**
+   * Installs a custom {@link AnnotationPainter annotation painter} to the given source viewer. If
+   * there is already an custom annotation painter installed this method just returns.
+   *
+   * @param sourceViewer
+   */
+  public void installPainter(ISourceViewer sourceViewer) {
 
-        painter = new AnnotationPainter(sourceViewer,
-            new CustomMarkerAnnotationAccess(customAnnotationTypes));
+    AnnotationPainter painter = installedPainters.get(sourceViewer);
 
-        for (String annotationType : customAnnotationTypes.keySet()) {
-            IDrawingStrategy strategy = drawingStrategyForAnnotationType
-                .get(annotationType);
+    if (painter != null) return;
 
-            if (strategy == null)
-                continue;
+    painter =
+        new AnnotationPainter(
+            sourceViewer, new CustomMarkerAnnotationAccess(customAnnotationTypes));
 
-            painter.addAnnotationType(annotationType, annotationType);
-            painter.addDrawingStrategy(annotationType, strategy);
-            // set a color or the drawing strategy will not be invoked
-            // FIMXE no control when this color is disposed
-            painter.setAnnotationTypeColor(annotationType, sourceViewer
-                .getTextWidget().getForeground());
-        }
+    for (String annotationType : customAnnotationTypes.keySet()) {
+      IDrawingStrategy strategy = drawingStrategyForAnnotationType.get(annotationType);
 
-        painter.paint(IPainter.CONFIGURATION);
+      if (strategy == null) continue;
+
+      painter.addAnnotationType(annotationType, annotationType);
+      painter.addDrawingStrategy(annotationType, strategy);
+      // set a color or the drawing strategy will not be invoked
+      // FIMXE no control when this color is disposed
+      painter.setAnnotationTypeColor(annotationType, sourceViewer.getTextWidget().getForeground());
     }
 
-    /**
-     * Uninstalls the custom {@link AnnotationPainter annotation painter} from
-     * the given source viewer. If there is no custom annotation painter
-     * installed this method just returns.
-     * 
-     * @param sourceViewer
-     * @param redraw
-     */
-    public void uninstallPainter(ISourceViewer sourceViewer, boolean redraw) {
+    painter.paint(IPainter.CONFIGURATION);
+  }
 
-        AnnotationPainter painter = installedPainters.remove(sourceViewer);
+  /**
+   * Uninstalls the custom {@link AnnotationPainter annotation painter} from the given source
+   * viewer. If there is no custom annotation painter installed this method just returns.
+   *
+   * @param sourceViewer
+   * @param redraw
+   */
+  public void uninstallPainter(ISourceViewer sourceViewer, boolean redraw) {
 
-        if (painter == null)
-            return;
+    AnnotationPainter painter = installedPainters.remove(sourceViewer);
 
-        painter.deactivate(redraw);
-        painter.dispose();
-    }
+    if (painter == null) return;
 
-    /**
-     * Uninstalls all custom {@link AnnotationPainter annotation painters} that
-     * were installed by {@link #installPainter(ISourceViewer)}.
-     * 
-     * @param redraw
-     */
-    public void uninstallAllPainters(boolean redraw) {
-        for (ISourceViewer sourceViewer : Arrays.asList(installedPainters
-            .keySet().toArray(new ISourceViewer[0])))
-            uninstallPainter(sourceViewer, redraw);
+    painter.deactivate(redraw);
+    painter.dispose();
+  }
 
-    }
+  /**
+   * Uninstalls all custom {@link AnnotationPainter annotation painters} that were installed by
+   * {@link #installPainter(ISourceViewer)}.
+   *
+   * @param redraw
+   */
+  public void uninstallAllPainters(boolean redraw) {
+    for (ISourceViewer sourceViewer :
+        Arrays.asList(installedPainters.keySet().toArray(new ISourceViewer[0])))
+      uninstallPainter(sourceViewer, redraw);
+  }
 
-    public void registerDrawingStrategy(String annotationType,
-        IDrawingStrategy strategy) {
-        drawingStrategyForAnnotationType.put(annotationType, strategy);
-    }
+  public void registerDrawingStrategy(String annotationType, IDrawingStrategy strategy) {
+    drawingStrategyForAnnotationType.put(annotationType, strategy);
+  }
 
-    public void registerAnnotation(String annotationType, int layer) {
-        customAnnotationTypes.put(annotationType, layer);
-    }
+  public void registerAnnotation(String annotationType, int layer) {
+    customAnnotationTypes.put(annotationType, layer);
+  }
 }

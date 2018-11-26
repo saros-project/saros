@@ -1,31 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.widgets.chat;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.log4j.Logger;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.jivesoftware.smack.XMPPException;
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.IChatServiceListener;
@@ -59,649 +33,643 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanatoryComposite;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.jivesoftware.smack.XMPPException;
+import org.picocontainer.annotations.Inject;
 
 /**
  * This component shows chat he right side of the {@link SarosView}
- * 
+ *
  * @author patbit
  */
-
 public class ChatRoomsComposite extends ListExplanatoryComposite {
 
-    private static final Logger log = Logger
-        .getLogger(ChatRoomsComposite.class);
+  private static final Logger log = Logger.getLogger(ChatRoomsComposite.class);
 
-    static final Color WHITE = Display.getDefault().getSystemColor(
-        SWT.COLOR_WHITE);
+  static final Color WHITE = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
 
-    /**
-     * Default image for ChatView.
-     */
-    public static final Image chatViewImage = ImageManager
-        .getImage("icons/view16/chat_misc.png");
+  /** Default image for ChatView. */
+  public static final Image chatViewImage = ImageManager.getImage("icons/view16/chat_misc.png");
 
-    /**
-     * Image while composing a message.
-     */
-    public static final Image composingImage = ImageManager
-        .getImage("icons/view16/cmpsg_misc.png");
+  /** Image while composing a message. */
+  public static final Image composingImage = ImageManager.getImage("icons/view16/cmpsg_misc.png");
 
-    private ListExplanation connectFirst = new ListExplanation(
-        SWT.ICON_INFORMATION, "To share projects you must connect first.");
+  private ListExplanation connectFirst =
+      new ListExplanation(SWT.ICON_INFORMATION, "To share projects you must connect first.");
 
-    private ListExplanation howToShareProjects = new ListExplanation(
-        SWT.ICON_INFORMATION, "To share projects you can either:",
-        "Right-click on a project", "Right-click on a contact",
-        "Use the Saros menu in the Eclipse menu bar");
+  private ListExplanation howToShareProjects =
+      new ListExplanation(
+          SWT.ICON_INFORMATION,
+          "To share projects you can either:",
+          "Right-click on a project",
+          "Right-click on a contact",
+          "Use the Saros menu in the Eclipse menu bar");
 
-    protected boolean isSessionRunning;
+  protected boolean isSessionRunning;
 
-    protected boolean isSessionHost;
+  protected boolean isSessionHost;
 
-    protected RosterTracker rosterTracker;
+  protected RosterTracker rosterTracker;
 
-    protected IChat sessionChat;
+  protected IChat sessionChat;
 
-    protected CTabItem sessionChatErrorTab;
+  protected CTabItem sessionChatErrorTab;
 
-    protected Object mucCreationLock = new Object();
+  protected Object mucCreationLock = new Object();
 
-    @Inject
-    private ConnectionHandler connectionHandler;
+  @Inject private ConnectionHandler connectionHandler;
 
-    @Inject
-    protected EditorManager editorManager;
+  @Inject protected EditorManager editorManager;
 
-    @Inject
-    protected ISarosSessionManager sessionManager;
+  @Inject protected ISarosSessionManager sessionManager;
 
-    protected CTabFolder chatRooms;
+  protected CTabFolder chatRooms;
 
-    @Inject
-    protected MultiUserChatService multiUserChatService;
+  @Inject protected MultiUserChatService multiUserChatService;
 
-    @Inject
-    protected SingleUserChatService singleUserChatService;
+  @Inject protected SingleUserChatService singleUserChatService;
 
-    @Inject
-    private MUCNegotiationManager mucNegotiationManager;
+  @Inject private MUCNegotiationManager mucNegotiationManager;
 
-    @Inject
-    private IPreferenceStore preferenceStore;
+  @Inject private IPreferenceStore preferenceStore;
 
-    private final IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+  private final IPropertyChangeListener propertyChangeListener =
+      new IPropertyChangeListener() {
 
         @Override
         public void propertyChange(PropertyChangeEvent event) {
-            if (!EclipsePreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT
-                .equals(event.getProperty()))
-                return;
+          if (!EclipsePreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT.equals(event.getProperty()))
+            return;
 
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+          SWTUtils.runSafeSWTAsync(
+              log,
+              new Runnable() {
 
                 @Override
                 public void run() {
-                    if (ChatRoomsComposite.this.isDisposed())
-                        return;
+                  if (ChatRoomsComposite.this.isDisposed()) return;
 
-                    final List<IChat> currentChats = new ArrayList<IChat>();
+                  final List<IChat> currentChats = new ArrayList<IChat>();
 
-                    final int activeIdx = chatRooms.getSelectionIndex();
+                  final int activeIdx = chatRooms.getSelectionIndex();
 
-                    for (CTabItem tab : chatRooms.getItems())
-                        currentChats.add((IChat) tab.getData());
+                  for (CTabItem tab : chatRooms.getItems()) currentChats.add((IChat) tab.getData());
 
-                    for (IChat chat : currentChats)
-                        closeChatTab(chat);
+                  for (IChat chat : currentChats) closeChatTab(chat);
 
-                    int idx = 0;
-                    for (IChat chat : currentChats)
-                        openChat(chat, idx++ == activeIdx);
+                  int idx = 0;
+                  for (IChat chat : currentChats) openChat(chat, idx++ == activeIdx);
                 }
-            });
+              });
         }
-    };
+      };
 
-    /**
-     * This RosterListener closure is added to the RosterTracker to get
-     * notifications when the roster changes.
-     */
-    protected IRosterListener rosterListener = new AbstractRosterListener() {
+  /**
+   * This RosterListener closure is added to the RosterTracker to get notifications when the roster
+   * changes.
+   */
+  protected IRosterListener rosterListener =
+      new AbstractRosterListener() {
 
         @Override
         public void entriesUpdated(final Collection<String> addresses) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+          SWTUtils.runSafeSWTAsync(
+              log,
+              new Runnable() {
                 @Override
                 public void run() {
 
-                    if (ChatRoomsComposite.this.isDisposed())
-                        return;
+                  if (ChatRoomsComposite.this.isDisposed()) return;
 
-                    log.trace("roster entries changed, refreshing chat tabs");
+                  log.trace("roster entries changed, refreshing chat tabs");
 
-                    Collection<JID> jids = new ArrayList<JID>();
+                  Collection<JID> jids = new ArrayList<JID>();
 
-                    for (String address : addresses)
-                        jids.add(new JID(address));
+                  for (String address : addresses) jids.add(new JID(address));
 
-                    updateChatTabs(jids);
+                  updateChatTabs(jids);
                 }
-            });
+              });
         }
-    };
+      };
 
-    private final IConnectionStateListener connectionStateListener = new IConnectionStateListener() {
+  private final IConnectionStateListener connectionStateListener =
+      new IConnectionStateListener() {
 
         @Override
-        public void connectionStateChanged(ConnectionState state,
-            Exception error) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        public void connectionStateChanged(ConnectionState state, Exception error) {
+          SWTUtils.runSafeSWTAsync(
+              log,
+              new Runnable() {
 
                 @Override
                 public void run() {
-                    if (ChatRoomsComposite.this.isDisposed())
-                        return;
+                  if (ChatRoomsComposite.this.isDisposed()) return;
 
-                    updateExplanation();
+                  updateExplanation();
                 }
-            });
+              });
         }
-    };
+      };
 
-    protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
+  protected ISessionLifecycleListener sessionLifecycleListener =
+      new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarting(final ISarosSession session) {
 
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
+          SWTUtils.runSafeSWTSync(
+              log,
+              new Runnable() {
                 @Override
                 public void run() {
-                    isSessionRunning = true;
-                    isSessionHost = session.isHost();
+                  isSessionRunning = true;
+                  isSessionHost = session.isHost();
                 }
-            });
+              });
 
-            final CountDownLatch mucCreationStart = new CountDownLatch(1);
+          final CountDownLatch mucCreationStart = new CountDownLatch(1);
 
-            /*
-             * FIXME: the clients should be notified after the chat has been
-             * created to join that chat. For slow connections it is possible
-             * that ALICE invites BOB, but BOB creates the chat room first. If
-             * now CARL joins the session and BOB leaves afterwards, ALICE and
-             * CARLs MUC is broken !
-             */
-            ThreadUtils.runSafeAsync("dpp-muc-join", log, new Runnable() {
+          /*
+           * FIXME: the clients should be notified after the chat has been
+           * created to join that chat. For slow connections it is possible
+           * that ALICE invites BOB, but BOB creates the chat room first. If
+           * now CARL joins the session and BOB leaves afterwards, ALICE and
+           * CARLs MUC is broken !
+           */
+          ThreadUtils.runSafeAsync(
+              "dpp-muc-join",
+              log,
+              new Runnable() {
                 @Override
                 public void run() {
-                    synchronized (mucCreationLock) {
-                        mucCreationStart.countDown();
-                        /*
-                         * ignore return value, we will be notified by the
-                         * listener before this call even returns
-                         */
-                        createChat(session);
-                    }
+                  synchronized (mucCreationLock) {
+                    mucCreationStart.countDown();
+                    /*
+                     * ignore return value, we will be notified by the
+                     * listener before this call even returns
+                     */
+                    createChat(session);
+                  }
                 }
-            });
+              });
 
-            try {
-                mucCreationStart.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+          try {
+            mucCreationStart.await();
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
         }
 
         @Override
         public void sessionStarted(final ISarosSession session) {
-            session.addListener(sessionListener);
+          session.addListener(sessionListener);
         }
 
         @Override
-        public void sessionEnded(final ISarosSession session,
-            SessionEndReason reason) {
+        public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
 
-            session.removeListener(sessionListener);
+          session.removeListener(sessionListener);
 
-            final CountDownLatch mucDestroyed = new CountDownLatch(1);
+          final CountDownLatch mucDestroyed = new CountDownLatch(1);
 
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+          SWTUtils.runSafeSWTAsync(
+              log,
+              new Runnable() {
                 @Override
                 public void run() {
 
-                    if (sessionChat != null)
-                        multiUserChatService.destroyChat(sessionChat);
+                  if (sessionChat != null) multiUserChatService.destroyChat(sessionChat);
 
-                    mucDestroyed.countDown();
+                  mucDestroyed.countDown();
 
-                    isSessionRunning = false;
-                    isSessionHost = false;
-                    sessionChat = null;
+                  isSessionRunning = false;
+                  isSessionHost = false;
+                  sessionChat = null;
 
-                    if (ChatRoomsComposite.this.isDisposed())
-                        return;
+                  if (ChatRoomsComposite.this.isDisposed()) return;
 
-                    if (sessionChatErrorTab != null
-                        && !sessionChatErrorTab.isDisposed())
-                        sessionChatErrorTab.dispose();
+                  if (sessionChatErrorTab != null && !sessionChatErrorTab.isDisposed())
+                    sessionChatErrorTab.dispose();
                 }
-            });
+              });
 
-            /*
-             * It is possible that the session was stopped by disconnecting from
-             * the server. As we run async. it is possible that destroyChat will
-             * wait for an acknowledge packet but this will never be received
-             * because the connection is closed in the meantime. This will
-             * produce a GUI freeze (currently 30 seconds, see Smack Packet
-             * Timeout). So we wait here to ensure that the connection is not
-             * closed until the chat is destroyed. See also SarosSessionManager
-             * class.
-             */
-            try {
-                mucDestroyed.await(5000, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+          /*
+           * It is possible that the session was stopped by disconnecting from
+           * the server. As we run async. it is possible that destroyChat will
+           * wait for an acknowledge packet but this will never be received
+           * because the connection is closed in the meantime. This will
+           * produce a GUI freeze (currently 30 seconds, see Smack Packet
+           * Timeout). So we wait here to ensure that the connection is not
+           * closed until the chat is destroyed. See also SarosSessionManager
+           * class.
+           */
+          try {
+            mucDestroyed.await(5000, TimeUnit.MILLISECONDS);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
         }
-    };
+      };
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+  protected ISessionListener sessionListener =
+      new AbstractSessionListener() {
         @Override
         public void userColorChanged(User user) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+          SWTUtils.runSafeSWTAsync(
+              log,
+              new Runnable() {
                 @Override
                 public void run() {
-                    for (CTabItem tab : chatRooms.getItems()) {
-                        Control control = tab.getControl();
-                        if (control instanceof ChatControl)
-                            ((ChatControl) control).updateColors();
-                    }
+                  for (CTabItem tab : chatRooms.getItems()) {
+                    Control control = tab.getControl();
+                    if (control instanceof ChatControl) ((ChatControl) control).updateColors();
+                  }
                 }
-            });
+              });
         }
-    };
+      };
 
-    protected DisposeListener disposeListener = new DisposeListener() {
+  protected DisposeListener disposeListener =
+      new DisposeListener() {
 
         @Override
         public void widgetDisposed(DisposeEvent e) {
-            CTabItem source = (CTabItem) e.getSource();
-            source.getControl().dispose();
+          CTabItem source = (CTabItem) e.getSource();
+          source.getControl().dispose();
 
-            updateExplanation();
+          updateExplanation();
         }
-    };
+      };
 
-    protected IChatServiceListener chatServiceListener = new IChatServiceListener() {
+  protected IChatServiceListener chatServiceListener =
+      new IChatServiceListener() {
 
         @Override
         public void chatCreated(final IChat chat, boolean createdLocally) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+          SWTUtils.runSafeSWTAsync(
+              log,
+              new Runnable() {
                 @Override
                 // FIXME: disposed ?!
                 public void run() {
 
-                    boolean isSessionChat = false;
+                  boolean isSessionChat = false;
 
-                    if (chat instanceof MultiUserChat) {
-
-                        /*
-                         * creation of the session chat is done async., so it is
-                         * possible to receive multiple requests from different
-                         * Saros sessions
-                         */
-                        if (sessionChat != null)
-                            multiUserChatService.destroyChat(sessionChat);
-
-                        sessionChat = chat;
-                        isSessionChat = true;
-                    }
+                  if (chat instanceof MultiUserChat) {
 
                     /*
-                     * creation of the session chat is done async., so the
-                     * session may have already ended
+                     * creation of the session chat is done async., so it is
+                     * possible to receive multiple requests from different
+                     * Saros sessions
                      */
-                    if (!isSessionRunning && isSessionChat) {
-                        multiUserChatService.destroyChat(sessionChat);
-                        sessionChat = null;
-                    } else {
-                        openChat(chat, false);
-                    }
+                    if (sessionChat != null) multiUserChatService.destroyChat(sessionChat);
+
+                    sessionChat = chat;
+                    isSessionChat = true;
+                  }
+
+                  /*
+                   * creation of the session chat is done async., so the
+                   * session may have already ended
+                   */
+                  if (!isSessionRunning && isSessionChat) {
+                    multiUserChatService.destroyChat(sessionChat);
+                    sessionChat = null;
+                  } else {
+                    openChat(chat, false);
+                  }
                 }
-            });
+              });
         }
 
         @Override
         public void chatDestroyed(final IChat chat) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+          SWTUtils.runSafeSWTAsync(
+              log,
+              new Runnable() {
 
                 @Override
                 public void run() {
-                    if (ChatRoomsComposite.this.isDisposed())
-                        return;
+                  if (ChatRoomsComposite.this.isDisposed()) return;
 
-                    closeChatTab(chat);
+                  closeChatTab(chat);
                 }
-            });
+              });
         }
 
         @Override
         public void chatAborted(IChat chat, XMPPException exception) {
 
-            if (!(chat instanceof MultiUserChat))
-                return;
+          if (!(chat instanceof MultiUserChat)) return;
 
-            MultiUserChatPreferences preferences = ((MultiUserChat) chat)
-                .getPreferences();
+          MultiUserChatPreferences preferences = ((MultiUserChat) chat).getPreferences();
 
-            String mucService = preferences.getService();
+          String mucService = preferences.getService();
 
-            final String errorMessage;
+          final String errorMessage;
 
-            if (mucService == null) {
-                errorMessage = isSessionHost ? Messages.ChatRoomsComposite_muc_error_host_no_service_found
+          if (mucService == null) {
+            errorMessage =
+                isSessionHost
+                    ? Messages.ChatRoomsComposite_muc_error_host_no_service_found
                     : Messages.ChatRoomsComposite_muc_error_client_no_service_found;
-            } else {
-                errorMessage = MessageFormat
-                    .format(
-                        Messages.ChatRoomsComposite_muc_error_connecting_failed,
-                        mucService,
-                        exception == null ? Messages.ChatRoomsComposite_muc_error_connecting_failed_unknown_error
-                            : exception.getMessage());
-            }
+          } else {
+            errorMessage =
+                MessageFormat.format(
+                    Messages.ChatRoomsComposite_muc_error_connecting_failed,
+                    mucService,
+                    exception == null
+                        ? Messages.ChatRoomsComposite_muc_error_connecting_failed_unknown_error
+                        : exception.getMessage());
+          }
 
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+          SWTUtils.runSafeSWTAsync(
+              log,
+              new Runnable() {
 
                 @Override
                 public void run() {
-                    if (ChatRoomsComposite.this.isDisposed())
-                        return;
+                  if (ChatRoomsComposite.this.isDisposed()) return;
 
-                    setErrorMessage(errorMessage);
+                  setErrorMessage(errorMessage);
                 }
-            });
+              });
         }
-    };
+      };
 
-    public ChatRoomsComposite(Composite parent, int style,
-        final RosterTracker rosterTracker) {
-        super(parent, style);
+  public ChatRoomsComposite(Composite parent, int style, final RosterTracker rosterTracker) {
+    super(parent, style);
 
-        this.rosterTracker = rosterTracker;
-        rosterTracker.addRosterListener(rosterListener);
+    this.rosterTracker = rosterTracker;
+    rosterTracker.addRosterListener(rosterListener);
 
-        SarosPluginContext.initComponent(this);
+    SarosPluginContext.initComponent(this);
 
-        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-        singleUserChatService.addChatServiceListener(chatServiceListener);
-        multiUserChatService.addChatServiceListener(chatServiceListener);
-        connectionHandler.addConnectionStateListener(connectionStateListener);
-        preferenceStore.addPropertyChangeListener(propertyChangeListener);
+    sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+    singleUserChatService.addChatServiceListener(chatServiceListener);
+    multiUserChatService.addChatServiceListener(chatServiceListener);
+    connectionHandler.addConnectionStateListener(connectionStateListener);
+    preferenceStore.addPropertyChangeListener(propertyChangeListener);
 
-        ISarosSession session = sessionManager.getSession();
-        if (session != null) {
-            session.addListener(sessionListener);
-        }
-
-        setLayout(new FillLayout());
-
-        chatRooms = new CTabFolder(this, SWT.BOTTOM);
-        setContentControl(chatRooms);
-
-        chatRooms.setSimple(true);
-        chatRooms.setBorderVisible(true);
-
-        /*
-         * TODO: The user can open and close Views as he wishes. This means that
-         * the live cycle of this ChatView is completely independent of the
-         * global MultiUserChat. Therefore we need to correctly validate the
-         * MultiUserChat's state when this ChatView is reopened.
-         */
-
-        isSessionRunning = session != null;
-        isSessionHost = isSessionRunning && session.isHost();
-
-        updateExplanation();
-
-        addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(DisposeEvent e) {
-
-                ISarosSession session = sessionManager.getSession();
-                if (session != null) {
-                    session.removeListener(sessionListener);
-                }
-
-                sessionManager
-                    .removeSessionLifecycleListener(sessionLifecycleListener);
-
-                preferenceStore
-                    .removePropertyChangeListener(propertyChangeListener);
-
-                singleUserChatService
-                    .removeChatServiceListener(chatServiceListener);
-
-                multiUserChatService
-                    .removeChatServiceListener(chatServiceListener);
-
-                connectionHandler
-                    .removeConnectionStateListener(connectionStateListener);
-                /**
-                 * This must be called before finalization otherwise you will
-                 * get NPE on RosterTracker.
-                 */
-                rosterTracker.removeRosterListener(rosterListener);
-            }
-        });
-
+    ISarosSession session = sessionManager.getSession();
+    if (session != null) {
+      session.addListener(sessionListener);
     }
 
-    /**
-     * Create a new single user chat with the given JID and open it.
-     * 
-     * @param jid
-     * @param activateAfterCreation
-     *            see {@link ChatRoomsComposite#openChat(IChat, boolean)} *
-     */
-    public void openChat(JID jid, boolean activateAfterCreation) {
-        openChat(singleUserChatService.createChat(jid), activateAfterCreation);
-    }
+    setLayout(new FillLayout());
 
-    /**
-     * Open the tab for a given chat.
-     * 
-     * If the the corresponding tab already exists, it will be activated,
-     * otherwise a new tab will be created.
-     * 
-     * @param chat
-     *            The chat that should be displayed. If no corresponding chat
-     *            tab exists, a new one will be created.
-     * @param activateAfterCreation
-     *            If a new tab is created, setting this parameter
-     *            <code>false</code> will open the tab in background,
-     *            <code>true</code> will activate it. If the newly created chat
-     *            tab is the only one, it will of course be active anyway. If
-     *            the chat tab already exists, this parameter has no effect: the
-     *            tab will be activated anyway.
-     */
-    public void openChat(IChat chat, boolean activateAfterCreation) {
-        if (selectExistentTab(chat)) {
-            return;
-        }
+    chatRooms = new CTabFolder(this, SWT.BOTTOM);
+    setContentControl(chatRooms);
 
-        hideExplanation();
-
-        CTabItem chatTab = createChatTab(chat);
-        if (activateAfterCreation || chatRooms.getItemCount() == 1) {
-            chatRooms.setSelection(chatTab);
-        }
-    }
-
-    private CTabItem createChatTab(IChat chat) {
-        ChatControl control = new ChatControl(this, chat, chatRooms,
-            SWT.BORDER, WHITE, 2);
-
-        CTabItem chatTab;
-
-        if (chat == sessionChat)
-            chatTab = new CTabItem(chatRooms, SWT.NONE, 0);
-        else
-            chatTab = new CTabItem(chatRooms, SWT.CLOSE);
-
-        chatTab.setText(getChatTabName(chat));
-        chatTab.setImage(chatViewImage);
-        chatTab.setData(chat);
-        chatTab.setControl(control);
-        chatTab.addDisposeListener(disposeListener);
-
-        return chatTab;
-    }
+    chatRooms.setSimple(true);
+    chatRooms.setBorderVisible(true);
 
     /*
-     * TODO make this protected / private and use a listener to update the chat
-     * tabs text
+     * TODO: The user can open and close Views as he wishes. This means that
+     * the live cycle of this ChatView is completely independent of the
+     * global MultiUserChat. Therefore we need to correctly validate the
+     * MultiUserChat's state when this ChatView is reopened.
      */
-    public CTabItem getChatTab(IChat chat) {
-        for (CTabItem tab : this.chatRooms.getItems()) {
-            IChat data = (IChat) tab.getData();
 
-            // do the equal check this way to allow null values in the tab data
-            if (chat.equals(data))
-                return tab;
-        }
+    isSessionRunning = session != null;
+    isSessionHost = isSessionRunning && session.isHost();
 
-        return null;
-    }
+    updateExplanation();
 
-    private boolean closeChatTab(IChat chat) {
-        CTabItem tab = getChatTab(chat);
-        if (tab != null && !tab.isDisposed()) {
-            tab.dispose();
+    addDisposeListener(
+        new DisposeListener() {
 
-            updateExplanation();
-            return true;
-        }
+          @Override
+          public void widgetDisposed(DisposeEvent e) {
 
-        return false;
-    }
-
-    /**
-     * Update title and history for chats. A chat is updated if its participants
-     * contains any of the given {@link JID}s.
-     * 
-     * @param jids
-     *            JIDs whom the chats should be updated for
-     */
-    private void updateChatTabs(Collection<JID> jids) {
-        for (CTabItem tab : chatRooms.getItems()) {
-
-            if (!(tab.getControl() instanceof ChatControl))
-                continue;
-
-            ChatControl control = (ChatControl) tab.getControl();
-            IChat chat = (IChat) tab.getData();
-
-            if (!Collections.disjoint(jids, chat.getParticipants())) {
-                control.updateDisplayNames();
-                tab.setText(getChatTabName(chat));
+            ISarosSession session = sessionManager.getSession();
+            if (session != null) {
+              session.removeListener(sessionListener);
             }
-        }
+
+            sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
+
+            preferenceStore.removePropertyChangeListener(propertyChangeListener);
+
+            singleUserChatService.removeChatServiceListener(chatServiceListener);
+
+            multiUserChatService.removeChatServiceListener(chatServiceListener);
+
+            connectionHandler.removeConnectionStateListener(connectionStateListener);
+            /**
+             * This must be called before finalization otherwise you will get NPE on RosterTracker.
+             */
+            rosterTracker.removeRosterListener(rosterListener);
+          }
+        });
+  }
+
+  /**
+   * Create a new single user chat with the given JID and open it.
+   *
+   * @param jid
+   * @param activateAfterCreation see {@link ChatRoomsComposite#openChat(IChat, boolean)} *
+   */
+  public void openChat(JID jid, boolean activateAfterCreation) {
+    openChat(singleUserChatService.createChat(jid), activateAfterCreation);
+  }
+
+  /**
+   * Open the tab for a given chat.
+   *
+   * <p>If the the corresponding tab already exists, it will be activated, otherwise a new tab will
+   * be created.
+   *
+   * @param chat The chat that should be displayed. If no corresponding chat tab exists, a new one
+   *     will be created.
+   * @param activateAfterCreation If a new tab is created, setting this parameter <code>false</code>
+   *     will open the tab in background, <code>true</code> will activate it. If the newly created
+   *     chat tab is the only one, it will of course be active anyway. If the chat tab already
+   *     exists, this parameter has no effect: the tab will be activated anyway.
+   */
+  public void openChat(IChat chat, boolean activateAfterCreation) {
+    if (selectExistentTab(chat)) {
+      return;
     }
 
-    private boolean selectExistentTab(IChat chat) {
-        for (CTabItem item : chatRooms.getItems()) {
-            // do the equal check this way to allow null values in the tab data
-            if (chat.equals(item.getData())) {
-                chatRooms.setSelection(item);
-                return true;
-            }
-        }
+    hideExplanation();
 
-        return false;
+    CTabItem chatTab = createChatTab(chat);
+    if (activateAfterCreation || chatRooms.getItemCount() == 1) {
+      chatRooms.setSelection(chatTab);
+    }
+  }
+
+  private CTabItem createChatTab(IChat chat) {
+    ChatControl control = new ChatControl(this, chat, chatRooms, SWT.BORDER, WHITE, 2);
+
+    CTabItem chatTab;
+
+    if (chat == sessionChat) chatTab = new CTabItem(chatRooms, SWT.NONE, 0);
+    else chatTab = new CTabItem(chatRooms, SWT.CLOSE);
+
+    chatTab.setText(getChatTabName(chat));
+    chatTab.setImage(chatViewImage);
+    chatTab.setData(chat);
+    chatTab.setControl(control);
+    chatTab.addDisposeListener(disposeListener);
+
+    return chatTab;
+  }
+
+  /*
+   * TODO make this protected / private and use a listener to update the chat
+   * tabs text
+   */
+  public CTabItem getChatTab(IChat chat) {
+    for (CTabItem tab : this.chatRooms.getItems()) {
+      IChat data = (IChat) tab.getData();
+
+      // do the equal check this way to allow null values in the tab data
+      if (chat.equals(data)) return tab;
     }
 
-    private void updateExplanation() {
-        if (chatRooms.getItemCount() != 0)
-            return;
+    return null;
+  }
 
-        if (!connectionHandler.isConnected())
-            showExplanation(connectFirst);
-        else
-            showExplanation(howToShareProjects);
+  private boolean closeChatTab(IChat chat) {
+    CTabItem tab = getChatTab(chat);
+    if (tab != null && !tab.isDisposed()) {
+      tab.dispose();
+
+      updateExplanation();
+      return true;
     }
 
-    public ChatControl getSelectedChatControl() {
-        return !isChatExistent() ? null : (ChatControl) chatRooms
-            .getSelection().getControl();
+    return false;
+  }
+
+  /**
+   * Update title and history for chats. A chat is updated if its participants contains any of the
+   * given {@link JID}s.
+   *
+   * @param jids JIDs whom the chats should be updated for
+   */
+  private void updateChatTabs(Collection<JID> jids) {
+    for (CTabItem tab : chatRooms.getItems()) {
+
+      if (!(tab.getControl() instanceof ChatControl)) continue;
+
+      ChatControl control = (ChatControl) tab.getControl();
+      IChat chat = (IChat) tab.getData();
+
+      if (!Collections.disjoint(jids, chat.getParticipants())) {
+        control.updateDisplayNames();
+        tab.setText(getChatTabName(chat));
+      }
+    }
+  }
+
+  private boolean selectExistentTab(IChat chat) {
+    for (CTabItem item : chatRooms.getItems()) {
+      // do the equal check this way to allow null values in the tab data
+      if (chat.equals(item.getData())) {
+        chatRooms.setSelection(item);
+        return true;
+      }
     }
 
-    public boolean isChatExistent() {
-        return chatRooms.getSelection() != null
-            && (chatRooms.getSelection().getControl() instanceof ChatControl);
+    return false;
+  }
+
+  private void updateExplanation() {
+    if (chatRooms.getItemCount() != 0) return;
+
+    if (!connectionHandler.isConnected()) showExplanation(connectFirst);
+    else showExplanation(howToShareProjects);
+  }
+
+  public ChatControl getSelectedChatControl() {
+    return !isChatExistent() ? null : (ChatControl) chatRooms.getSelection().getControl();
+  }
+
+  public boolean isChatExistent() {
+    return chatRooms.getSelection() != null
+        && (chatRooms.getSelection().getControl() instanceof ChatControl);
+  }
+
+  private void setErrorMessage(String message) {
+
+    if (!isSessionRunning || message == null) return;
+
+    if (sessionChatErrorTab != null && !sessionChatErrorTab.isDisposed())
+      sessionChatErrorTab.dispose();
+
+    ListExplanatoryComposite errorComposite = new ListExplanatoryComposite(chatRooms, SWT.NONE);
+
+    ListExplanation explanation = new ListExplanation(SWT.ICON_ERROR, message);
+
+    errorComposite.showExplanation(explanation);
+
+    sessionChatErrorTab = new CTabItem(chatRooms, SWT.CLOSE, 0);
+
+    sessionChatErrorTab.setText(Messages.ChatRoomsComposite_muc_error_tab_text);
+
+    // TODO add an icon
+
+    sessionChatErrorTab.setData(null);
+    sessionChatErrorTab.setControl(errorComposite);
+    sessionChatErrorTab.addDisposeListener(disposeListener);
+    chatRooms.setSelection(sessionChatErrorTab);
+
+    hideExplanation();
+  }
+
+  /**
+   * Connects to the session's {@link MultiUserChat}. Automatically (if necessary) created and joins
+   * the {@link MultiUserChat}.
+   *
+   * @param session session the multi user chat should belong to
+   * @return multi user chat of the session
+   */
+  private IChat createChat(ISarosSession session) {
+    MultiUserChatPreferences preferences =
+        session.isHost()
+            ? mucNegotiationManager.getOwnPreferences()
+            : mucNegotiationManager.getSessionPreferences();
+
+    return multiUserChatService.createChat(preferences);
+  }
+
+  /**
+   * Returns the name for the given chat that would be used as caption for a chat tab.
+   *
+   * @param chat
+   * @return
+   */
+  public String getChatTabName(IChat chat) {
+
+    if (chat instanceof MultiUserChat) return Messages.ChatRoomsComposite_roundtable;
+    else {
+      JID jid = chat.getParticipants().iterator().next();
+      return XMPPUtils.getNickname(null, jid, jid.getBase());
     }
-
-    private void setErrorMessage(String message) {
-
-        if (!isSessionRunning || message == null)
-            return;
-
-        if (sessionChatErrorTab != null && !sessionChatErrorTab.isDisposed())
-            sessionChatErrorTab.dispose();
-
-        ListExplanatoryComposite errorComposite = new ListExplanatoryComposite(
-            chatRooms, SWT.NONE);
-
-        ListExplanation explanation = new ListExplanation(SWT.ICON_ERROR,
-            message);
-
-        errorComposite.showExplanation(explanation);
-
-        sessionChatErrorTab = new CTabItem(chatRooms, SWT.CLOSE, 0);
-
-        sessionChatErrorTab
-            .setText(Messages.ChatRoomsComposite_muc_error_tab_text);
-
-        // TODO add an icon
-
-        sessionChatErrorTab.setData(null);
-        sessionChatErrorTab.setControl(errorComposite);
-        sessionChatErrorTab.addDisposeListener(disposeListener);
-        chatRooms.setSelection(sessionChatErrorTab);
-
-        hideExplanation();
-
-    }
-
-    /**
-     * Connects to the session's {@link MultiUserChat}. Automatically (if
-     * necessary) created and joins the {@link MultiUserChat}.
-     * 
-     * @param session
-     *            session the multi user chat should belong to
-     * @return multi user chat of the session
-     */
-    private IChat createChat(ISarosSession session) {
-        MultiUserChatPreferences preferences = session.isHost() ? mucNegotiationManager
-            .getOwnPreferences() : mucNegotiationManager
-            .getSessionPreferences();
-
-        return multiUserChatService.createChat(preferences);
-    }
-
-    /**
-     * Returns the name for the given chat that would be used as caption for a
-     * chat tab.
-     * 
-     * @param chat
-     * @return
-     */
-    public String getChatTabName(IChat chat) {
-
-        if (chat instanceof MultiUserChat)
-            return Messages.ChatRoomsComposite_roundtable;
-        else {
-            JID jid = chat.getParticipants().iterator().next();
-            return XMPPUtils.getNickname(null, jid, jid.getBase());
-        }
-    }
+  }
 }

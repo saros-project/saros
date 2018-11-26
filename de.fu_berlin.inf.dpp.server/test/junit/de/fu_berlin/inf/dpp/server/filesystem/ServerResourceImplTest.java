@@ -10,129 +10,128 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-import org.easymock.EasyMockSupport;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ServerResourceImplTest extends EasyMockSupport {
 
-    private static class ExampleResource extends ServerResourceImpl {
+  private static class ExampleResource extends ServerResourceImpl {
 
-        public ExampleResource(IPath path, IWorkspace workspace) {
-            super(workspace, path);
-        }
-
-        @Override
-        public int getType() {
-            return IResource.FILE;
-        }
-
-        @Override
-        public void delete(int updateFlags) throws IOException {
-            // Do nothing
-        }
-
-        @Override
-        public void move(IPath destination, boolean force) throws IOException {
-            // Do nothing
-        }
+    public ExampleResource(IPath path, IWorkspace workspace) {
+      super(workspace, path);
     }
 
-    private IResource resource;
-    private IWorkspace workspace;
-    private IProject project;
-    private IFolder parent;
-
-    @Before
-    public void setUp() throws Exception {
-        workspace = createMock(IWorkspace.class);
-        project = createMock(IProject.class);
-        parent = createMock(IFolder.class);
-
-        expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
-
-        expect(workspace.getProject("project")).andStubReturn(project);
-        expect(project.getFolder(path("folder"))).andStubReturn(parent);
-
-        replayAll();
-
-        resource = new ExampleResource(path("project/folder/file"), workspace);
+    @Override
+    public int getType() {
+      return IResource.FILE;
     }
 
-    @After
-    public void cleanUp() {
-        FileUtils.deleteQuietly(workspace.getLocation().toFile());
+    @Override
+    public void delete(int updateFlags) throws IOException {
+      // Do nothing
     }
 
-    @Test
-    public void getFullPath() {
-        assertEquals(path("project/folder/file"), resource.getFullPath());
+    @Override
+    public void move(IPath destination, boolean force) throws IOException {
+      // Do nothing
     }
+  }
 
-    @Test
-    public void getProjectRelativePath() {
-        assertEquals(path("folder/file"), resource.getProjectRelativePath());
-    }
+  private IResource resource;
+  private IWorkspace workspace;
+  private IProject project;
+  private IFolder parent;
 
-    @Test
-    public void getLocation() {
-        assertEquals(workspace.getLocation().append("project/folder/file"),
-            ((ServerResourceImpl) resource).getLocation());
-    }
+  @Before
+  public void setUp() throws Exception {
+    workspace = createMock(IWorkspace.class);
+    project = createMock(IProject.class);
+    parent = createMock(IFolder.class);
 
-    @Test
-    public void getName() {
-        assertEquals("file", resource.getName());
-    }
+    expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
 
-    @Test
-    public void getProject() {
-        assertEquals(project, resource.getProject());
-    }
+    expect(workspace.getProject("project")).andStubReturn(project);
+    expect(project.getFolder(path("folder"))).andStubReturn(parent);
 
-    @Test
-    public void getParentIfParentIsFolder() {
-        assertEquals(parent, resource.getParent());
-    }
+    replayAll();
 
-    @Test
-    public void getParentIfParentIsProject() {
-        resource = new ExampleResource(path("project/file"), workspace);
-        assertEquals(project, resource.getParent());
-    }
+    resource = new ExampleResource(path("project/folder/file"), workspace);
+  }
 
-    @Test
-    public void exists() throws Exception {
-        assertFalse(resource.exists());
-        createFileForResource();
-        assertTrue(resource.exists());
-    }
+  @After
+  public void cleanUp() {
+    FileUtils.deleteQuietly(workspace.getLocation().toFile());
+  }
 
-    @Test
-    public void isNeverDerived() throws Exception {
-        assertFalse(resource.isDerived());
-        assertFalse(resource.isDerived(true));
-    }
+  @Test
+  public void getFullPath() {
+    assertEquals(path("project/folder/file"), resource.getFullPath());
+  }
 
-    @Test
-    public void getAdapterDefault() {
-        assertSame(resource, resource.getAdapter(ExampleResource.class));
-        assertSame(resource, resource.getAdapter(IResource.class));
-        assertNull(resource.getAdapter(IFile.class));
-    }
+  @Test
+  public void getProjectRelativePath() {
+    assertEquals(path("folder/file"), resource.getProjectRelativePath());
+  }
 
-    private void createFileForResource() throws IOException {
-        createFile(workspace, "project/folder/file");
-    }
+  @Test
+  public void getLocation() {
+    assertEquals(
+        workspace.getLocation().append("project/folder/file"),
+        ((ServerResourceImpl) resource).getLocation());
+  }
+
+  @Test
+  public void getName() {
+    assertEquals("file", resource.getName());
+  }
+
+  @Test
+  public void getProject() {
+    assertEquals(project, resource.getProject());
+  }
+
+  @Test
+  public void getParentIfParentIsFolder() {
+    assertEquals(parent, resource.getParent());
+  }
+
+  @Test
+  public void getParentIfParentIsProject() {
+    resource = new ExampleResource(path("project/file"), workspace);
+    assertEquals(project, resource.getParent());
+  }
+
+  @Test
+  public void exists() throws Exception {
+    assertFalse(resource.exists());
+    createFileForResource();
+    assertTrue(resource.exists());
+  }
+
+  @Test
+  public void isNeverDerived() throws Exception {
+    assertFalse(resource.isDerived());
+    assertFalse(resource.isDerived(true));
+  }
+
+  @Test
+  public void getAdapterDefault() {
+    assertSame(resource, resource.getAdapter(ExampleResource.class));
+    assertSame(resource, resource.getAdapter(IResource.class));
+    assertNull(resource.getAdapter(IFile.class));
+  }
+
+  private void createFileForResource() throws IOException {
+    createFile(workspace, "project/folder/file");
+  }
 }

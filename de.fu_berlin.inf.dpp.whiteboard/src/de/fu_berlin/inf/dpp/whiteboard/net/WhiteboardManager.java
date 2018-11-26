@@ -1,12 +1,5 @@
 package de.fu_berlin.inf.dpp.whiteboard.net;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.eclipse.swt.graphics.RGB;
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -28,14 +21,18 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController.State;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEOutgoingSynchronizationProcess;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.log4j.Logger;
+import org.eclipse.swt.graphics.RGB;
+import org.picocontainer.annotations.Inject;
 
 /**
  * This class makes the interconnection between Saros and SXE.
- * 
- * The singleton instantiated on plug-in StartUp (see plugin.xml).
- * 
+ *
+ * <p>The singleton instantiated on plug-in StartUp (see plugin.xml).
+ *
  * @author jurke
- * 
  */
 /*
  * Note: this class is not yet final because a lot of changes are about to
@@ -43,98 +40,97 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEOutgoingSynchronizationProcess
  */
 public class WhiteboardManager {
 
-    private static final Logger LOG = Logger.getLogger(WhiteboardManager.class);
+  private static final Logger LOG = Logger.getLogger(WhiteboardManager.class);
 
-    private static final Object LOCK = new Object();
+  private static final Object LOCK = new Object();
 
-    private static final WhiteboardManager INSTANCE = new WhiteboardManager();
+  private static final WhiteboardManager INSTANCE = new WhiteboardManager();
 
-    protected SXEController controller;
+  protected SXEController controller;
 
-    /**
-     * Only used by the client
-     */
-    private boolean hostHasWhiteboard;
-    /**
-     * Only used by the Host, for representing which client has a whiteboard
-     */
-    private final Map<JID, Boolean> hasWhiteboard = new HashMap<JID, Boolean>();
+  /** Only used by the client */
+  private boolean hostHasWhiteboard;
+  /** Only used by the Host, for representing which client has a whiteboard */
+  private final Map<JID, Boolean> hasWhiteboard = new HashMap<JID, Boolean>();
 
-    public static WhiteboardManager getInstance() {
-        return INSTANCE;
-    }
+  public static WhiteboardManager getInstance() {
+    return INSTANCE;
+  }
 
-    /**
-     * The session life-cycle listener lets the host initialize a local session,
-     * enables for other peers to be invited and let the host start the
-     * synchronization process.
-     */
-    protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
+  /**
+   * The session life-cycle listener lets the host initialize a local session, enables for other
+   * peers to be invited and let the host start the synchronization process.
+   */
+  protected ISessionLifecycleListener sessionLifecycleListener =
+      new NullSessionLifecycleListener() {
 
         @Override
-        public void postOutgoingInvitationCompleted(ISarosSession session,
-            User user, IProgressMonitor monitor) {
+        public void postOutgoingInvitationCompleted(
+            ISarosSession session, User user, IProgressMonitor monitor) {
 
-            // This method might be called concurrently in case multiple users
-            // are invited at once.
-            synchronized (LOCK) {
-                if (!hasWhiteboard.get(user.getJID())) {
-                    LOG.debug("Skip Whiteboard preparation because " + user
-                        + " has no with Whiteboard support");
-                    return;
-                }
-
-                // This preparation needs to be performed only once, and we are
-                // doing it lazy: When the first client with a Whiteboard
-                // completed his SessionNegotiation.
-                if (controller.getState().equals(State.DISCONNECTED)) {
-                    LOG.debug("Preparing Whiteboard for sending an invitation");
-                    setupColorAndTransmitter(session);
-                    controller.startSession();
-                }
-
-                SXEOutgoingSynchronizationProcess inv = new SXEOutgoingSynchronizationProcess(
-                    controller, sxeTransmitter, user.getJID().toString());
-                inv.start(ProgressMonitorAdapterFactory.convert(monitor));
+          // This method might be called concurrently in case multiple users
+          // are invited at once.
+          synchronized (LOCK) {
+            if (!hasWhiteboard.get(user.getJID())) {
+              LOG.debug(
+                  "Skip Whiteboard preparation because "
+                      + user
+                      + " has no with Whiteboard support");
+              return;
             }
+
+            // This preparation needs to be performed only once, and we are
+            // doing it lazy: When the first client with a Whiteboard
+            // completed his SessionNegotiation.
+            if (controller.getState().equals(State.DISCONNECTED)) {
+              LOG.debug("Preparing Whiteboard for sending an invitation");
+              setupColorAndTransmitter(session);
+              controller.startSession();
+            }
+
+            SXEOutgoingSynchronizationProcess inv =
+                new SXEOutgoingSynchronizationProcess(
+                    controller, sxeTransmitter, user.getJID().toString());
+            inv.start(ProgressMonitorAdapterFactory.convert(monitor));
+          }
         }
 
         @Override
         public void sessionStarted(ISarosSession session) {
 
-            if (!hostHasWhiteboard) {
-                LOG.debug("Skip Whiteboard preparation because session host has no Whiteboard");
-                return;
-            }
+          if (!hostHasWhiteboard) {
+            LOG.debug("Skip Whiteboard preparation because session host has no Whiteboard");
+            return;
+          }
 
-            LOG.debug("Preparing Whiteboard for receiving an invitation");
+          LOG.debug("Preparing Whiteboard for receiving an invitation");
 
-            setupColorAndTransmitter(session);
-            sxeTransmitter.enableInvitation(controller);
-
+          setupColorAndTransmitter(session);
+          sxeTransmitter.enableInvitation(controller);
         }
 
         @Override
         public void sessionEnded(ISarosSession session, SessionEndReason reason) {
-            hostHasWhiteboard = false;
-            hasWhiteboard.clear();
+          hostHasWhiteboard = false;
+          hasWhiteboard.clear();
 
-            controller.setDisconnected();
+          controller.setDisconnected();
 
-            /*
-             * dispose because we do not want to be invited when not in a Saros
-             * session and the transmitter will be recreated on start
-             */
-            dispose();
+          /*
+           * dispose because we do not want to be invited when not in a Saros
+           * session and the transmitter will be recreated on start
+           */
+          dispose();
         }
-    };
+      };
 
-    /**
-     * This hook determines whether there are Whiteboard counterparts on the
-     * remote sides to communicate with. The result will be stored in
-     * {@link #hasWhiteboard} and {@link #hostHasWhiteboard}.
-     */
-    private final ISessionNegotiationHook hook = new ISessionNegotiationHook() {
+  /**
+   * This hook determines whether there are Whiteboard counterparts on the remote sides to
+   * communicate with. The result will be stored in {@link #hasWhiteboard} and {@link
+   * #hostHasWhiteboard}.
+   */
+  private final ISessionNegotiationHook hook =
+      new ISessionNegotiationHook() {
 
         private static final String IDENTIFIER = "whiteboard";
         private static final String USE_KEY = "useWhiteboard";
@@ -142,94 +138,90 @@ public class WhiteboardManager {
 
         @Override
         public String getIdentifier() {
-            return IDENTIFIER;
+          return IDENTIFIER;
         }
 
         @Override
         public void setInitialHostPreferences(IPreferenceStore hostPreferences) {
-            // NOP
+          // NOP
         }
 
         @Override
         public Map<String, String> tellClientPreferences() {
-            Map<String, String> map = new HashMap<String, String>();
-            map.put(USE_KEY, USE_VAL);
-            return map;
+          Map<String, String> map = new HashMap<String, String>();
+          map.put(USE_KEY, USE_VAL);
+          return map;
         }
 
         @Override
-        public Map<String, String> considerClientPreferences(JID client,
-            Map<String, String> input) {
+        public Map<String, String> considerClientPreferences(
+            JID client, Map<String, String> input) {
 
-            // This method might be called concurrently in case multiple
-            // client are invited at once.
-            synchronized (LOCK) {
-                boolean has = (input != null && USE_VAL.equals(input
-                    .get(USE_KEY)));
+          // This method might be called concurrently in case multiple
+          // client are invited at once.
+          synchronized (LOCK) {
+            boolean has = (input != null && USE_VAL.equals(input.get(USE_KEY)));
 
-                LOG.debug("Detected " + (has ? "" : "no") + " Whiteboard at "
-                    + client);
+            LOG.debug("Detected " + (has ? "" : "no") + " Whiteboard at " + client);
 
-                hasWhiteboard.put(client, has);
+            hasWhiteboard.put(client, has);
 
-                return has ? input : null;
-            }
+            return has ? input : null;
+          }
         }
 
         @Override
-        public void applyActualParameters(Map<String, String> input,
-            IPreferenceStore hostPreferences, IPreferenceStore clientPreferences) {
+        public void applyActualParameters(
+            Map<String, String> input,
+            IPreferenceStore hostPreferences,
+            IPreferenceStore clientPreferences) {
 
-            hostHasWhiteboard = (input != null && USE_VAL.equals(input
-                .get(USE_KEY)));
+          hostHasWhiteboard = (input != null && USE_VAL.equals(input.get(USE_KEY)));
         }
-    };
+      };
 
-    @Inject
-    private SarosSessionManager sessionManager;
+  @Inject private SarosSessionManager sessionManager;
 
-    @Inject
-    private SessionNegotiationHookManager hooks;
+  @Inject private SessionNegotiationHookManager hooks;
 
-    private SarosSXETransmitter sxeTransmitter;
+  private SarosSXETransmitter sxeTransmitter;
 
-    private WhiteboardManager() {
+  private WhiteboardManager() {
 
-        SarosPluginContext.initComponent(this);
+    SarosPluginContext.initComponent(this);
 
-        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-        hooks.addHook(hook);
+    sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+    hooks.addHook(hook);
 
-        LOG.debug("WhiteboardManager instantiated");
+    LOG.debug("WhiteboardManager instantiated");
 
-        controller = new SXEController(new GEFRecordFactory());
-    }
+    controller = new SXEController(new GEFRecordFactory());
+  }
 
-    private void setupColorAndTransmitter(final ISarosSession session) {
+  private void setupColorAndTransmitter(final ISarosSession session) {
 
-        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+    SWTUtils.runSafeSWTSync(
+        LOG,
+        new Runnable() {
 
-            @Override
-            public void run() {
-                RGB color = SarosAnnotation
-                    .getUserColor(session.getLocalUser()).getRGB();
+          @Override
+          public void run() {
+            RGB color = SarosAnnotation.getUserColor(session.getLocalUser()).getRGB();
 
-                ColorUtils.setForegroundColor(color);
-            }
+            ColorUtils.setForegroundColor(color);
+          }
         });
 
-        sxeTransmitter = new SarosSXETransmitter(session);
-        controller.initNetwork(sxeTransmitter);
-    }
+    sxeTransmitter = new SarosSXETransmitter(session);
+    controller.initNetwork(sxeTransmitter);
+  }
 
-    public ISXEMessageHandler getSXEMessageHandler() {
-        return controller;
-    }
+  public ISXEMessageHandler getSXEMessageHandler() {
+    return controller;
+  }
 
-    private void dispose() {
-        controller.clear();
-        if (sxeTransmitter != null)
-            sxeTransmitter.dispose();
-    }
-
+  private void dispose() {
+    controller.clear();
+    if (sxeTransmitter != null) sxeTransmitter.dispose();
+  }
 }

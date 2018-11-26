@@ -4,6 +4,5 @@ import java.util.EventListener;
 
 public interface IChatDisplayListener extends EventListener {
 
-    public void chatCleared(ChatClearedEvent event);
-
+  public void chatCleared(ChatClearedEvent event);
 }

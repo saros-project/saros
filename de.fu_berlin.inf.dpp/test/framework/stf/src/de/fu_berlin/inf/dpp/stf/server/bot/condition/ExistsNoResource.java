@@ -8,25 +8,23 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 public class ExistsNoResource extends DefaultCondition {
 
-    String resourcePath;
+  String resourcePath;
 
-    ExistsNoResource(String resourcePath) {
-        this.resourcePath = resourcePath;
-    }
+  ExistsNoResource(String resourcePath) {
+    this.resourcePath = resourcePath;
+  }
 
-    @Override
-    public String getFailureMessage() {
+  @Override
+  public String getFailureMessage() {
 
-        return null;
-    }
+    return null;
+  }
 
-    @Override
-    public boolean test() throws Exception {
-        IPath path = new Path(resourcePath);
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        if (resource == null)
-            return true;
-        return false;
-    }
+  @Override
+  public boolean test() throws Exception {
+    IPath path = new Path(resourcePath);
+    IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+    if (resource == null) return true;
+    return false;
+  }
 }

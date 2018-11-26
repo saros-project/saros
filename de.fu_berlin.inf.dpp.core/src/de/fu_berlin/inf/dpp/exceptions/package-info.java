@@ -1,5 +1,2 @@
-/**
- * Assorted Saros-specific exceptions. 
- */
-
+/** Assorted Saros-specific exceptions. */
 package de.fu_berlin.inf.dpp.exceptions;
