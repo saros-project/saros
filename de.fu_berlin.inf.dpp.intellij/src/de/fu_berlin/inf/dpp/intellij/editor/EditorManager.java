@@ -662,6 +662,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));
   }
 
+  /**
+   * Generates an editor save activity for the given path.
+   *
+   * @param path the path to generate an editor saved activity for
+   */
+  void generateEditorSaved(SPath path) {
+    fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED, path));
+  }
+
   /** Generates a {@link TextSelectionActivity} and fires it. */
   void generateSelection(SPath path, SelectionEvent newSelection) {
 
