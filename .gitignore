@@ -6,6 +6,7 @@ bin_test/
 /.idea/inspectionProfiles/
 /.idea/copyright/
 /.idea/dictionaries/
+/.idea/sonarlint/
 /de.fu_berlin.inf.dpp.intellij/build.properties
 /de.fu_berlin.inf.dpp.server/lib/
 /de.fu_berlin.inf.dpp.server/instr/

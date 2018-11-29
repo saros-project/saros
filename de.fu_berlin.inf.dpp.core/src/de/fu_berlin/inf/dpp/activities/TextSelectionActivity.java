@@ -21,89 +21,86 @@ package de.fu_berlin.inf.dpp.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("textSelectionActivity")
 public class TextSelectionActivity extends AbstractResourceActivity {
 
-    @XStreamAlias("o")
-    @XStreamAsAttribute
-    protected final int offset;
+  @XStreamAlias("o")
+  @XStreamAsAttribute
+  protected final int offset;
 
-    @XStreamAlias("l")
-    @XStreamAsAttribute
-    protected final int length;
+  @XStreamAlias("l")
+  @XStreamAsAttribute
+  protected final int length;
 
-    public TextSelectionActivity(User source, int offset, int length, SPath path) {
-        super(source, path);
+  public TextSelectionActivity(User source, int offset, int length, SPath path) {
+    super(source, path);
 
-        if (path == null)
-            throw new IllegalArgumentException("path must not be null");
+    if (path == null) throw new IllegalArgumentException("path must not be null");
 
-        this.offset = offset;
-        this.length = length;
-    }
+    this.offset = offset;
+    this.length = length;
+  }
 
-    @Override
-    public boolean isValid() {
-        return super.isValid() && (getPath() != null);
-    }
+  @Override
+  public boolean isValid() {
+    return super.isValid() && (getPath() != null);
+  }
 
-    public int getLength() {
-        return this.length;
-    }
+  public int getLength() {
+    return this.length;
+  }
 
-    public int getOffset() {
-        return this.offset;
-    }
+  public int getOffset() {
+    return this.offset;
+  }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + length;
-        result = prime * result + offset;
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + length;
+    result = prime * result + offset;
+    return result;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (!(obj instanceof TextSelectionActivity))
-            return false;
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!super.equals(obj)) return false;
+    if (!(obj instanceof TextSelectionActivity)) return false;
 
-        TextSelectionActivity other = (TextSelectionActivity) obj;
+    TextSelectionActivity other = (TextSelectionActivity) obj;
 
-        if (this.offset != other.offset)
-            return false;
-        if (this.length != other.length)
-            return false;
+    if (this.offset != other.offset) return false;
+    if (this.length != other.length) return false;
 
-        return true;
-    }
+    return true;
+  }
 
-    @Override
-    public String toString() {
-        return "TextSelectionActivity(offset: " + offset + ", length: "
-            + length + ", src: " + getSource() + ", path: " + getPath() + ")";
-    }
+  @Override
+  public String toString() {
+    return "TextSelectionActivity(offset: "
+        + offset
+        + ", length: "
+        + length
+        + ", src: "
+        + getSource()
+        + ", path: "
+        + getPath()
+        + ")";
+  }
 
-    @Override
-    public void dispatch(IActivityReceiver receiver) {
-        /**
-         * @JTourBusStop 13, Activity sending, Third dispatch:
-         * 
-         *               Each specific activity implementation does the same
-         *               simple third dispatch: It uses the given receiver to
-         *               deliver itself to it, so the IActivityReceiver
-         *               implementation gets a correctly typed activity without
-         *               having to use "instanceof" constructions.
-         */
-
-        receiver.receive(this);
-    }
+  @Override
+  public void dispatch(IActivityReceiver receiver) {
+    /**
+     * @JTourBusStop 13, Activity sending, Third dispatch:
+     *
+     * <p>Each specific activity implementation does the same simple third dispatch: It uses the
+     * given receiver to deliver itself to it, so the IActivityReceiver implementation gets a
+     * correctly typed activity without having to use "instanceof" constructions.
+     */
+    receiver.receive(this);
+  }
 }

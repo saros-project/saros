@@ -1,18 +1,15 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events;
 
 public class FilterClosedProjectsChangedEvent {
-    private boolean filterClosedProjects;
+  private boolean filterClosedProjects;
 
-    /**
-     * @param filterClosedProjects
-     */
-    public FilterClosedProjectsChangedEvent(boolean filterClosedProjects) {
-        super();
-        this.filterClosedProjects = filterClosedProjects;
-    }
+  /** @param filterClosedProjects */
+  public FilterClosedProjectsChangedEvent(boolean filterClosedProjects) {
+    super();
+    this.filterClosedProjects = filterClosedProjects;
+  }
 
-    public boolean isFilterClosedProjects() {
-        return filterClosedProjects;
-    }
-
+  public boolean isFilterClosedProjects() {
+    return filterClosedProjects;
+  }
 }

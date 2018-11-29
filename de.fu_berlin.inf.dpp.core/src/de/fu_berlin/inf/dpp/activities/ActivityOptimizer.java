@@ -6,77 +6,70 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Optimizer for activities.
- */
+/** Optimizer for activities. */
 public class ActivityOptimizer {
 
-    /**
-     * Tries to reduce the number of {@link IActivity activities} so that:
-     * <p>
-     * 
-     * <pre>
-     * for (activity : optimize(activities))
-     *         exec(activity)
-     * 
-     * will produce the same result as
-     * 
-     * for (activity : activities)
-     *         exec(activity)
-     * </pre>
-     * 
-     * @param activities
-     *            a collection containing the activities to optimize
-     * @return a list which may contains a reduced amount of activities
+  /**
+   * Tries to reduce the number of {@link IActivity activities} so that:
+   *
+   * <p>
+   *
+   * <pre>
+   * for (activity : optimize(activities))
+   *         exec(activity)
+   *
+   * will produce the same result as
+   *
+   * for (activity : activities)
+   *         exec(activity)
+   * </pre>
+   *
+   * @param activities a collection containing the activities to optimize
+   * @return a list which may contains a reduced amount of activities
+   */
+  public static List<IActivity> optimize(Collection<IActivity> activities) {
+
+    List<IActivity> result = new ArrayList<IActivity>(activities.size());
+
+    boolean[] dropActivityIdx = new boolean[activities.size()];
+
+    Map<SPath, Integer> selections = new HashMap<SPath, Integer>();
+    Map<SPath, Integer> viewports = new HashMap<SPath, Integer>();
+
+    /*
+     * keep only the latest selection/viewport activities per project and
+     * path
      */
 
-    public static List<IActivity> optimize(Collection<IActivity> activities) {
+    int activityIdx = 0;
 
-        List<IActivity> result = new ArrayList<IActivity>(activities.size());
+    for (IActivity activity : activities) {
 
-        boolean[] dropActivityIdx = new boolean[activities.size()];
+      if (activity instanceof TextSelectionActivity) {
+        SPath path = ((TextSelectionActivity) activity).getPath();
 
-        Map<SPath, Integer> selections = new HashMap<SPath, Integer>();
-        Map<SPath, Integer> viewports = new HashMap<SPath, Integer>();
+        Integer idx = selections.get(path);
 
-        /*
-         * keep only the latest selection/viewport activities per project and
-         * path
-         */
+        if (idx != null) dropActivityIdx[idx] = true;
 
-        int activityIdx = 0;
+        selections.put(path, activityIdx);
+      } else if (activity instanceof ViewportActivity) {
+        SPath path = ((ViewportActivity) activity).getPath();
 
-        for (IActivity activity : activities) {
+        Integer idx = viewports.get(path);
 
-            if (activity instanceof TextSelectionActivity) {
-                SPath path = ((TextSelectionActivity) activity).getPath();
+        if (idx != null) dropActivityIdx[idx] = true;
 
-                Integer idx = selections.get(path);
+        viewports.put(path, activityIdx);
+      }
 
-                if (idx != null)
-                    dropActivityIdx[idx] = true;
-
-                selections.put(path, activityIdx);
-            } else if (activity instanceof ViewportActivity) {
-                SPath path = ((ViewportActivity) activity).getPath();
-
-                Integer idx = viewports.get(path);
-
-                if (idx != null)
-                    dropActivityIdx[idx] = true;
-
-                viewports.put(path, activityIdx);
-            }
-
-            activityIdx++;
-        }
-
-        activityIdx = 0;
-
-        for (IActivity activity : activities)
-            if (!dropActivityIdx[activityIdx++])
-                result.add(activity);
-
-        return result;
+      activityIdx++;
     }
+
+    activityIdx = 0;
+
+    for (IActivity activity : activities) if (!dropActivityIdx[activityIdx++]) result.add(activity);
+
+    return result;
+  }
 }

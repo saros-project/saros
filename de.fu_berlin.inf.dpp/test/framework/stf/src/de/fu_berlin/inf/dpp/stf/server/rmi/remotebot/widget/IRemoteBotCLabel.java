@@ -5,8 +5,7 @@ import java.rmi.RemoteException;
 
 public interface IRemoteBotCLabel extends Remote {
 
-    public String getToolTipText() throws RemoteException;
+  public String getToolTipText() throws RemoteException;
 
-    public String getText() throws RemoteException;
-
+  public String getText() throws RemoteException;
 }

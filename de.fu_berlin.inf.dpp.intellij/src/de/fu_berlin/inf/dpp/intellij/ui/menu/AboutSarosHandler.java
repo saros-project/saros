@@ -6,16 +6,16 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 
-/**
- * About menu action.
- */
+/** About menu action. */
 public class AboutSarosHandler extends AnAction {
-    @Override
-    public void actionPerformed(AnActionEvent e) {
-        Project project = e.getData(PlatformDataKeys.PROJECT);
+  @Override
+  public void actionPerformed(AnActionEvent e) {
+    Project project = e.getData(PlatformDataKeys.PROJECT);
 
-        Messages.showMessageDialog(project,
-            "Saros plugin for IntelliJ. \n Still under Development.",
-            "About Saros", Messages.getInformationIcon());
-    }
+    Messages.showMessageDialog(
+        project,
+        "Saros plugin for IntelliJ. \n Still under Development.",
+        "About Saros",
+        Messages.getInformationIcon());
+  }
 }

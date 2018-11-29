@@ -9,16 +9,6 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
@@ -27,104 +17,108 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class FileActivityConsumerTest {
 
-    private static final byte[] FILE_CONTENT = new byte[] { 'a', 'b', 'c' };
+  private static final byte[] FILE_CONTENT = new byte[] {'a', 'b', 'c'};
 
-    private static final byte[] INCOMING_SAME_CONTENT = FILE_CONTENT.clone();
-    private static final byte[] INCOMING_DIFFERENT_CONTENT = new byte[] { 'a',
-        'b', 'd' };
+  private static final byte[] INCOMING_SAME_CONTENT = FILE_CONTENT.clone();
+  private static final byte[] INCOMING_DIFFERENT_CONTENT = new byte[] {'a', 'b', 'd'};
 
-    /** Unit under test */
-    private FileActivityConsumer consumer;
+  /** Unit under test */
+  private FileActivityConsumer consumer;
 
-    /**
-     * Partial file mock in recording state, has to be replayed in every test
-     * before being used.
-     */
-    private IFile file;
+  /** Partial file mock in recording state, has to be replayed in every test before being used. */
+  private IFile file;
 
-    private SharedResourcesManager resourceChangeListener;
+  private SharedResourcesManager resourceChangeListener;
 
-    @Before
-    public void setUp() throws CoreException {
+  @Before
+  public void setUp() throws CoreException {
 
-        resourceChangeListener = createMock(SharedResourcesManager.class);
+    resourceChangeListener = createMock(SharedResourcesManager.class);
 
-        resourceChangeListener.suspend();
-        expectLastCall().once();
+    resourceChangeListener.suspend();
+    expectLastCall().once();
 
-        resourceChangeListener.resume();
-        expectLastCall().once();
+    resourceChangeListener.resume();
+    expectLastCall().once();
 
-        replay(resourceChangeListener);
+    replay(resourceChangeListener);
 
-        consumer = new FileActivityConsumer(null, resourceChangeListener, null);
+    consumer = new FileActivityConsumer(null, resourceChangeListener, null);
 
-        file = createMock(IFile.class);
+    file = createMock(IFile.class);
 
-        expect(file.getContents()).andStubReturn(
-            new ByteArrayInputStream(FILE_CONTENT));
+    expect(file.getContents()).andStubReturn(new ByteArrayInputStream(FILE_CONTENT));
 
-        expect(file.exists()).andStubReturn(Boolean.TRUE);
-        expect(file.getType()).andStubReturn(IResource.FILE);
-        expect(file.getAdapter(IFile.class)).andStubReturn(file);
+    expect(file.exists()).andStubReturn(Boolean.TRUE);
+    expect(file.getType()).andStubReturn(IResource.FILE);
+    expect(file.getAdapter(IFile.class)).andStubReturn(file);
+  }
 
-    }
+  @After
+  public void tearDown() {
+    verify(resourceChangeListener);
+  }
 
-    @After
-    public void tearDown() {
-        verify(resourceChangeListener);
-    }
+  @Test
+  public void testExecFileActivityCreationSameContent() throws CoreException {
 
-    @Test
-    public void testExecFileActivityCreationSameContent() throws CoreException {
+    file.setContents(
+        isA(InputStream.class), anyBoolean(), anyBoolean(), anyObject(IProgressMonitor.class));
 
-        file.setContents(isA(InputStream.class), anyBoolean(), anyBoolean(),
-            anyObject(IProgressMonitor.class));
+    expectLastCall().andStubThrow(new AssertionError("file was written unnecessarily"));
 
-        expectLastCall().andStubThrow(
-            new AssertionError("file was written unnecessarily"));
+    replay(file);
 
-        replay(file);
+    consumer.exec(createFileActivity(file, INCOMING_SAME_CONTENT));
 
-        consumer.exec(createFileActivity(file, INCOMING_SAME_CONTENT));
+    verify(file);
+  }
 
-        verify(file);
-    }
+  @Test
+  public void testExecFileActivityCreationDifferentContent() throws CoreException {
 
-    @Test
-    public void testExecFileActivityCreationDifferentContent()
-        throws CoreException {
+    file.setContents(
+        isA(InputStream.class), anyBoolean(), anyBoolean(), anyObject(IProgressMonitor.class));
 
-        file.setContents(isA(InputStream.class), anyBoolean(), anyBoolean(),
-            anyObject(IProgressMonitor.class));
+    expectLastCall().once();
 
-        expectLastCall().once();
+    replay(file);
 
-        replay(file);
+    consumer.exec(createFileActivity(file, INCOMING_DIFFERENT_CONTENT));
 
-        consumer.exec(createFileActivity(file, INCOMING_DIFFERENT_CONTENT));
+    // ensure file was written
+    verify(file);
+  }
 
-        // ensure file was written
-        verify(file);
-    }
+  private SPath createPathMockForFile(IFile file) {
+    final SPath path = createMock(SPath.class);
 
-    private SPath createPathMockForFile(IFile file) {
-        final SPath path = createMock(SPath.class);
+    expect(path.getFile()).andStubReturn(ResourceAdapterFactory.create(file));
 
-        expect(path.getFile()).andStubReturn(
-            ResourceAdapterFactory.create(file));
+    replay(path);
 
-        replay(path);
+    return path;
+  }
 
-        return path;
-    }
-
-    private FileActivity createFileActivity(IFile file, byte[] content) {
-        return new FileActivity(new User(new JID("foo@bar"), true, true, 0, 0),
-            Type.CREATED, Purpose.ACTIVITY, createPathMockForFile(file), null,
-            content, null);
-    }
+  private FileActivity createFileActivity(IFile file, byte[] content) {
+    return new FileActivity(
+        new User(new JID("foo@bar"), true, true, 0, 0),
+        Type.CREATED,
+        Purpose.ACTIVITY,
+        createPathMockForFile(file),
+        null,
+        content,
+        null);
+  }
 }

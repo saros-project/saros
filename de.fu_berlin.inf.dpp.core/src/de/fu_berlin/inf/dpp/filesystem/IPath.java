@@ -24,38 +24,36 @@ package de.fu_berlin.inf.dpp.filesystem;
 import java.io.File;
 
 /**
- * This interface is under development. It currently equals its Eclipse
- * counterpart. If not mentioned otherwise all offered methods are equivalent to
- * their Eclipse counterpart.
+ * This interface is under development. It currently equals its Eclipse counterpart. If not
+ * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
  */
 public interface IPath {
 
-    public IPath append(IPath path);
+  public IPath append(IPath path);
 
-    public String segment(int index);
+  public String segment(int index);
 
-    public String lastSegment();
+  public String lastSegment();
 
-    public boolean isPrefixOf(IPath path);
+  public boolean isPrefixOf(IPath path);
 
-    public int segmentCount();
+  public int segmentCount();
 
-    public IPath removeFirstSegments(int count);
+  public IPath removeFirstSegments(int count);
 
-    public IPath removeLastSegments(int count);
+  public IPath removeLastSegments(int count);
 
-    public String[] segments();
+  public String[] segments();
 
-    public IPath append(String path);
+  public IPath append(String path);
 
-    public IPath makeAbsolute();
+  public IPath makeAbsolute();
 
-    public boolean isAbsolute();
+  public boolean isAbsolute();
 
-    public String toPortableString();
+  public String toPortableString();
 
-    public String toOSString();
+  public String toOSString();
 
-    public File toFile();
-
+  public File toFile();
 }

@@ -24,17 +24,16 @@ package de.fu_berlin.inf.dpp.filesystem;
 import java.io.IOException;
 
 /**
- * This interface is under development. It currently equals its Eclipse
- * counterpart. If not mentioned otherwise all offered methods are equivalent to
- * their Eclipse counterpart.
+ * This interface is under development. It currently equals its Eclipse counterpart. If not
+ * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
  */
 public interface IContainer extends IResource {
 
-    public boolean exists(IPath path);
+  public boolean exists(IPath path);
 
-    public IResource[] members() throws IOException;
+  public IResource[] members() throws IOException;
 
-    public IResource[] members(int memberFlags) throws IOException;
+  public IResource[] members(int memberFlags) throws IOException;
 
-    public String getDefaultCharset() throws IOException;
+  public String getDefaultCharset() throws IOException;
 }

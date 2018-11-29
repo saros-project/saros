@@ -12,107 +12,105 @@ import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 /**
- * This manager is responsible for distributing knowledge about changes in
- * follow modes between session participants
+ * This manager is responsible for distributing knowledge about changes in follow modes between
+ * session participants
  */
-public class FollowingActivitiesManager extends AbstractActivityProducer
-    implements Startable {
+public class FollowingActivitiesManager extends AbstractActivityProducer implements Startable {
 
-    private static final Logger LOG = Logger
-        .getLogger(FollowingActivitiesManager.class);
+  private static final Logger LOG = Logger.getLogger(FollowingActivitiesManager.class);
 
-    private final List<IFollowModeChangesListener> listeners = new CopyOnWriteArrayList<IFollowModeChangesListener>();
+  private final List<IFollowModeChangesListener> listeners =
+      new CopyOnWriteArrayList<IFollowModeChangesListener>();
 
-    private final ISarosSession session;
+  private final ISarosSession session;
 
-    private final AwarenessInformationCollector collector;
+  private final AwarenessInformationCollector collector;
 
-    private final EditorManager editor;
+  private final EditorManager editor;
 
-    private final ISharedEditorListener followModeListener = new AbstractSharedEditorListener() {
+  private final ISharedEditorListener followModeListener =
+      new AbstractSharedEditorListener() {
         @Override
         public void followModeChanged(User target, boolean isFollowed) {
 
-            if (isFollowed) {
-                fireActivity(
-                    new StartFollowingActivity(session.getLocalUser(), target));
-            } else {
-                fireActivity(new StopFollowingActivity(session.getLocalUser()));
-            }
+          if (isFollowed) {
+            fireActivity(new StartFollowingActivity(session.getLocalUser(), target));
+          } else {
+            fireActivity(new StopFollowingActivity(session.getLocalUser()));
+          }
         }
-    };
+      };
 
-    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
+  private final IActivityConsumer consumer =
+      new AbstractActivityConsumer() {
         @Override
         public void receive(StartFollowingActivity activity) {
-            final User source = activity.getSource();
-            final User target = activity.getFollowedUser();
+          final User source = activity.getSource();
+          final User target = activity.getFollowedUser();
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                    "received new follow mode from: " + source + " , followed: "
-                        + target);
-            }
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("received new follow mode from: " + source + " , followed: " + target);
+          }
 
-            collector.setUserFollowing(source, target);
-            notifyListeners();
+          collector.setUserFollowing(source, target);
+          notifyListeners();
         }
 
         @Override
         public void receive(StopFollowingActivity activity) {
-            User source = activity.getSource();
+          User source = activity.getSource();
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("user " + source + " stopped follow mode");
-            }
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("user " + source + " stopped follow mode");
+          }
 
-            collector.setUserFollowing(source, null);
-            notifyListeners();
+          collector.setUserFollowing(source, null);
+          notifyListeners();
         }
-    };
+      };
 
-    public FollowingActivitiesManager(final ISarosSession session,
-        final AwarenessInformationCollector collector,
-        final EditorManager editor) {
-        this.session = session;
-        this.collector = collector;
-        this.editor = editor;
-    }
+  public FollowingActivitiesManager(
+      final ISarosSession session,
+      final AwarenessInformationCollector collector,
+      final EditorManager editor) {
+    this.session = session;
+    this.collector = collector;
+    this.editor = editor;
+  }
 
-    @Override
-    public void start() {
-        collector.flushFollowModes();
-        session.addActivityProducer(this);
-        session.addActivityConsumer(consumer, Priority.ACTIVE);
-        editor.addSharedEditorListener(followModeListener);
-    }
+  @Override
+  public void start() {
+    collector.flushFollowModes();
+    session.addActivityProducer(this);
+    session.addActivityConsumer(consumer, Priority.ACTIVE);
+    editor.addSharedEditorListener(followModeListener);
+  }
 
-    @Override
-    public void stop() {
-        session.removeActivityProducer(this);
-        session.removeActivityConsumer(consumer);
-        editor.removeSharedEditorListener(followModeListener);
-        collector.flushFollowModes();
-    }
+  @Override
+  public void stop() {
+    session.removeActivityProducer(this);
+    session.removeActivityConsumer(consumer);
+    editor.removeSharedEditorListener(followModeListener);
+    collector.flushFollowModes();
+  }
 
-    private void notifyListeners() {
-        for (IFollowModeChangesListener listener : listeners) {
-            listener.followModeChanged();
-        }
+  private void notifyListeners() {
+    for (IFollowModeChangesListener listener : listeners) {
+      listener.followModeChanged();
     }
+  }
 
-    public void addListener(IFollowModeChangesListener listener) {
-        this.listeners.add(listener);
-    }
+  public void addListener(IFollowModeChangesListener listener) {
+    this.listeners.add(listener);
+  }
 
-    public void removeListener(IFollowModeChangesListener listener) {
-        this.listeners.remove(listener);
-    }
+  public void removeListener(IFollowModeChangesListener listener) {
+    this.listeners.remove(listener);
+  }
 }

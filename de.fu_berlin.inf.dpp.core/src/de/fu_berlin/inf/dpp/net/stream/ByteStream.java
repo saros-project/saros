@@ -7,13 +7,13 @@ import java.io.OutputStream;
 // TODO JavaDoc
 public interface ByteStream {
 
-    public InputStream getInputStream() throws IOException;
+  public InputStream getInputStream() throws IOException;
 
-    public OutputStream getOutputStream() throws IOException;
+  public OutputStream getOutputStream() throws IOException;
 
-    public void close() throws IOException;
+  public void close() throws IOException;
 
-    public int getReadTimeout() throws IOException;
+  public int getReadTimeout() throws IOException;
 
-    public void setReadTimeout(int timeout) throws IOException;
+  public void setReadTimeout(int timeout) throws IOException;
 }

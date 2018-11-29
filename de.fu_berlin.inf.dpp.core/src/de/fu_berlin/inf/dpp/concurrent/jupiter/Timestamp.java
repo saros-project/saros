@@ -22,19 +22,18 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 /**
- * This interface represents the concept of a timestamp. Timestamps is a general
- * concept, so this interface remains empty. Timestamps are immutable.
- * 
+ * This interface represents the concept of a timestamp. Timestamps is a general concept, so this
+ * interface remains empty. Timestamps are immutable.
+ *
  * @see VectorTime
  */
 public interface Timestamp {
 
-    /**
-     * Retrieves the components of the timestamp as an int array. The exact
-     * representation is up to the concrete Timestamp implementation.
-     * 
-     * @return the components of the Timestamp implementation
-     */
-    int[] getComponents();
-
+  /**
+   * Retrieves the components of the timestamp as an int array. The exact representation is up to
+   * the concrete Timestamp implementation.
+   *
+   * @return the components of the Timestamp implementation
+   */
+  int[] getComponents();
 }
