@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.whiteboard.ui.browser.EclipseWhiteboardBrowser;
  */
 public class HTMLWhiteboardView extends ViewPart {
 
+  private static final String PATH_TO_HTML_WHITEBOARD = "/frontend/dist/index.html";
   private static final Logger LOG = Logger.getLogger(HTMLWhiteboardView.class);
 
   private Browser browser;
@@ -46,79 +47,47 @@ public class HTMLWhiteboardView extends ViewPart {
     browser = new Browser(parent, SWT.NONE);
     browser.setJavascriptEnabled(true);
     LOG.debug("HTML Whiteboard Browser Started");
-  }
-}
-    private static final String PATH_TO_HTML_WHITEBOARD = "/frontend/dist/index.html";
-    private static final Logger LOG = Logger
-        .getLogger(HTMLWhiteboardView.class);
 
-    private Browser browser;
-
-    /**
-     * initialises the view part which will hold the browser
-     */
-    public HTMLWhiteboardView() {
-        super();
+    // open the whiteboard document in browser
+    URL htmlURL = getClass().getResource(PATH_TO_HTML_WHITEBOARD);
+    if (htmlURL == null) {
+      showErrorMessage(null);
+      return;
     }
-
-    @Override
-    public void setFocus() {
-        browser.setFocus();
+    try {
+      htmlURL = FileLocator.toFileURL(htmlURL);
+    } catch (IOException e) {
+      showErrorMessage(e);
+      return;
     }
+    browser.addProgressListener(
+        new ProgressListener() {
 
-    /**
-     * creates a browser and adds it to the view
-     *
-     * @param parent
-     *            the parent view to which the browser window will be added
-     */
-    @Override
-    public void createPartControl(Composite parent) {
+          @Override
+          public void completed(ProgressEvent event) {
+            LOG.debug("HTML Whiteboard loaded");
+            WhiteboardManager.getInstance().createBridge(new EclipseWhiteboardBrowser(browser));
+          }
 
-        browser = new Browser(parent, SWT.NONE);
-        browser.setJavascriptEnabled(true);
-        LOG.debug("HTML Whiteboard Browser Started");
-
-        // open the whiteboard document in browser
-        URL htmlURL = getClass().getResource(PATH_TO_HTML_WHITEBOARD);
-        if (htmlURL == null) {
-            showErrorMessage(null);
-            return;
-        }
-        try {
-            htmlURL = FileLocator.toFileURL(htmlURL);
-        } catch (IOException e) {
-            showErrorMessage(e);
-            return;
-        }
-        browser.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void completed(ProgressEvent event) {
-                LOG.debug("HTML Whiteboard loaded");
-                WhiteboardManager.getInstance().createBridge(
-                    new EclipseWhiteboardBrowser(browser));
-            }
-
-            @Override
-            public void changed(ProgressEvent event) {
-                // not needed
-            }
+          @Override
+          public void changed(ProgressEvent event) {
+            // not needed
+          }
         });
-        browser.setUrl(htmlURL.toString());
+    browser.setUrl(htmlURL.toString());
+  }
 
+  private void showErrorMessage(Exception e) {
+    String errorMessage =
+        "can not find the whiteboard's html document at " + PATH_TO_HTML_WHITEBOARD;
+    if (e != null) {
+      LOG.error(errorMessage, e);
+    } else {
+      LOG.error(errorMessage);
     }
-
-    private void showErrorMessage(Exception e) {
-        String errorMessage = "can not find the whiteboard's html document at "
-            + PATH_TO_HTML_WHITEBOARD;
-        if (e != null) {
-            LOG.error(errorMessage, e);
-        } else {
-            LOG.error(errorMessage);
-        }
-        browser.setText("<html><body><pre>Resource <b>"
+    browser.setText(
+        "<html><body><pre>Resource <b>"
             + PATH_TO_HTML_WHITEBOARD
             + "</b> could not be found.</pre></body></html>");
-    }
+  }
 }

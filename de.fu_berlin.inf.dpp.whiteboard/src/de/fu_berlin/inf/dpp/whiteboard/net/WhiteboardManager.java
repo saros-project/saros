@@ -1,5 +1,12 @@
 package de.fu_berlin.inf.dpp.whiteboard.net;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.eclipse.swt.graphics.RGB;
+import org.picocontainer.annotations.Inject;
+
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -21,11 +28,6 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController.State;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEOutgoingSynchronizationProcess;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.log4j.Logger;
-import org.eclipse.swt.graphics.RGB;
-import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.whiteboard.ui.browser.BrowserSXEBridge;
 import de.fu_berlin.inf.dpp.whiteboard.ui.browser.IWhiteboardBrowser;
 
@@ -57,15 +59,6 @@ public class WhiteboardManager {
 
   // this bridge will connect the sxe controller with the browser
   private BrowserSXEBridge bridge;
-
-  /**
-    * Only used by the client
-    */
-  private boolean hostHasWhiteboard;
-  /**
-    * Only used by the Host, for representing which client has a whiteboard
-    */
-  private final Map<JID, Boolean> hasWhiteboard = new HashMap<JID, Boolean>();
 
   public static WhiteboardManager getInstance() {
     return INSTANCE;
@@ -237,27 +230,24 @@ public class WhiteboardManager {
   private void dispose() {
     controller.clear();
     if (bridge != null) {
-        bridge.dispose();
+      bridge.dispose();
     }
-    if (sxeTransmitter != null)
-        sxeTransmitter.dispose();
+    if (sxeTransmitter != null) sxeTransmitter.dispose();
   }
 
   /**
-    * Instantiates the bridge with the given browser.
-    * <p>
-    * note: it would be best to call this function after the browser has fully
-    * loaded the document to guarantee proper browser function initialisation
-    *
-    * @param browser
-    *            the browser created in the view which displays the whiteboard
-    *            html document
-    */
+   * Instantiates the bridge with the given browser.
+   *
+   * <p>note: it would be best to call this function after the browser has fully loaded the document
+   * to guarantee proper browser function initialisation
+   *
+   * @param browser the browser created in the view which displays the whiteboard html document
+   */
   public void createBridge(IWhiteboardBrowser browser) {
-      if (bridge != null) {
-          bridge.dispose();
-      }
-      bridge = new BrowserSXEBridge(controller, browser);
-      bridge.init();
+    if (bridge != null) {
+      bridge.dispose();
+    }
+    bridge = new BrowserSXEBridge(controller, browser);
+    bridge.init();
   }
 }
