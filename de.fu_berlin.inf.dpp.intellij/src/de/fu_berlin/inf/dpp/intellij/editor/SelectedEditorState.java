@@ -2,163 +2,146 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
-
-import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.picocontainer.annotations.Inject;
-
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.picocontainer.annotations.Inject;
 
-/**
- * Class used to capture and re-apply which editors are currently selected by
- * the user.
- */
-//TODO consider duplicated open editors during screen splitting
+/** Class used to capture and re-apply which editors are currently selected by the user. */
+// TODO consider duplicated open editors during screen splitting
 public class SelectedEditorState {
-    private static final Logger log = Logger
-        .getLogger(SelectedEditorState.class);
+  private static final Logger log = Logger.getLogger(SelectedEditorState.class);
 
-    private final List<VirtualFile> selectedEditors;
+  private final List<VirtualFile> selectedEditors;
 
-    private boolean hasCapturedState;
+  private boolean hasCapturedState;
 
-    @Inject
-    private ProjectAPI projectAPI;
+  @Inject private static ProjectAPI projectAPI;
 
-    @Inject
-    private EditorManager editorManager;
+  @Inject private static EditorManager editorManager;
 
-    @Inject
-    private Project project;
+  @Inject private static Project project;
 
-    public SelectedEditorState() {
-        this.selectedEditors = new ArrayList<>();
-        this.hasCapturedState = false;
+  static {
+    SarosPluginContext.initComponent(new SelectedEditorState());
+  }
 
-        SarosPluginContext.initComponent(this);
+  public SelectedEditorState() {
+    this.selectedEditors = new ArrayList<>();
+    this.hasCapturedState = false;
+  }
+
+  /** Captures the local selected editor state. */
+  public void captureState() {
+    if (hasCapturedState) {
+      log.warn("Overwriting existing captured selected editor state.");
+
+      selectedEditors.clear();
     }
 
-    /**
-     * Captures the local selected editor state.
-     */
-    public void captureState() {
-        if (hasCapturedState) {
-            log.warn("Overwriting existing captured selected editor state.");
+    selectedEditors.addAll(Arrays.asList(projectAPI.getSelectedFiles()));
 
-            selectedEditors.clear();
-        }
+    hasCapturedState = true;
+  }
 
-        selectedEditors.addAll(Arrays.asList(projectAPI.getSelectedFiles()));
+  /** Applies the captured selected editor state to the local IDE. */
+  public void applyCapturedState() {
+    if (!hasCapturedState) {
+      log.warn("Trying to applying state before capturing a local state to" + "re-apply.");
 
-        hasCapturedState = true;
+      return;
     }
 
-    /**
-     * Applies the captured selected editor state to the local IDE.
-     */
-    public void applyCapturedState() {
-        if (!hasCapturedState) {
-            log.warn(
-                "Trying to applying state before capturing a local state to"
-                    + "re-apply.");
+    ListIterator<VirtualFile> iterator = selectedEditors.listIterator(selectedEditors.size());
 
-            return;
-        }
+    try {
+      editorManager.getFileListener().unsubscribe();
 
-        ListIterator<VirtualFile> iterator = selectedEditors
-            .listIterator(selectedEditors.size());
+      while (iterator.hasPrevious()) {
+        projectAPI.openEditor(iterator.previous(), true);
+      }
 
-        try {
-            editorManager.getFileListener().unsubscribe();
+    } finally {
+      editorManager.getFileListener().subscribe(project);
+    }
+  }
 
-            while (iterator.hasPrevious()) {
-                projectAPI.openEditor(iterator.previous(), true);
-            }
+  /**
+   * Replaces the given old file with the given new file in the captured selected editor state.
+   *
+   * @param oldFile the old file to remove from the captured selected editor state
+   * @param newFile the new file to add to the captured selected editor state in the position of the
+   *     old file
+   */
+  public void replaceSelectedFile(@NotNull VirtualFile oldFile, @NotNull VirtualFile newFile) {
 
-        } finally {
-            editorManager.getFileListener().subscribe(project);
-        }
+    if (!hasCapturedState) {
+      log.warn(
+          "Trying to replace file in state before capturing a local "
+              + "state. old file: "
+              + oldFile
+              + ", new file: "
+              + newFile);
+
+      return;
     }
 
-    /**
-     * Replaces the given old file with the given new file in the captured
-     * selected editor state.
-     *
-     * @param oldFile the old file to remove from the captured selected editor
-     *                state
-     * @param newFile the new file to add to the captured selected editor state
-     *                in the position of the old file
-     */
-    public void replaceSelectedFile(
-        @NotNull
-            VirtualFile oldFile,
-        @NotNull
-            VirtualFile newFile) {
+    int index = selectedEditors.indexOf(oldFile);
 
-        if (!hasCapturedState) {
-            log.warn("Trying to replace file in state before capturing a local "
-                + "state. old file: " + oldFile + ", new file: " + newFile);
+    if (index != -1) {
+      selectedEditors.set(index, newFile);
 
-            return;
-        }
+    } else {
+      log.debug(
+          "Could not replace "
+              + oldFile
+              + " with "
+              + newFile
+              + " as the captured state does not contain the given file to "
+              + "replace.");
+    }
+  }
 
-        int index = selectedEditors.indexOf(oldFile);
+  /**
+   * Replaces the given old file with the given new file in the captured selected editor state.
+   *
+   * @param oldFile the old file to remove from the captured selected editor state
+   * @param newFile the new file to add to the captured selected editor state in the position of the
+   *     old file
+   * @throws IllegalStateException if either the given old or new IFile could not be converted to a
+   *     VirtualFile
+   */
+  public void replaceSelectedFile(@NotNull IFile oldFile, @NotNull IFile newFile) {
 
-        if (index != -1) {
-            selectedEditors.set(index, newFile);
+    VirtualFile oldVirtualFile = VirtualFileConverter.convertToVirtualFile(oldFile);
 
-        } else {
-            log.debug("Could not replace " + oldFile + " with " + newFile
-                + " as the captured state does not contain the given file to "
-                + "replace.");
-        }
+    VirtualFile newVirtualFile = VirtualFileConverter.convertToVirtualFile(newFile);
+
+    if (oldVirtualFile == null) {
+      throw new IllegalStateException(
+          "Could not get a VirtualFile for the old file "
+              + oldFile
+              + " while trying to replace it with "
+              + newFile
+              + " - "
+              + newVirtualFile);
+
+    } else if (newVirtualFile == null) {
+      throw new IllegalStateException(
+          "Could not get a VirtualFile for the new file "
+              + newFile
+              + " while trying to replace "
+              + oldFile
+              + " - "
+              + oldVirtualFile);
     }
 
-    /**
-     * Replaces the given old file with the given new file in the captured
-     * selected editor state.
-     *
-     * @param oldFile the old file to remove from the captured selected editor
-     *                state
-     * @param newFile the new file to add to the captured selected editor state
-     *                in the position of the old file
-     * @throws IllegalStateException if either the given old or new IFile could
-     *                               not be converted to a VirtualFile
-     */
-    public void replaceSelectedFile(
-        @NotNull
-            IFile oldFile,
-        @NotNull
-            IFile newFile) {
-
-        VirtualFile oldVirtualFile = ((IntelliJProjectImplV2) oldFile
-            .getProject().getAdapter(IntelliJProjectImplV2.class))
-            .findVirtualFile(oldFile.getProjectRelativePath());
-
-        VirtualFile newVirtualFile = ((IntelliJProjectImplV2) newFile
-            .getProject().getAdapter(IntelliJProjectImplV2.class))
-            .findVirtualFile(newFile.getProjectRelativePath());
-
-        if (oldVirtualFile == null) {
-            throw new IllegalStateException(
-                "Could not get a VirtualFile for the old file " + oldFile
-                    + " while trying to replace it with " + newFile + " - "
-                    + newVirtualFile);
-
-        } else if (newVirtualFile == null) {
-            throw new IllegalStateException(
-                "Could not get a VirtualFile for the new file " + newFile
-                    + " while trying to replace " + oldFile + " - "
-                    + oldVirtualFile);
-        }
-
-        replaceSelectedFile(oldVirtualFile, newVirtualFile);
-    }
+    replaceSelectedFile(oldVirtualFile, newVirtualFile);
+  }
 }

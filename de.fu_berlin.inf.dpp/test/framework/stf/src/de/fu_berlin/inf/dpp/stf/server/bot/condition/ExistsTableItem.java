@@ -1,27 +1,26 @@
 package de.fu_berlin.inf.dpp.stf.server.bot.condition;
 
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTable;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 public class ExistsTableItem extends DefaultCondition {
 
-    private IRemoteBotTable table;
-    private String itemText;
+  private IRemoteBotTable table;
+  private String itemText;
 
-    ExistsTableItem(IRemoteBotTable table, String itemText) {
-        this.table = table;
-        this.itemText = itemText;
-    }
+  ExistsTableItem(IRemoteBotTable table, String itemText) {
+    this.table = table;
+    this.itemText = itemText;
+  }
 
-    @Override
-    public String getFailureMessage() {
+  @Override
+  public String getFailureMessage() {
 
-        return null;
-    }
+    return null;
+  }
 
-    @Override
-    public boolean test() throws Exception {
-        return table.containsItem(itemText);
-    }
+  @Override
+  public boolean test() throws Exception {
+    return table.containsItem(itemText);
+  }
 }

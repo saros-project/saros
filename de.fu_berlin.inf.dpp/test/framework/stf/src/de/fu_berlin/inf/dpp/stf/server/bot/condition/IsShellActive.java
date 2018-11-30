@@ -5,19 +5,19 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 public class IsShellActive extends DefaultCondition {
 
-    private SWTBotShell shell;
+  private SWTBotShell shell;
 
-    IsShellActive(SWTBotShell shell) {
-        this.shell = shell;
-    }
+  IsShellActive(SWTBotShell shell) {
+    this.shell = shell;
+  }
 
-    @Override
-    public String getFailureMessage() {
-        return "STFBotShell  not found.";
-    }
+  @Override
+  public String getFailureMessage() {
+    return "STFBotShell  not found.";
+  }
 
-    @Override
-    public boolean test() throws Exception {
-        return shell.isActive();
-    }
+  @Override
+  public boolean test() throws Exception {
+    return shell.isActive();
+  }
 }

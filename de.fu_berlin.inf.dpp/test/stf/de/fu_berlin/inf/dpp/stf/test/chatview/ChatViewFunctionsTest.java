@@ -5,204 +5,262 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
+import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.shared.Constants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.shared.Constants;
-
 public class ChatViewFunctionsTest extends StfTestCase {
 
-    String messageBob = "Hello Bob";
-    String messageAlice = "Hello Alice";
-    String messageUnseen1 = "first unseen message";
-    String messageUnseen2 = "second unseen message";
-    String messageUnseen3 = "third unseen message";
+  String messageBob = "Hello Bob";
+  String messageAlice = "Hello Alice";
+  String messageUnseen1 = "first unseen message";
+  String messageUnseen2 = "second unseen message";
+  String messageUnseen3 = "third unseen message";
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        select(ALICE, BOB);
-    }
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    select(ALICE, BOB);
+  }
 
-    @Before
-    public void setUp() throws Exception {
-        closeAllShells();
-        closeAllEditors();
-        clearWorkspaces();
+  @Before
+  public void setUp() throws Exception {
+    closeAllShells();
+    closeAllEditors();
+    clearWorkspaces();
 
-        Util.setUpSessionWithJavaProjectAndClass("foo", "bar", "test", ALICE,
-            BOB);
+    Util.setUpSessionWithJavaProjectAndClass("foo", "bar", "test", ALICE, BOB);
+  }
 
-    }
+  @After
+  public void tearDown() throws Exception {
+    leaveSessionPeersFirst(ALICE);
+  }
 
-    @After
-    public void tearDown() throws Exception {
-        leaveSessionPeersFirst(ALICE);
-    }
+  @Test
+  public void testChat() throws Exception {
 
-    @Test
-    public void testChat() throws Exception {
+    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/src/bar/test.java");
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("foo/src/bar/test.java");
+    ALICE
+        .superBot()
+        .views()
+        .sarosView()
+        .selectChatroom(Constants.CHATROOM_TAB_LABEL)
+        .sendChatMessage(messageBob);
 
-        ALICE.superBot().views().sarosView()
-            .selectChatroom(Constants.CHATROOM_TAB_LABEL)
-            .sendChatMessage(messageBob);
+    /* Wait so that the message is received on the other side */
+    Thread.sleep(5000);
 
-        /* Wait so that the message is received on the other side */
-        Thread.sleep(5000);
-
-        assertEquals(messageBob, BOB.superBot().views().sarosView()
-            .selectChatroom(Constants.CHATROOM_TAB_LABEL)
-            .getTextOfLastChatLine());
-
-        BOB.superBot().views().sarosView()
-            .selectChatroom(Constants.CHATROOM_TAB_LABEL)
-            .sendChatMessage(messageAlice);
-
-        /* Wait so that the message is received on the other side */
-        Thread.sleep(5000);
-
-        assertEquals(messageAlice, ALICE.superBot().views().sarosView()
+    assertEquals(
+        messageBob,
+        BOB.superBot()
+            .views()
+            .sarosView()
             .selectChatroom(Constants.CHATROOM_TAB_LABEL)
             .getTextOfLastChatLine());
-    }
 
-    /*
-     * Test for misbehavior on file opening in follow mode as described by bug
-     * #3455372.
-     */
-    @Test
-    public void testUnintentionalCursorMove() throws Exception {
+    BOB.superBot()
+        .views()
+        .sarosView()
+        .selectChatroom(Constants.CHATROOM_TAB_LABEL)
+        .sendChatMessage(messageAlice);
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("foo/src/bar/test.java");
+    /* Wait so that the message is received on the other side */
+    Thread.sleep(5000);
 
-        ALICE.superBot().internal().createFile("foo", "src/bar/test2.java", "");
-
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("foo/src/bar/test2.java");
-
-        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
-            .followParticipant();
-
-        BOB.superBot().views().sarosView()
+    assertEquals(
+        messageAlice,
+        ALICE
+            .superBot()
+            .views()
+            .sarosView()
             .selectChatroom(Constants.CHATROOM_TAB_LABEL)
-            .enterChatMessage("Hello how");
+            .getTextOfLastChatLine());
+  }
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectClass("foo", "bar", "test2").open();
+  /*
+   * Test for misbehavior on file opening in follow mode as described by bug
+   * #3455372.
+   */
+  @Test
+  public void testUnintentionalCursorMove() throws Exception {
 
-        /* Wait a short time so the editor change is executed on Bobs side */
-        Thread.sleep(5000);
+    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/src/bar/test.java");
 
-        BOB.superBot().views().sarosView()
+    ALICE.superBot().internal().createFile("foo", "src/bar/test2.java", "");
+
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("foo/src/bar/test2.java");
+
+    BOB.superBot().views().sarosView().selectUser(ALICE.getJID()).followParticipant();
+
+    BOB.superBot()
+        .views()
+        .sarosView()
+        .selectChatroom(Constants.CHATROOM_TAB_LABEL)
+        .enterChatMessage("Hello how");
+
+    ALICE.superBot().views().packageExplorerView().selectClass("foo", "bar", "test2").open();
+
+    /* Wait a short time so the editor change is executed on Bobs side */
+    Thread.sleep(5000);
+
+    BOB.superBot()
+        .views()
+        .sarosView()
+        .selectChatroom(Constants.CHATROOM_TAB_LABEL)
+        .enterChatMessage(" are you?");
+
+    assertEquals(
+        "cursor position changed during focus lost and focus regain",
+        "Hello how are you?",
+        BOB.superBot()
+            .views()
+            .sarosView()
             .selectChatroom(Constants.CHATROOM_TAB_LABEL)
-            .enterChatMessage(" are you?");
+            .getChatMessage());
+  }
 
-        assertEquals(
-            "cursor position changed during focus lost and focus regain",
-            "Hello how are you?", BOB.superBot().views().sarosView()
-                .selectChatroom(Constants.CHATROOM_TAB_LABEL).getChatMessage());
-    }
+  @Test
+  public void testVisualChatNotification() throws Exception {
 
-    @Test
-    public void testVisualChatNotification() throws Exception {
+    // Initial state: session chat open and with focus, two message
+    // exchanged, no notification shown
+    ALICE
+        .superBot()
+        .views()
+        .sarosView()
+        .selectChatroom(Constants.CHATROOM_TAB_LABEL)
+        .sendChatMessage(messageBob);
 
-        // Initial state: session chat open and with focus, two message
-        // exchanged, no notification shown
-        ALICE.superBot().views().sarosView()
+    BOB.superBot()
+        .views()
+        .sarosView()
+        .selectChatroom(Constants.CHATROOM_TAB_LABEL)
+        .sendChatMessage(messageAlice);
+
+    assertTrue(
+        "Session Chat should be the active chat tab at ALICE",
+        ALICE
+            .superBot()
+            .views()
+            .sarosView()
             .selectChatroom(Constants.CHATROOM_TAB_LABEL)
-            .sendChatMessage(messageBob);
+            .isActive());
 
-        BOB.superBot().views().sarosView()
+    assertTrue(
+        "Session Chat should be the active chat tab at BOB",
+        BOB.superBot().views().sarosView().selectChatroom(Constants.CHATROOM_TAB_LABEL).isActive());
+
+    assertEquals(
+        "Visual chat notification should not appear at ALICE",
+        Constants.CHATROOM_TAB_LABEL,
+        ALICE
+            .superBot()
+            .views()
+            .sarosView()
             .selectChatroom(Constants.CHATROOM_TAB_LABEL)
-            .sendChatMessage(messageAlice);
+            .getTitle());
 
-        assertTrue(
-            "Session Chat should be the active chat tab at ALICE",
-            ALICE.superBot().views().sarosView()
-                .selectChatroom(Constants.CHATROOM_TAB_LABEL).isActive());
+    assertEquals(
+        "Visual chat notification should not appear at BOB",
+        Constants.CHATROOM_TAB_LABEL,
+        BOB.superBot().views().sarosView().selectChatroom(Constants.CHATROOM_TAB_LABEL).getTitle());
 
-        assertTrue(
-            "Session Chat should be the active chat tab at BOB",
-            BOB.superBot().views().sarosView()
-                .selectChatroom(Constants.CHATROOM_TAB_LABEL).isActive());
+    // Alice opens new single user chat with Bob and sends a message
+    ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).openChat();
 
-        assertEquals("Visual chat notification should not appear at ALICE",
-            Constants.CHATROOM_TAB_LABEL, ALICE.superBot().views().sarosView()
-                .selectChatroom(Constants.CHATROOM_TAB_LABEL).getTitle());
+    assertTrue(
+        "Session Chat should still be the active chat tab at BOB",
+        BOB.superBot().views().sarosView().selectChatroom(Constants.CHATROOM_TAB_LABEL).isActive());
 
-        assertEquals("Visual chat notification should not appear at BOB",
-            Constants.CHATROOM_TAB_LABEL, BOB.superBot().views().sarosView()
-                .selectChatroom(Constants.CHATROOM_TAB_LABEL).getTitle());
+    ALICE
+        .superBot()
+        .views()
+        .sarosView()
+        .selectChatroomWithRegex(BOB.getBaseJid() + ".*")
+        .sendChatMessage(messageUnseen1);
 
-        // Alice opens new single user chat with Bob and sends a message
-        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
-            .openChat();
+    Thread.sleep(5000);
 
-        assertTrue(
-            "Session Chat should still be the active chat tab at BOB",
-            BOB.superBot().views().sarosView()
-                .selectChatroom(Constants.CHATROOM_TAB_LABEL).isActive());
+    assertTrue(
+        "Session Chat should still be the active chat tab at BOB",
+        BOB.superBot().views().sarosView().selectChatroom(Constants.CHATROOM_TAB_LABEL).isActive());
 
-        ALICE.superBot().views().sarosView()
-            .selectChatroomWithRegex(BOB.getBaseJid() + ".*")
-            .sendChatMessage(messageUnseen1);
+    // Chat notification is not shown if the chat tab was opened because of
+    // this message
+    assertEquals(
+        "Visual chat notification should not appear at BOB",
+        ALICE.getBaseJid(),
+        BOB.superBot()
+            .views()
+            .sarosView()
+            .selectChatroomWithRegex(ALICE.getBaseJid() + ".*")
+            .getTitle());
 
-        Thread.sleep(5000);
+    assertTrue(
+        "Session Chat should still be the active chat tab at BOB",
+        BOB.superBot().views().sarosView().selectChatroom(Constants.CHATROOM_TAB_LABEL).isActive());
 
-        assertTrue(
-            "Session Chat should still be the active chat tab at BOB",
-            BOB.superBot().views().sarosView()
-                .selectChatroom(Constants.CHATROOM_TAB_LABEL).isActive());
+    ALICE
+        .superBot()
+        .views()
+        .sarosView()
+        .selectChatroomWithRegex(BOB.getBaseJid() + ".*")
+        .sendChatMessage(messageUnseen2);
 
-        // Chat notification is not shown if the chat tab was opened because of
-        // this message
-        assertEquals("Visual chat notification should not appear at BOB",
-            ALICE.getBaseJid(), BOB.superBot().views().sarosView()
-                .selectChatroomWithRegex(ALICE.getBaseJid() + ".*").getTitle());
+    Thread.sleep(5000);
 
-        assertTrue(
-            "Session Chat should still be the active chat tab at BOB",
-            BOB.superBot().views().sarosView()
-                .selectChatroom(Constants.CHATROOM_TAB_LABEL).isActive());
+    assertEquals(
+        "Visual chat notification should appear at BOB",
+        "(1) " + ALICE.getBaseJid(),
+        BOB.superBot()
+            .views()
+            .sarosView()
+            .selectChatroomWithRegex(ALICE.getBaseJid() + ".*")
+            .getTitle());
 
-        ALICE.superBot().views().sarosView()
-            .selectChatroomWithRegex(BOB.getBaseJid() + ".*")
-            .sendChatMessage(messageUnseen2);
+    ALICE
+        .superBot()
+        .views()
+        .sarosView()
+        .selectChatroomWithRegex(BOB.getBaseJid() + ".*")
+        .sendChatMessage(messageUnseen3);
 
-        Thread.sleep(5000);
+    Thread.sleep(5000);
 
-        assertEquals("Visual chat notification should appear at BOB", "(1) "
-            + ALICE.getBaseJid(), BOB.superBot().views().sarosView()
-            .selectChatroomWithRegex(ALICE.getBaseJid() + ".*").getTitle());
+    assertEquals(
+        "Visual chat notification should appear at BOB",
+        "(2) " + ALICE.getBaseJid(),
+        BOB.superBot()
+            .views()
+            .sarosView()
+            .selectChatroomWithRegex(ALICE.getBaseJid() + ".*")
+            .getTitle());
 
-        ALICE.superBot().views().sarosView()
-            .selectChatroomWithRegex(BOB.getBaseJid() + ".*")
-            .sendChatMessage(messageUnseen3);
+    BOB.superBot()
+        .views()
+        .sarosView()
+        .selectChatroomWithRegex(ALICE.getBaseJid() + ".*")
+        .activate();
 
-        Thread.sleep(5000);
+    assertEquals(
+        "Visual chat notification should disappear at BOB",
+        ALICE.getBaseJid(),
+        BOB.superBot()
+            .views()
+            .sarosView()
+            .selectChatroomWithRegex(ALICE.getBaseJid() + ".*")
+            .getTitle());
 
-        assertEquals("Visual chat notification should appear at BOB", "(2) "
-            + ALICE.getBaseJid(), BOB.superBot().views().sarosView()
-            .selectChatroomWithRegex(ALICE.getBaseJid() + ".*").getTitle());
+    ALICE.superBot().views().sarosView().closeChatroomWithRegex(BOB.getBaseJid() + ".*");
 
-        BOB.superBot().views().sarosView()
-            .selectChatroomWithRegex(ALICE.getBaseJid() + ".*").activate();
-
-        assertEquals("Visual chat notification should disappear at BOB",
-            ALICE.getBaseJid(), BOB.superBot().views().sarosView()
-                .selectChatroomWithRegex(ALICE.getBaseJid() + ".*").getTitle());
-
-        ALICE.superBot().views().sarosView()
-            .closeChatroomWithRegex(BOB.getBaseJid() + ".*");
-
-        BOB.superBot().views().sarosView()
-            .closeChatroomWithRegex(ALICE.getBaseJid() + ".*");
-    }
+    BOB.superBot().views().sarosView().closeChatroomWithRegex(ALICE.getBaseJid() + ".*");
+  }
 }

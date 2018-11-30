@@ -69,50 +69,10 @@ different concerns and should consider splitting your patch.
 
 ### Formatting
 
-
 We expect source code to be formatted and cleaned up using an automated
-tool prior to submission.
-
-*   For projects that are managed by Eclipse (dpp, dpp.core, dpp.ui,
-    dpp.server, dpp.whiteboard), the code formatter should be called
-    automatically on every save. So there is no need to take
-    any actions.
-*   For the projects that are managed by Intellij (currently only
-    dpp.intellij), code formatting styles are configured, but need to be
-    invoked manually through CTRL+ALT+L while the src (or test) folder
-    is selected. Make sure to check "Organize Imports" in the
-    configuration dialog.
-
-
-The following steps are necessary to ensure that your Eclipse recognizes
-our code style presets. You only need to do this once for any given
-Eclipse insallation.
-
-#### Configure
-
-The code style presets are meant to keep the patches clean. They will be
-applied automatically every time you save a file within Eclipse.
-
-To "install" the presets follow the following steps:
-
-1.  Right-click the "Saros" project in the project explorer and select
-    "Properties"
-2.  Navigate to the section "**Java Code Style**"
-3.  Import the clean-up profile:
-    1.  Select the sub-section "Java Code Style" &gt; "**Clean up**"
-    2.  Under the box "Active profile:", click Import...
-    3.  Navigate to the base folder of the "Saros"
-        project ("\[...\]/de.fu\_berlin.inf.dpp/")
-    4.  Select ["`clean-up-profile.xml`"](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/clean-up-profile.xml) and click Open
-    5.  Click Apply and exit the menu by clicking Ok
-
-4.  Import the formatter profile:
-    1.  Select the sub-section "Java Code Style" &gt; "**Formatter**"
-    2.  Under the box "Active profile:", click Import...
-    3.  Navigate to the base folder of the "Saros"
-        project ("\[...\]/de.fu\_berlin.inf.dpp/")
-    4.  Select ["`formatter-profile.xml`"](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/formatter-profile.xml) and click "Open"
-    5.  Click Apply and exit the menu by clicking Ok
+tool prior to submission. The formatting is also checked by the CI server
+and will fail if a commit does not comply with the formatting rules.
+See the [development environment documentation](development-environment.md) for more information.
 
 ### Structure
 

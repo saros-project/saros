@@ -9,236 +9,228 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImplV2;
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
+import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
 
-/**
- * This class applies the logic for activities that were received from remote.
- */
+/** This class applies the logic for activities that were received from remote. */
 public class LocalEditorManipulator {
 
-    private static final Logger LOG = Logger
-        .getLogger(LocalEditorManipulator.class);
+  private static final Logger LOG = Logger.getLogger(LocalEditorManipulator.class);
 
-    private final ProjectAPI projectAPI;
-    private final EditorAPI editorAPI;
+  private final ProjectAPI projectAPI;
+  private final EditorAPI editorAPI;
 
-    /**
-     * This is just a reference to {@link EditorManager}'s editorPool and not a
-     * separate pool.
-     */
-    private EditorPool editorPool;
+  /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
+  private EditorPool editorPool;
 
-    private EditorManager manager;
+  private EditorManager manager;
 
-    public LocalEditorManipulator(ProjectAPI projectAPI, EditorAPI editorAPI) {
-        this.projectAPI = projectAPI;
-        this.editorAPI = editorAPI;
+  public LocalEditorManipulator(ProjectAPI projectAPI, EditorAPI editorAPI) {
+    this.projectAPI = projectAPI;
+    this.editorAPI = editorAPI;
+  }
+
+  /** Initializes all fields that require an EditorManager. */
+  public void initialize(EditorManager editorManager) {
+    editorPool = editorManager.getEditorPool();
+    manager = editorManager;
+  }
+
+  /**
+   * Opens an editor for the passed virtualFile, adds it to the pool of currently open editors and
+   * calls {@link EditorManager#startEditor(Editor)} with it.
+   *
+   * <p><b>Note:</b> This does only work for shared resources.
+   *
+   * @param path path of the file to open
+   * @param activate activate editor after opening
+   * @return the editor for the given path, or <code>null</code> if the file does not exist or is
+   *     not shared
+   */
+  public Editor openEditor(SPath path, boolean activate) {
+    if (!SessionUtils.isShared(path.getResource())) {
+      LOG.warn("Ignored open editor request for path " + path + " as it is not shared");
+
+      return null;
     }
 
-    /**
-     * Initializes all fields that require an EditorManager.
-     */
-    public void initialize(EditorManager editorManager) {
-        editorPool = editorManager.getEditorPool();
-        manager = editorManager;
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+
+    if (virtualFile == null || !virtualFile.exists()) {
+      LOG.warn(
+          "Could not open Editor for path "
+              + path
+              + " as a "
+              + "matching VirtualFile does not exist or could not be found");
+
+      return null;
     }
 
-    /**
-     * Opens an editor for the passed virtualFile, adds it to the pool of
-     * currently open editors and calls
-     * {@link EditorManager#startEditor(Editor)} with it.
-     * <p>
-     * <b>Note:</b> This does only work for shared resources.
-     *
-     * @param path path of the file to open
-     * @param activate activate editor after opening
-     * @return the editor for the given path,
-     * or <code>null</code> if the file does not exist or is not shared
-     */
-    public Editor openEditor(SPath path, boolean activate) {
-        if (!manager.getSession().isShared(path.getResource())) {
-            LOG.warn("Ignored open editor request for path " + path +
-                " as it is not shared");
+    // todo: in case it is already open, need to activate only, not open
+    Editor editor = projectAPI.openEditor(virtualFile, activate);
 
-            return null;
-        }
+    manager.startEditor(editor);
+    editorPool.add(path, editor);
 
-        IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
-            path.getProject().getAdapter(IntelliJProjectImplV2.class);
+    LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
 
-        VirtualFile virtualFile = intelliJProject
-            .findVirtualFile(path.getProjectRelativePath());
+    return editor;
+  }
 
-        if (virtualFile == null || !virtualFile.exists()) {
-            LOG.warn("Could not open Editor for path " + path + " as a " +
-                "matching VirtualFile does not exist or could not be found");
+  /**
+   * Closes the editor under path.
+   *
+   * @param path
+   */
+  public void closeEditor(SPath path) {
+    editorPool.removeEditor(path);
 
-            return null;
-        }
+    LOG.debug("Removed editor for path " + path + " from EditorPool");
 
-        //todo: in case it is already open, need to activate only, not open
-        Editor editor = projectAPI.openEditor(virtualFile, activate);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
 
-        manager.startEditor(editor);
-        editorPool.add(path, editor);
+    if (virtualFile == null || !virtualFile.exists()) {
+      LOG.warn(
+          "Could not close Editor for path "
+              + path
+              + " as a "
+              + "matching VirtualFile does not exist or could not be found");
 
-        LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
-
-        return editor;
+      return;
     }
 
-    /**
-     * Closes the editor under path.
-     *
-     * @param path
-     */
-    public void closeEditor(SPath path) {
-        editorPool.removeEditor(path);
-
-        LOG.debug("Removed editor for path " + path + " from EditorPool");
-
-        IntelliJProjectImplV2 intelliJProject = (IntelliJProjectImplV2)
-            path.getProject().getAdapter(IntelliJProjectImplV2.class);
-
-        VirtualFile virtualFile = intelliJProject
-            .findVirtualFile(path.getProjectRelativePath());
-
-        if (virtualFile == null || !virtualFile.exists()) {
-            LOG.warn("Could not close Editor for path " + path + " as a " +
-                "matching VirtualFile does not exist or could not be found");
-
-            return;
-        }
-
-        if (projectAPI.isOpen(virtualFile)) {
-            projectAPI.closeEditor(virtualFile);
-        }
-
-        LOG.debug("Closed editor for file " + virtualFile);
+    if (projectAPI.isOpen(virtualFile)) {
+      projectAPI.closeEditor(virtualFile);
     }
 
-    /**
-     * Replaces the content of the document at the given path. The text is only
-     * replaced, if the editor is writable.
-     *
-     * @param path path of the editor
-     * @param text text to set the document's content to
-     * @return Returns <code>true</code> if replacement was successful,
-     * <code>false</code> if the path was <code>null></code>, if the path points
-     * to a non-existing document or the document was not writable.
-     */
-    public boolean replaceText(SPath path, String text) {
-        Document doc = editorPool.getDocument(path);
-        if (doc == null) {
-            return false;
-        }
-        if (!doc.isWritable()) {
-            LOG.error("File to replace text in is not writeable: " + path);
-            return false;
-        }
+    LOG.debug("Closed editor for file " + virtualFile);
+  }
 
-        editorAPI.setText(doc, text);
-        return true;
+  /**
+   * Replaces the content of the document at the given path. The text is only replaced, if the
+   * editor is writable.
+   *
+   * @param path path of the editor
+   * @param text text to set the document's content to
+   * @return Returns <code>true</code> if replacement was successful, <code>false</code> if the path
+   *     was <code>null></code>, if the path points to a non-existing document or the document was
+   *     not writable.
+   */
+  public boolean replaceText(SPath path, String text) {
+    Document doc = editorPool.getDocument(path);
+    if (doc == null) {
+      return false;
+    }
+    if (!doc.isWritable()) {
+      LOG.error("File to replace text in is not writeable: " + path);
+      return false;
     }
 
-    /**
-     * Applies the text operations on the path and marks them in color.
-     *
-     * @param path
-     * @param operations
+    editorAPI.setText(doc, text);
+    return true;
+  }
+
+  /**
+   * Applies the text operations on the path and marks them in color.
+   *
+   * @param path
+   * @param operations
+   */
+  public void applyTextOperations(SPath path, Operation operations) {
+    Document doc = editorPool.getDocument(path);
+
+    /*
+     * If the document was not opened in an editor yet, it is not in the
+     * editorPool so we have to create it temporarily here.
      */
-    public void applyTextOperations(SPath path, Operation operations) {
-        Document doc = editorPool.getDocument(path);
+    if (doc == null) {
+      VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
 
-        /*
-         * If the document was not opened in an editor yet, it is not in the
-         * editorPool so we have to create it temporarily here.
-         */
-        if (doc == null) {
-            IntelliJProjectImplV2 module = (IntelliJProjectImplV2)
-                path.getProject().getAdapter(IntelliJProjectImplV2.class);
+      if (virtualFile == null || !virtualFile.exists()) {
+        LOG.warn(
+            "Could not apply TextOperations "
+                + operations
+                + " as the VirtualFile for path "
+                + path
+                + " does not exist or could not be found");
 
-            VirtualFile virtualFile = module
-                .findVirtualFile(path.getProjectRelativePath());
+        return;
+      }
 
-            if (virtualFile == null || !virtualFile.exists()) {
-                LOG.warn("Could not apply TextOperations " + operations
-                    + " as the VirtualFile for path " + path
-                    + " does not exist or could not be found");
+      doc = projectAPI.getDocument(virtualFile);
 
-                return;
-            }
+      if (doc == null) {
+        LOG.warn(
+            "Could not apply TextOperations "
+                + operations
+                + " as the Document for VirtualFile "
+                + virtualFile
+                + " could not be found");
 
-            doc = projectAPI.getDocument(virtualFile);
-
-            if (doc == null) {
-                LOG.warn("Could not apply TextOperations " + operations
-                    + " as the Document for VirtualFile " + virtualFile
-                    + " could not be found");
-
-                return;
-            }
-        }
-
-         /*
-         * Disable documentListener temporarily to avoid being notified of the
-         * change
-         */
-        manager.disableDocumentListener();
-        for (ITextOperation op : operations.getTextOperations()) {
-            if (op instanceof DeleteOperation) {
-                editorAPI.deleteText(doc, op.getPosition(),
-                    op.getPosition() + op.getTextLength());
-            } else {
-                boolean writePermission = doc.isWritable();
-                if (!writePermission) {
-                    doc.setReadOnly(false);
-                }
-                editorAPI.insertText(doc, op.getPosition(), op.getText());
-                if (!writePermission) {
-                    doc.setReadOnly(true);
-                }
-            }
-        }
-
-        manager.enableDocumentListener();
+        return;
+      }
     }
 
-    /**
-     * Sets the viewport of the editor for path to the specified range.
-     *
-     * @param path
-     * @param lineStart
-     * @param lineEnd
-     */
-    public void setViewPort(final SPath path, final int lineStart,
-        final int lineEnd) {
-        Editor editor = editorPool.getEditor(path);
-        if (editor != null) {
-            editorAPI.setViewPort(editor, lineStart, lineEnd);
+    try {
+      /*
+       * Disable documentListener temporarily to avoid being notified of
+       * the change
+       */
+      manager.disableDocumentListener();
+
+      for (ITextOperation op : operations.getTextOperations()) {
+        if (op instanceof DeleteOperation) {
+          editorAPI.deleteText(doc, op.getPosition(), op.getPosition() + op.getTextLength());
+        } else {
+          boolean writePermission = doc.isWritable();
+          if (!writePermission) {
+            doc.setReadOnly(false);
+          }
+          editorAPI.insertText(doc, op.getPosition(), op.getText());
+          if (!writePermission) {
+            doc.setReadOnly(true);
+          }
         }
+      }
+
+    } finally {
+      manager.enableDocumentListener();
+    }
+  }
+
+  /**
+   * Sets the viewport of the editor for path to the specified range.
+   *
+   * @param path
+   * @param lineStart
+   * @param lineEnd
+   */
+  public void setViewPort(final SPath path, final int lineStart, final int lineEnd) {
+    Editor editor = editorPool.getEditor(path);
+    if (editor != null) {
+      editorAPI.setViewPort(editor, lineStart, lineEnd);
+    }
+  }
+
+  /**
+   * Adjusts viewport. Focus is set on the center of the range, but priority is given to selected
+   * lines.
+   *
+   * @param editor Editor of the open Editor
+   * @param range viewport of the followed user. Must not be <code>null</code>.
+   * @param selection text selection of the followed user. Must not be <code>null</code>.
+   */
+  public void adjustViewport(Editor editor, LineRange range, TextSelection selection) {
+    if (editor == null || selection == null || range == null) {
+      return;
     }
 
-    /**
-     * Adjusts viewport. Focus is set on the center of the range, but priority
-     * is given to selected lines.
-     *
-     * @param editor    Editor of the open Editor
-     * @param range     viewport of the followed user. Must not be <code>null</code>.
-     * @param selection text selection of the followed user. Must not be <code>null</code>.
-     */
-    public void adjustViewport(Editor editor, LineRange range,
-        TextSelection selection) {
-        if (editor == null || selection == null || range == null) {
-            return;
-        }
+    editorAPI.setSelection(
+        editor, selection.getOffset(), selection.getOffset() + selection.getLength(), null);
+    editorAPI.setViewPort(
+        editor, range.getStartLine(), range.getStartLine() + range.getNumberOfLines());
 
-        editorAPI.setSelection(editor, selection.getOffset(),
-            selection.getOffset() + selection.getLength(), null);
-        editorAPI.setViewPort(editor, range.getStartLine(),
-            range.getStartLine() + range.getNumberOfLines());
-
-        //todo: implement actual viewport adjustment logic
-    }
+    // todo: implement actual viewport adjustment logic
+  }
 }

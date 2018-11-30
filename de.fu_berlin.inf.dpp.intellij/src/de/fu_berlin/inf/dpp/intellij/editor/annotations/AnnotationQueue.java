@@ -2,137 +2,120 @@ package de.fu_berlin.inf.dpp.intellij.editor.annotations;
 
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.session.User;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * A class to store a limited number of annotations of a certain type. The store
- * operates like a queue, meaning, if the store is full, the oldest annotation
- * is removed. This is not done automatically but rather should be done by the
- * caller by calling {@link #removeIfFull()} before adding new annotations.
+ * A class to store a limited number of annotations of a certain type. The store operates like a
+ * queue, meaning, if the store is full, the oldest annotation is removed. This is not done
+ * automatically but rather should be done by the caller by calling {@link #removeIfFull()} before
+ * adding new annotations.
  *
  * @param <E> the stored annotation type
  */
-class AnnotationQueue<E extends AbstractEditorAnnotation>
-    extends AnnotationStore<E> {
+class AnnotationQueue<E extends AbstractEditorAnnotation> extends AnnotationStore<E> {
 
-    private final Queue<E> annotationQueue;
+  private final Queue<E> annotationQueue;
 
-    private final int maxSize;
+  private final int maxSize;
 
-    /**
-     * Creates an annotation store with the given capacity. The given capacity
-     * needs to be at least 1.
-     *
-     * @param maxSize the capacity of the annotation store.
-     */
-    AnnotationQueue(int maxSize) {
-        super();
+  /**
+   * Creates an annotation store with the given capacity. The given capacity needs to be at least 1.
+   *
+   * @param maxSize the capacity of the annotation store.
+   */
+  AnnotationQueue(int maxSize) {
+    super();
 
-        if (maxSize < 1) {
-            throw new IllegalArgumentException(
-                "The given size of the queue must be at least 1. maxSize: "
-                    + maxSize);
-        }
-
-        this.maxSize = maxSize;
-
-        this.annotationQueue = new ArrayDeque<>(maxSize);
+    if (maxSize < 1) {
+      throw new IllegalArgumentException(
+          "The given size of the queue must be at least 1. maxSize: " + maxSize);
     }
 
-    /**
-     * Removes and returns the oldest element of the annotation queue if the
-     * queue has reached its maximum size.
-     * <p>
-     * <b>NOTE:</b> This does not remove the annotation from the local editor.
-     * </p>
-     * This method should always be called before
-     * {@link #addAnnotation(AbstractEditorAnnotation)}.
-     *
-     * @return the oldest element of the annotation queue if the queue has
-     * reached its maximum size or <code>null</code> otherwise
-     */
-    @Nullable
-    E removeIfFull() {
-        if (annotationQueue.size() == maxSize) {
-            return annotationQueue.remove();
-        }
+    this.maxSize = maxSize;
 
-        return null;
+    this.annotationQueue = new ArrayDeque<>(maxSize);
+  }
+
+  /**
+   * Removes and returns the oldest element of the annotation queue if the queue has reached its
+   * maximum size.
+   *
+   * <p><b>NOTE:</b> This does not remove the annotation from the local editor. This method should
+   * always be called before {@link #addAnnotation(AbstractEditorAnnotation)}.
+   *
+   * @return the oldest element of the annotation queue if the queue has reached its maximum size or
+   *     <code>null</code> otherwise
+   */
+  @Nullable
+  E removeIfFull() {
+    if (annotationQueue.size() == maxSize) {
+      return annotationQueue.remove();
     }
 
-    /**
-     * Adds the given annotation to the annotation store.
-     * <p>
-     * {@link #removeIfFull()} should always be called before this method to
-     * ensure that the queue is not full when trying to add an element.
-     * </p>
-     *
-     * @param annotation the annotation to add
-     * @throws IllegalStateException if the annotation queue is full
-     */
-    @Override
-    void addAnnotation(
-        @NotNull
-            E annotation) {
+    return null;
+  }
 
-        if (annotationQueue.size() >= maxSize) {
-            throw new IllegalStateException("The queue already contains the "
-                + "allowed number of annotations.");
-        }
+  /**
+   * Adds the given annotation to the annotation store.
+   *
+   * <p>{@link #removeIfFull()} should always be called before this method to ensure that the queue
+   * is not full when trying to add an element.
+   *
+   * @param annotation the annotation to add
+   * @throws IllegalStateException if the annotation queue is full
+   */
+  @Override
+  void addAnnotation(@NotNull E annotation) {
 
-        super.addAnnotation(annotation);
-
-        annotationQueue.add(annotation);
+    if (annotationQueue.size() >= maxSize) {
+      throw new IllegalStateException(
+          "The queue already contains the " + "allowed number of annotations.");
     }
 
-    @Override
-    void removeAnnotation(
-        @NotNull
-            E annotation) {
+    super.addAnnotation(annotation);
 
-        super.removeAnnotation(annotation);
+    annotationQueue.add(annotation);
+  }
 
-        annotationQueue.remove(annotation);
-    }
+  @Override
+  void removeAnnotation(@NotNull E annotation) {
 
-    @Override
-    @NotNull
-    List<E> removeAnnotations(
-        @NotNull
-            User user,
-        @NotNull
-            IFile file) {
+    super.removeAnnotation(annotation);
 
-        List<E> removedAnnotations = super.removeAnnotations(user, file);
+    annotationQueue.remove(annotation);
+  }
 
-        annotationQueue.removeAll(removedAnnotations);
+  @Override
+  @NotNull
+  List<E> removeAnnotations(@NotNull User user, @NotNull IFile file) {
 
-        return removedAnnotations;
-    }
+    List<E> removedAnnotations = super.removeAnnotations(user, file);
 
-    @Override
-    @NotNull
-    List<E> removeAnnotations(
-        @NotNull
-            User user) {
+    annotationQueue.removeAll(removedAnnotations);
 
-        List<E> removedAnnotations = super.removeAnnotations(user);
+    return removedAnnotations;
+  }
 
-        annotationQueue.removeAll(removedAnnotations);
+  @Override
+  @NotNull
+  List<E> removeAnnotations(@NotNull User user) {
 
-        return removedAnnotations;
-    }
+    List<E> removedAnnotations = super.removeAnnotations(user);
 
-    @Override
-    @NotNull
-    List<E> removeAllAnnotations() {
-        annotationQueue.clear();
+    annotationQueue.removeAll(removedAnnotations);
 
-        return super.removeAllAnnotations();
-    }
+    return removedAnnotations;
+  }
+
+  @Override
+  @NotNull
+  List<E> removeAllAnnotations() {
+    annotationQueue.clear();
+
+    return super.removeAllAnnotations();
+  }
 }

@@ -21,70 +21,58 @@
 
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.session.User;
+import java.util.Collections;
+import java.util.List;
 
-/**
- * The NoOperation is used to hold a empty text together with the position zero.
- */
+/** The NoOperation is used to hold a empty text together with the position zero. */
 @XStreamAlias("noOp")
 public class NoOperation implements Operation {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return "Noop(0,'')";
-    }
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return "Noop(0,'')";
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        } else if (obj == null) {
-            return false;
-        } else if (obj.getClass().equals(getClass())) {
-            return true;
-        } else {
-            return false;
-        }
+  /** {@inheritDoc} */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    } else if (obj == null) {
+      return false;
+    } else if (obj.getClass().equals(getClass())) {
+      return true;
+    } else {
+      return false;
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hashcode = 37;
-        return hashcode;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int hashCode() {
+    int hashcode = 37;
+    return hashcode;
+  }
 
-    @Override
-    public List<TextEditActivity> toTextEdit(SPath path, User source) {
-        return Collections.emptyList();
-    }
+  @Override
+  public List<TextEditActivity> toTextEdit(SPath path, User source) {
+    return Collections.emptyList();
+  }
 
-    @Override
-    public List<ITextOperation> getTextOperations() {
-        return Collections.emptyList();
-    }
+  @Override
+  public List<ITextOperation> getTextOperations() {
+    return Collections.emptyList();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Operation invert() {
-        return new NoOperation();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public Operation invert() {
+    return new NoOperation();
+  }
 }

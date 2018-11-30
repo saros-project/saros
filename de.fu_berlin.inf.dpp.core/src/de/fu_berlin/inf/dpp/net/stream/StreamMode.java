@@ -1,17 +1,20 @@
 package de.fu_berlin.inf.dpp.net.stream;
 
 public enum StreamMode {
-    NONE("UNKNOWN"), IBB("IBB"), SOCKS5_MEDIATED("SOCKS5 (M)"), SOCKS5_DIRECT(
-        "SOCKS5 (D)"), TCP("TCP");
+  NONE("UNKNOWN"),
+  IBB("IBB"),
+  SOCKS5_MEDIATED("SOCKS5 (M)"),
+  SOCKS5_DIRECT("SOCKS5 (D)"),
+  TCP("TCP");
 
-    private final String name;
+  private final String name;
 
-    StreamMode(String name) {
-        this.name = name;
-    }
+  StreamMode(String name) {
+    this.name = name;
+  }
 
-    @Override
-    public String toString() {
-        return name;
-    }
+  @Override
+  public String toString() {
+    return name;
+  }
 }

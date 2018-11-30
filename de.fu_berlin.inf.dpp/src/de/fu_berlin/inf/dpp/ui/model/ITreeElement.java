@@ -8,36 +8,24 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * Implementations of this interface are used as elements for
- * {@link TreeContentProvider}s
- * 
+ * Implementations of this interface are used as elements for {@link TreeContentProvider}s
+ *
  * @author bkahlert
  */
 public interface ITreeElement extends IAdaptable {
 
-    /**
-     * @see IStyledLabelProvider#getStyledText(Object)
-     */
-    public StyledString getStyledText();
+  /** @see IStyledLabelProvider#getStyledText(Object) */
+  public StyledString getStyledText();
 
-    /**
-     * @see ILabelProvider#getImage(Object)
-     */
-    public Image getImage();
+  /** @see ILabelProvider#getImage(Object) */
+  public Image getImage();
 
-    /**
-     * @see ITreeContentProvider#getParent(Object)
-     */
-    public ITreeElement getParent();
+  /** @see ITreeContentProvider#getParent(Object) */
+  public ITreeElement getParent();
 
-    /**
-     * @see ITreeContentProvider#getChildren(Object)
-     */
-    public Object[] getChildren();
+  /** @see ITreeContentProvider#getChildren(Object) */
+  public Object[] getChildren();
 
-    /**
-     * @see ITreeContentProvider#hasChildren(Object)
-     */
-    public boolean hasChildren();
-
+  /** @see ITreeContentProvider#hasChildren(Object) */
+  public boolean hasChildren();
 }

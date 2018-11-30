@@ -1,14 +1,5 @@
 package de.fu_berlin.inf.dpp;
 
-import java.util.Arrays;
-
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Platform;
-import org.osgi.framework.Bundle;
-import org.osgi.service.prefs.Preferences;
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
-
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.communication.SkypeManager;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
@@ -47,115 +38,109 @@ import de.fu_berlin.inf.dpp.ui.eventhandler.SessionStatusRequestHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.SessionViewOpener;
 import de.fu_berlin.inf.dpp.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.XMPPAuthorizationHandler;
+import java.util.Arrays;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
+import org.osgi.service.prefs.Preferences;
+import org.picocontainer.BindKey;
+import org.picocontainer.MutablePicoContainer;
 
 /**
  * Factory used for creating the Saros context when running as Eclipse plugin.
- * 
+ *
  * @author srossbach
  */
 public class SarosEclipseContextFactory extends AbstractContextFactory {
 
-    private final Saros saros;
+  private final Saros saros;
 
-    /**
-     * Must not be static in order to avoid heavy work during class
-     * initialization
-     * 
-     * @see <a
-     *      href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
-     */
-    private final Component[] getContextComponents() {
-        return new Component[] {
-            // Core Managers
-            Component.create(IEditorManager.class, EditorManager.class),
+  /**
+   * Must not be static in order to avoid heavy work during class initialization
+   *
+   * @see <a href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
+   */
+  private final Component[] getContextComponents() {
+    return new Component[] {
+      // Core Managers
+      Component.create(IEditorManager.class, EditorManager.class),
+      Component.create(
+          de.fu_berlin.inf.dpp.preferences.Preferences.class, EclipsePreferences.class),
+      Component.create(SessionViewOpener.class),
+      Component.create(UndoManager.class),
+      Component.create(ISarosSessionContextFactory.class, SarosEclipseSessionContextFactory.class),
 
-            Component.create(
-                de.fu_berlin.inf.dpp.preferences.Preferences.class,
-                EclipsePreferences.class),
-            Component.create(SessionViewOpener.class),
-            Component.create(UndoManager.class),
+      // UI handlers
+      Component.create(HostLeftAloneInSessionHandler.class),
+      Component.create(NegotiationHandler.class),
+      Component.create(UserStatusChangeHandler.class),
+      Component.create(JoinSessionRequestHandler.class),
+      Component.create(JoinSessionRejectedHandler.class),
+      Component.create(ServerPreferenceHandler.class),
+      Component.create(SessionStatusRequestHandler.class),
+      Component.create(XMPPAuthorizationHandler.class),
+      Component.create(ConnectingFailureHandler.class),
+      // Cache support
+      /*
+       * TODO avoid direct creation as this will become tricky especially
+       * if we are the delegate and depends on components that are only
+       * available after we added all our context stuff or vice versa
+       */
+      Component.create(
+          IChecksumCache.class, new FileSystemChecksumCache(new FileContentNotifierBridge())),
+      Component.create(IWorkspace.class, new EclipseWorkspaceImpl(ResourcesPlugin.getWorkspace())),
+      Component.create(
+          IWorkspaceRoot.class,
+          new EclipseWorkspaceRootImpl(ResourcesPlugin.getWorkspace().getRoot())),
 
-            Component.create(ISarosSessionContextFactory.class,
-                SarosEclipseSessionContextFactory.class),
+      // Saros Core Path Support
+      Component.create(IPathFactory.class, EclipsePathFactory.class),
 
-            // UI handlers
-            Component.create(HostLeftAloneInSessionHandler.class),
-            Component.create(NegotiationHandler.class),
-            Component.create(UserStatusChangeHandler.class),
-            Component.create(JoinSessionRequestHandler.class),
-            Component.create(JoinSessionRejectedHandler.class),
-            Component.create(ServerPreferenceHandler.class),
-            Component.create(SessionStatusRequestHandler.class),
-            Component.create(XMPPAuthorizationHandler.class),
-            Component.create(ConnectingFailureHandler.class),
-            // Cache support
-            /*
-             * TODO avoid direct creation as this will become tricky especially
-             * if we are the delegate and depends on components that are only
-             * available after we added all our context stuff or vice versa
-             */
-            Component.create(IChecksumCache.class, new FileSystemChecksumCache(
-                new FileContentNotifierBridge())),
+      // SWT EDT support
+      Component.create(UISynchronizer.class, SWTSynchronizer.class),
 
-            Component.create(IWorkspace.class, new EclipseWorkspaceImpl(
-                ResourcesPlugin.getWorkspace())),
+      // Proxy Support for the XMPP server connection
+      Component.create(IProxyResolver.class, Socks5ProxyResolver.class),
 
-            Component.create(IWorkspaceRoot.class,
-                new EclipseWorkspaceRootImpl(ResourcesPlugin.getWorkspace()
-                    .getRoot())),
+      // Remote progress indication
+      Component.create(
+          IRemoteProgressIndicatorFactory.class, EclipseRemoteProgressIndicatorFactoryImpl.class),
+      Component.create(MUCNegotiationManager.class),
+      Component.create(SkypeManager.class),
+      Component.create(AwarenessInformationCollector.class)
+    };
+  }
 
-            // Saros Core Path Support
-            Component.create(IPathFactory.class, EclipsePathFactory.class),
+  public SarosEclipseContextFactory(Saros saros) {
+    this.saros = saros;
+  }
 
-            // SWT EDT support
-            Component.create(UISynchronizer.class, SWTSynchronizer.class),
+  @Override
+  public void createComponents(MutablePicoContainer container) {
+    for (Component component : Arrays.asList(getContextComponents()))
+      container.addComponent(component.getBindKey(), component.getImplementation());
 
-            // Proxy Support for the XMPP server connection
-            Component.create(IProxyResolver.class, Socks5ProxyResolver.class),
+    container.addComponent(saros);
 
-            // Remote progress indication
-            Component.create(IRemoteProgressIndicatorFactory.class,
-                EclipseRemoteProgressIndicatorFactoryImpl.class),
+    container.addComponent(Bundle.class, saros.getBundle());
 
-            Component.create(MUCNegotiationManager.class),
-            Component.create(SkypeManager.class),
+    container.addComponent(
+        BindKey.bindKey(String.class, IContextKeyBindings.SarosVersion.class),
+        saros.getBundle().getVersion().toString());
 
-            Component.create(AwarenessInformationCollector.class) };
-    }
+    container.addComponent(
+        BindKey.bindKey(String.class, IContextKeyBindings.PlatformVersion.class),
+        Platform.getBundle("org.eclipse.core.runtime").getVersion().toString());
 
-    public SarosEclipseContextFactory(Saros saros) {
-        this.saros = saros;
-    }
+    // for core logic and extended Eclipse session components
+    container.addComponent(
+        IPreferenceStore.class, new EclipsePreferenceStoreAdapter(saros.getPreferenceStore()));
 
-    @Override
-    public void createComponents(MutablePicoContainer container) {
-        for (Component component : Arrays.asList(getContextComponents()))
-            container.addComponent(component.getBindKey(),
-                component.getImplementation());
+    // TODO remove
+    // for plain Eclipse components like preference pages etc.
+    container.addComponent(
+        org.eclipse.jface.preference.IPreferenceStore.class, saros.getPreferenceStore());
 
-        container.addComponent(saros);
-
-        container.addComponent(Bundle.class, saros.getBundle());
-
-        container.addComponent(BindKey.bindKey(String.class,
-            IContextKeyBindings.SarosVersion.class), saros.getBundle()
-            .getVersion().toString());
-
-        container.addComponent(BindKey.bindKey(String.class,
-            IContextKeyBindings.PlatformVersion.class),
-            Platform.getBundle("org.eclipse.core.runtime").getVersion()
-                .toString());
-
-        // for core logic and extended Eclipse session components
-        container.addComponent(IPreferenceStore.class,
-            new EclipsePreferenceStoreAdapter(saros.getPreferenceStore()));
-
-        // TODO remove
-        // for plain Eclipse components like preference pages etc.
-        container.addComponent(
-            org.eclipse.jface.preference.IPreferenceStore.class,
-            saros.getPreferenceStore());
-
-        container.addComponent(Preferences.class, saros.getGlobalPreferences());
-    }
+    container.addComponent(Preferences.class, saros.getGlobalPreferences());
+  }
 }

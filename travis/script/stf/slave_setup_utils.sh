@@ -72,6 +72,7 @@ function wait_for_rmi_server()
       echo "Rmi server of port $port on $slave alive"
       return 0
     fi
+    echo "Still waiting for rmi server of port $port on $slave"
   done
   echo "Timout waiting for rmi server"
   exit 1
@@ -113,7 +114,7 @@ function start_container_slave()
     docker run -dt --name $slave_name \
       -v $STF_HOST_WS:$STF_CONTAINER_WS \
       -v $CONFIG_DIR_HOST:$CONFIG_DIR_CONTAINER \
-      -v $SCRIPT_DIR_HOST/slave:$SCRIPT_DIR_CONTAINER \
+      -v $SCRIPT_DIR_HOST:$SCRIPT_DIR_CONTAINER \
       $port_mapping_args \
       --net=$stf_network_name \
       --net-alias=$slave_name \
@@ -137,11 +138,11 @@ function setup_container_slave()
 
     for i in "${!users[@]}"; do
       echo "Starting vnc server on $slave_name with display $display"
-      docker exec -d "$slave_name" vncserver
+      docker exec -d "$slave_name" vncserver -geometry 1280x960
       wait_for_xfwm 100 10 $display $slave_name
 
       echo "Starting eclipse on $slave_name with display $display, user ${users[$i]} and port ${ports[$i]}"
-      docker exec -dt "$slave_name" bash -c "$SCRIPT_DIR_CONTAINER/start_eclipse.sh $display ${users[$i]} ${ports[$i]} > $STF_CONTAINER_WS/ws/${users[$i]}.log 2>&1"
+      docker exec -dt "$slave_name" bash -c "$SCRIPT_DIR_CONTAINER/stf/slave/start_eclipse.sh $display ${users[$i]} ${ports[$i]} > $STF_CONTAINER_WS/ws/${users[$i]}.log 2>&1"
       wait_for_rmi_server 100 10 "${ports[$i]}" "$slave_name"
       (( display++ ))
     done
