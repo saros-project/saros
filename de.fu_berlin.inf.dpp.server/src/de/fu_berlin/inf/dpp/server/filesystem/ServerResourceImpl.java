@@ -3,8 +3,10 @@ package de.fu_berlin.inf.dpp.server.filesystem;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.ReferencePointImpl;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -16,6 +18,7 @@ public abstract class ServerResourceImpl implements IResource {
 
   private IWorkspace workspace;
   private IPath path;
+  private IReferencePoint referencePoint;
 
   /**
    * Creates a ServerResourceImpl.
@@ -26,6 +29,7 @@ public abstract class ServerResourceImpl implements IResource {
   public ServerResourceImpl(IWorkspace workspace, IPath path) {
     this.path = path;
     this.workspace = workspace;
+    this.referencePoint = new ReferencePointImpl(workspace.getLocation());
   }
 
   /**
@@ -122,5 +126,10 @@ public abstract class ServerResourceImpl implements IResource {
    */
   Path toNioPath() {
     return ((ServerPathImpl) getLocation()).getDelegate();
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint() {
+    return referencePoint;
   }
 }

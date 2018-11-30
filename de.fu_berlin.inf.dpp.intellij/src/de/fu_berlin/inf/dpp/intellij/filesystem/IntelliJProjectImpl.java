@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.ReferencePointImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -69,6 +70,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     this.moduleName = module.getName();
 
     moduleRoot = getModuleContentRoot(module);
+
+    this.referencePoint = new ReferencePointImpl(getFullPath());
 
     checkIfContentRootLocatedBelowProjectRoot(module, moduleRoot);
     checkIfModuleFileLocatedInContentRoot(module, moduleRoot);

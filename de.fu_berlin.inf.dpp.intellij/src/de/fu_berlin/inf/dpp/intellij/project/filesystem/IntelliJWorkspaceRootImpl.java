@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 import java.io.IOException;
@@ -104,5 +105,10 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   @Override
   public Object getAdapter(Class<? extends IResource> clazz) {
     return null;
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint() {
+    throw new UnsupportedOperationException();
   }
 }

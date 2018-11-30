@@ -29,6 +29,8 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   public IntelliJFolderImpl(@NotNull final IntelliJProjectImpl project, @NotNull final IPath path) {
     this.project = project;
     this.path = path;
+
+    this.referencePoint = project.getReferencePoint();
   }
 
   @Override
