@@ -1,63 +1,67 @@
 package de.fu_berlin.inf.dpp.git;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import de.fu_berlin.inf.dpp.versioning.JGitService;
-
 public class JGitFacadeTest {
 
-    @Before
-    public void setUp() {
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    }
+    /**
+     * Method to create file,folder and .git Directory with a given number of
+     * commits. Commits can be accessed by Tag (The first is named
+     * CheckoutAtInit, the following CheckoutAtCommit2,CheckoutAtCommit3,...)
+     * 
+     * @param iD
+     *            Test should never use the same iD twice
+     * @param amountCommits
+     *            At least 1 will be created. If >= 2 more than that.
+     * 
+     * @return The file that will be used to identify the folder with the Git
+     *         Directory
+     */
+    File createTestFile(int amountCommits, int iD) {
 
-    public static Git createTestRepo(int amountCommits)
-        throws IllegalStateException, GitAPIException, IOException {
+        File tempSubfolder = tempFolder.newFolder("tempFolder" + iD);
+        try {
+            File tempFile = tempSubfolder.createTempFile("tempFile", ".txt");
+            JGitFacade.initNewRepo(tempFile);
+            for (int i = 2; i <= amountCommits; i++) {
+                JGitFacade.writeCommitToRepo(tempFile, i);
 
-        @Rule
-        TemporaryFolder tempFolder = new TemporaryFolder();
+            }
+            return tempFile;
+        } catch (IOException e) {
 
-        File tempSubfolder = tempFolder.newFolder("tempFolder" + amountCommits);
-        File tempFile = tempSubfolder.createTempFile("tempFile", ".txt");
-        Git git = Git.init().setDirectory(tempFile.getParentFile()).call();
-        git.add().addFilepattern(tempFile.getPath()).call();
-        git.commit().setMessage("Initial commit").call();
-        git.tag().setName("CheckoutAtInit").setAnnotated(false)
-            .setForceUpdate(true).call();
-
-        for (int i = 2; i <= amountCommits; i++) {
-            FileUtils.writeStringToFile(tempFile,
-                System.getProperty("line.separator") + "Commit Nr." + i);
-            git.add().addFilepattern(tempFile.getPath()).call(); // git add
-                                                                 // tempfile
-            git.commit()
-                .setMessage("changed tempfile.New Text: Commit Nr." + i).call();
-            git.tag().setName("CheckoutAtCommit" + i).setAnnotated(false)
-                .setForceUpdate(true).call();
         }
-        return git;
+        return null;
     }
 
     @Test
-    public void testCreateBundle() throws IOException, IllegalStateException,
-        GitAPIException {
+    public void testCreateBundle() throws IOException {
 
-        Git gitCommitAHead = createTestRepo(2);
-        File bundle = JGitService.getBundleByTag(gitCommitAHead,
+        File firstRepoTempFile = createTestFile(2, 1);
+        File bundle = JGitFacade.createBundleByTag(firstRepoTempFile,
             "CheckoutAtInit");
         assertNotNull(bundle);
 
+    }
+
+    @Test
+    public void testCreateBundleRaisesNullPointerExeption() throws IOException {
+        try {
+            File bundle2 = JGitFacade.createBundleByTag(null, "CheckoutAtInit");
+            fail("created Bundle with null File");
+        } catch (NullPointerException e) {
+        }
     }
 
 }
