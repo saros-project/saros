@@ -40,13 +40,9 @@ import org.jivesoftware.smack.packet.Packet;
 public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiation {
 
   private static final Logger LOG = Logger.getLogger(AbstractOutgoingProjectNegotiation.class);
-
-  protected List<IProject> projects;
-
   private static final Random NEGOTIATION_ID_GENERATOR = new Random();
-
   protected final IEditorManager editorManager;
-
+  protected List<IProject> projects;
   private PacketCollector remoteFileListResponseCollector;
 
   private PacketCollector startActivityQueuingResponseCollector;
@@ -321,7 +317,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         FileList projectFileList =
             FileListFactory.createFileList(
                 project,
-                session.getSharedResources(project),
+                session.getSharedResources(project.getReferencePoint()),
                 checksumCache,
                 new SubProgressMonitor(
                     monitor,
@@ -329,9 +325,9 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
                     SubProgressMonitor.SUPPRESS_BEGINTASK
                         | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-        boolean partial = !session.isCompletelyShared(project);
+        boolean partial = !session.isCompletelyShared(project.getReferencePoint());
 
-        String projectID = session.getProjectID(project);
+        String projectID = session.getReferencePointID(project.getReferencePoint());
         projectFileList.setProjectID(projectID);
 
         ProjectNegotiationData data =

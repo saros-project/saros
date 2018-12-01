@@ -3,8 +3,10 @@ package de.fu_berlin.inf.dpp.negotiation.stream;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -19,10 +21,12 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol {
   private static final Logger log = Logger.getLogger(IncomingStreamProtocol.class);
 
   private DataInputStream in;
+  private IReferencePointManager referencePointManager;
 
   public IncomingStreamProtocol(InputStream in, ISarosSession session, IProgressMonitor monitor) {
     super(session, monitor);
     this.in = new DataInputStream(in);
+    this.referencePointManager = session.getComponent(IReferencePointManager.class);
   }
 
   /**
@@ -42,7 +46,8 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol {
         if (projectID.isEmpty()) break;
 
         String fileName = in.readUTF();
-        IFile file = session.getProject(projectID).getFile(fileName);
+        IProject project = referencePointManager.get(session.getReferencePoint(projectID));
+        IFile file = project.getFile(fileName);
 
         String message = "receiving " + displayName(file);
         log.debug(message);

@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.io.IOException;
@@ -29,32 +30,25 @@ import org.jivesoftware.smackx.filetransfer.FileTransferManager;
  */
 public abstract class ProjectNegotiation extends Negotiation {
 
-  private static final Logger LOG = Logger.getLogger(ProjectNegotiation.class);
-
   /** Prefix part of the id used in the SMACK XMPP file transfer protocol. */
   public static final String TRANSFER_ID_PREFIX = "saros-dpp-pn-server-client/";
-
   /**
    * Delimiter for every Zip entry to delimit the project id from the path entry.
    *
    * <p>E.g: <b>12345:foo/bar/foobar.java</b>
    */
   protected static final String PATH_DELIMITER = ":";
-
   /** Timeout for all packet exchanges during the project negotiation */
   protected static final long PACKET_TIMEOUT =
       Long.getLong("de.fu_berlin.inf.dpp.negotiation.project.PACKET_TIMEOUT", 30000L);
 
+  private static final Logger LOG = Logger.getLogger(ProjectNegotiation.class);
   protected final ISarosSessionManager sessionManager;
 
   protected final ISarosSession session;
-
-  private final String sessionID;
-
   protected final IWorkspace workspace;
-
   protected final IChecksumCache checksumCache;
-
+  private final String sessionID;
   /**
    * The file transfer manager can be <code>null</code> if no connection was established or was lost
    * when the class was instantiated.
@@ -62,6 +56,8 @@ public abstract class ProjectNegotiation extends Negotiation {
   protected FileTransferManager fileTransferManager;
 
   protected TransferType transferType;
+
+  protected IReferencePointManager referencePointManager;
 
   public ProjectNegotiation(
       final String id,
@@ -87,6 +83,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     if (connection != null) fileTransferManager = new FileTransferManager(connection);
 
     this.transferType = transferType;
+    this.referencePointManager = session.getComponent(IReferencePointManager.class);
   }
 
   /**

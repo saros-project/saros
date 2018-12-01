@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
@@ -241,7 +242,10 @@ public class CollaborationUtils {
    */
   private static String getShareProjectDescription(ISarosSession sarosSession) {
 
-    Set<IProject> projects = sarosSession.getProjects();
+    IReferencePointManager referencePointManager =
+        sarosSession.getComponent(IReferencePointManager.class);
+
+    Set<IProject> projects = referencePointManager.getProjects(sarosSession.getReferencePoints());
 
     StringBuilder result = new StringBuilder();
 
@@ -250,7 +254,7 @@ public class CollaborationUtils {
 
         Pair<Long, Long> fileCountAndSize;
 
-        if (sarosSession.isCompletelyShared(project)) {
+        if (sarosSession.isCompletelyShared(project.getReferencePoint())) {
           fileCountAndSize =
               getFileCountAndSize(Arrays.asList(project.members()), true, IContainer.FILE);
 
@@ -261,7 +265,7 @@ public class CollaborationUtils {
                   fileCountAndSize.getRight(),
                   format(fileCountAndSize.getLeft())));
         } else {
-          List<IResource> resources = sarosSession.getSharedResources(project);
+          List<IResource> resources = sarosSession.getSharedResources(project.getReferencePoint());
 
           fileCountAndSize = getFileCountAndSize(resources, false, IResource.NONE);
 

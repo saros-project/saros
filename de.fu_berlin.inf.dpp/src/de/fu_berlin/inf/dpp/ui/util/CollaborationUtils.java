@@ -5,6 +5,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
@@ -52,6 +53,8 @@ public class CollaborationUtils {
 
   @Inject private static ISarosSessionManager sessionManager;
 
+  private static IReferencePointManager referencePointManager;
+
   static {
     SarosPluginContext.initComponent(new CollaborationUtils());
   }
@@ -87,6 +90,8 @@ public class CollaborationUtils {
               ISarosSession session = sessionManager.getSession();
 
               if (session == null) return Status.CANCEL_STATUS;
+
+              referencePointManager = session.getComponent(IReferencePointManager.class);
 
               sessionManager.invite(participantsToAdd, getSessionDescription(session));
 
@@ -256,7 +261,8 @@ public class CollaborationUtils {
    */
   private static String getSessionDescription(ISarosSession sarosSession) {
 
-    final Set<de.fu_berlin.inf.dpp.filesystem.IProject> projects = sarosSession.getProjects();
+    Set<de.fu_berlin.inf.dpp.filesystem.IProject> projects =
+        referencePointManager.getProjects(sarosSession.getReferencePoints());
 
     final StringBuilder result = new StringBuilder();
 
@@ -264,13 +270,17 @@ public class CollaborationUtils {
 
       final Pair<Long, Long> fileCountAndSize;
 
-      final boolean isCompletelyShared = sarosSession.isCompletelyShared(project);
+      final boolean isCompletelyShared =
+          sarosSession.isCompletelyShared(project.getReferencePoint());
 
       final List<IResource> resources;
 
       if (isCompletelyShared)
         resources = Collections.singletonList(((EclipseProjectImpl) project).getDelegate());
-      else resources = ResourceAdapterFactory.convertBack(sarosSession.getSharedResources(project));
+      else
+        resources =
+            ResourceAdapterFactory.convertBack(
+                sarosSession.getSharedResources(project.getReferencePoint()));
 
       fileCountAndSize =
           FileUtils.getFileCountAndSize(
