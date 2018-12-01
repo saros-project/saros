@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.test.stubs;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
@@ -15,8 +15,8 @@ import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
@@ -85,17 +85,17 @@ public class SarosSessionStub implements ISarosSession {
   }
 
   @Override
-  public Set<IProject> getProjects() {
+  public Set<IReferencePoint> getReferencePoints() {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
   @Override
-  public String getProjectID(IProject project) {
+  public String getReferencePointID(IReferencePoint referencePoint) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
   @Override
-  public IProject getProject(String projectID) {
+  public IReferencePoint getReferencePoint(String referencePointID) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
@@ -141,7 +141,7 @@ public class SarosSessionStub implements ISarosSession {
 
   @Override
   public void addSharedResources(
-      IProject project, String projectID, List<IResource> dependentResources) {
+      IReferencePoint referencePoint, String referencePointID, List<IResource> dependentResources) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
@@ -151,27 +151,27 @@ public class SarosSessionStub implements ISarosSession {
   }
 
   @Override
-  public HashMap<IProject, List<IResource>> getProjectResourcesMapping() {
+  public Map<IReferencePoint, List<IResource>> getReferencePointResourcesMapping() {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
   @Override
-  public boolean isCompletelyShared(IProject project) {
+  public boolean isCompletelyShared(IReferencePoint referencePoint) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
   @Override
-  public List<IResource> getSharedResources(IProject project) {
+  public List<IResource> getSharedResources(IReferencePoint referencePoint) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
   @Override
-  public void addProjectMapping(String projectID, IProject project) {
+  public void addReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
   @Override
-  public void removeProjectMapping(String projectID, IProject project) {
+  public void removeReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
@@ -196,12 +196,12 @@ public class SarosSessionStub implements ISarosSession {
   }
 
   @Override
-  public void enableQueuing(IProject project) {
+  public void enableQueuing(IReferencePoint referencePoint) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
   @Override
-  public void disableQueuing(IProject project) {
+  public void disableQueuing(IReferencePoint referencePoint) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 
@@ -216,7 +216,7 @@ public class SarosSessionStub implements ISarosSession {
   }
 
   @Override
-  public boolean userHasProject(User user, IProject project) {
+  public boolean userHasReferencePoint(User user, IReferencePoint referencePoint) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 

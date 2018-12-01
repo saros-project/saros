@@ -65,14 +65,6 @@ public final class ActivityHandler implements Startable {
   private final ConcurrentDocumentClient documentClient;
 
   private final UISynchronizer synchronizer;
-
-  /*
-   * We must use a thread for synchronous execution otherwise we would block
-   * the DispatchThreadContext which handles the dispatching of all network
-   * packets
-   */
-  private Thread dispatchThread;
-
   private final Runnable dispatchThreadRunnable =
       new Runnable() {
 
@@ -104,6 +96,12 @@ public final class ActivityHandler implements Startable {
           LOG.debug("activity dispatcher stopped");
         }
       };
+  /*
+   * We must use a thread for synchronous execution otherwise we would block
+   * the DispatchThreadContext which handles the dispatching of all network
+   * packets
+   */
+  private Thread dispatchThread;
 
   public ActivityHandler(
       ISarosSession session,
@@ -182,7 +180,8 @@ public final class ActivityHandler implements Startable {
         recipients = item.recipients;
       } else {
         for (User user : item.recipients) {
-          if (session.userHasProject(user, activity.getPath().getProject())) {
+          if (session.userHasReferencePoint(
+              user, activity.getPath().getProject().getReferencePoint())) {
             recipients.add(user);
           }
         }

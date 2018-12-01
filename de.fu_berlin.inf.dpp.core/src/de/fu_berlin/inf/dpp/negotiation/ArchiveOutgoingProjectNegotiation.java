@@ -146,7 +146,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     for (final FileList list : fileLists) {
       final String projectID = list.getProjectID();
 
-      final IProject project = session.getProject(projectID);
+      final IProject project = referencePointManager.get(session.getReferencePoint(projectID));
 
       if (project == null)
         throw new LocalCancellationException(

@@ -91,38 +91,17 @@ public class SarosSessionManager implements ISarosSessionManager {
   private static final long LOCK_TIMEOUT = 10000L;
 
   private static final long NEGOTIATION_TIMEOUT = 10000L;
-
-  private volatile SarosSession session;
-
   private final IContainerContext context;
-
   private final NegotiationFactory negotiationFactory;
-
   private final NegotiationPacketListener negotiationPacketLister;
-
   private final SessionNegotiationHookManager hookManager;
-
   private final SessionNegotiationObservable currentSessionNegotiations;
-
   private final ProjectNegotiationObservable currentProjectNegotiations;
-
   private final ProjectNegotiationCollector nextProjectNegotiation =
       new ProjectNegotiationCollector();
-  private Thread nextProjectNegotiationWorker;
-
-  private XMPPConnectionService connectionService;
-
   private final List<ISessionLifecycleListener> sessionLifecycleListeners =
       new CopyOnWriteArrayList<ISessionLifecycleListener>();
-
   private final Lock startStopSessionLock = new ReentrantLock();
-
-  private volatile boolean sessionStartup = false;
-
-  private volatile boolean sessionShutdown = false;
-
-  private volatile INegotiationHandler negotiationHandler;
-
   private final NegotiationListener negotiationListener =
       new NegotiationListener() {
         @Override
@@ -141,7 +120,11 @@ public class SarosSessionManager implements ISarosSessionManager {
           }
         }
       };
-
+  private Thread nextProjectNegotiationWorker;
+  private volatile SarosSession session;
+  private XMPPConnectionService connectionService;
+  private volatile boolean sessionStartup = false;
+  private volatile boolean sessionShutdown = false;
   private final IConnectionListener connectionListener =
       new IConnectionListener() {
         @Override
@@ -152,6 +135,8 @@ public class SarosSessionManager implements ISarosSessionManager {
           }
         }
       };
+  private volatile INegotiationHandler negotiationHandler;
+  private IReferencePointManager referencePointManager;
 
   public SarosSessionManager(
       IContainerContext context,
@@ -252,6 +237,8 @@ public class SarosSessionManager implements ISarosSessionManager {
       session.start();
       sessionStarted(session);
 
+      referencePointManager = session.getComponent(IReferencePointManager.class);
+
       for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping.entrySet()) {
 
         final IProject project = mapEntry.getKey();
@@ -259,7 +246,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
-        session.addSharedResources(project, projectID, resourcesList);
+        referencePointManager.put(project.getReferencePoint(), project);
+        session.addSharedResources(project.getReferencePoint(), projectID, resourcesList);
       }
 
       log.info("session started");
@@ -573,14 +561,15 @@ public class SarosSessionManager implements ISarosSessionManager {
       final List<IResource> resourcesList = mapEntry.getValue();
 
       // side effect: non shared projects are always partial -.-
-      if (!currentSession.isCompletelyShared(project)) {
-        String projectID = currentSession.getProjectID(project);
+      if (!currentSession.isCompletelyShared(project.getReferencePoint())) {
+        String projectID = currentSession.getReferencePointID(project.getReferencePoint());
 
         if (projectID == null) {
           projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
         }
 
-        currentSession.addSharedResources(project, projectID, resourcesList);
+        referencePointManager.put(project.getReferencePoint(), project);
+        currentSession.addSharedResources(project.getReferencePoint(), projectID, resourcesList);
 
         projectsToShare.add(project);
       }
@@ -645,7 +634,9 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    List<IProject> currentSharedProjects = new ArrayList<IProject>(currentSession.getProjects());
+    List<IProject> currentSharedProjects =
+        new ArrayList<IProject>(
+            referencePointManager.getProjects(currentSession.getReferencePoints()));
 
     if (currentSharedProjects.isEmpty()) return;
 

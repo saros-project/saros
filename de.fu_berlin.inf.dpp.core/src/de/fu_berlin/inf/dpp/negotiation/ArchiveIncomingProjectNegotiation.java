@@ -86,8 +86,10 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
        * functionality. This will enable a specific Queuing mechanism per
        * TransferType (see github issue #137).
        */
-      session.addProjectMapping(projectID, project);
-      session.enableQueuing(project);
+      referencePointManager.put(project.getReferencePoint(), project);
+
+      session.addReferencePointMapping(projectID, project.getReferencePoint());
+      session.enableQueuing(project.getReferencePoint());
     }
 
     transmitter.send(

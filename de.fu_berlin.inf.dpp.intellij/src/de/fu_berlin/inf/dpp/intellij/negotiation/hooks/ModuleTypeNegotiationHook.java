@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,7 +104,11 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
     StringBuilder stringBuilder = new StringBuilder();
 
-    for (final IProject project : sessionManager.getSession().getProjects()) {
+    IReferencePointManager referencePointManager =
+        sessionManager.getSession().getComponent(IReferencePointManager.class);
+
+    for (final IProject project :
+        referencePointManager.getProjects(sessionManager.getSession().getReferencePoints())) {
 
       IntelliJProjectImpl intelliJProject =
           (IntelliJProjectImpl) project.getAdapter(IntelliJProjectImpl.class);

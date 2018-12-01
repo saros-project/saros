@@ -56,9 +56,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
       new CopyOnWriteArrayList<ILabelProviderListener>();
 
   @Inject private ISarosSessionManager sessionManager;
-
   private volatile ISarosSession session;
-
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
 
@@ -112,7 +110,8 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
     if (resource.getType() == IResource.PROJECT) {
       boolean isCompletelyShared =
-          currentSession.isCompletelyShared(ResourceAdapterFactory.create(resource.getProject()));
+          currentSession.isCompletelyShared(
+              ResourceAdapterFactory.create(resource).getReferencePoint());
 
       decoration.addSuffix(
           isCompletelyShared

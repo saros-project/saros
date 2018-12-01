@@ -47,17 +47,13 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
   private static final Logger LOG = Logger.getLogger(AbstractIncomingProjectNegotiation.class);
 
   private static int MONITOR_WORK_SCALE = 1000;
-
-  private final Map<String, ProjectNegotiationData> projectNegotiationData;
-
   protected final FileReplacementInProgressObservable fileReplacementInProgressObservable;
-
+  private final Map<String, ProjectNegotiationData> projectNegotiationData;
   protected boolean running;
-
-  private PacketCollector startActivityQueuingRequestCollector;
-
   /** used to handle file transmissions * */
   protected TransferListener transferListener = null;
+
+  private PacketCollector startActivityQueuingRequestCollector;
 
   public AbstractIncomingProjectNegotiation(
       final JID peer, //
@@ -163,7 +159,9 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
           for (final String path : paths) resources.add(getResource(project, path));
         }
 
-        session.addSharedResources(project, projectID, resources);
+        referencePointManager.put(project.getReferencePoint(), project);
+
+        session.addSharedResources(project.getReferencePoint(), projectID, resources);
       }
     } catch (Exception e) {
       exception = e;
@@ -219,7 +217,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
      * functionality. This will enable a specific Queuing mechanism per
      * TransferType (see github issue #137).
      */
-    for (IProject project : projectMapping.values()) session.disableQueuing(project);
+    for (IProject project : projectMapping.values())
+      session.disableQueuing(project.getReferencePoint());
 
     if (fileTransferManager != null)
       fileTransferManager.removeFileTransferListener(transferListener);

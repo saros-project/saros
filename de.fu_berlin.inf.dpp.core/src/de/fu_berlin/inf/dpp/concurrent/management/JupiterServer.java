@@ -80,7 +80,7 @@ public class JupiterServer {
          * resources in question. Other clients that haven't accepted
          * the Project yet will be added later.
          */
-        if (sarosSession.userHasProject(client, path.getProject())) {
+        if (sarosSession.userHasReferencePoint(client, path.getProject().getReferencePoint())) {
           docServer.addProxyClient(client);
         }
       }

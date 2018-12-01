@@ -62,7 +62,6 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -238,10 +237,12 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void addSharedResources(IProject project, String id, List<IResource> resources) {
+  public void addSharedResources(
+      IReferencePoint referencePoint, String id, List<IResource> resources) {
 
     Set<IResource> allResources = null;
-    IReferencePoint referencePoint = project.getReferencePoint();
+
+    IProject project = referencePointManager.get(referencePoint);
 
     if (resources != null) {
       allResources = new HashSet<IResource>();
@@ -259,7 +260,6 @@ public final class SarosSession implements ISarosSession {
         sharedReferencePointMapper.addResources(referencePoint, allResources);
       }
 
-      referencePointManager.put(referencePoint, project);
       listenerDispatch.projectAdded(project);
     } else {
       // existing project
@@ -315,8 +315,8 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public boolean userHasProject(User user, IProject project) {
-    return sharedReferencePointMapper.userHasReferencePoint(user, project.getReferencePoint());
+  public boolean userHasReferencePoint(User user, IReferencePoint referencePoint) {
+    return sharedReferencePointMapper.userHasReferencePoint(user, referencePoint);
   }
 
   @Override
@@ -571,8 +571,8 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public Set<IProject> getProjects() {
-    return referencePointManager.getProjects(sharedReferencePointMapper.getReferencePoints());
+  public Set<IReferencePoint> getReferencePoints() {
+    return sharedReferencePointMapper.getReferencePoints();
   }
 
   // FIXME synchronization
@@ -974,57 +974,43 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public String getProjectID(IProject project) {
-    return sharedReferencePointMapper.getID(project.getReferencePoint());
+  public String getReferencePointID(IReferencePoint referencePoint) {
+    return sharedReferencePointMapper.getID(referencePoint);
   }
 
   @Override
-  public IProject getProject(String projectID) {
-    return referencePointManager.get(sharedReferencePointMapper.getReferencePoint(projectID));
+  public IReferencePoint getReferencePoint(String referencePointID) {
+    return sharedReferencePointMapper.getReferencePoint(referencePointID);
   }
 
   @Override
-  public Map<IProject, List<IResource>> getProjectResourcesMapping() {
-    Map<IReferencePoint, List<IResource>> referencePointResourceMap =
-        sharedReferencePointMapper.getReferencePointResourceMapping();
-
-    Map<IProject, List<IResource>> projectResourceMap = new HashMap<IProject, List<IResource>>();
-
-    for (Map.Entry<IReferencePoint, List<IResource>> entry : referencePointResourceMap.entrySet()) {
-      projectResourceMap.put(referencePointManager.get(entry.getKey()), entry.getValue());
-    }
-
-    return projectResourceMap;
+  public Map<IReferencePoint, List<IResource>> getReferencePointResourcesMapping() {
+    return sharedReferencePointMapper.getReferencePointResourceMapping();
   }
 
   @Override
-  public List<IResource> getSharedResources(IProject project) {
-    return sharedReferencePointMapper
-        .getReferencePointResourceMapping()
-        .get(project.getReferencePoint());
+  public List<IResource> getSharedResources(IReferencePoint referencePoint) {
+    return sharedReferencePointMapper.getReferencePointResourceMapping().get(referencePoint);
   }
 
   @Override
-  public boolean isCompletelyShared(IProject project) {
-    return sharedReferencePointMapper.isCompletelyShared(project.getReferencePoint());
+  public boolean isCompletelyShared(IReferencePoint referencePoint) {
+    return sharedReferencePointMapper.isCompletelyShared(referencePoint);
   }
 
   @Override
-  public void addProjectMapping(String projectID, IProject project) {
-    if (sharedReferencePointMapper.getReferencePoint(projectID) == null) {
-      IReferencePoint referencePoint = project.getReferencePoint();
-
-      referencePointManager.put(referencePoint, project);
-      sharedReferencePointMapper.addReferencePoint(projectID, referencePoint, true);
-      listenerDispatch.projectAdded(project);
+  public void addReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
+    if (sharedReferencePointMapper.getReferencePoint(referencePointID) == null) {
+      sharedReferencePointMapper.addReferencePoint(referencePointID, referencePoint, true);
+      listenerDispatch.projectAdded(referencePointManager.get(referencePoint));
     }
   }
 
   @Override
-  public void removeProjectMapping(String projectID, IProject project) {
-    if (sharedReferencePointMapper.getReferencePoint(projectID) != null) {
-      sharedReferencePointMapper.removeReferencePoint(projectID);
-      listenerDispatch.projectRemoved(project);
+  public void removeReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
+    if (sharedReferencePointMapper.getReferencePoint(referencePointID) != null) {
+      sharedReferencePointMapper.removeReferencePoint(referencePointID);
+      listenerDispatch.projectRemoved(referencePointManager.get(referencePoint));
     }
   }
 
@@ -1060,13 +1046,13 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void enableQueuing(IProject project) {
-    activityQueuer.enableQueuing(project);
+  public void enableQueuing(IReferencePoint referencePoint) {
+    activityQueuer.enableQueuing(referencePointManager.get(referencePoint));
   }
 
   @Override
-  public void disableQueuing(IProject project) {
-    activityQueuer.disableQueuing(project);
+  public void disableQueuing(IReferencePoint referencePoint) {
+    activityQueuer.disableQueuing(referencePointManager.get(referencePoint));
     // send us a dummy activity to ensure the queues get flushed
     sendActivity(Collections.singletonList(localUser), new NOPActivity(localUser, localUser, 0));
   }
