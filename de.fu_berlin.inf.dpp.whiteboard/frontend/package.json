@@ -4,14 +4,15 @@
   "description": "Whiteboard for Saros built with HTML",
   "main": "main.js",
   "scripts": {
-    "setup": "npm install && bower install fabric",
+    "setup": "npm install && bower install fabric --allow-root",
     "dev": "webpack -w",
-    "build": "webpack --mode=production --silent && inline-source ./index.html ./dist/index.html --root ./ && del-cli dist/bundle.js"
+    "build": "webpack --mode=production && inline-source ./index.html ./dist/index.html --root ./ && del-cli dist/bundle.js"
   },
   "author": "Abdullah Barhoum",
   "license": "ISC",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "fabric": "^2.4.4",
     "react": "^16.6.3",
     "react-dom": "^16.6.3"
   },
