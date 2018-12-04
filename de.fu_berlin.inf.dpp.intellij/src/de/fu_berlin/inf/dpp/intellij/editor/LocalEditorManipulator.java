@@ -120,30 +120,6 @@ public class LocalEditorManipulator {
   }
 
   /**
-   * Replaces the content of the document at the given path. The text is only replaced, if the
-   * editor is writable.
-   *
-   * @param path path of the editor
-   * @param text text to set the document's content to
-   * @return Returns <code>true</code> if replacement was successful, <code>false</code> if the path
-   *     was <code>null></code>, if the path points to a non-existing document or the document was
-   *     not writable.
-   */
-  public boolean replaceText(SPath path, String text) {
-    Document doc = editorPool.getDocument(path);
-    if (doc == null) {
-      return false;
-    }
-    if (!doc.isWritable()) {
-      LOG.error("File to replace text in is not writeable: " + path);
-      return false;
-    }
-
-    editorAPI.setText(doc, text);
-    return true;
-  }
-
-  /**
    * Applies the text operations on the path and marks them in color.
    *
    * @param path
