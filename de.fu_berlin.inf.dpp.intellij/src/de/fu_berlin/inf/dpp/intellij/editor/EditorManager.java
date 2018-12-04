@@ -830,6 +830,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     return session.isShared(editorFilePath.getResource());
   }
 
+  boolean isDocumentListenerEnabled() {
+    return documentListener.enabled;
+  }
+
   void enableDocumentListener() {
     documentListener.setEnabled(true);
     annotationDocumentListener.setEnabled(true);
