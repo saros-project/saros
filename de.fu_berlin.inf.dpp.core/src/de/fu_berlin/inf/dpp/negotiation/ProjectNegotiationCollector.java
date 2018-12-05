@@ -1,18 +1,20 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+
 /**
  * This class collects resources that should be added to a session to add them at once in
  * preparation of a new single project negotiation. The reason is to prevent multiple concurrent
  * running project negotiations per user.
  */
+// FIXME wrong package, move to session
 public class ProjectNegotiationCollector {
   private Map<IProject, List<IResource>> mapping = new HashMap<IProject, List<IResource>>();
 
@@ -51,8 +53,8 @@ public class ProjectNegotiationCollector {
    * @return project resource mappings to add
    */
   public synchronized Map<IProject, List<IResource>> get() {
-    Map<IProject, List<IResource>> tmp = mapping;
-    mapping = new HashMap<IProject, List<IResource>>();
-    return tmp;
+    Map<IProject, List<IResource>> result = mapping;
+    mapping = new HashMap<>();
+    return result;
   }
 }

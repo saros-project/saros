@@ -19,6 +19,23 @@
  */
 package de.fu_berlin.inf.dpp.session;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.Connection;
+
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -47,20 +64,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
-import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.Connection;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for reacting to
@@ -86,9 +89,15 @@ public class SarosSessionManager implements ISarosSessionManager {
    */
   private static final Logger log = Logger.getLogger(SarosSessionManager.class.getName());
 
-  private static final Random SESSION_ID_GENERATOR = new Random();
+  private static final int SESSION_STATE_STOPPED = 0;
 
-  private static final long LOCK_TIMEOUT = 10000L;
+  private static final int SESSION_STATE_STARTING = 1;
+
+  private static final int SESSION_STATE_RUNNING = 2;
+
+  private static final int SESSION_STATE_STOPPING = 3;
+
+  private static final Random ID_GENERATOR = new Random();
 
   private static final long NEGOTIATION_TIMEOUT = 10000L;
 
@@ -108,20 +117,19 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   private final ProjectNegotiationCollector nextProjectNegotiation =
       new ProjectNegotiationCollector();
-  private Thread nextProjectNegotiationWorker;
 
   private XMPPConnectionService connectionService;
 
   private final List<ISessionLifecycleListener> sessionLifecycleListeners =
       new CopyOnWriteArrayList<ISessionLifecycleListener>();
 
-  private final Lock startStopSessionLock = new ReentrantLock();
-
-  private volatile boolean sessionStartup = false;
-
-  private volatile boolean sessionShutdown = false;
-
   private volatile INegotiationHandler negotiationHandler;
+
+  private final ExecutorService worker = Executors.newSingleThreadExecutor();
+
+  private final Lock sessionStateLock = new ReentrantLock();
+
+  private int sessionState = SESSION_STATE_STOPPED;
 
   private final NegotiationListener negotiationListener =
       new NegotiationListener() {
@@ -134,11 +142,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         public void negotiationTerminated(final ProjectNegotiation negotiation) {
           currentProjectNegotiations.remove(negotiation);
 
-          if (currentProjectNegotiations.isEmpty()) {
-            synchronized (nextProjectNegotiation) {
-              nextProjectNegotiation.notifyAll();
-            }
-          }
+          triggerResourceNegotiation();
         }
       };
 
@@ -148,6 +152,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         public void connectionStateChanged(Connection connection, ConnectionState state) {
 
           if (state == ConnectionState.DISCONNECTING) {
+            // TODO run async and not block SMACK
             stopSession(SessionEndReason.CONNECTION_LOST);
           }
         }
@@ -196,76 +201,70 @@ public class SarosSessionManager implements ISarosSessionManager {
   @Override
   public void startSession(final Map<IProject, List<IResource>> projectResourcesMapping) {
 
-    /*
-     * FIXME split the logic, start a session without anything and then add
-     * resources !
-     */
+    final Future<?> future;
+
+    sessionStateLock.lock();
     try {
-      if (!startStopSessionLock.tryLock(LOCK_TIMEOUT, TimeUnit.MILLISECONDS)) {
-        log.warn(
-            "could not start a new session because another operation still tries to start or stop a session");
-        return;
-      }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return;
+      if (sessionState != SESSION_STATE_STOPPED) return;
+
+      sessionState = SESSION_STATE_STARTING;
+
+      future = worker.submit(() -> internalStartSession(projectResourcesMapping));
+
+    } finally {
+      sessionStateLock.unlock();
     }
 
     try {
+      future.get();
+    } catch (InterruptedException e) {
+      log.warn("interrupted while waiting for session start", e);
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException e) {
+      log.error("unable to start a session", e);
+    }
+  }
 
-      if (sessionShutdown)
-        throw new IllegalStateException(
-            "cannot start the session from the same thread context that is currently about to stop the session: "
-                + Thread.currentThread().getName());
+  private void internalStartSession(final Map<IProject, List<IResource>> resources) {
 
-      if (sessionStartup) {
-        log.warn("recursive execution detected, ignoring session start request", new StackTrace());
-        return;
+    assert sessionState == SESSION_STATE_STARTING;
+
+    final String sessionID = String.valueOf(ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+
+    negotiationPacketLister.setRejectSessionNegotiationRequests(true);
+
+    IPreferenceStore hostProperties = new PreferenceStore();
+
+    if (hookManager != null) {
+      for (ISessionNegotiationHook hook : hookManager.getHooks()) {
+        hook.setInitialHostPreferences(hostProperties);
       }
+    }
 
-      if (session != null) {
-        log.warn("could not start a new session because a session has already been started");
-        return;
-      }
+    session = new SarosSession(sessionID, hostProperties, context);
 
-      if (negotiationPacketLister.isRejectingSessionNegotiationsRequests()) {
-        log.warn("cannot start a session while a session invitation is pending");
-        return;
-      }
+    sessionStarting(session);
+    session.start();
 
-      sessionStartup = true;
+    sessionStarted(session);
 
-      final String sessionID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+    for (Entry<IProject, List<IResource>> entry : resources.entrySet()) {
 
-      negotiationPacketLister.setRejectSessionNegotiationRequests(true);
+      final IProject project = entry.getKey();
+      final List<IResource> resourcesList = entry.getValue();
 
-      IPreferenceStore hostProperties = new PreferenceStore();
-      if (hookManager != null) {
-        for (ISessionNegotiationHook hook : hookManager.getHooks()) {
-          hook.setInitialHostPreferences(hostProperties);
-        }
-      }
+      String projectID = String.valueOf(ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
-      session = new SarosSession(sessionID, hostProperties, context);
+      session.addSharedResources(project, projectID, resourcesList);
+    }
 
-      sessionStarting(session);
-      session.start();
-      sessionStarted(session);
+    log.info("session started");
 
-      for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping.entrySet()) {
-
-        final IProject project = mapEntry.getKey();
-        final List<IResource> resourcesList = mapEntry.getValue();
-
-        String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
-
-        session.addSharedResources(project, projectID, resourcesList);
-      }
-
-      log.info("session started");
+    sessionStateLock.lock();
+    try {
+      sessionState = SESSION_STATE_RUNNING;
     } finally {
-      sessionStartup = false;
-      startStopSessionLock.unlock();
+      sessionStateLock.unlock();
     }
   }
 
@@ -280,67 +279,78 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     log.info("joined uninitialized Saros session");
 
+    // FIXME this is not true !
+    sessionState = SESSION_STATE_RUNNING;
+
     return session;
   }
 
-  /** @nonSWT */
   @Override
-  public void stopSession(SessionEndReason reason) {
+  public void stopSession(final SessionEndReason reason) {
 
+    final Future<?> future;
+
+    sessionStateLock.lock();
     try {
-      if (!startStopSessionLock.tryLock(LOCK_TIMEOUT, TimeUnit.MILLISECONDS)) {
-        log.warn(
-            "could not stop the current session because another operation still tries to start or stop a session");
+
+      if (sessionState != SESSION_STATE_RUNNING) {
+
+        // see IncomingSessionNegotiation , we have to execute this
+        negotiationPacketLister.setRejectSessionNegotiationRequests(false);
         return;
       }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return;
+
+      sessionState = SESSION_STATE_STOPPING;
+      future = worker.submit(() -> internalStopSession(reason));
+
+    } finally {
+      sessionStateLock.unlock();
     }
 
     try {
+      future.get();
+    } catch (InterruptedException e) {
+      log.warn("interrupted while waiting for session stop", e);
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException e) {
+      log.error("unable to stop the current session", e);
+    }
+  }
 
-      if (sessionStartup)
-        throw new IllegalStateException(
-            "cannot stop the session from the same thread context that is currently about to start the session: "
-                + Thread.currentThread().getName());
+  private void internalStopSession(final SessionEndReason reason) {
 
-      if (sessionShutdown) {
-        log.warn("recursive execution detected, ignoring session stop request", new StackTrace());
-        return;
-      }
+    assert sessionState == SESSION_STATE_STOPPING;
 
-      if (session == null) return;
+    log.debug("terminating all running negotiations");
 
-      sessionShutdown = true;
+    if (!terminateNegotiations()) log.warn("there are still running negotiations");
 
-      log.debug("terminating all running negotiations");
+    sessionEnding(session);
 
-      if (!terminateNegotiations()) log.warn("there are still running negotiations");
+    try {
+      session.stop(reason);
+      log.info("stopped session: " + session.getID());
+    } catch (RuntimeException e) {
+      log.error("failed to stop the session", e);
+    }
 
-      sessionEnding(session);
+    /*
+     * FIXME check the behavior if getSession should already return null at
+     * this point
+     */
 
-      try {
-        session.stop(reason);
-        log.info("session stopped");
-      } catch (RuntimeException e) {
-        log.error("failed to stop the session", e);
-      }
+    final ISarosSession currentSession = session;
+    session = null;
 
-      /*
-       * FIXME check the behavior if getSession should already return null
-       * at this point
-       */
+    sessionEnded(currentSession, reason);
 
-      ISarosSession currentSession = session;
-      session = null;
+    negotiationPacketLister.setRejectSessionNegotiationRequests(false);
 
-      sessionEnded(currentSession, reason);
-
+    sessionStateLock.lock();
+    try {
+      sessionState = SESSION_STATE_STOPPED;
     } finally {
-      sessionShutdown = false;
-      negotiationPacketLister.setRejectSessionNegotiationRequests(false);
-      startStopSessionLock.unlock();
+      sessionStateLock.unlock();
     }
   }
 
@@ -360,129 +370,149 @@ public class SarosSessionManager implements ISarosSessionManager {
   }
 
   void sessionNegotiationRequestReceived(
-      JID remoteAddress,
-      String sessionID,
-      String negotiationID,
-      String version,
-      String description) {
+      final JID remoteAddress,
+      final String sessionID,
+      final String negotiationID,
+      final String version,
+      final String description) {
 
-    INegotiationHandler handler = negotiationHandler;
+    sessionStateLock.lock();
+    try {
+
+      if (sessionState != SESSION_STATE_STOPPED) return;
+
+      if (negotiationPacketLister.isRejectingSessionNegotiationsRequests()) {
+        log.error("could not accept invitation because there is already a pending invitation");
+        return;
+      }
+
+      negotiationPacketLister.setRejectSessionNegotiationRequests(true);
+
+      worker.submit(
+          () ->
+              acceptSessionNegotiationRequest(
+                  remoteAddress, sessionID, negotiationID, version, description));
+
+    } finally {
+      sessionStateLock.unlock();
+    }
+  }
+
+  private void acceptSessionNegotiationRequest(
+      final JID remoteAddress,
+      final String sessionID,
+      final String negotiationID,
+      final String version,
+      final String description) {
+
+    final INegotiationHandler handler = negotiationHandler;
 
     if (handler == null) {
       log.warn("could not accept invitation because no handler is installed");
       return;
     }
 
-    IncomingSessionNegotiation negotiation;
+    final IncomingSessionNegotiation negotiation;
 
-    synchronized (this) {
-      if (!startStopSessionLock.tryLock()) {
-        log.warn("could not accept invitation because the current session is about to stop");
-        return;
-      }
+    negotiation =
+        negotiationFactory.newIncomingSessionNegotiation(
+            remoteAddress, negotiationID, sessionID, version, this, description);
 
-      try {
+    negotiation.setNegotiationListener(negotiationListener);
+    currentSessionNegotiations.add(negotiation);
 
-        // should not happen
-        if (negotiationPacketLister.isRejectingSessionNegotiationsRequests()) {
-          log.error("could not accept invitation because there is already a pending invitation");
-          return;
-        }
-
-        negotiationPacketLister.setRejectSessionNegotiationRequests(true);
-
-        negotiation =
-            negotiationFactory.newIncomingSessionNegotiation(
-                remoteAddress, negotiationID, sessionID, version, this, description);
-
-        negotiation.setNegotiationListener(negotiationListener);
-        currentSessionNegotiations.add(negotiation);
-
-      } finally {
-        startStopSessionLock.unlock();
-      }
-    }
     handler.handleIncomingSessionNegotiation(negotiation);
   }
 
   void projectNegotiationRequestReceived(
-      JID remoteAddress,
-      TransferType transferType,
-      List<ProjectNegotiationData> projectNegotiationData,
-      String negotiationID) {
+      final JID remoteAddress,
+      final TransferType transferType,
+      final List<ProjectNegotiationData> projectNegotiationData,
+      final String negotiationID) {
 
-    INegotiationHandler handler = negotiationHandler;
+    sessionStateLock.lock();
+    try {
+
+      if (sessionState != SESSION_STATE_RUNNING) return;
+
+      worker.submit(
+          () ->
+              acceptProjectNegotiationRequest(
+                  remoteAddress, transferType, projectNegotiationData, negotiationID));
+
+    } finally {
+      sessionStateLock.unlock();
+    }
+  }
+
+  private void acceptProjectNegotiationRequest(
+      final JID remoteAddress,
+      final TransferType transferType,
+      final List<ProjectNegotiationData> projectNegotiationData,
+      final String negotiationID) {
+
+    final INegotiationHandler handler = negotiationHandler;
 
     if (handler == null) {
       log.warn("could not accept project negotiation because no handler is installed");
       return;
     }
 
-    AbstractIncomingProjectNegotiation negotiation;
+    final AbstractIncomingProjectNegotiation negotiation;
 
-    synchronized (this) {
-      if (!startStopSessionLock.tryLock()) {
-        log.warn(
-            "could not accept project negotiation because the current session is about to stop");
-        return;
-      }
+    negotiation =
+        negotiationFactory.newIncomingProjectNegotiation(
+            remoteAddress, transferType, negotiationID, projectNegotiationData, this, session);
 
-      try {
-        negotiation =
-            negotiationFactory.newIncomingProjectNegotiation(
-                remoteAddress, transferType, negotiationID, projectNegotiationData, this, session);
+    negotiation.setNegotiationListener(negotiationListener);
+    currentProjectNegotiations.add(negotiation);
 
-        negotiation.setNegotiationListener(negotiationListener);
-        currentProjectNegotiations.add(negotiation);
-
-      } finally {
-        startStopSessionLock.unlock();
-      }
-    }
     handler.handleIncomingProjectNegotiation(negotiation);
   }
 
   @Override
-  public void invite(JID toInvite, String description) {
+  public void invite(final JID toInvite, final String description) {
 
-    INegotiationHandler handler = negotiationHandler;
+    sessionStateLock.lock();
+    try {
+
+      if (sessionState != SESSION_STATE_RUNNING) return;
+
+      worker.submit(() -> inviteInternal(toInvite, description));
+
+    } finally {
+      sessionStateLock.unlock();
+    }
+  }
+
+  private void inviteInternal(final JID user, final String description) {
+
+    final INegotiationHandler handler = negotiationHandler;
+    final ISarosSession currentSession = session;
+
+    assert currentSession != null;
 
     if (handler == null) {
       log.warn("could not start an invitation because no handler is installed");
       return;
     }
 
-    OutgoingSessionNegotiation negotiation;
+    final OutgoingSessionNegotiation negotiation;
 
-    synchronized (this) {
-      if (!startStopSessionLock.tryLock()) {
-        log.warn(
-            "could not start an invitation because the current session is about to start or stop");
-        return;
-      }
+    /*
+     * this assumes that a user is added to the session before the
+     * negotiation terminates !
+     */
+    if (session.getResourceQualifiedJID(user) != null) return;
 
-      try {
+    if (currentSessionNegotiations.exists(user)) return;
 
-        if (session == null) return;
+    negotiation =
+        negotiationFactory.newOutgoingSessionNegotiation(user, this, session, description);
 
-        /*
-         * this assumes that a user is added to the session before the
-         * negotiation terminates !
-         */
-        if (session.getResourceQualifiedJID(toInvite) != null) return;
+    negotiation.setNegotiationListener(negotiationListener);
+    currentSessionNegotiations.add(negotiation);
 
-        if (currentSessionNegotiations.exists(toInvite)) return;
-
-        negotiation =
-            negotiationFactory.newOutgoingSessionNegotiation(toInvite, this, session, description);
-
-        negotiation.setNegotiationListener(negotiationListener);
-        currentSessionNegotiations.add(negotiation);
-
-      } finally {
-        startStopSessionLock.unlock();
-      }
-    }
     handler.handleOutgoingSessionNegotiation(negotiation);
   }
 
@@ -497,11 +527,9 @@ public class SarosSessionManager implements ISarosSessionManager {
    * @param projectResourcesMapping
    */
   @Override
-  public synchronized void addResourcesToSession(
-      Map<IProject, List<IResource>> projectResourcesMapping) {
-    if (projectResourcesMapping == null) {
-      return;
-    }
+  public void addResourcesToSession(Map<IProject, List<IResource>> projectResourcesMapping) {
+
+    if (projectResourcesMapping == null) return;
 
     /*
      * To prevent multiple concurrent negotiations per user. 1. Collect all
@@ -511,79 +539,54 @@ public class SarosSessionManager implements ISarosSessionManager {
      */
 
     nextProjectNegotiation.add(projectResourcesMapping);
-
-    if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
-      return;
-    } else if (currentProjectNegotiations.isEmpty()) {
-      /* shortcut to direct handling */
-      startNextProjectNegotiation();
-      return;
-    }
-
-    /* else create a worker thread */
-    Runnable worker =
-        new Runnable() {
-          @Override
-          public void run() {
-            synchronized (nextProjectNegotiation) {
-              while (!currentProjectNegotiations.isEmpty()) {
-                try {
-                  nextProjectNegotiation.wait();
-                } catch (InterruptedException e) {
-                  Thread.currentThread().interrupt();
-                  return;
-                }
-              }
-            }
-
-            startNextProjectNegotiation();
-          }
-        };
-    nextProjectNegotiationWorker = ThreadUtils.runSafeAsync(log, worker);
+    triggerResourceNegotiation();
   }
 
   /**
-   * This method handles new project negotiations for already invited user (not the first in the
+   * This method handles new project negotiations for already invited users (not the first in the
    * process of inviting to the session).
    */
-  private synchronized void startNextProjectNegotiation() {
-    ISarosSession currentSession = session;
+  private void startCollectedResourcesNegotiation() {
 
-    if (currentSession == null) {
-      log.warn("could not add resources because there is no active session");
-      return;
-    }
+    final Map<IProject, List<IResource>> resourceMapping = nextProjectNegotiation.get();
+
+    final ISarosSession currentSession = session;
+
+    assert currentSession != null;
+
+    if (resourceMapping.isEmpty()) return;
 
     /*
      * TODO: there are race conditions, USER A restricts USER B to read-only
      * while this code is executed
      */
 
+    // FIXME non host sharing is disabled, this logic makes no sense
     if (!currentSession.hasWriteAccess()) {
       log.error(
           "current local user has not enough privileges to add resources to the current session");
       return;
     }
 
-    List<IProject> projectsToShare = new ArrayList<IProject>();
-    Map<IProject, List<IResource>> mapping = nextProjectNegotiation.get();
+    final List<IProject> projectsToShare = new ArrayList<IProject>();
 
-    for (Entry<IProject, List<IResource>> mapEntry : mapping.entrySet()) {
-      final IProject project = mapEntry.getKey();
-      final List<IResource> resourcesList = mapEntry.getValue();
+    for (Entry<IProject, List<IResource>> entry : resourceMapping.entrySet()) {
+
+      final IProject project = entry.getKey();
+      final List<IResource> resources = entry.getValue();
 
       // side effect: non shared projects are always partial -.-
-      if (!currentSession.isCompletelyShared(project)) {
-        String projectID = currentSession.getProjectID(project);
+      if (currentSession.isCompletelyShared(project)) continue;
 
-        if (projectID == null) {
-          projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
-        }
+      String projectID = currentSession.getProjectID(project);
 
-        currentSession.addSharedResources(project, projectID, resourcesList);
-
-        projectsToShare.add(project);
+      if (projectID == null) {
+        projectID = String.valueOf(ID_GENERATOR.nextInt(Integer.MAX_VALUE));
       }
+
+      currentSession.addSharedResources(project, projectID, resources);
+
+      projectsToShare.add(project);
     }
 
     if (projectsToShare.isEmpty()) {
@@ -592,106 +595,96 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    INegotiationHandler handler = negotiationHandler;
-    if (handler == null) {
-      log.warn("could not start a project negotiation because no handler is installed");
-      return;
-    }
-
-    List<AbstractOutgoingProjectNegotiation> negotiations =
-        new ArrayList<AbstractOutgoingProjectNegotiation>();
-
-    if (!startStopSessionLock.tryLock()) {
-      log.warn(
-          "could not start a project negotiation because the current session is about to stop");
-      return;
-    }
-
-    try {
-      for (User user : currentSession.getRemoteUsers()) {
-
-        TransferType type =
-            TransferType.valueOf(
-                currentSession
-                    .getUserProperties(user)
-                    .getString(ProjectNegotiationTypeHook.KEY_TYPE));
-        AbstractOutgoingProjectNegotiation negotiation =
-            negotiationFactory.newOutgoingProjectNegotiation(
-                user.getJID(), type, projectsToShare, this, currentSession);
-
-        negotiation.setNegotiationListener(negotiationListener);
-        currentProjectNegotiations.add(negotiation);
-        negotiations.add(negotiation);
-      }
-    } finally {
-      startStopSessionLock.unlock();
-    }
-
-    for (AbstractOutgoingProjectNegotiation negotiation : negotiations)
-      handler.handleOutgoingProjectNegotiation(negotiation);
+    for (User user : currentSession.getRemoteUsers())
+      startResourceNegotiation(user.getJID(), projectsToShare);
   }
 
   @Override
-  public void startSharingProjects(JID user) {
+  public void startSharingProjects(final JID user) {
+
+    sessionStateLock.lock();
+    try {
+
+      if (sessionState != SESSION_STATE_RUNNING) return;
+
+      worker.submit(() -> startResourceNegotiation(user));
+
+    } finally {
+      sessionStateLock.unlock();
+    }
+  }
+
+  private void startResourceNegotiation(final JID user) {
 
     ISarosSession currentSession = session;
 
-    if (currentSession == null) {
-      /*
-       * as this currently only called by the OutgoingSessionNegotiation
-       * job just silently return
-       */
-      log.error("cannot share projects when no session is running");
-      return;
-    }
+    assert currentSession != null;
 
-    List<IProject> currentSharedProjects = new ArrayList<IProject>(currentSession.getProjects());
+    final List<IProject> currentSharedProjects =
+        new ArrayList<IProject>(currentSession.getProjects());
 
     if (currentSharedProjects.isEmpty()) return;
 
-    INegotiationHandler handler = negotiationHandler;
+    startResourceNegotiation(user, currentSharedProjects);
+  }
+
+  private void startResourceNegotiation(final JID user, final List<IProject> projects) {
+
+    ISarosSession currentSession = session;
+
+    assert currentSession != null;
+
+    final INegotiationHandler handler = negotiationHandler;
 
     if (handler == null) {
-      log.warn("could not start a project negotiation because no" + " handler is installed");
+      log.warn("could not start a resource negotiation because no" + " handler is installed");
       return;
     }
 
-    AbstractOutgoingProjectNegotiation negotiation;
+    final AbstractOutgoingProjectNegotiation negotiation;
 
-    synchronized (this) {
-      if (!startStopSessionLock.tryLock()) {
-        log.warn(
-            "could not start a project negotiation because the"
-                + " current session is about to stop");
-        return;
-      }
+    final User remoteUser = currentSession.getUser(user);
 
-      try {
-        User remoteUser = currentSession.getUser(user);
-        if (remoteUser == null) {
-          log.warn(
-              "could not start a project negotiation because"
-                  + " the remote user is not part of the current session");
-          return;
-        }
-
-        TransferType type =
-            TransferType.valueOf(
-                currentSession
-                    .getUserProperties(remoteUser)
-                    .getString(ProjectNegotiationTypeHook.KEY_TYPE));
-        negotiation =
-            negotiationFactory.newOutgoingProjectNegotiation(
-                user, type, currentSharedProjects, this, currentSession);
-
-        negotiation.setNegotiationListener(negotiationListener);
-        currentProjectNegotiations.add(negotiation);
-
-      } finally {
-        startStopSessionLock.unlock();
-      }
+    if (remoteUser == null) {
+      log.warn(
+          "could not start a resource negotiation because"
+              + " the remote user "
+              + user
+              + " is not part of the current session");
+      return;
     }
+
+    final TransferType type =
+        TransferType.valueOf(
+            currentSession
+                .getUserProperties(remoteUser)
+                .getString(ProjectNegotiationTypeHook.KEY_TYPE));
+
+    negotiation =
+        negotiationFactory.newOutgoingProjectNegotiation(
+            user, type, projects, this, currentSession);
+
+    negotiation.setNegotiationListener(negotiationListener);
+    currentProjectNegotiations.add(negotiation);
+
     handler.handleOutgoingProjectNegotiation(negotiation);
+  }
+
+  private void triggerResourceNegotiation() {
+
+    sessionStateLock.lock();
+    try {
+
+      if (sessionState != SESSION_STATE_RUNNING) return;
+
+      worker.submit(
+          () -> {
+            if (currentProjectNegotiations.isEmpty()) startCollectedResourcesNegotiation();
+          });
+
+    } finally {
+      sessionStateLock.unlock();
+    }
   }
 
   @Override
