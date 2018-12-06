@@ -15,36 +15,66 @@ import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-/** IntelliJ editor file listener */
-public class StoppableEditorFileListener extends AbstractStoppableListener
-    implements FileEditorManagerListener {
+/** Dispatches activities for editor changes. */
+class StoppableEditorFileListener extends AbstractStoppableListener {
 
   private static final Logger LOG = Logger.getLogger(StoppableEditorFileListener.class);
-
-  private final BeforeEditorActionListener beforeEditorActionListener;
 
   private final AnnotationManager annotationManager;
 
   private MessageBusConnection messageBusConnection;
+
+  private final FileEditorManagerListener fileEditorManagerListener =
+      new FileEditorManagerListener() {
+        @Override
+        public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+          setUpOpenedEditor(file);
+        }
+
+        @Override
+        public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+          generateEditorClosedActivity(file);
+        }
+
+        @Override
+        public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+          generateEditorActivatedActivity(event);
+        }
+      };
+
+  private final FileEditorManagerListener.Before beforeFileEditorManagerListener =
+      new FileEditorManagerListener.Before() {
+        @Override
+        public void beforeFileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+          cleanUpAnnotations(file);
+        }
+
+        /**
+         * NOP. Only needed to preserve backwards compatibility to Intellij versions older than
+         * 2018.2.6.
+         */
+        // TODO remove once requiring the users to use Intellij 2018.2.6 or newer is acceptable
+        @Override
+        public void beforeFileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+          // NOP
+        }
+      };
 
   StoppableEditorFileListener(EditorManager manager, AnnotationManager annotationManager) {
 
     super(manager);
 
     this.annotationManager = annotationManager;
-
-    this.beforeEditorActionListener = new BeforeEditorActionListener();
   }
 
   /**
-   * Calls {@link LocalEditorHandler#openEditor(VirtualFile,boolean)}.
+   * Adds the opened editor to the EditorPool and adds the local representation to annotations for
+   * the opened file.
    *
-   * @param fileEditorManager
-   * @param virtualFile
+   * @param virtualFile the file whose editor was opened
+   * @see FileEditorManagerListener#fileOpened(FileEditorManager, VirtualFile)
    */
-  @Override
-  public void fileOpened(
-      @NotNull FileEditorManager fileEditorManager, @NotNull VirtualFile virtualFile) {
+  private void setUpOpenedEditor(@NotNull VirtualFile virtualFile) {
     if (!enabled) {
       return;
     }
@@ -61,12 +91,10 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
   /**
    * Calls {@link LocalEditorHandler#closeEditor(VirtualFile)}.
    *
-   * @param fileEditorManager
-   * @param virtualFile
+   * @param virtualFile the file whose editor was closed
+   * @see FileEditorManagerListener#fileClosed(FileEditorManager, VirtualFile)
    */
-  @Override
-  public void fileClosed(
-      @NotNull FileEditorManager fileEditorManager, @NotNull VirtualFile virtualFile) {
+  private void generateEditorClosedActivity(@NotNull VirtualFile virtualFile) {
     if (!enabled) {
       return;
     }
@@ -77,10 +105,10 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
   /**
    * Calls {@link LocalEditorHandler#activateEditor(VirtualFile)}.
    *
-   * @param event
+   * @param event the event to react to
+   * @see FileEditorManagerListener#selectionChanged(FileEditorManagerEvent)
    */
-  @Override
-  public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+  private void generateEditorActivatedActivity(@NotNull FileEditorManagerEvent event) {
 
     VirtualFile virtualFile = event.getNewFile();
 
@@ -89,6 +117,23 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
     }
 
     editorManager.getLocalEditorHandler().activateEditor(virtualFile);
+  }
+
+  /**
+   * Cleans up the held annotations for the closed file and removes their local representation.
+   *
+   * @param virtualFile the file whose editor was closed
+   * @see FileEditorManagerListener.Before#beforeFileClosed(FileEditorManager, VirtualFile)
+   */
+  private void cleanUpAnnotations(@NotNull VirtualFile virtualFile) {
+    SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
+
+    if (sPath != null && SessionUtils.isShared(sPath)) {
+      IFile file = sPath.getFile();
+
+      annotationManager.updateAnnotationStore(file);
+      annotationManager.removeLocalRepresentation(file);
+    }
   }
 
   /**
@@ -106,9 +151,10 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
 
     messageBusConnection = project.getMessageBus().connect();
 
-    messageBusConnection.subscribe(FILE_EDITOR_MANAGER, this);
     messageBusConnection.subscribe(
-        BeforeEditorActionListener.FILE_EDITOR_MANAGER, beforeEditorActionListener);
+        fileEditorManagerListener.FILE_EDITOR_MANAGER, fileEditorManagerListener);
+    messageBusConnection.subscribe(
+        beforeFileEditorManagerListener.FILE_EDITOR_MANAGER, beforeFileEditorManagerListener);
   }
 
   /** Unsubscribes the editor listeners. */
@@ -116,23 +162,5 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
     messageBusConnection.disconnect();
 
     messageBusConnection = null;
-  }
-
-  /** Intellij editor listener called <b>before</b> editors are opened or closed */
-  private class BeforeEditorActionListener extends FileEditorManagerListener.Before.Adapter {
-
-    @Override
-    public void beforeFileClosed(
-        @NotNull FileEditorManager source, @NotNull VirtualFile virtualFile) {
-
-      SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
-
-      if (sPath != null && SessionUtils.isShared(sPath)) {
-        IFile file = sPath.getFile();
-
-        annotationManager.updateAnnotationStore(file);
-        annotationManager.removeLocalRepresentation(file);
-      }
-    }
   }
 }

@@ -1,24 +1,27 @@
 package de.fu_berlin.inf.dpp.intellij.editor;
 
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.editor.event.SelectionListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import org.jetbrains.annotations.NotNull;
 
-/** IntelliJ editor selection listener */
-public class StoppableSelectionListener extends AbstractStoppableListener
-    implements SelectionListener {
+/** Dispatches activities for selection changes. */
+class StoppableSelectionListener extends AbstractStoppableListener {
 
-  public StoppableSelectionListener(EditorManager manager) {
+  private final SelectionListener selectionListener = this::generateSelectionActivity;
+
+  StoppableSelectionListener(EditorManager manager) {
     super(manager);
   }
 
   /**
    * Calls {@link EditorManager#generateSelection(SPath, SelectionEvent)}.
    *
-   * @param event
+   * @param event the event to react to
+   * @see SelectionListener#selectionChanged(SelectionEvent)
    */
-  @Override
-  public void selectionChanged(SelectionEvent event) {
+  private void generateSelectionActivity(SelectionEvent event) {
     if (!enabled) {
       return;
     }
@@ -27,5 +30,14 @@ public class StoppableSelectionListener extends AbstractStoppableListener
     if (path != null) {
       editorManager.generateSelection(path, event);
     }
+  }
+
+  /**
+   * Registers the contained SelectionListener to the given editor.
+   *
+   * @param editor the editor to register
+   */
+  void register(@NotNull Editor editor) {
+    editor.getSelectionModel().addSelectionListener(selectionListener);
   }
 }

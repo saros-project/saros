@@ -10,9 +10,8 @@ import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
 
-/** Parent class for stoppable document listeners. */
-public abstract class AbstractStoppableDocumentListener extends AbstractStoppableListener
-    implements DocumentListener {
+/** Parent class containing utility methods when working with document listeners. */
+public abstract class AbstractStoppableDocumentListener extends AbstractStoppableListener {
 
   private static final Logger LOG = Logger.getLogger(AbstractStoppableDocumentListener.class);
 
@@ -28,12 +27,11 @@ public abstract class AbstractStoppableDocumentListener extends AbstractStoppabl
     super.setEnabled(false);
   }
 
-  @Override
-  public void setEnabled(boolean enabled) {
+  public void setEnabled(boolean enabled, DocumentListener documentListener) {
     if (!this.enabled && enabled) {
       LOG.debug("Started listening for document events");
 
-      EditorFactory.getInstance().getEventMulticaster().addDocumentListener(this);
+      EditorFactory.getInstance().getEventMulticaster().addDocumentListener(documentListener);
 
       this.enabled = true;
 
@@ -41,7 +39,7 @@ public abstract class AbstractStoppableDocumentListener extends AbstractStoppabl
 
       LOG.debug("Stopped listening for document events");
 
-      EditorFactory.getInstance().getEventMulticaster().removeDocumentListener(this);
+      EditorFactory.getInstance().getEventMulticaster().removeDocumentListener(documentListener);
 
       this.enabled = false;
     }

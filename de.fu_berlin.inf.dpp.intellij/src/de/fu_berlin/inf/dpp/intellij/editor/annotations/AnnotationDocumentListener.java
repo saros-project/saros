@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.intellij.editor.annotations;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableDocumentListener;
@@ -19,6 +20,14 @@ public class AnnotationDocumentListener extends AbstractStoppableDocumentListene
   private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
 
+  private final DocumentListener documentListener =
+      new DocumentListener() {
+        @Override
+        public void beforeDocumentChange(DocumentEvent event) {
+          cleanUpAnnotations(event);
+        }
+      };
+
   public AnnotationDocumentListener(
       @NotNull EditorManager editorManager,
       @NotNull ProjectAPI projectAPI,
@@ -31,16 +40,14 @@ public class AnnotationDocumentListener extends AbstractStoppableDocumentListene
   }
 
   /**
-   * {@inheritDoc}
-   *
-   * <p>Adjusts the annotations for the resource represented by the changed document if it is not
+   * Adjusts the annotations for the resource represented by the changed document if it is not
    * currently open in an editor. If it is currently open in an editor, this will be done
    * automatically by Intellij.
    *
-   * @param event {@inheritDoc}
+   * @param event the event to react to
+   * @see DocumentListener#beforeDocumentChange(DocumentEvent)
    */
-  @Override
-  public void beforeDocumentChange(DocumentEvent event) {
+  private void cleanUpAnnotations(DocumentEvent event) {
     Document document = event.getDocument();
 
     SPath path = getSPath(document);
@@ -66,5 +73,10 @@ public class AnnotationDocumentListener extends AbstractStoppableDocumentListene
         annotationManager.moveAnnotationsAfterAddition(file, offset, offset + newTextLength);
       }
     }
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled, documentListener);
   }
 }

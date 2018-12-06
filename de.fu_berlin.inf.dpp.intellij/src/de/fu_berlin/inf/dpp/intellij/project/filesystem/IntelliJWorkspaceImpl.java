@@ -5,6 +5,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFileListener;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -13,7 +14,6 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
-import de.fu_berlin.inf.dpp.intellij.project.FileSystemChangeListener;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import java.io.IOException;
 import org.apache.log4j.Logger;
@@ -61,11 +61,11 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
     return IntelliJPathImpl.fromString(project.getBasePath());
   }
 
-  public void addResourceListener(FileSystemChangeListener listener) {
-    fileSystem.addVirtualFileListener(listener);
+  public void addResourceListener(VirtualFileListener virtualFileListener) {
+    fileSystem.addVirtualFileListener(virtualFileListener);
   }
 
-  public void removeResourceListener(FileSystemChangeListener listener) {
-    fileSystem.removeVirtualFileListener(listener);
+  public void removeResourceListener(VirtualFileListener virtualFileListener) {
+    fileSystem.removeVirtualFileListener(virtualFileListener);
   }
 }
