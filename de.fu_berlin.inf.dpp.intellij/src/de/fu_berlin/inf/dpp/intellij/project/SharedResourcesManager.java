@@ -15,7 +15,6 @@ import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.SelectedEditorState;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -84,15 +83,13 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       LocalEditorHandler localEditorHandler,
       LocalEditorManipulator localEditorManipulator,
-      IntelliJWorkspaceImpl intelliJWorkspaceImpl,
       AnnotationManager annotationManager) {
 
     this.sarosSession = sarosSession;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
-    fileSystemListener =
-        new FileSystemChangeListener(this, editorManager, intelliJWorkspaceImpl, sarosSession);
+    fileSystemListener = new FileSystemChangeListener(this, editorManager, sarosSession);
     this.annotationManager = annotationManager;
   }
 
