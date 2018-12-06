@@ -6,6 +6,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileCopyEvent;
@@ -31,7 +32,6 @@ import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import java.io.IOException;
@@ -58,8 +58,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener {
   private static final Logger LOG = Logger.getLogger(FileSystemChangeListener.class);
 
   private final SharedResourcesManager resourceManager;
-  private final IntelliJWorkspaceImpl intellijWorkspace;
   private final ISarosSession session;
+  private final LocalFileSystem localFileSystem;
 
   @Inject private ProjectAPI projectAPI;
 
@@ -103,20 +103,31 @@ public class FileSystemChangeListener extends AbstractStoppableListener {
       };
 
   FileSystemChangeListener(
-      SharedResourcesManager resourceManager,
-      EditorManager editorManager,
-      IntelliJWorkspaceImpl intellijWorkspace,
-      ISarosSession session) {
+      SharedResourcesManager resourceManager, EditorManager editorManager, ISarosSession session) {
 
     super(editorManager);
 
     this.resourceManager = resourceManager;
-    this.intellijWorkspace = intellijWorkspace;
     this.session = session;
 
     SarosPluginContext.initComponent(this);
 
-    intellijWorkspace.addResourceListener(virtualFileListener);
+    this.localFileSystem = LocalFileSystem.getInstance();
+
+    String projectBasePath = project.getBasePath();
+    if (projectBasePath == null) {
+      LOG.error(
+          "Could not register the VirtualFileListener as the current project does not have a base "
+              + "path. Saros will not be able to react to local filesystem changes. project: "
+              + project);
+
+      return;
+    }
+
+    // FIXME listen to all relevant roots; currently assuming all roots are located in project root
+    localFileSystem.addRootToWatch(projectBasePath, true);
+
+    localFileSystem.addVirtualFileListener(virtualFileListener);
   }
 
   /**
@@ -849,14 +860,14 @@ public class FileSystemChangeListener extends AbstractStoppableListener {
 
       this.enabled = false;
 
-      intellijWorkspace.removeResourceListener(virtualFileListener);
+      localFileSystem.removeVirtualFileListener(virtualFileListener);
 
     } else if (!this.enabled && enabled) {
       LOG.trace("Enabling filesystem listener");
 
       this.enabled = true;
 
-      intellijWorkspace.addResourceListener(virtualFileListener);
+      localFileSystem.addVirtualFileListener(virtualFileListener);
     }
   }
 }
