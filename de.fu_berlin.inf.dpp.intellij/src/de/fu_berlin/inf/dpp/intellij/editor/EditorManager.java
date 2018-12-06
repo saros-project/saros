@@ -870,8 +870,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   void startEditor(Editor editor) {
     editor.getDocument().setReadOnly(isLocked || !hasWriteAccess);
-    editor.getSelectionModel().addSelectionListener(selectionListener);
-    editor.getScrollingModel().addVisibleAreaListener(viewportListener);
+    selectionListener.register(editor);
+    viewportListener.register(editor);
   }
 
   /** Unlocks all editors in the editorPool. */
