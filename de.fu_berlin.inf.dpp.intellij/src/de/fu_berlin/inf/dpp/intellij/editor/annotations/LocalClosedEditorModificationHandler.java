@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableDocumentListener;
+import de.fu_berlin.inf.dpp.intellij.editor.AbstractLocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see com.intellij.openapi.editor.event.DocumentListener
  */
-public class AnnotationDocumentListener extends AbstractStoppableDocumentListener {
+public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentModificationHandler {
   private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
 
@@ -28,7 +28,7 @@ public class AnnotationDocumentListener extends AbstractStoppableDocumentListene
         }
       };
 
-  public AnnotationDocumentListener(
+  public LocalClosedEditorModificationHandler(
       @NotNull EditorManager editorManager,
       @NotNull ProjectAPI projectAPI,
       @NotNull AnnotationManager annotationManager) {

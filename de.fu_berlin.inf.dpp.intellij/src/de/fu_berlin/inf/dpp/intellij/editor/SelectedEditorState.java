@@ -61,14 +61,14 @@ public class SelectedEditorState {
     ListIterator<VirtualFile> iterator = selectedEditors.listIterator(selectedEditors.size());
 
     try {
-      editorManager.getFileListener().unsubscribe();
+      editorManager.getLocalEditorStatusChangeHandler().unsubscribe();
 
       while (iterator.hasPrevious()) {
         projectAPI.openEditor(iterator.previous(), true);
       }
 
     } finally {
-      editorManager.getFileListener().subscribe(project);
+      editorManager.getLocalEditorStatusChangeHandler().subscribe(project);
     }
   }
 

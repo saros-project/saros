@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
  *
  * @see DocumentListener#beforeDocumentChange(DocumentEvent)
  */
-public class StoppableDocumentListener extends AbstractStoppableDocumentListener {
+public class LocalDocumentModificationHandler extends AbstractLocalDocumentModificationHandler {
 
   private final DocumentListener documentListener =
       new DocumentListener() {
@@ -21,7 +21,7 @@ public class StoppableDocumentListener extends AbstractStoppableDocumentListener
         }
       };
 
-  StoppableDocumentListener(EditorManager editorManager) {
+  LocalDocumentModificationHandler(EditorManager editorManager) {
     super(editorManager);
   }
 

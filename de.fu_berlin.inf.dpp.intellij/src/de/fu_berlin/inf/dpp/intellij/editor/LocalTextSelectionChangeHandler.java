@@ -7,11 +7,11 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for selection changes. */
-class StoppableSelectionListener extends AbstractStoppableListener {
+class LocalTextSelectionChangeHandler extends AbstractStoppableListener {
 
   private final SelectionListener selectionListener = this::generateSelectionActivity;
 
-  StoppableSelectionListener(EditorManager manager) {
+  LocalTextSelectionChangeHandler(EditorManager manager) {
     super(manager);
   }
 

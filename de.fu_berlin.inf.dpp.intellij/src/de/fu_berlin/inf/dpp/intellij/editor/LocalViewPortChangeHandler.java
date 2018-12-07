@@ -9,11 +9,11 @@ import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for viewport changes. */
-class StoppableViewPortListener extends AbstractStoppableListener {
+class LocalViewPortChangeHandler extends AbstractStoppableListener {
 
   private final VisibleAreaListener visibleAreaListener = this::generateViewportActivity;
 
-  StoppableViewPortListener(EditorManager manager) {
+  LocalViewPortChangeHandler(EditorManager manager) {
     super(manager);
   }
 

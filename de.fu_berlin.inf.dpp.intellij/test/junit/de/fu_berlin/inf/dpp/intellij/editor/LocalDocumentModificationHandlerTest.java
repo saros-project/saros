@@ -19,41 +19,41 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({EditorFactory.class})
-public class StoppableDocumentListenerTest {
+public class LocalDocumentModificationHandlerTest {
 
-  private StoppableDocumentListener listener;
+  private LocalDocumentModificationHandler localDocumentModificationHandler;
   boolean listening;
 
   @Before
   public void before() {
     mockEditorFactory();
-    listener = new StoppableDocumentListener(dummyEditorManager());
+    localDocumentModificationHandler = new LocalDocumentModificationHandler(dummyEditorManager());
     listening = false;
   }
 
   @Test
   public void testEnable() {
-    listener.setEnabled(true);
+    localDocumentModificationHandler.setEnabled(true);
 
     assertListening();
   }
 
   @Test
   public void testDisable() {
-    listener.setEnabled(true);
-    listener.setEnabled(false);
+    localDocumentModificationHandler.setEnabled(true);
+    localDocumentModificationHandler.setEnabled(false);
 
     assertNotListening();
   }
 
   private void assertListening() {
     assertThat(listening).as("Is listening").isTrue();
-    assertThat(listener.enabled).as("Is enabled").isTrue();
+    assertThat(localDocumentModificationHandler.enabled).as("Is enabled").isTrue();
   }
 
   private void assertNotListening() {
     assertThat(listening).as("Is not listening").isFalse();
-    assertThat(listener.enabled).as("Is disabled").isFalse();
+    assertThat(localDocumentModificationHandler.enabled).as("Is disabled").isFalse();
   }
 
   private void mockEditorFactory() {
