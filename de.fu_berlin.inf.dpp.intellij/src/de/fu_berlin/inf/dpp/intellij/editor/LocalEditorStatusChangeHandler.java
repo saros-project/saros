@@ -16,13 +16,15 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for editor changes. */
-class LocalEditorStatusChangeHandler extends AbstractStoppableListener {
+class LocalEditorStatusChangeHandler implements DisableableHandler {
 
   private static final Logger LOG = Logger.getLogger(LocalEditorStatusChangeHandler.class);
 
+  private final LocalEditorHandler localEditorHandler;
   private final AnnotationManager annotationManager;
 
   private MessageBusConnection messageBusConnection;
+  private boolean enabled;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -60,11 +62,19 @@ class LocalEditorStatusChangeHandler extends AbstractStoppableListener {
         }
       };
 
-  LocalEditorStatusChangeHandler(EditorManager manager, AnnotationManager annotationManager) {
-
-    super(manager);
-
+  /**
+   * Instantiates a LocalEditorStatusChangeHandler object. The handler is enabled by default. The
+   * held listener is disabled by default and has to be activated using {@link #subscribe(Project)}.
+   *
+   * @param localEditorHandler the LocalEditorHandler instance
+   * @param annotationManager the AnnotationManager instance
+   */
+  LocalEditorStatusChangeHandler(
+      LocalEditorHandler localEditorHandler, AnnotationManager annotationManager) {
+    this.localEditorHandler = localEditorHandler;
     this.annotationManager = annotationManager;
+
+    this.enabled = true;
   }
 
   /**
@@ -79,7 +89,7 @@ class LocalEditorStatusChangeHandler extends AbstractStoppableListener {
       return;
     }
 
-    Editor editor = editorManager.getLocalEditorHandler().openEditor(virtualFile, false);
+    Editor editor = localEditorHandler.openEditor(virtualFile, false);
 
     SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
 
@@ -99,7 +109,7 @@ class LocalEditorStatusChangeHandler extends AbstractStoppableListener {
       return;
     }
 
-    editorManager.getLocalEditorHandler().closeEditor(virtualFile);
+    localEditorHandler.closeEditor(virtualFile);
   }
 
   /**
@@ -116,7 +126,7 @@ class LocalEditorStatusChangeHandler extends AbstractStoppableListener {
       return;
     }
 
-    editorManager.getLocalEditorHandler().activateEditor(virtualFile);
+    localEditorHandler.activateEditor(virtualFile);
   }
 
   /**
@@ -125,6 +135,7 @@ class LocalEditorStatusChangeHandler extends AbstractStoppableListener {
    * @param virtualFile the file whose editor was closed
    * @see FileEditorManagerListener.Before#beforeFileClosed(FileEditorManager, VirtualFile)
    */
+  // TODO move to separate class in annotation package
   private void cleanUpAnnotations(@NotNull VirtualFile virtualFile) {
     SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
 
@@ -162,5 +173,16 @@ class LocalEditorStatusChangeHandler extends AbstractStoppableListener {
     messageBusConnection.disconnect();
 
     messageBusConnection = null;
+  }
+
+  /**
+   * Enables or disabled the handler. This is not done by disabling the underlying listener.
+   *
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
+   */
+  // TODO merge subscribe/unsubscribe into setEnabled once annotation handling is extracted
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 }

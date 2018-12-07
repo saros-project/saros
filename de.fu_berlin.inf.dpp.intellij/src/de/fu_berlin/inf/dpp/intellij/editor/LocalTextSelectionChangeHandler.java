@@ -7,12 +7,25 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for selection changes. */
-class LocalTextSelectionChangeHandler extends AbstractStoppableListener {
+class LocalTextSelectionChangeHandler implements DisableableHandler {
+
+  private final EditorManager editorManager;
 
   private final SelectionListener selectionListener = this::generateSelectionActivity;
 
-  LocalTextSelectionChangeHandler(EditorManager manager) {
-    super(manager);
+  private boolean enabled;
+
+  /**
+   * Instantiates a LocalTextSelectionChangeHandler object. The handler is enabled by default. The
+   * contained listener is disabled by default and has to be enabled separately for every editor
+   * using {@link #register(Editor)}.
+   *
+   * @param editorManager the EditorManager instance
+   */
+  LocalTextSelectionChangeHandler(EditorManager editorManager) {
+    this.editorManager = editorManager;
+
+    this.enabled = true;
   }
 
   /**
@@ -39,5 +52,15 @@ class LocalTextSelectionChangeHandler extends AbstractStoppableListener {
    */
   void register(@NotNull Editor editor) {
     editor.getSelectionModel().addSelectionListener(selectionListener);
+  }
+
+  /**
+   * Enables or disabled the handler. This is not done by disabling the underlying listener.
+   *
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
+   */
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 }

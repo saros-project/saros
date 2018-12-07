@@ -48,12 +48,12 @@ public class LocalDocumentModificationHandlerTest {
 
   private void assertListening() {
     assertThat(listening).as("Is listening").isTrue();
-    assertThat(localDocumentModificationHandler.enabled).as("Is enabled").isTrue();
+    assertThat(localDocumentModificationHandler.isEnabled()).as("Is enabled").isTrue();
   }
 
   private void assertNotListening() {
     assertThat(listening).as("Is not listening").isFalse();
-    assertThat(localDocumentModificationHandler.enabled).as("Is disabled").isFalse();
+    assertThat(localDocumentModificationHandler.isEnabled()).as("Is disabled").isFalse();
   }
 
   private void mockEditorFactory() {

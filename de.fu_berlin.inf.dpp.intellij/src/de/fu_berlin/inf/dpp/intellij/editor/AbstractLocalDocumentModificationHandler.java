@@ -11,23 +11,35 @@ import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
 
 /** Parent class containing utility methods when working with document listeners. */
-public abstract class AbstractLocalDocumentModificationHandler extends AbstractStoppableListener {
+public abstract class AbstractLocalDocumentModificationHandler implements DisableableHandler {
 
   private static final Logger LOG =
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
 
+  protected final EditorManager editorManager;
+
+  private boolean enabled;
+
   /**
-   * Uses the constructor provided by AbstractStoppableListener and sets the internal listener state
-   * flag to be disabled by default. The default state is set to false as the document listener is
-   * only registered to the IntelliJ API when {@link #setEnabled(boolean)} is called.
+   * Sets the internal listener state flag to be disabled by default. The default state is set to
+   * false as the document listener is only registered to the local IntelliJ instance when {@link
+   * #setEnabled(boolean)} is called with <code>true</code>.
    *
    * @param editorManager the EditorManager instance
    */
   protected AbstractLocalDocumentModificationHandler(EditorManager editorManager) {
-    super(editorManager);
-    super.setEnabled(false);
+    this.editorManager = editorManager;
+
+    this.enabled = false;
   }
 
+  /**
+   * Enables or disables the given DocumentListener by registering or unregistering it from the
+   * local Intellij instance. Also updates the local <code>enabled</code> flag.
+   *
+   * @param enabled the new state of the listener
+   * @param documentListener the listener whose state to change
+   */
   public void setEnabled(boolean enabled, DocumentListener documentListener) {
     if (!this.enabled && enabled) {
       LOG.debug("Started listening for document events");
@@ -44,6 +56,15 @@ public abstract class AbstractLocalDocumentModificationHandler extends AbstractS
 
       this.enabled = false;
     }
+  }
+
+  /**
+   * Returns whether the handler is enabled.
+   *
+   * @return whether the handle is enabled
+   */
+  public boolean isEnabled() {
+    return enabled;
   }
 
   /**
