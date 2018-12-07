@@ -26,9 +26,9 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.intellij.editor.LocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
-import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
@@ -53,9 +53,9 @@ import org.picocontainer.annotations.Inject;
  * @see VirtualFileListener
  */
 // TODO decouple from SharedResourceManager and add to session context instead
-public class FileSystemChangeListener extends AbstractStoppableListener {
+public class LocalFilesystemModificationHandler extends AbstractStoppableListener {
 
-  private static final Logger LOG = Logger.getLogger(FileSystemChangeListener.class);
+  private static final Logger LOG = Logger.getLogger(LocalFilesystemModificationHandler.class);
 
   private final SharedResourcesManager resourceManager;
   private final ISarosSession session;
@@ -102,7 +102,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener {
         }
       };
 
-  FileSystemChangeListener(
+  LocalFilesystemModificationHandler(
       SharedResourcesManager resourceManager, EditorManager editorManager, ISarosSession session) {
 
     super(editorManager);
@@ -135,10 +135,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener {
    * files.
    *
    * <p>File changes done though an Intellij editor are processed in the {@link
-   * StoppableDocumentListener} instead.
+   * LocalDocumentModificationHandler} instead.
    *
    * @param virtualFileEvent the event to react to
-   * @see StoppableDocumentListener
+   * @see LocalDocumentModificationHandler
    * @see VirtualFileListener#beforeContentsChange(VirtualFileEvent)
    */
   private void generateEditorSavedActivity(@NotNull VirtualFileEvent virtualFileEvent) {

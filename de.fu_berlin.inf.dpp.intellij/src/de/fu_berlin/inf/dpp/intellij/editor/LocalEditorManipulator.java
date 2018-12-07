@@ -165,7 +165,7 @@ public class LocalEditorManipulator {
        * Disable documentListener temporarily to avoid being notified of
        * the change
        */
-      manager.disableDocumentListener();
+      manager.disableDocumentHandlers();
 
       for (ITextOperation op : operations.getTextOperations()) {
         if (op instanceof DeleteOperation) {
@@ -183,7 +183,7 @@ public class LocalEditorManipulator {
       }
 
     } finally {
-      manager.enableDocumentListener();
+      manager.enableDocumentHandlers();
     }
   }
 
@@ -279,7 +279,7 @@ public class LocalEditorManipulator {
     }
 
     boolean wasReadOnly = !document.isWritable();
-    boolean wasDocumentListenerEnabled = manager.isDocumentListenerEnabled();
+    boolean wasDocumentListenerEnabled = manager.isDocumentModificationHandlerEnabled();
 
     try {
       // TODO distinguish if read-only was set by the StopManager, abort otherwise
@@ -288,7 +288,7 @@ public class LocalEditorManipulator {
       }
 
       if (wasDocumentListenerEnabled) {
-        manager.disableDocumentListener();
+        manager.disableDocumentHandlers();
       }
 
       editorAPI.deleteText(document, 0, documentLength);
@@ -297,7 +297,7 @@ public class LocalEditorManipulator {
     } finally {
 
       if (wasDocumentListenerEnabled) {
-        manager.enableDocumentListener();
+        manager.enableDocumentHandlers();
       }
 
       if (wasReadOnly) {

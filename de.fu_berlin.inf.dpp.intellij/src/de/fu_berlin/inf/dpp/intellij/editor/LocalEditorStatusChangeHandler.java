@@ -16,9 +16,9 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for editor changes. */
-class StoppableEditorFileListener extends AbstractStoppableListener {
+class LocalEditorStatusChangeHandler extends AbstractStoppableListener {
 
-  private static final Logger LOG = Logger.getLogger(StoppableEditorFileListener.class);
+  private static final Logger LOG = Logger.getLogger(LocalEditorStatusChangeHandler.class);
 
   private final AnnotationManager annotationManager;
 
@@ -60,7 +60,7 @@ class StoppableEditorFileListener extends AbstractStoppableListener {
         }
       };
 
-  StoppableEditorFileListener(EditorManager manager, AnnotationManager annotationManager) {
+  LocalEditorStatusChangeHandler(EditorManager manager, AnnotationManager annotationManager) {
 
     super(manager);
 

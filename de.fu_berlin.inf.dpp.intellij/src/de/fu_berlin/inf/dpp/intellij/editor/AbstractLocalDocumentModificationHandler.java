@@ -11,9 +11,10 @@ import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
 
 /** Parent class containing utility methods when working with document listeners. */
-public abstract class AbstractStoppableDocumentListener extends AbstractStoppableListener {
+public abstract class AbstractLocalDocumentModificationHandler extends AbstractStoppableListener {
 
-  private static final Logger LOG = Logger.getLogger(AbstractStoppableDocumentListener.class);
+  private static final Logger LOG =
+      Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
 
   /**
    * Uses the constructor provided by AbstractStoppableListener and sets the internal listener state
@@ -22,7 +23,7 @@ public abstract class AbstractStoppableDocumentListener extends AbstractStoppabl
    *
    * @param editorManager the EditorManager instance
    */
-  protected AbstractStoppableDocumentListener(EditorManager editorManager) {
+  protected AbstractLocalDocumentModificationHandler(EditorManager editorManager) {
     super(editorManager);
     super.setEnabled(false);
   }

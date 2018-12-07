@@ -44,7 +44,7 @@ public class LocalEditorHandler {
   public void initialize(EditorManager editorManager) {
     this.editorPool = editorManager.getEditorPool();
     this.manager = editorManager;
-    projectAPI.addFileEditorManagerListener(editorManager.getFileListener());
+    projectAPI.addFileEditorManagerListener(editorManager.getLocalEditorStatusChangeHandler());
   }
 
   /**
