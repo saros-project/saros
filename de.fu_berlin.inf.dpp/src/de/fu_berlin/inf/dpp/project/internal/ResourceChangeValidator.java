@@ -5,7 +5,7 @@ import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import org.apache.log4j.Logger;
@@ -105,7 +105,7 @@ public class ResourceChangeValidator extends ModelProvider {
     SarosPluginContext.initComponent(this);
 
     sessionManager.addSessionLifecycleListener(
-        new NullSessionLifecycleListener() {
+        new ISessionLifecycleListener() {
           @Override
           public void sessionStarted(ISarosSession newSarosSession) {
             session = newSarosSession;

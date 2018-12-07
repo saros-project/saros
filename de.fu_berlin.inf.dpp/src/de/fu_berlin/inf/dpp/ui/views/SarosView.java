@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
@@ -212,7 +211,7 @@ public class SarosView extends ViewPart {
       };
 
   private final ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
         @Override
         public void sessionEnded(ISarosSession session, SessionEndReason reason) {
           showStopNotification(session.getHost(), reason);
@@ -331,9 +330,8 @@ public class SarosView extends ViewPart {
             if (treeItem == null) return;
 
             RosterEntryElement rosterEntryElement =
-                (RosterEntryElement)
-                    Platform.getAdapterManager()
-                        .getAdapter(treeItem.getData(), RosterEntryElement.class);
+                Platform.getAdapterManager()
+                    .getAdapter(treeItem.getData(), RosterEntryElement.class);
 
             if (rosterEntryElement == null) return;
 

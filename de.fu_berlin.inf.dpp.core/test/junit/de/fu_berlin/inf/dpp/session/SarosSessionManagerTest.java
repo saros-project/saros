@@ -30,7 +30,7 @@ public class SarosSessionManagerTest {
     private static final long serialVersionUID = 1L;
   }
 
-  private class StateVerifyListener extends NullSessionLifecycleListener {
+  private class StateVerifyListener implements ISessionLifecycleListener {
     int state = -1;
 
     @Override
@@ -59,7 +59,7 @@ public class SarosSessionManagerTest {
     }
   }
 
-  private class ErrorThrowingListener extends NullSessionLifecycleListener {
+  private class ErrorThrowingListener implements ISessionLifecycleListener {
 
     @Override
     public void sessionStarting(ISarosSession newSarosSession) {
@@ -140,7 +140,7 @@ public class SarosSessionManagerTest {
   @Test
   public void testRecursiveStop() {
     ISessionLifecycleListener listener =
-        new NullSessionLifecycleListener() {
+        new ISessionLifecycleListener() {
           int count = 0;
 
           @Override
@@ -158,7 +158,7 @@ public class SarosSessionManagerTest {
   @Test
   public void testRecursiveStart() {
     ISessionLifecycleListener listener =
-        new NullSessionLifecycleListener() {
+        new ISessionLifecycleListener() {
           int count = 0;
 
           @Override
@@ -178,7 +178,7 @@ public class SarosSessionManagerTest {
     final AtomicReference<RuntimeException> exception = new AtomicReference<RuntimeException>();
 
     ISessionLifecycleListener listener =
-        new NullSessionLifecycleListener() {
+        new ISessionLifecycleListener() {
           @Override
           public void sessionStarting(ISarosSession oldSarosSession) {
             try {
@@ -202,7 +202,7 @@ public class SarosSessionManagerTest {
     final AtomicReference<RuntimeException> exception = new AtomicReference<RuntimeException>();
 
     ISessionLifecycleListener listener =
-        new NullSessionLifecycleListener() {
+        new ISessionLifecycleListener() {
           @Override
           public void sessionEnding(ISarosSession oldSarosSession) {
             try {
