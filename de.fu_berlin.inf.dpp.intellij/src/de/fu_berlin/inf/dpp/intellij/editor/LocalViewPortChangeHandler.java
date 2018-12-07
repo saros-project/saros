@@ -9,12 +9,25 @@ import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for viewport changes. */
-class LocalViewPortChangeHandler extends AbstractStoppableListener {
+class LocalViewPortChangeHandler implements DisableableHandler {
+
+  private final EditorManager editorManager;
 
   private final VisibleAreaListener visibleAreaListener = this::generateViewportActivity;
 
-  LocalViewPortChangeHandler(EditorManager manager) {
-    super(manager);
+  private boolean enabled;
+
+  /**
+   * Instantiates a LocalViewPortChangeHandler object. The handler is enabled by default. The
+   * contained listener is disabled by default and has to be enabled separately for every editor
+   * using {@link #register(Editor)}.
+   *
+   * @param editorManager the EditorManager instance
+   */
+  LocalViewPortChangeHandler(EditorManager editorManager) {
+    this.editorManager = editorManager;
+
+    this.enabled = true;
   }
 
   /**
@@ -48,5 +61,15 @@ class LocalViewPortChangeHandler extends AbstractStoppableListener {
    */
   void register(@NotNull Editor editor) {
     editor.getScrollingModel().addVisibleAreaListener(visibleAreaListener);
+  }
+
+  /**
+   * Enables or disabled the handler. This is not done by disabling the underlying listener.
+   *
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
+   */
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 }

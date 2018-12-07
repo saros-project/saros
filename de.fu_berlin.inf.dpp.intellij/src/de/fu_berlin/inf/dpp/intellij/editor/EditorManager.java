@@ -480,7 +480,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     localDocumentModificationHandler = new LocalDocumentModificationHandler(this);
     localClosedEditorModificationHandler =
         new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
-    localEditorStatusChangeHandler = new LocalEditorStatusChangeHandler(this, annotationManager);
+    localEditorStatusChangeHandler =
+        new LocalEditorStatusChangeHandler(localEditorHandler, annotationManager);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
     localViewPortChangeHandler = new LocalViewPortChangeHandler(this);
@@ -839,7 +840,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   boolean isDocumentModificationHandlerEnabled() {
-    return localDocumentModificationHandler.enabled;
+    return localDocumentModificationHandler.isEnabled();
   }
 
   void enableDocumentHandlers() {

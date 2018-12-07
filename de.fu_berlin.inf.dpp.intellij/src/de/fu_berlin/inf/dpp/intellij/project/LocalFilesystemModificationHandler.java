@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableListener;
+import de.fu_berlin.inf.dpp.intellij.editor.DisableableHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
@@ -53,21 +53,21 @@ import org.picocontainer.annotations.Inject;
  * @see VirtualFileListener
  */
 // TODO decouple from SharedResourceManager and add to session context instead
-public class LocalFilesystemModificationHandler extends AbstractStoppableListener {
+public class LocalFilesystemModificationHandler implements DisableableHandler {
 
   private static final Logger LOG = Logger.getLogger(LocalFilesystemModificationHandler.class);
 
+  private final EditorManager editorManager;
   private final SharedResourcesManager resourceManager;
   private final ISarosSession session;
   private final LocalFileSystem localFileSystem;
 
   @Inject private ProjectAPI projectAPI;
-
   @Inject private AnnotationManager annotationManager;
-
   @Inject private Project project;
-
   @Inject private LocalEditorHandler localEditorHandler;
+
+  private boolean enabled;
 
   private final VirtualFileListener virtualFileListener =
       new VirtualFileListener() {
@@ -102,15 +102,24 @@ public class LocalFilesystemModificationHandler extends AbstractStoppableListene
         }
       };
 
+  /**
+   * Instantiates a LocalFilesystemModificationHandler object. The handler, including the held
+   * filesystem listener, is enabled by default.
+   *
+   * @param resourceManager the ResourceManager instance
+   * @param editorManager the EditorManager instance
+   * @param session the current SarosSession instance
+   */
   LocalFilesystemModificationHandler(
       SharedResourcesManager resourceManager, EditorManager editorManager, ISarosSession session) {
 
-    super(editorManager);
-
     this.resourceManager = resourceManager;
+    this.editorManager = editorManager;
     this.session = session;
 
     SarosPluginContext.initComponent(this);
+
+    this.enabled = true;
 
     this.localFileSystem = LocalFileSystem.getInstance();
 
