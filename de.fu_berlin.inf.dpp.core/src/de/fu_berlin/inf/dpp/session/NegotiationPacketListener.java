@@ -41,7 +41,7 @@ final class NegotiationPacketListener {
 
   // TODO maybe this should be controlled by the SessionManager itself
   private final ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
 
         @Override
         public void sessionStarted(final ISarosSession session) {

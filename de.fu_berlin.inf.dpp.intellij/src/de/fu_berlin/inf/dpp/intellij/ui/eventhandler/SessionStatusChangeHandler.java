@@ -5,7 +5,6 @@ import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import java.text.MessageFormat;
@@ -18,7 +17,7 @@ public class SessionStatusChangeHandler {
   public SessionStatusChangeHandler(@NotNull ISarosSessionManager sarosSessionManager) {
 
     ISessionLifecycleListener lifecycleListener =
-        new NullSessionLifecycleListener() {
+        new ISessionLifecycleListener() {
 
           @Override
           public void sessionStarted(ISarosSession session) {
