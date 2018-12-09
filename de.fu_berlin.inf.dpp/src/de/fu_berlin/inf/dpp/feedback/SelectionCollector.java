@@ -4,7 +4,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -90,7 +89,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
   private final IEditorManager editorManager;
 
   private final ISharedEditorListener editorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
 
         @Override
         public void textEdited(TextEditActivity textEdit) {
