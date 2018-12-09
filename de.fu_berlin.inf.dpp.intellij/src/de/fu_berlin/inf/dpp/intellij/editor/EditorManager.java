@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationDocumentListener;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
@@ -399,6 +400,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.addActivityConsumer(consumer, Priority.ACTIVE);
 
           documentListener.setEnabled(true);
+          annotationDocumentListener.setEnabled(true);
 
           userEditorStateManager = session.getComponent(UserEditorStateManager.class);
           remoteWriteAccessManager = new RemoteWriteAccessManager(session);
@@ -423,6 +425,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.removeActivityConsumer(consumer);
 
           documentListener.setEnabled(false);
+          annotationDocumentListener.setEnabled(false);
 
           session = null;
 
@@ -447,6 +450,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private ISarosSession session;
 
   private final StoppableDocumentListener documentListener;
+  private final AnnotationDocumentListener annotationDocumentListener;
   private final StoppableEditorFileListener fileListener;
   private final StoppableSelectionListener selectionListener;
   private final StoppableViewPortListener viewportListener;
@@ -476,6 +480,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
 
     documentListener = new StoppableDocumentListener(this);
+    annotationDocumentListener =
+        new AnnotationDocumentListener(this, projectAPI, annotationManager);
     fileListener = new StoppableEditorFileListener(this, annotationManager);
 
     selectionListener = new StoppableSelectionListener(this);
@@ -827,10 +833,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   void enableDocumentListener() {
     documentListener.setEnabled(true);
+    annotationDocumentListener.setEnabled(true);
   }
 
   void disableDocumentListener() {
     documentListener.setEnabled(false);
+    annotationDocumentListener.setEnabled(false);
   }
 
   /**
@@ -839,6 +847,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   void setListenerEnabled(boolean enable) {
     documentListener.setEnabled(enable);
+    annotationDocumentListener.setEnabled(enable);
     fileListener.setEnabled(enable);
     selectionListener.setEnabled(enable);
     viewportListener.setEnabled(enable);
