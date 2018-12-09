@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -58,7 +57,7 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
   private long writeAccessDuration = 0;
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         @Override
         public void permissionChanged(User user) {

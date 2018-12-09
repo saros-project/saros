@@ -35,7 +35,9 @@ public interface ISessionListener {
    *
    * @param user the user whose {@link Permission} changed.
    */
-  public void permissionChanged(User user);
+  public default void permissionChanged(User user) {
+    // NOP
+  }
 
   /**
    * Is fired when an user joins the shared project.
@@ -44,7 +46,9 @@ public interface ISessionListener {
    *
    * @param user the user that has joined.
    */
-  public void userJoined(User user);
+  public default void userJoined(User user) {
+    // NOP
+  }
 
   /**
    * Is fired when a user started queuing and is now able to process all activities.
@@ -53,7 +57,9 @@ public interface ISessionListener {
    *
    * @param user the user that has joined.
    */
-  public void userStartedQueuing(User user);
+  public default void userStartedQueuing(User user) {
+    // NOP
+  }
 
   /**
    * Is fired when a finished the Project Negotiation
@@ -62,7 +68,9 @@ public interface ISessionListener {
    *
    * @param user the user that has joined.
    */
-  public void userFinishedProjectNegotiation(User user);
+  public default void userFinishedProjectNegotiation(User user) {
+    // NOP
+  }
 
   /**
    * Is fired when the color assigned to a user in the session changed.
@@ -71,7 +79,9 @@ public interface ISessionListener {
    *
    * @param user the user whose color changed
    */
-  public void userColorChanged(User user);
+  public default void userColorChanged(User user) {
+    // NOP
+  }
 
   /**
    * Is fired when an user leaves the shared project.
@@ -80,7 +90,9 @@ public interface ISessionListener {
    *
    * @param user the user that has left.
    */
-  public void userLeft(User user);
+  public default void userLeft(User user) {
+    // NOP
+  }
 
   /**
    * Is fired then a project has been made part of the session, either because the local user began
@@ -93,7 +105,9 @@ public interface ISessionListener {
    *
    * @param project the project that was added
    */
-  public void projectAdded(IProject project);
+  public default void projectAdded(IProject project) {
+    // NOP
+  }
 
   /**
    * Is fired then a project has been removed from the session, meaning it is not shared between the
@@ -103,12 +117,16 @@ public interface ISessionListener {
    *
    * @param project the project that was removed
    */
-  public void projectRemoved(IProject project);
+  public default void projectRemoved(IProject project) {
+    // NOP
+  }
 
   /**
    * Is fired when resources are added to the current session.
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    */
-  public void resourcesAdded(IProject project);
+  public default void resourcesAdded(IProject project) {
+    // NOP
+  }
 }

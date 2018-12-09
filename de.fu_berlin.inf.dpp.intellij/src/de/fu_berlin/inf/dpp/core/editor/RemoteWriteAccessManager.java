@@ -6,7 +6,6 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.core.util.AutoHashMap;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -52,7 +51,7 @@ public class RemoteWriteAccessManager {
   }
 
   protected ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         /**
          * Remove the user and potentially disconnect from the document providers which only this
