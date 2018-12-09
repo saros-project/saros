@@ -14,7 +14,9 @@ public interface IAccountStoreListener {
    *     <p>Is never <code>null</code>; if the account store is empty or not yet initialized, the
    *     list is empty.
    */
-  public void accountsChanged(List<XMPPAccount> currentAccounts);
+  public default void accountsChanged(List<XMPPAccount> currentAccounts) {
+    // NOP
+  }
 
   /**
    * Will be called if the currently active account has been just changed. Will also be called after
@@ -25,5 +27,7 @@ public interface IAccountStoreListener {
    *     <p>Will be <code>null</code> if the account store has no active account yet (e.g. during
    *     start up or for first-time Saros users).
    */
-  public void activeAccountChanged(XMPPAccount activeAccount);
+  public default void activeAccountChanged(XMPPAccount activeAccount) {
+    // NOP
+  }
 }
