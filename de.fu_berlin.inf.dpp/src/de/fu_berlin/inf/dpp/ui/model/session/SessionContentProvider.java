@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
@@ -107,7 +107,7 @@ public class SessionContentProvider extends TreeContentProvider {
 
   // TODO call update and not refresh
   private final RosterListener rosterListener =
-      new AbstractRosterListener() {
+      new IRosterListener() {
         // update nicknames
         @Override
         public void entriesUpdated(Collection<String> addresses) {

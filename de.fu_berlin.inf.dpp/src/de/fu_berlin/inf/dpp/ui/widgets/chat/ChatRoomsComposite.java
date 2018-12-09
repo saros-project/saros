@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
@@ -149,7 +148,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
    * changes.
    */
   protected IRosterListener rosterListener =
-      new AbstractRosterListener() {
+      new IRosterListener() {
 
         @Override
         public void entriesUpdated(final Collection<String> addresses) {
