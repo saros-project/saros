@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 
 import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
@@ -59,7 +58,7 @@ public class FollowButton extends ToolbarButton {
       };
 
   private final ISharedEditorListener editorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
         @Override
         public void followModeChanged(final User target, final boolean isFollowed) {
           updateMenu();

@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.EditorHistoryEntry;
 import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -262,7 +261,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
    * stored in history.
    */
   protected ISharedEditorListener sharedEditorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
 
         @Override
         public void editorActivated(User user, SPath newActiveEditor) {

@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.model.session;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
@@ -89,7 +88,7 @@ public class SessionContentProvider extends TreeContentProvider {
       };
 
   private final ISharedEditorListener sharedEditorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
         @Override
         public void editorActivated(final User user, SPath filePath) {
           SWTUtils.runSafeSWTAsync(

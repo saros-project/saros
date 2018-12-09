@@ -62,7 +62,7 @@ public class FollowModeManager implements Startable {
 
   /** If the local user activates another editor (or closes the followed one), stop following */
   private ISharedEditorListener stopFollowingOnOwnActions =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
         @Override
         public void editorActivated(User user, SPath filePath) {
           if (!user.equals(localUser) || !isFollowing()) return;
