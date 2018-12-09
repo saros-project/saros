@@ -257,7 +257,7 @@ public class CollaborationUtils {
           result.append(
               String.format(
                   "\nModule: %s, Files: %d, Size: %s",
-                  project.getName(), fileCountAndSize.v, format(fileCountAndSize.p)));
+                  project.getName(), fileCountAndSize.value, format(fileCountAndSize.key)));
         } else {
           List<IResource> resources = sarosSession.getSharedResources(project);
 
@@ -267,8 +267,8 @@ public class CollaborationUtils {
               String.format(
                   "\nModule: %s, Files: %s, Size: %s",
                   project.getName() + " " + Messages.CollaborationUtils_partial,
-                  fileCountAndSize.v,
-                  format(fileCountAndSize.p)));
+                  fileCountAndSize.value,
+                  format(fileCountAndSize.key)));
         }
       }
     } catch (IOException e) {
@@ -441,10 +441,9 @@ public class CollaborationUtils {
    */
   private static Pair<Long, Long> getFileCountAndSize(
       Collection<? extends IResource> resources, boolean includeMembers, int flags) {
+
     long totalFileSize = 0;
     long totalFileCount = 0;
-
-    Pair<Long, Long> fileCountAndSize = new Pair<>(0L, 0L);
 
     for (IResource resource : resources) {
       switch (resource.getType()) {
@@ -471,8 +470,8 @@ public class CollaborationUtils {
             Pair<Long, Long> subFileCountAndSize =
                 getFileCountAndSize(Arrays.asList(container.members(flags)), true, flags);
 
-            totalFileSize += subFileCountAndSize.p;
-            totalFileCount += subFileCountAndSize.v;
+            totalFileSize += subFileCountAndSize.key;
+            totalFileCount += subFileCountAndSize.value;
 
           } catch (Exception e) {
             LOG.warn("failed to process container: " + resource, e);
@@ -482,8 +481,7 @@ public class CollaborationUtils {
           break;
       }
     }
-    fileCountAndSize.p = totalFileSize;
-    fileCountAndSize.v = totalFileCount;
-    return fileCountAndSize;
+
+    return new Pair<>(totalFileSize, totalFileCount);
   }
 }

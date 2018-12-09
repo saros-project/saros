@@ -256,38 +256,35 @@ public class CollaborationUtils {
    */
   private static String getSessionDescription(ISarosSession sarosSession) {
 
-    Set<de.fu_berlin.inf.dpp.filesystem.IProject> projects = sarosSession.getProjects();
+    final Set<de.fu_berlin.inf.dpp.filesystem.IProject> projects = sarosSession.getProjects();
 
-    StringBuilder result = new StringBuilder();
+    final StringBuilder result = new StringBuilder();
 
     for (de.fu_berlin.inf.dpp.filesystem.IProject project : projects) {
 
-      Pair<Long, Long> fileCountAndSize;
+      final Pair<Long, Long> fileCountAndSize;
 
-      if (sarosSession.isCompletelyShared(project)) {
-        fileCountAndSize =
-            FileUtils.getFileCountAndSize(
-                Collections.singletonList(((EclipseProjectImpl) project).getDelegate()),
-                true,
-                IContainer.EXCLUDE_DERIVED);
+      final boolean isCompletelyShared = sarosSession.isCompletelyShared(project);
 
-        result.append(
-            String.format(
-                "\nProject: %s, Files: %d, Size: %s",
-                project.getName(), fileCountAndSize.v, format(fileCountAndSize.p)));
-      } else {
-        List<IResource> resources =
-            ResourceAdapterFactory.convertBack(sarosSession.getSharedResources(project));
+      final List<IResource> resources;
 
-        fileCountAndSize = FileUtils.getFileCountAndSize(resources, false, IResource.NONE);
+      if (isCompletelyShared)
+        resources = Collections.singletonList(((EclipseProjectImpl) project).getDelegate());
+      else resources = ResourceAdapterFactory.convertBack(sarosSession.getSharedResources(project));
 
-        result.append(
-            String.format(
-                "\nProject: %s, Files: %s, Size: %s",
-                project.getName() + " " + Messages.CollaborationUtils_partial,
-                fileCountAndSize.v,
-                format(fileCountAndSize.p)));
-      }
+      fileCountAndSize =
+          FileUtils.getFileCountAndSize(
+              resources,
+              isCompletelyShared ? true : false,
+              isCompletelyShared ? IContainer.EXCLUDE_DERIVED : IResource.NONE);
+
+      result.append(
+          String.format(
+              "\nProject: %s (%s), Files: %d, Size: %s",
+              project.getName(),
+              isCompletelyShared ? "complete" : "partial",
+              fileCountAndSize.value,
+              format(fileCountAndSize.key)));
     }
 
     return result.toString();

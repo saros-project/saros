@@ -127,10 +127,9 @@ public class FileUtils {
    */
   public static Pair<Long, Long> getFileCountAndSize(
       Collection<? extends IResource> resources, boolean includeMembers, int flags) {
+
     long totalFileSize = 0;
     long totalFileCount = 0;
-
-    Pair<Long, Long> fileCountAndSize = new Pair<Long, Long>(0L, 0L);
 
     for (IResource resource : resources) {
       switch (resource.getType()) {
@@ -150,14 +149,14 @@ public class FileUtils {
           if (!includeMembers) break;
 
           try {
-            IContainer container = ((IContainer) resource.getAdapter(IContainer.class));
+            IContainer container = resource.getAdapter(IContainer.class);
 
             Pair<Long, Long> subFileCountAndSize =
                 FileUtils.getFileCountAndSize(
                     Arrays.asList(container.members(flags)), includeMembers, flags);
 
-            totalFileSize += subFileCountAndSize.p;
-            totalFileCount += subFileCountAndSize.v;
+            totalFileSize += subFileCountAndSize.key;
+            totalFileCount += subFileCountAndSize.value;
 
           } catch (Exception e) {
             LOG.warn("failed to process container: " + resource, e);
@@ -167,9 +166,8 @@ public class FileUtils {
           break;
       }
     }
-    fileCountAndSize.p = totalFileSize;
-    fileCountAndSize.v = totalFileCount;
-    return fileCountAndSize;
+
+    return new Pair<>(totalFileSize, totalFileCount);
   }
 
   /**
