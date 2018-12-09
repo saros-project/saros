@@ -5,7 +5,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
@@ -81,7 +80,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
   }
 
   protected ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         /**
          * Remove the user and potentially disconnect from the document providers which only this

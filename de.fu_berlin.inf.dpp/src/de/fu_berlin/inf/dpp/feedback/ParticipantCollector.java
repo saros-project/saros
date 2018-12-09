@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -52,7 +51,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
   private long sessionTime;
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         @Override
         public void userJoined(User user) {

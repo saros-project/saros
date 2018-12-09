@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -33,7 +32,7 @@ public class UserStatusChangeHandler {
       };
 
   private ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         /*
          * save to call SarosView.showNotification because it uses asyncExec

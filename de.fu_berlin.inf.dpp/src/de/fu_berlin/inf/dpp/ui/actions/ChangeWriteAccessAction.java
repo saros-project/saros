@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -87,7 +86,7 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
       };
 
   private ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void permissionChanged(User user) {
           updateEnablement();
