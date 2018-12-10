@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
