@@ -283,8 +283,8 @@ public class CollaborationUtils {
               "\nProject: %s (%s), Files: %d, Size: %s",
               project.getName(),
               isCompletelyShared ? "complete" : "partial",
-              fileCountAndSize.value,
-              format(fileCountAndSize.key)));
+              fileCountAndSize.getRight(),
+              format(fileCountAndSize.getLeft())));
     }
 
     return result.toString();

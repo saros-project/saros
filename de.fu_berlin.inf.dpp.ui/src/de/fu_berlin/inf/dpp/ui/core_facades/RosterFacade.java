@@ -96,7 +96,7 @@ public class RosterFacade {
         if (correctEntry == null) continue;
 
         Presence presence = roster.getPresence(correctEntry.getUser());
-        entries.add(new Pair<RosterEntry, Presence>(correctEntry, presence));
+        entries.add(Pair.of(correctEntry, presence));
       }
 
       return entries;

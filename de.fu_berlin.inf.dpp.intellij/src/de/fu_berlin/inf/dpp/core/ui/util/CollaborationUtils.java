@@ -257,7 +257,9 @@ public class CollaborationUtils {
           result.append(
               String.format(
                   "\nModule: %s, Files: %d, Size: %s",
-                  project.getName(), fileCountAndSize.value, format(fileCountAndSize.key)));
+                  project.getName(),
+                  fileCountAndSize.getRight(),
+                  format(fileCountAndSize.getLeft())));
         } else {
           List<IResource> resources = sarosSession.getSharedResources(project);
 
@@ -267,8 +269,8 @@ public class CollaborationUtils {
               String.format(
                   "\nModule: %s, Files: %s, Size: %s",
                   project.getName() + " " + Messages.CollaborationUtils_partial,
-                  fileCountAndSize.value,
-                  format(fileCountAndSize.key)));
+                  fileCountAndSize.getRight(),
+                  format(fileCountAndSize.getLeft())));
         }
       }
     } catch (IOException e) {
@@ -470,8 +472,8 @@ public class CollaborationUtils {
             Pair<Long, Long> subFileCountAndSize =
                 getFileCountAndSize(Arrays.asList(container.members(flags)), true, flags);
 
-            totalFileSize += subFileCountAndSize.key;
-            totalFileCount += subFileCountAndSize.value;
+            totalFileSize += subFileCountAndSize.getLeft();
+            totalFileCount += subFileCountAndSize.getRight();
 
           } catch (Exception e) {
             LOG.warn("failed to process container: " + resource, e);
@@ -482,6 +484,6 @@ public class CollaborationUtils {
       }
     }
 
-    return new Pair<>(totalFileSize, totalFileCount);
+    return Pair.of(totalFileSize, totalFileCount);
   }
 }

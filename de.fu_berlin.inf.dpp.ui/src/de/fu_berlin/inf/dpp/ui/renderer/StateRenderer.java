@@ -67,7 +67,7 @@ public class StateRenderer extends Renderer {
             List<Contact> contacts = new ArrayList<Contact>();
 
             for (Pair<RosterEntry, Presence> entry : rosterEntries) {
-              contacts.add(ContactRenderer.convert(entry.key, entry.value));
+              contacts.add(ContactRenderer.convert(entry.getLeft(), entry.getRight()));
             }
 
             state.setContactList(contacts);

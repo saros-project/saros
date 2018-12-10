@@ -122,8 +122,8 @@ public class FileUtils {
    * @param includeMembers <code>true</code> to include the members of resources that represents a
    *     {@linkplain IContainer container}
    * @param flags additional flags on how to process the members of containers
-   * @return a pair containing the {@linkplain Pair#p file size} and {@linkplain Pair#v file count}
-   *     for the given resources
+   * @return a pair containing the {@linkplain Pair#getLeft() file size} and {@linkplain
+   *     Pair#getRight() file count} for the given resources
    */
   public static Pair<Long, Long> getFileCountAndSize(
       Collection<? extends IResource> resources, boolean includeMembers, int flags) {
@@ -155,8 +155,8 @@ public class FileUtils {
                 FileUtils.getFileCountAndSize(
                     Arrays.asList(container.members(flags)), includeMembers, flags);
 
-            totalFileSize += subFileCountAndSize.key;
-            totalFileCount += subFileCountAndSize.value;
+            totalFileSize += subFileCountAndSize.getLeft();
+            totalFileCount += subFileCountAndSize.getRight();
 
           } catch (Exception e) {
             LOG.warn("failed to process container: " + resource, e);
@@ -167,7 +167,7 @@ public class FileUtils {
       }
     }
 
-    return new Pair<>(totalFileSize, totalFileCount);
+    return Pair.of(totalFileSize, totalFileCount);
   }
 
   /**
