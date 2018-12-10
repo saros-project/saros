@@ -5,6 +5,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
+import de.fu_berlin.inf.dpp.editor.FollowModeBroadcaster;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
@@ -60,6 +61,7 @@ public class SarosCoreSessionContextFactory implements ISarosSessionContextFacto
     container.addComponent(ActivitySequencer.class);
     container.addComponent(ChangeColorManager.class);
     container.addComponent(FollowModeManager.class);
+    container.addComponent(FollowModeBroadcaster.class);
     container.addComponent(LeaveAndKickHandler.class);
     container.addComponent(PermissionManager.class);
     container.addComponent(StopManager.class);
