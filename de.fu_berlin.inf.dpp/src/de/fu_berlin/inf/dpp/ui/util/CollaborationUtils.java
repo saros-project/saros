@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -35,20 +34,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
 
-/**
- * Offers convenient methods for collaboration actions like sharing a project resources.
- *
- * @author bkahlert
- * @author kheld
- */
+/** Offers convenient methods for collaboration actions like sharing a project resources. */
 public class CollaborationUtils {
 
-  private static final Logger LOG = Logger.getLogger(CollaborationUtils.class);
+  private static final Logger log = Logger.getLogger(CollaborationUtils.class);
 
   @Inject private static ISarosSessionManager sessionManager;
 
@@ -61,44 +56,51 @@ public class CollaborationUtils {
   }
 
   /**
-   * Starts a new session and shares the given resources with given contacts.<br>
-   * Does nothing if a {@link ISarosSession session} is already running.
+   * Starts a new session and shares the given resources with given contacts. The operation is
+   * performed <b>asynchronously</b> and therefore this method returns immediately.
+   *
+   * <p>The provided list will be <b>altered</b> and therefore <b>should not</b> be used any
+   * further.
+   *
+   * <p>Does nothing if a session is already running.
    *
    * @param resources
    * @param contacts
-   * @nonBlocking
    */
-  public static void startSession(List<IResource> resources, final List<JID> contacts) {
+  public static void startSession(final List<IResource> resources, final List<JID> contacts) {
 
-    final Map<IProject, List<IResource>> newResources = acquireResources(resources, null);
+    final IJobFunction startSessionFunction =
+        (final IProgressMonitor monitor) -> {
+          monitor.beginTask("Starting session...", IProgressMonitor.UNKNOWN);
 
-    Job sessionStartupJob =
-        new Job("Session Startup") {
+          try {
 
-          @Override
-          protected IStatus run(IProgressMonitor monitor) {
-            monitor.beginTask("Starting session...", IProgressMonitor.UNKNOWN);
+            final Map<IProject, List<IResource>> resourcesToShare =
+                getResourceMapping(resources, null);
 
-            try {
-              refreshProjects(newResources.keySet(), null);
-              sessionManager.startSession(convert(newResources));
-              Set<JID> participantsToAdd = new HashSet<JID>(contacts);
+            refreshProjectsIfNeeded(resourcesToShare.keySet(), null, null);
 
-              ISarosSession session = sessionManager.getSession();
+            sessionManager.startSession(convert(resourcesToShare));
 
-              if (session == null) return Status.CANCEL_STATUS;
+            final Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
-              sessionManager.invite(participantsToAdd, getSessionDescription(session));
+            final ISarosSession session = sessionManager.getSession();
 
-            } catch (Exception e) {
+            if (session == null) return Status.CANCEL_STATUS;
 
-              LOG.error("could not start a Saros session", e);
-              return new Status(IStatus.ERROR, Saros.PLUGIN_ID, e.getMessage(), e);
-            }
+            sessionManager.invite(participantsToAdd, getSessionDescription(session));
 
-            return Status.OK_STATUS;
+          } catch (Exception e) {
+            log.error("could not start a Saros session", e);
+            return new Status(IStatus.ERROR, Saros.PLUGIN_ID, e.getMessage(), e);
+          } finally {
+            monitor.done();
           }
+
+          return Status.OK_STATUS;
         };
+
+    final Job sessionStartupJob = Job.create("Session Startup", startSessionFunction);
 
     sessionStartupJob.setPriority(Job.SHORT);
     sessionStartupJob.setUser(true);
@@ -106,148 +108,127 @@ public class CollaborationUtils {
   }
 
   /**
-   * Leaves the currently running {@link SarosSession}<br>
-   * Does nothing if no {@link SarosSession} is running.
+   * Leaves / stops the current session. This method asks for user confirmation and blocks until the
+   * user has either confirmed or declined the request. The actual leaving / stopping of the session
+   * is performed <b>asynchronously</b>.
+   *
+   * <p>Does nothing if no session is running.
    */
   public static void leaveSession() {
-
-    ISarosSession sarosSession = sessionManager.getSession();
-
-    Shell shell = SWTUtils.getShell();
-
-    if (sarosSession == null) {
-      LOG.warn("cannot leave a non-running session");
-      return;
-    }
-
-    boolean reallyLeave;
-
-    if (sarosSession.isHost()) {
-      if (sarosSession.getUsers().size() == 1) {
-        // Do not ask when host is alone...
-        reallyLeave = true;
-      } else {
-        reallyLeave =
-            MessageDialog.openQuestion(
-                shell,
-                Messages.CollaborationUtils_confirm_closing,
-                Messages.CollaborationUtils_confirm_closing_text);
-      }
-    } else {
-      reallyLeave =
-          MessageDialog.openQuestion(
-              shell,
-              Messages.CollaborationUtils_confirm_leaving,
-              Messages.CollaborationUtils_confirm_leaving_text);
-    }
-
-    if (!reallyLeave) return;
-
-    ThreadUtils.runSafeAsync(
-        "StopSession",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
-          }
-        });
-  }
-
-  /**
-   * Adds the given project resources to the session.<br>
-   * Does nothing if no {@link SarosSession session} is running.
-   *
-   * @param resourcesToAdd
-   * @nonBlocking
-   */
-  public static void addResourcesToSession(List<IResource> resourcesToAdd) {
 
     final ISarosSession session = sessionManager.getSession();
 
     if (session == null) {
-      LOG.warn("cannot add resources to a non-running session");
+      log.warn("cannot leave a non-running session");
       return;
     }
 
-    final Map<IProject, List<IResource>> projectResources =
-        acquireResources(resourcesToAdd, session);
+    if (!confirmSessionShutdown(session.isHost(), session.getUsers().size() == 1)) return;
 
-    if (projectResources.isEmpty()) return;
+    final IJobFunction stopSessionFunction =
+        (final IProgressMonitor monitor) -> {
+          monitor.beginTask("Leaving session...", IProgressMonitor.UNKNOWN);
+
+          try {
+            sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
+          } catch (Exception e) {
+            log.error("could not stop the current session", e);
+            return new Status(IStatus.ERROR, Saros.PLUGIN_ID, e.getMessage(), e);
+          } finally {
+            monitor.done();
+          }
+
+          return Status.OK_STATUS;
+        };
+
+    final Job sessionStartupJob = Job.create("Session Shutdown", stopSessionFunction);
+
+    sessionStartupJob.setPriority(Job.SHORT);
+    sessionStartupJob.setUser(true);
+    sessionStartupJob.schedule();
+  }
+
+  /**
+   * Adds the given project resources to the session. The operation is performed
+   * <b>asynchronously</b> and therefore this method returns immediately.
+   *
+   * <p>Does nothing if no session is running.
+   *
+   * @param resources the resources to add
+   */
+  public static void addResourcesToSession(List<IResource> resources) {
+
+    final ISarosSession session = sessionManager.getSession();
+
+    if (session == null) {
+      log.warn("cannot add resources to a non-running session");
+      return;
+    }
+
+    final Map<IProject, List<IResource>> resourcesToShare = getResourceMapping(resources, session);
+
+    if (resourcesToShare.isEmpty()) return;
 
     ThreadUtils.runSafeAsync(
         "AddResourceToSession",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-
-            if (!session.hasWriteAccess()) {
-              DialogUtils.popUpFailureMessage(
-                  Messages.CollaborationUtils_insufficient_privileges,
-                  Messages.CollaborationUtils_insufficient_privileges_text,
-                  false);
-              return;
-            }
-
-            final List<IProject> projectsToRefresh = new ArrayList<IProject>();
-
-            for (IProject project : projectResources.keySet()) {
-              if (!session.isShared(ResourceAdapterFactory.create(project)))
-                projectsToRefresh.add(project);
-            }
-
-            try {
-              refreshProjects(projectsToRefresh, null);
-            } catch (CoreException e) {
-              LOG.warn("failed to refresh projects", e);
-              /*
-               * FIXME use a Job instead of a plain thread and so better
-               * execption handling !
-               */
-            }
-
-            sessionManager.addResourcesToSession(convert(projectResources));
+        log,
+        () -> {
+          if (!session.hasWriteAccess()) {
+            DialogUtils.popUpFailureMessage(
+                Messages.CollaborationUtils_insufficient_privileges,
+                Messages.CollaborationUtils_insufficient_privileges_text,
+                false);
+            return;
           }
+
+          try {
+            refreshProjectsIfNeeded(resourcesToShare.keySet(), session, null);
+          } catch (CoreException e) {
+            log.warn("failed to refresh projects", e);
+            /*
+             * FIXME use a Job instead of a plain thread and so better
+             * exception handling !
+             */
+          }
+
+          sessionManager.addResourcesToSession(convert(resourcesToShare));
         });
   }
 
   /**
-   * Adds the given contacts to the session.<br>
-   * Does nothing if no {@link ISarosSession session} is running.
+   * Adds the given contacts to the session. The operation is performed <b>asynchronously</b> and
+   * therefore this method returns immediately.
+   *
+   * <p>Does nothing if no session is running.
    *
    * @param contacts
-   * @nonBlocking
    */
   public static void addContactsToSession(final List<JID> contacts) {
 
-    final ISarosSession sarosSession = sessionManager.getSession();
+    final ISarosSession session = sessionManager.getSession();
 
-    if (sarosSession == null) {
-      LOG.warn("cannot add contacts to a non-running session");
+    if (session == null) {
+      log.warn("cannot add contacts to a non-running session");
       return;
     }
 
     ThreadUtils.runSafeAsync(
         "AddContactToSession",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
+        log,
+        () -> {
+          final Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
-            Set<JID> participantsToAdd = new HashSet<JID>(contacts);
+          for (final User user : session.getUsers()) participantsToAdd.remove(user.getJID());
 
-            for (User user : sarosSession.getUsers()) participantsToAdd.remove(user.getJID());
-
-            if (participantsToAdd.size() > 0) {
-              sessionManager.invite(participantsToAdd, getSessionDescription(sarosSession));
-            }
-          }
+          if (!participantsToAdd.isEmpty())
+            sessionManager.invite(participantsToAdd, getSessionDescription(session));
         });
   }
 
+  // FIXME This is only displayed once. If you add another project during a session this helpful
+  // information about the size is NOT shown at all!
   /**
-   * Creates the message that invitees see on an incoming project share request. Currently it
+   * Creates the message that the invitee(s) see on an incoming project share request. Currently it
    * contains the project names along with the number of shared files and total file size for each
    * shared project.
    *
@@ -262,27 +243,31 @@ public class CollaborationUtils {
 
     for (de.fu_berlin.inf.dpp.filesystem.IProject project : projects) {
 
-      final Pair<Long, Long> fileCountAndSize;
-
-      final boolean isCompletelyShared = sarosSession.isCompletelyShared(project);
-
       final List<IResource> resources;
+      final boolean searchRecursive;
+      final int searchFlags;
+      final String projectSharingMode;
 
-      if (isCompletelyShared)
+      if (sarosSession.isCompletelyShared(project)) {
         resources = Collections.singletonList(((EclipseProjectImpl) project).getDelegate());
-      else resources = ResourceAdapterFactory.convertBack(sarosSession.getSharedResources(project));
+        searchRecursive = true;
+        searchFlags = IContainer.EXCLUDE_DERIVED;
+        projectSharingMode = "complete";
+      } else {
+        resources = ResourceAdapterFactory.convertBack(sarosSession.getSharedResources(project));
+        searchRecursive = false;
+        searchFlags = IResource.NONE;
+        projectSharingMode = "partial";
+      }
 
-      fileCountAndSize =
-          FileUtils.getFileCountAndSize(
-              resources,
-              isCompletelyShared ? true : false,
-              isCompletelyShared ? IContainer.EXCLUDE_DERIVED : IResource.NONE);
+      final Pair<Long, Long> fileCountAndSize =
+          FileUtils.getFileCountAndSize(resources, searchRecursive, searchFlags);
 
       result.append(
           String.format(
               "\nProject: %s (%s), Files: %d, Size: %s",
               project.getName(),
-              isCompletelyShared ? "complete" : "partial",
+              projectSharingMode,
               fileCountAndSize.getRight(),
               format(fileCountAndSize.getLeft())));
     }
@@ -291,8 +276,10 @@ public class CollaborationUtils {
   }
 
   /**
-   * Determines which of the the selected resources belong to fully shared projects or to partially
-   * shared ones. The result is returned as a {@link Map} of the following structure:
+   * Calculates the required mapping for the {@link ISarosSessionManager#startSession(Map) start
+   * session call} and {@link ISarosSessionManager#addResourcesToSession(Map) add resources call}.
+   *
+   * <p>The result is returned as a {@link Map} of the following structure:
    *
    * <ul>
    *   <li>fully shared project: {@link IProject} --> <code>null</code>
@@ -303,70 +290,75 @@ public class CollaborationUtils {
    * for a consistent project on the receiver's side, even when there were not selected by the user
    * (e.g ".project" files).
    *
-   * @param selectedResources
-   * @param sarosSession
+   * @param resources the resources to add to the session
+   * @param session the current session or <code>null</code>
    * @return
    */
-  private static Map<IProject, List<IResource>> acquireResources(
-      List<IResource> selectedResources, ISarosSession sarosSession) {
+  private static Map<IProject, List<IResource>> getResourceMapping(
+      final List<IResource> resources, final ISarosSession session) {
 
-    if (sarosSession != null) {
-      List<IResource> sharedResources =
-          ResourceAdapterFactory.convertBack(sarosSession.getSharedResources());
-      selectedResources.removeAll(sharedResources);
+    if (session != null) {
+      // remove already shared resources for partial projects and all full shared projects
+      resources.removeAll(ResourceAdapterFactory.convertBack(session.getProjects()));
+      resources.removeAll(ResourceAdapterFactory.convertBack(session.getSharedResources()));
     }
 
-    final int resourcesSize = selectedResources.size();
+    final int resourcesSize = resources.size();
 
-    IResource[] preSortedResources = new IResource[resourcesSize];
+    final IResource[] preSortedResources = new IResource[resourcesSize];
 
     int frontIdx = 0;
     int backIdx = resourcesSize - 1;
 
     // move projects to the front so the algorithm is working as expected
-    for (IResource resource : selectedResources) {
+    for (final IResource resource : resources) {
       if (resource.getType() == IResource.PROJECT) preSortedResources[frontIdx++] = resource;
       else preSortedResources[backIdx--] = resource;
     }
 
-    Map<IProject, Set<IResource>> projectsResources = new HashMap<IProject, Set<IResource>>();
+    final Map<IProject, Set<IResource>> projectsToResourcesMapping =
+        new HashMap<IProject, Set<IResource>>();
 
-    for (IResource resource : preSortedResources) {
+    for (final IResource resource : preSortedResources) {
+
+      // init full shared projects
       if (resource.getType() == IResource.PROJECT) {
-        projectsResources.put((IProject) resource, null);
+        projectsToResourcesMapping.put(resource.getAdapter(IProject.class), null);
         continue;
       }
 
-      IProject project = resource.getProject();
+      final IProject project = resource.getProject();
 
       if (project == null) continue;
 
-      if (!projectsResources.containsKey(project))
-        projectsResources.put(project, new HashSet<IResource>());
+      // init partial shared projects
+      if (!projectsToResourcesMapping.containsKey(project))
+        projectsToResourcesMapping.put(project, new HashSet<IResource>());
 
-      Set<IResource> resources = projectsResources.get(project);
+      final Set<IResource> projectResources = projectsToResourcesMapping.get(project);
 
-      // if the resource set is null, it is a full shared project
-      if (resources != null) resources.add(resource);
+      // if the project resource set is null, it is a full shared project
+      if (projectResources != null) projectResources.add(resource);
     }
 
-    List<IResource> additionalFilesForPartialSharing = new ArrayList<IResource>();
+    for (Entry<IProject, Set<IResource>> entry : projectsToResourcesMapping.entrySet()) {
 
-    for (Entry<IProject, Set<IResource>> entry : projectsResources.entrySet()) {
+      final IProject project = entry.getKey();
+      final Set<IResource> projectResources = entry.getValue();
 
-      IProject project = entry.getKey();
-      Set<IResource> resources = entry.getValue();
+      if (projectResources == /* full shared */ null) continue;
 
-      if (resources == /* full shared */ null) continue;
+      // do not add the files again in case this is an already partial shared project
+      if (session != null && session.isShared(ResourceAdapterFactory.create(project))) continue;
 
-      additionalFilesForPartialSharing.clear();
+      final List<IResource> additionalFilesForPartialSharing = new ArrayList<IResource>();
 
       /*
        * we need this file otherwise creating a new project on the remote
        * will produce garbage because the project nature is not set /
        * updated correctly
        */
-      IFile projectFile = project.getFile(".project");
+      final IFile projectFile = project.getFile(".project");
 
       if (projectFile.exists()) additionalFilesForPartialSharing.add(projectFile);
 
@@ -390,34 +382,34 @@ public class CollaborationUtils {
        * project encoding settings.
        */
 
-      IFolder settingsFolder = project.getFolder(".settings");
+      final IFolder settingsFolder = project.getFolder(".settings");
 
       if (settingsFolder.exists() /* remove to execute block */ && false) {
 
         additionalFilesForPartialSharing.add(settingsFolder);
 
         try {
-          for (IResource resource : settingsFolder.members()) {
+          for (final IResource resource : settingsFolder.members()) {
             // TODO are sub folders possible ?
             if (resource.getType() == IResource.FILE)
               additionalFilesForPartialSharing.add(resource);
           }
         } catch (CoreException e) {
-          LOG.warn("could not read the contents of the settings folder", e);
+          log.warn("could not read the contents of the settings folder", e);
         }
       }
 
-      resources.addAll(additionalFilesForPartialSharing);
+      projectResources.addAll(additionalFilesForPartialSharing);
     }
 
-    HashMap<IProject, List<IResource>> resources = new HashMap<IProject, List<IResource>>();
+    final HashMap<IProject, List<IResource>> result = new HashMap<>();
 
-    for (Entry<IProject, Set<IResource>> entry : projectsResources.entrySet())
-      resources.put(
+    for (final Entry<IProject, Set<IResource>> entry : projectsToResourcesMapping.entrySet())
+      result.put(
           entry.getKey(),
           entry.getValue() == null ? null : new ArrayList<IResource>(entry.getValue()));
 
-    return resources;
+    return result;
   }
 
   private static String format(long size) {
@@ -450,18 +442,59 @@ public class CollaborationUtils {
     return result;
   }
 
-  private static void refreshProjects(
-      final Collection<IProject> projects, final IProgressMonitor monitor) throws CoreException {
+  /**
+   * Refreshes the given projects if they are not already shared. This is necessary to prevent
+   * unwanted file addition in case of partial sharing and unnecessary file activities in case of
+   * full shared projects when the user refreshes the project manually during a session.
+   *
+   * @param projects the projects to refresh
+   * @param session the current session or <code>null</code>
+   * @param monitor
+   * @throws CoreException
+   */
+  private static void refreshProjectsIfNeeded(
+      final Collection<IProject> projects,
+      final ISarosSession session,
+      final IProgressMonitor monitor)
+      throws CoreException {
 
-    final SubMonitor progress =
-        SubMonitor.convert(monitor, "Refreshing projects...", projects.size());
+    final List<IProject> projectsToRefresh = new ArrayList<>();
 
     for (final IProject project : projects) {
+      if (session == null || !session.isShared(ResourceAdapterFactory.create(project)))
+        projectsToRefresh.add(project);
+    }
+
+    final SubMonitor progress =
+        SubMonitor.convert(monitor, "Refreshing projects...", projectsToRefresh.size());
+
+    for (final IProject project : projectsToRefresh) {
+
       if (!project.isOpen()) project.open(progress.newChild(0));
 
       project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(1));
     }
 
     progress.done();
+  }
+
+  private static boolean confirmSessionShutdown(boolean isHost, boolean isLastUser) {
+
+    if (isHost && isLastUser) return true;
+
+    final Shell shell = SWTUtils.getShell();
+
+    final String questionTitle;
+    final String questionMessage;
+
+    if (isHost) {
+      questionTitle = Messages.CollaborationUtils_confirm_closing;
+      questionMessage = Messages.CollaborationUtils_confirm_closing_text;
+    } else {
+      questionTitle = Messages.CollaborationUtils_confirm_leaving;
+      questionMessage = Messages.CollaborationUtils_confirm_leaving_text;
+    }
+
+    return MessageDialog.openQuestion(shell, questionTitle, questionMessage);
   }
 }
