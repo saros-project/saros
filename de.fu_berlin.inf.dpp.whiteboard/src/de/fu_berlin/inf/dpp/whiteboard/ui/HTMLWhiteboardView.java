@@ -1,8 +1,9 @@
 package de.fu_berlin.inf.dpp.whiteboard.ui;
 
+import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
+import de.fu_berlin.inf.dpp.whiteboard.ui.browser.EclipseWhiteboardBrowser;
 import java.io.IOException;
 import java.net.URL;
-
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swt.SWT;
@@ -11,9 +12,6 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
-
-import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
-import de.fu_berlin.inf.dpp.whiteboard.ui.browser.EclipseWhiteboardBrowser;
 
 /**
  * This is the main view for the HTML Whiteboard, it contains the browser which runs the HTML

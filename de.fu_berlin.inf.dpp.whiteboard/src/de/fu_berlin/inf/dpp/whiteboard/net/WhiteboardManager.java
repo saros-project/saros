@@ -1,12 +1,5 @@
 package de.fu_berlin.inf.dpp.whiteboard.net;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.eclipse.swt.graphics.RGB;
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -30,6 +23,11 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController.State;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEOutgoingSynchronizationProcess;
 import de.fu_berlin.inf.dpp.whiteboard.ui.browser.BrowserSXEBridge;
 import de.fu_berlin.inf.dpp.whiteboard.ui.browser.IWhiteboardBrowser;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.log4j.Logger;
+import org.eclipse.swt.graphics.RGB;
+import org.picocontainer.annotations.Inject;
 
 /**
  * This class makes the interconnection between Saros and SXE.
