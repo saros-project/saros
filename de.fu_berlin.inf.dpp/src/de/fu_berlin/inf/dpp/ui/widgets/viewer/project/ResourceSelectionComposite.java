@@ -365,7 +365,7 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
     IProject newProject = null;
 
     for (IProject project : projectsAfter) {
-      if (!org.apache.commons.lang.ArrayUtils.contains(projectsBefore, project)) {
+      if (!org.apache.commons.lang3.ArrayUtils.contains(projectsBefore, project)) {
         // Did not find the project, so it's the new one
         newProject = project;
         break;
