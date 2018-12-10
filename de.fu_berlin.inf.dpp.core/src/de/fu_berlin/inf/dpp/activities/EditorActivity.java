@@ -22,7 +22,7 @@ package de.fu_berlin.inf.dpp.activities;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import de.fu_berlin.inf.dpp.session.User;
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Activity for activating, closing, and saving editors. If the {@link #getPath()} returns <code>
