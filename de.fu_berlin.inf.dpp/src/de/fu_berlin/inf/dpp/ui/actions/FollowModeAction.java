@@ -3,12 +3,10 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -52,7 +50,7 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
       };
 
   private ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void userLeft(final User user) {
           SWTUtils.runSafeSWTAsync(
@@ -87,7 +85,7 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
       };
 
   private ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession session) {
 

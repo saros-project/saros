@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
@@ -67,6 +68,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
   @Inject private AnnotationManager annotationManager;
 
   @Inject private Project project;
+
+  @Inject private LocalEditorHandler localEditorHandler;
 
   public FileSystemChangeListener(
       SharedResourcesManager resourceManager,
@@ -122,7 +125,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             "Ignoring contents change for " + file + " as they were caused by a document save.");
       }
 
-      // TODO dispatch save activity for saved file
+      localEditorHandler.generateEditorSaved(path);
+
       return;
     }
 

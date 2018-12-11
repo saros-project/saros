@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.EditorHistoryEntry;
 import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -25,14 +24,13 @@ import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
@@ -235,7 +233,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
    * does cleanup works at the begin and the end of a session.
    */
   protected ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -263,7 +261,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
    * stored in history.
    */
   protected ISharedEditorListener sharedEditorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
 
         @Override
         public void editorActivated(User user, SPath newActiveEditor) {

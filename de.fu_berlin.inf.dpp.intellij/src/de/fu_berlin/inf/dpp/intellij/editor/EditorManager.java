@@ -37,14 +37,12 @@ import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -266,7 +264,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       };
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         @Override
         public void permissionChanged(final User user) {
@@ -365,7 +363,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   private final ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -668,6 +666,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));
   }
 
+  /**
+   * Generates an editor save activity for the given path.
+   *
+   * @param path the path to generate an editor saved activity for
+   */
+  void generateEditorSaved(SPath path) {
+    fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED, path));
+  }
+
   /** Generates a {@link TextSelectionActivity} and fires it. */
   void generateSelection(SPath path, SelectionEvent newSelection) {
 
@@ -829,6 +836,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     }
 
     return session.isShared(editorFilePath.getResource());
+  }
+
+  boolean isDocumentListenerEnabled() {
+    return documentListener.enabled;
   }
 
   void enableDocumentListener() {

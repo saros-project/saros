@@ -5,7 +5,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
@@ -32,7 +32,7 @@ public class SessionUtils {
     SarosPluginContext.initComponent(new SessionUtils());
 
     sarosSessionManager.addSessionLifecycleListener(
-        new NullSessionLifecycleListener() {
+        new ISessionLifecycleListener() {
           @Override
           public void sessionStarted(ISarosSession session) {
 

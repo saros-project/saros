@@ -88,36 +88,6 @@ public class EditorAPI {
   }
 
   /**
-   * Overwrites the content of the document with text inside the UI thread.
-   *
-   * @param doc
-   * @param text
-   */
-  public void setText(final Document doc, final String text) {
-    Runnable action =
-        new Runnable() {
-          @Override
-          public void run() {
-            commandProcessor.executeCommand(
-                project,
-                new Runnable() {
-
-                  @Override
-                  public void run() {
-                    doc.setText(text);
-                  }
-                },
-                "Saros text set to \"" + text + "\"",
-                commandProcessor.getCurrentCommandGroupId(),
-                UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-                doc);
-          }
-        };
-
-    Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
-  }
-
-  /**
    * Deletes text in document in the specified range in the UI thread.
    *
    * @param doc

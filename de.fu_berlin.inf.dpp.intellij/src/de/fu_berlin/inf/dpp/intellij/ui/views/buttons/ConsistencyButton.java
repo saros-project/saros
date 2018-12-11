@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,7 +65,7 @@ public class ConsistencyButton extends ToolbarButton {
       };
 
   private final ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
           setSarosSession(newSarosSession);
@@ -131,8 +130,7 @@ public class ConsistencyButton extends ToolbarButton {
     /** Creates an object to store the inconsistency warning state for a session. */
     public SessionInconsistencyState(ISarosSession sarosSession) {
 
-      watchdogClient =
-          (ConsistencyWatchdogClient) sarosSession.getComponent(ConsistencyWatchdogClient.class);
+      watchdogClient = sarosSession.getComponent(ConsistencyWatchdogClient.class);
 
       action = new ConsistencyAction(watchdogClient);
       action.addActionListener(consistencyActionListener);

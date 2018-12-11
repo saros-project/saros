@@ -4,7 +4,6 @@ import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
@@ -82,7 +81,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
       };
 
   private ISharedEditorListener sharedEditorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
         /**
          * Marks checksums as dirty as soon as their associated documents are modified. With this
          * information, checksum calculation can be avoided when the document hasn't changed between

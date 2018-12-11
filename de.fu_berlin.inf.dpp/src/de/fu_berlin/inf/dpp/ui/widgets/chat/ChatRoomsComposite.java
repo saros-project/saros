@@ -14,16 +14,13 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -150,7 +147,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
    * changes.
    */
   protected IRosterListener rosterListener =
-      new AbstractRosterListener() {
+      new IRosterListener() {
 
         @Override
         public void entriesUpdated(final Collection<String> addresses) {
@@ -194,7 +191,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
       };
 
   protected ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
 
         @Override
         public void sessionStarting(final ISarosSession session) {
@@ -294,7 +291,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
       };
 
   protected ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void userColorChanged(User user) {
           SWTUtils.runSafeSWTAsync(
