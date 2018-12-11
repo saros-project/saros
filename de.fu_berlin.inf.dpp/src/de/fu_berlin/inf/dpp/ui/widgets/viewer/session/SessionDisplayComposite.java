@@ -8,7 +8,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -65,7 +64,7 @@ public abstract class SessionDisplayComposite extends ViewerComposite<TreeViewer
       };
 
   private final ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
         /*
          * do not use sessionStarting as the context may still start and so we
          * get null in session#getComponent call in the SessionContentProvider
