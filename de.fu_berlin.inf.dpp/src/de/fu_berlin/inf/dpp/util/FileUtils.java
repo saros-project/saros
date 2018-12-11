@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IContainer;
@@ -122,15 +123,14 @@ public class FileUtils {
    * @param includeMembers <code>true</code> to include the members of resources that represents a
    *     {@linkplain IContainer container}
    * @param flags additional flags on how to process the members of containers
-   * @return a pair containing the {@linkplain Pair#p file size} and {@linkplain Pair#v file count}
-   *     for the given resources
+   * @return a pair containing the {@linkplain Pair#getLeft() file size} and {@linkplain
+   *     Pair#getRight() file count} for the given resources
    */
   public static Pair<Long, Long> getFileCountAndSize(
       Collection<? extends IResource> resources, boolean includeMembers, int flags) {
+
     long totalFileSize = 0;
     long totalFileCount = 0;
-
-    Pair<Long, Long> fileCountAndSize = new Pair<Long, Long>(0L, 0L);
 
     for (IResource resource : resources) {
       switch (resource.getType()) {
@@ -150,14 +150,14 @@ public class FileUtils {
           if (!includeMembers) break;
 
           try {
-            IContainer container = ((IContainer) resource.getAdapter(IContainer.class));
+            IContainer container = resource.getAdapter(IContainer.class);
 
             Pair<Long, Long> subFileCountAndSize =
                 FileUtils.getFileCountAndSize(
                     Arrays.asList(container.members(flags)), includeMembers, flags);
 
-            totalFileSize += subFileCountAndSize.p;
-            totalFileCount += subFileCountAndSize.v;
+            totalFileSize += subFileCountAndSize.getLeft();
+            totalFileCount += subFileCountAndSize.getRight();
 
           } catch (Exception e) {
             LOG.warn("failed to process container: " + resource, e);
@@ -167,9 +167,8 @@ public class FileUtils {
           break;
       }
     }
-    fileCountAndSize.p = totalFileSize;
-    fileCountAndSize.v = totalFileCount;
-    return fileCountAndSize;
+
+    return Pair.of(totalFileSize, totalFileCount);
   }
 
   /**
