@@ -217,8 +217,14 @@ public class LocalEditorHandler {
     }
   }
 
-  public void sendEditorActivitySaved(SPath path) {
-    // FIXME: not sure how to do it intelliJ
+  /**
+   * Generates an editor save activity for the given path.
+   *
+   * @param path the path to generate an editor saved activity for
+   * @see EditorManager#generateEditorSaved(SPath)
+   */
+  public void generateEditorSaved(SPath path) {
+    manager.generateEditorSaved(path);
   }
 
   /**

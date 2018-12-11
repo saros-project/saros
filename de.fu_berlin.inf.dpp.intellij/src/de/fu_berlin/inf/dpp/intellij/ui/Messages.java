@@ -106,5 +106,8 @@ public class Messages {
   public static String SessionStatusChangeHandler_kicked;
   public static String SessionStatusChangeHandler_connection_lost;
 
+  public static String LocalEditorManipulator_incompatible_encoding_title;
+  public static String LocalEditorManipulator_incompatible_encoding_message;
+
   private Messages() {}
 }

@@ -106,4 +106,18 @@ final class ProjectNegotiationObservable {
 
     return currentNegotiations;
   }
+
+  /**
+   * Returns <tt>true</tt> if no running negotiations exist.
+   *
+   * @return <tt>true</tt> if no running negotiations exist
+   */
+  public synchronized boolean isEmpty() {
+    for (List<ProjectNegotiation> negotiationList : negotiations.values()) {
+      if (!negotiationList.isEmpty()) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

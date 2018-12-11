@@ -175,10 +175,17 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
     try {
       if (type == FileActivity.Type.CREATED) {
-        // TODO handle case if file already exists and only content needs to be recovered
-        handleFileCreation(activity);
+        if (path.getFile().exists()) {
+          localEditorManipulator.handleContentRecovery(
+              path, activity.getContent(), activity.getEncoding(), activity.getSource());
+
+        } else {
+          handleFileCreation(activity);
+        }
+
       } else if (type == FileActivity.Type.REMOVED) {
         handleFileDeletion(activity);
+
       } else {
         LOG.warn("performing recovery for type " + type + " is not supported");
       }

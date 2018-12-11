@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import java.io.IOException;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.eclipse.core.runtime.CoreException;
@@ -151,6 +151,6 @@ public class EclipseWorkspaceImplTest {
   private void assertOriginalExceptionNotSwallowed(Exception e, String methodName) {
     assertTrue(
         "method name '" + methodName + "'not found in stack trace",
-        ExceptionUtils.getFullStackTrace(e).contains(methodName));
+        ExceptionUtils.getStackTrace(e).contains(methodName));
   }
 }
