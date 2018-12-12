@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.filesystem.NullChecksumCache;
 import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
+import de.fu_berlin.inf.dpp.server.console.InviteCommand;
 import de.fu_berlin.inf.dpp.server.console.ServerConsole;
 import de.fu_berlin.inf.dpp.server.dummies.NullRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathFactoryImpl;
@@ -88,6 +89,7 @@ public class ServerContextFactory extends AbstractContextFactory {
     c.addComponent(NegotiationHandler.class);
     if (ServerConfig.isInteractive()) {
       c.addComponent(new ServerConsole(System.in, System.out));
+      c.addComponent(InviteCommand.class);
     }
   }
 
