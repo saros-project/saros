@@ -24,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.List;
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * A Checksum Error is a notification sent to the host by a user who wants inconsistencies to be

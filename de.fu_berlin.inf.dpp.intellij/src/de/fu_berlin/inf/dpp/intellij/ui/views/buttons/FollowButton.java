@@ -2,16 +2,13 @@ package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 
 import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
@@ -29,7 +26,7 @@ public class FollowButton extends ToolbarButton {
   private final FollowModeAction followModeAction;
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void userLeft(final User user) {
           updateMenu();
@@ -42,7 +39,7 @@ public class FollowButton extends ToolbarButton {
       };
 
   private final ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession session) {
           session.addListener(sessionListener);
@@ -60,7 +57,7 @@ public class FollowButton extends ToolbarButton {
       };
 
   private final ISharedEditorListener editorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
         @Override
         public void followModeChanged(final User target, final boolean isFollowed) {
           updateMenu();

@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -31,7 +30,7 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
   private final IEditorManager editorManager;
 
   private final ISharedEditorListener editorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
 
         @Override
         public void jumpedToUser(User target) {

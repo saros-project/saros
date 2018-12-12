@@ -3,16 +3,14 @@ package de.fu_berlin.inf.dpp.ui.model.session;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -89,7 +87,7 @@ public class SessionContentProvider extends TreeContentProvider {
       };
 
   private final ISharedEditorListener sharedEditorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
         @Override
         public void editorActivated(final User user, SPath filePath) {
           SWTUtils.runSafeSWTAsync(
@@ -108,7 +106,7 @@ public class SessionContentProvider extends TreeContentProvider {
 
   // TODO call update and not refresh
   private final RosterListener rosterListener =
-      new AbstractRosterListener() {
+      new IRosterListener() {
         // update nicknames
         @Override
         public void entriesUpdated(Collection<String> addresses) {
@@ -128,7 +126,7 @@ public class SessionContentProvider extends TreeContentProvider {
    * refresh otherwise the viewer is not correctly updated
    */
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void userLeft(User user) {
           // UserElement userElement = getUserElement(currentRoster, user);

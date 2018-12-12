@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.core.project.internal;
 import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -35,7 +34,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer impleme
   private final EditorManager editor;
 
   private final ISharedEditorListener followModeListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
         @Override
         public void followModeChanged(User target, boolean isFollowed) {
 

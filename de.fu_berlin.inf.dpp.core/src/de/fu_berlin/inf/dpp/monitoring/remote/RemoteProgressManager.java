@@ -6,14 +6,12 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
@@ -76,7 +74,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
       };
 
   private ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         /**
          * Stops all remote progress indicators owned by a particular user when that user leaves the
          * session.
@@ -98,7 +96,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
       };
 
   private ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
 
         /** Registers the required listeners after a new session has started. */
         @Override
