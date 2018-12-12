@@ -5,7 +5,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.negotiation.ProjectSharingData;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,10 +22,13 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
   /** used for copy operations between streams * */
   private final byte[] buffer = new byte[BUFFER_SIZE];
 
+  private ProjectSharingData projectSharingData;
   private DataOutputStream out;
 
-  public OutgoingStreamProtocol(OutputStream out, ISarosSession session, IProgressMonitor monitor) {
-    super(session, monitor);
+  public OutgoingStreamProtocol(
+      OutputStream out, ProjectSharingData projectSharingData, IProgressMonitor monitor) {
+    super(monitor);
+    this.projectSharingData = projectSharingData;
     this.out = new DataOutputStream(out);
   }
 
@@ -72,7 +75,7 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
   }
 
   private void writeHeader(SPath file, long fileSize) throws IOException {
-    String projectID = session.getProjectID(file.getProject());
+    String projectID = projectSharingData.getProjectID(file.getProject());
     String fileName = file.getProjectRelativePath().toPortableString();
 
     out.writeUTF(projectID);

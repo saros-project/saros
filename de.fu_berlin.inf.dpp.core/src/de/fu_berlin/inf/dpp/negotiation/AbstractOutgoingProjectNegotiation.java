@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
@@ -41,7 +42,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
   private static final Logger LOG = Logger.getLogger(AbstractOutgoingProjectNegotiation.class);
 
-  protected List<IProject> projects;
+  protected ProjectSharingData projects;
 
   private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 
@@ -54,7 +55,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
   protected AbstractOutgoingProjectNegotiation( //
       final JID peer, //
       final TransferType transferType, //
-      final List<IProject> projects, //
+      final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -98,6 +99,19 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
       List<FileList> fileLists = getRemoteFileList(monitor);
       monitor.subTask("");
+
+      /*
+       * If we are a non-host sharing projects with the host, now is the
+       * time where we know that the host has accepted our projects. We
+       * can thus safely assume these projects to be shared now.
+       */
+      if (!session.isHost()) {
+        for (IProject project : projects) {
+          String projectID = projects.getProjectID(project);
+          List<IResource> resources = projects.getResourcesToShare(project);
+          session.addSharedResources(project, projectID, resources);
+        }
+      }
 
       prepareTransfer(monitor, fileLists);
 
@@ -293,7 +307,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
   }
 
   protected List<ProjectNegotiationData> createProjectNegotiationDataList(
-      final List<IProject> projectsToShare, final IProgressMonitor monitor)
+      final ProjectSharingData projectSharingData, final IProgressMonitor monitor)
       throws IOException, LocalCancellationException {
 
     // *stretch* progress bar so it will increment smoothly
@@ -301,16 +315,18 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
     monitor.beginTask(
         "Creating file list and calculating file checksums. This may take a while...",
-        projectsToShare.size() * scale);
+        projectSharingData.size() * scale);
 
     List<ProjectNegotiationData> negData =
-        new ArrayList<ProjectNegotiationData>(projectsToShare.size());
+        new ArrayList<ProjectNegotiationData>(projectSharingData.size());
 
-    for (IProject project : projectsToShare) {
+    for (IProject project : projectSharingData) {
 
       if (monitor.isCanceled())
         throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
       try {
+        String projectID = projectSharingData.getProjectID(project);
+        List<IResource> resources = projectSharingData.getResourcesToShare(project);
 
         /*
          * force editor buffer flush because we read the files from the
@@ -321,7 +337,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         FileList projectFileList =
             FileListFactory.createFileList(
                 project,
-                session.getSharedResources(project),
+                resources,
                 checksumCache,
                 new SubProgressMonitor(
                     monitor,
@@ -329,9 +345,8 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
                     SubProgressMonitor.SUPPRESS_BEGINTASK
                         | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-        boolean partial = !session.isCompletelyShared(project);
+        boolean partial = projectSharingData.shouldBeSharedPartially(project);
 
-        String projectID = session.getProjectID(project);
         projectFileList.setProjectID(projectID);
 
         ProjectNegotiationData data =
