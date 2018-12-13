@@ -6,7 +6,8 @@
   "scripts": {
     "setup": "npm install && bower install fabric --allow-root",
     "dev": "webpack -w",
-    "build": "webpack --mode=production && inline-source ./index.html ./dist/index.html --root ./ && del-cli dist/bundle.js"
+    "build": "webpack --mode=production && inline-source ./index.html ./dist/index.html --root ./ && del-cli dist/bundle.js",
+    "lint": "eslint --ext .js,.jsx ./app.js src"
   },
   "author": "Abdullah Barhoum",
   "license": "GPLv2",
