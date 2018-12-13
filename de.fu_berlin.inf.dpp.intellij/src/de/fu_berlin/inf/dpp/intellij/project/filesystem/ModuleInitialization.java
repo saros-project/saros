@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import java.io.IOException;
@@ -42,7 +41,7 @@ public class ModuleInitialization implements Startable {
   private final ISarosSession session;
 
   private final ISessionListener moduleReloaderListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         @Override
         public void resourcesAdded(IProject module) {

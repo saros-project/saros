@@ -20,7 +20,9 @@ public interface ISharedEditorListener {
    *     no open editor at all)
    * @param user the user who activated the editor (may be the local user)
    */
-  public void editorActivated(User user, SPath filePath);
+  public default void editorActivated(User user, SPath filePath) {
+    // NOP
+  }
 
   /**
    * Fired when a user closes an editor.
@@ -28,7 +30,9 @@ public interface ISharedEditorListener {
    * @param user the user who closed the editor (may be the local user)
    * @param filePath project-relative path of the file associated with the closed editor
    */
-  public void editorClosed(User user, SPath filePath);
+  public default void editorClosed(User user, SPath filePath) {
+    // NOP
+  }
 
   /**
    * Fired when the local user starts or stops following a remote user.
@@ -40,14 +44,18 @@ public interface ISharedEditorListener {
    *     FollowModeManager}.
    */
   @Deprecated
-  public void followModeChanged(User target, boolean isFollowed);
+  public default void followModeChanged(User target, boolean isFollowed) {
+    // NOP
+  }
 
   /**
    * Fired when a user changes an editor's text content. This should only be treated as an event
    * notification; it should not be assumed that the change has already been applied locally when
    * this method is called.
    */
-  public void textEdited(TextEditActivity textEdit);
+  public default void textEdited(TextEditActivity textEdit) {
+    // NOP
+  }
 
   /**
    * Fired when a user changes the text selection in an editor. The change has already been applied
@@ -55,7 +63,9 @@ public interface ISharedEditorListener {
    *
    * @param selection The text selection as a {@link TextSelectionActivity}
    */
-  public void textSelectionChanged(TextSelectionActivity selection);
+  public default void textSelectionChanged(TextSelectionActivity selection) {
+    // NOP
+  }
 
   /**
    * Fired when the local user uses the "jump to user" feature to jump to the active editor and
@@ -63,5 +73,7 @@ public interface ISharedEditorListener {
    *
    * @param target the user being jumped to
    */
-  public void jumpedToUser(User target);
+  public default void jumpedToUser(User target) {
+    // NOP
+  }
 }

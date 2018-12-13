@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
-import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
@@ -257,7 +257,9 @@ public class CollaborationUtils {
           result.append(
               String.format(
                   "\nModule: %s, Files: %d, Size: %s",
-                  project.getName(), fileCountAndSize.v, format(fileCountAndSize.p)));
+                  project.getName(),
+                  fileCountAndSize.getRight(),
+                  format(fileCountAndSize.getLeft())));
         } else {
           List<IResource> resources = sarosSession.getSharedResources(project);
 
@@ -267,8 +269,8 @@ public class CollaborationUtils {
               String.format(
                   "\nModule: %s, Files: %s, Size: %s",
                   project.getName() + " " + Messages.CollaborationUtils_partial,
-                  fileCountAndSize.v,
-                  format(fileCountAndSize.p)));
+                  fileCountAndSize.getRight(),
+                  format(fileCountAndSize.getLeft())));
         }
       }
     } catch (IOException e) {
@@ -441,10 +443,9 @@ public class CollaborationUtils {
    */
   private static Pair<Long, Long> getFileCountAndSize(
       Collection<? extends IResource> resources, boolean includeMembers, int flags) {
+
     long totalFileSize = 0;
     long totalFileCount = 0;
-
-    Pair<Long, Long> fileCountAndSize = new Pair<>(0L, 0L);
 
     for (IResource resource : resources) {
       switch (resource.getType()) {
@@ -471,8 +472,8 @@ public class CollaborationUtils {
             Pair<Long, Long> subFileCountAndSize =
                 getFileCountAndSize(Arrays.asList(container.members(flags)), true, flags);
 
-            totalFileSize += subFileCountAndSize.p;
-            totalFileCount += subFileCountAndSize.v;
+            totalFileSize += subFileCountAndSize.getLeft();
+            totalFileCount += subFileCountAndSize.getRight();
 
           } catch (Exception e) {
             LOG.warn("failed to process container: " + resource, e);
@@ -482,8 +483,7 @@ public class CollaborationUtils {
           break;
       }
     }
-    fileCountAndSize.p = totalFileSize;
-    fileCountAndSize.v = totalFileCount;
-    return fileCountAndSize;
+
+    return Pair.of(totalFileSize, totalFileCount);
   }
 }

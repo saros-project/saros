@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.feedback;
 
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -14,8 +13,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -152,7 +151,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
   private final IEditorManager editorManager;
 
   private final ISharedEditorListener editorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
 
         @Override
         public void textEdited(TextEditActivity textEdit) {

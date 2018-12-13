@@ -5,7 +5,7 @@ eclipse.project {
 dependencies {
   releaseDep 'commons-codec:commons-codec:1.3'
   releaseDep 'commons-io:commons-io:2.0.1'
-  releaseDep 'commons-lang:commons-lang:2.4'
+  releaseDep 'org.apache.commons:commons-lang3:3.8.1'
   releaseDep 'javax.jmdns:jmdns:3.4.1'
   releaseDep 'org.picocontainer:picocontainer:2.11.2'
   releaseDep 'org.igniterealtime.smack:smack:3.4.1'

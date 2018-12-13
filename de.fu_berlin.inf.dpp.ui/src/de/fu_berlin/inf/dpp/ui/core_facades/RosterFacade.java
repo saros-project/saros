@@ -8,10 +8,10 @@ import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.observables.ObservableValue;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
-import de.fu_berlin.inf.dpp.util.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
@@ -96,7 +96,7 @@ public class RosterFacade {
         if (correctEntry == null) continue;
 
         Presence presence = roster.getPresence(correctEntry.getUser());
-        entries.add(new Pair<RosterEntry, Presence>(correctEntry, presence));
+        entries.add(Pair.of(correctEntry, presence));
       }
 
       return entries;

@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.editor.remote;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
@@ -32,7 +31,7 @@ public class UserEditorStateManager implements IActivityConsumer, Startable {
   private final ISarosSession sarosSession;
 
   private final ISessionListener setupAndTeardownUserStates =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void userJoined(User user) {
           /*
