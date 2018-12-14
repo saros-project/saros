@@ -4,9 +4,7 @@ import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -17,22 +15,25 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
 
-// TODO evaluate what logic can moved to the core. The AwarenessInformationCollector is a singleton
-// Application Runtime component, only used for the Eclipse UI. It is not the best choice to move it
-// also to the core.
+/*
+ * TODO Move this class into the core once another Saros implementation also wants to display which
+ * user is currently following which other user.
+ *
+ * During this move, it should be evaluated if AwarenessInformationCollector is suitable for other
+ * IDE implementations or if if would be better to abstract from a specific implementation handling
+ * the stored follow mode information.
+ */
+
 /**
  * This manager is responsible for collection changes in follow modes between session participants.
  * It consumes activities.
- *
- * @author Alexander Waldmann (contact@net-corps.de)
  */
 @Component(module = "core")
-public class FollowingActivitiesManager extends AbstractActivityProducer implements Startable {
+public class FollowingActivitiesManager implements Startable {
 
   private static final Logger LOG = Logger.getLogger(FollowingActivitiesManager.class);
 
-  private final List<IFollowModeChangesListener> listeners =
-      new CopyOnWriteArrayList<IFollowModeChangesListener>();
+  private final List<IFollowModeChangesListener> listeners = new CopyOnWriteArrayList<>();
 
   private final ISarosSession session;
 
@@ -73,9 +74,8 @@ public class FollowingActivitiesManager extends AbstractActivityProducer impleme
       };
 
   public FollowingActivitiesManager(
-      final ISarosSession session,
-      final AwarenessInformationCollector collector,
-      final FollowModeManager followModeManager) {
+      final ISarosSession session, final AwarenessInformationCollector collector) {
+
     this.session = session;
     this.collector = collector;
   }
@@ -83,14 +83,12 @@ public class FollowingActivitiesManager extends AbstractActivityProducer impleme
   @Override
   public void start() {
     collector.flushFollowModes();
-    session.addActivityProducer(this);
     session.addActivityConsumer(consumer, Priority.ACTIVE);
     session.addListener(sessionListener);
   }
 
   @Override
   public void stop() {
-    session.removeActivityProducer(this);
     session.removeActivityConsumer(consumer);
     session.removeListener(sessionListener);
     collector.flushFollowModes();
