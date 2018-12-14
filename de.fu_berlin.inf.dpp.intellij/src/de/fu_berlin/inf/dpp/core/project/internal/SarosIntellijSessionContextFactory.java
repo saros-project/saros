@@ -14,7 +14,6 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {
 
     // Other
-    container.addComponent(FollowingActivitiesManager.class);
     if (!session.isHost()) {
       container.addComponent(ModuleInitialization.class);
     }

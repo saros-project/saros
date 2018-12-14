@@ -5,7 +5,6 @@ import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.communication.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
-import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFactory;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
@@ -88,7 +87,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
       // Proxy Support for the XMPP server connection
       Component.create(IProxyResolver.class, NullProxyResolver.class),
-      Component.create(AwarenessInformationCollector.class)
     };
   }
 
