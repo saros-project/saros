@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
@@ -74,7 +73,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
       };
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void userJoined(User user) {
 

@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.eventhandler;
 
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -52,7 +51,7 @@ public class HostLeftAloneInSessionHandler {
       };
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         @Override
         public void userLeft(User user) {

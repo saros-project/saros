@@ -3,12 +3,10 @@ package de.fu_berlin.inf.dpp.ui.decorators;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -118,7 +116,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
       };
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         @Override
         public void userColorChanged(User user) {
@@ -135,7 +133,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
       };
 
   private final ISharedEditorListener editorListener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
 
         @Override
         public void editorActivated(User user, SPath filePath) {

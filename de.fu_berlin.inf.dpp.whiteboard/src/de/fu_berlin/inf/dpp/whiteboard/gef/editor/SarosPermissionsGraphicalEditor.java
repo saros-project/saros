@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.editor;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
@@ -34,7 +33,7 @@ public abstract class SarosPermissionsGraphicalEditor extends BlockableGraphical
       };
 
   protected ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void permissionChanged(User user) {
           if (user.isLocal()) {

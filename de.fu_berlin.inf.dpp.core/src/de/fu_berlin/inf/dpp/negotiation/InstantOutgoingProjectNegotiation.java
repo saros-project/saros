@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
@@ -52,7 +51,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
   /** receive open editors to prioritize these files * */
   private final ISharedEditorListener listener =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
         @Override
         public void editorActivated(User user, SPath file) {
           fileOpened(file);
