@@ -30,29 +30,37 @@ public interface ISessionLifecycleListener {
    * @param session The corresponding session
    * @param monitor the invitation process's monitor to track process and cancellation
    */
-  public void postOutgoingInvitationCompleted(
-      ISarosSession session, User user, IProgressMonitor monitor);
+  public default void postOutgoingInvitationCompleted(
+      ISarosSession session, User user, IProgressMonitor monitor) {
+    // NOP
+  }
 
   /**
    * Is fired when a new session is about to start.
    *
    * @param session the session that is about to start
    */
-  public void sessionStarting(ISarosSession session);
+  public default void sessionStarting(ISarosSession session) {
+    // NOP
+  }
 
   /**
    * Is fired when a new session started.
    *
    * @param session the session that has been started
    */
-  public void sessionStarted(ISarosSession session);
+  public default void sessionStarted(ISarosSession session) {
+    // NOP
+  }
 
   /**
    * Is fired when a session is about to be ended.
    *
    * @param session the session that is about to end <code>null</code>.
    */
-  public void sessionEnding(ISarosSession session);
+  public default void sessionEnding(ISarosSession session) {
+    // NOP
+  }
 
   /**
    * Is fired when a session ended.
@@ -60,5 +68,7 @@ public interface ISessionLifecycleListener {
    * @param session the session that has been ended
    * @param reason the reason why the session ended
    */
-  public void sessionEnded(ISarosSession session, SessionEndReason reason);
+  public default void sessionEnded(ISarosSession session, SessionEndReason reason) {
+    // NOP
+  }
 }

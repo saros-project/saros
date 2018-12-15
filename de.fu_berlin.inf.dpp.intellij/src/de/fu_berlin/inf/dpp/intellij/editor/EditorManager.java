@@ -30,20 +30,19 @@ import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.LocalClosedEditorModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -265,7 +264,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       };
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         @Override
         public void permissionChanged(final User user) {
@@ -364,7 +363,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   private final ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -398,7 +397,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.addActivityProducer(EditorManager.this);
           session.addActivityConsumer(consumer, Priority.ACTIVE);
 
-          documentListener.setEnabled(true);
+          localDocumentModificationHandler.setEnabled(true);
+          localClosedEditorModificationHandler.setEnabled(true);
 
           userEditorStateManager = session.getComponent(UserEditorStateManager.class);
           remoteWriteAccessManager = new RemoteWriteAccessManager(session);
@@ -422,7 +422,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.removeActivityProducer(EditorManager.this);
           session.removeActivityConsumer(consumer);
 
-          documentListener.setEnabled(false);
+          localDocumentModificationHandler.setEnabled(false);
+          localClosedEditorModificationHandler.setEnabled(false);
 
           session = null;
 
@@ -446,10 +447,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private RemoteWriteAccessManager remoteWriteAccessManager;
   private ISarosSession session;
 
-  private final StoppableDocumentListener documentListener;
-  private final StoppableEditorFileListener fileListener;
-  private final StoppableSelectionListener selectionListener;
-  private final StoppableViewPortListener viewportListener;
+  private final LocalDocumentModificationHandler localDocumentModificationHandler;
+  private final LocalClosedEditorModificationHandler localClosedEditorModificationHandler;
+  private final LocalEditorStatusChangeHandler localEditorStatusChangeHandler;
+  private final LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
+  private final LocalViewPortChangeHandler localViewPortChangeHandler;
 
   /** The user that is followed or <code>null</code> if no user is followed. */
   private User followedUser = null;
@@ -475,11 +477,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     this.annotationManager = annotationManager;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
 
-    documentListener = new StoppableDocumentListener(this);
-    fileListener = new StoppableEditorFileListener(this, annotationManager);
+    localDocumentModificationHandler = new LocalDocumentModificationHandler(this);
+    localClosedEditorModificationHandler =
+        new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
+    localEditorStatusChangeHandler =
+        new LocalEditorStatusChangeHandler(localEditorHandler, annotationManager);
 
-    selectionListener = new StoppableSelectionListener(this);
-    viewportListener = new StoppableViewPortListener(this);
+    localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
+    localViewPortChangeHandler = new LocalViewPortChangeHandler(this);
 
     localEditorHandler.initialize(this);
     localEditorManipulator.initialize(this);
@@ -611,8 +616,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     return session != null;
   }
 
-  StoppableEditorFileListener getFileListener() {
-    return fileListener;
+  LocalEditorStatusChangeHandler getLocalEditorStatusChangeHandler() {
+    return localEditorStatusChangeHandler;
   }
 
   /**
@@ -660,6 +665,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     // TODO What about a editorListenerDispatch.editorClosed() call?
 
     fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));
+  }
+
+  /**
+   * Generates an editor save activity for the given path.
+   *
+   * @param path the path to generate an editor saved activity for
+   */
+  void generateEditorSaved(SPath path) {
+    fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED, path));
   }
 
   /** Generates a {@link TextSelectionActivity} and fires it. */
@@ -825,44 +839,52 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     return session.isShared(editorFilePath.getResource());
   }
 
-  void enableDocumentListener() {
-    documentListener.setEnabled(true);
+  boolean isDocumentModificationHandlerEnabled() {
+    return localDocumentModificationHandler.isEnabled();
   }
 
-  void disableDocumentListener() {
-    documentListener.setEnabled(false);
+  void enableDocumentHandlers() {
+    localDocumentModificationHandler.setEnabled(true);
+    localClosedEditorModificationHandler.setEnabled(true);
+  }
+
+  void disableDocumentHandlers() {
+    localDocumentModificationHandler.setEnabled(false);
+    localClosedEditorModificationHandler.setEnabled(false);
   }
 
   /**
-   * Enables the documentListener, the fileListener, the selectionListener and the viewportListener
-   * if the parameter is <code>true</code>, else disables them.
+   * Enables the localDocumentModificationHandler, the localEditorStatusChangeHandler, the
+   * localTextSelectionChangeHandler and the localViewPortChangeHandler if the parameter is <code>
+   * true</code>, else disables them.
    */
-  void setListenerEnabled(boolean enable) {
-    documentListener.setEnabled(enable);
-    fileListener.setEnabled(enable);
-    selectionListener.setEnabled(enable);
-    viewportListener.setEnabled(enable);
+  void setHandlersEnabled(boolean enable) {
+    localDocumentModificationHandler.setEnabled(enable);
+    localClosedEditorModificationHandler.setEnabled(enable);
+    localEditorStatusChangeHandler.setEnabled(enable);
+    localTextSelectionChangeHandler.setEnabled(enable);
+    localViewPortChangeHandler.setEnabled(enable);
   }
 
   /**
-   * Sets the editor's document writable and adds StoppableSelectionListener,
-   * StoppableViewPortListener and the documentListener.
+   * Sets the editor's document writable and adds LocalTextSelectionChangeHandler,
+   * LocalViewPortChangeHandler and the localDocumentModificationHandler.
    */
   void startEditor(Editor editor) {
     editor.getDocument().setReadOnly(isLocked || !hasWriteAccess);
-    editor.getSelectionModel().addSelectionListener(selectionListener);
-    editor.getScrollingModel().addVisibleAreaListener(viewportListener);
+    localTextSelectionChangeHandler.register(editor);
+    localViewPortChangeHandler.register(editor);
   }
 
   /** Unlocks all editors in the editorPool. */
   void unlockAllEditors() {
-    setListenerEnabled(true);
+    setHandlersEnabled(true);
     editorPool.unlockAllDocuments();
   }
 
   /** Locks all open editors, by setting them to read-only. */
   void lockAllEditors() {
-    setListenerEnabled(false);
+    setHandlersEnabled(false);
     editorPool.lockAllDocuments();
   }
 

@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.FileUtils;
-import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -256,38 +256,35 @@ public class CollaborationUtils {
    */
   private static String getSessionDescription(ISarosSession sarosSession) {
 
-    Set<de.fu_berlin.inf.dpp.filesystem.IProject> projects = sarosSession.getProjects();
+    final Set<de.fu_berlin.inf.dpp.filesystem.IProject> projects = sarosSession.getProjects();
 
-    StringBuilder result = new StringBuilder();
+    final StringBuilder result = new StringBuilder();
 
     for (de.fu_berlin.inf.dpp.filesystem.IProject project : projects) {
 
-      Pair<Long, Long> fileCountAndSize;
+      final Pair<Long, Long> fileCountAndSize;
 
-      if (sarosSession.isCompletelyShared(project)) {
-        fileCountAndSize =
-            FileUtils.getFileCountAndSize(
-                Collections.singletonList(((EclipseProjectImpl) project).getDelegate()),
-                true,
-                IContainer.EXCLUDE_DERIVED);
+      final boolean isCompletelyShared = sarosSession.isCompletelyShared(project);
 
-        result.append(
-            String.format(
-                "\nProject: %s, Files: %d, Size: %s",
-                project.getName(), fileCountAndSize.v, format(fileCountAndSize.p)));
-      } else {
-        List<IResource> resources =
-            ResourceAdapterFactory.convertBack(sarosSession.getSharedResources(project));
+      final List<IResource> resources;
 
-        fileCountAndSize = FileUtils.getFileCountAndSize(resources, false, IResource.NONE);
+      if (isCompletelyShared)
+        resources = Collections.singletonList(((EclipseProjectImpl) project).getDelegate());
+      else resources = ResourceAdapterFactory.convertBack(sarosSession.getSharedResources(project));
 
-        result.append(
-            String.format(
-                "\nProject: %s, Files: %s, Size: %s",
-                project.getName() + " " + Messages.CollaborationUtils_partial,
-                fileCountAndSize.v,
-                format(fileCountAndSize.p)));
-      }
+      fileCountAndSize =
+          FileUtils.getFileCountAndSize(
+              resources,
+              isCompletelyShared ? true : false,
+              isCompletelyShared ? IContainer.EXCLUDE_DERIVED : IResource.NONE);
+
+      result.append(
+          String.format(
+              "\nProject: %s (%s), Files: %d, Size: %s",
+              project.getName(),
+              isCompletelyShared ? "complete" : "partial",
+              fileCountAndSize.getRight(),
+              format(fileCountAndSize.getLeft())));
     }
 
     return result.toString();

@@ -4,12 +4,10 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -62,7 +60,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
   private volatile ISarosSession session;
 
   private final ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
@@ -80,7 +78,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
       };
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void resourcesAdded(IProject project) {
           LOG.debug("updating project decoration for all shared projects");

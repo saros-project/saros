@@ -5,12 +5,10 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
@@ -37,7 +35,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
   @Inject private ISarosSessionManager sessionManager;
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void userLeft(final User user) {
           UIUtil.invokeLaterIfNeeded(
@@ -73,7 +71,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
       };
 
   private final ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession newSarosSession) {
           UIUtil.invokeLaterIfNeeded(

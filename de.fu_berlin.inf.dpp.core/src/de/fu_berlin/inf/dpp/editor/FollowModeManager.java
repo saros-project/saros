@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -48,7 +47,7 @@ public class FollowModeManager implements Startable {
 
   /** If the user left which I am following, then stop following him/her */
   private ISessionListener stopFollowingWhenUserLeaves =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void userLeft(User user) {
           if (!isFollowing()) return;
@@ -62,7 +61,7 @@ public class FollowModeManager implements Startable {
 
   /** If the local user activates another editor (or closes the followed one), stop following */
   private ISharedEditorListener stopFollowingOnOwnActions =
-      new AbstractSharedEditorListener() {
+      new ISharedEditorListener() {
         @Override
         public void editorActivated(User user, SPath filePath) {
           if (!user.equals(localUser) || !isFollowing()) return;

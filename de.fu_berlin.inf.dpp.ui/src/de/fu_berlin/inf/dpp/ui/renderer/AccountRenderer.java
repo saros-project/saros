@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.ui.renderer;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.account.NullAccountStoreListener;
+import de.fu_berlin.inf.dpp.account.IAccountStoreListener;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
@@ -24,7 +24,7 @@ public class AccountRenderer extends Renderer {
     this.accounts = new ArrayList<XMPPAccount>();
 
     accountStore.addListener(
-        new NullAccountStoreListener() {
+        new IAccountStoreListener() {
           @Override
           public void accountsChanged(List<XMPPAccount> currentAccounts) {
             update(currentAccounts);

@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.feedback;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class ProjectCollector extends AbstractStatisticCollector {
       new HashMap<String, ProjectInformation>();
 
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void resourcesAdded(IProject project) {
           String projectID = sarosSession.getProjectID(project);

@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.QueueItem;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -39,7 +38,7 @@ public class ConcurrentDocumentServer implements Startable {
 
   /** {@link ISessionListener} for updating Jupiter documents on the host. */
   private final ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
 
         @Override
         public void userStartedQueuing(final User user) {

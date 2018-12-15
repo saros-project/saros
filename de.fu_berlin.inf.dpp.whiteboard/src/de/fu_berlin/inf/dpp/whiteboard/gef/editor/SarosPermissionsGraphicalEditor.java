@@ -1,11 +1,9 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.editor;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
@@ -20,7 +18,7 @@ import org.picocontainer.annotations.Inject;
 public abstract class SarosPermissionsGraphicalEditor extends BlockableGraphicalEditor {
 
   protected ISessionLifecycleListener sessionLifecycleListener =
-      new NullSessionLifecycleListener() {
+      new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession session) {
           session.addListener(sessionListener);
@@ -35,7 +33,7 @@ public abstract class SarosPermissionsGraphicalEditor extends BlockableGraphical
       };
 
   protected ISessionListener sessionListener =
-      new AbstractSessionListener() {
+      new ISessionListener() {
         @Override
         public void permissionChanged(User user) {
           if (user.isLocal()) {

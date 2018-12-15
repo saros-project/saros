@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.fu_berlin.inf.dpp.session.User;
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 public abstract class AbstractResourceActivity extends AbstractActivity
     implements IResourceActivity {

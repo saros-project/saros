@@ -3,14 +3,23 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
+import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
+import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
+import de.fu_berlin.inf.dpp.intellij.ui.Messages;
+import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
+import de.fu_berlin.inf.dpp.session.User;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import org.apache.log4j.Logger;
 
 /** This class applies the logic for activities that were received from remote. */
@@ -20,15 +29,18 @@ public class LocalEditorManipulator {
 
   private final ProjectAPI projectAPI;
   private final EditorAPI editorAPI;
+  private final AnnotationManager annotationManager;
 
   /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
   private EditorPool editorPool;
 
   private EditorManager manager;
 
-  public LocalEditorManipulator(ProjectAPI projectAPI, EditorAPI editorAPI) {
+  public LocalEditorManipulator(
+      ProjectAPI projectAPI, EditorAPI editorAPI, AnnotationManager annotationManager) {
     this.projectAPI = projectAPI;
     this.editorAPI = editorAPI;
+    this.annotationManager = annotationManager;
   }
 
   /** Initializes all fields that require an EditorManager. */
@@ -108,30 +120,6 @@ public class LocalEditorManipulator {
   }
 
   /**
-   * Replaces the content of the document at the given path. The text is only replaced, if the
-   * editor is writable.
-   *
-   * @param path path of the editor
-   * @param text text to set the document's content to
-   * @return Returns <code>true</code> if replacement was successful, <code>false</code> if the path
-   *     was <code>null></code>, if the path points to a non-existing document or the document was
-   *     not writable.
-   */
-  public boolean replaceText(SPath path, String text) {
-    Document doc = editorPool.getDocument(path);
-    if (doc == null) {
-      return false;
-    }
-    if (!doc.isWritable()) {
-      LOG.error("File to replace text in is not writeable: " + path);
-      return false;
-    }
-
-    editorAPI.setText(doc, text);
-    return true;
-  }
-
-  /**
    * Applies the text operations on the path and marks them in color.
    *
    * @param path
@@ -177,7 +165,7 @@ public class LocalEditorManipulator {
        * Disable documentListener temporarily to avoid being notified of
        * the change
        */
-      manager.disableDocumentListener();
+      manager.disableDocumentHandlers();
 
       for (ITextOperation op : operations.getTextOperations()) {
         if (op instanceof DeleteOperation) {
@@ -195,7 +183,7 @@ public class LocalEditorManipulator {
       }
 
     } finally {
-      manager.enableDocumentListener();
+      manager.enableDocumentHandlers();
     }
   }
 
@@ -232,5 +220,96 @@ public class LocalEditorManipulator {
         editor, range.getStartLine(), range.getStartLine() + range.getNumberOfLines());
 
     // todo: implement actual viewport adjustment logic
+  }
+
+  /**
+   * Replaces the content of the given file with the given content. This is done on the Document
+   * level.
+   *
+   * <p><b>NOTE:</b> This method should only be used as part of the recovery process.
+   *
+   * @param path the path of the file to recover
+   * @param content the new content of the file
+   * @param encoding the encoding of the content
+   * @param source the user that send the recovery action
+   * @see Document
+   * @see SharedResourcesManager#handleFileRecovery(FileActivity)
+   */
+  public void handleContentRecovery(SPath path, byte[] content, String encoding, User source) {
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+    if (virtualFile == null) {
+      LOG.warn(
+          "Could not recover file content of "
+              + path
+              + " as it could not be converted to a VirtualFile.");
+
+      return;
+    }
+
+    Document document = projectAPI.getDocument(virtualFile);
+    if (document == null) {
+      LOG.warn(
+          "Could not recover file content of "
+              + path
+              + " as no valid Document representation was returned by the IntelliJ API.");
+
+      return;
+    }
+
+    int documentLength = document.getTextLength();
+
+    IFile file = path.getFile();
+    annotationManager.removeAnnotations(file);
+
+    String text;
+    try {
+      text = new String(content, encoding);
+    } catch (UnsupportedEncodingException e) {
+      LOG.warn("Could not decode text using given encoding. Using default instead.", e);
+
+      text = new String(content);
+
+      NotificationPanel.showWarning(
+          String.format(
+              Messages.LocalEditorManipulator_incompatible_encoding_message,
+              file.getLocation(),
+              encoding,
+              Charset.defaultCharset()),
+          Messages.LocalEditorManipulator_incompatible_encoding_title);
+    }
+
+    boolean wasReadOnly = !document.isWritable();
+    boolean wasDocumentListenerEnabled = manager.isDocumentModificationHandlerEnabled();
+
+    try {
+      // TODO distinguish if read-only was set by the StopManager, abort otherwise
+      if (wasReadOnly) {
+        document.setReadOnly(false);
+      }
+
+      if (wasDocumentListenerEnabled) {
+        manager.disableDocumentHandlers();
+      }
+
+      editorAPI.deleteText(document, 0, documentLength);
+      editorAPI.insertText(document, 0, text);
+
+    } finally {
+
+      if (wasDocumentListenerEnabled) {
+        manager.enableDocumentHandlers();
+      }
+
+      if (wasReadOnly) {
+        document.setReadOnly(true);
+      }
+    }
+
+    Editor editor = null;
+    if (projectAPI.isOpen(virtualFile)) {
+      editor = projectAPI.openEditor(virtualFile, false);
+    }
+
+    annotationManager.addContributionAnnotation(source, file, 0, documentLength, editor);
   }
 }
