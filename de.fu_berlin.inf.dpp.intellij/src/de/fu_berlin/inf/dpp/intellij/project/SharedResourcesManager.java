@@ -15,7 +15,6 @@ import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.SelectedEditorState;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -40,7 +39,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
   private final ISarosSession sarosSession;
 
-  private final FileSystemChangeListener fileSystemListener;
+  private final LocalFilesystemModificationHandler localFilesystemModificationHandler;
 
   /**
    * Should return <code>true</code> while executing resource changes to avoid an infinite resource
@@ -61,7 +60,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
             () -> {
               sarosSession.addActivityProducer(SharedResourcesManager.this);
               sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
-              fileSystemListener.setEnabled(true);
+              localFilesystemModificationHandler.setEnabled(true);
             },
             ModalityState.defaultModalityState());
   }
@@ -71,7 +70,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              fileSystemListener.setEnabled(false);
+              localFilesystemModificationHandler.setEnabled(false);
               sarosSession.removeActivityProducer(SharedResourcesManager.this);
               sarosSession.removeActivityConsumer(consumer);
             },
@@ -84,16 +83,16 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       LocalEditorHandler localEditorHandler,
       LocalEditorManipulator localEditorManipulator,
-      IntelliJWorkspaceImpl intelliJWorkspaceImpl,
       AnnotationManager annotationManager) {
 
     this.sarosSession = sarosSession;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
-    fileSystemListener =
-        new FileSystemChangeListener(this, editorManager, intelliJWorkspaceImpl, sarosSession);
     this.annotationManager = annotationManager;
+
+    this.localFilesystemModificationHandler =
+        new LocalFilesystemModificationHandler(this, editorManager, sarosSession);
   }
 
   private final IActivityConsumer consumer =
@@ -240,7 +239,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     annotationManager.updateAnnotationPath(oldFile, newFile);
 
     try {
-      fileSystemListener.setEnabled(false);
+      localFilesystemModificationHandler.setEnabled(false);
 
       localEditorHandler.saveDocument(oldPath);
 
@@ -261,7 +260,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
       oldFile.delete(DELETION_FLAGS);
 
     } finally {
-      fileSystemListener.setEnabled(true);
+      localFilesystemModificationHandler.setEnabled(true);
     }
 
     // TODO reset the vector time for the old file
@@ -283,14 +282,14 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     }
 
     try {
-      fileSystemListener.setEnabled(false);
+      localFilesystemModificationHandler.setEnabled(false);
 
       localEditorHandler.saveDocument(path);
 
       file.delete(DELETION_FLAGS);
 
     } finally {
-      fileSystemListener.setEnabled(true);
+      localFilesystemModificationHandler.setEnabled(true);
     }
 
     annotationManager.removeAnnotations(file);
@@ -312,12 +311,12 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     InputStream contents = new ByteArrayInputStream(activity.getContent());
 
     try {
-      fileSystemListener.setEnabled(false);
+      localFilesystemModificationHandler.setEnabled(false);
 
       file.create(contents, FORCE);
 
     } finally {
-      fileSystemListener.setEnabled(true);
+      localFilesystemModificationHandler.setEnabled(true);
     }
   }
 
@@ -332,12 +331,12 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     }
 
     try {
-      fileSystemListener.setEnabled(false);
+      localFilesystemModificationHandler.setEnabled(false);
 
       folder.create(FORCE, LOCAL);
 
     } finally {
-      fileSystemListener.setEnabled(true);
+      localFilesystemModificationHandler.setEnabled(true);
     }
   }
 
@@ -363,12 +362,12 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     }
 
     try {
-      fileSystemListener.setEnabled(false);
+      localFilesystemModificationHandler.setEnabled(false);
 
       folder.delete(DELETION_FLAGS);
 
     } finally {
-      fileSystemListener.setEnabled(true);
+      localFilesystemModificationHandler.setEnabled(true);
     }
   }
 

@@ -2,9 +2,10 @@ package de.fu_berlin.inf.dpp.intellij.editor.annotations;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableDocumentListener;
+import de.fu_berlin.inf.dpp.intellij.editor.AbstractLocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import org.jetbrains.annotations.NotNull;
@@ -15,11 +16,19 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see com.intellij.openapi.editor.event.DocumentListener
  */
-public class AnnotationDocumentListener extends AbstractStoppableDocumentListener {
+public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentModificationHandler {
   private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
 
-  public AnnotationDocumentListener(
+  private final DocumentListener documentListener =
+      new DocumentListener() {
+        @Override
+        public void beforeDocumentChange(DocumentEvent event) {
+          cleanUpAnnotations(event);
+        }
+      };
+
+  public LocalClosedEditorModificationHandler(
       @NotNull EditorManager editorManager,
       @NotNull ProjectAPI projectAPI,
       @NotNull AnnotationManager annotationManager) {
@@ -31,16 +40,14 @@ public class AnnotationDocumentListener extends AbstractStoppableDocumentListene
   }
 
   /**
-   * {@inheritDoc}
-   *
-   * <p>Adjusts the annotations for the resource represented by the changed document if it is not
+   * Adjusts the annotations for the resource represented by the changed document if it is not
    * currently open in an editor. If it is currently open in an editor, this will be done
    * automatically by Intellij.
    *
-   * @param event {@inheritDoc}
+   * @param event the event to react to
+   * @see DocumentListener#beforeDocumentChange(DocumentEvent)
    */
-  @Override
-  public void beforeDocumentChange(DocumentEvent event) {
+  private void cleanUpAnnotations(DocumentEvent event) {
     Document document = event.getDocument();
 
     SPath path = getSPath(document);
@@ -66,5 +73,10 @@ public class AnnotationDocumentListener extends AbstractStoppableDocumentListene
         annotationManager.moveAnnotationsAfterAddition(file, offset, offset + newTextLength);
       }
     }
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled, documentListener);
   }
 }

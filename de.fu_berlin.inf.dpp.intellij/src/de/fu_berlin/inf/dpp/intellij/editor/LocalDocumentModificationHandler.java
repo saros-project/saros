@@ -11,22 +11,28 @@ import de.fu_berlin.inf.dpp.activities.SPath;
  *
  * @see DocumentListener#beforeDocumentChange(DocumentEvent)
  */
-public class StoppableDocumentListener extends AbstractStoppableDocumentListener {
+public class LocalDocumentModificationHandler extends AbstractLocalDocumentModificationHandler {
 
-  StoppableDocumentListener(EditorManager editorManager) {
+  private final DocumentListener documentListener =
+      new DocumentListener() {
+        @Override
+        public void beforeDocumentChange(DocumentEvent event) {
+          generateTextEditActivity(event);
+        }
+      };
+
+  LocalDocumentModificationHandler(EditorManager editorManager) {
     super(editorManager);
   }
 
   /**
-   * {@inheritDoc}
-   *
-   * <p>Generates and dispatches a <code>TextEditActivity</code> for the given <code>DocumentEvent
+   * Generates and dispatches a <code>TextEditActivity</code> for the given <code>DocumentEvent
    * </code>.
    *
-   * @param event {@inheritDoc}
+   * @param event the event to react to
+   * @see DocumentListener#beforeDocumentChange(DocumentEvent)
    */
-  @Override
-  public void beforeDocumentChange(DocumentEvent event) {
+  private void generateTextEditActivity(DocumentEvent event) {
     Document document = event.getDocument();
 
     SPath path = getSPath(document);
@@ -39,5 +45,10 @@ public class StoppableDocumentListener extends AbstractStoppableDocumentListener
     String replacedText = event.getOldFragment().toString();
 
     editorManager.generateTextEdit(event.getOffset(), newText, replacedText, path);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled, documentListener);
   }
 }

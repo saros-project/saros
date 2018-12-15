@@ -6,6 +6,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileCopyEvent;
@@ -23,15 +24,14 @@ import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableListener;
+import de.fu_berlin.inf.dpp.intellij.editor.DisableableHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.intellij.editor.LocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
-import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import java.io.IOException;
@@ -45,61 +45,112 @@ import org.jetbrains.annotations.Nullable;
 import org.picocontainer.annotations.Inject;
 
 /**
- * Virtual file system listener. It receives events for all files in all projects opened by the
- * user. It filters for files that are shared and creates the corresponding activities dispatches
- * these activities using {@link SharedResourcesManager#fireActivity(IActivity)}.
+ * Uses a VirtualFileListener to generate and dispatch FileActivities for shared files. Activities
+ * are dispatched using {@link SharedResourcesManager#fireActivity(IActivity)}.
  *
  * <p>The listener is enabled by default when the session context is created.
  *
  * @see VirtualFileListener
  */
 // TODO decouple from SharedResourceManager and add to session context instead
-public class FileSystemChangeListener extends AbstractStoppableListener
-    implements VirtualFileListener {
+public class LocalFilesystemModificationHandler implements DisableableHandler {
 
-  private static final Logger LOG = Logger.getLogger(FileSystemChangeListener.class);
+  private static final Logger LOG = Logger.getLogger(LocalFilesystemModificationHandler.class);
 
+  private final EditorManager editorManager;
   private final SharedResourcesManager resourceManager;
-  private final IntelliJWorkspaceImpl intellijWorkspace;
   private final ISarosSession session;
+  private final LocalFileSystem localFileSystem;
 
   @Inject private ProjectAPI projectAPI;
-
   @Inject private AnnotationManager annotationManager;
-
   @Inject private Project project;
-
   @Inject private LocalEditorHandler localEditorHandler;
 
-  public FileSystemChangeListener(
-      SharedResourcesManager resourceManager,
-      EditorManager editorManager,
-      IntelliJWorkspaceImpl intellijWorkspace,
-      ISarosSession session) {
+  private boolean enabled;
 
-    super(editorManager);
+  private final VirtualFileListener virtualFileListener =
+      new VirtualFileListener() {
+        @Override
+        public void fileCreated(@NotNull VirtualFileEvent event) {
+          generateResourceCreationActivity(event);
+        }
+
+        @Override
+        public void fileCopied(@NotNull VirtualFileCopyEvent event) {
+          generateResourceCopyCreationActivity(event);
+        }
+
+        @Override
+        public void beforePropertyChange(@NotNull VirtualFilePropertyEvent event) {
+          generateRenamingResourceMoveActivity(event);
+        }
+
+        @Override
+        public void beforeContentsChange(@NotNull VirtualFileEvent event) {
+          generateEditorSavedActivity(event);
+        }
+
+        @Override
+        public void beforeFileDeletion(@NotNull VirtualFileEvent event) {
+          generateResourceDeletionActivity(event);
+        }
+
+        @Override
+        public void beforeFileMovement(@NotNull VirtualFileMoveEvent event) {
+          generateResourceMoveActivitiy(event);
+        }
+      };
+
+  /**
+   * Instantiates a LocalFilesystemModificationHandler object. The handler, including the held
+   * filesystem listener, is enabled by default.
+   *
+   * @param resourceManager the ResourceManager instance
+   * @param editorManager the EditorManager instance
+   * @param session the current SarosSession instance
+   */
+  LocalFilesystemModificationHandler(
+      SharedResourcesManager resourceManager, EditorManager editorManager, ISarosSession session) {
 
     this.resourceManager = resourceManager;
-    this.intellijWorkspace = intellijWorkspace;
+    this.editorManager = editorManager;
     this.session = session;
 
     SarosPluginContext.initComponent(this);
 
-    intellijWorkspace.addResourceListener(this);
+    this.enabled = true;
+
+    this.localFileSystem = LocalFileSystem.getInstance();
+
+    String projectBasePath = project.getBasePath();
+    if (projectBasePath == null) {
+      LOG.error(
+          "Could not register the VirtualFileListener as the current project does not have a base "
+              + "path. Saros will not be able to react to local filesystem changes. project: "
+              + project);
+
+      return;
+    }
+
+    // FIXME listen to all relevant roots; currently assuming all roots are located in project root
+    localFileSystem.addRootToWatch(projectBasePath, true);
+
+    localFileSystem.addVirtualFileListener(virtualFileListener);
   }
 
   /**
-   * {@inheritDoc} Works for all files in the application scope, including meta-files like Intellij
-   * configuration files.
+   * Works for all files in the application scope, including meta-files like Intellij configuration
+   * files.
    *
    * <p>File changes done though an Intellij editor are processed in the {@link
-   * StoppableDocumentListener} instead.
+   * LocalDocumentModificationHandler} instead.
    *
-   * @param virtualFileEvent {@inheritDoc}
-   * @see StoppableDocumentListener
+   * @param virtualFileEvent the event to react to
+   * @see LocalDocumentModificationHandler
+   * @see VirtualFileListener#beforeContentsChange(VirtualFileEvent)
    */
-  @Override
-  public void beforeContentsChange(@NotNull VirtualFileEvent virtualFileEvent) {
+  private void generateEditorSavedActivity(@NotNull VirtualFileEvent virtualFileEvent) {
 
     assert enabled : "the before contents change listener was triggered while it was disabled";
 
@@ -152,14 +203,12 @@ public class FileSystemChangeListener extends AbstractStoppableListener
   }
 
   /**
-   * {@inheritDoc}
+   * Generates and dispatches a creation activity for the new resource.
    *
-   * <p>Generates and dispatches a creation activity for the new resource.
-   *
-   * @param virtualFileEvent {@inheritDoc}
+   * @param virtualFileEvent the event to react to
+   * @see VirtualFileListener#fileCreated(VirtualFileEvent)
    */
-  @Override
-  public void fileCreated(@NotNull VirtualFileEvent virtualFileEvent) {
+  private void generateResourceCreationActivity(@NotNull VirtualFileEvent virtualFileEvent) {
 
     assert enabled : "the file created listener was triggered while it was disabled";
 
@@ -202,16 +251,15 @@ public class FileSystemChangeListener extends AbstractStoppableListener
   }
 
   /**
-   * {@inheritDoc}
+   * Generates and dispatches creation activities for copied files. Copied directories are handled
+   * by {@link #generateResourceCreationActivity(VirtualFileEvent)} (VirtualFileEvent)} and
+   * contained files are subsequently handled by this listener.
    *
-   * <p>Generates and dispatches creation activities for copied files. Copied directories are
-   * handled by {@link #fileCreated(VirtualFileEvent)} and contained files are subsequently handled
-   * by this listener.
-   *
-   * @param virtualFileCopyEvent {@inheritDoc}
+   * @param virtualFileCopyEvent event to react to
+   * @see VirtualFileListener#fileCopied(VirtualFileCopyEvent)
    */
-  @Override
-  public void fileCopied(@NotNull VirtualFileCopyEvent virtualFileCopyEvent) {
+  private void generateResourceCopyCreationActivity(
+      @NotNull VirtualFileCopyEvent virtualFileCopyEvent) {
 
     assert enabled : "the file copied listener was triggered while it was disabled";
 
@@ -251,16 +299,14 @@ public class FileSystemChangeListener extends AbstractStoppableListener
   }
 
   /**
-   * {@inheritDoc}
-   *
-   * <p>Generates and dispatches a deletion activity for the deleted resource. If the resource was a
+   * Generates and dispatches a deletion activity for the deleted resource. If the resource was a
    * file, subsequently removes any editors for the file from the editor pool and drops any held
    * annotations for the file.
    *
-   * @param virtualFileEvent {@inheritDoc}
+   * @param virtualFileEvent the event to react to
+   * @see VirtualFileListener#beforeFileDeletion(VirtualFileEvent)
    */
-  @Override
-  public void beforeFileDeletion(@NotNull VirtualFileEvent virtualFileEvent) {
+  private void generateResourceDeletionActivity(@NotNull VirtualFileEvent virtualFileEvent) {
 
     assert enabled : "the before file deletion listener was triggered while it was disabled";
 
@@ -305,9 +351,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
   }
 
   /**
-   * {@inheritDoc}
-   *
-   * <p>Generates and dispatches activities handling resources moves.
+   * Generates and dispatches activities handling resources moves.
    *
    * <p>Intellij offers multiple ways of moving resources through the UI that are handled in
    * different ways internally:
@@ -325,14 +369,13 @@ public class FileSystemChangeListener extends AbstractStoppableListener
    *     order. Then triggers the move listener for the contained files. Then triggers the delete
    *     listener for the old path of the contained directories.
    *
-   * @param virtualFileMoveEvent {@inheritDoc}
+   * @param virtualFileMoveEvent the event to react to
    * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
    * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
-   * @see #fileCreated(VirtualFileEvent)
-   * @see #fileDeleted(VirtualFileEvent)
+   * @see #generateResourceCreationActivity(VirtualFileEvent) (VirtualFileEvent)
+   * @see #generateResourceDeletionActivity(VirtualFileEvent) (VirtualFileEvent)
    */
-  @Override
-  public void beforeFileMovement(@NotNull VirtualFileMoveEvent virtualFileMoveEvent) {
+  private void generateResourceMoveActivitiy(@NotNull VirtualFileMoveEvent virtualFileMoveEvent) {
 
     assert enabled : "the before file move listener was triggered while it was disabled";
 
@@ -663,20 +706,18 @@ public class FileSystemChangeListener extends AbstractStoppableListener
   }
 
   /**
-   * {@inheritDoc}
-   *
-   * <p>Handles name changes for resource as resource moves. Generates and dispatches the needed
+   * Handles name changes for resource as resource moves. Generates and dispatches the needed
    * activities. For directories, the listener is not called for all contained resources, meaning
    * these resources are also handled by the call for the directory.
    *
    * <p>Other property changes are ignored.
    *
-   * @param filePropertyEvent {@inheritDoc}
+   * @param filePropertyEvent the event to react to
    * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
    * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
    */
-  @Override
-  public void beforePropertyChange(@NotNull VirtualFilePropertyEvent filePropertyEvent) {
+  private void generateRenamingResourceMoveActivity(
+      @NotNull VirtualFilePropertyEvent filePropertyEvent) {
 
     assert enabled : "the before property change listener was triggered while it was disabled";
 
@@ -828,14 +869,14 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
       this.enabled = false;
 
-      intellijWorkspace.removeResourceListener(this);
+      localFileSystem.removeVirtualFileListener(virtualFileListener);
 
     } else if (!this.enabled && enabled) {
       LOG.trace("Enabling filesystem listener");
 
       this.enabled = true;
 
-      intellijWorkspace.addResourceListener(this);
+      localFileSystem.addVirtualFileListener(virtualFileListener);
     }
   }
 }
