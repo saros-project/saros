@@ -87,15 +87,14 @@ class ContactPopMenu extends JPopupMenu {
         LOG.debug(
             "Ignoring module "
                 + moduleName
-                + " as it does not meet the current release restrictions.",
-            exception);
+                + " as it does not meet the current release restrictions.");
 
         nonCompliantModules.add(moduleName);
 
         continue;
 
       } catch (IllegalStateException exception) {
-        LOG.debug(
+        LOG.warn(
             "Ignoring module "
                 + moduleName
                 + " as an error "

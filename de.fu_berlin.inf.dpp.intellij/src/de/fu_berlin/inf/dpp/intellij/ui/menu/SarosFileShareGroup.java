@@ -100,21 +100,18 @@ public class SarosFileShareGroup extends ActionGroup {
             "Ignoring module "
                 + moduleName
                 + " as it does "
-                + "not meet the current release restrictions.",
-            exception);
+                + "not meet the current release restrictions.");
       }
 
       return false;
 
     } catch (IllegalStateException exception) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace(
-            "Ignoring module "
-                + moduleName
-                + " as an error "
-                + "occurred while trying to create an IProject object.",
-            exception);
-      }
+      LOG.warn(
+          "Ignoring module "
+              + moduleName
+              + " as an error "
+              + "occurred while trying to create an IProject object.",
+          exception);
 
       return false;
     }
