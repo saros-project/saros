@@ -4,10 +4,11 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
 
+import de.fu_berlin.inf.dpp.stf.Constants;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
+
 import java.io.IOException;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;
