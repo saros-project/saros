@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

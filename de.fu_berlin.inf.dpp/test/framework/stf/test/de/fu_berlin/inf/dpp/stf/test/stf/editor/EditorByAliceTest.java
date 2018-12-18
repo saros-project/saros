@@ -8,7 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import java.rmi.RemoteException;
 import java.util.List;
 import org.eclipse.jface.bindings.keys.IKeyLookup;

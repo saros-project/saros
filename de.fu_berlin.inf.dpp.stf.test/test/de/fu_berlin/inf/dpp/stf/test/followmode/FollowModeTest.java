@@ -4,10 +4,9 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.stf.Constants;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

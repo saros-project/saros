@@ -7,11 +7,10 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.stf.Constants;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import java.util.regex.Pattern;
 import org.junit.After;
 import org.junit.Before;

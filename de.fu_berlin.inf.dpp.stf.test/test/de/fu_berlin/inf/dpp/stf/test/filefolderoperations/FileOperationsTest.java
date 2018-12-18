@@ -6,10 +6,9 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.stf.Constants;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import org.eclipse.core.runtime.CoreException;

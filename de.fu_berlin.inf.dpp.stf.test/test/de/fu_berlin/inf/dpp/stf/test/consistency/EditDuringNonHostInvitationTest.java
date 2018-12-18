@@ -7,9 +7,9 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.stf.Constants;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.BeforeClass;

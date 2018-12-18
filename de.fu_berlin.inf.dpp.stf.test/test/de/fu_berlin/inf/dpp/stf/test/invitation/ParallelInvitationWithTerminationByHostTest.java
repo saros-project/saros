@@ -10,7 +10,7 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_INVITATION_CANCELE
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import java.io.IOException;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test;
+package de.fu_berlin.inf.dpp.stf.test.stf;
 
 import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;

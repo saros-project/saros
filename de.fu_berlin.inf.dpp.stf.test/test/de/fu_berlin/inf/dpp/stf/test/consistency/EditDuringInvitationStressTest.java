@@ -7,11 +7,11 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.stf.Constants;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.tester.SarosTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 import java.rmi.RemoteException;
 import java.util.Random;

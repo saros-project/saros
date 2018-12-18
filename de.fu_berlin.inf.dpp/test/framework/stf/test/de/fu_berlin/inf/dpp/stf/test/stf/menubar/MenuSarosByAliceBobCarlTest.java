@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

@@ -8,10 +8,9 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.SUFFIX_JAVA;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.stf.Constants;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
+import de.fu_berlin.inf.dpp.stf.test.stf.Constants;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
