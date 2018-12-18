@@ -215,7 +215,7 @@ public class AddProjectToSessionWizard extends Wizard {
             if (sharedProject == null) {
               LOG.error("Could not find the shared module " + moduleName + ".");
 
-              cancelNegotiation("Could not find chosen local " + "representation of shared module");
+              cancelNegotiation("Could not find chosen local representation of shared module");
 
               NotificationPanel.showError(
                   MessageFormat.format(
@@ -286,7 +286,7 @@ public class AddProjectToSessionWizard extends Wizard {
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       if (moduleName.equals(module.getName()))
         throw new ModuleWithNameAlreadyExists(
-            "Could not create stub " + "module as a module with the chosen name already exists",
+            "Could not create stub module as a module with the chosen name already exists",
             moduleName);
     }
 
@@ -300,7 +300,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                 if (baseDir == null) {
                   throw new FileNotFoundException(
-                      "Could not find base" + " directory for project " + project + ".");
+                      "Could not find base directory for project " + project + ".");
                 }
 
                 Path moduleBasePath = Paths.get(baseDir.getPath()).resolve(moduleName);
@@ -325,18 +325,14 @@ public class AddProjectToSessionWizard extends Wizard {
 
                 if (moduleFile == null) {
                   throw new FileNotFoundException(
-                      "Could not find "
-                          + "module file for module "
-                          + module
-                          + " after "
-                          + "creating it.");
+                      "Could not find module file for module " + module + " after creating it.");
                 }
 
                 VirtualFile moduleRoot = moduleFile.getParent();
 
                 if (moduleRoot == null) {
                   throw new FileNotFoundException(
-                      "Could not  find base" + " directory for module " + module + ".");
+                      "Could not  find base directory for module " + module + ".");
                 }
 
                 modifiableRootModel.addContentEntry(moduleRoot);

@@ -99,8 +99,7 @@ public class SarosFileShareGroup extends ActionGroup {
         LOG.trace(
             "Ignoring module "
                 + moduleName
-                + " as it does "
-                + "not meet the current release restrictions.");
+                + " as it does not meet the current release restrictions.");
       }
 
       return false;
@@ -109,8 +108,7 @@ public class SarosFileShareGroup extends ActionGroup {
       LOG.warn(
           "Ignoring module "
               + moduleName
-              + " as an error "
-              + "occurred while trying to create an IProject object.",
+              + " as an error occurred while trying to create an IProject object.",
           exception);
 
       return false;
