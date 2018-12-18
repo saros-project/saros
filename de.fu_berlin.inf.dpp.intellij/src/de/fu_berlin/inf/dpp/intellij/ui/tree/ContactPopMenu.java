@@ -45,8 +45,7 @@ class ContactPopMenu extends JPopupMenu {
       SarosPluginContext.initComponent(this);
 
       if (workspace == null || project == null) {
-        LOG.error(
-            "PicoContainer injection failed. Objects still not " + "present after injection.");
+        LOG.error("PicoContainer injection failed. Objects still not present after injection.");
 
         return;
       }
@@ -169,9 +168,8 @@ class ContactPopMenu extends JPopupMenu {
         LOG.error(
             "The IProject object for the module "
                 + moduleName
-                + " could not be created. This most likely means that"
-                + " the local IntelliJ instance does not know any"
-                + " module with the given name.");
+                + " could not be created. This most likely means that the local IntelliJ instance "
+                + "does not know any module with the given name.");
 
         NotificationPanel.showError(
             MessageFormat.format(
