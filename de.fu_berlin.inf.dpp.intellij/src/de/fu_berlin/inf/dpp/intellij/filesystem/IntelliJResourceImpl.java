@@ -8,7 +8,7 @@ public abstract class IntelliJResourceImpl implements IResource {
 
   @Nullable
   @Override
-  public Object getAdapter(@NotNull Class<? extends IResource> clazz) {
-    return clazz.isInstance(this) ? this : null;
+  public <T extends IResource> T getAdapter(@NotNull Class<T> clazz) {
+    return clazz.isInstance(this) ? clazz.cast(this) : null;
   }
 }

@@ -90,7 +90,7 @@ public class ModuleInitialization implements Startable {
     private IntelliJProjectImpl project;
 
     public ModuleReloader(IProject project) {
-      this.project = (IntelliJProjectImpl) project.getAdapter(IntelliJProjectImpl.class);
+      this.project = project.getAdapter(IntelliJProjectImpl.class);
     }
 
     @Override

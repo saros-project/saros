@@ -1,10 +1,27 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 
 public class EclipseResourceImpl implements IResource {
+
+  private static final Map<
+          Class<? extends de.fu_berlin.inf.dpp.filesystem.IResource>,
+          Class<? extends org.eclipse.core.resources.IResource>>
+      classMapping;
+
+  static {
+    classMapping = new HashMap<>();
+    classMapping.put(IResource.class, org.eclipse.core.resources.IResource.class);
+    classMapping.put(IWorkspaceRoot.class, org.eclipse.core.resources.IWorkspaceRoot.class);
+    classMapping.put(IContainer.class, org.eclipse.core.resources.IContainer.class);
+    classMapping.put(IProject.class, org.eclipse.core.resources.IProject.class);
+    classMapping.put(IFolder.class, org.eclipse.core.resources.IFolder.class);
+    classMapping.put(IFile.class, org.eclipse.core.resources.IFile.class);
+  }
 
   protected final org.eclipse.core.resources.IResource delegate;
 
@@ -125,26 +142,19 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public Object getAdapter(Class<? extends IResource> clazz) {
+  public <T extends IResource> T getAdapter(Class<T> clazz) {
 
-    if (IResource.class.equals(clazz)) return this;
+    /*
+     * As we do not know what Eclipse is doing in the background play it safe and let Eclipse always
+     * convert the object.
+     */
 
-    Class<?> classToMap = null;
+    Class<? extends org.eclipse.core.resources.IResource> classToMap = classMapping.get(clazz);
 
-    if (IFile.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFile.class;
-    else if (IFolder.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFolder.class;
-    else if (IContainer.class.equals(clazz))
-      classToMap = org.eclipse.core.resources.IContainer.class;
-    else if (IProject.class.equals(clazz)) classToMap = org.eclipse.core.resources.IProject.class;
-    else if (IWorkspaceRoot.class.equals(clazz))
-      classToMap = org.eclipse.core.resources.IWorkspaceRoot.class;
+    if (classToMap == null)
+      throw new IllegalArgumentException("class: " + clazz + " is not available as adapter");
 
-    if (classToMap == null) return null;
-
-    final org.eclipse.core.resources.IResource result =
-        (org.eclipse.core.resources.IResource) delegate.getAdapter(classToMap);
-
-    return ResourceAdapterFactory.create(result);
+    return clazz.cast(ResourceAdapterFactory.create(delegate.getAdapter(classToMap)));
   }
 
   /**

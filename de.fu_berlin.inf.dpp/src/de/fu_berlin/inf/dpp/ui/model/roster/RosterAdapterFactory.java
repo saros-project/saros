@@ -13,8 +13,8 @@ import org.jivesoftware.smack.RosterGroup;
  * <p>E.g. let's you adapt {@link RosterGroupElement} to {@link RosterGroup} with
  *
  * <pre>
- * RosterGroup rosterGroup = (RosterGroup) rosterGroupElement
- *     .getAdapter(RosterGroup.class);
+ * RosterGroup rosterGroup = (RosterGroup) rosterGroupElement.getAdapter(RosterGroup.class);
+ *
  * if (rosterGroup != null)
  *     return true;
  * else

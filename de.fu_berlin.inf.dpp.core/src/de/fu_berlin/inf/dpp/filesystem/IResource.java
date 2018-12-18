@@ -5,6 +5,23 @@ import java.io.IOException;
 /**
  * This interface is under development. It currently equals its Eclipse counterpart. If not
  * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
+ *
+ * <p>Represents an element (normally a file or folder) in the (virtual) file system.
+ *
+ * <p><b>Note:</b> Instances of this class should <b>NOT</b> be casted using the Java type cast
+ * operator. Instead use the {@link #getAdapter(Class)} method.
+ *
+ * <p>Example:
+ *
+ * <pre>
+ *     IResource resource = getAResource();
+ *
+ *     if (resource == IResource.File) {
+ *         IFile file = resource.getAdapter(IFile.class) // you may assume this will never return null
+ *
+ *         // do stuff
+ *     }
+ * </pre>
  */
 public interface IResource {
 
@@ -49,5 +66,5 @@ public interface IResource {
 
   public IPath getLocation();
 
-  public Object getAdapter(Class<? extends IResource> clazz);
+  public <T extends IResource> T getAdapter(Class<T> clazz);
 }
