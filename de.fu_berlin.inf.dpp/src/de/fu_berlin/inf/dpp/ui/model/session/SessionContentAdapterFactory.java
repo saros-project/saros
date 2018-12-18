@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
  *
  * <pre>
  * User user = (User) userElement.getAdapter(User.class);
+ *
  * if (user != null)
  *     return true;
  * else

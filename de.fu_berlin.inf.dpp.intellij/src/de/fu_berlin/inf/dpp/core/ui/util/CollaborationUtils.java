@@ -252,7 +252,7 @@ public class CollaborationUtils {
 
         if (sarosSession.isCompletelyShared(project)) {
           fileCountAndSize =
-              getFileCountAndSize(Arrays.asList(project.members()), true, IContainer.FILE);
+              getFileCountAndSize(Arrays.asList(project.members()), true, IResource.FILE);
 
           result.append(
               String.format(
@@ -365,8 +365,7 @@ public class CollaborationUtils {
        * we need the .iml file, otherwise the project type will not be set
        * correctly on the other side
        */
-      IntelliJProjectImpl intelliJProject =
-          (IntelliJProjectImpl) project.getAdapter(IntelliJProjectImpl.class);
+      IntelliJProjectImpl intelliJProject = project.getAdapter(IntelliJProjectImpl.class);
 
       Module module = intelliJProject.getModule();
       VirtualFile moduleFile = module.getModuleFile();
@@ -453,7 +452,7 @@ public class CollaborationUtils {
           totalFileCount++;
 
           try {
-            IFile file = (IFile) resource.getAdapter(IFile.class);
+            IFile file = resource.getAdapter(IFile.class);
 
             totalFileSize += file.getSize();
           } catch (IOException e) {
@@ -467,7 +466,7 @@ public class CollaborationUtils {
           }
 
           try {
-            IContainer container = ((IContainer) resource.getAdapter(IContainer.class));
+            IContainer container = resource.getAdapter(IContainer.class);
 
             Pair<Long, Long> subFileCountAndSize =
                 getFileCountAndSize(Arrays.asList(container.members(flags)), true, flags);
