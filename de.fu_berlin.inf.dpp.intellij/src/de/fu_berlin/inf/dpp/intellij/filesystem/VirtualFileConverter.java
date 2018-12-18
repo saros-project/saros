@@ -76,8 +76,18 @@ public class VirtualFileConverter {
 
       return wrappedModule.getResource(virtualFile);
 
-    } catch (IllegalArgumentException | IllegalStateException e) {
-      log.debug(
+    } catch (IllegalArgumentException e) {
+      if (log.isTraceEnabled()) {
+        log.trace(
+            "Could not convert VirtualFile "
+                + virtualFile
+                + " as the module for the resource does not comply with the current restrictions.");
+      }
+
+      return null;
+
+    } catch (IllegalStateException e) {
+      log.warn(
           "Could not convert VirtualFile "
               + virtualFile
               + " as the creation of an IProject object for its module "
