@@ -59,9 +59,9 @@ public interface Constants {
   public static final String CLS2_SUFFIX = "MyClass2.java";
   public static final String CLS3_SUFFIX = "MyClass3.java";
   /* content path */
-  public static final String CP1 = "test/resources/stf/" + CLS1 + ".java.txt";
-  public static final String CP2 = "test/resources/stf/" + CLS2 + ".java.txt";
-  public static final String CP3 = "test/resources/stf/" + CLS3 + ".java.txt";
-  public static final String CP1_CHANGE = "test/resources/stf/" + CLS1 + "Change.java.txt";
-  public static final String CP2_CHANGE = "test/resources/stf/" + CLS2 + "Change.java.txt";
+  public static final String CP1 = "test/resources/" + CLS1 + ".java.txt";
+  public static final String CP2 = "test/resources/" + CLS2 + ".java.txt";
+  public static final String CP3 = "test/resources/" + CLS3 + ".java.txt";
+  public static final String CP1_CHANGE = "test/resources/" + CLS1 + "Change.java.txt";
+  public static final String CP2_CHANGE = "test/resources/" + CLS2 + "Change.java.txt";
 }

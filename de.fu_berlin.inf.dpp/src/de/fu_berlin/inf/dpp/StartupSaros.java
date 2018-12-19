@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.commandHandlers.GettingStartedHandler;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewUtils;
@@ -67,15 +66,9 @@ public class StartupSaros implements IStartup {
 
     if (xmppAccountStore.isEmpty()) showSarosView();
 
-    Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
+    Integer testmode = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
 
-    if (port != null && port > 0 && port <= 65535) {
-      LOG.info("starting STF controller on port " + port);
-      startSTFController(port);
-
-    } else if (port != null) {
-      LOG.error("could not start STF controller: port " + port + " is not a valid port number");
-    } else {
+    if (testmode == null) {
       /*
        * Only show configuration wizard if no accounts are configured. If
        * Saros is already configured, do not show the tutorial because the
@@ -122,23 +115,6 @@ public class StartupSaros implements IStartup {
               new GettingStartedHandler().execute(new ExecutionEvent());
             } catch (ExecutionException e) {
               LOG.warn("failed to execute tutorial handler", e);
-            }
-          }
-        });
-  }
-
-  private void startSTFController(final int port) {
-
-    ThreadUtils.runSafeAsync(
-        "dpp-stf-startup",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              STFController.start(port, context);
-            } catch (Exception e) {
-              LOG.error("starting STF controller failed", e);
             }
           }
         });

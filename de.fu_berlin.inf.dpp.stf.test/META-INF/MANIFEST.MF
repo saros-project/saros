@@ -7,6 +7,7 @@ ExecutionEnvironment: JavaSE-1.8
 Require-Bundle: de.fu_berlin.inf.dpp,
  de.fu_berlin.inf.dpp.core,
  de.fu_berlin.inf.dpp.ui,
+ de.fu_berlin.inf.dpp.stf,
  org.eclipse.core.runtime,
  org.eclipse.jface,
  org.junit

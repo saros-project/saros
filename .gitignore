@@ -28,7 +28,7 @@ bin_test/
 /de.fu_berlin.inf.dpp.update_beta/logs.zip
 /de.fu_berlin.inf.dpp.update_beta/features/
 /de.fu_berlin.inf.dpp.update_beta/plugins/
-/de.fu_berlin.inf.dpp/test/framework/stf/src/de/fu_berlin/inf/dpp/stf/client/configuration.properties
+/de.fu_berlin.inf.dpp.stf/src/de/fu_berlin/inf/dpp/stf/client/configuration.properties
 /de.fu_berlin.inf.dpp/lib
 /de.fu_berlin.inf.dpp.core/lib
 /de.fu_berlin.inf.dpp.ui/lib
