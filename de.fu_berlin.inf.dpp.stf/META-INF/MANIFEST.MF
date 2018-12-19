@@ -8,9 +8,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: de.fu_berlin.inf.dpp.core,
  de.fu_berlin.inf.dpp.ui,
  org.eclipse.swt
-Bundle-ClassPath: .,
- lib/swt-browser-improved.jar
-Export-Package: de.fu_berlin.inf.ag_se.browser,
- de.fu_berlin.inf.ag_se.browser.extensions,
- de.fu_berlin.inf.ag_se.browser.functions,
- de.fu_berlin.inf.ag_se.browser.swt
+Bundle-ClassPath: .
