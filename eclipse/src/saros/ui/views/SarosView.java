@@ -37,11 +37,13 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.packet.Presence;
+import saros.SarosConstants;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.discovery.DiscoveryManager;
 import saros.net.xmpp.roster.IRosterListener;
 import saros.net.xmpp.roster.RosterTracker;
 import saros.preferences.EclipsePreferenceConstants;
@@ -68,6 +70,7 @@ import saros.ui.actions.OpenChatAction;
 import saros.ui.actions.OpenPreferencesAction;
 import saros.ui.actions.RemoveUserAction;
 import saros.ui.actions.RenameContactAction;
+import saros.ui.actions.RequestSessionInviteAction;
 import saros.ui.actions.SendFileAction;
 import saros.ui.actions.SkypeAction;
 import saros.ui.model.roster.RosterEntryElement;
@@ -228,6 +231,8 @@ public class SarosView extends ViewPart {
   @Inject protected RosterTracker rosterTracker;
 
   @Inject protected XMPPConnectionService connectionService;
+
+  @Inject private DiscoveryManager discoveryManager;
 
   private static volatile boolean showBalloonNotifications;
 
@@ -432,6 +437,15 @@ public class SarosView extends ViewPart {
              * version 14.1.31)
              */
             // manager.add(getAction(SkypeAction.class));
+
+            // TODO: Currently only Saros/S is known to have a working JoinSessionRequestHandler,
+            //       remove this once the situation changes / change this to it's own feature.
+            Boolean isServer =
+                discoveryManager.isFeatureSupported(
+                    contacts.get(0), SarosConstants.NAMESPACE_SERVER);
+            if (contacts.size() == 1 && isServer != null && isServer) {
+              manager.add(getAction(RequestSessionInviteAction.ACTION_ID));
+            }
             manager.add(new Separator());
             manager.add(getAction(OpenChatAction.ACTION_ID));
             manager.add(getAction(SendFileAction.ACTION_ID));
@@ -661,6 +675,7 @@ public class SarosView extends ViewPart {
     registerAction(new SendFileAction());
     registerAction(new ChangeColorAction());
     registerAction(new RemoveUserAction());
+    registerAction(new RequestSessionInviteAction());
 
     // ContextMenus Roster/Contact list
     registerAction(new SkypeAction());
