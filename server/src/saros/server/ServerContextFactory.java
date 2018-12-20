@@ -26,6 +26,7 @@ import saros.server.dummies.NullRemoteProgressIndicatorFactory;
 import saros.server.filesystem.ServerPathFactoryImpl;
 import saros.server.filesystem.ServerPathImpl;
 import saros.server.filesystem.ServerWorkspaceImpl;
+import saros.server.net.ServerFeatureAdvertiser;
 import saros.server.net.SubscriptionAuthorizer;
 import saros.server.preferences.PersistencePreferenceStore;
 import saros.server.preferences.ServerPreferences;
@@ -90,6 +91,7 @@ public class ServerContextFactory extends AbstractContextFactory {
     c.addComponent(SubscriptionAuthorizer.class);
     c.addComponent(NegotiationHandler.class);
     c.addComponent(JoinSessionRequestHandler.class);
+    c.addComponent(ServerFeatureAdvertiser.class);
     if (ServerConfig.isInteractive()) {
       c.addComponent(new ServerConsole(System.in, System.out));
       c.addComponent(InviteCommand.class);
