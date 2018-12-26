@@ -13,6 +13,7 @@ dependencies {
   releaseDep 'xpp3:xpp3:1.1.4c'
   releaseDep 'com.thoughtworks.xstream:xstream:1.4.10'
   releaseDep 'org.gnu.inet:libidn:1.15'
+  releaseDep 'org.eclipse.jgit:org.eclipse.jgit:5.1.3.201810200350-r'
 
   releaseDep (log4jVersion) {
       exclude group: 'com.sun.jmx', module: 'jmxri'
@@ -22,6 +23,7 @@ dependencies {
   // The used version is a SNAPSHOT version which is not available!
   // TODO: use real release
   releaseDep files('libs/weupnp.jar')
+  
 
   compile configurations.releaseDep
   testCompile configurations.testConfig
