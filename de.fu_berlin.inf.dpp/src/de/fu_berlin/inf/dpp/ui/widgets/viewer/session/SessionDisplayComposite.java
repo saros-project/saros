@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -57,7 +57,7 @@ public abstract class SessionDisplayComposite extends ViewerComposite<TreeViewer
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
-        public void resourcesAdded(IProject project) {
+        public void resourcesAdded(IReferencePoint referencePoint) {
           ViewerUtils.refresh(getViewer(), true);
         }
       };

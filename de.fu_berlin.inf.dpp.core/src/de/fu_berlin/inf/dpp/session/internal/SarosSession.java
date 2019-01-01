@@ -242,8 +242,6 @@ public final class SarosSession implements ISarosSession {
 
     Set<IResource> allResources = null;
 
-    IProject project = referencePointManager.get(referencePoint);
-
     if (resources != null) {
       allResources = new HashSet<IResource>();
       for (IResource resource : resources) allResources.addAll(getAllNonSharedChildren(resource));
@@ -260,7 +258,8 @@ public final class SarosSession implements ISarosSession {
         sharedReferencePointMapper.addResources(referencePoint, allResources);
       }
 
-      listenerDispatch.projectAdded(project);
+      listenerDispatch.projectAdded(referencePoint);
+
     } else {
       // existing project
       if (allResources == null) {
@@ -272,7 +271,7 @@ public final class SarosSession implements ISarosSession {
       }
     }
 
-    listenerDispatch.resourcesAdded(project);
+    listenerDispatch.resourcesAdded(referencePoint);
   }
 
   /**
@@ -1002,7 +1001,7 @@ public final class SarosSession implements ISarosSession {
   public void addReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
     if (sharedReferencePointMapper.getReferencePoint(referencePointID) == null) {
       sharedReferencePointMapper.addReferencePoint(referencePointID, referencePoint, true);
-      listenerDispatch.projectAdded(referencePointManager.get(referencePoint));
+      listenerDispatch.projectAdded(referencePoint);
     }
   }
 
@@ -1010,7 +1009,7 @@ public final class SarosSession implements ISarosSession {
   public void removeReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
     if (sharedReferencePointMapper.getReferencePoint(referencePointID) != null) {
       sharedReferencePointMapper.removeReferencePoint(referencePointID);
-      listenerDispatch.projectRemoved(referencePointManager.get(referencePoint));
+      listenerDispatch.projectRemoved(referencePoint);
     }
   }
 

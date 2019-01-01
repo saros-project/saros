@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.LocalClosedEditorModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
@@ -38,6 +39,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -243,7 +245,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         @Override
-        public void resourcesAdded(final IProject project) {
+        public void resourcesAdded(final IReferencePoint referencePoint) {
+          IReferencePointManager referencePointManager =
+              session.getComponent(IReferencePointManager.class);
+          IProject project = referencePointManager.get(referencePoint);
+
           ApplicationManager.getApplication()
               .invokeAndWait(
                   () -> addProjectResources(project), ModalityState.defaultModalityState());
