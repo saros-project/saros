@@ -11,7 +11,13 @@ class LocalTextSelectionChangeHandler implements DisableableHandler {
 
   private final EditorManager editorManager;
 
-  private final SelectionListener selectionListener = this::generateSelectionActivity;
+  private final SelectionListener selectionListener =
+      new SelectionListener() {
+        @Override
+        public void selectionChanged(@NotNull SelectionEvent e) {
+          generateSelectionActivity(e);
+        }
+      };
 
   private boolean enabled;
 
