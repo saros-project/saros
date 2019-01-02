@@ -16,7 +16,7 @@ public class ProjectNegotiationData {
 
   @XStreamAlias("pid")
   @XStreamAsAttribute
-  private final String projectID;
+  private final String referencePointID;
 
   @XStreamAlias("partial")
   @XStreamAsAttribute
@@ -26,16 +26,17 @@ public class ProjectNegotiationData {
   private final FileList fileList;
 
   /**
-   * @param projectID Session wide ID of the project. This ID is the same for all users.
+   * @param referencePointID Session wide ID of the reference point. This ID is the same for all
+   *     users.
    * @param projectName Name of the project on inviter side.
    * @param fileList complete list of all files that are part of the sharing for the given project
    */
   public ProjectNegotiationData(
-      String projectID, String projectName, boolean partial, FileList fileList) {
+      String referencePointID, String projectName, boolean partial, FileList fileList) {
 
     this.fileList = fileList;
     this.projectName = projectName;
-    this.projectID = projectID;
+    this.referencePointID = referencePointID;
     this.partial = partial;
   }
 
@@ -47,8 +48,8 @@ public class ProjectNegotiationData {
     return projectName;
   }
 
-  public String getProjectID() {
-    return projectID;
+  public String getReferencePointID() {
+    return referencePointID;
   }
 
   public boolean isPartial() {
