@@ -6,7 +6,6 @@ import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -39,7 +38,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
   public ArchiveOutgoingProjectNegotiation( //
       final JID peer, //
-      final List<IProject> projects, //
+      final List<IReferencePoint> referencePoints, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -52,7 +51,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     super(
         peer,
         TransferType.ARCHIVE,
-        projects,
+        referencePoints,
         sessionManager,
         session,
         editorManager,

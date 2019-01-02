@@ -8,7 +8,6 @@ import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CancellationException;
-import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -44,7 +42,6 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
   private static final Logger LOG = Logger.getLogger(AbstractOutgoingProjectNegotiation.class);
   private static final Random NEGOTIATION_ID_GENERATOR = new Random();
   protected final IEditorManager editorManager;
-  protected List<IProject> projects;
   protected List<IReferencePoint> referencePoints;
   private PacketCollector remoteFileListResponseCollector;
 
@@ -53,7 +50,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
   protected AbstractOutgoingProjectNegotiation( //
       final JID peer, //
       final TransferType transferType, //
-      final List<IProject> projects, //
+      final List<IReferencePoint> referencePoints, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -75,15 +72,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         transmitter,
         receiver);
 
-    this.projects = projects;
-    this.referencePoints =
-        projects == null
-            ? null
-            : new ArrayList<>(
-                projects
-                    .stream()
-                    .map(project -> project.getReferencePoint())
-                    .collect(Collectors.toList()));
+    this.referencePoints = referencePoints;
     this.editorManager = editorManager;
   }
 
