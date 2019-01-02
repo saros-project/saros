@@ -316,7 +316,8 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
         FileList projectFileList =
             FileListFactory.createFileList(
-                project,
+                referencePointManager,
+                project.getReferencePoint(),
                 session.getSharedResources(project.getReferencePoint()),
                 checksumCache,
                 new SubProgressMonitor(

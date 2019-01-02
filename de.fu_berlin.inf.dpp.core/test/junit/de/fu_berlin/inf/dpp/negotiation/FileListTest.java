@@ -12,7 +12,9 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,16 +51,21 @@ public class FileListTest {
   }
 
   private IProject project;
+  private IReferencePoint referencePoint;
+  private IReferencePointManager referencePointManager;
 
   @Before
   public void setUp() throws Exception {
-    project = createProjectLayout();
+    referencePoint = createReferencePointMock();
+    project = createProjectLayout(referencePoint);
+    referencePointManager = createReferencePointManagerMock(referencePoint, project);
   }
 
   @Test
   public void testCreateFileListForProject() throws IOException {
 
-    final FileList fileList = FileListFactory.createFileList(project, null, null, null);
+    final FileList fileList =
+        FileListFactory.createFileList(referencePointManager, referencePoint, null, null, null);
 
     final List<String> paths = fileList.getPaths();
 
@@ -106,7 +113,7 @@ public class FileListTest {
     assertEquals(list, listFromXml);
   }
 
-  private static IProject createProjectLayout() {
+  private static IProject createProjectLayout(IReferencePoint referencePoint) {
 
     final IProject project = EasyMock.createMock(IProject.class);
 
@@ -123,6 +130,7 @@ public class FileListTest {
         createFolderMock(project, "foobar", new IResource[] {foobarfooFolder, foobarInfoTxtFile});
 
     EasyMock.expect(project.getName()).andStubReturn("foo");
+    EasyMock.expect(project.getReferencePoint()).andStubReturn(referencePoint);
 
     try {
       EasyMock.expect(project.getDefaultCharset()).andStubReturn("UTF-16");
@@ -207,6 +215,21 @@ public class FileListTest {
 
     EasyMock.replay(folderMock);
     return folderMock;
+  }
+
+  private static IReferencePoint createReferencePointMock() {
+    IReferencePoint referencePoint = EasyMock.createMock(IReferencePoint.class);
+    EasyMock.replay(referencePoint);
+    return referencePoint;
+  }
+
+  private static IReferencePointManager createReferencePointManagerMock(
+      IReferencePoint referencePoint, IProject project) {
+    IReferencePointManager referencePointManager =
+        EasyMock.createMock(IReferencePointManager.class);
+    EasyMock.expect(referencePointManager.get(referencePoint)).andStubReturn(project);
+    EasyMock.replay(referencePointManager);
+    return referencePointManager;
   }
 
   private static String toXML(FileList list) {

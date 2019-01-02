@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -307,9 +308,14 @@ public class AddProjectToSessionWizard extends Wizard {
               final Map<String, de.fu_berlin.inf.dpp.filesystem.IProject> convertedMapping =
                   new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IProject>();
 
+              IReferencePointManager referencePointManager =
+                  sessionManager.getSession().getComponent(IReferencePointManager.class);
+
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
-                convertedMapping.put(
-                    entry.getKey(), ResourceAdapterFactory.create(entry.getValue()));
+                de.fu_berlin.inf.dpp.filesystem.IProject coreProject =
+                    ResourceAdapterFactory.create(entry.getValue());
+                fillReferencePointManager(coreProject, referencePointManager);
+                convertedMapping.put(entry.getKey(), coreProject);
               }
 
               final ProjectNegotiation.Status status =
@@ -556,9 +562,15 @@ public class AddProjectToSessionWizard extends Wizard {
        */
 
       try {
+        IReferencePointManager referencePointManager =
+            session.getComponent(IReferencePointManager.class);
+
+        fillReferencePointManager(adaptedProject, referencePointManager);
+
         localFileList =
             FileListFactory.createFileList(
-                adaptedProject,
+                referencePointManager,
+                adaptedProject.getReferencePoint(),
                 null,
                 checksumCache,
                 ProgressMonitorAdapterFactory.convert(
@@ -662,5 +674,11 @@ public class AddProjectToSessionWizard extends Wizard {
     if (proceed) {
       for (IEditorPart editor : dirtyEditors) editor.doSave(new NullProgressMonitor());
     }
+  }
+
+  private void fillReferencePointManager(
+      de.fu_berlin.inf.dpp.filesystem.IProject project,
+      IReferencePointManager referencePointManager) {
+    referencePointManager.put(project.getReferencePoint(), project);
   }
 }
