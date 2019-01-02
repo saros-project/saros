@@ -84,7 +84,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     this.projectNegotiationData = new HashMap<String, ProjectNegotiationData>();
 
     for (final ProjectNegotiationData data : projectNegotiationData)
-      this.projectNegotiationData.put(data.getProjectID(), data);
+      this.projectNegotiationData.put(data.getReferencePointID(), data);
 
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
   }
