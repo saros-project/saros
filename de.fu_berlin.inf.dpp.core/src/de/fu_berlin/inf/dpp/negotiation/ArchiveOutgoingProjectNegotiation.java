@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -144,33 +145,34 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     final List<IResource> projectsToLock = new ArrayList<IResource>();
 
     for (final FileList list : fileLists) {
-      final String projectID = list.getProjectID();
+      final String referencePointID = list.getProjectID();
 
-      final IProject project = referencePointManager.get(session.getReferencePoint(projectID));
+      final IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
-      if (project == null)
+      if (referencePoint == null)
         throw new LocalCancellationException(
-            "project with id " + projectID + " was unshared during synchronization",
+            "project with id " + referencePointID + " was unshared during synchronization",
             CancelOption.NOTIFY_PEER);
 
-      projectsToLock.add(project);
+      projectsToLock.add(referencePointManager.get(referencePoint));
 
       /*
        * force editor buffer flush because we read the files from the
        * underlying storage
        */
-      if (editorManager != null) editorManager.saveEditors(project);
+      if (editorManager != null)
+        editorManager.saveEditors(referencePointManager.get(referencePoint));
 
       final StringBuilder aliasBuilder = new StringBuilder();
 
-      aliasBuilder.append(projectID).append(PATH_DELIMITER);
+      aliasBuilder.append(referencePointID).append(PATH_DELIMITER);
 
       final int prefixLength = aliasBuilder.length();
 
       for (final String path : list.getPaths()) {
 
         // assert path is relative !
-        filesToCompress.add(project.getFile(path));
+        filesToCompress.add(referencePointManager.get(referencePoint).getFile(path));
         aliasBuilder.append(path);
         fileAlias.add(aliasBuilder.toString());
         aliasBuilder.setLength(prefixLength);
