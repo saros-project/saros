@@ -321,7 +321,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
       final FileList localProjectFileList =
           FileListFactory.createFileList(
-              project,
+              referencePointManager,
+              project.getReferencePoint(),
               null,
               checksumCache,
               new SubProgressMonitor(
