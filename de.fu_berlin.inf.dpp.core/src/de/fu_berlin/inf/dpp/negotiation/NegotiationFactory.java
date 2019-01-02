@@ -4,6 +4,7 @@ import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -16,7 +17,9 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class NegotiationFactory {
 
@@ -142,7 +145,7 @@ public final class NegotiationFactory {
       case ARCHIVE:
         return new ArchiveOutgoingProjectNegotiation(
             remoteAddress,
-            resources,
+            getReferencePointList(resources),
             sessionManager,
             session, /* editorManager */
             context.getComponent(IEditorManager.class),
@@ -154,7 +157,7 @@ public final class NegotiationFactory {
       case INSTANT:
         return new InstantOutgoingProjectNegotiation(
             remoteAddress,
-            resources,
+            getReferencePointList(resources),
             sessionManager,
             session, /* editorManager */
             context.getComponent(IEditorManager.class),
@@ -210,5 +213,15 @@ public final class NegotiationFactory {
       default:
         throw new UnsupportedOperationException("transferType not implemented");
     }
+  }
+
+  private List<IReferencePoint> getReferencePointList(List<IProject> projects) {
+    return projects == null
+        ? null
+        : new ArrayList<>(
+            projects
+                .stream()
+                .map(project -> project.getReferencePoint())
+                .collect(Collectors.toList()));
   }
 }

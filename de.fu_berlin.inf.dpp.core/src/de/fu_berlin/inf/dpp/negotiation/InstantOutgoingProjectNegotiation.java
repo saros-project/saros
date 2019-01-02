@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -62,7 +61,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
   public InstantOutgoingProjectNegotiation(
       final JID peer, //
-      final List<IProject> projects, //
+      final List<IReferencePoint> referencePoints, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -75,7 +74,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     super(
         peer,
         TransferType.INSTANT,
-        projects,
+        referencePoints,
         sessionManager,
         session,
         editorManager,
