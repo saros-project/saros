@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.negotiation;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
@@ -17,9 +16,7 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class NegotiationFactory {
 
@@ -133,7 +130,7 @@ public final class NegotiationFactory {
   public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
       final JID remoteAddress,
       final TransferType transferType,
-      final List<IProject> resources,
+      final List<IReferencePoint> referencePoints,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
@@ -145,7 +142,7 @@ public final class NegotiationFactory {
       case ARCHIVE:
         return new ArchiveOutgoingProjectNegotiation(
             remoteAddress,
-            getReferencePointList(resources),
+            referencePoints,
             sessionManager,
             session, /* editorManager */
             context.getComponent(IEditorManager.class),
@@ -157,7 +154,7 @@ public final class NegotiationFactory {
       case INSTANT:
         return new InstantOutgoingProjectNegotiation(
             remoteAddress,
-            getReferencePointList(resources),
+            referencePoints,
             sessionManager,
             session, /* editorManager */
             context.getComponent(IEditorManager.class),
@@ -213,15 +210,5 @@ public final class NegotiationFactory {
       default:
         throw new UnsupportedOperationException("transferType not implemented");
     }
-  }
-
-  private List<IReferencePoint> getReferencePointList(List<IProject> projects) {
-    return projects == null
-        ? null
-        : new ArrayList<>(
-            projects
-                .stream()
-                .map(project -> project.getReferencePoint())
-                .collect(Collectors.toList()));
   }
 }
