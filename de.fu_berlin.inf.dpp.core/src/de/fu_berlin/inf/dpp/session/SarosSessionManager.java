@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.session;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
@@ -51,6 +52,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -499,7 +501,12 @@ public class SarosSessionManager implements ISarosSessionManager {
      * negotiation with all collected resources.
      */
 
-    nextProjectNegotiation.add(projectResourcesMapping);
+    Map<IReferencePoint, List<IResource>> referencePointMapping = new HashMap<>();
+    for (Map.Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
+      referencePointManager.put(entry.getKey().getReferencePoint(), entry.getKey());
+      referencePointMapping.put(entry.getKey().getReferencePoint(), entry.getValue());
+    }
+    nextProjectNegotiation.add(referencePointMapping);
 
     if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
       return;
@@ -555,10 +562,11 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     List<IProject> projectsToShare = new ArrayList<IProject>();
-    Map<IProject, List<IResource>> mapping = nextProjectNegotiation.get();
+    Map<IReferencePoint, List<IResource>> mapping = nextProjectNegotiation.get();
 
-    for (Entry<IProject, List<IResource>> mapEntry : mapping.entrySet()) {
-      final IProject project = mapEntry.getKey();
+    for (Entry<IReferencePoint, List<IResource>> mapEntry : mapping.entrySet()) {
+      final IReferencePoint referencePoint = mapEntry.getKey();
+      final IProject project = referencePointManager.get(referencePoint);
       final List<IResource> resourcesList = mapEntry.getValue();
 
       // side effect: non shared projects are always partial -.-
@@ -568,8 +576,6 @@ public class SarosSessionManager implements ISarosSessionManager {
         if (projectID == null) {
           projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
         }
-
-        referencePointManager.put(project.getReferencePoint(), project);
         currentSession.addSharedResources(project.getReferencePoint(), projectID, resourcesList);
 
         projectsToShare.add(project);

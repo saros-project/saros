@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,30 +14,34 @@ import java.util.Map.Entry;
  * running project negotiations per user.
  */
 public class ProjectNegotiationCollector {
-  private Map<IProject, List<IResource>> mapping = new HashMap<IProject, List<IResource>>();
+  private Map<IReferencePoint, List<IResource>> mapping =
+      new HashMap<IReferencePoint, List<IResource>>();
 
   /**
-   * Add project resource mappings for the next project negotiation.
+   * Add reference point resource mappings for the next project negotiation.
    *
-   * @param projectResourcesMapping project resource mappings to add
+   * @param referencePointResourcesMapping reference point resource mappings to add
    */
-  public synchronized void add(Map<IProject, List<IResource>> projectResourcesMapping) {
-    for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping.entrySet()) {
-      final IProject project = mapEntry.getKey();
+  public synchronized void add(
+      Map<IReferencePoint, List<IResource>> referencePointResourcesMapping) {
+    for (Entry<IReferencePoint, List<IResource>> mapEntry :
+        referencePointResourcesMapping.entrySet()) {
+      final IReferencePoint referencePoint = mapEntry.getKey();
       final List<IResource> resources = mapEntry.getValue();
 
-      boolean alreadyFullShared = mapping.containsKey(project) && mapping.get(project) == null;
+      boolean alreadyFullShared =
+          mapping.containsKey(referencePoint) && mapping.get(referencePoint) == null;
 
-      /* full shared project */
+      /* full shared project / reference point */
       if (resources == null || alreadyFullShared) {
-        mapping.put(project, null);
+        mapping.put(referencePoint, null);
         continue;
       }
 
-      /* update partial shared project */
-      List<IResource> mappedResources = mapping.get(project);
+      /* update partial shared project / reference point */
+      List<IResource> mappedResources = mapping.get(referencePoint);
       if (mappedResources == null) {
-        mapping.put(project, new ArrayList<IResource>(resources));
+        mapping.put(referencePoint, new ArrayList<IResource>(resources));
       } else {
         mappedResources.addAll(resources);
       }
@@ -45,14 +49,14 @@ public class ProjectNegotiationCollector {
   }
 
   /**
-   * Returns a list of project resource mappings that should be handled by a project negotiation.
-   * Resets the Collector for next additions.
+   * Returns a list of reference point resource mappings that should be handled by a project
+   * negotiation. Resets the Collector for next additions.
    *
-   * @return project resource mappings to add
+   * @return reference point resource mappings to add
    */
-  public synchronized Map<IProject, List<IResource>> get() {
-    Map<IProject, List<IResource>> tmp = mapping;
-    mapping = new HashMap<IProject, List<IResource>>();
+  public synchronized Map<IReferencePoint, List<IResource>> get() {
+    Map<IReferencePoint, List<IResource>> tmp = mapping;
+    mapping = new HashMap<IReferencePoint, List<IResource>>();
     return tmp;
   }
 }
