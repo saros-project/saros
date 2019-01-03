@@ -4,7 +4,9 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.eclipse.core.runtime.CoreException;
@@ -119,8 +121,31 @@ public class EclipseWorkspaceImpl implements IWorkspace {
   }
 
   @Override
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
+      throws IOException, OperationCanceledException {
+
+    IResource[] resources = null;
+
+    if (referencePoints != null) {
+      resources = new IResource[referencePoints.length];
+      for (int i = 0; i < referencePoints.length; i++) {
+        resources[i] = referencePointManager.get(referencePoints[i]);
+      }
+    }
+    run(runnable, resources);
+  }
+
+  @Override
   public IProject getProject(String project) {
     return ResourceAdapterFactory.create(delegate.getRoot().getProject(project));
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint(String projectName) {
+    return getProject(projectName).getReferencePoint();
   }
 
   @Override

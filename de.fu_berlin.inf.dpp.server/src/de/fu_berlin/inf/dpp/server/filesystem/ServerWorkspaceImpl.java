@@ -3,10 +3,12 @@ package de.fu_berlin.inf.dpp.server.filesystem;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import java.io.IOException;
 
 /** Server implementation of the {@link IWorkspace} interface. */
@@ -49,5 +51,19 @@ public class ServerWorkspaceImpl implements IWorkspace {
     synchronized (this) {
       runnable.run(new NullProgressMonitor());
     }
+  }
+
+  @Override
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
+      throws IOException, OperationCanceledException {
+    run(runnable, null);
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint(String projectName) {
+    return getProject(projectName).getReferencePoint();
   }
 }
