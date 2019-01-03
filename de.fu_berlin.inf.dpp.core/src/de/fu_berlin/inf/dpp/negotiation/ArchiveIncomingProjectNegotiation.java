@@ -167,7 +167,10 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
      */
 
     try {
-      workspace.run(decompressTask, projectMapping.values().toArray(new IResource[0]));
+      workspace.run(
+          decompressTask,
+          localReferencePointMapping.values().toArray(new IReferencePoint[0]),
+          referencePointManager);
     } catch (de.fu_berlin.inf.dpp.exceptions.OperationCanceledException e) {
       LocalCancellationException canceled =
           new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);

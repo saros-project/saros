@@ -141,7 +141,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     final List<IFile> filesToCompress = new ArrayList<IFile>(fileCount);
     final List<String> fileAlias = new ArrayList<String>(fileCount);
 
-    final List<IResource> projectsToLock = new ArrayList<IResource>();
+    final List<IReferencePoint> referencePointsToLock = new ArrayList<IReferencePoint>();
 
     for (final FileList list : fileLists) {
       final String referencePointID = list.getProjectID();
@@ -153,7 +153,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
             "project with id " + referencePointID + " was unshared during synchronization",
             CancelOption.NOTIFY_PEER);
 
-      projectsToLock.add(referencePointManager.get(referencePoint));
+      referencePointsToLock.add(referencePoint);
 
       /*
        * force editor buffer flush because we read the files from the
@@ -186,7 +186,8 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       tempArchive = File.createTempFile("saros_" + getID(), ".zip");
       workspace.run(
           new CreateArchiveTask(tempArchive, filesToCompress, fileAlias, monitor),
-          projectsToLock.toArray(new IResource[0]));
+          referencePointsToLock.toArray(new IReferencePoint[0]),
+          referencePointManager);
     } catch (OperationCanceledException e) {
       LocalCancellationException canceled = new LocalCancellationException();
       canceled.initCause(e);

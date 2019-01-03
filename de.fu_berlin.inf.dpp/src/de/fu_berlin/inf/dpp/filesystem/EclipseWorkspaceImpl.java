@@ -72,7 +72,7 @@ public class EclipseWorkspaceImpl implements IWorkspace {
   @Override
   public void run(final IWorkspaceRunnable runnable)
       throws IOException, OperationCanceledException {
-    run(runnable, null);
+    run(runnable, null, null);
   }
 
   @Override
