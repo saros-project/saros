@@ -8,7 +8,6 @@ import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
@@ -30,12 +29,6 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
   @Override
   public void run(IWorkspaceRunnable procedure) throws IOException, OperationCanceledException {
     procedure.run(new NullProgressMonitor());
-  }
-
-  @Override
-  public void run(IWorkspaceRunnable runnable, IResource[] resources)
-      throws IOException, OperationCanceledException {
-    run(runnable);
   }
 
   @Override

@@ -4,7 +4,6 @@ import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
@@ -42,7 +41,10 @@ public class ServerWorkspaceImpl implements IWorkspace {
   }
 
   @Override
-  public void run(IWorkspaceRunnable runnable, IResource[] resources)
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
       throws IOException, OperationCanceledException {
 
     /*
@@ -51,15 +53,6 @@ public class ServerWorkspaceImpl implements IWorkspace {
     synchronized (this) {
       runnable.run(new NullProgressMonitor());
     }
-  }
-
-  @Override
-  public void run(
-      IWorkspaceRunnable runnable,
-      IReferencePoint[] referencePoints,
-      IReferencePointManager referencePointManager)
-      throws IOException, OperationCanceledException {
-    run(runnable, null);
   }
 
   @Override
