@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.server.session;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
@@ -153,7 +154,7 @@ public class NegotiationHandler implements INegotiationHandler {
             negotiation.localCancel(
                 "Server does not accept incoming projects",
                 NegotiationTools.CancelOption.NOTIFY_PEER);
-            negotiation.run(new HashMap<String, IProject>(), new NullProgressMonitor());
+            negotiation.run(new HashMap<String, IReferencePoint>(), new NullProgressMonitor());
           }
         });
   }

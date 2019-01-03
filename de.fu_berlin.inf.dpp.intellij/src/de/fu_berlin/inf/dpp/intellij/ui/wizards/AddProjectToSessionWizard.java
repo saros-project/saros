@@ -54,6 +54,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
@@ -473,7 +474,14 @@ public class AddProjectToSessionWizard extends Wizard {
               @Override
               public void run(ProgressIndicator indicator) {
                 final ProjectNegotiation.Status status =
-                    negotiation.run(localProjects, new ProgessMonitorAdapter(indicator));
+                    negotiation.run(
+                        localProjects
+                            .entrySet()
+                            .stream()
+                            .collect(
+                                Collectors.toMap(
+                                    e -> e.getKey(), e -> e.getValue().getReferencePoint())),
+                        new ProgessMonitorAdapter(indicator));
 
                 indicator.stop();
 

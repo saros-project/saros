@@ -5,6 +5,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -66,7 +67,9 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
   @Override
   protected void transfer(
-      IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
+      IProgressMonitor monitor,
+      Map<String, IReferencePoint> referencePointMapping,
+      List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
 
     awaitActivityQueueingActivation(monitor);
@@ -76,20 +79,19 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
      * the user who sends this ProjectNegotiation is now responsible for the
      * resources of the contained projects
      */
-    for (Entry<String, IProject> entry : projectMapping.entrySet()) {
+    for (Entry<String, IReferencePoint> entry : referencePointMapping.entrySet()) {
 
-      final String projectID = entry.getKey();
-      final IProject project = entry.getValue();
+      final String referencePointID = entry.getKey();
+      final IReferencePoint referencePoint = entry.getValue();
       /*
        * TODO Queuing responsibility should be moved to Project
        * Negotiation, since its the only consumer of queuing
        * functionality. This will enable a specific Queuing mechanism per
        * TransferType (see github issue #137).
        */
-      referencePointManager.put(project.getReferencePoint(), project);
 
-      session.addReferencePointMapping(projectID, project.getReferencePoint());
-      session.enableQueuing(project.getReferencePoint());
+      session.addReferencePointMapping(referencePointID, referencePoint);
+      session.enableQueuing(referencePoint);
     }
 
     transmitter.send(
@@ -106,13 +108,13 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
     // the host do not send an archive if we do not need any files
     if (filesMissing) {
-      receiveAndUnpackArchive(projectMapping, transferListener, monitor);
+      receiveAndUnpackArchive(referencePointMapping, transferListener, monitor);
     }
   }
 
   /** Receives the archive with all missing files and unpacks it. */
   private void receiveAndUnpackArchive(
-      final Map<String, IProject> localProjectMapping,
+      final Map<String, IReferencePoint> localReferencePointMapping,
       final TransferListener archiveTransferListener,
       final IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
@@ -129,7 +131,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
      */
 
     try {
-      unpackArchive(localProjectMapping, archiveFile, new SubProgressMonitor(monitor, 50));
+      unpackArchive(localReferencePointMapping, archiveFile, new SubProgressMonitor(monitor, 50));
       monitor.done();
     } finally {
       if (archiveFile != null && !archiveFile.delete()) {
@@ -139,15 +141,15 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
   }
 
   private void unpackArchive(
-      final Map<String, IProject> localProjectMapping,
+      final Map<String, IReferencePoint> localReferencePointMapping,
       final File archiveFile,
       final IProgressMonitor monitor)
       throws LocalCancellationException, IOException {
 
     final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
 
-    for (Entry<String, IProject> entry : localProjectMapping.entrySet())
-      projectMapping.put(entry.getKey(), entry.getValue());
+    for (Entry<String, IReferencePoint> entry : localReferencePointMapping.entrySet())
+      projectMapping.put(entry.getKey(), referencePointManager.get(entry.getValue()));
 
     final DecompressArchiveTask decompressTask =
         new DecompressArchiveTask(archiveFile, projectMapping, PATH_DELIMITER, monitor);
