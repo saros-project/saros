@@ -42,7 +42,10 @@ public class ServerWorkspaceImpl implements IWorkspace {
   }
 
   @Override
-  public void run(IWorkspaceRunnable runnable, IResource[] resources)
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
       throws IOException, OperationCanceledException {
 
     /*
@@ -51,15 +54,6 @@ public class ServerWorkspaceImpl implements IWorkspace {
     synchronized (this) {
       runnable.run(new NullProgressMonitor());
     }
-  }
-
-  @Override
-  public void run(
-      IWorkspaceRunnable runnable,
-      IReferencePoint[] referencePoints,
-      IReferencePointManager referencePointManager)
-      throws IOException, OperationCanceledException {
-    run(runnable, null);
   }
 
   @Override

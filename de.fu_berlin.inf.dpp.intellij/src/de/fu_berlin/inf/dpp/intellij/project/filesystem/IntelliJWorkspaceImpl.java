@@ -33,12 +33,6 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
   }
 
   @Override
-  public void run(IWorkspaceRunnable runnable, IResource[] resources)
-      throws IOException, OperationCanceledException {
-    run(runnable);
-  }
-
-  @Override
   public void run(
       IWorkspaceRunnable runnable,
       IReferencePoint[] referencePoints,
