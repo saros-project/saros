@@ -59,6 +59,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 
@@ -606,7 +607,14 @@ public class SarosSessionManager implements ISarosSessionManager {
                     .getString(ProjectNegotiationTypeHook.KEY_TYPE));
         AbstractOutgoingProjectNegotiation negotiation =
             negotiationFactory.newOutgoingProjectNegotiation(
-                user.getJID(), type, projectsToShare, this, currentSession);
+                user.getJID(),
+                type,
+                projectsToShare
+                    .stream()
+                    .map(project -> project.getReferencePoint())
+                    .collect(Collectors.toList()),
+                this,
+                currentSession);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);
@@ -673,7 +681,14 @@ public class SarosSessionManager implements ISarosSessionManager {
                     .getString(ProjectNegotiationTypeHook.KEY_TYPE));
         negotiation =
             negotiationFactory.newOutgoingProjectNegotiation(
-                user, type, currentSharedProjects, this, currentSession);
+                user,
+                type,
+                currentSharedProjects
+                    .stream()
+                    .map(project -> project.getReferencePoint())
+                    .collect(Collectors.toList()),
+                this,
+                currentSession);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);

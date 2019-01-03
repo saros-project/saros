@@ -133,7 +133,7 @@ public final class NegotiationFactory {
   public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
       final JID remoteAddress,
       final TransferType transferType,
-      final List<IProject> resources,
+      final List<IReferencePoint> referencePoints,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
@@ -145,7 +145,7 @@ public final class NegotiationFactory {
       case ARCHIVE:
         return new ArchiveOutgoingProjectNegotiation(
             remoteAddress,
-            getReferencePointList(resources),
+            referencePoints,
             sessionManager,
             session, /* editorManager */
             context.getComponent(IEditorManager.class),
@@ -157,7 +157,7 @@ public final class NegotiationFactory {
       case INSTANT:
         return new InstantOutgoingProjectNegotiation(
             remoteAddress,
-            getReferencePointList(resources),
+            referencePoints,
             sessionManager,
             session, /* editorManager */
             context.getComponent(IEditorManager.class),
@@ -213,15 +213,5 @@ public final class NegotiationFactory {
       default:
         throw new UnsupportedOperationException("transferType not implemented");
     }
-  }
-
-  private List<IReferencePoint> getReferencePointList(List<IProject> projects) {
-    return projects == null
-        ? null
-        : new ArrayList<>(
-            projects
-                .stream()
-                .map(project -> project.getReferencePoint())
-                .collect(Collectors.toList()));
   }
 }
