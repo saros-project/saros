@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.session;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -17,6 +18,16 @@ public interface ISarosSessionManager {
 
   /** @return the active session or <code>null</code> if there is no active session. */
   public ISarosSession getSession();
+
+  /**
+   * Starts a new DPP session with the local user as only participant.
+   *
+   * @param referencePointResources the local reference point resources which should be shared.
+   * @param referencePointManager
+   */
+  public void startSession(
+      Map<IReferencePoint, List<IResource>> referencePointResources,
+      IReferencePointManager referencePointManager);
 
   /**
    * Starts a new DPP session with the local user as only participant.

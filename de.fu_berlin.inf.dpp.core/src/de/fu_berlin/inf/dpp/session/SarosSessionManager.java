@@ -168,22 +168,11 @@ public class SarosSessionManager implements ISarosSessionManager {
     negotiationHandler = handler;
   }
 
-  /**
-   * @JTourBusStop 3, Invitation Process:
-   *
-   * <p>This class manages the current Saros session.
-   *
-   * <p>Saros makes a distinction between a session and a shared project. A session is an on-line
-   * collaboration between users which allows users to carry out activities. The main activity is to
-   * share projects. Hence, before you share a project, a session has to be started and all users
-   * added to it.
-   *
-   * <p>(At the moment, this separation is invisible to the user. He/she must share a project in
-   * order to start a session.)
-   */
   @Override
-  public void startSession(final Map<IProject, List<IResource>> projectResourcesMapping) {
-
+  public void startSession(
+      Map<IReferencePoint, List<IResource>> referencePointResources,
+      IReferencePointManager referencePointManager)
+  {
     /*
      * FIXME split the logic, start a session without anything and then add
      * resources !
@@ -234,23 +223,23 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
       }
 
-      session = new SarosSession(sessionID, hostProperties, context);
+      session = new SarosSession(sessionID, hostProperties, context, referencePointManager);
 
       sessionStarting(session);
       session.start();
       sessionStarted(session);
 
-      referencePointManager = session.getComponent(IReferencePointManager.class);
+      this.referencePointManager = session.getComponent(IReferencePointManager.class);
 
-      for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping.entrySet()) {
+      for (Entry<IReferencePoint, List<IResource>> mapEntry : referencePointResources.entrySet()) {
 
-        final IProject project = mapEntry.getKey();
+        final IReferencePoint referencePoint = mapEntry.getKey();
         final List<IResource> resourcesList = mapEntry.getValue();
 
-        String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+        String referencePointID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
-        referencePointManager.put(project.getReferencePoint(), project);
-        session.addSharedResources(project.getReferencePoint(), projectID, resourcesList);
+
+        session.addSharedResources(referencePoint, referencePointID, resourcesList);
       }
 
       log.info("session started");
@@ -258,6 +247,36 @@ public class SarosSessionManager implements ISarosSessionManager {
       sessionStartup = false;
       startStopSessionLock.unlock();
     }
+  }
+
+  /**
+   * @JTourBusStop 3, Invitation Process:
+   *
+   * <p>This class manages the current Saros session.
+   *
+   * <p>Saros makes a distinction between a session and a shared project. A session is an on-line
+   * collaboration between users which allows users to carry out activities. The main activity is to
+   * share projects. Hence, before you share a project, a session has to be started and all users
+   * added to it.
+   *
+   * <p>(At the moment, this separation is invisible to the user. He/she must share a project in
+   * order to start a session.)
+   */
+  @Override
+  public void startSession(final Map<IProject, List<IResource>> projectResourcesMapping) {
+
+    IReferencePointManager referencePointManager = new ReferencePointManager();
+    Map<IReferencePoint, List<IResource>> referencePointResourceMapping = null;
+    if(projectResourcesMapping != null)
+    {
+      referencePointResourceMapping = new HashMap<>();
+
+      for (Map.Entry<IProject, List<IResource>> entry: projectResourcesMapping.entrySet()) {
+        referencePointManager.put(entry.getKey().getReferencePoint(), entry.getKey());
+        referencePointResourceMapping.put(entry.getKey().getReferencePoint(), entry.getValue());
+      }
+    }
+    startSession(referencePointResourceMapping, referencePointManager);
   }
 
   // FIXME offer a startSession method for the client and host !

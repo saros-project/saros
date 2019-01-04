@@ -92,8 +92,6 @@ public final class SarosSession implements ISarosSession {
 
   @Inject private IConnectionManager connectionManager;
 
-  private IReferencePointManager referencePointManager;
-
   private final IContainerContext containerContext;
 
   private final ConcurrentDocumentClient concurrentDocumentClient;
@@ -223,7 +221,23 @@ public final class SarosSession implements ISarosSession {
   /** Constructor for host. */
   public SarosSession(
       final String id, IPreferenceStore properties, IContainerContext containerContext) {
-    this(id, containerContext, properties, /* unused */ null, /* unused */ null);
+    this(id, containerContext, properties, /* unused */ null, /* unused */ null, null);
+  }
+
+  // FIXME those parameter passing feels strange, find a better way
+  /** Constructor for host. */
+  public SarosSession(
+      final String id,
+      IPreferenceStore properties,
+      IContainerContext containerContext,
+      IReferencePointManager referencePointManager) {
+    this(
+        id,
+        containerContext,
+        properties, /* unused */
+        null, /* unused */
+        null,
+        referencePointManager);
   }
 
   /** Constructor for client. */
@@ -233,7 +247,7 @@ public final class SarosSession implements ISarosSession {
       IPreferenceStore localProperties,
       IPreferenceStore hostProperties,
       IContainerContext containerContext) {
-    this(id, containerContext, localProperties, hostJID, hostProperties);
+    this(id, containerContext, localProperties, hostJID, hostProperties, null);
   }
 
   @Override
@@ -1061,7 +1075,8 @@ public final class SarosSession implements ISarosSession {
       IContainerContext context,
       IPreferenceStore localProperties,
       JID host,
-      IPreferenceStore hostProperties) {
+      IPreferenceStore hostProperties,
+      IReferencePointManager referencePointManager) {
 
     context.initComponent(this);
 
@@ -1069,6 +1084,8 @@ public final class SarosSession implements ISarosSession {
     this.sharedReferencePointMapper = new SharedReferencePointMapper();
     this.activityQueuer = new ActivityQueuer();
     this.containerContext = context;
+
+    if (referencePointManager == null) referencePointManager = new ReferencePointManager();
 
     // FIXME that should be passed in !
     JID localUserJID = connectionService.getJID();
@@ -1121,8 +1138,6 @@ public final class SarosSession implements ISarosSession {
     activitySequencer = sessionContainer.getComponent(ActivitySequencer.class);
 
     userListHandler = sessionContainer.getComponent(UserInformationHandler.class);
-
-    referencePointManager = sessionContainer.getComponent(IReferencePointManager.class);
 
     // ensure that the container uses caching
     assert sessionContainer.getComponent(ActivityHandler.class)
