@@ -3,11 +3,12 @@ package de.fu_berlin.inf.dpp.negotiation;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.monitoring.CancelableInputStream;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +25,9 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
   private final File file;
   private final IProgressMonitor monitor;
-  private final Map<String, IProject> idToProjectMapping;
+  private final Map<String, IReferencePoint> idToReferencePointMapping;
   private final String delimiter;
+  private final IReferencePointManager referencePointManager;
 
   /**
    * Creates a decompress task for an archive file that can be executed by {@link IWorkspace#run}.
@@ -33,20 +35,22 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
    * <b>overwritten without confirmation</b>!
    *
    * @param file Zip file containing the compressed data
-   * @param idToProjectMapping map containing the id to project mapping (see also {@link
-   *     ISarosSession#getReferencePointID(de.fu_berlin.inf.dpp.filesystem.IReferencePoint)}
+   * @param idToReferencePointMapping map containing the id to project mapping (see also {@link
+   *     ISarosSession#getReferencePointID(IReferencePoint)}
    * @param monitor monitor that is used for progress report and cancellation or <code>null</code>
    *     to use the monitor provided by the {@link #run(IProgressMonitor)} method
    */
   public DecompressArchiveTask(
       final File file,
-      final Map<String, IProject> idToProjectMapping,
+      final Map<String, IReferencePoint> idToReferencePointMapping,
       final String delimiter,
-      final IProgressMonitor monitor) {
+      final IProgressMonitor monitor,
+      final IReferencePointManager referencePointManager) {
     this.file = file;
-    this.idToProjectMapping = idToProjectMapping;
+    this.idToReferencePointMapping = idToReferencePointMapping;
     this.delimiter = delimiter;
     this.monitor = monitor;
+    this.referencePointManager = referencePointManager;
   }
 
   // TODO extract as much as possible even on some failures
@@ -88,16 +92,16 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
         final String path = entryName.substring(delimiterIdx + 1, entryName.length());
 
-        final IProject project = idToProjectMapping.get(id);
+        final IReferencePoint referencePoint = idToReferencePointMapping.get(id);
 
-        if (project == null) {
-          LOG.warn("skipping zip entry " + entryName + ", unknown project id: " + id);
+        if (referencePointManager == null) {
+          LOG.warn("skipping zip entry " + entryName + ", unknown reference point id: " + id);
 
           monitor.worked(1);
           continue;
         }
 
-        final IFile decompressedFile = project.getFile(path);
+        final IFile decompressedFile = referencePointManager.get(referencePoint).getFile(path);
 
         FileSystem.createFolder(decompressedFile);
 

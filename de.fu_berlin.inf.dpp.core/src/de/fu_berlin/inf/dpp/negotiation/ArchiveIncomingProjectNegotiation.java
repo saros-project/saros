@@ -4,9 +4,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRespons
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
@@ -21,7 +19,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -146,13 +143,13 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
       final IProgressMonitor monitor)
       throws LocalCancellationException, IOException {
 
-    final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
-
-    for (Entry<String, IReferencePoint> entry : localReferencePointMapping.entrySet())
-      projectMapping.put(entry.getKey(), referencePointManager.get(entry.getValue()));
-
     final DecompressArchiveTask decompressTask =
-        new DecompressArchiveTask(archiveFile, projectMapping, PATH_DELIMITER, monitor);
+        new DecompressArchiveTask(
+            archiveFile,
+            localReferencePointMapping,
+            PATH_DELIMITER,
+            monitor,
+            referencePointManager);
 
     long startTime = System.currentTimeMillis();
 
