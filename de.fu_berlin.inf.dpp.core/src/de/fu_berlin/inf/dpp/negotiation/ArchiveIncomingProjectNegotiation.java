@@ -146,13 +146,13 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
       final IProgressMonitor monitor)
       throws LocalCancellationException, IOException {
 
-    final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
-
-    for (Entry<String, IReferencePoint> entry : localReferencePointMapping.entrySet())
-      projectMapping.put(entry.getKey(), referencePointManager.get(entry.getValue()));
-
     final DecompressArchiveTask decompressTask =
-        new DecompressArchiveTask(archiveFile, projectMapping, PATH_DELIMITER, monitor);
+        new DecompressArchiveTask(
+            archiveFile,
+            localReferencePointMapping,
+            PATH_DELIMITER,
+            monitor,
+            referencePointManager);
 
     long startTime = System.currentTimeMillis();
 
