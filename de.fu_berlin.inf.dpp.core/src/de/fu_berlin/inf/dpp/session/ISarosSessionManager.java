@@ -29,13 +29,6 @@ public interface ISarosSessionManager {
       Map<IReferencePoint, List<IResource>> referencePointResources,
       IReferencePointManager referencePointManager);
 
-  /**
-   * Starts a new DPP session with the local user as only participant.
-   *
-   * @param projectResources the local project resources which should be shared.
-   */
-  public void startSession(Map<IProject, List<IResource>> projectResources);
-
   // FIXME this method is error prone and only used by the IPN, find a better
   // abstraction
   /**
