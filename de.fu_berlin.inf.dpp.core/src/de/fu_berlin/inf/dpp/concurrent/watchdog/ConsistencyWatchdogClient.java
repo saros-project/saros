@@ -6,6 +6,8 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
@@ -13,6 +15,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.UserFormatUtils;
 import java.util.ArrayList;
@@ -256,7 +259,15 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
 
     final SPath path = checksum.getPath();
 
-    final boolean existsFileLocally = path.getFile().exists();
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    IReferencePoint referencePoint = path.getReferencePoint();
+
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    final boolean existsFileLocally =
+        referencePointManager.get(referencePoint).getFile(referencePointRelativePath).exists();
 
     if (!checksum.existsFile() && existsFileLocally) {
       /*

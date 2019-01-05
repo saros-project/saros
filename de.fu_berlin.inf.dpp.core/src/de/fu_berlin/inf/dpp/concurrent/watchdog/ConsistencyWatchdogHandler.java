@@ -9,10 +9,13 @@ import de.fu_berlin.inf.dpp.activities.TargetedFileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -160,7 +163,15 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
    */
   private void recoverFile(final User from, final SPath path) {
 
-    final IFile file = path.getFile();
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    IReferencePoint referencePoint = path.getReferencePoint();
+
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    final IFile file =
+        referencePointManager.get(referencePoint).getFile(referencePointRelativePath);
 
     // Reset jupiter
     session.getConcurrentDocumentServer().reset(from, path);

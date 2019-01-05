@@ -7,7 +7,11 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -242,11 +246,20 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
       documentChecksums.put(docPath, checksum);
     }
 
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    IReferencePoint referencePoint = docPath.getReferencePoint();
+
+    IPath referencePointRelativePath = docPath.getProjectRelativePath();
+
+    IFile file = referencePointManager.get(referencePoint).getFile(referencePointRelativePath);
+
     /*
      * Ensures that the watchdog server doesn't use outdated checksums for
      * files that no longer exist locally.
      */
-    if (checksum.getHash() != DocumentChecksum.NOT_AVAILABLE && !docPath.getFile().exists()) {
+    if (checksum.getHash() != DocumentChecksum.NOT_AVAILABLE && !file.exists()) {
 
       LOG.debug(
           "Updating checksum for "

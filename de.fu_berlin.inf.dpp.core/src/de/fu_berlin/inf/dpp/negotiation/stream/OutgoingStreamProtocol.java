@@ -3,8 +3,11 @@ package de.fu_berlin.inf.dpp.negotiation.stream;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -38,11 +41,19 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
    * @throws LocalCancellationException on local user cancellation
    */
   public void streamFile(SPath file) throws IOException, LocalCancellationException {
-    String message = "sending " + displayName(file.getFile());
+    String message = "sending " + file.getFullPath();
     log.debug(message);
     monitor.subTask(message);
 
-    IFile fileHandle = file.getFile();
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    IReferencePoint referencePoint = file.getReferencePoint();
+
+    IPath referencePointRelativePath = file.getProjectRelativePath();
+
+    IFile fileHandle =
+        referencePointManager.get(referencePoint).getFile(referencePointRelativePath);
 
     writeHeader(file, fileHandle.getSize());
 
