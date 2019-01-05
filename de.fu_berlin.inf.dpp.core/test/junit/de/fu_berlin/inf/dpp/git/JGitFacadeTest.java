@@ -15,7 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class TestJGitFacade {
+public class JGitFacadeTest {
 
   @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
