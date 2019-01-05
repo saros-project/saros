@@ -71,11 +71,11 @@ public class SPathConverter implements Converter, Startable {
 
     SPath spath = (SPath) value;
 
-    String i = session.getReferencePointID(spath.getProject().getReferencePoint());
+    String i = session.getReferencePointID(spath.getReferencePoint());
     if (i == null) {
       LOG.error(
           "Could not retrieve project id for project '"
-              + spath.getProject().getName()
+              + spath.getReferencePoint()
               + "'. Make sure you don't create activities for non-shared projects");
       return;
     }

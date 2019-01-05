@@ -29,7 +29,6 @@ import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -337,17 +336,9 @@ public class ActivityHandlerTest {
 
     IReferencePoint referencePoint = EasyMock.createMock(IReferencePoint.class);
 
-    IProject project = EasyMock.createMock(IProject.class);
-
-    EasyMock.expect(project.getReferencePoint()).andStubReturn(referencePoint);
-
-    EasyMock.replay(referencePoint, project);
-
-    EasyMock.expect(sessionMock.userHasReferencePoint(dave, project.getReferencePoint()))
-        .andStubReturn(false);
+    EasyMock.expect(sessionMock.userHasReferencePoint(dave, referencePoint)).andStubReturn(false);
     for (User user : remoteUsersWithProjects) {
-      EasyMock.expect(sessionMock.userHasReferencePoint(user, project.getReferencePoint()))
-          .andStubReturn(true);
+      EasyMock.expect(sessionMock.userHasReferencePoint(user, referencePoint)).andStubReturn(true);
     }
 
     EasyMock.expect(sessionMock.getUsers()).andStubReturn(participants);
@@ -376,7 +367,7 @@ public class ActivityHandlerTest {
     activities.add(EasyMock.createNiceMock(ChecksumActivity.class));
 
     path = EasyMock.createMock(SPath.class);
-    EasyMock.expect(path.getProject()).andStubReturn(project);
+    EasyMock.expect(path.getReferencePoint()).andStubReturn(referencePoint);
     EasyMock.replay(path);
 
     // Assign Targets and Source to activities

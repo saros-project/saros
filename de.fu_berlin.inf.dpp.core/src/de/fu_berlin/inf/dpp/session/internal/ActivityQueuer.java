@@ -143,8 +143,8 @@ public class ActivityQueuer {
 
           // try to reuse the queue as lookup is O(n)
           if (projectQueue == null
-              || !projectQueue.referencePoint.equals(path.getProject().getReferencePoint())) {
-            projectQueue = getProjectQueue(path.getProject().getReferencePoint());
+              || !projectQueue.referencePoint.equals(path.getReferencePoint())) {
+            projectQueue = getProjectQueue(path.getReferencePoint());
           }
 
           if (projectQueue != null) {
