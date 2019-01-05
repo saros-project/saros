@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ReferencePointManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
@@ -84,14 +85,14 @@ public class CollaborationUtils {
 
             try {
               refreshProjects(newResources.keySet(), null);
-              sessionManager.startSession(convert(newResources));
+              referencePointManager = new ReferencePointManager();
+              sessionManager.startSession(
+                  convert(newResources, referencePointManager), referencePointManager);
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
               ISarosSession session = sessionManager.getSession();
 
               if (session == null) return Status.CANCEL_STATUS;
-
-              referencePointManager = session.getComponent(IReferencePointManager.class);
 
               sessionManager.invite(participantsToAdd, getSessionDescription(session));
 
@@ -443,6 +444,32 @@ public class CollaborationUtils {
   }
 
   private static Map<
+          de.fu_berlin.inf.dpp.filesystem.IReferencePoint,
+          List<de.fu_berlin.inf.dpp.filesystem.IResource>>
+      convert(Map<IProject, List<IResource>> data, IReferencePointManager referencePointManager) {
+
+    Map<
+            de.fu_berlin.inf.dpp.filesystem.IReferencePoint,
+            List<de.fu_berlin.inf.dpp.filesystem.IResource>>
+        result =
+            new HashMap<
+                de.fu_berlin.inf.dpp.filesystem.IReferencePoint,
+                List<de.fu_berlin.inf.dpp.filesystem.IResource>>();
+
+    for (Entry<IProject, List<IResource>> entry : data.entrySet()) {
+      de.fu_berlin.inf.dpp.filesystem.IProject coreProject =
+          ResourceAdapterFactory.create(entry.getKey());
+
+      fillReferencePointManager(coreProject, referencePointManager);
+
+      result.put(
+          coreProject.getReferencePoint(), ResourceAdapterFactory.convertTo(entry.getValue()));
+    }
+
+    return result;
+  }
+
+  private static Map<
           de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>>
       convert(Map<IProject, List<IResource>> data) {
 
@@ -473,5 +500,11 @@ public class CollaborationUtils {
     }
 
     progress.done();
+  }
+
+  private static void fillReferencePointManager(
+      de.fu_berlin.inf.dpp.filesystem.IProject project,
+      IReferencePointManager referencePointManager) {
+    referencePointManager.put(project.getReferencePoint(), project);
   }
 }
