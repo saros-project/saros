@@ -21,7 +21,6 @@ package de.fu_berlin.inf.dpp.session;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -52,7 +51,6 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -61,7 +59,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 
@@ -556,28 +553,27 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    List<IProject> projectsToShare = new ArrayList<IProject>();
+    List<IReferencePoint> referencePointsToShare = new ArrayList<IReferencePoint>();
     Map<IReferencePoint, List<IResource>> mapping = nextProjectNegotiation.get();
 
     for (Entry<IReferencePoint, List<IResource>> mapEntry : mapping.entrySet()) {
       final IReferencePoint referencePoint = mapEntry.getKey();
-      final IProject project = referencePointManager.get(referencePoint);
       final List<IResource> resourcesList = mapEntry.getValue();
 
       // side effect: non shared projects are always partial -.-
-      if (!currentSession.isCompletelyShared(project.getReferencePoint())) {
-        String projectID = currentSession.getReferencePointID(project.getReferencePoint());
+      if (!currentSession.isCompletelyShared(referencePoint)) {
+        String referencePointID = currentSession.getReferencePointID(referencePoint);
 
-        if (projectID == null) {
-          projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+        if (referencePointID == null) {
+          referencePointID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
         }
-        currentSession.addSharedResources(project.getReferencePoint(), projectID, resourcesList);
+        currentSession.addSharedResources(referencePoint, referencePointID, resourcesList);
 
-        projectsToShare.add(project);
+        referencePointsToShare.add(referencePoint);
       }
     }
 
-    if (projectsToShare.isEmpty()) {
+    if (referencePointsToShare.isEmpty()) {
       log.warn(
           "skipping project negotiation because no new projects were added to the current session");
       return;
@@ -608,14 +604,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     .getString(ProjectNegotiationTypeHook.KEY_TYPE));
         AbstractOutgoingProjectNegotiation negotiation =
             negotiationFactory.newOutgoingProjectNegotiation(
-                user.getJID(),
-                type,
-                projectsToShare
-                    .stream()
-                    .map(project -> project.getReferencePoint())
-                    .collect(Collectors.toList()),
-                this,
-                currentSession);
+                user.getJID(), type, referencePointsToShare, this, currentSession);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);
@@ -643,11 +632,10 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    List<IProject> currentSharedProjects =
-        new ArrayList<IProject>(
-            referencePointManager.getProjects(currentSession.getReferencePoints()));
+    List<IReferencePoint> currentSharedReferencePoints =
+        new ArrayList<IReferencePoint>(currentSession.getReferencePoints());
 
-    if (currentSharedProjects.isEmpty()) return;
+    if (currentSharedReferencePoints.isEmpty()) return;
 
     INegotiationHandler handler = negotiationHandler;
 
@@ -682,14 +670,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     .getString(ProjectNegotiationTypeHook.KEY_TYPE));
         negotiation =
             negotiationFactory.newOutgoingProjectNegotiation(
-                user,
-                type,
-                currentSharedProjects
-                    .stream()
-                    .map(project -> project.getReferencePoint())
-                    .collect(Collectors.toList()),
-                this,
-                currentSession);
+                user, type, currentSharedReferencePoints, this, currentSession);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);
