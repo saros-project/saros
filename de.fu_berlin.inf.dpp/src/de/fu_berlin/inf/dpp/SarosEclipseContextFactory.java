@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.EclipsePathFactory;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceRootImpl;
 import de.fu_berlin.inf.dpp.filesystem.FileContentNotifierBridge;
@@ -107,7 +108,10 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
           IRemoteProgressIndicatorFactory.class, EclipseRemoteProgressIndicatorFactoryImpl.class),
       Component.create(MUCNegotiationManager.class),
       Component.create(SkypeManager.class),
-      Component.create(AwarenessInformationCollector.class)
+      Component.create(AwarenessInformationCollector.class),
+
+      // ReferencePointManager
+      Component.create(EclipseReferencePointManager.class)
     };
   }
 
