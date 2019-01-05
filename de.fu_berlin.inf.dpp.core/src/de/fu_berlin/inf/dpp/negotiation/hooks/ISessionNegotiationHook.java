@@ -33,7 +33,8 @@ public interface ISessionNegotiationHook {
    * Sets the host preferences that are needed before the session negotiation is started.
    *
    * <p>This method will be called on the <b>host</b> side during the session creation as part of
-   * {@link SarosSessionManager#startSession(Map)}).
+   * {@link SarosSessionManager#startSession(Map,
+   * de.fu_berlin.inf.dpp.session.IReferencePointManager)}).
    *
    * @param hostPreferences The session preference store that corresponds to the host. May be used
    *     to store the initial host properties so they can be accessed by other components.
