@@ -905,7 +905,7 @@ public final class SarosSession implements ISarosSession {
           break;
       }
     } else if (activity instanceof FolderCreatedActivity) {
-      IFolder folder = activity.getPath().getFolder();
+      IFolder folder = project.getFolder(activity.getPath().getProjectRelativePath());
 
       if (!isShared(folder.getParent())) {
         log.error("PSFOC -" + " folder creation detected for a non shared parent: " + folder);
@@ -923,7 +923,7 @@ public final class SarosSession implements ISarosSession {
       sharedReferencePointMapper.addResources(referencePoint, Collections.singletonList(folder));
 
     } else if (activity instanceof FolderDeletedActivity) {
-      IFolder folder = activity.getPath().getFolder();
+      IFolder folder = project.getFolder(activity.getPath().getProjectRelativePath());
 
       if (!isShared(folder)) {
         log.error("PSFOR -" + " folder removal detected for a non shared folder: " + folder);
