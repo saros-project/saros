@@ -2,9 +2,14 @@ package de.fu_berlin.inf.dpp.git;
 
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -18,6 +23,9 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.BundleWriter;
+import org.eclipse.jgit.transport.FetchResult;
+import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.TransportBundleStream;
 import org.eclipse.jgit.transport.URIish;
 
 public class JGitFacade {
@@ -34,12 +42,12 @@ public class JGitFacade {
     Git user = Git.open(workDir);
     Repository repo = user.getRepository();
     Ref HEAD = repo.exactRef("HEAD");
-    Ref MASTER = repo.exactRef("master");
+    Ref MASTER = repo.exactRef("refs/heads/master");
     BundleWriter bundlewriter = new BundleWriter(repo);
     File bundle = File.createTempFile("file", ".bundle");
     OutputStream fos = new FileOutputStream(bundle);
     ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
-    bundlewriter.include(HEAD);
+    bundlewriter.include("refs/heads/aaa", repo.resolve("HEAD"));
     if (MASTER != null) bundlewriter.include(MASTER);
     RevWalk walk = new RevWalk(repo);
     RevCommit tagCommit = walk.parseCommit(repo.resolve(tag));
@@ -71,7 +79,7 @@ public class JGitFacade {
 
   /**
    * Change a existing Git Repo by add a new File, git add fileChangable, git commit and create a
-   * Tag "CheckoutAt(numberOfCommit)"
+   * Tag "CheckoutAtCommit(numberOfCommit)"
    *
    * @param workDir The Directory that contains the .git Directory
    * @param numberOfCommit The first used number should be 2 and than incremented by 1
@@ -94,11 +102,17 @@ public class JGitFacade {
     }
   }
 
-  public static void unbundle(File bundleFile, File gitRepo) throws IOException, GitAPIException {
+  public static void unbundle(File bundleFile, File gitRepo) throws IOException {
     Git git = Git.open(gitRepo);
-    URIish bundleURI = new URIish().setPath(bundleFile.getCanonicalPath());
-    git.remoteAdd().setUri(bundleURI).setName("bundle").call();
-    git.fetch().setRemote("bundle").call();
+    // URIish bundleURI = new URIish().setPath(bundleFile.getAbstraPath());
+    // git.remoteAdd().setUri(bundleURI).setName("bundle").call();
+    InputStream fos = new FileInputStream(bundleFile);
+    TransportBundleStream tbs = new TransportBundleStream(git.getRepository(), null, fos);
+    final RefSpec rs = new RefSpec("+refs/heads/*:refs/remotes/bundle/*");
+    final Set<RefSpec> refs = Collections.singleton(rs);
+    tbs.fetch(NullProgressMonitor.INSTANCE, refs);
+    // tbs.fetch(NullProgressMonitor.INSTANCE, null);
+    // git.fetch().setRemote("bundle").call();
   }
 
   static File getMetaDataByGitRepo(File gitDir1) throws IOException {
@@ -117,11 +131,23 @@ public class JGitFacade {
     git.close();
   }
 
-  public static void clone(File remote, File local)
+  public static void clone(File from, File to)
       throws IOException, InvalidRemoteException, TransportException, GitAPIException {
     CloneCommand cloneCommand = Git.cloneRepository();
-    cloneCommand.setURI(getUrlByGitRepo(remote));
-    cloneCommand.setDirectory(local);
+    cloneCommand.setURI(getUrlByGitRepo(from));
+    cloneCommand.setDirectory(to);
     cloneCommand.call();
+  }
+
+  static FetchResult fetchFromBundle(final File workDir, final File bundleFile)
+      throws URISyntaxException, IOException {
+    final URIish uri = new URIish("in-memory://");
+    final FileInputStream fis = new FileInputStream(bundleFile);
+    final RefSpec rs = new RefSpec("refs:heads/*:refs/heads/*");
+    final Set<RefSpec> refs = Collections.singleton(rs);
+    try (Repository workRepo = Git.open(workDir).getRepository();
+        TransportBundleStream transport = new TransportBundleStream(workRepo, uri, fis)) {
+      return transport.fetch(NullProgressMonitor.INSTANCE, refs);
+    }
   }
 }

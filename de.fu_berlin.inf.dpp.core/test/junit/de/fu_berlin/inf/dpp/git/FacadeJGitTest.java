@@ -1,15 +1,20 @@
 package de.fu_berlin.inf.dpp.git;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.transport.FetchResult;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,20 +66,28 @@ public class FacadeJGitTest {
   @Test
   public void testValidUnbundle() {
     try {
-      File bundle = JGitFacade.createBundleByTag(localWorkDir, "CheckoutAt2");
-      JGitFacade.unbundle(bundle, remoteWorkDir);
+      File bundle2 =
+          JGitFacade.createBundleByTag(new File(localWorkDir, ".git"), "CheckoutAtCommit2");
+      ObjectId old = Git.open(remoteWorkDir).getRepository().resolve("FETCH_HEAD");
+      assertEquals(old, Git.open(remoteWorkDir).getRepository().resolve("FETCH_HEAD"));
+      FetchResult fetchResult = JGitFacade.fetchFromBundle(remoteWorkDir, bundle2);
+      Ref advertisedRef = fetchResult.getAdvertisedRef("HEAD");
+      assertEquals(
+          Git.open(localWorkDir).getRepository().resolve("HEAD"), advertisedRef.getObjectId());
+
+      assertEquals(
+          Git.open(localWorkDir).getRepository().resolve("HEAD"),
+          Git.open(remoteWorkDir).getRepository().resolve("refs/heads/aaa"));
+
+      assertNotEquals(old, Git.open(remoteWorkDir).getRepository().resolve("FETCH_HEAD"));
 
       assertEquals(
           Git.open(localWorkDir).getRepository().resolve("HEAD"),
           Git.open(remoteWorkDir).getRepository().resolve("FETCH_HEAD"));
     } catch (IOException e) {
       fail("IO");
-    } catch (InvalidRemoteException e) {
-      fail("GitRepo1");
-    } catch (TransportException e) {
-      fail("Transport");
-    } catch (GitAPIException e) {
-      fail("Other");
+    } catch (URISyntaxException e) { // TODO Auto-generated catch block
+      fail("URI");
     }
   }
 
