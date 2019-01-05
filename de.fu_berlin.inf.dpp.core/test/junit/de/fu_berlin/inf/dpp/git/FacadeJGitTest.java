@@ -61,7 +61,7 @@ public class FacadeJGitTest {
   @Test
   public void testValidUnbundle() {
     try {
-      File bundle = JGitFacade.createBundleByTag(localWorkDir, "CheckoutAt2");
+      File bundle = JGitFacade.createBundleByTag(localWorkDir, "CheckoutAtCommit2");
       JGitFacade.unbundle(bundle, remoteWorkDir);
 
       assertEquals(
@@ -80,4 +80,34 @@ public class FacadeJGitTest {
 
   @Test
   public void testEmptyfileUnbundle() {}
+
+  /* Tests for working with manual created TestDirectorys
+   * To run this Test
+   *  write "private File selfMadeWorkDir;" as a local variable
+   *  write "selfMadeWorkDir = new File("TestWorkDirGit");" in the SetUp()
+   *  create a new directory in the root of the core project with the name "TestWorkDirGit"
+   *  init git repo with cl
+   *  create a empty file helloworld.txt
+   *  git add .
+   *  git commit -m "initCommit"
+   *
+  @Test
+  public void testValidBundleSelfMade() {
+    try {
+      File bundle = JGitFacade.createBundleByTag(selfMadeWorkDir, "");
+      assertNotNull(bundle);
+    } catch (IOException e) {
+      fail("IO");
+    }
+  }
+
+  @Test
+  public void preTestValidBundleSelfMade() {
+    try {
+      Git myRepo = Git.open(selfMadeWorkDir);
+    } catch (IOException e) {
+      fail("IO");
+    }
+  }
+  */
 }

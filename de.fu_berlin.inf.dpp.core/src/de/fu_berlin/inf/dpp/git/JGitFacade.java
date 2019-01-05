@@ -28,22 +28,26 @@ public class JGitFacade {
    * workDir.
    *
    * @param workDir The Directory that contains the .git Directory
-   * @param tag assume that the recipient have at least the commit the tag is pointing to
+   * @param tag assume that the recipient have at least the commit the tag is pointing to. If tag is
+   *     an empty String the bundle contains everything to HEAD and everything to master.
    */
   public static File createBundleByTag(File workDir, String tag) throws IOException {
     Git user = Git.open(workDir);
     Repository repo = user.getRepository();
     Ref HEAD = repo.exactRef("HEAD");
-    Ref MASTER = repo.exactRef("master");
+    Ref MASTER = repo.exactRef("refs/heads/master");
     BundleWriter bundlewriter = new BundleWriter(repo);
     File bundle = File.createTempFile("file", ".bundle");
     OutputStream fos = new FileOutputStream(bundle);
     ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
-    bundlewriter.include(HEAD);
+    if (HEAD != null) bundlewriter.include(HEAD);
     if (MASTER != null) bundlewriter.include(MASTER);
-    RevWalk walk = new RevWalk(repo);
-    RevCommit tagCommit = walk.parseCommit(repo.resolve(tag));
-    bundlewriter.assume(tagCommit);
+
+    if (tag != "") {
+      RevWalk walk = new RevWalk(repo);
+      RevCommit tagCommit = walk.parseCommit(repo.resolve(tag));
+      bundlewriter.assume(tagCommit);
+    }
     bundlewriter.writeBundle(monitor, fos);
     return bundle;
   }
@@ -70,8 +74,8 @@ public class JGitFacade {
   }
 
   /**
-   * Change a existing Git Repo by add a new File, git add fileChangable, git commit and create a
-   * Tag "CheckoutAt(numberOfCommit)"
+   * Change a existing Git Repo by creating a new File, git add, git commit and create a Tag
+   * "CheckoutAtCommit(numberOfCommit)"
    *
    * @param workDir The Directory that contains the .git Directory
    * @param numberOfCommit The first used number should be 2 and than incremented by 1
@@ -94,8 +98,16 @@ public class JGitFacade {
     }
   }
 
-  public static void unbundle(File bundleFile, File gitRepo) throws IOException, GitAPIException {
-    Git git = Git.open(gitRepo);
+  /**
+   * Fetching from bundle to an git Repo
+   *
+   * @param bundleFile
+   * @param workDir The Directory that contains the .git Directory
+   * @throws IOException
+   * @throws GitAPIException
+   */
+  public static void unbundle(File bundleFile, File workDir) throws IOException, GitAPIException {
+    Git git = Git.open(workDir);
     URIish bundleURI = new URIish().setPath(bundleFile.getCanonicalPath());
     git.remoteAdd().setUri(bundleURI).setName("bundle").call();
     git.fetch().setRemote("bundle").call();
@@ -117,11 +129,11 @@ public class JGitFacade {
     git.close();
   }
 
-  public static void clone(File remote, File local)
+  public static void clone(File from, File to)
       throws IOException, InvalidRemoteException, TransportException, GitAPIException {
     CloneCommand cloneCommand = Git.cloneRepository();
-    cloneCommand.setURI(getUrlByGitRepo(remote));
-    cloneCommand.setDirectory(local);
+    cloneCommand.setURI(getUrlByGitRepo(from));
+    cloneCommand.setDirectory(to);
     cloneCommand.call();
   }
 }
