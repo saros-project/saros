@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.server.console.ShareCommand;
 import de.fu_berlin.inf.dpp.server.dummies.NullRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathFactoryImpl;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathImpl;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerReferencePointManager;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerWorkspaceImpl;
 import de.fu_berlin.inf.dpp.server.net.SubscriptionAuthorizer;
 import de.fu_berlin.inf.dpp.server.preferences.PersistencePreferenceStore;
@@ -75,6 +76,8 @@ public class ServerContextFactory extends AbstractContextFactory {
     c.addComponent(IRemoteProgressIndicatorFactory.class, NullRemoteProgressIndicatorFactory.class);
 
     c.addComponent(UISynchronizer.class, ServerUISynchronizerImpl.class);
+
+    c.addComponent(ServerReferencePointManager.class);
   }
 
   /*
