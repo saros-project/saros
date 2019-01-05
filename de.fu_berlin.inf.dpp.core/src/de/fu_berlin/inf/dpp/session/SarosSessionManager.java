@@ -483,14 +483,14 @@ public class SarosSessionManager implements ISarosSessionManager {
   }
 
   /**
-   * Adds project resources to an existing session.
+   * Adds reference point resources to an existing session.
    *
-   * @param projectResourcesMapping
+   * @param referencePointResourcesMapping
    */
   @Override
   public synchronized void addResourcesToSession(
-      Map<IProject, List<IResource>> projectResourcesMapping) {
-    if (projectResourcesMapping == null) {
+      Map<IReferencePoint, List<IResource>> referencePointResourcesMapping) {
+    if (referencePointResourcesMapping == null) {
       return;
     }
 
@@ -501,12 +501,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * negotiation with all collected resources.
      */
 
-    Map<IReferencePoint, List<IResource>> referencePointMapping = new HashMap<>();
-    for (Map.Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
-      referencePointManager.put(entry.getKey().getReferencePoint(), entry.getKey());
-      referencePointMapping.put(entry.getKey().getReferencePoint(), entry.getValue());
-    }
-    nextProjectNegotiation.add(referencePointMapping);
+    nextProjectNegotiation.add(referencePointResourcesMapping);
 
     if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
       return;

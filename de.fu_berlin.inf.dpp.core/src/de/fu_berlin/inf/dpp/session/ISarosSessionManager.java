@@ -89,11 +89,11 @@ public interface ISarosSessionManager {
   public void invite(Collection<JID> jidsToInvite, String description);
 
   /**
-   * Adds project resources to an existing session.
+   * Adds reference point resources to an existing session.
    *
-   * @param projectResourcesMapping
+   * @param referencePointResourcesMapping
    */
-  public void addResourcesToSession(Map<IProject, List<IResource>> projectResourcesMapping);
+  public void addResourcesToSession(Map<IReferencePoint, List<IResource>> referencePointResourcesMapping);
 
   /**
    * Call this before a ISarosSession is started.

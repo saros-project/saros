@@ -199,7 +199,21 @@ public class CollaborationUtils {
           public void run() {
 
             if (sarosSession.hasWriteAccess()) {
-              sessionManager.addResourcesToSession(projectResources);
+
+              final Map<IReferencePoint, List<IResource>> referencePointResources = new HashMap<>();
+
+              final IReferencePointManager referencePointManager =
+                  sarosSession.getComponent(IReferencePointManager.class);
+
+              for (Map.Entry<IProject, List<IResource>> entry : projectResources.entrySet()) {
+                IProject project = entry.getKey();
+
+                fillReferencePointManager(project, referencePointManager);
+
+                referencePointResources.put(project.getReferencePoint(), entry.getValue());
+              }
+
+              sessionManager.addResourcesToSession(referencePointResources);
               return;
             }
 

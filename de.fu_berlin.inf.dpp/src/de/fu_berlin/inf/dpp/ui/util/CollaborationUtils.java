@@ -213,7 +213,7 @@ public class CollaborationUtils {
                */
             }
 
-            sessionManager.addResourcesToSession(convert(projectResources));
+            sessionManager.addResourcesToSession(convert(projectResources, referencePointManager));
           }
         });
   }
@@ -465,24 +465,6 @@ public class CollaborationUtils {
       result.put(
           coreProject.getReferencePoint(), ResourceAdapterFactory.convertTo(entry.getValue()));
     }
-
-    return result;
-  }
-
-  private static Map<
-          de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>>
-      convert(Map<IProject, List<IResource>> data) {
-
-    Map<de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>>
-        result =
-            new HashMap<
-                de.fu_berlin.inf.dpp.filesystem.IProject,
-                List<de.fu_berlin.inf.dpp.filesystem.IResource>>();
-
-    for (Entry<IProject, List<IResource>> entry : data.entrySet())
-      result.put(
-          ResourceAdapterFactory.create(entry.getKey()),
-          ResourceAdapterFactory.convertTo(entry.getValue()));
 
     return result;
   }
