@@ -5,6 +5,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
 import org.apache.commons.lang3.ObjectUtils;
@@ -31,6 +32,9 @@ public class SPath {
   /** The local IProject in which the resource is contained which this SPath represents */
   private final IProject project;
 
+  /** The local IReferencePoint in which the resource is contained which this SPath represents */
+  private final IReferencePoint referencePoint;
+
   /** The project relative path of the resource this SPath represents. */
   private final IPath projectRelativePath;
 
@@ -51,6 +55,7 @@ public class SPath {
 
     this.project = project;
     this.projectRelativePath = path;
+    this.referencePoint = project.getReferencePoint();
   }
 
   /** Convenience constructor, which retrieves path and project from the given resource */
@@ -95,6 +100,11 @@ public class SPath {
    */
   public IFolder getFolder() {
     return project.getFolder(projectRelativePath);
+  }
+
+  /** Returns the reference point in which the referenced resource is located. */
+  public IReferencePoint getReferencePoint() {
+    return referencePoint;
   }
 
   /** Returns the project in which the referenced resource is located. */

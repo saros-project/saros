@@ -4,6 +4,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
  * This test class represent local execution of document changes and appropriate jupiter operations.
  */
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createMockBuilder;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,6 +20,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.PathFake;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 import org.junit.Test;
 
@@ -27,7 +30,12 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
   @Test
   public void testExecuteLocalOperations() {
     Algorithm algo = new Jupiter(true);
+
+    IReferencePoint referencePoint = createMock(IReferencePoint.class);
+    replay(referencePoint);
+
     IProject project = createMock(IProject.class);
+    expect(project.getReferencePoint()).andStubReturn(referencePoint);
     replay(project);
 
     IPath path = new PathFake("dummy");

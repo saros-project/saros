@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
@@ -11,6 +12,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +29,11 @@ public class JupiterSimulator {
 
   public JupiterSimulator(String document) {
 
+    IReferencePoint referencePoint = createMock(IReferencePoint.class);
+    replay(referencePoint);
+
     IProject project = createMock(IProject.class);
+    expect(project.getReferencePoint()).andStubReturn(referencePoint);
     replay(project);
     IPath path = new PathFake("test");
 

@@ -1,10 +1,13 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
+import com.sun.org.apache.bcel.internal.generic.IREM;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.HashMap;
 import java.util.PriorityQueue;
@@ -27,7 +30,11 @@ public class NetworkSimulator {
   protected int presentTime = -1;
 
   public NetworkSimulator() {
+    IReferencePoint referencePoint = createMock(IReferencePoint.class);
+    replay(referencePoint);
+
     project = createMock(IProject.class);
+    expect(project.getReferencePoint()).andStubReturn(referencePoint);
     replay(project);
     clients = new HashMap<User, NetworkEventHandler>();
   }

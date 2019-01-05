@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.concurrent;
 
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
@@ -14,6 +16,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.PathFake;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -25,6 +28,7 @@ import org.junit.Test;
 public class SplitOperationTest {
 
   protected IProject project;
+  protected IReferencePoint referencePoint;
 
   protected SPath path;
   protected User source = JupiterTestCase.createUser("source");
@@ -47,7 +51,10 @@ public class SplitOperationTest {
 
   @Before
   public void setUp() {
+    referencePoint = createMock(IReferencePoint.class);
+    replay(referencePoint);
     project = createMock(IProject.class);
+    expect(project.getReferencePoint()).andStubReturn(referencePoint);
     replay(project);
     path = new SPath(project, new PathFake("path"));
   }
