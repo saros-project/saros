@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
@@ -20,6 +21,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ReferencePointManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
@@ -69,6 +71,18 @@ public class CollaborationUtils {
 
     final Map<IProject, List<IResource>> newResources = acquireResources(resources, null);
 
+    final Map<IReferencePoint, List<IResource>> referencePointResources = new HashMap<>();
+
+    IReferencePointManager referencePointManager = new ReferencePointManager();
+
+    for (Map.Entry<IProject, List<IResource>> entry : newResources.entrySet()) {
+      IProject project = entry.getKey();
+
+      fillReferencePointManager(project, referencePointManager);
+
+      referencePointResources.put(project.getReferencePoint(), entry.getValue());
+    }
+
     UIMonitoredJob sessionStartupJob =
         new UIMonitoredJob("Session Startup") {
 
@@ -76,7 +90,7 @@ public class CollaborationUtils {
           protected IStatus run(IProgressMonitor monitor) {
             monitor.beginTask("Starting session...", IProgressMonitor.UNKNOWN);
             try {
-              sessionManager.startSession(newResources);
+              sessionManager.startSession(referencePointResources, referencePointManager);
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
               monitor.worked(50);
@@ -489,5 +503,11 @@ public class CollaborationUtils {
     }
 
     return Pair.of(totalFileSize, totalFileCount);
+  }
+
+  private static void fillReferencePointManager(
+      de.fu_berlin.inf.dpp.filesystem.IProject project,
+      IReferencePointManager referencePointManager) {
+    referencePointManager.put(project.getReferencePoint(), project);
   }
 }
