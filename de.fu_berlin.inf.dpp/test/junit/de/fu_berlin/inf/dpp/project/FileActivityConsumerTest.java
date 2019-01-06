@@ -13,6 +13,8 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -43,8 +45,10 @@ public class FileActivityConsumerTest {
 
   private IProject project;
   private IPath path;
+  private IReferencePoint referencePoint;
 
   private SharedResourcesManager resourceChangeListener;
+  private EclipseReferencePointManager eclipseReferencePointManager;
 
   @Before
   public void setUp() throws CoreException {
@@ -59,13 +63,14 @@ public class FileActivityConsumerTest {
 
     replay(resourceChangeListener);
 
-    consumer = new FileActivityConsumer(null, resourceChangeListener, null);
+    referencePoint = createMock(IReferencePoint.class);
+
+    replay(referencePoint);
 
     path = createMock(IPath.class);
     replay(path);
 
     project = createMock(IProject.class);
-    expect(project.getFullPath()).andStubReturn(path);
     replay(project);
 
     file = createMock(IFile.class);
@@ -76,6 +81,16 @@ public class FileActivityConsumerTest {
     expect(file.getType()).andStubReturn(IResource.FILE);
     expect(file.getAdapter(IFile.class)).andStubReturn(file);
     expect(file.getProject()).andStubReturn(project);
+    expect(file.getProjectRelativePath()).andStubReturn(path);
+
+    eclipseReferencePointManager = createMock(EclipseReferencePointManager.class);
+    expect(eclipseReferencePointManager.get(referencePoint)).andStubReturn(project);
+    expect(eclipseReferencePointManager.getFile(referencePoint, path)).andStubReturn(file);
+
+    replay(eclipseReferencePointManager);
+
+    consumer =
+        new FileActivityConsumer(null, resourceChangeListener, null, eclipseReferencePointManager);
   }
 
   @After
@@ -117,8 +132,8 @@ public class FileActivityConsumerTest {
   private SPath createPathMockForFile(IFile file) {
     final SPath path = createMock(SPath.class);
 
-    expect(path.getFile()).andStubReturn(ResourceAdapterFactory.create(file));
-
+    expect(path.getReferencePoint()).andStubReturn(referencePoint);
+    expect(path.getProjectRelativePath()).andStubReturn(ResourceAdapterFactory.create(this.path));
     replay(path);
 
     return path;

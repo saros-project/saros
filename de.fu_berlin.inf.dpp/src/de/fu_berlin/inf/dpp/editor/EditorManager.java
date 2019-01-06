@@ -24,7 +24,8 @@ import de.fu_berlin.inf.dpp.editor.remote.EditorState;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -138,6 +139,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private FollowModeManager followModeManager;
 
   private final CustomAnnotationManager customAnnotationManager = new CustomAnnotationManager();
+
+  private final EclipseReferencePointManager eclipseReferencePointManager;
 
   private final IPropertyChangeListener annotationPreferenceListener =
       new IPropertyChangeListener() {
@@ -369,7 +372,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
       };
 
-  public EditorManager(ISarosSessionManager sessionManager, IPreferenceStore preferenceStore) {
+  public EditorManager(
+      ISarosSessionManager sessionManager,
+      IPreferenceStore preferenceStore,
+      EclipseReferencePointManager eclipseReferencePointManager) {
 
     this.preferenceStore = preferenceStore;
 
@@ -378,6 +384,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     registerCustomAnnotations();
     sessionManager.addSessionLifecycleListener(this.sessionLifecycleListener);
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
   }
 
   // FIXME thread access (used by ProjectDeltaVisitor which might NOT run from
@@ -439,7 +446,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   private String doGetContent(SPath path) {
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelative = path.getProjectRelativePath();
+
+    IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelative));
     FileEditorInput input = new FileEditorInput(file);
 
     IDocumentProvider provider = EditorAPI.connect(input);
@@ -677,7 +689,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     LOG.trace(".execTextEdit invoked");
 
     SPath path = textEdit.getPath();
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelative = path.getProjectRelativePath();
+
+    IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelative));
 
     if (!file.exists()) {
       LOG.error("TextEditActivity refers to file which" + " is not available locally: " + textEdit);
@@ -996,7 +1014,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   private void replaceText(SPath path, int offset, String replacedText, String text, User source) {
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelative = path.getProjectRelativePath();
+
+    IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelative));
+
     FileEditorInput input = new FileEditorInput(file);
     IDocumentProvider provider = EditorAPI.connect(input);
 
@@ -1096,7 +1120,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   private boolean isDirty(SPath path) throws FileNotFoundException {
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelative = path.getProjectRelativePath();
+
+    IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelative));
 
     if (file == null || !file.exists()) {
       throw new FileNotFoundException("File not found: " + path);
@@ -1124,7 +1153,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public void saveEditor(SPath path) {
     checkThreadAccess();
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelative = path.getProjectRelativePath();
+
+    IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelative));
 
     LOG.trace(".saveEditor (" + file.getName() + ") invoked");
 
@@ -1389,7 +1423,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         new Runnable() {
           @Override
           public void run() {
-            EditorAPI.openEditor(path, activate);
+            EditorAPI.openEditor(path, activate, eclipseReferencePointManager);
           }
         });
   }
@@ -1460,7 +1494,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         new Runnable() {
           @Override
           public void run() {
-            IEditorPart newEditor = EditorAPI.openEditor(path, true);
+            IEditorPart newEditor = EditorAPI.openEditor(path, true, eclipseReferencePointManager);
             if (newEditor == null) {
               LOG.warn("editor for " + path + " couldn't be opened");
               return;
@@ -1653,7 +1687,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     followModeManager = session.getComponent(FollowModeManager.class);
     userEditorStateManager = session.getComponent(UserEditorStateManager.class);
-    remoteWriteAccessManager = new RemoteWriteAccessManager(session);
+    remoteWriteAccessManager = new RemoteWriteAccessManager(session, eclipseReferencePointManager);
 
     preferenceStore.addPropertyChangeListener(annotationPreferenceListener);
 

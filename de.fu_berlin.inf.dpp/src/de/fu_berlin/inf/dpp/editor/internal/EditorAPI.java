@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.editor.internal;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -98,8 +100,13 @@ public class EditorAPI {
    * @param activate <code>true</code>, if editor should get focus, otherwise <code>false</code>
    * @return the opened editor or <code>null</code> if the editor couldn't be opened.
    */
-  public static IEditorPart openEditor(SPath path, boolean activate) {
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+  public static IEditorPart openEditor(SPath path, boolean activate, EclipseReferencePointManager eclipseReferencePointManager) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelativePath));
 
     if (!file.exists()) {
       LOG.error("EditorAPI cannot open file which does not exist: " + file, new StackTrace());

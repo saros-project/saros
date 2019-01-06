@@ -1,9 +1,13 @@
 package de.fu_berlin.inf.dpp.project;
 
+import com.sun.org.apache.bcel.internal.generic.IREM;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -24,15 +28,18 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   private final ISarosSession session;
   private final SharedResourcesManager resourceChangeListener;
   private final EditorManager editorManager;
+  private final EclipseReferencePointManager eclipseReferencePointManager;
 
   public FileActivityConsumer(
       final ISarosSession session,
       final SharedResourcesManager resourceChangeListener,
-      final EditorManager editorManager) {
+      final EditorManager editorManager,
+      final EclipseReferencePointManager eclipseReferencePointManager) {
 
     this.session = session;
     this.resourceChangeListener = resourceChangeListener;
     this.editorManager = editorManager;
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
   }
 
   @Override
@@ -127,9 +134,22 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
 
   private void handleFileMove(FileActivity activity) throws CoreException {
 
-    final IFile fileDestination = toEclipseIFile(activity.getPath().getFile());
+    SPath newPath = activity.getPath();
+    SPath oldPath = activity.getOldPath();
 
-    final IFile fileToMove = toEclipseIFile(activity.getOldPath().getFile());
+    IReferencePoint newReferencePoint = newPath.getReferencePoint();
+    IReferencePoint oldReferencePoint = oldPath.getReferencePoint();
+
+    IPath newReferencePointRelativePath = newPath.getProjectRelativePath();
+    IPath oldReferencePointRelativePath = oldPath.getProjectRelativePath();
+
+    final IFile fileDestination =
+        eclipseReferencePointManager.getFile(
+            newReferencePoint, ResourceAdapterFactory.convertBack(newReferencePointRelativePath));
+
+    final IFile fileToMove =
+        eclipseReferencePointManager.getFile(
+            oldReferencePoint, ResourceAdapterFactory.convertBack(oldReferencePointRelativePath));
 
     FileUtils.mkdirs(fileDestination);
 
@@ -141,14 +161,28 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   }
 
   private void handleFileDeletion(FileActivity activity) throws CoreException {
-    final IFile file = toEclipseIFile(activity.getPath().getFile());
+    SPath path = activity.getPath();
+
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    final IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelativePath));
 
     if (file.exists()) FileUtils.delete(file);
     else LOG.warn("could not delete file " + file + " because it does not exist");
   }
 
   private void handleFileCreation(FileActivity activity) throws CoreException {
-    final IFile file = toEclipseIFile(activity.getPath().getFile());
+    SPath path = activity.getPath();
+
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    final IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelativePath));
 
     final String encoding = activity.getEncoding();
     final byte[] newContent = activity.getContent();

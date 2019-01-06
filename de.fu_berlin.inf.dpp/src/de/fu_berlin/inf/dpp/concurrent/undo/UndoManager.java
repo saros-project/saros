@@ -18,6 +18,10 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
@@ -82,6 +86,8 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
   protected ISarosSessionManager sessionManager;
 
   protected ISarosSession sarosSession;
+
+  private EclipseReferencePointManager eclipseReferencePointManager;
 
   protected InclusionTransformation transformation = new GOTOInclusionTransformation();
 
@@ -368,7 +374,10 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
         }
       };
 
-  public UndoManager(ISarosSessionManager sessionManager, EditorManager editorManager) {
+  public UndoManager(
+      ISarosSessionManager sessionManager,
+      EditorManager editorManager,
+      EclipseReferencePointManager eclipseReferencePointManager) {
 
     if (log.isDebugEnabled()) DefaultOperationHistory.DEBUG_OPERATION_HISTORY_APPROVAL = true;
 
@@ -381,6 +390,8 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     this.editorManager = editorManager;
 
     editorManager.addSharedEditorListener(sharedEditorListener);
+
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
   }
 
   // just for testing
@@ -489,7 +500,12 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
     List<ITextOperation> textOps = activity.toOperation().getTextOperations();
 
-    IFile file = ((EclipseFileImpl) currentActiveEditor.getFile()).getDelegate();
+    IReferencePoint referencePoint = currentActiveEditor.getReferencePoint();
+    IPath referencePointRelative = currentActiveEditor.getProjectRelativePath();
+
+    IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelative));
 
     FileEditorInput input = new FileEditorInput(file);
     IDocumentProvider provider = EditorAPI.connect(input);

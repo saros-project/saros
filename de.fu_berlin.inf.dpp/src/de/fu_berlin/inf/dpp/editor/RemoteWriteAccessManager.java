@@ -4,6 +4,10 @@ import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -47,9 +51,14 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
   protected ISarosSession sarosSession;
 
-  public RemoteWriteAccessManager(final ISarosSession sarosSession) {
+  private EclipseReferencePointManager eclipseReferencePointManager;
+
+  public RemoteWriteAccessManager(
+      final ISarosSession sarosSession,
+      final EclipseReferencePointManager eclipseReferencePointManager) {
     this.sarosSession = sarosSession;
     this.sarosSession.addListener(sessionListener);
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
   }
 
   /** This method is called from the shared project when a new Activity arrives */
@@ -131,7 +140,13 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     assert !connectedUserWithWriteAccessFiles.contains(path);
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelative = path.getProjectRelativePath();
+
+    IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelative));
+
     if (!file.exists()) {
       log.error(
           "Attempting to connect to file which" + " is not available locally: " + path,
@@ -154,7 +169,13 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     connectedUserWithWriteAccessFiles.remove(path);
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelative = path.getProjectRelativePath();
+
+    IFile file =
+        eclipseReferencePointManager.getFile(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelative));
+
     EditorAPI.disconnect(new FileEditorInput(file));
   }
 
