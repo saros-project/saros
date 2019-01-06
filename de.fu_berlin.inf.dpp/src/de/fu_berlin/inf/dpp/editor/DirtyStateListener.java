@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.editor;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.util.HashMap;
@@ -9,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -68,7 +71,13 @@ public class DirtyStateListener implements IElementStateListener {
             if (!editorManager.isManaged(file)) return;
 
             LOG.debug("Dirty state reset for: " + file);
-            editorManager.sendEditorActivitySaved(new SPath(ResourceAdapterFactory.create(file)));
+
+            IReferencePoint referencePoint = EclipseReferencePointManager.create(file);
+            IPath referencePointRelativePath = file.getProjectRelativePath();
+
+            editorManager.sendEditorActivitySaved(
+                new SPath(
+                    referencePoint, ResourceAdapterFactory.create(referencePointRelativePath)));
           }
         });
   }

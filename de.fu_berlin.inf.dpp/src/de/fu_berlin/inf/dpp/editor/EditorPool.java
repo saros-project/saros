@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.editor;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import java.util.ArrayList;
@@ -142,7 +144,11 @@ final class EditorPool {
     dirtyStateListener.register(documentProvider, input);
     documentProvider.getDocument(input).addDocumentListener(documentListener);
 
-    final SPath path = new SPath(ResourceAdapterFactory.create(file));
+    IReferencePoint referencePoint = EclipseReferencePointManager.create(file);
+    IPath referencePointRelativePath = file.getProjectRelativePath();
+
+    final SPath path =
+        new SPath(referencePoint, ResourceAdapterFactory.create(referencePointRelativePath));
 
     Set<IEditorPart> parts = editorParts.get(path);
 
@@ -235,7 +241,11 @@ final class EditorPool {
 
     editorManager.disconnect(file);
 
-    final SPath path = new SPath(ResourceAdapterFactory.create(file));
+    IReferencePoint referencePoint = EclipseReferencePointManager.create(file);
+    IPath referencePointRelativePath = file.getProjectRelativePath();
+
+    final SPath path =
+        new SPath(referencePoint, ResourceAdapterFactory.create(referencePointRelativePath));
 
     editorParts.get(path).remove(editorPart);
   }

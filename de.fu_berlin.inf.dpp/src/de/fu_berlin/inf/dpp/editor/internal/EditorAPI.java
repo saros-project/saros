@@ -100,7 +100,8 @@ public class EditorAPI {
    * @param activate <code>true</code>, if editor should get focus, otherwise <code>false</code>
    * @return the opened editor or <code>null</code> if the editor couldn't be opened.
    */
-  public static IEditorPart openEditor(SPath path, boolean activate, EclipseReferencePointManager eclipseReferencePointManager) {
+  public static IEditorPart openEditor(
+      SPath path, boolean activate, EclipseReferencePointManager eclipseReferencePointManager) {
     IReferencePoint referencePoint = path.getReferencePoint();
     IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
@@ -391,7 +392,13 @@ public class EditorAPI {
   public static SPath getEditorPath(IEditorPart editorPart) {
     IResource resource = getEditorResource(editorPart);
 
-    return (resource == null) ? null : new SPath(ResourceAdapterFactory.create(resource));
+    if (resource == null) return null;
+
+    IReferencePoint referencePoint = EclipseReferencePointManager.create(resource);
+    IPath referencePointRelativePath =
+        ResourceAdapterFactory.create(resource.getProjectRelativePath());
+
+    return new SPath(referencePoint, referencePointRelativePath);
   }
 
   /**

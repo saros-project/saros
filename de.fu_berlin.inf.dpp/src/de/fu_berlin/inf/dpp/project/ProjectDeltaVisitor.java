@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -171,7 +172,11 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   private void generateCreated(IResource resource) {
 
-    final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
+    IReferencePoint referencePoint = EclipseReferencePointManager.create(resource);
+    IPath referencePointRelativePath = resource.getProjectRelativePath();
+
+    final SPath spath =
+        new SPath(referencePoint, ResourceAdapterFactory.create(referencePointRelativePath));
 
     if (isFile(resource)) {
       byte[] content = FileUtils.getLocalFileContent((IFile) resource.getAdapter(IFile.class));
@@ -208,7 +213,11 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
       }
     }
 
-    SPath newPath = new SPath(ResourceAdapterFactory.create(resource));
+    IReferencePoint newReferencePoint = EclipseReferencePointManager.create(resource);
+
+    SPath newPath =
+        new SPath(
+            newReferencePoint, ResourceAdapterFactory.create(resource.getProjectRelativePath()));
     SPath oldPath =
         new SPath(
             EclipseReferencePointManager.create(oldProject),
@@ -220,19 +229,23 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   private void generateRemoved(IResource resource) {
 
+    IReferencePoint referencePoint = EclipseReferencePointManager.create(resource);
+    de.fu_berlin.inf.dpp.filesystem.IPath referencePointRelativePath =
+        ResourceAdapterFactory.create(resource.getProjectRelativePath());
+
     if (resource instanceof IFile) {
       addActivity(
           new FileActivity(
               user,
               Type.REMOVED,
               Purpose.ACTIVITY,
-              new SPath(ResourceAdapterFactory.create(resource)),
+              new SPath(referencePoint, referencePointRelativePath),
               null,
               null,
               null));
     } else {
       addActivity(
-          new FolderDeletedActivity(user, new SPath(ResourceAdapterFactory.create(resource))));
+          new FolderDeletedActivity(user, new SPath(referencePoint, referencePointRelativePath)));
     }
   }
 
@@ -249,7 +262,12 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     assert resource.getType() == IResource.FILE;
 
-    final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
+    IPath referencePointRelativePath = resource.getProjectRelativePath();
+
+    final SPath spath =
+        new SPath(
+            EclipseReferencePointManager.create(resource),
+            ResourceAdapterFactory.create(referencePointRelativePath));
 
     if (!session.isShared(ResourceAdapterFactory.create(resource))) return;
 
