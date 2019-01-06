@@ -3,8 +3,11 @@ package de.fu_berlin.inf.dpp.server.session;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.server.editor.ServerEditorManager;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerFileImpl;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerWorkspaceImpl;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.ByteArrayInputStream;
@@ -19,6 +22,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
 
   private final ISarosSession session;
   private final ServerEditorManager editorManager;
+  private final ServerWorkspaceImpl workspace;
 
   /**
    * Creates a FileActivityExecutor.
@@ -26,10 +30,12 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
    * @param session the current session
    * @param editorManager the editor manager to update the file mapping on a file move
    */
-  public FileActivityExecutor(ISarosSession session, ServerEditorManager editorManager) {
+  public FileActivityExecutor(
+      ISarosSession session, ServerEditorManager editorManager, ServerWorkspaceImpl workspace) {
 
     this.session = session;
     this.editorManager = editorManager;
+    this.workspace = workspace;
   }
 
   @Override
@@ -65,15 +71,15 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
   }
 
   private void executeFileCreation(FileActivity activity) throws IOException {
-    IFile file = activity.getPath().getFile();
+    IFile file = getFile(activity.getPath());
     file.create(new ByteArrayInputStream(activity.getContent()), true);
   }
 
   private void executeFileMove(FileActivity activity) throws IOException {
     SPath oldPath = activity.getOldPath();
-    IFile oldFile = oldPath.getFile();
+    IFile oldFile = getFile(oldPath);
     SPath newPath = activity.getPath();
-    IFile newFile = newPath.getFile();
+    IFile newFile = getFile(newPath);
     oldFile.move(activity.getPath().getFullPath(), true);
     byte[] content = activity.getContent();
     if (content != null) {
@@ -85,8 +91,14 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
 
   private void executeFileRemoval(FileActivity activity) throws IOException {
     SPath path = activity.getPath();
-    IFile file = path.getFile();
+    IFile file = getFile(path);
     editorManager.closeEditor(path);
     file.delete(IResource.NONE);
+  }
+
+  private IFile getFile(SPath path) {
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    return new ServerFileImpl(workspace, referencePointRelativePath);
   }
 }
