@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
@@ -87,6 +89,8 @@ public class AddProjectToSessionWizard extends Wizard {
   @Inject private Preferences preferences;
 
   @Inject private ISarosSessionManager sessionManager;
+
+  @Inject private EclipseReferencePointManager eclipseReferencePointManager;
 
   private static class OverwriteErrorDialog extends ErrorDialog {
 
@@ -315,6 +319,7 @@ public class AddProjectToSessionWizard extends Wizard {
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
                 de.fu_berlin.inf.dpp.filesystem.IProject coreProject =
                     ResourceAdapterFactory.create(entry.getValue());
+                // Filling reference point manager which maps a reference point to core project
                 fillReferencePointManager(coreProject, referencePointManager);
                 convertedMapping.put(entry.getKey(), coreProject.getReferencePoint());
               }
@@ -681,5 +686,6 @@ public class AddProjectToSessionWizard extends Wizard {
       de.fu_berlin.inf.dpp.filesystem.IProject project,
       IReferencePointManager referencePointManager) {
     referencePointManager.put(project.getReferencePoint(), project);
+    eclipseReferencePointManager.put(((EclipseProjectImpl) project).getDelegate());
   }
 }

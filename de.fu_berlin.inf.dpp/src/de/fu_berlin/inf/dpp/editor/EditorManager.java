@@ -1414,8 +1414,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             editorPaths.addAll(openEditorPaths);
 
             for (final SPath path : editorPaths) {
-              if (referencePoint == null
-                  || referencePoint.equals(path.getProject().getReferencePoint())) saveLazy(path);
+              if (referencePoint == null || referencePoint.equals(path.getReferencePoint()))
+                saveLazy(path);
             }
           }
         });

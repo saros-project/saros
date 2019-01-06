@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
@@ -310,6 +311,7 @@ public class SarosSessionTest {
 
     addMockedComponent(IPathFactory.class);
     addMockedComponent(ISarosSessionManager.class);
+    addMockedComponent(EclipseReferencePointManager.class);
 
     container.start();
   }

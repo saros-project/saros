@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.util;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
@@ -54,6 +55,8 @@ public class CollaborationUtils {
 
   @Inject private static ISarosSessionManager sessionManager;
 
+  @Inject private static EclipseReferencePointManager eclipseReferencePointManager;
+
   private static IReferencePointManager referencePointManager;
 
   static {
@@ -86,6 +89,7 @@ public class CollaborationUtils {
             try {
               refreshProjects(newResources.keySet(), null);
               referencePointManager = new ReferencePointManager();
+              fillReferencePointManager(newResources.keySet());
               sessionManager.startSession(
                   convert(newResources, referencePointManager), referencePointManager);
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
@@ -212,7 +216,7 @@ public class CollaborationUtils {
                * execption handling !
                */
             }
-
+            fillReferencePointManager(projectResources.keySet());
             sessionManager.addResourcesToSession(convert(projectResources, referencePointManager));
           }
         });
@@ -488,5 +492,11 @@ public class CollaborationUtils {
       de.fu_berlin.inf.dpp.filesystem.IProject project,
       IReferencePointManager referencePointManager) {
     referencePointManager.put(project.getReferencePoint(), project);
+  }
+
+  private static void fillReferencePointManager(Collection<IProject> projects) {
+    for (IProject project : projects) {
+      eclipseReferencePointManager.put(project);
+    }
   }
 }

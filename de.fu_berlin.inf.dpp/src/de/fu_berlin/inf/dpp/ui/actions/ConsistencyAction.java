@@ -6,8 +6,10 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -107,6 +109,8 @@ public class ConsistencyAction extends Action implements Disposable {
   @Inject protected ISarosSessionManager sessionManager;
 
   @Inject protected IsInconsistentObservable inconsistentObservable;
+
+  @Inject protected EclipseReferencePointManager eclipseReferencePointManager;
 
   private boolean isFading;
 
@@ -278,7 +282,7 @@ public class ConsistencyAction extends Action implements Disposable {
               IStatus.WARNING,
               pluginID,
               "project: "
-                  + path.getProject().getName()
+                  + eclipseReferencePointManager.get(path.getReferencePoint()).getName()
                   + ", file:"
                   + path.getProjectRelativePath().toOSString()));
 

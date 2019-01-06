@@ -5,6 +5,11 @@ import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFolderImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.util.FileUtils;
@@ -19,12 +24,16 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer imple
 
   private final ISarosSession session;
   private final SharedResourcesManager resourceChangeListener;
+  private final EclipseReferencePointManager eclipseReferencePointManager;
 
   public FolderActivityConsumer(
-      final ISarosSession session, final SharedResourcesManager resourceChangeListener) {
+      final ISarosSession session,
+      final SharedResourcesManager resourceChangeListener,
+      final EclipseReferencePointManager eclipseReferencePointManager) {
 
     this.session = session;
     this.resourceChangeListener = resourceChangeListener;
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
   }
 
   @Override
@@ -57,9 +66,12 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer imple
 
     SPath path = activity.getPath();
 
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
     IFolder folder =
-        ((EclipseFolderImpl) path.getProject().getFolder(path.getProjectRelativePath()))
-            .getDelegate();
+        eclipseReferencePointManager.getFolder(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelativePath));
 
     try {
       FileUtils.create(folder);
@@ -73,9 +85,12 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer imple
 
     SPath path = activity.getPath();
 
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
     IFolder folder =
-        ((EclipseFolderImpl) path.getProject().getFolder(path.getProjectRelativePath()))
-            .getDelegate();
+        eclipseReferencePointManager.getFolder(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelativePath));
 
     try {
       if (folder.exists()) FileUtils.delete(folder);

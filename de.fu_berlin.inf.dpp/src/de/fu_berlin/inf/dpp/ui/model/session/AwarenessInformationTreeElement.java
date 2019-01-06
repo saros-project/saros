@@ -110,7 +110,7 @@ public class AwarenessInformationTreeElement extends TreeElement {
        * TODO: make this configurable?
        */
       details.add(
-          activeFile.getProject().getName()
+          activeFile.getReferencePoint()
               + ": "
               + activeFile.getFile().getProjectRelativePath().toString());
     }
