@@ -107,11 +107,6 @@ public class SPath {
     return referencePoint;
   }
 
-  /** Returns the project in which the referenced resource is located. */
-  public IProject getProject() {
-    return project;
-  }
-
   /** Convenience method for getting the full path of the file identified by this SPath. */
   public IPath getFullPath() {
     final IPath fullProjectPath = project.getFullPath();
