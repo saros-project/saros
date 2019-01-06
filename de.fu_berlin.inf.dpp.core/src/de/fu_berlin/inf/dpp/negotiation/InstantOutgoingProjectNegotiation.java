@@ -193,8 +193,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
         new Comparator<SPath>() {
           @Override
           public int compare(SPath a, SPath b) {
-            int lenA = a.getProjectRelativePath().segmentCount();
-            int lenB = b.getProjectRelativePath().segmentCount();
+            int lenA = a.getReferencePointRelativePath().segmentCount();
+            int lenB = b.getReferencePointRelativePath().segmentCount();
             return Integer.valueOf(lenA).compareTo(Integer.valueOf(lenB));
           }
         });

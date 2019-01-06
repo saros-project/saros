@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.project;
 
-import com.sun.org.apache.bcel.internal.generic.IREM;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -140,8 +139,8 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     IReferencePoint newReferencePoint = newPath.getReferencePoint();
     IReferencePoint oldReferencePoint = oldPath.getReferencePoint();
 
-    IPath newReferencePointRelativePath = newPath.getProjectRelativePath();
-    IPath oldReferencePointRelativePath = oldPath.getProjectRelativePath();
+    IPath newReferencePointRelativePath = newPath.getReferencePointRelativePath();
+    IPath oldReferencePointRelativePath = oldPath.getReferencePointRelativePath();
 
     final IFile fileDestination =
         eclipseReferencePointManager.getFile(
@@ -164,7 +163,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     SPath path = activity.getPath();
 
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     final IFile file =
         eclipseReferencePointManager.getFile(
@@ -178,7 +177,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     SPath path = activity.getPath();
 
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     final IFile file =
         eclipseReferencePointManager.getFile(

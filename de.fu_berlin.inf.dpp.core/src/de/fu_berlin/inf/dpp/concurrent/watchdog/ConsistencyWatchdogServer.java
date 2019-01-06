@@ -251,7 +251,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
 
     IReferencePoint referencePoint = docPath.getReferencePoint();
 
-    IPath referencePointRelativePath = docPath.getProjectRelativePath();
+    IPath referencePointRelativePath = docPath.getReferencePointRelativePath();
 
     IFile file = referencePointManager.get(referencePoint).getFile(referencePointRelativePath);
 

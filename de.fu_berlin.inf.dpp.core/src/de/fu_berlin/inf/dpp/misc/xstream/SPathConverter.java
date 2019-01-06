@@ -81,7 +81,7 @@ public class SPathConverter implements Converter, Startable {
       return;
     }
 
-    String p = URLCodec.encode(pathFactory.fromPath(spath.getProjectRelativePath()));
+    String p = URLCodec.encode(pathFactory.fromPath(spath.getReferencePointRelativePath()));
 
     writer.addAttribute(PROJECT_ID, i);
     writer.addAttribute(PATH, p);

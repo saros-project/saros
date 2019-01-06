@@ -102,7 +102,7 @@ public class EditorAPI {
    */
   public static IEditorPart openEditor(SPath path, boolean activate, EclipseReferencePointManager eclipseReferencePointManager) {
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     IFile file =
         eclipseReferencePointManager.getFile(

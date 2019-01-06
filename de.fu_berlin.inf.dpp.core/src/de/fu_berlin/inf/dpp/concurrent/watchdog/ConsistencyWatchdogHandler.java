@@ -168,7 +168,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
     IReferencePoint referencePoint = path.getReferencePoint();
 
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     final IFile file =
         referencePointManager.get(referencePoint).getFile(referencePointRelativePath);

@@ -97,7 +97,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
   }
 
   private IFile getFile(SPath path) {
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     return new ServerFileImpl(workspace, referencePointRelativePath);
   }

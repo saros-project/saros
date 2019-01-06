@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
-import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -284,7 +283,7 @@ public class ConsistencyAction extends Action implements Disposable {
               "project: "
                   + eclipseReferencePointManager.get(path.getReferencePoint()).getName()
                   + ", file:"
-                  + path.getProjectRelativePath().toOSString()));
+                  + path.getReferencePointRelativePath().toOSString()));
 
     class OkCancelErrorDialog extends ErrorDialog {
       public OkCancelErrorDialog(

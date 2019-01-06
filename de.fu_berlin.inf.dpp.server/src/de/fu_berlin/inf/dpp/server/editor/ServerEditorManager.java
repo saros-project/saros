@@ -95,7 +95,7 @@ public class ServerEditorManager implements IEditorManager {
   private Editor getOrCreateEditor(SPath path) throws IOException {
     Editor editor = openEditors.get(path);
     if (editor == null) {
-      IPath referencePointRelativePath = path.getProjectRelativePath();
+      IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
       IResource resource = new ServerFileImpl(workspace, referencePointRelativePath);
       if (resource == null || !resource.exists()) {

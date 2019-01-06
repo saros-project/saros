@@ -812,7 +812,7 @@ public final class SarosSession implements ISarosSession {
 
     if (activity instanceof FileActivity) {
       FileActivity fileActivity = ((FileActivity) activity);
-      IFile file = project.getFile(fileActivity.getPath().getProjectRelativePath());
+      IFile file = project.getFile(fileActivity.getPath().getReferencePointRelativePath());
 
       switch (fileActivity.getType()) {
         case CREATED:
@@ -861,7 +861,7 @@ public final class SarosSession implements ISarosSession {
 
         case MOVED:
           IReferencePoint oldReferencePoint = fileActivity.getOldPath().getReferencePoint();
-          IPath oldReferencePointRelativePath = fileActivity.getOldPath().getProjectRelativePath();
+          IPath oldReferencePointRelativePath = fileActivity.getOldPath().getReferencePointRelativePath();
           IFile oldFile =
               referencePointManager.get(oldReferencePoint).getFile(oldReferencePointRelativePath);
 
@@ -909,7 +909,7 @@ public final class SarosSession implements ISarosSession {
           break;
       }
     } else if (activity instanceof FolderCreatedActivity) {
-      IFolder folder = project.getFolder(activity.getPath().getProjectRelativePath());
+      IFolder folder = project.getFolder(activity.getPath().getReferencePointRelativePath());
 
       if (!isShared(folder.getParent())) {
         log.error("PSFOC -" + " folder creation detected for a non shared parent: " + folder);
@@ -927,7 +927,7 @@ public final class SarosSession implements ISarosSession {
       sharedReferencePointMapper.addResources(referencePoint, Collections.singletonList(folder));
 
     } else if (activity instanceof FolderDeletedActivity) {
-      IFolder folder = project.getFolder(activity.getPath().getProjectRelativePath());
+      IFolder folder = project.getFolder(activity.getPath().getReferencePointRelativePath());
 
       if (!isShared(folder)) {
         log.error("PSFOR -" + " folder removal detected for a non shared folder: " + folder);

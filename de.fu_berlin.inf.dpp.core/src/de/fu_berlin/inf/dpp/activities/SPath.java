@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -34,8 +32,8 @@ public class SPath {
   /** The local IReferencePoint in which the resource is contained which this SPath represents */
   private final IReferencePoint referencePoint;
 
-  /** The project relative path of the resource this SPath represents. */
-  private final IPath projectRelativePath;
+  /** The reference point relative path of the resource this SPath represents. */
+  private final IPath referencePointRelativePath;
 
   @Inject IPathFactory pathFactory;
 
@@ -55,7 +53,7 @@ public class SPath {
     if (path.isAbsolute()) throw new IllegalArgumentException("path is absolute: " + path);
 
     this.referencePoint = referencePoint;
-    this.projectRelativePath = path;
+    this.referencePointRelativePath = path;
   }
 
   /**
@@ -89,8 +87,8 @@ public class SPath {
    *
    * @return project relative path of the resource
    */
-  public IPath getProjectRelativePath() {
-    return projectRelativePath;
+  public IPath getReferencePointRelativePath() {
+    return referencePointRelativePath;
   }
 
   /** Returns the reference point in which the referenced resource is located. */
@@ -101,7 +99,7 @@ public class SPath {
   /** Convenience method for getting the full path of the file identified by this SPath. */
   public IPath getFullPath() {
     final IPath fullProjectPath = pathFactory.fromString(referencePoint.toString());
-    return fullProjectPath.append(projectRelativePath);
+    return fullProjectPath.append(referencePointRelativePath);
   }
 
   @Override
@@ -109,7 +107,7 @@ public class SPath {
     final int prime = 31;
     int result = 1;
     result = prime * result + ObjectUtils.hashCode(referencePoint);
-    result = prime * result + ObjectUtils.hashCode(projectRelativePath);
+    result = prime * result + ObjectUtils.hashCode(referencePointRelativePath);
     return result;
   }
 
@@ -124,11 +122,15 @@ public class SPath {
     SPath other = (SPath) obj;
 
     return ObjectUtils.equals(referencePoint, other.referencePoint)
-        && ObjectUtils.equals(projectRelativePath, other.projectRelativePath);
+        && ObjectUtils.equals(referencePointRelativePath, other.referencePointRelativePath);
   }
 
   @Override
   public String toString() {
-    return "SPath [referencePoint=" + referencePoint + ", projectRelativePath=" + projectRelativePath + "]";
+    return "SPath [referencePoint="
+        + referencePoint
+        + ", projectRelativePath="
+        + referencePointRelativePath
+        + "]";
   }
 }

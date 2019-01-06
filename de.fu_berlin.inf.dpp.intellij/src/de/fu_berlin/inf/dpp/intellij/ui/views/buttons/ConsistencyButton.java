@@ -237,7 +237,7 @@ public class ConsistencyButton extends ToolbarButton {
       sbInconsistentFiles.append("project: ");
       sbInconsistentFiles.append(path.getReferencePoint());
       sbInconsistentFiles.append(", file: ");
-      sbInconsistentFiles.append(path.getProjectRelativePath().toOSString());
+      sbInconsistentFiles.append(path.getReferencePointRelativePath().toOSString());
       sbInconsistentFiles.append("\n");
     }
 
@@ -253,7 +253,7 @@ public class ConsistencyButton extends ToolbarButton {
 
     for (SPath path : paths) {
       IReferencePoint referencePoint = path.getReferencePoint();
-      IPath referencePointRelativePath = path.getProjectRelativePath();
+      IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
       VirtualFile virtualFile =
           intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);

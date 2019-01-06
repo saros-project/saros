@@ -155,7 +155,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
             IReferencePoint referencePoint = filePath.getReferencePoint();
 
-            IPath referencePointRelativePath = filePath.getProjectRelativePath();
+            IPath referencePointRelativePath = filePath.getReferencePointRelativePath();
 
             IResource resource =
                 eclipseReferencePointManager.getResource(

@@ -50,7 +50,7 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
 
     IReferencePoint referencePoint = file.getReferencePoint();
 
-    IPath referencePointRelativePath = file.getProjectRelativePath();
+    IPath referencePointRelativePath = file.getReferencePointRelativePath();
 
     IFile fileHandle =
         referencePointManager.get(referencePoint).getFile(referencePointRelativePath);
@@ -84,7 +84,7 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
 
   private void writeHeader(SPath path, long fileSize) throws IOException {
     String projectID = session.getReferencePointID(path.getReferencePoint());
-    String fileName = path.getProjectRelativePath().toPortableString();
+    String fileName = path.getReferencePointRelativePath().toPortableString();
 
     out.writeUTF(projectID);
     out.writeUTF(fileName);

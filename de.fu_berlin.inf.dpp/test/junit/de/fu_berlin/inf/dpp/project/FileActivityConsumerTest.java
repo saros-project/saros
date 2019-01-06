@@ -133,7 +133,8 @@ public class FileActivityConsumerTest {
     final SPath path = createMock(SPath.class);
 
     expect(path.getReferencePoint()).andStubReturn(referencePoint);
-    expect(path.getProjectRelativePath()).andStubReturn(ResourceAdapterFactory.create(this.path));
+    expect(path.getReferencePointRelativePath())
+        .andStubReturn(ResourceAdapterFactory.create(this.path));
     replay(path);
 
     return path;

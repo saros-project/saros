@@ -880,7 +880,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
   private IFile getFile(SPath path) {
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     VirtualFile virtualFile =
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
@@ -890,7 +890,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
   private IResource getResource(SPath path) {
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     VirtualFile virtualFile =
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);

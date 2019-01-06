@@ -264,7 +264,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
 
     IReferencePoint referencePoint = path.getReferencePoint();
 
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     final boolean existsFileLocally =
         referencePointManager.get(referencePoint).getFile(referencePointRelativePath).exists();

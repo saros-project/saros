@@ -133,7 +133,7 @@ public class VirtualFileConverter {
   public static VirtualFile convertToVirtualFile(@NotNull SPath path) {
 
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     VirtualFile virtualFile =
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);

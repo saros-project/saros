@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -501,7 +500,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     List<ITextOperation> textOps = activity.toOperation().getTextOperations();
 
     IReferencePoint referencePoint = currentActiveEditor.getReferencePoint();
-    IPath referencePointRelative = currentActiveEditor.getProjectRelativePath();
+    IPath referencePointRelative = currentActiveEditor.getReferencePointRelativePath();
 
     IFile file =
         eclipseReferencePointManager.getFile(

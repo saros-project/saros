@@ -180,7 +180,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
     IReferencePoint referencePoint = path.getReferencePoint();
 
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     VirtualFile file =
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
@@ -231,8 +231,8 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     IReferencePoint oldReferencePoint = oldPath.getReferencePoint();
     IReferencePoint newReferencePoint = newPath.getReferencePoint();
 
-    IPath oldReferencePointRelativePath = oldPath.getProjectRelativePath();
-    IPath newReferencePointRelativePath = newPath.getProjectRelativePath();
+    IPath oldReferencePointRelativePath = oldPath.getReferencePointRelativePath();
+    IPath newReferencePointRelativePath = newPath.getReferencePointRelativePath();
 
     VirtualFile oldVirtualFile =
         intelliJReferencePointManager.getResource(oldReferencePoint, oldReferencePointRelativePath);
@@ -302,7 +302,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
     IReferencePoint referencePoint = path.getReferencePoint();
 
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     VirtualFile file =
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
@@ -341,7 +341,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
     IReferencePoint referencePoint = path.getReferencePoint();
 
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     VirtualFile file =
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
@@ -370,7 +370,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     SPath path = activity.getPath();
 
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     VirtualFile intelliJFolder =
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
@@ -409,7 +409,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     SPath path = activity.getPath();
 
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getProjectRelativePath();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
     VirtualFile intelliJFolder =
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);

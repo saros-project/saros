@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.editor;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -141,7 +140,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
     assert !connectedUserWithWriteAccessFiles.contains(path);
 
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelative = path.getProjectRelativePath();
+    IPath referencePointRelative = path.getReferencePointRelativePath();
 
     IFile file =
         eclipseReferencePointManager.getFile(
@@ -170,7 +169,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
     connectedUserWithWriteAccessFiles.remove(path);
 
     IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelative = path.getProjectRelativePath();
+    IPath referencePointRelative = path.getReferencePointRelativePath();
 
     IFile file =
         eclipseReferencePointManager.getFile(
