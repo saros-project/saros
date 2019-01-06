@@ -93,15 +93,6 @@ public class SPath {
     return project.findMember(projectRelativePath);
   }
 
-  /**
-   * Returns a handle for an IFolder represented by this SPath.
-   *
-   * @return the IFolder contained in the associated IProject for the given project relative path
-   */
-  public IFolder getFolder() {
-    return project.getFolder(projectRelativePath);
-  }
-
   /** Returns the reference point in which the referenced resource is located. */
   public IReferencePoint getReferencePoint() {
     return referencePoint;
