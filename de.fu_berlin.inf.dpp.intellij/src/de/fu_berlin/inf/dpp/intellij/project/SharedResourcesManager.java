@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.intellij.project;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
@@ -10,11 +11,15 @@ import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.SelectedEditorState;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -53,6 +58,8 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
   private final AnnotationManager annotationManager;
 
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
+
   @Override
   public void start() {
     ApplicationManager.getApplication()
@@ -83,13 +90,15 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       LocalEditorHandler localEditorHandler,
       LocalEditorManipulator localEditorManipulator,
-      AnnotationManager annotationManager) {
+      AnnotationManager annotationManager,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.sarosSession = sarosSession;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
     this.annotationManager = annotationManager;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     this.localFilesystemModificationHandler =
         new LocalFilesystemModificationHandler(this, editorManager, sarosSession);
@@ -321,8 +330,15 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
   }
 
   private void handleFolderCreation(@NotNull FolderCreatedActivity activity) throws IOException {
+    SPath path = activity.getPath();
 
-    IFolder folder = activity.getPath().getFolder();
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile intelliJFolder =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    IFolder folder = (IFolder) VirtualFileConverter.convertToResource(intelliJFolder);
 
     if (folder.exists()) {
       LOG.warn("Could not create folder " + folder + " as it already exist.");
@@ -353,7 +369,15 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
   // TODO deal with children that are not part of the current session (submodules)
   private void handleFolderDeletion(@NotNull FolderDeletedActivity activity) throws IOException {
 
-    IFolder folder = activity.getPath().getFolder();
+    SPath path = activity.getPath();
+
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile intelliJFolder =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    IFolder folder = (IFolder) VirtualFileConverter.convertToResource(intelliJFolder);
 
     if (!folder.exists()) {
       LOG.warn("Could not delete folder " + folder + " as it does not exist.");
