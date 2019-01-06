@@ -1,8 +1,14 @@
 package de.fu_berlin.inf.dpp.intellij.session;
 
+import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
+import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -27,6 +33,8 @@ public class SessionUtils {
   private static volatile ISarosSession currentSarosSession;
 
   @Inject private static ISarosSessionManager sarosSessionManager;
+
+  @Inject private static IntelliJReferencePointManager intelliJReferencePointManager;
 
   static {
     SarosPluginContext.initComponent(new SessionUtils());
@@ -74,10 +82,21 @@ public class SessionUtils {
    */
   public static boolean isShared(@NotNull SPath path) {
 
-    IResource resource = path.getResource();
-
     ISarosSession session = currentSarosSession;
 
-    return resource != null && session != null && session.isShared(resource);
+    if (session == null) return false;
+
+    IReferencePoint referencePoint = path.getReferencePoint();
+
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile virtualFile =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    if (virtualFile == null) return false;
+
+    IResource resource = VirtualFileConverter.convertToResource(virtualFile);
+
+    return resource != null && session.isShared(resource);
   }
 }

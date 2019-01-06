@@ -171,7 +171,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(file);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (path == null || !session.isShared(getResource(path))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource's contents change: " + file);
       }
@@ -229,7 +229,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(createdVirtualFile);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (path == null || !session.isShared(getResource(path))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource creation: " + createdVirtualFile);
       }
@@ -287,7 +287,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     SPath copyPath = VirtualFileConverter.convertToSPath(copy);
 
-    if (copyPath == null || !session.isShared(copyPath.getResource())) {
+    if (copyPath == null || !session.isShared(getResource(copyPath))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource copy: " + copy);
       }
@@ -327,7 +327,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(deletedVirtualFile);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (path == null || !session.isShared(getResource(path))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource deletion: " + deletedVirtualFile);
       }
@@ -452,9 +452,9 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldPath != null && session.isShared(oldPath.getResource());
+    boolean oldPathIsShared = oldPath != null && session.isShared(getResource(oldPath));
     boolean newPathIsShared =
-        newParentPath != null && session.isShared(newParentPath.getResource());
+        newParentPath != null && session.isShared(getResource(newParentPath));
 
     if (!oldPathIsShared && !newPathIsShared) {
       if (LOG.isTraceEnabled()) {
@@ -591,9 +591,9 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
     IResource newParentResource = VirtualFileConverter.convertToResource(newBaseParent);
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldFilePath != null && session.isShared(oldFilePath.getResource());
+    boolean oldPathIsShared = oldFilePath != null && session.isShared(getResource(oldFilePath));
     boolean newPathIsShared =
-        newParentPath != null && session.isShared(newParentPath.getResource());
+        newParentPath != null && session.isShared(getResource(newParentPath));
 
     boolean fileIsOpen = projectAPI.isOpen(oldFile);
 
@@ -745,7 +745,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
           SPath path = VirtualFileConverter.convertToSPath(file);
 
-          if (path != null && session.isShared(path.getResource())) {
+          if (path != null && session.isShared(getResource(path))) {
             LOG.error(
                 "Renamed resource is a root directory. "
                     + "Such an activity can not be shared through Saros.");
@@ -886,5 +886,15 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
 
     return (IFile) VirtualFileConverter.convertToResource(virtualFile);
+  }
+
+  private IResource getResource(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile virtualFile =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    return VirtualFileConverter.convertToResource(virtualFile);
   }
 }

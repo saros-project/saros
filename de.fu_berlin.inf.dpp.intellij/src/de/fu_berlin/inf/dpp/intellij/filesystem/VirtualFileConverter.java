@@ -6,7 +6,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +24,8 @@ public class VirtualFileConverter {
   private static final Logger log = Logger.getLogger(VirtualFileConverter.class);
 
   @Inject private static Project project;
+
+  @Inject private static IntelliJReferencePointManager intelliJReferencePointManager;
 
   static {
     SarosPluginContext.initComponent(new VirtualFileConverter());
@@ -128,13 +132,13 @@ public class VirtualFileConverter {
   @Nullable
   public static VirtualFile convertToVirtualFile(@NotNull SPath path) {
 
-    IResource resource = path.getResource();
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
 
-    if (resource == null) {
-      return null;
-    }
+    VirtualFile virtualFile =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
 
-    return convertToVirtualFile(resource);
+    return virtualFile;
   }
 
   /**

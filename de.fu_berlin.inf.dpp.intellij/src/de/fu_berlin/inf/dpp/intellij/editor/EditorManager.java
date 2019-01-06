@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.LocalClosedEditorModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
@@ -463,9 +464,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     localDocumentModificationHandler = new LocalDocumentModificationHandler(this);
     localClosedEditorModificationHandler =
-        new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager, intelliJReferencePointManager);
+        new LocalClosedEditorModificationHandler(
+            this, projectAPI, annotationManager, intelliJReferencePointManager);
     localEditorStatusChangeHandler =
-        new LocalEditorStatusChangeHandler(project, localEditorHandler, annotationManager, intelliJReferencePointManager);
+        new LocalEditorStatusChangeHandler(
+            project, localEditorHandler, annotationManager, intelliJReferencePointManager);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
     localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
@@ -557,7 +560,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *     <code>null</code> if the local user has no editor open.
    */
   void generateEditorActivated(SPath path) {
-    if (path == null || session.isShared(path.getResource())) {
+    if (path == null || session.isShared(getResource(path))) {
       editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.ACTIVATED, path));
@@ -572,7 +575,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * EditorListenerDispatcher.
    */
   void generateEditorClosed(@NotNull SPath path) {
-    if (session.isShared(path.getResource())) {
+    if (session.isShared(getResource(path))) {
       editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));
@@ -828,5 +831,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
 
     return (IFile) VirtualFileConverter.convertToResource(virtualFile);
+  }
+
+  private IResource getResource(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile virtualFile =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    return VirtualFileConverter.convertToResource(virtualFile);
   }
 }

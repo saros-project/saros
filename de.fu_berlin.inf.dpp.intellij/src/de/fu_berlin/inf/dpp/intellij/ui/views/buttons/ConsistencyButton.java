@@ -1,11 +1,16 @@
 package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
@@ -91,6 +96,8 @@ public class ConsistencyButton extends ToolbarButton {
   @Inject private ISarosSessionManager sessionManager;
 
   @Inject private IsInconsistentObservable inconsistentObservable;
+
+  @Inject private IntelliJReferencePointManager intelliJReferencePointManager;
 
   private volatile SessionInconsistencyState sessionInconsistencyState;
 
@@ -245,7 +252,13 @@ public class ConsistencyButton extends ToolbarButton {
     StringBuilder sb = new StringBuilder();
 
     for (SPath path : paths) {
-      IResource resource = path.getResource();
+      IReferencePoint referencePoint = path.getReferencePoint();
+      IPath referencePointRelativePath = path.getProjectRelativePath();
+
+      VirtualFile virtualFile =
+          intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+      IResource resource = VirtualFileConverter.convertToResource(virtualFile);
 
       if (resource == null) {
         LOG.warn("Inconsistent resource " + path + " could not be " + "found.");
