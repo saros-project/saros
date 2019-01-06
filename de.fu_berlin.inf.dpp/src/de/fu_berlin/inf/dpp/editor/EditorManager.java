@@ -495,7 +495,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     this.locallyActiveEditor = path;
 
-    if (path != null && session.isShared(path.getResource())) openEditorPaths.add(path);
+    if (path != null && session.isShared(getResource(path))) openEditorPaths.add(path);
 
     editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
@@ -1404,7 +1404,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
       if (resource == null) continue;
 
-      if (ResourceAdapterFactory.create(resource).equals(path.getResource())) return true;
+      if (ResourceAdapterFactory.create(resource).equals(getResource(path))) return true;
     }
 
     return false;
@@ -1750,5 +1750,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   private void checkThreadAccess() {
     if (!SWTUtils.isSWT()) throw new IllegalStateException("method must be invoked from EDT");
+  }
+
+  private de.fu_berlin.inf.dpp.filesystem.IResource getResource(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    return ResourceAdapterFactory.create(
+        eclipseReferencePointManager.getResource(
+            referencePoint, ResourceAdapterFactory.convertBack(referencePointRelativePath)));
   }
 }

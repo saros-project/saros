@@ -6,6 +6,9 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -84,6 +87,8 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
   @Inject private ISarosSessionManager sessionManager;
 
+  @Inject private EclipseReferencePointManager eclipseReferencePointManager;
+
   private static class MemoryImageDescriptor extends ImageDescriptor {
 
     private final ImageData data;
@@ -148,7 +153,13 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
           if (filePath != null) {
 
-            IResource resource = ResourceAdapterFactory.convertBack(filePath.getResource());
+            IReferencePoint referencePoint = filePath.getReferencePoint();
+
+            IPath referencePointRelativePath = filePath.getProjectRelativePath();
+
+            IResource resource =
+                eclipseReferencePointManager.getResource(
+                    referencePoint, ResourceAdapterFactory.convertBack(referencePointRelativePath));
 
             if (resource != null) activeEditorResources.put(user, getResources(resource));
             else LOG.warn("resource for editor " + filePath + " does not exist locally");
