@@ -4,11 +4,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
 import org.apache.commons.lang3.ObjectUtils;
+import org.picocontainer.annotations.Inject;
 
 /**
  * A <i>SPath</i> points to a {@link IResource resource} in a {@link IProject project}. The specific
@@ -29,14 +31,32 @@ public class SPath {
    * includes additional identifying information.
    */
 
-  /** The local IProject in which the resource is contained which this SPath represents */
-  private final IProject project;
-
   /** The local IReferencePoint in which the resource is contained which this SPath represents */
   private final IReferencePoint referencePoint;
 
   /** The project relative path of the resource this SPath represents. */
   private final IPath projectRelativePath;
+
+  @Inject IPathFactory pathFactory;
+
+  /**
+   * Default constructor, initializing this SPath as a reference to the resource identified by the
+   * given path in the given reference point.
+   *
+   * @param path
+   * @throws IllegalArgumentException if referencePoint is <code>null</code><br>
+   * @throws IllegalArgumentException if the path is <code>null</code> or is not relative
+   */
+  public SPath(IReferencePoint referencePoint, IPath path) {
+    if (referencePoint == null) throw new IllegalArgumentException("reference point is null");
+
+    if (path == null) throw new IllegalArgumentException("path is null");
+
+    if (path.isAbsolute()) throw new IllegalArgumentException("path is absolute: " + path);
+
+    this.referencePoint = referencePoint;
+    this.projectRelativePath = path;
+  }
 
   /**
    * Default constructor, initializing this SPath as a reference to the resource identified by the
@@ -46,21 +66,22 @@ public class SPath {
    * @throws IllegalArgumentException if project is <code>null</code><br>
    * @throws IllegalArgumentException if the path is <code>null</code> or is not relative
    */
-  public SPath(IProject project, IPath path) {
-    if (project == null) throw new IllegalArgumentException("project is null");
+  /*
+    public SPath(IProject project, IPath path) {
+      if (project == null) throw new IllegalArgumentException("project is null");
 
-    if (path == null) throw new IllegalArgumentException("path is null");
+      if (path == null) throw new IllegalArgumentException("path is null");
 
-    if (path.isAbsolute()) throw new IllegalArgumentException("path is absolute: " + path);
+      if (path.isAbsolute()) throw new IllegalArgumentException("path is absolute: " + path);
 
-    this.project = project;
-    this.projectRelativePath = path;
-    this.referencePoint = project.getReferencePoint();
-  }
-
+      this.project = project;
+      this.projectRelativePath = path;
+      this.referencePoint = project.getReferencePoint();
+    }
+  */
   /** Convenience constructor, which retrieves path and project from the given resource */
   public SPath(IResource resource) {
-    this(resource.getProject(), resource.getProjectRelativePath());
+    this(resource.getReferencePoint(), resource.getProjectRelativePath());
   }
 
   /**
@@ -79,7 +100,7 @@ public class SPath {
 
   /** Convenience method for getting the full path of the file identified by this SPath. */
   public IPath getFullPath() {
-    final IPath fullProjectPath = project.getFullPath();
+    final IPath fullProjectPath = pathFactory.fromString(referencePoint.toString());
     return fullProjectPath.append(projectRelativePath);
   }
 
@@ -87,7 +108,7 @@ public class SPath {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ObjectUtils.hashCode(project);
+    result = prime * result + ObjectUtils.hashCode(referencePoint);
     result = prime * result + ObjectUtils.hashCode(projectRelativePath);
     return result;
   }
@@ -102,12 +123,12 @@ public class SPath {
 
     SPath other = (SPath) obj;
 
-    return ObjectUtils.equals(project, other.project)
+    return ObjectUtils.equals(referencePoint, other.referencePoint)
         && ObjectUtils.equals(projectRelativePath, other.projectRelativePath);
   }
 
   @Override
   public String toString() {
-    return "SPath [project=" + project + ", projectRelativePath=" + projectRelativePath + "]";
+    return "SPath [referencePoint=" + referencePoint + ", projectRelativePath=" + projectRelativePath + "]";
   }
 }

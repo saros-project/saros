@@ -61,7 +61,7 @@ public class SPathConverterTest {
     receiver.registerConverter(new SPathConverter(session, pathFactory));
 
     /* Test */
-    SPath spath = new SPath(project, path);
+    SPath spath = new SPath(referencePoint, path);
     SPath copy = (SPath) receiver.fromXML(sender.toXML(spath));
     assertEquals(spath, copy);
 
@@ -98,7 +98,7 @@ public class SPathConverterTest {
     receiver.registerConverter(new SPathConverter(receiverSession, pathFactory));
 
     /* Test */
-    SPath spath = new SPath(project, path);
+    SPath spath = new SPath(referencePoint, path);
 
     // first call on running session on receiver side
     receiver.fromXML(sender.toXML(spath));
@@ -138,7 +138,7 @@ public class SPathConverterTest {
     receiver.registerConverter(new SPathConverter(receiverSession, pathFactory));
 
     /* Test */
-    Dummy dummy = new Dummy(new SPath(project, path));
+    Dummy dummy = new Dummy(new SPath(referencePoint, path));
     Dummy copy = (Dummy) receiver.fromXML(sender.toXML(dummy));
     assertEquals(dummy, copy);
 

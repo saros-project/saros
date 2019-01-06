@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import org.apache.log4j.Logger;
@@ -92,14 +93,14 @@ public class SPathConverter implements Converter, Startable {
     String i = reader.getAttribute(PROJECT_ID);
     String p = URLCodec.decode(reader.getAttribute(PATH));
 
-    IProject project = referencePointManager.get(session.getReferencePoint(i));
-    if (project == null) {
-      LOG.error("Could not create SPath because there is no shared project for id '" + i + "'");
+    IReferencePoint referencePoint = session.getReferencePoint(i);
+    if (referencePoint == null) {
+      LOG.error("Could not create SPath because there is no shared reference point for id '" + i + "'");
       return null;
     }
 
     IPath path = pathFactory.fromString(p);
 
-    return new SPath(project, path);
+    return new SPath(referencePoint, path);
   }
 }

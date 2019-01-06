@@ -68,7 +68,7 @@ public class JupiterSimulator {
       User user = JupiterTestCase.createUser("DUMMY");
 
       JupiterActivity jupiterActivity =
-          algorithm.generateJupiterActivity(operation, user, new SPath(project, path));
+          algorithm.generateJupiterActivity(operation, user, new SPath(project.getReferencePoint(), path));
 
       if (this == client) {
         server.inQueue.add(jupiterActivity);

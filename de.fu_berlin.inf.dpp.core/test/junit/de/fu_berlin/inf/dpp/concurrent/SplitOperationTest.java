@@ -53,10 +53,7 @@ public class SplitOperationTest {
   public void setUp() {
     referencePoint = createMock(IReferencePoint.class);
     replay(referencePoint);
-    project = createMock(IProject.class);
-    expect(project.getReferencePoint()).andStubReturn(referencePoint);
-    replay(project);
-    path = new SPath(project, new PathFake("path"));
+    path = new SPath(referencePoint, new PathFake("path"));
   }
 
   @Test

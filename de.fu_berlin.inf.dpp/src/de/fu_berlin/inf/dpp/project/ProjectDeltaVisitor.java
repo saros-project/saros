@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -210,7 +211,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     SPath newPath = new SPath(ResourceAdapterFactory.create(resource));
     SPath oldPath =
         new SPath(
-            ResourceAdapterFactory.create(oldProject),
+            EclipseReferencePointManager.create(oldProject),
             ResourceAdapterFactory.create(oldFullPath.removeFirstSegments(1)));
     // TODO add encoding
     addActivity(

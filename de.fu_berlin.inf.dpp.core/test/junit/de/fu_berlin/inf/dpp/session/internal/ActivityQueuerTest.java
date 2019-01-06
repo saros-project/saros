@@ -61,11 +61,12 @@ public class ActivityQueuerTest {
 
     EasyMock.replay(SHARED_PROJECT, NOT_SHARED_PROJECT);
 
-    FOO_PATH_SHARED_PROJECT = new SPath(SHARED_PROJECT, EasyMock.createMock(IPath.class));
+    FOO_PATH_SHARED_PROJECT = new SPath(SHARED_REFERENCEPOINT, EasyMock.createMock(IPath.class));
 
-    BAR_PATH_SHARED_PROJECT = new SPath(SHARED_PROJECT, EasyMock.createMock(IPath.class));
+    BAR_PATH_SHARED_PROJECT = new SPath(SHARED_REFERENCEPOINT, EasyMock.createMock(IPath.class));
 
-    PATH_TO_NOT_SHARED_PROJECT = new SPath(NOT_SHARED_PROJECT, EasyMock.createMock(IPath.class));
+    PATH_TO_NOT_SHARED_PROJECT =
+        new SPath(NOT_SHARED_REFERENCEPOINT, EasyMock.createMock(IPath.class));
   }
 
   @Before

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertSame;
 
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
@@ -21,33 +22,33 @@ public class ActivityOptimizerTest {
   private IPath fooPath;
   private IPath barPath;
 
-  private IProject fooProject;
-  private IProject barProject;
+  private IReferencePoint fooReferencePoint;
+  private IReferencePoint barReferencePoint;
 
   private final NOPActivity nop = new NOPActivity(alice, bob, 0);
 
   @Before
   public void setup() {
 
-    fooProject = EasyMock.createNiceMock(IProject.class);
-    barProject = EasyMock.createNiceMock(IProject.class);
+    fooReferencePoint = EasyMock.createNiceMock(IReferencePoint.class);
+    barReferencePoint = EasyMock.createNiceMock(IReferencePoint.class);
 
     fooPath = EasyMock.createNiceMock(IPath.class);
     barPath = EasyMock.createNiceMock(IPath.class);
 
-    EasyMock.replay(fooProject, barProject, fooPath, barPath);
+    EasyMock.replay(fooReferencePoint, barReferencePoint, fooPath, barPath);
   }
 
   @Test
   public void testOptimize() {
 
-    SPath foofooSPath = new SPath(fooProject, fooPath);
+    SPath foofooSPath = new SPath(fooReferencePoint, fooPath);
 
-    SPath foobarSPath = new SPath(fooProject, barPath);
+    SPath foobarSPath = new SPath(fooReferencePoint, barPath);
 
-    SPath barfooSPath = new SPath(barProject, fooPath);
+    SPath barfooSPath = new SPath(barReferencePoint, fooPath);
 
-    SPath barbarSPath = new SPath(barProject, barPath);
+    SPath barbarSPath = new SPath(barReferencePoint, barPath);
 
     TextSelectionActivity tsChange0 = new TextSelectionActivity(alice, 0, 1, foofooSPath);
 

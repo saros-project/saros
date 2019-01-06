@@ -24,8 +24,6 @@ import org.junit.Test;
 public class UndoTest {
 
   // private static final Logger log = Logger.getLogger(UndoTest.class);
-
-  protected IProject project;
   protected IReferencePoint referencePoint;
 
   protected SPath path1;
@@ -38,13 +36,10 @@ public class UndoTest {
   public void setUp() {
     referencePoint = createMock(IReferencePoint.class);
     replay(referencePoint);
-    project = createMock(IProject.class);
-    expect(project.getReferencePoint()).andStubReturn(referencePoint);
-    replay(project);
     undoManager = new UndoManager();
     history = undoManager.getHistory();
-    path1 = new SPath(project, ResourceAdapterFactory.create(new Path("path1")));
-    path2 = new SPath(project, ResourceAdapterFactory.create(new Path("path2")));
+    path1 = new SPath(referencePoint, ResourceAdapterFactory.create(new Path("path1")));
+    path2 = new SPath(referencePoint, ResourceAdapterFactory.create(new Path("path2")));
   }
 
   protected Operation nop() {
