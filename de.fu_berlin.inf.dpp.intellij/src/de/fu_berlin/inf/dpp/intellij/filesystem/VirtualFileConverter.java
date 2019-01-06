@@ -49,7 +49,12 @@ public class VirtualFileConverter {
 
     IResource resource = convertToResource(virtualFile);
 
-    return resource == null ? null : new SPath(resource);
+    if (resource == null) return null;
+
+    IReferencePoint referencePoint = resource.getReferencePoint();
+    IPath referencePointRelativePath = resource.getProjectRelativePath();
+
+    return new SPath(referencePoint, referencePointRelativePath);
   }
 
   /**

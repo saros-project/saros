@@ -453,8 +453,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
     User user = session.getLocalUser();
 
     boolean oldPathIsShared = oldPath != null && session.isShared(getResource(oldPath));
-    boolean newPathIsShared =
-        newParentPath != null && session.isShared(getResource(newParentPath));
+    boolean newPathIsShared = newParentPath != null && session.isShared(getResource(newParentPath));
 
     if (!oldPathIsShared && !newPathIsShared) {
       if (LOG.isTraceEnabled()) {
@@ -509,7 +508,8 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
           if (newPathIsShared) {
             IResource newParentResource = VirtualFileConverter.convertToResource(newParent);
-            SPath newFolderPath = new SPath(newParentResource);
+
+            SPath newFolderPath = VirtualFileConverter.convertToSPath(newParent);
 
             IActivity newFolderCreatedActivity = new FolderCreatedActivity(user, newFolderPath);
 
@@ -518,7 +518,8 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
           if (oldPathIsShared) {
             IResource oldCoreFile = VirtualFileConverter.convertToResource(oldFile);
-            SPath oldFolderPath = new SPath(oldCoreFile);
+
+            SPath oldFolderPath = VirtualFileConverter.convertToSPath(oldFile);
 
             IActivity newFolderDeletedActivity = new FolderDeletedActivity(user, oldFolderPath);
 
@@ -589,11 +590,11 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
     SPath newParentPath = VirtualFileConverter.convertToSPath(newBaseParent);
 
     IResource newParentResource = VirtualFileConverter.convertToResource(newBaseParent);
+
     User user = session.getLocalUser();
 
     boolean oldPathIsShared = oldFilePath != null && session.isShared(getResource(oldFilePath));
-    boolean newPathIsShared =
-        newParentPath != null && session.isShared(getResource(newParentPath));
+    boolean newPathIsShared = newParentPath != null && session.isShared(getResource(newParentPath));
 
     boolean fileIsOpen = projectAPI.isOpen(oldFile);
 
@@ -617,7 +618,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     if (oldPathIsShared && newPathIsShared) {
       // moved file inside shared modules
-      SPath newFilePath = new SPath(newParentResource);
+      SPath newFilePath = VirtualFileConverter.convertToSPath(newBaseParent);
 
       activity =
           new FileActivity(
@@ -637,7 +638,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       // moved file into shared module
       byte[] fileContent = getContent(oldFile);
 
-      SPath newFilePath = new SPath(newParentResource);
+      SPath newFilePath = VirtualFileConverter.convertToSPath(newBaseParent);
 
       activity =
           new FileActivity(
@@ -694,7 +695,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
     }
 
     if (newPathIsShared && fileIsOpen) {
-      SPath newFilePath = new SPath(newParentResource);
+      SPath newFilePath = VirtualFileConverter.convertToSPath(newBaseParent);
 
       EditorActivity openNewEditorActivity =
           new EditorActivity(user, EditorActivity.Type.ACTIVATED, newFilePath);
