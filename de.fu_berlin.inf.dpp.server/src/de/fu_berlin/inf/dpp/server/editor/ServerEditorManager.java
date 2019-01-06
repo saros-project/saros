@@ -7,8 +7,11 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerFileImpl;
 import de.fu_berlin.inf.dpp.session.User;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
@@ -20,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
 
 /** Server implementation of the {@link IEditorManager} interface */
 public class ServerEditorManager implements IEditorManager {
@@ -28,6 +32,7 @@ public class ServerEditorManager implements IEditorManager {
 
   private Map<SPath, Editor> openEditors = Collections.synchronizedMap(new LRUMap(10));
   private List<ISharedEditorListener> listeners = new CopyOnWriteArrayList<>();
+  @Inject private IWorkspace workspace;
 
   @Override
   public void openEditor(SPath path, boolean activate) {
@@ -90,8 +95,10 @@ public class ServerEditorManager implements IEditorManager {
   private Editor getOrCreateEditor(SPath path) throws IOException {
     Editor editor = openEditors.get(path);
     if (editor == null) {
-      IResource resource = path.getResource();
-      if (resource == null) {
+      IPath referencePointRelativePath = path.getProjectRelativePath();
+
+      IResource resource = new ServerFileImpl(workspace, referencePointRelativePath);
+      if (resource == null || !resource.exists()) {
         throw new NoSuchFileException(path.toString());
       }
 
