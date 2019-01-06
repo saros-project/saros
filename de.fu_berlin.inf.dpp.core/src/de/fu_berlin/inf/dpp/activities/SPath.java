@@ -72,18 +72,6 @@ public class SPath {
     return projectRelativePath;
   }
 
-  /**
-   * Returns the IResource represented by this SPath.
-   *
-   * <p><b>Note:</b> This operation might perform disk I/O.
-   *
-   * @return the resource represented by this SPath or <code>null</code> if such or resource does
-   *     not exist
-   */
-  public IResource getResource() {
-    return project.findMember(projectRelativePath);
-  }
-
   /** Returns the reference point in which the referenced resource is located. */
   public IReferencePoint getReferencePoint() {
     return referencePoint;
