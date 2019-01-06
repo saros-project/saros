@@ -73,15 +73,6 @@ public class SPath {
   }
 
   /**
-   * Returns a handle for an IFile represented by this SPath.
-   *
-   * @return the IFile contained in the associated IProject for the given project relative path
-   */
-  public IFile getFile() {
-    return project.getFile(projectRelativePath);
-  }
-
-  /**
    * Returns the IResource represented by this SPath.
    *
    * <p><b>Note:</b> This operation might perform disk I/O.
