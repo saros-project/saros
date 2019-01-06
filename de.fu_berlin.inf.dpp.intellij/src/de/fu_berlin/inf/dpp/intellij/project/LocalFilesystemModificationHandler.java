@@ -23,13 +23,16 @@ import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.editor.DisableableHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -66,6 +69,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
   @Inject private AnnotationManager annotationManager;
   @Inject private Project project;
   @Inject private LocalEditorHandler localEditorHandler;
+  @Inject private IntelliJReferencePointManager intelliJReferencePointManager;
 
   private boolean enabled;
 
@@ -499,10 +503,8 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
           }
 
           if (newPathIsShared) {
-            SPath newFolderPath =
-                new SPath(
-                    newParentPath.getProject(),
-                    newParentPath.getProjectRelativePath().append(folderName).append(relativePath));
+            IResource newParentResource = VirtualFileConverter.convertToResource(newParent);
+            SPath newFolderPath = new SPath(newParentResource);
 
             IActivity newFolderCreatedActivity = new FolderCreatedActivity(user, newFolderPath);
 
@@ -510,9 +512,8 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
           }
 
           if (oldPathIsShared) {
-            SPath oldFolderPath =
-                new SPath(
-                    oldPath.getProject(), oldPath.getProjectRelativePath().append(relativePath));
+            IResource oldCoreFile = VirtualFileConverter.convertToResource(oldFile);
+            SPath oldFolderPath = new SPath(oldCoreFile);
 
             IActivity newFolderDeletedActivity = new FolderDeletedActivity(user, oldFolderPath);
 
@@ -582,6 +583,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
     SPath oldFilePath = VirtualFileConverter.convertToSPath(oldFile);
     SPath newParentPath = VirtualFileConverter.convertToSPath(newBaseParent);
 
+    IResource newParentResource = VirtualFileConverter.convertToResource(newBaseParent);
     User user = session.getLocalUser();
 
     boolean oldPathIsShared = oldFilePath != null && session.isShared(oldFilePath.getResource());
@@ -610,10 +612,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     if (oldPathIsShared && newPathIsShared) {
       // moved file inside shared modules
-      SPath newFilePath =
-          new SPath(
-              newParentPath.getProject(),
-              newParentPath.getProjectRelativePath().append(relativePath));
+      SPath newFilePath = new SPath(newParentResource);
 
       activity =
           new FileActivity(
@@ -633,10 +632,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       // moved file into shared module
       byte[] fileContent = getContent(oldFile);
 
-      SPath newFilePath =
-          new SPath(
-              newParentPath.getProject(),
-              newParentPath.getProjectRelativePath().append(relativePath));
+      SPath newFilePath = new SPath(newParentResource);
 
       activity =
           new FileActivity(
@@ -693,10 +689,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
     }
 
     if (newPathIsShared && fileIsOpen) {
-      SPath newFilePath =
-          new SPath(
-              newParentPath.getProject(),
-              newParentPath.getProjectRelativePath().append(relativePath));
+      SPath newFilePath = new SPath(newParentResource);
 
       EditorActivity openNewEditorActivity =
           new EditorActivity(user, EditorActivity.Type.ACTIVATED, newFilePath);

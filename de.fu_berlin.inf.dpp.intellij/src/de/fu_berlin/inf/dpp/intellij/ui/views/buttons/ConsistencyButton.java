@@ -228,7 +228,7 @@ public class ConsistencyButton extends ToolbarButton {
     StringBuilder sbInconsistentFiles = new StringBuilder();
     for (SPath path : paths) {
       sbInconsistentFiles.append("project: ");
-      sbInconsistentFiles.append(path.getProject().getName());
+      sbInconsistentFiles.append(path.getReferencePoint());
       sbInconsistentFiles.append(", file: ");
       sbInconsistentFiles.append(path.getProjectRelativePath().toOSString());
       sbInconsistentFiles.append("\n");

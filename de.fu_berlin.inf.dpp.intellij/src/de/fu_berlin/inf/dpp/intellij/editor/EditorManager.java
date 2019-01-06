@@ -748,9 +748,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           }
 
           for (SPath editorPath : editorPaths) {
-            if (referencePoint == null
-                || referencePoint.equals(editorPath.getProject().getReferencePoint())) {
-
+            if (referencePoint == null || referencePoint.equals(editorPath.getReferencePoint())) {
               saveDocument(editorPath);
             }
           }
