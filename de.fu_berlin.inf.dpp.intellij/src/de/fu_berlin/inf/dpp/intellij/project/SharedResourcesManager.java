@@ -101,7 +101,8 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     this.localFilesystemModificationHandler =
-        new LocalFilesystemModificationHandler(this, editorManager, sarosSession);
+        new LocalFilesystemModificationHandler(
+            this, editorManager, sarosSession, intelliJReferencePointManager);
   }
 
   private final IActivityConsumer consumer =
@@ -177,13 +178,22 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
     SPath path = activity.getPath();
 
+    IReferencePoint referencePoint = path.getReferencePoint();
+
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile file =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    IFile sarosFile = (IFile) VirtualFileConverter.convertToResource(file);
+
     LOG.debug("performing recovery for file: " + activity.getPath().getFullPath());
 
     FileActivity.Type type = activity.getType();
 
     try {
       if (type == FileActivity.Type.CREATED) {
-        if (path.getFile().exists()) {
+        if (sarosFile.exists()) {
           localEditorManipulator.handleContentRecovery(
               path, activity.getContent(), activity.getEncoding(), activity.getSource());
 
@@ -218,8 +228,19 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     SPath oldPath = activity.getOldPath();
     SPath newPath = activity.getPath();
 
-    IFile oldFile = oldPath.getFile();
-    IFile newFile = newPath.getFile();
+    IReferencePoint oldReferencePoint = oldPath.getReferencePoint();
+    IReferencePoint newReferencePoint = newPath.getReferencePoint();
+
+    IPath oldReferencePointRelativePath = oldPath.getProjectRelativePath();
+    IPath newReferencePointRelativePath = newPath.getProjectRelativePath();
+
+    VirtualFile oldVirtualFile =
+        intelliJReferencePointManager.getResource(oldReferencePoint, oldReferencePointRelativePath);
+    VirtualFile newVirtualFile =
+        intelliJReferencePointManager.getResource(newReferencePoint, newReferencePointRelativePath);
+
+    IFile oldFile = (IFile) VirtualFileConverter.convertToResource(oldVirtualFile);
+    IFile newFile = (IFile) VirtualFileConverter.convertToResource(newVirtualFile);
 
     if (!oldFile.exists()) {
       LOG.warn(
@@ -278,9 +299,17 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
   private void handleFileDeletion(@NotNull FileActivity activity) throws IOException {
 
     SPath path = activity.getPath();
-    IFile file = path.getFile();
 
-    if (!file.exists()) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile file =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    IFile sarosFile = (IFile) VirtualFileConverter.convertToResource(file);
+
+    if (!sarosFile.exists()) {
       LOG.warn("Could not delete file " + file + " as it does not exist.");
 
       return;
@@ -301,7 +330,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
       localFilesystemModificationHandler.setEnabled(true);
     }
 
-    annotationManager.removeAnnotations(file);
+    annotationManager.removeAnnotations(sarosFile);
 
     // TODO reset the vector time for the deleted file
   }
@@ -309,9 +338,17 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
   private void handleFileCreation(@NotNull FileActivity activity) throws IOException {
 
     SPath path = activity.getPath();
-    IFile file = path.getFile();
 
-    if (file.exists()) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile file =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    IFile sarosFile = (IFile) VirtualFileConverter.convertToResource(file);
+
+    if (sarosFile.exists()) {
       LOG.warn("Could not create file " + file + " as it already exists.");
 
       return;
@@ -322,7 +359,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     try {
       localFilesystemModificationHandler.setEnabled(false);
 
-      file.create(contents, FORCE);
+      sarosFile.create(contents, FORCE);
 
     } finally {
       localFilesystemModificationHandler.setEnabled(true);

@@ -13,7 +13,10 @@ import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
@@ -39,11 +42,17 @@ public class LocalEditorManipulator {
 
   private EditorManager manager;
 
+  private IntelliJReferencePointManager intelliJReferencePointManager;
+
   public LocalEditorManipulator(
-      ProjectAPI projectAPI, EditorAPI editorAPI, AnnotationManager annotationManager) {
+      ProjectAPI projectAPI,
+      EditorAPI editorAPI,
+      AnnotationManager annotationManager,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
     this.projectAPI = projectAPI;
     this.editorAPI = editorAPI;
     this.annotationManager = annotationManager;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   /** Initializes all fields that require an EditorManager. */
@@ -310,7 +319,7 @@ public class LocalEditorManipulator {
 
     int documentLength = document.getTextLength();
 
-    IFile file = path.getFile();
+    IFile file = getFile(path);
     annotationManager.removeAnnotations(file);
 
     String text;
@@ -363,5 +372,15 @@ public class LocalEditorManipulator {
     }
 
     annotationManager.addContributionAnnotation(source, file, 0, documentLength, editor);
+  }
+
+  private IFile getFile(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile virtualFile =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    return (IFile) VirtualFileConverter.convertToResource(virtualFile);
   }
 }

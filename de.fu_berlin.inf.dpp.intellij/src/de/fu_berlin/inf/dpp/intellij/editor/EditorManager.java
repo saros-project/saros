@@ -28,11 +28,13 @@ import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.LocalClosedEditorModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -142,7 +144,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           localEditorManipulator.applyTextOperations(path, operation);
 
-          adjustAnnotationsAfterEdit(user, path.getFile(), editorPool.getEditor(path), operation);
+          adjustAnnotationsAfterEdit(user, getFile(path), editorPool.getEditor(path), operation);
 
           editorListenerDispatch.textEdited(editorActivity);
         }
@@ -201,7 +203,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return;
           }
 
-          IFile file = path.getFile();
+          IFile file = getFile(path);
 
           LOG.debug("Text selection activity received: " + path + ", " + selection);
 
@@ -434,6 +436,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private final LocalEditorStatusChangeHandler localEditorStatusChangeHandler;
   private final LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
   private final LocalViewPortChangeHandler localViewPortChangeHandler;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private boolean hasWriteAccess;
   // FIXME why is this never assigned? Either assign or remove flag
@@ -447,7 +450,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       AnnotationManager annotationManager,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       Project project,
-      EditorAPI editorAPI) {
+      EditorAPI editorAPI,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     this.localEditorHandler = localEditorHandler;
@@ -455,12 +459,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     this.annotationManager = annotationManager;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.editorAPI = editorAPI;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     localDocumentModificationHandler = new LocalDocumentModificationHandler(this);
     localClosedEditorModificationHandler =
-        new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
+        new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager, intelliJReferencePointManager);
     localEditorStatusChangeHandler =
-        new LocalEditorStatusChangeHandler(project, localEditorHandler, annotationManager);
+        new LocalEditorStatusChangeHandler(project, localEditorHandler, annotationManager, intelliJReferencePointManager);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
     localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
@@ -813,5 +818,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public void addEditorMapping(SPath file, Editor editor) {
     startEditor(editor);
     editorPool.add(file, editor);
+  }
+
+  private IFile getFile(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile virtualFile =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    return (IFile) VirtualFileConverter.convertToResource(virtualFile);
   }
 }

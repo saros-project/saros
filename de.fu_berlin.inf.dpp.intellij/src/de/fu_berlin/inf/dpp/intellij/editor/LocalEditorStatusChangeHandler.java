@@ -9,7 +9,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +23,7 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
   private final Project project;
   private final LocalEditorHandler localEditorHandler;
   private final AnnotationManager annotationManager;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private MessageBusConnection messageBusConnection;
   private boolean enabled;
@@ -67,11 +71,15 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
    * @param annotationManager the AnnotationManager instance
    */
   LocalEditorStatusChangeHandler(
-      Project project, LocalEditorHandler localEditorHandler, AnnotationManager annotationManager) {
+      Project project,
+      LocalEditorHandler localEditorHandler,
+      AnnotationManager annotationManager,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.project = project;
     this.localEditorHandler = localEditorHandler;
     this.annotationManager = annotationManager;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     subscribe();
     this.enabled = true;
@@ -92,7 +100,7 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
     SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
 
     if (sPath != null && SessionUtils.isShared(sPath) && editor != null) {
-      annotationManager.applyStoredAnnotations(sPath.getFile(), editor);
+      annotationManager.applyStoredAnnotations(getFile(sPath), editor);
     }
   }
 
@@ -131,7 +139,7 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
     SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
 
     if (sPath != null && SessionUtils.isShared(sPath)) {
-      IFile file = sPath.getFile();
+      IFile file = getFile(sPath);
 
       annotationManager.updateAnnotationStore(file);
       annotationManager.removeLocalRepresentation(file);
@@ -175,5 +183,15 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
 
       this.enabled = true;
     }
+  }
+
+  private IFile getFile(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile virtualFile =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    return (IFile) VirtualFileConverter.convertToResource(virtualFile);
   }
 }

@@ -3,11 +3,16 @@ package de.fu_berlin.inf.dpp.intellij.editor.annotations;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.editor.AbstractLocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentModificationHandler {
   private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private final DocumentListener documentListener =
       new DocumentListener() {
@@ -31,12 +37,14 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
   public LocalClosedEditorModificationHandler(
       @NotNull EditorManager editorManager,
       @NotNull ProjectAPI projectAPI,
-      @NotNull AnnotationManager annotationManager) {
+      @NotNull AnnotationManager annotationManager,
+      @NotNull IntelliJReferencePointManager intelliJReferencePointManager) {
 
     super(editorManager);
 
     this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   /**
@@ -61,7 +69,7 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
     String replacedText = event.getOldFragment().toString();
 
     if (!projectAPI.isOpen(document)) {
-      IFile file = path.getFile();
+      IFile file = getFile(path);
 
       int replacedTextLength = replacedText.length();
       if (replacedTextLength > 0) {
@@ -78,5 +86,15 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
   @Override
   public void setEnabled(boolean enabled) {
     super.setEnabled(enabled, documentListener);
+  }
+
+  private IFile getFile(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile virtualFile =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    return (IFile) VirtualFileConverter.convertToResource(virtualFile);
   }
 }

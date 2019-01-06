@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.editor.DisableableHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
@@ -69,7 +70,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
   @Inject private AnnotationManager annotationManager;
   @Inject private Project project;
   @Inject private LocalEditorHandler localEditorHandler;
-  @Inject private IntelliJReferencePointManager intelliJReferencePointManager;
+  private IntelliJReferencePointManager intelliJReferencePointManager;
 
   private boolean enabled;
 
@@ -115,11 +116,15 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
    * @param session the current SarosSession instance
    */
   LocalFilesystemModificationHandler(
-      SharedResourcesManager resourceManager, EditorManager editorManager, ISarosSession session) {
+      SharedResourcesManager resourceManager,
+      EditorManager editorManager,
+      ISarosSession session,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.resourceManager = resourceManager;
     this.editorManager = editorManager;
     this.session = session;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     SarosPluginContext.initComponent(this);
 
@@ -346,7 +351,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
       editorManager.removeAllEditorsForPath(path);
 
-      annotationManager.removeAnnotations(path.getFile());
+      annotationManager.removeAnnotations(getFile(path));
     }
 
     fireActivity(activity);
@@ -626,7 +631,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
       editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
 
-      annotationManager.updateAnnotationPath(oldFilePath.getFile(), newFilePath.getFile());
+      annotationManager.updateAnnotationPath(getFile(oldFilePath), getFile(newFilePath));
 
     } else if (newPathIsShared) {
       // moved file into shared module
@@ -658,7 +663,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
       editorManager.removeAllEditorsForPath(oldFilePath);
 
-      annotationManager.removeAnnotations(oldFilePath.getFile());
+      annotationManager.removeAnnotations(getFile(oldFilePath));
 
     } else {
       // neither source nor destination are shared
@@ -871,5 +876,15 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
       localFileSystem.addVirtualFileListener(virtualFileListener);
     }
+  }
+
+  private IFile getFile(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getProjectRelativePath();
+
+    VirtualFile virtualFile =
+        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
+
+    return (IFile) VirtualFileConverter.convertToResource(virtualFile);
   }
 }
