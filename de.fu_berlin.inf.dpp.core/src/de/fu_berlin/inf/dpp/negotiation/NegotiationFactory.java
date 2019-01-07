@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.negotiation;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -50,6 +51,7 @@ public final class NegotiationFactory {
   private final IConnectionManager connectionManager;
   private final ITransmitter transmitter;
   private final IReceiver receiver;
+  private final IPathFactory pathFactory;
 
   public NegotiationFactory(
       final VersionManager versionManager, //
@@ -69,8 +71,8 @@ public final class NegotiationFactory {
        * the SessionManager and IEditorManager implementations which are using
        * the SessionManager as well.
        */
-      final IContainerContext context //
-      ) {
+      final IContainerContext context, //
+      final IPathFactory pathFactory) {
 
     this.versionManager = versionManager;
     this.hookManager = hookManager;
@@ -89,6 +91,7 @@ public final class NegotiationFactory {
     this.connectionManager = connectionManager;
     this.transmitter = transmitter;
     this.receiver = receiver;
+    this.pathFactory = pathFactory;
   }
 
   public OutgoingSessionNegotiation newOutgoingSessionNegotiation(
@@ -165,7 +168,8 @@ public final class NegotiationFactory {
             checksumCache,
             connectionService,
             transmitter,
-            receiver);
+            receiver,
+            pathFactory);
       default:
         throw new UnsupportedOperationException("transferType not implemented");
     }

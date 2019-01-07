@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -58,6 +59,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   private Set<SPath> transmittedFiles;
   private List<StartHandle> stoppedUsers = null;
   private User remoteUser = null;
+  private IPathFactory pathFactory;
 
   public InstantOutgoingProjectNegotiation(
       final JID peer, //
@@ -69,7 +71,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       final IChecksumCache checksumCache, //
       final XMPPConnectionService connectionService, //
       final ITransmitter transmitter, //
-      final IReceiver receiver) //
+      final IReceiver receiver,
+      final IPathFactory pathFactory) //
       {
     super(
         peer,
@@ -83,6 +86,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
         connectionService,
         transmitter,
         receiver);
+
+    this.pathFactory = pathFactory;
   }
 
   @Override
@@ -183,7 +188,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     for (final FileList list : fileLists) {
       IReferencePoint referencePoint = session.getReferencePoint(list.getProjectID());
       for (String file : list.getPaths()) {
-        files.add(new SPath(referencePointManager.get(referencePoint).getFile(file)));
+        files.add(new SPath(referencePoint, pathFactory.fromString(file)));
       }
     }
 
@@ -222,9 +227,9 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       ".settings/org.eclipse.jdt.ui.prefs"
     };
 
-    for (String string : eclipseProjFiles) {
+    for (String referencePointRelativePath : eclipseProjFiles) {
       for (IReferencePoint referencePoint : referencePoints) {
-        SPath file = new SPath(referencePointManager.get(referencePoint).getFile(string));
+        SPath file = new SPath(referencePoint, pathFactory.fromString(referencePointRelativePath));
         sendIfRequired(osp, file);
       }
     }
