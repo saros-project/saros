@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
@@ -38,7 +39,8 @@ public class SarosCoreContextFactoryTest {
       Preferences.class,
       IWorkspace.class,
       IEditorManager.class,
-      IChecksumCache.class
+      IChecksumCache.class,
+      IPathFactory.class
     };
 
     ContextMocker.addMocks(container, Arrays.asList(dependencies));

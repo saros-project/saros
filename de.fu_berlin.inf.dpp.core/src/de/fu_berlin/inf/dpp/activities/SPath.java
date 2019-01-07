@@ -3,16 +3,15 @@ package de.fu_berlin.inf.dpp.activities;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.picocontainer.annotations.Inject;
 
 /**
- * A <i>SPath</i> points to a {@link IResource resource} in a {@link IProject project}. The specific
- * resource does not need to exist, neither during the marshaling nor during unmarshaling.
+ * A <i>SPath</i> points to a {@link IPath referencePointRelativePath} in a {@link IReferencePoint
+ * reference point}. The specific resource does not need to exist, neither during the marshaling nor
+ * during unmarshaling.
  *
  * <p><i>SPath</i> objects can be marshaled and unmarshaled.
  *
@@ -54,32 +53,6 @@ public class SPath {
 
     this.referencePoint = referencePoint;
     this.referencePointRelativePath = path;
-  }
-
-  /**
-   * Default constructor, initializing this SPath as a reference to the resource identified by the
-   * given path in the given project.
-   *
-   * @param path
-   * @throws IllegalArgumentException if project is <code>null</code><br>
-   * @throws IllegalArgumentException if the path is <code>null</code> or is not relative
-   */
-  /*
-    public SPath(IProject project, IPath path) {
-      if (project == null) throw new IllegalArgumentException("project is null");
-
-      if (path == null) throw new IllegalArgumentException("path is null");
-
-      if (path.isAbsolute()) throw new IllegalArgumentException("path is absolute: " + path);
-
-      this.project = project;
-      this.projectRelativePath = path;
-      this.referencePoint = project.getReferencePoint();
-    }
-  */
-  /** Convenience constructor, which retrieves path and project from the given resource */
-  public SPath(IResource resource) {
-    this(resource.getReferencePoint(), resource.getProjectRelativePath());
   }
 
   /**
