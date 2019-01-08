@@ -7,6 +7,7 @@ package de.fu_berlin.inf.dpp.activities;
  */
 public abstract class AbstractActivityReceiver implements IActivityReceiver {
 
+<<<<<<< HEAD
   /**
    * @JTourBusStop 4, Creating a new Activity type, Triple dispatch abstract class:
    *
