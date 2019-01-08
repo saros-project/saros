@@ -21,8 +21,9 @@ import org.picocontainer.Startable;
  * Converts session- and IDE-dependent SPath to session- and IDE-independent XML representations,
  * and vice versa.
  *
- * <p><b>Example:</b> The XML representation of an {@link SPath} for a {@linkplain IProject project}
- * with id <code>"projA"</code> and a {@linkplain IPath relative path} <code>"src/Main.java"</code>:
+ * <p><b>Example:</b> The XML representation of an {@link SPath} for a {@linkplain IReferencePoint
+ * reference point} with id <code>"projA"</code> and a {@linkplain IPath relative path} <code>
+ * "src/Main.java"</code>:
  *
  * <pre>
  * &lt;SPath i="projA" p="src/Main.java" /&gt;
@@ -95,7 +96,8 @@ public class SPathConverter implements Converter, Startable {
 
     IReferencePoint referencePoint = session.getReferencePoint(i);
     if (referencePoint == null) {
-      LOG.error("Could not create SPath because there is no shared reference point for id '" + i + "'");
+      LOG.error(
+          "Could not create SPath because there is no shared reference point for id '" + i + "'");
       return null;
     }
 
