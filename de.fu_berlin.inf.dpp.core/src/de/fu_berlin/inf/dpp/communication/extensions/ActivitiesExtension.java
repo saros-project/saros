@@ -22,36 +22,37 @@ package de.fu_berlin.inf.dpp.communication.extensions;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import de.fu_berlin.inf.dpp.activities.ChangeColorActivity;
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
-import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
-import de.fu_berlin.inf.dpp.activities.FolderMovedActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.NOPActivity;
-import de.fu_berlin.inf.dpp.activities.PermissionActivity;
-import de.fu_berlin.inf.dpp.activities.ProgressActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
-import de.fu_berlin.inf.dpp.activities.StopActivity;
-import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
-import de.fu_berlin.inf.dpp.activities.TargetedFileActivity;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.List;
 import org.jivesoftware.smack.packet.PacketExtension;
+import src.de.fu_berlin.inf.dpp.activities.ChangeColorActivity;
+import src.de.fu_berlin.inf.dpp.activities.ChecksumActivity;
+import src.de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
+import src.de.fu_berlin.inf.dpp.activities.EditorActivity;
+import src.de.fu_berlin.inf.dpp.activities.FileActivity;
+import src.de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import src.de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
+import src.de.fu_berlin.inf.dpp.activities.FolderMovedActivity;
+import src.de.fu_berlin.inf.dpp.activities.IActivity;
+import src.de.fu_berlin.inf.dpp.activities.JupiterActivity;
+import src.de.fu_berlin.inf.dpp.activities.NOPActivity;
+import src.de.fu_berlin.inf.dpp.activities.PermissionActivity;
+import src.de.fu_berlin.inf.dpp.activities.ProgressActivity;
+import src.de.fu_berlin.inf.dpp.activities.SPath;
+import src.de.fu_berlin.inf.dpp.activities.SendBundleActivity;
+import src.de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
+import src.de.fu_berlin.inf.dpp.activities.StopActivity;
+import src.de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
+import src.de.fu_berlin.inf.dpp.activities.TargetedFileActivity;
+import src.de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
+import src.de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import src.de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
+import src.de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
+import src.de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import src.de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
+import src.de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import src.de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
+import src.de.fu_berlin.inf.dpp.net.xmpp.JID;
+import src.de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("ADOS")
 public class ActivitiesExtension extends SarosSessionPacketExtension {
@@ -153,6 +154,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
           PermissionActivity.class,
           ProgressActivity.class,
           TargetedFileActivity.class,
+          SendBundleActivity.class,
           StartFollowingActivity.class,
           StopActivity.class,
           StopFollowingActivity.class,

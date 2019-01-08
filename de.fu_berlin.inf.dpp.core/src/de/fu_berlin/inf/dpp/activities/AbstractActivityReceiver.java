@@ -85,6 +85,10 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
     // do nothing
   }
 
+  public void receive(SendBundleActivity sendBundleActivity) {
+    // do nothing
+  }
+
   @Override
   public void receive(StopActivity stopActivity) {
     // do nothing
