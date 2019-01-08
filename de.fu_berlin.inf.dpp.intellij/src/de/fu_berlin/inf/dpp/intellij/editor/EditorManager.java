@@ -651,10 +651,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Fires an EditorActivity.Type.CLOSED event for the given path and leaves following, if closing
-   * the followed editor.
+   * Fires an EditorActivity.Type.CLOSED event for the given path, notifies the local
+   * EditorListenerDispatcher and leaves following, if closing the followed editor.
    */
-  void generateEditorClosed(SPath path) {
+  void generateEditorClosed(@NotNull SPath path) {
     // if closing the followed editor, leave follow mode
     if (followedUser != null) {
       // TODO Let the FollowModeManager handle this
@@ -670,10 +670,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       }
     }
 
-    // TODO What about cleaning up (editorPool, currentlyOpenEditors, ...)?
-    // TODO What about a editorListenerDispatch.editorClosed() call?
+    if (session.isShared(path.getResource())) {
+      editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
-    fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));
+      fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));
+    }
   }
 
   /**
