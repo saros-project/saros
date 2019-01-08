@@ -958,15 +958,35 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         });
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Only adjusts the viewport if there currently is an open editor for the given path (meaning
+   * such an editor is contained in the editor pool).
+   *
+   * @param path {@inheritDoc}
+   * @param range {@inheritDoc}
+   * @param selection {@inheritDoc}
+   */
   @Override
   public void adjustViewport(
-      final SPath path, final LineRange range, final TextSelection selection) {
+      @NotNull final SPath path, final LineRange range, final TextSelection selection) {
 
     executeInUIThreadSynchronous(
         new Runnable() {
           @Override
           public void run() {
-            Editor editor = localEditorManipulator.openEditor(path, false);
+            Editor editor = editorPool.getEditor(path);
+
+            if (editor == null) {
+              LOG.warn(
+                  "Failed to adjust viewport for "
+                      + path
+                      + " as it is not known to the editor pool.");
+
+              return;
+            }
+
             localEditorManipulator.adjustViewport(editor, range, selection);
           }
         });
