@@ -43,16 +43,9 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
 
   @Override
   public IProject getProject(final String moduleName) {
-    Module module =
-        Filesystem.runReadAction(
-            new Computable<Module>() {
-              @Override
-              public Module compute() {
-                return ModuleManager.getInstance(project).findModuleByName(moduleName);
-              }
-            });
+    Module module = getModule(moduleName);
 
-    return module != null ? new IntelliJProjectImpl(module) : null;
+    return module == null ? null : new IntelliJProjectImpl(module);
   }
 
   @Override
@@ -65,5 +58,18 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
     IProject project = getProject(moduleName);
 
     return project.getReferencePoint();
+  }
+
+  public Module getModule(final String moduleName) {
+    Module module =
+        Filesystem.runReadAction(
+            new Computable<Module>() {
+              @Override
+              public Module compute() {
+                return ModuleManager.getInstance(project).findModuleByName(moduleName);
+              }
+            });
+
+    return module;
   }
 }

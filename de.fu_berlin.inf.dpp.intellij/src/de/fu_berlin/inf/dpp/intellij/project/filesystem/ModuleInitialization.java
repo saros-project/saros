@@ -6,14 +6,14 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
-import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import java.io.IOException;
@@ -42,15 +42,15 @@ public class ModuleInitialization implements Startable {
 
   private final ISarosSession session;
 
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
+
   private final ISessionListener moduleReloaderListener =
       new ISessionListener() {
 
         @Override
         public void resourcesAdded(IReferencePoint referencePoint) {
-          IReferencePointManager referencePointManager =
-              session.getComponent(IReferencePointManager.class);
           final ModuleReloader moduleReloader =
-              new ModuleReloader(referencePointManager.get(referencePoint));
+              new ModuleReloader(intelliJReferencePointManager.get(referencePoint));
 
           // Registers a ModuleLoader with the AWT event dispatching thread to be executed
           // asynchronously.
@@ -65,8 +65,10 @@ public class ModuleInitialization implements Startable {
         }
       };
 
-  public ModuleInitialization(ISarosSession session) {
+  public ModuleInitialization(
+      ISarosSession session, IntelliJReferencePointManager intelliJReferencePointManager) {
     this.session = session;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   @Override
@@ -92,17 +94,17 @@ public class ModuleInitialization implements Startable {
    * @see IntelliJProjectImpl#refreshModule()
    */
   private class ModuleReloader implements Runnable {
-    private IntelliJProjectImpl project;
+    private Module module;
+    private final String RELOAD_STUB_MODULE_TYPE = "SAROS_RELOAD_STUB_MODULE";
 
-    public ModuleReloader(IProject project) {
-      this.project = (IntelliJProjectImpl) project.getAdapter(IntelliJProjectImpl.class);
+    public ModuleReloader(Module module) {
+      this.module = module;
     }
 
     @Override
     public void run() {
-      Module module = project.getModule();
 
-      if (IntelliJProjectImpl.RELOAD_STUB_MODULE_TYPE.equals(ModuleType.get(module).getId())) {
+      if (RELOAD_STUB_MODULE_TYPE.equals(ModuleType.get(module).getId())) {
 
         String moduleName = module.getName();
         String moduleFilePath = module.getModuleFilePath();
@@ -150,15 +152,42 @@ public class ModuleInitialization implements Startable {
         modifiableModuleModel.commit();
 
         try {
-          if (!project.refreshModule()) {
+          if (!refreshModule(moduleName)) {
             LOG.error(
-                "Failed to refresh the module object for " + project + " as it it not disposed.");
+                "Failed to refresh the module object for " + module + " as it it not disposed.");
           }
         } catch (ModuleNotFoundException | IllegalArgumentException | IllegalStateException e) {
-          LOG.error("Failed to refresh the module object for " + project, e);
+          LOG.error("Failed to refresh the module object for " + module, e);
         }
         // TODO clean up excluded module roots
       }
+    }
+
+    private boolean refreshModule(String moduleName) throws ModuleNotFoundException {
+      if (module.isDisposed()) {
+        Project project = module.getProject();
+
+        Module newModule = ModuleManager.getInstance(project).findModuleByName(moduleName);
+
+        if (newModule == null) {
+
+          throw new ModuleNotFoundException(
+              "The module "
+                  + moduleName
+                  + " could not be refreshed as no module with the same"
+                  + " name could be found in the current project "
+                  + project);
+        }
+
+        module = newModule;
+
+        // Put the refreshed module to the intelliJReferencePointManager;
+        intelliJReferencePointManager.put(module);
+
+        return true;
+      }
+
+      return false;
     }
   }
 }

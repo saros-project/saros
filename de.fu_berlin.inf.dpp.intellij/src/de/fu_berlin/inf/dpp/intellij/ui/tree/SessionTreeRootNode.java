@@ -1,10 +1,12 @@
 package de.fu_berlin.inf.dpp.intellij.ui.tree;
 
+import com.intellij.openapi.module.Module;
 import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -63,9 +65,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
               new Runnable() {
                 @Override
                 public void run() {
-                  IReferencePointManager referencePointManager =
-                      sessionManager.getSession().getComponent(IReferencePointManager.class);
-                  addProjectNode(referencePointManager.get(referencePoint));
+                  addProjectNode(referencePoint);
                 }
               });
         }
@@ -98,6 +98,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         }
       };
   @Inject private ISarosSessionManager sessionManager;
+
+  @Inject private IntelliJReferencePointManager intelliJReferencePointManager;
 
   public SessionTreeRootNode(SessionAndContactsTreeView treeView) {
     super(treeView);
@@ -150,16 +152,17 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
     treeView.expandRow(2);
   }
 
-  private void addProjectNode(IProject project) {
+  private void addProjectNode(IReferencePoint referencePoint) {
     for (DefaultMutableTreeNode nSession : sessionNodeList.values()) {
       ISarosSession session = ((SessionInfo) nSession.getUserObject()).getSession();
 
+      Module module = intelliJReferencePointManager.get(referencePoint);
+
       ProjectInfo projInfo;
-      if (session.isCompletelyShared(project.getReferencePoint())) {
-        projInfo = new ProjectInfo(project);
+      if (session.isCompletelyShared(referencePoint)) {
+        projInfo = new ProjectInfo(module);
       } else {
-        projInfo =
-            new ProjectInfo(project, session.getSharedResources(project.getReferencePoint()));
+        projInfo = new ProjectInfo(module, session.getSharedResources(referencePoint));
       }
 
       DefaultMutableTreeNode nProject = new DefaultMutableTreeNode(projInfo);
@@ -227,28 +230,24 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
   }
 
   protected class ProjectInfo extends LeafInfo {
-    private final IProject project;
+    private final Module module;
     private List<IResource> resList;
 
-    public ProjectInfo(IProject project) {
-      super(project.getName());
-      this.project = project;
+    public ProjectInfo(Module module) {
+      super(module.getName());
+      this.module = module;
     }
 
-    public ProjectInfo(IProject project, List<IResource> resources) {
-      this(project);
+    public ProjectInfo(Module module, List<IResource> resources) {
+      this(module);
       resList = resources;
-    }
-
-    public IProject getProject() {
-      return project;
     }
 
     @Override
     public String toString() {
       if (resList != null) {
         StringBuilder sbOut = new StringBuilder();
-        sbOut.append(project.getName());
+        sbOut.append(module.getName());
         sbOut.append(" : ");
         for (IResource res : resList) {
           if (res.getType() == IResource.FILE) {
@@ -259,7 +258,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
 
         return sbOut.toString();
       } else {
-        return project.getName();
+        return module.getName();
       }
     }
   }
