@@ -4,7 +4,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -36,16 +36,16 @@ public class Document {
 
   protected IPath path;
 
-  protected IProject project;
-
+  protected IReferencePoint referencePoint;
   /**
    * constructor to init doc.
    *
    * @param initState start document state.
+   * @param referencePoint
    */
-  public Document(String initState, IProject project, IPath path) {
+  public Document(String initState, IReferencePoint referencePoint, IPath path) {
     doc = new StringBuffer(initState);
-    this.project = project;
+    this.referencePoint = referencePoint;
     this.path = path;
   }
 
@@ -71,7 +71,7 @@ public class Document {
   public void execOperation(Operation op) {
     User dummy = JupiterTestCase.createUser("dummy");
 
-    List<TextEditActivity> activities = op.toTextEdit(new SPath(project.getReferencePoint(), path), dummy);
+    List<TextEditActivity> activities = op.toTextEdit(new SPath(referencePoint, path), dummy);
 
     for (TextEditActivity activity : activities) {
 

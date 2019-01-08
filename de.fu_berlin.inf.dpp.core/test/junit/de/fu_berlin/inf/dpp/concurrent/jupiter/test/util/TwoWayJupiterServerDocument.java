@@ -24,7 +24,7 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler, Documen
   private NetworkSimulator connection;
 
   public TwoWayJupiterServerDocument(String content, NetworkSimulator con) {
-    this.doc = new Document(content, con.project, con.path);
+    this.doc = new Document(content, con.referencePoint, con.path);
     this.algorithm = new Jupiter(false);
     this.connection = con;
   }

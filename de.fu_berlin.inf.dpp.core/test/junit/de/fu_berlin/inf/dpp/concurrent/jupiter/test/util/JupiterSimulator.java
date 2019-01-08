@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
@@ -11,7 +10,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.LinkedList;
@@ -32,13 +30,10 @@ public class JupiterSimulator {
     IReferencePoint referencePoint = createMock(IReferencePoint.class);
     replay(referencePoint);
 
-    IProject project = createMock(IProject.class);
-    expect(project.getReferencePoint()).andStubReturn(referencePoint);
-    replay(project);
     IPath path = new PathFake("test");
 
-    client = new Peer(new Jupiter(true), document, project, path);
-    server = new Peer(new Jupiter(false), document, project, path);
+    client = new Peer(new Jupiter(true), document, referencePoint, path);
+    server = new Peer(new Jupiter(false), document, referencePoint, path);
   }
 
   public class Peer {
@@ -51,12 +46,12 @@ public class JupiterSimulator {
 
     protected IPath path;
 
-    protected IProject project;
+    protected IReferencePoint referencePoint;
 
-    public Peer(Algorithm algorithm, String document, IProject project, IPath path) {
+    public Peer(Algorithm algorithm, String document, IReferencePoint referencePoint, IPath path) {
       this.algorithm = algorithm;
-      this.document = new Document(document, project, path);
-      this.project = project;
+      this.document = new Document(document, referencePoint, path);
+      this.referencePoint = referencePoint;
       this.path = path;
     }
 
@@ -68,7 +63,7 @@ public class JupiterSimulator {
       User user = JupiterTestCase.createUser("DUMMY");
 
       JupiterActivity jupiterActivity =
-          algorithm.generateJupiterActivity(operation, user, new SPath(project.getReferencePoint(), path));
+          algorithm.generateJupiterActivity(operation, user, new SPath(referencePoint, path));
 
       if (this == client) {
         server.inQueue.add(jupiterActivity);
