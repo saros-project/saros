@@ -7,9 +7,13 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,32 +25,15 @@ public class JGitFacadeTest {
 
   // the local user is creating the bundle
   private File localWorkDir;
-  // the remote user is receiving the bundle
-  private File remoteWorkDir;
-  // empty directory
-  private File emptyDir;
-  // testfile
-  private File testFile;
 
   @Before
-  public void SetUp() {
+  public void setUp() {
     try {
       localWorkDir = tempFolder.newFolder("TempDir1");
-      JGitFacade.initNewRepo(localWorkDir);
-      JGitFacade.writeCommitToRepo(localWorkDir, 2);
-      remoteWorkDir = tempFolder.newFolder("TempDir2");
-      JGitFacade.cloneFromRepo(localWorkDir, remoteWorkDir);
-      JGitFacade.writeCommitToRepo(localWorkDir, 3);
-      JGitFacade.writeCommitToRepo(localWorkDir, 4);
-      emptyDir = tempFolder.newFolder("TempDir3");
-      testFile = tempFolder.newFile();
-
+      initNewRepo(localWorkDir);
+      writeCommitToRepo(localWorkDir, 2);
     } catch (IOException e) {
       fail("IO");
-    } catch (InvalidRemoteException e) {
-      fail("GitRepo1");
-    } catch (TransportException e) {
-      fail("Transport");
     } catch (GitAPIException e) {
       fail("Other");
     }
@@ -55,19 +42,24 @@ public class JGitFacadeTest {
   @Test
   public void testWrongBundle() {
     try {
-      File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "WrongTag");
-      fail("Tag is not existing");
-    } catch (IOException e) {
+      JGitFacade.createBundle(localWorkDir, "refs/heads/master", "WrongBasis");
+      fail("Basis isn't existing");
+    } catch (IllegalArgumentException e) {
 
+    } catch (Exception e) {
+      fail("Expected IllegalArgumentException but thrown" + e);
     }
     try {
-      File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/wrongRef", "CheckoutAtInit");
-      fail("Ref is not existing");
-    } catch (IOException e) {
+      JGitFacade.createBundle(localWorkDir, "refs/heads/wrongRef", "CheckoutAtInit");
+      fail("Ref isn't existing");
+    } catch (IllegalArgumentException e) {
 
+    } catch (Exception e) {
+      fail("Expected IllegalArgumentException but thrown" + e);
     }
     try {
-      File bundle = JGitFacade.createBundle(emptyDir, "refs/heads/master", "CheckoutAtInit");
+      File emptyDir = tempFolder.newFolder("TempDir3");
+      JGitFacade.createBundle(emptyDir, "refs/heads/master", "CheckoutAtInit");
       fail("Dir is empty");
     } catch (IOException e) {
 
@@ -88,14 +80,17 @@ public class JGitFacadeTest {
   public void testValidUnbundle() {
     try {
 
+      File remoteWorkDir = tempFolder.newFolder("TempDir2");
+      JGitFacade.cloneFromRepo(localWorkDir, remoteWorkDir);
+      writeCommitToRepo(localWorkDir, 3);
       File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "CheckoutAtCommit2");
       assertNotEquals(
-          JGitFacade.getObjectIDbyRevisionString(localWorkDir, "HEAD"),
-          JGitFacade.getObjectIDbyRevisionString(remoteWorkDir, "FETCH_HEAD"));
+          getObjectIdByRevisionString(localWorkDir, "HEAD"),
+          getObjectIdByRevisionString(remoteWorkDir, "FETCH_HEAD"));
       JGitFacade.fetchFromBundle(bundle, remoteWorkDir);
       assertEquals(
-          JGitFacade.getObjectIDbyRevisionString(localWorkDir, "HEAD"),
-          JGitFacade.getObjectIDbyRevisionString(remoteWorkDir, "FETCH_HEAD"));
+          getObjectIdByRevisionString(localWorkDir, "HEAD"),
+          getObjectIdByRevisionString(remoteWorkDir, "FETCH_HEAD"));
     } catch (IOException e) {
       fail("IO");
     } catch (GitAPIException e) {
@@ -107,12 +102,15 @@ public class JGitFacadeTest {
   public void testWrongUnbundle() {
     //      TO-DO: Analyse endless loop
     //     try {
+    //      testFile = tempFolder.newFile();
     //      JGitFacade.fetchFromBundle(testFile, remoteWorkDir);
     //      fail("fetch from empty file");
     //    } catch (IOException | GitAPIException e) {
     //
     //    }
     try {
+      File emptyDir = tempFolder.newFolder("TempDir3");
+      writeCommitToRepo(localWorkDir, 3);
       File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "CheckoutAtCommit2");
       JGitFacade.fetchFromBundle(bundle, emptyDir);
       fail("fetch into emptyDir");
@@ -120,6 +118,10 @@ public class JGitFacadeTest {
 
     }
     try {
+      File remoteWorkDir = tempFolder.newFolder("TempDir2");
+      JGitFacade.cloneFromRepo(localWorkDir, remoteWorkDir);
+      writeCommitToRepo(localWorkDir, 3);
+      writeCommitToRepo(localWorkDir, 4);
       File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "CheckoutAtCommit3");
       JGitFacade.fetchFromBundle(bundle, remoteWorkDir);
       fail("fetch but remote havn't the basis");
@@ -128,33 +130,52 @@ public class JGitFacadeTest {
     }
   }
 
-  /* Tests for working with manual created TestDirectorys
-   * To run this Test
-   *  write "private File selfMadeWorkDir;" as a local variable
-   *  write "selfMadeWorkDir = new File("TestWorkDirGit");" in the SetUp()
-   *  create a new directory in the root of the core project with the name "TestWorkDirGit"
-   *  init git repo with cl
-   *  create a empty file helloworld.txt
-   *  git add .
-   *  git commit -m "initCommit"
+  /**
+   * Creating a new Git directory,create a file and git add the file,create the first commit and
+   * create the Tag "CheckoutAtInit" that is pointing to the commit
    *
-  @Test
-  public void testValidBundleSelfMade() {
-    try {
-      File bundle = JGitFacade.createBundle(selfMadeWorkDir,"refs/heads/master", "");
-      assertNotNull(bundle);
-    } catch (IOException e) {
-      fail("IO");
-    }
+   * @param workDir The directory that will contain the .git directory
+   * @throws GitAPIException
+   * @throws IllegalStateException
+   * @throws IOException
+   */
+  private static void initNewRepo(File workDir)
+      throws IllegalStateException, GitAPIException, IOException {
+    Git git;
+    git = Git.init().setDirectory(workDir).call();
+    File testFile1 = new File(workDir, "testFile1");
+    testFile1.createNewFile();
+    git.add().addFilepattern(workDir.getAbsolutePath()).call();
+    git.commit().setMessage("Initial commit").call();
+    git.tag().setName("CheckoutAtInit").setAnnotated(false).setForceUpdate(true).call();
   }
 
-  @Test
-  public void preTestValidBundleSelfMade() {
-    try {
-      Git myRepo = Git.open(selfMadeWorkDir);
-    } catch (IOException e) {
-      fail("IO");
-    }
+  /**
+   * Creating a new File, git add, git commit and create a Tag "CheckoutAtCommit(numberOfCommit)"
+   *
+   * @param workDir The directory that contains the .git directory
+   * @param numberOfCommit The first used number should be 2 and than incremented by 1
+   * @throws IOException
+   * @throws GitAPIException
+   * @throws NoFilepatternException
+   */
+  private static void writeCommitToRepo(File workDir, int numberOfCommit)
+      throws IOException, NoFilepatternException, GitAPIException {
+
+    Git git = Git.open(workDir);
+    File testfile = new File(workDir, "testfile" + numberOfCommit);
+    git.add().addFilepattern(workDir.getAbsolutePath()).call(); // git add .
+    git.commit().setMessage("new file Commit Nr." + numberOfCommit).call();
+    git.tag()
+        .setName("CheckoutAtCommit" + numberOfCommit)
+        .setAnnotated(false)
+        .setForceUpdate(true)
+        .call();
   }
-  */
+
+  private static ObjectId getObjectIdByRevisionString(File workDir, String rev)
+      throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException,
+          IOException {
+    return Git.open(workDir).getRepository().resolve(rev);
+  }
 }
