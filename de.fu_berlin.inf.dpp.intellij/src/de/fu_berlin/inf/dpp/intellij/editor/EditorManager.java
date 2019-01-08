@@ -774,13 +774,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     return followedUser != null && followedUser.equals(user);
   }
 
-  /**
-   * Locally opens the editor that the User jumpTo has currently open, adjusts the viewport and
-   * calls {@link SharedEditorListenerDispatch#jumpedToUser(User)} to inform the session
-   * participants of the jump.
-   */
   @Override
-  public void jumpToUser(final User jumpTo) {
+  public void jumpToUser(@NotNull final User jumpTo) {
 
     // you can't jump to yourself
     if (session.getLocalUser().equals(jumpTo)) {
@@ -791,7 +786,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         userEditorStateManager.getState(jumpTo).getActiveEditorState();
 
     if (remoteActiveEditor == null) {
-      LOG.info(jumpTo.getJID() + " has no editor open");
+      LOG.info("Remote user " + jumpTo + " does not have an open editor.");
       return;
     }
 
@@ -807,25 +802,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             }
 
             LineRange viewport = remoteActiveEditor.getViewport();
+            TextSelection textSelection = remoteActiveEditor.getSelection();
 
-            if (viewport == null) {
-              LOG.warn(
-                  jumpTo.getJID() + " has no viewport in editor: " + remoteActiveEditor.getPath());
-              return;
-            }
-            // FIXME Why are we suddenly interested in the followedUser?
-            EditorState state =
-                userEditorStateManager.getState(followedUser).getActiveEditorState();
-
-            TextSelection selection = (state == null) ? null : state.getSelection();
-
-            // state.getSelection() can return null
-            if (selection != null) {
-              // FIXME Why are we only jumping if we know the selection,
-              // but not if there is no selection but a perfectly usable
-              // viewport?
-              localEditorManipulator.adjustViewport(newEditor, viewport, selection);
-            }
+            localEditorManipulator.adjustViewport(newEditor, viewport, textSelection);
           }
         });
 
