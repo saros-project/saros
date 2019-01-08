@@ -42,7 +42,6 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -249,13 +248,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void resourcesAdded(final IReferencePoint referencePoint) {
-          IReferencePointManager referencePointManager =
-              session.getComponent(IReferencePointManager.class);
-          IProject project = referencePointManager.get(referencePoint);
-
           ApplicationManager.getApplication()
               .invokeAndWait(
-                  () -> addProjectResources(project), ModalityState.defaultModalityState());
+                  () -> addProjectResources(referencePoint), ModalityState.defaultModalityState());
         }
 
         /**
@@ -329,11 +324,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       };
 
   /**
-   * Adds all currently open editors belonging to the passed project to the pool of open editors.
+   * Adds all currently open editors belonging to the passed reference point to the pool of open
+   * editors.
    *
-   * @param project the added project
+   * @param referencePoint the added reference point
    */
-  private void addProjectResources(IProject project) {
+  private void addProjectResources(IReferencePoint referencePoint) {
     VirtualFile[] openFiles = projectAPI.getOpenFiles();
 
     SelectedEditorState selectedEditorState = new SelectedEditorState();
@@ -343,7 +339,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       localEditorStatusChangeHandler.setEnabled(false);
 
       for (VirtualFile openFile : openFiles) {
-        localEditorHandler.openEditor(openFile, project, false);
+        localEditorHandler.openEditor(openFile, referencePoint, false);
       }
 
     } finally {

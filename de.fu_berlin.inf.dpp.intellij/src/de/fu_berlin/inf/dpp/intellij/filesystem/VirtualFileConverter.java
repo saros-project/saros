@@ -127,6 +127,16 @@ public class VirtualFileConverter {
     return wrappedModule.getResource(virtualFile);
   }
 
+  @Nullable
+  public static IResource convertToResource(
+      @NotNull VirtualFile virtualFile, @NotNull IReferencePoint referencePoint) {
+
+    IntelliJProjectImpl wrappedModule =
+        new IntelliJProjectImpl(intelliJReferencePointManager.get(referencePoint));
+
+    return convertToResource(virtualFile, wrappedModule);
+  }
+
   /**
    * Returns a <code>VirtualFile</code> for the given resource.
    *
