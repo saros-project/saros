@@ -47,6 +47,10 @@ public interface IActivityReceiver {
 
   void receive(StopActivity stopActivity);
 
+  void receive(SendBundleActivity sendBundleActivity);
+
+  void receive(StartFollowingActivity startFollowingActivity);
+
   void receive(StopFollowingActivity stopFollowingActivity);
 
   void receive(TextEditActivity textEditActivity);
