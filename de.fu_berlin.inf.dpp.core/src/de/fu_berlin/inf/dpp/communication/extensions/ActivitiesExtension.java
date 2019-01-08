@@ -160,7 +160,6 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
           StopFollowingActivity.class,
           TextSelectionActivity.class,
           ViewportActivity.class);
-
     }
-
+  }
 }
