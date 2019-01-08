@@ -18,6 +18,9 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.lib.NullProgressMonitor;
+import org.eclipse.jgit.lib.ProgressMonitor;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -31,39 +34,38 @@ public class JGitFacade {
     private static final Logger LOG = Logger
         .getLogger(XMPPConnectionService.class);
 
-    /**
-     * Create a bundle File with all commits from commit at tag to commit at
-     * HEAD of the given workDir.
-     *
-     * @param workDir
-     *            The Directory that contains the .git Directory
-     * @param tag
-     *            assume that the recipient have at least the commit the tag is
-     *            pointing to. If tag is an empty String the bundle contains
-     *            everything to HEAD and everything to master.
-     */
-    public static File createBundleByTag(File workDir, String tag)
-        throws IOException {
-        Git user = Git.open(workDir);
-        Repository repo = user.getRepository();
-        Ref HEAD = repo.exactRef("HEAD");
-        Ref MASTER = repo.exactRef("refs/heads/master");
-        BundleWriter bundlewriter = new BundleWriter(repo);
-        File bundle = File.createTempFile("file", ".bundle");
-        OutputStream fos = new FileOutputStream(bundle);
-        ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
-        if (HEAD != null)
-            bundlewriter.include(HEAD);
-        if (MASTER != null)
-            bundlewriter.include(MASTER);
+  /**
+   * Create a bundle file with all commits from basis to actual of the given workDir.
+   *
+   * @param workDir The directory that contains the .git directory
+   * @param actual the name of the ref to lookup. Must not be a short-handform; e.g., "master" is
+   *     not automatically expanded to"refs/heads/master". Include the object the ref is point at in
+   *     the bundle and (if the basis is an empty string) everything reachable from it.
+   * @param basis assume that the recipient have at least the commit the basis is pointing to. In
+   *     order to fetch from a bundle the recipient must have the commit the basis is pointing to.
+   * @throws IOException if the workDir can't be accessed
+   * @throws IllegalArgumentException if actual or the basis can't be resolved
+   */
+  public static File createBundle(File workDir, String actual, String basis)
+      throws IOException, IllegalArgumentException, NullPointerException {
+    Git user = Git.open(workDir);
+    Repository repo = user.getRepository();
+    Ref actualRef = repo.exactRef(actual);
+    if (actualRef == null) throw new IllegalArgumentException("actual can't be resolved");
+    BundleWriter bundlewriter = new BundleWriter(repo);
+    File bundle = File.createTempFile("file", ".bundle");
+    OutputStream fos = new FileOutputStream(bundle);
+    ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+    bundlewriter.include(actualRef);
 
-        if (tag != "") {
-            RevWalk walk = new RevWalk(repo);
-            RevCommit tagCommit = walk.parseCommit(repo.resolve(tag));
-            bundlewriter.assume(tagCommit);
-        }
-        bundlewriter.writeBundle(monitor, fos);
-        return bundle;
+    if (basis != "") {
+      RevWalk walk = new RevWalk(repo);
+      try {
+        RevCommit basisCommit = walk.parseCommit(repo.resolve(basis));
+        bundlewriter.assume(basisCommit);
+      } catch (Exception e) {
+        throw new IllegalArgumentException("basis can't be resolved");
+      }
     }
 
     /**
@@ -89,82 +91,16 @@ public class JGitFacade {
         }
     }
 
-    /**
-     * Change a existing Git Repo by creating a new File, git add, git commit
-     * and create a Tag "CheckoutAtCommit(numberOfCommit)"
-     *
-     * @param workDir
-     *            The Directory that contains the .git Directory
-     * @param numberOfCommit
-     *            The first used number should be 2 and than incremented by 1
-     */
-    static void writeCommitToRepo(File workDir, int numberOfCommit) {
-        try {
-            Git git = Git.open(workDir);
-            File testfile = new File(workDir, "testfile" + numberOfCommit);
-            git.add().addFilepattern(workDir.getAbsolutePath()).call(); // git
-            // add
-            // tempfile
-            git.commit().setMessage("new file Commit Nr." + numberOfCommit)
-                .call();
-            git.tag().setName("CheckoutAtCommit" + numberOfCommit)
-                .setAnnotated(false).setForceUpdate(true).call();
-        } catch (Exception e) {
-            LOG.debug("Error while create commit Nr." + numberOfCommit, e);
-        }
-    }
-
-    /**
-     * Fetching from bundle to an git Repo
-     *
-     * @param bundleFile
-     * @param workDir
-     *            The Directory that contains the .git Directory
-     * @throws IOException
-     * @throws GitAPIException
-     */
-    public static void unbundle(File bundleFile, File workDir)
-        throws IOException, GitAPIException {
-        Git git = Git.open(workDir);
-        URIish bundleURI = new URIish().setPath(bundleFile.getCanonicalPath());
-        git.remoteAdd().setUri(bundleURI).setName("bundle").call();
-        git.fetch().setRemote("bundle").call();
-    }
-
-    static File getMetaDataByGitRepo(File gitDir1) throws IOException {
-        Git git = Git.open(gitDir1);
-        File gitDir = git.getRepository().getDirectory();
-        return gitDir;
-    }
-
-    public static String getUrlByGitRepo(File gitRepo) throws IOException {
-        Git git = Git.open(gitRepo);
-        return git.getRepository().getDirectory().getCanonicalPath();
-    }
-
-    public static void close(File gitRepo) throws IOException {
-        Git git = Git.open(gitRepo);
-        git.close();
-    }
-
-    public static void clone(File from, File to) throws IOException,
+    public static void cloneFromRepo(File from, File to) throws IOException,
         InvalidRemoteException, TransportException, GitAPIException {
         CloneCommand cloneCommand = Git.cloneRepository();
-        cloneCommand.setURI(getUrlByGitRepo(from));
+        cloneCommand.setURI(getUrlByWorkDir(from));
         cloneCommand.setDirectory(to);
         cloneCommand.call();
     }
 
-    static FetchResult fetchFromBundle(final File workDir,
-        final File bundleFile) throws URISyntaxException, IOException {
-        final URIish uri = new URIish("in-memory://");
-        final FileInputStream fis = new FileInputStream(bundleFile);
-        final RefSpec rs = new RefSpec("refs:heads/*:refs/heads/*");
-        final Set<RefSpec> refs = Collections.singleton(rs);
-        try (Repository workRepo = Git.open(workDir).getRepository();
-            TransportBundleStream transport = new TransportBundleStream(
-                workRepo, uri, fis)) {
-            return transport.fetch(NullProgressMonitor.INSTANCE, refs);
-        }
+    static String getUrlByWorkDir(File gitRepo) throws IOException {
+        Git git = Git.open(gitRepo);
+        return git.getRepository().getDirectory().getCanonicalPath();
     }
 }
