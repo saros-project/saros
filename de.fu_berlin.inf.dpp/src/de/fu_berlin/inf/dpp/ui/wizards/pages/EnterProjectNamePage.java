@@ -1,10 +1,11 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -63,22 +64,22 @@ public class EnterProjectNamePage extends WizardPage {
   private IConnectionManager connectionManager;
   private Preferences preferences;
   private boolean flashState;
-  private IReferencePointManager referencePointManager;
+  private EclipseReferencePointManager eclipseReferencePointManager;
 
   public EnterProjectNamePage(
       ISarosSession session,
       IConnectionManager connectionManager,
       Preferences preferences,
       JID peer,
-      List<ProjectNegotiationData> projectNegotiationData) {
+      List<ProjectNegotiationData> projectNegotiationData,
+      EclipseReferencePointManager eclipseReferencePointManager) {
 
     super(Messages.EnterProjectNamePage_title);
     this.session = session;
     this.connectionManager = connectionManager;
     this.preferences = preferences;
     this.peer = peer;
-
-    this.referencePointManager = session.getComponent(IReferencePointManager.class);
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
 
     remoteProjectMapping = new HashMap<String, String>();
 
@@ -350,13 +351,14 @@ public class EnterProjectNamePage extends WizardPage {
 
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
-      String projectID = entry.getKey();
+      String referencePointID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      de.fu_berlin.inf.dpp.filesystem.IProject project =
-          referencePointManager.get(session.getReferencePoint(projectID));
+      IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
-      if (project == null) continue;
+      if (referencePoint == null) continue;
+
+      IProject project = eclipseReferencePointManager.get(referencePoint);
 
       projectOptionComposite.setProjectName(true, project.getName());
       projectOptionComposite.setEnabled(false);
@@ -365,17 +367,19 @@ public class EnterProjectNamePage extends WizardPage {
 
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
-      String projectID = entry.getKey();
+      String referencePointID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      de.fu_berlin.inf.dpp.filesystem.IProject project =
-          referencePointManager.get(session.getReferencePoint(projectID));
+      IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
+
+      IProject project = eclipseReferencePointManager.get(referencePoint);
 
       if (project != null) continue;
 
       String projectNameProposal =
           findProjectNameProposal(
-              remoteProjectMapping.get(projectID), reservedProjectNames.toArray(new String[0]));
+              remoteProjectMapping.get(referencePointID),
+              reservedProjectNames.toArray(new String[0]));
 
       projectOptionComposite.setProjectName(false, projectNameProposal);
       reservedProjectNames.add(projectNameProposal);
