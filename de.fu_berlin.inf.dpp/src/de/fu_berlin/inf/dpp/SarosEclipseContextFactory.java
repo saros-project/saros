@@ -63,6 +63,9 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
    */
   private final Component[] getContextComponents() {
     return new Component[] {
+      // ReferencePointManager
+      Component.create(EclipseReferencePointManager.class),
+
       // Core Managers
       Component.create(IEditorManager.class, EditorManager.class),
       Component.create(
@@ -108,10 +111,7 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
           IRemoteProgressIndicatorFactory.class, EclipseRemoteProgressIndicatorFactoryImpl.class),
       Component.create(MUCNegotiationManager.class),
       Component.create(SkypeManager.class),
-      Component.create(AwarenessInformationCollector.class),
-
-      // ReferencePointManager
-      Component.create(EclipseReferencePointManager.class)
+      Component.create(AwarenessInformationCollector.class)
     };
   }
 

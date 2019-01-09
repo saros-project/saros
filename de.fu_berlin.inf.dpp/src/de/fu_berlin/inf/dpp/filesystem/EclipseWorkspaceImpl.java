@@ -1,19 +1,20 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.MultiRule;
+import org.picocontainer.annotations.Inject;
 
 /**
  * Eclipse implementation of {@link IWorkspace}. Lets you execute {@link IWorkspaceRunnable}s via
@@ -65,6 +66,8 @@ public class EclipseWorkspaceImpl implements IWorkspace {
 
   private org.eclipse.core.resources.IWorkspace delegate;
 
+  @Inject EclipseReferencePointManager eclipseReferencePointManager;
+
   public EclipseWorkspaceImpl(org.eclipse.core.resources.IWorkspace workspace) {
     this.delegate = workspace;
   }
@@ -97,10 +100,11 @@ public class EclipseWorkspaceImpl implements IWorkspace {
     List<org.eclipse.core.resources.IResource> eclipseResources = null;
 
     if (referencePoints != null) {
+      if (eclipseReferencePointManager == null) SarosPluginContext.initComponent(this);
+
       eclipseResources = new ArrayList<>();
       for (IReferencePoint referencePoint : referencePoints)
-        eclipseResources.add(
-            ResourceAdapterFactory.convertBack(referencePointManager.get(referencePoint)));
+        eclipseResources.add(eclipseReferencePointManager.get(referencePoint));
     }
     final ISchedulingRule schedulingRule;
 
