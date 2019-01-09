@@ -325,12 +325,9 @@ public class AddProjectToSessionWizard extends Wizard {
                   sessionManager.getSession().getComponent(IReferencePointManager.class);
 
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
-                de.fu_berlin.inf.dpp.filesystem.IProject coreProject =
-                    ResourceAdapterFactory.create(entry.getValue());
-                // Filling reference point manager which maps a reference point to core project
                 fillReferencePointManager(
                     new EclipseProjectImpl_V2(entry.getValue()), referencePointManager);
-                convertedMapping.put(entry.getKey(), coreProject.getReferencePoint());
+                convertedMapping.put(entry.getKey(), EclipseReferencePointManager.create(entry.getValue()));
               }
 
               final ProjectNegotiation.Status status =
@@ -560,7 +557,7 @@ public class AddProjectToSessionWizard extends Wizard {
       final String projectID = entry.getKey();
       final IProject project = entry.getValue();
 
-      final de.fu_berlin.inf.dpp.filesystem.IProject adaptedProject =
+      final de.fu_berlin.inf.dpp.filesystem.IFolder_V2 adaptedProject =
           ResourceAdapterFactory.create(entry.getValue());
 
       /*
@@ -586,7 +583,7 @@ public class AddProjectToSessionWizard extends Wizard {
         localFileList =
             FileListFactory.createFileList(
                 referencePointManager,
-                adaptedProject.getReferencePoint(),
+                eclipseReferencePointManager.create(entry.getValue()),
                 null,
                 checksumCache,
                 ProgressMonitorAdapterFactory.convert(

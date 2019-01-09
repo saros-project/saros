@@ -14,14 +14,7 @@ public class EclipseWorkspaceRootImpl extends EclipseContainerImpl implements IW
   @Override
   public IProject[] getProjects() {
 
-    final List<IProject> result = new ArrayList<IProject>();
-
-    for (final org.eclipse.core.resources.IProject project :
-        ((org.eclipse.core.resources.IWorkspaceRoot) getDelegate()).getProjects()) {
-      result.add(ResourceAdapterFactory.create(project));
-    }
-
-    return result.toArray(new IProject[result.size()]);
+    return null;
   }
 
   @Override

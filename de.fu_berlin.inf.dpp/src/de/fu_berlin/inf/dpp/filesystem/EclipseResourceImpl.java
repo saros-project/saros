@@ -43,7 +43,7 @@ public class EclipseResourceImpl implements IResource {
       case org.eclipse.core.resources.IResource.FOLDER:
         return new EclipseFolderImpl((org.eclipse.core.resources.IFolder) container);
       case org.eclipse.core.resources.IResource.PROJECT:
-        return new EclipseProjectImpl((org.eclipse.core.resources.IProject) container);
+        return new EclipseProjectImpl_V2((org.eclipse.core.resources.IProject) container);
       case org.eclipse.core.resources.IResource.ROOT:
         return new EclipseWorkspaceRootImpl((org.eclipse.core.resources.IWorkspaceRoot) container);
       default:
@@ -53,11 +53,7 @@ public class EclipseResourceImpl implements IResource {
 
   @Override
   public IProject getProject() {
-    org.eclipse.core.resources.IProject project = delegate.getProject();
-
-    if (project == null) return null;
-
-    return new EclipseProjectImpl(project);
+    return null;
   }
 
   @Override
@@ -148,7 +144,7 @@ public class EclipseResourceImpl implements IResource {
     else if (IFolder.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFolder.class;
     else if (IContainer.class.equals(clazz))
       classToMap = org.eclipse.core.resources.IContainer.class;
-    else if (IProject.class.equals(clazz)) classToMap = org.eclipse.core.resources.IProject.class;
+    else if (IFolder_V2.class.equals(clazz)) classToMap = org.eclipse.core.resources.IProject.class;
     else if (IWorkspaceRoot.class.equals(clazz))
       classToMap = org.eclipse.core.resources.IWorkspaceRoot.class;
 

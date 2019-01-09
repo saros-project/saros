@@ -134,7 +134,7 @@ public class EclipseWorkspaceImpl implements IWorkspace {
 
   @Override
   public IProject getProject(String project) {
-    return ResourceAdapterFactory.create(delegate.getRoot().getProject(project));
+    return null;
   }
 
   @Override
