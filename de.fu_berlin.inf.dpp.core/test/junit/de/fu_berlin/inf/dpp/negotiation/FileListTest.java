@@ -10,6 +10,7 @@ import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -50,7 +51,7 @@ public class FileListTest {
     xstream.processAnnotations(FileList.class);
   }
 
-  private IProject project;
+  private IFolder_V2 project;
   private IReferencePoint referencePoint;
   private IReferencePointManager referencePointManager;
 
@@ -113,9 +114,9 @@ public class FileListTest {
     assertEquals(list, listFromXml);
   }
 
-  private static IProject createProjectLayout(IReferencePoint referencePoint) {
+  private static IFolder_V2 createProjectLayout(IReferencePoint referencePoint) {
 
-    final IProject project = EasyMock.createMock(IProject.class);
+    final IFolder_V2 project = EasyMock.createMock(IFolder_V2.class);
 
     final IFolder barFolder = createFolderMock(project, "bar", new IResource[0]);
 
@@ -147,13 +148,13 @@ public class FileListTest {
   }
 
   private static IFile createFileMock(
-      final IProject project, final String path, final String content, final String encoding) {
+      final IFolder_V2 project, final String path, final String content, final String encoding) {
 
     final IPath relativePath = createPathMock(path);
 
     final IFile fileMock = EasyMock.createMock(IFile.class);
 
-    EasyMock.expect(fileMock.getProject()).andStubReturn(project);
+    EasyMock.expect(fileMock.getReferenceFolder()).andStubReturn(project);
     EasyMock.expect(fileMock.getProjectRelativePath()).andStubReturn(relativePath);
 
     EasyMock.expect(fileMock.isDerived()).andStubReturn(false);
@@ -194,13 +195,13 @@ public class FileListTest {
   }
 
   private static IFolder createFolderMock(
-      final IProject project, final String path, final IResource[] members) {
+      final IFolder_V2 project, final String path, final IResource[] members) {
 
     final IPath relativePath = createPathMock(path);
 
     final IFolder folderMock = EasyMock.createMock(IFolder.class);
 
-    EasyMock.expect(folderMock.getProject()).andStubReturn(project);
+    EasyMock.expect(folderMock.getReferenceFolder()).andStubReturn(project);
     EasyMock.expect(folderMock.getProjectRelativePath()).andStubReturn(relativePath);
 
     EasyMock.expect(folderMock.isDerived()).andStubReturn(false);
@@ -224,7 +225,7 @@ public class FileListTest {
   }
 
   private static IReferencePointManager createReferencePointManagerMock(
-      IReferencePoint referencePoint, IProject project) {
+      IReferencePoint referencePoint, IFolder_V2 project) {
     IReferencePointManager referencePointManager =
         EasyMock.createMock(IReferencePointManager.class);
     EasyMock.expect(referencePointManager.get(referencePoint)).andStubReturn(project);

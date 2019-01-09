@@ -26,6 +26,8 @@ public interface IResource {
 
   public IProject getProject();
 
+  public IFolder_V2 getReferenceFolder();
+
   public IPath getProjectRelativePath();
 
   public int getType();

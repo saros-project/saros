@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.session;
 
+import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import java.util.Set;
@@ -13,7 +14,7 @@ public interface IReferencePointManager {
    * @param referencePoint the key of the pair
    * @param project the value of the pair
    */
-  void put(IReferencePoint referencePoint, IProject project);
+  void put(IReferencePoint referencePoint, IFolder_V2 folder);
 
   /**
    * Returns the IProject given by the IReferencePoint
@@ -21,7 +22,7 @@ public interface IReferencePointManager {
    * @param referencePoint the key for which the IProject should be returned
    * @return the IProject given by referencePoint
    */
-  IProject get(IReferencePoint referencePoint);
+  IFolder_V2 get(IReferencePoint referencePoint);
 
   /**
    * Returns a set of IProjects given by a set of IReferencePoints
@@ -29,5 +30,5 @@ public interface IReferencePointManager {
    * @param referencePoints a set of referencePoints for which the set of IProjects should returned
    * @return a set of IProject given by referencePoint
    */
-  Set<IProject> getProjects(Set<IReferencePoint> referencePoints);
+  Set<IFolder_V2> getProjects(Set<IReferencePoint> referencePoints);
 }

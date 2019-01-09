@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
@@ -37,9 +36,6 @@ public class ActivityQueuerTest {
   private static IReferencePoint SHARED_REFERENCEPOINT;
   private static IReferencePoint NOT_SHARED_REFERENCEPOINT;
 
-  private static IProject SHARED_PROJECT;
-  private static IProject NOT_SHARED_PROJECT;
-
   private static SPath FOO_PATH_SHARED_PROJECT;
   private static SPath BAR_PATH_SHARED_PROJECT;
   private static SPath PATH_TO_NOT_SHARED_PROJECT;
@@ -50,16 +46,6 @@ public class ActivityQueuerTest {
   public static void prepare() {
     SHARED_REFERENCEPOINT = EasyMock.createMock(IReferencePoint.class);
     NOT_SHARED_REFERENCEPOINT = EasyMock.createMock(IReferencePoint.class);
-
-    SHARED_PROJECT = EasyMock.createMock(IProject.class);
-    NOT_SHARED_PROJECT = EasyMock.createMock(IProject.class);
-
-    EasyMock.expect(SHARED_PROJECT.getReferencePoint()).andStubReturn(SHARED_REFERENCEPOINT);
-
-    EasyMock.expect(NOT_SHARED_PROJECT.getReferencePoint())
-        .andStubReturn(NOT_SHARED_REFERENCEPOINT);
-
-    EasyMock.replay(SHARED_PROJECT, NOT_SHARED_PROJECT);
 
     FOO_PATH_SHARED_PROJECT = new SPath(SHARED_REFERENCEPOINT, EasyMock.createMock(IPath.class));
 

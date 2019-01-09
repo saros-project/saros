@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -800,8 +801,10 @@ public final class SarosSession implements ISarosSession {
 
   private boolean updatePartialSharedResources(final IFileSystemModificationActivity activity) {
 
-    final IProject project = activity.getPath().getProject();
-    final IReferencePoint referencePoint = project.getReferencePoint();
+    IReferencePointManager referencePointManager = getComponent(IReferencePointManager.class);
+
+    final IReferencePoint referencePoint = activity.getPath().getReferencePoint();
+    final IFolder_V2 project = referencePointManager.get(referencePoint);
     /*
      * The follow 'if check' assumes that move operations where at least one
      * project is not part of the sharing is announced as create and delete

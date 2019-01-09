@@ -6,4 +6,14 @@ public class EclipseProjectImpl_V2 extends EclipseAbstractFolderImpl implements 
   {
     super(delegate);
   }
+
+  /**
+   * Returns the original {@link org.eclipse.core.resources.IProject IProject} object.
+   *
+   * @return
+   */
+  @Override
+  public org.eclipse.core.resources.IProject getDelegate() {
+    return (org.eclipse.core.resources.IProject) delegate;
+  }
 }

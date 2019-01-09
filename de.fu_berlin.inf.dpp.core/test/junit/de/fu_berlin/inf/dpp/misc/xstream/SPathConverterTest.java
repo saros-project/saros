@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -19,7 +20,7 @@ import org.junit.Test;
 public class SPathConverterTest {
 
   private static IPath path;
-  private static IProject project;
+  private static IFolder_V2 project;
   private static IReferencePoint referencePoint;
   private static IPathFactory pathFactory;
   private static IReferencePointManager referencePointManager;
@@ -36,7 +37,7 @@ public class SPathConverterTest {
     expect(pathFactory.fromString("/foo/src/Main.java")).andStubReturn(path);
 
     referencePoint = EasyMock.createNiceMock(IReferencePoint.class);
-    project = EasyMock.createNiceMock(IProject.class);
+    project = EasyMock.createNiceMock(IFolder_V2.class);
     expect(project.getReferencePoint()).andStubReturn(referencePoint);
     referencePointManager = EasyMock.createNiceMock(IReferencePointManager.class);
     expect(referencePointManager.get(referencePoint)).andStubReturn(project);

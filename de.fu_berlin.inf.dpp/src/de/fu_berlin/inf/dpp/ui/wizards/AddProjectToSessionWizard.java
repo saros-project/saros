@@ -3,7 +3,10 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.filesystem.EclipseAbstractFolderImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFolderImpl_V2;
 import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl_V2;
 import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -325,7 +328,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 de.fu_berlin.inf.dpp.filesystem.IProject coreProject =
                     ResourceAdapterFactory.create(entry.getValue());
                 // Filling reference point manager which maps a reference point to core project
-                fillReferencePointManager(coreProject, referencePointManager);
+                fillReferencePointManager(
+                    new EclipseProjectImpl_V2(entry.getValue()), referencePointManager);
                 convertedMapping.put(entry.getKey(), coreProject.getReferencePoint());
               }
 
@@ -576,7 +580,8 @@ public class AddProjectToSessionWizard extends Wizard {
         IReferencePointManager referencePointManager =
             session.getComponent(IReferencePointManager.class);
 
-        fillReferencePointManager(adaptedProject, referencePointManager);
+        fillReferencePointManager(
+            new EclipseProjectImpl_V2(entry.getValue()), referencePointManager);
 
         localFileList =
             FileListFactory.createFileList(
@@ -688,9 +693,9 @@ public class AddProjectToSessionWizard extends Wizard {
   }
 
   private void fillReferencePointManager(
-      de.fu_berlin.inf.dpp.filesystem.IProject project,
+      de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl_V2 project,
       IReferencePointManager referencePointManager) {
     referencePointManager.put(project.getReferencePoint(), project);
-    eclipseReferencePointManager.put(((EclipseProjectImpl) project).getDelegate());
+    eclipseReferencePointManager.put((IProject)project.getDelegate());
   }
 }

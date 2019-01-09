@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.negotiation.stream;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
@@ -46,7 +47,7 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol {
         if (projectID.isEmpty()) break;
 
         String fileName = in.readUTF();
-        IProject project = referencePointManager.get(session.getReferencePoint(projectID));
+        IFolder_V2 project = referencePointManager.get(session.getReferencePoint(projectID));
         IFile file = project.getFile(fileName);
 
         String message = "receiving " + displayName(file);

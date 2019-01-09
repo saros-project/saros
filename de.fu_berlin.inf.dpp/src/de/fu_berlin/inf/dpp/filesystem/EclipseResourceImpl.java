@@ -61,6 +61,15 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
+  public IFolder_V2 getReferenceFolder() {
+    org.eclipse.core.resources.IProject project = delegate.getProject();
+
+    if (project == null) return null;
+
+    return new EclipseProjectImpl_V2(project);
+  }
+
+  @Override
   public IPath getProjectRelativePath() {
     return new EclipsePathImpl(delegate.getProjectRelativePath());
   }
