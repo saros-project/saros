@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import java.util.ArrayList;
