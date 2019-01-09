@@ -71,7 +71,7 @@ public class SPath {
 
   /** Convenience method for getting the full path of the file identified by this SPath. */
   public IPath getFullPath() {
-    final IPath fullProjectPath = pathFactory.fromString(referencePoint.toString());
+    final IPath fullProjectPath = referencePoint.getPathRepresentation();
     return fullProjectPath.append(referencePointRelativePath);
   }
 

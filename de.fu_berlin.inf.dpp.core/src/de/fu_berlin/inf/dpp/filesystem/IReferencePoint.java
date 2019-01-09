@@ -10,5 +10,6 @@ package de.fu_berlin.inf.dpp.filesystem;
  * IProject}
  */
 public interface IReferencePoint {
-  /* Nothing here */
+
+  IPath getPathRepresentation();
 }
