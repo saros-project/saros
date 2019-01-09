@@ -41,7 +41,7 @@ public class EclipseResourceImpl implements IResource {
 
     switch (container.getType()) {
       case org.eclipse.core.resources.IResource.FOLDER:
-        return new EclipseFolderImpl((org.eclipse.core.resources.IFolder) container);
+        return new EclipseFolderImpl_V2((org.eclipse.core.resources.IFolder) container);
       case org.eclipse.core.resources.IResource.PROJECT:
         return new EclipseProjectImpl_V2((org.eclipse.core.resources.IProject) container);
       case org.eclipse.core.resources.IResource.ROOT:
@@ -141,10 +141,9 @@ public class EclipseResourceImpl implements IResource {
     Class<?> classToMap = null;
 
     if (IFile.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFile.class;
-    else if (IFolder.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFolder.class;
+    else if (IFolder_V2.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFolder.class;
     else if (IContainer.class.equals(clazz))
       classToMap = org.eclipse.core.resources.IContainer.class;
-    else if (IFolder_V2.class.equals(clazz)) classToMap = org.eclipse.core.resources.IProject.class;
     else if (IWorkspaceRoot.class.equals(clazz))
       classToMap = org.eclipse.core.resources.IWorkspaceRoot.class;
 

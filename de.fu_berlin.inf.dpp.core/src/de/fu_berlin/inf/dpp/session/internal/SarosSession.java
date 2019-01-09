@@ -32,7 +32,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -303,7 +302,7 @@ public final class SarosSession implements ISarosSession {
 
     if (resource.getType() == IResource.FOLDER) {
       try {
-        IResource[] members = ((IFolder) resource.getAdapter(IFolder.class)).members();
+        IResource[] members = ((IFolder_V2) resource.getAdapter(IFolder_V2.class)).members();
 
         for (int i = 0; i < members.length; i++) list.addAll(getAllNonSharedChildren(members[i]));
       } catch (IOException e) {
@@ -911,7 +910,7 @@ public final class SarosSession implements ISarosSession {
           break;
       }
     } else if (activity instanceof FolderCreatedActivity) {
-      IFolder folder = project.getFolder(activity.getPath().getReferencePointRelativePath());
+      IFolder_V2 folder = project.getFolder(activity.getPath().getReferencePointRelativePath());
 
       if (!isShared(folder.getParent())) {
         log.error("PSFOC -" + " folder creation detected for a non shared parent: " + folder);
@@ -929,7 +928,7 @@ public final class SarosSession implements ISarosSession {
       sharedReferencePointMapper.addResources(referencePoint, Collections.singletonList(folder));
 
     } else if (activity instanceof FolderDeletedActivity) {
-      IFolder folder = project.getFolder(activity.getPath().getReferencePointRelativePath());
+      IFolder_V2 folder = project.getFolder(activity.getPath().getReferencePointRelativePath());
 
       if (!isShared(folder)) {
         log.error("PSFOR -" + " folder removal detected for a non shared folder: " + folder);

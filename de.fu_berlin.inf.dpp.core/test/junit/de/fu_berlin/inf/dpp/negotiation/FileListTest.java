@@ -9,7 +9,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -117,16 +116,16 @@ public class FileListTest {
 
     final IFolder_V2 project = EasyMock.createMock(IFolder_V2.class);
 
-    final IFolder barFolder = createFolderMock(project, "bar", new IResource[0]);
+    final IFolder_V2 barFolder = createFolderMock(project, "bar", new IResource[0]);
 
-    final IFolder foobarfooFolder = createFolderMock(project, "foobar/foo", new IResource[0]);
+    final IFolder_V2 foobarfooFolder = createFolderMock(project, "foobar/foo", new IResource[0]);
 
     final IFile infoTxtFile = createFileMock(project, "info.txt", "1234", "UTF-8");
 
     final IFile foobarInfoTxtFile =
         createFileMock(project, "foobar/info.txt", "12345", "ISO-8859-1");
 
-    final IFolder foobarFolder =
+    final IFolder_V2 foobarFolder =
         createFolderMock(project, "foobar", new IResource[] {foobarfooFolder, foobarInfoTxtFile});
 
     EasyMock.expect(project.getName()).andStubReturn("foo");
@@ -193,12 +192,12 @@ public class FileListTest {
     return pathMock;
   }
 
-  private static IFolder createFolderMock(
+  private static IFolder_V2 createFolderMock(
       final IFolder_V2 project, final String path, final IResource[] members) {
 
     final IPath relativePath = createPathMock(path);
 
-    final IFolder folderMock = EasyMock.createMock(IFolder.class);
+    final IFolder_V2 folderMock = EasyMock.createMock(IFolder_V2.class);
 
     EasyMock.expect(folderMock.getReferenceFolder()).andStubReturn(project);
     EasyMock.expect(folderMock.getProjectRelativePath()).andStubReturn(relativePath);
