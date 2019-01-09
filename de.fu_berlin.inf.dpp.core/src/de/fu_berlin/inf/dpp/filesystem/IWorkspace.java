@@ -41,6 +41,8 @@ public interface IWorkspace {
 
   public IProject getProject(String project);
 
+  public IFolder_V2 getReferenceFolder(String project);
+
   /**
    * Return the {@link IReferencePoint} reference point of the project, given by the project name
    *
