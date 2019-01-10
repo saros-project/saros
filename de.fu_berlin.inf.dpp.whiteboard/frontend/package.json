@@ -13,8 +13,8 @@
   "license": "GPLv2",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3"
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -31,11 +31,11 @@
     "del-cli": "^1.1.0",
     "eslint": "^4.19.1",
     "eslint-config-google": "^0.9.1",
-    "eslint-plugin-react": "^7.11.1",
+    "eslint-plugin-react": "^7.12.3",
     "inline-source-cli": "^1.2.0",
     "json3": "^3.3.2",
     "style-loader": "^0.21.0",
-    "webpack": "^4.26.1",
-    "webpack-cli": "^3.1.2"
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.2.1"
   }
 }
