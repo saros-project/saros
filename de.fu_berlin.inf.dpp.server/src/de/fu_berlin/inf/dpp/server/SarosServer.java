@@ -31,10 +31,6 @@ public class SarosServer {
     lifecycle.start();
   }
 
-  public void initConsole(ServerConsole console) {
-    // no commands (yet) to register
-  }
-
   public void stop() {
     lifecycle.stop();
   }
@@ -47,9 +43,6 @@ public class SarosServer {
   public static void main(String[] args) {
     final SarosServer server = new SarosServer();
 
-    LOG.info("Starting server...");
-    server.start();
-
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
@@ -61,10 +54,13 @@ public class SarosServer {
                   }
                 }));
 
+    LOG.info("Starting server...");
+    server.start();
+
     if (ServerConfig.isInteractive()) {
-      ServerConsole console = new ServerConsole(System.in, System.out);
-      server.initConsole(console);
-      console.run();
+      server.lifecycle.getSarosContext().getComponent(ServerConsole.class).run();
+      server.stop();
+      System.exit(0);
     }
   }
 }

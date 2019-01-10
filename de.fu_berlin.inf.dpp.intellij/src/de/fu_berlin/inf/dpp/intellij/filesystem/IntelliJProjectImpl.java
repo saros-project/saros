@@ -95,8 +95,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     if (numberOfContentRoots != 1) {
       throw new IllegalArgumentException(
-          "Modules shared with Saros currently must contain exactly one "
-              + "content root. The given module "
+          "Modules shared with Saros currently must contain exactly one content root. The given "
+              + "module "
               + module
               + " has "
               + numberOfContentRoots
@@ -183,8 +183,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
               + moduleFile
               + " for the module "
               + module
-              + " is not located in the base directory of the content"
-              + " root "
+              + " is not located in the base directory of the content root "
               + moduleRoot
               + ".");
     }
@@ -226,8 +225,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
         throw new ModuleNotFoundException(
             "The module "
                 + moduleName
-                + " could not be refreshed as no module with the same"
-                + " name could be found in the current project "
+                + " could not be refreshed as no module with the same name could be found in the "
+                + "current project "
                 + project);
       }
 

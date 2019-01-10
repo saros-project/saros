@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.server;
 
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.communication.connection.NullProxyResolver;
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
+import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
@@ -12,6 +12,9 @@ import de.fu_berlin.inf.dpp.filesystem.NullChecksumCache;
 import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
+import de.fu_berlin.inf.dpp.server.console.InviteCommand;
+import de.fu_berlin.inf.dpp.server.console.ServerConsole;
+import de.fu_berlin.inf.dpp.server.console.ShareCommand;
 import de.fu_berlin.inf.dpp.server.dummies.NullRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathFactoryImpl;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathImpl;
@@ -19,6 +22,7 @@ import de.fu_berlin.inf.dpp.server.filesystem.ServerWorkspaceImpl;
 import de.fu_berlin.inf.dpp.server.net.SubscriptionAuthorizer;
 import de.fu_berlin.inf.dpp.server.preferences.PersistencePreferenceStore;
 import de.fu_berlin.inf.dpp.server.preferences.ServerPreferences;
+import de.fu_berlin.inf.dpp.server.session.JoinSessionRequestHandler;
 import de.fu_berlin.inf.dpp.server.session.NegotiationHandler;
 import de.fu_berlin.inf.dpp.server.session.ServerSessionContextFactory;
 import de.fu_berlin.inf.dpp.server.synchronize.ServerUISynchronizerImpl;
@@ -33,20 +37,19 @@ import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
 /**
- * Server implementation of {@link de.fu_berlin.inf.dpp.ISarosContextFactory}. In addition to the
- * core components configured in {@link SarosCoreContextFactory}, this class adds the
- * server-specific components such as implementations of unimplemented core interfaces.
+ * Server implementation of {@link de.fu_berlin.inf.dpp.context.IContextFactory}. In addition to the
+ * core components configured in {@link de.fu_berlin.inf.dpp.context.CoreContextFactory}, this class
+ * adds the server-specific components such as implementations of unimplemented core interfaces.
  */
-public class ServerContextFactory extends CoreContextFactory {
+public class ServerContextFactory extends AbstractContextFactory {
 
   private static final Logger LOG = Logger.getLogger(ServerContextFactory.class);
 
   @Override
   public void createComponents(MutablePicoContainer c) {
-    super.createComponents(c);
     addVersionString(c);
     addCoreInterfaceImplementations(c);
-    addOptionialCoreInterfaceImplementations(c);
+    addOptionalCoreInterfaceImplementations(c);
     addAdditionalComponents(c);
   }
 
@@ -78,16 +81,20 @@ public class ServerContextFactory extends CoreContextFactory {
    * Components that are not necessarily needed but must be present, i.e. use
    * dummies
    */
-  private void addOptionialCoreInterfaceImplementations(MutablePicoContainer c) {
+  private void addOptionalCoreInterfaceImplementations(MutablePicoContainer c) {
     c.addComponent(IProxyResolver.class, NullProxyResolver.class);
     c.addComponent(IChecksumCache.class, NullChecksumCache.class);
   }
 
   private void addAdditionalComponents(MutablePicoContainer c) {
-    // c.addComponent(JoinSessionRequestHandler.class);
-    // c.addComponent(ServerFeatureAdvertiser.class);
     c.addComponent(SubscriptionAuthorizer.class);
     c.addComponent(NegotiationHandler.class);
+    c.addComponent(JoinSessionRequestHandler.class);
+    if (ServerConfig.isInteractive()) {
+      c.addComponent(new ServerConsole(System.in, System.out));
+      c.addComponent(InviteCommand.class);
+      c.addComponent(ShareCommand.class);
+    }
   }
 
   private IWorkspace createWorkspace() {
