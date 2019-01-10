@@ -188,20 +188,6 @@ public class LocalEditorManipulator {
   }
 
   /**
-   * Sets the viewport of the editor for path to the specified range.
-   *
-   * @param path
-   * @param lineStart
-   * @param lineEnd
-   */
-  public void setViewPort(final SPath path, final int lineStart, final int lineEnd) {
-    Editor editor = editorPool.getEditor(path);
-    if (editor != null) {
-      editorAPI.setViewPort(editor, lineStart, lineEnd);
-    }
-  }
-
-  /**
    * Adjusts viewport. Focus is set on the center of the range, but priority is given to selected
    * lines.
    *

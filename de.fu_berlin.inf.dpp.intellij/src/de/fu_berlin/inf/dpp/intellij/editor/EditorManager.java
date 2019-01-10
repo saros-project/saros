@@ -20,7 +20,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.core.editor.RemoteWriteAccessManager;
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.SharedEditorListenerDispatch;
@@ -34,7 +33,6 @@ import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.LocalClosedEditorModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -53,12 +51,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * IntelliJ implementation of the {@link IEditorManager} interface.
- *
- * <p>FIXME: There are several usages of the "followedUser" field that should have nothing to do
- * with the follow mode. Search for "FIXME followMode" to find all instances.
- */
+/** IntelliJ implementation of the {@link IEditorManager} interface. */
 public class EditorManager extends AbstractActivityProducer implements IEditorManager {
 
   private static final Logger LOG = Logger.getLogger(EditorManager.class);
@@ -116,11 +109,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           execTextSelection(textSelectionActivity);
         }
 
-        @Override
-        public void receive(ViewportActivity viewportActivity) {
-          execViewport(viewportActivity);
-        }
-
         private void execEditorActivity(EditorActivity editorActivity) {
 
           SPath path = editorActivity.getPath();
@@ -134,18 +122,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           switch (editorActivity.getType()) {
             case ACTIVATED:
-              // TODO: Let the FollowModeManager handle this
-              if (isFollowing(user)) {
-                localEditorManipulator.openEditor(path, false);
-              }
               editorListenerDispatch.editorActivated(user, path);
               break;
 
             case CLOSED:
-              // TODO: Let the FollowModeManager handle this
-              if (isFollowing(user)) {
-                localEditorManipulator.closeEditor(path);
-              }
               editorListenerDispatch.editorClosed(user, path);
               break;
             case SAVED:
@@ -245,23 +225,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           editorListenerDispatch.textSelectionChanged(selection);
         }
-
-        private void execViewport(ViewportActivity viewport) {
-
-          SPath path = viewport.getPath();
-          LOG.debug(path + " viewport activity received " + viewport);
-          if (path == null) {
-            return;
-          }
-
-          User user = viewport.getSource();
-          if (isFollowing(user)) {
-            localEditorManipulator.setViewPort(
-                path,
-                viewport.getStartLine(),
-                viewport.getStartLine() + viewport.getNumberOfLines());
-          }
-        }
       };
 
   private final ISessionListener sessionListener =
@@ -323,11 +286,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         @Override
         public void userLeft(final User user) {
           annotationManager.removeAnnotations(user);
-
-          // TODO: Let the FollowModeManager handle this
-          if (user.equals(followedUser)) {
-            setFollowing(null);
-          }
         }
 
         @Override
@@ -419,8 +377,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         private void endSession() {
           annotationManager.removeAllAnnotations();
 
-          setFollowing(null);
-
           // This sets all editors, that were set to read only, writeable
           // again
           unlockAllEditors();
@@ -460,9 +416,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private final LocalEditorStatusChangeHandler localEditorStatusChangeHandler;
   private final LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
   private final LocalViewPortChangeHandler localViewPortChangeHandler;
-
-  /** The user that is followed or <code>null</code> if no user is followed. */
-  private User followedUser = null;
 
   private boolean hasWriteAccess;
   private boolean isLocked;
@@ -562,53 +515,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     editorPool.replacePath(oldPath, newPath);
   }
 
-  /**
-   * Returns the followed {@link User} or <code>null</code> if currently no user is followed.
-   *
-   * @deprecated Use the {@link FollowModeManager} instead.
-   */
-  @Deprecated
-  public User getFollowedUser() {
-    return followedUser;
-  }
-
-  /** @deprecated Use the {@link UserEditorStateManager} component directly. */
-  @Deprecated
-  public UserEditorStateManager getUserEditorStateManager() {
-    return userEditorStateManager;
-  }
-
-  public boolean isActiveEditorShared() {
-    return activeEditor != null && isSharedEditor(activeEditor);
-  }
-
-  /**
-   * Sets the {@link User} to follow or <code>null</code> if no user should be followed. Calls
-   * {@link SharedEditorListenerDispatch#followModeChanged(User, boolean)} to inform the other
-   * participants of the change.
-   *
-   * <p>Jumps to the newly followed user.
-   *
-   * @deprecated Use the {@link FollowModeManager} instead.
-   */
-  @Deprecated
-  public void setFollowing(User newFollowedUser) {
-    assert newFollowedUser == null || !newFollowedUser.equals(session.getLocalUser())
-        : "local user cannot follow himself!";
-
-    User oldFollowedUser = followedUser;
-    followedUser = newFollowedUser;
-
-    if (oldFollowedUser != null && !oldFollowedUser.equals(newFollowedUser)) {
-      editorListenerDispatch.followModeChanged(oldFollowedUser, false);
-    }
-
-    if (newFollowedUser != null) {
-      editorListenerDispatch.followModeChanged(newFollowedUser, true);
-      jumpToUser(newFollowedUser);
-    }
-  }
-
   LocalEditorHandler getLocalEditorHandler() {
     return localEditorHandler;
   }
@@ -651,25 +557,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Fires an EditorActivity.Type.CLOSED event for the given path, notifies the local
-   * EditorListenerDispatcher and leaves following, if closing the followed editor.
+   * Fires an EditorActivity.Type.CLOSED event for the given path and notifies the local
+   * EditorListenerDispatcher.
    */
   void generateEditorClosed(@NotNull SPath path) {
-    // if closing the followed editor, leave follow mode
-    if (followedUser != null) {
-      // TODO Let the FollowModeManager handle this
-      EditorState activeEditor =
-          userEditorStateManager.getState(followedUser).getActiveEditorState();
-
-      if (activeEditor != null && activeEditor.getPath().equals(path)) {
-        // follower closed the followed editor (no other editor gets
-        // activated)
-        setFollowing(null);
-        NotificationPanel.showInformation(
-            "You closed the followed editor.", "Follow Mode stopped!");
-      }
-    }
-
     if (session.isShared(path.getResource())) {
       editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
@@ -765,16 +656,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     editorListenerDispatch.textEdited(textEdit);
   }
 
-  /**
-   * Returns <code>true</code> if it is currently following user, otherwise <code>false</code>.
-   *
-   * @deprecated Use the {@link FollowModeManager} instead.
-   */
-  @Deprecated
-  boolean isFollowing(User user) {
-    return followedUser != null && followedUser.equals(user);
-  }
-
   @Override
   public void jumpToUser(@NotNull final User jumpTo) {
 
@@ -814,18 +695,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   void refreshAnnotations() {
     // FIXME: needs implementation
-  }
-
-  boolean isSharedEditor(SPath editorFilePath) {
-    if (session == null) {
-      return false;
-    }
-
-    if (!localEditorHandler.isOpenEditor(editorFilePath)) {
-      return false;
-    }
-
-    return session.isShared(editorFilePath.getResource());
   }
 
   boolean isDocumentModificationHandlerEnabled() {
