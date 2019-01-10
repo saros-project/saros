@@ -9,11 +9,12 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.picocontainer.annotations.Inject;
 
-/** Action to activateor deactivate follow mode. */
+/** Action to activate or deactivate follow mode. */
 public class FollowModeAction extends AbstractSarosAction {
 
   public static final String NAME = "follow";
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
         @Override
