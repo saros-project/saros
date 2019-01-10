@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.PermissionActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.SendBundleActivity;
 import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.StopActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
@@ -153,6 +154,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
           PermissionActivity.class,
           ProgressActivity.class,
           TargetedFileActivity.class,
+          SendBundleActivity.class,
           StartFollowingActivity.class,
           StopActivity.class,
           StopFollowingActivity.class,

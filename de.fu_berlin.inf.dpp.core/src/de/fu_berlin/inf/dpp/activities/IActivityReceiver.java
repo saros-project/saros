@@ -43,6 +43,8 @@ public interface IActivityReceiver {
 
   void receive(ProgressActivity progressActivity);
 
+  void receive(SendBundleActivity sendBundleActivity);
+
   void receive(StartFollowingActivity startFollowingActivity);
 
   void receive(StopActivity stopActivity);
