@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 
 import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
+import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -38,29 +38,43 @@ public class FollowButton extends ToolbarButton {
         }
       };
 
+  private final IFollowModeListener followModeListener =
+      new IFollowModeListener() {
+        @Override
+        public void stoppedFollowing(Reason reason) {
+          updateMenu();
+        }
+
+        @Override
+        public void startedFollowing(User target) {
+          updateMenu();
+        }
+      };
+
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession session) {
-          session.addListener(sessionListener);
+          FollowButton.this.session = session;
+          FollowButton.this.session.addListener(sessionListener);
+
+          followModeManager = session.getComponent(FollowModeManager.class);
+          followModeManager.addListener(followModeListener);
+
           updateMenu();
           setEnabledFromUIThread(true);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
+          FollowButton.this.session.removeListener(sessionListener);
+          FollowButton.this.session = null;
 
-          oldSarosSession.removeListener(sessionListener);
+          followModeManager.removeListener(followModeListener);
+          followModeManager = null;
+
           updateMenu();
           setEnabledFromUIThread(false);
-        }
-      };
-
-  private final ISharedEditorListener editorListener =
-      new ISharedEditorListener() {
-        @Override
-        public void followModeChanged(final User target, final boolean isFollowed) {
-          updateMenu();
         }
       };
 
@@ -68,7 +82,8 @@ public class FollowButton extends ToolbarButton {
 
   @Inject private ISarosSessionManager sessionManager;
 
-  @Inject private EditorManager editorManager;
+  private volatile ISarosSession session;
+  private volatile FollowModeManager followModeManager;
 
   /**
    * Creates a Follow button with Popupmenu, registers sessionListeners and editorlisteners.
@@ -82,8 +97,6 @@ public class FollowButton extends ToolbarButton {
     followModeAction = new FollowModeAction();
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-
-    editorManager.addSharedEditorListener(editorListener);
 
     createMenu();
     setEnabled(false);
@@ -103,7 +116,14 @@ public class FollowButton extends ToolbarButton {
 
     menuItemPrefix = "Follow ";
 
-    for (User user : followModeAction.getCurrentRemoteSessionUsers()) {
+    ISarosSession currentSession = session;
+    FollowModeManager currentFollowModeManager = followModeManager;
+
+    if (currentSession == null || currentFollowModeManager == null) {
+      return;
+    }
+
+    for (User user : currentSession.getRemoteUsers()) {
       JMenuItem menuItem = createItemForUser(user);
       popupMenu.add(menuItem);
     }
@@ -111,15 +131,14 @@ public class FollowButton extends ToolbarButton {
     popupMenu.addSeparator();
 
     JMenuItem leaveItem = new JMenuItem("Leave follow mode");
-    leaveItem.setActionCommand(null);
     leaveItem.addActionListener(
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            followModeAction.execute(e.getActionCommand());
+            followModeAction.execute(null);
           }
         });
-    leaveItem.setEnabled(followModeAction.getCurrentlyFollowedUser() != null);
+    leaveItem.setEnabled(currentFollowModeManager.getFollowedUser() != null);
 
     popupMenu.add(leaveItem);
   }
@@ -134,7 +153,14 @@ public class FollowButton extends ToolbarButton {
 
     JMenuItem menuItem = new JMenuItem(menuItemPrefix + userNameShort);
 
-    User currentlyFollowedUser = followModeAction.getCurrentlyFollowedUser();
+    FollowModeManager currentFollowModeManager = followModeManager;
+
+    User currentlyFollowedUser = null;
+
+    if (currentFollowModeManager != null) {
+      currentlyFollowedUser = currentFollowModeManager.getFollowedUser();
+    }
+
     if (currentlyFollowedUser != null) {
       String currentUserName = ModelFormatUtils.getDisplayName(currentlyFollowedUser);
       if (currentUserName.equalsIgnoreCase(userNameShort)) {
