@@ -6,7 +6,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
@@ -61,24 +60,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void unblock() {
-          executeInUIThreadSynchronous(
-              new Runnable() {
-                @Override
-                public void run() {
-                  unlockAllEditors();
-                }
-              });
+          executeInUIThreadSynchronous(EditorManager.this::unlockAllEditors);
         }
 
         @Override
         public void block() {
-          executeInUIThreadSynchronous(
-              new Runnable() {
-                @Override
-                public void run() {
-                  lockAllEditors();
-                }
-              });
+          executeInUIThreadSynchronous(EditorManager.this::lockAllEditors);
         }
       };
 
@@ -242,8 +229,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
               unlockAllEditors();
             }
           }
-
-          refreshAnnotations();
         }
 
         @Override
@@ -292,13 +277,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         public void resourcesAdded(final IProject project) {
           ApplicationManager.getApplication()
               .invokeAndWait(
-                  new Runnable() {
-                    @Override
-                    public void run() {
-                      addProjectResources(project);
-                    }
-                  },
-                  ModalityState.defaultModalityState());
+                  () -> addProjectResources(project), ModalityState.defaultModalityState());
         }
       };
 
@@ -328,6 +307,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     selectedEditorState.applyCapturedState();
   }
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
 
@@ -342,13 +322,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           assert session == oldSarosSession;
           session.getStopManager().removeBlockable(stopManagerListener); // todo
 
-          executeInUIThreadSynchronous(
-              new Runnable() {
-                @Override
-                public void run() {
-                  endSession();
-                }
-              });
+          executeInUIThreadSynchronous(this::endSession);
         }
 
         private void startSession(ISarosSession newSarosSession) {
@@ -418,6 +392,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private final LocalViewPortChangeHandler localViewPortChangeHandler;
 
   private boolean hasWriteAccess;
+  // FIXME why is this never assigned? Either assign or remove flag
   private boolean isLocked;
   private SelectionEvent localSelection;
   private LineRange localViewport;
@@ -462,27 +437,23 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   @Override
   public String getContent(final SPath path) {
     return Filesystem.runReadAction(
-        new Computable<String>() {
+        () -> {
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
 
-          @Override
-          public String compute() {
-            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+          if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
 
-            if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
+            LOG.warn(
+                "Could not retrieve content of "
+                    + path
+                    + " as a matching VirtualFile could not be found,"
+                    + " does not exist, or is a directory");
 
-              LOG.warn(
-                  "Could not retrieve content of "
-                      + path
-                      + " as a matching VirtualFile could not be found,"
-                      + " does not exist, or is a directory");
-
-              return null;
-            }
-
-            Document doc = projectAPI.getDocument(virtualFile);
-
-            return (doc != null) ? doc.getText() : null;
+            return null;
           }
+
+          Document doc = projectAPI.getDocument(virtualFile);
+
+          return (doc != null) ? doc.getText() : null;
         });
   }
 
@@ -503,7 +474,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @see Document
    * @see LocalEditorHandler#saveDocument(SPath)
    */
-  public void saveDocument(SPath path) {
+  private void saveDocument(SPath path) {
     localEditorHandler.saveDocument(path);
   }
 
@@ -513,10 +484,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   public void replaceAllEditorsForPath(SPath oldPath, SPath newPath) {
     editorPool.replacePath(oldPath, newPath);
-  }
-
-  LocalEditorHandler getLocalEditorHandler() {
-    return localEditorHandler;
   }
 
   EditorPool getEditorPool() {
@@ -673,28 +640,20 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     }
 
     executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
-            Editor newEditor =
-                localEditorManipulator.openEditor(remoteActiveEditor.getPath(), true);
+        () -> {
+          Editor newEditor = localEditorManipulator.openEditor(remoteActiveEditor.getPath(), true);
 
-            if (newEditor == null) {
-              return;
-            }
-
-            LineRange viewport = remoteActiveEditor.getViewport();
-            TextSelection textSelection = remoteActiveEditor.getSelection();
-
-            localEditorManipulator.adjustViewport(newEditor, viewport, textSelection);
+          if (newEditor == null) {
+            return;
           }
+
+          LineRange viewport = remoteActiveEditor.getViewport();
+          TextSelection textSelection = remoteActiveEditor.getSelection();
+
+          localEditorManipulator.adjustViewport(newEditor, viewport, textSelection);
         });
 
     editorListenerDispatch.jumpedToUser(jumpTo);
-  }
-
-  void refreshAnnotations() {
-    // FIXME: needs implementation
   }
 
   boolean isDocumentModificationHandlerEnabled() {
@@ -716,7 +675,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * localTextSelectionChangeHandler and the localViewPortChangeHandler if the parameter is <code>
    * true</code>, else disables them.
    */
-  void setHandlersEnabled(boolean enable) {
+  private void setHandlersEnabled(boolean enable) {
     localDocumentModificationHandler.setEnabled(enable);
     localClosedEditorModificationHandler.setEnabled(enable);
     localEditorStatusChangeHandler.setEnabled(enable);
@@ -735,22 +694,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /** Unlocks all editors in the editorPool. */
-  void unlockAllEditors() {
+  private void unlockAllEditors() {
     setHandlersEnabled(true);
     editorPool.unlockAllDocuments();
   }
 
   /** Locks all open editors, by setting them to read-only. */
-  void lockAllEditors() {
+  private void lockAllEditors() {
     setHandlersEnabled(false);
     editorPool.lockAllDocuments();
-  }
-
-  /** Unlocks all locally open editors by starting them. */
-  public void unlockAllLocalOpenedEditors() {
-    for (Editor editor : editorPool.getEditors()) {
-      startEditor(editor);
-    }
   }
 
   private void executeInUIThreadSynchronous(Runnable runnable) {
@@ -758,28 +710,20 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         .invokeAndWait(runnable, ModalityState.defaultModalityState());
   }
 
-  private void executeInUIThreadAsynchronous(Runnable runnable) {
-    ApplicationManager.getApplication().invokeLater(runnable);
-  }
-
   @Override
   public void saveEditors(final IProject project) {
     executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
+        () -> {
+          Set<SPath> editorPaths = new HashSet<>(editorPool.getFiles());
 
-            Set<SPath> editorPaths = new HashSet<>(editorPool.getFiles());
+          if (userEditorStateManager != null) {
+            editorPaths.addAll(userEditorStateManager.getOpenEditors());
+          }
 
-            if (userEditorStateManager != null) {
-              editorPaths.addAll(userEditorStateManager.getOpenEditors());
-            }
+          for (SPath editorPath : editorPaths) {
+            if (project == null || project.equals(editorPath.getProject())) {
 
-            for (SPath editorPath : editorPaths) {
-              if (project == null || project.equals(editorPath.getProject())) {
-
-                saveDocument(editorPath);
-              }
+              saveDocument(editorPath);
             }
           }
         });
@@ -787,24 +731,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   @Override
   public void openEditor(final SPath path, final boolean activate) {
-    executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
-            localEditorManipulator.openEditor(path, activate);
-          }
-        });
+    executeInUIThreadSynchronous(() -> localEditorManipulator.openEditor(path, activate));
   }
 
   @Override
   public void closeEditor(final SPath path) {
-    executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
-            localEditorManipulator.closeEditor(path);
-          }
-        });
+    executeInUIThreadSynchronous(() -> localEditorManipulator.closeEditor(path));
   }
 
   /**
@@ -822,22 +754,19 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       @NotNull final SPath path, final LineRange range, final TextSelection selection) {
 
     executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
-            Editor editor = editorPool.getEditor(path);
+        () -> {
+          Editor editor = editorPool.getEditor(path);
 
-            if (editor == null) {
-              LOG.warn(
-                  "Failed to adjust viewport for "
-                      + path
-                      + " as it is not known to the editor pool.");
+          if (editor == null) {
+            LOG.warn(
+                "Failed to adjust viewport for "
+                    + path
+                    + " as it is not known to the editor pool.");
 
-              return;
-            }
-
-            localEditorManipulator.adjustViewport(editor, range, selection);
+            return;
           }
+
+          localEditorManipulator.adjustViewport(editor, range, selection);
         });
   }
 

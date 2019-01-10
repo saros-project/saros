@@ -7,8 +7,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.picocontainer.annotations.Inject;
@@ -40,18 +38,16 @@ class SessionPopMenu extends JPopupMenu {
     sarosSessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 
     JMenuItem menuItemFollowParticipant = new JMenuItem("Follow participant");
+
     menuItemFollowParticipant.addActionListener(
-        new ActionListener() {
+        actionEvent -> {
+          FollowModeManager currentFollowModeManager = followModeManager;
 
-          @Override
-          public void actionPerformed(ActionEvent actionEvent) {
-            FollowModeManager currentFollowModeManager = followModeManager;
-
-            if (currentFollowModeManager != null) {
-              currentFollowModeManager.follow(user);
-            }
+          if (currentFollowModeManager != null) {
+            currentFollowModeManager.follow(user);
           }
         });
+
     add(menuItemFollowParticipant);
   }
 }

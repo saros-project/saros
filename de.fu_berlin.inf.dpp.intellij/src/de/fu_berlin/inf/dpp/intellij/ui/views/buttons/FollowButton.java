@@ -12,8 +12,6 @@ import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -51,6 +49,7 @@ public class FollowButton extends ToolbarButton {
         }
       };
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
         @Override
@@ -86,9 +85,9 @@ public class FollowButton extends ToolbarButton {
   private volatile FollowModeManager followModeManager;
 
   /**
-   * Creates a Follow button with Popupmenu, registers sessionListeners and editorlisteners.
+   * Creates a Follow button with a JPopupMenu, registers session listeners and editor listeners.
    *
-   * <p>The FollowButton is created as dissabled.
+   * <p>The FollowButton is created as disabled.
    */
   public FollowButton() {
     super(FollowModeAction.NAME, "Follow", FOLLOW_ICON_PATH, "Enter follow mode");
@@ -103,12 +102,7 @@ public class FollowButton extends ToolbarButton {
 
     final JButton button = this;
     addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent ev) {
-            popupMenu.show(button, 0, button.getBounds().y + button.getBounds().height);
-          }
-        });
+        ev -> popupMenu.show(button, 0, button.getBounds().y + button.getBounds().height));
   }
 
   private void createMenu() {
@@ -131,13 +125,7 @@ public class FollowButton extends ToolbarButton {
     popupMenu.addSeparator();
 
     JMenuItem leaveItem = new JMenuItem("Leave follow mode");
-    leaveItem.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            followModeAction.execute(null);
-          }
-        });
+    leaveItem.addActionListener(e -> followModeAction.execute(null));
     leaveItem.setEnabled(currentFollowModeManager.getFollowedUser() != null);
 
     popupMenu.add(leaveItem);
@@ -169,23 +157,11 @@ public class FollowButton extends ToolbarButton {
     }
 
     menuItem.setActionCommand(userName);
-    menuItem.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            followModeAction.execute(e.getActionCommand());
-          }
-        });
+    menuItem.addActionListener(e -> followModeAction.execute(e.getActionCommand()));
     return menuItem;
   }
 
   private void updateMenu() {
-    UIUtil.invokeAndWaitIfNeeded(
-        new Runnable() {
-          @Override
-          public void run() {
-            createMenu();
-          }
-        });
+    UIUtil.invokeAndWaitIfNeeded((Runnable) this::createMenu);
   }
 }
