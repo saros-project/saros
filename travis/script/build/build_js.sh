@@ -16,5 +16,4 @@ npm run test:log
 echo "Building the HTML Whiteboard"
 cd /home/ci/saros_src/de.fu_berlin.inf.dpp.whiteboard/frontend
 npm install
-npm run lint
 npm run build
