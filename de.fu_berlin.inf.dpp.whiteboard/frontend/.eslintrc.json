@@ -4,8 +4,8 @@
     "es6": true
   },
   "extends": [
-    "eslint:recommended",
     "google",
+    "eslint:recommended",
     "plugin:react/recommended"
   ],
   "parserOptions": {
