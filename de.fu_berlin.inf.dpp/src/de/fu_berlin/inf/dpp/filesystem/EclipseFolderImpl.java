@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 
-public class EclipseFolderImpl extends EclipseContainerImpl implements IFolder {
+public class EclipseFolderImpl extends EclipseContainerImpl implements IFolder_old {
 
   EclipseFolderImpl(org.eclipse.core.resources.IFolder delegate) {
     super(delegate);

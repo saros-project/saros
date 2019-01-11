@@ -27,7 +27,7 @@ import java.io.IOException;
  * This interface is under development. It currently equals its Eclipse counterpart. If not
  * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
  */
-public interface IFolder extends IContainer {
+public interface IFolder_old extends IContainer {
 
   /** Equivalent to the Eclipse call <code>IFolder#create(updateFlags, local, null)</code> */
   public void create(int updateFlags, boolean local) throws IOException;

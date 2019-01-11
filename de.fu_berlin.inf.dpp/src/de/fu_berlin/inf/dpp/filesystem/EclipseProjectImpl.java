@@ -27,12 +27,12 @@ public class EclipseProjectImpl extends EclipseContainerImpl implements IProject
   }
 
   @Override
-  public IFolder getFolder(String name) {
+  public IFolder_old getFolder(String name) {
     return new EclipseFolderImpl(getDelegate().getFolder(name));
   }
 
   @Override
-  public IFolder getFolder(IPath path) {
+  public IFolder_old getFolder(IPath path) {
     return new EclipseFolderImpl(getDelegate().getFolder(((EclipsePathImpl) path).getDelegate()));
   }
 

@@ -33,7 +33,7 @@ public interface IProject extends IContainer {
 
   public IFile getFile(IPath path);
 
-  public IFolder getFolder(String name);
+  public IFolder_old getFolder(String name);
 
-  public IFolder getFolder(IPath path);
+  public IFolder_old getFolder(IPath path);
 }
