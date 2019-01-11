@@ -20,6 +20,8 @@ public class Messages {
   public static String AddProjectToSessionWizard_module_not_found_message_condition;
   public static String AddProjectToSessionWizard_invalid_module_title;
   public static String AddProjectToSessionWizard_invalid_module_message_condition;
+  public static String AddProjectToSessionWizard_error_creating_module_object_title;
+  public static String AddProjectToSessionWizard_error_creating_module_object_message;
 
   public static String CollaborationUtils_confirm_closing;
   public static String CollaborationUtils_confirm_closing_text;
