@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 import com.google.gson.Gson;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
@@ -34,8 +35,8 @@ public class ProjectListManagerTest {
   private static final String JAVA_FILE = "Main.java";
   private static final String TEXT_FILE = "README.txt";
 
-  private IProject project;
-  private IFolder srcFolder;
+  private IFolder_V2 project;
+  private IFolder_V2 srcFolder;
   private IFile javaFile;
   private IFile textFile;
 
@@ -200,15 +201,15 @@ public class ProjectListManagerTest {
     assertTrue(format(msg, TEXT_FILE), foundTextFile);
   }
 
-  private IWorkspaceRoot root(IProject... projects) {
+  private IWorkspaceRoot root(IFolder_V2... projects) {
     IWorkspaceRoot root = createMock(IWorkspaceRoot.class);
-    expect(root.getProjects()).andStubReturn(projects);
+    expect(root.getReferenceFolders()).andStubReturn(projects);
     replay(root);
     return root;
   }
 
-  private IProject project(String name, IResource... members) {
-    IProject project = createMock(IProject.class);
+  private IFolder_V2 project(String name, IResource... members) {
+    IFolder_V2 project = createMock(IFolder_V2.class);
     try {
       expect(project.members()).andStubReturn(members);
     } catch (IOException e) {
@@ -222,8 +223,8 @@ public class ProjectListManagerTest {
     return project;
   }
 
-  private IFolder folder(String name, IResource... members) {
-    IFolder folder = createMock(IFolder.class);
+  private IFolder_V2 folder(String name, IResource... members) {
+    IFolder_V2 folder = createMock(IFolder_V2.class);
     expect(folder.getType()).andStubReturn(IResource.FOLDER);
     try {
       expect(folder.members()).andStubReturn(members);

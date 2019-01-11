@@ -39,8 +39,6 @@ public interface IWorkspace {
       IReferencePointManager referencePointManager)
       throws IOException, OperationCanceledException;
 
-  public IProject getProject(String project);
-
   public IFolder_V2 getReferenceFolder(String project);
 
   /**

@@ -133,18 +133,13 @@ public class EclipseWorkspaceImpl implements IWorkspace {
   }
 
   @Override
-  public IProject getProject(String project) {
-    return null;
-  }
-
-  @Override
   public IFolder_V2 getReferenceFolder(String project) {
     return ResourceAdapterFactory.create(delegate.getRoot().getProject(project));
   }
 
   @Override
   public IReferencePoint getReferencePoint(String projectName) {
-    return getProject(projectName).getReferencePoint();
+    return getReferenceFolder(projectName).getReferencePoint();
   }
 
   @Override

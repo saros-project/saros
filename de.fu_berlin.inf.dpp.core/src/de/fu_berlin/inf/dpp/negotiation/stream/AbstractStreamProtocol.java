@@ -69,7 +69,7 @@ abstract class AbstractStreamProtocol {
    * @return String of local project name and filename
    */
   String displayName(IFile file) {
-    String projectName = file.getProject().getName();
+    String projectName = file.getReferenceFolder().getName();
     String fileName = file.getProjectRelativePath().toOSString();
 
     return projectName + ": " + fileName;

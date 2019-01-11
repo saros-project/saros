@@ -7,6 +7,7 @@ import static de.fu_berlin.inf.dpp.filesystem.IResource.PROJECT;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
@@ -77,12 +78,12 @@ public class ProjectListManager {
     this.projectModels = new ArrayList<ProjectTree>();
     this.resourceMap = new HashMap<Node, IResource>();
 
-    if (workspaceRoot.getProjects().length == 0) {
+    if (workspaceRoot.getReferenceFolders().length == 0) {
       // No projects inside this workspace | IDE
       return;
     }
 
-    for (IProject project : workspaceRoot.getProjects()) {
+    for (IFolder_V2 project : workspaceRoot.getReferenceFolders()) {
       Node root;
       try {
         root = createModel(project);
@@ -103,7 +104,7 @@ public class ProjectListManager {
    * @param container the resource to create the model from.
    * @return the model for the given resource
    */
-  private Node createModel(IContainer container) throws IOException {
+  private Node createModel(IFolder_V2 container) throws IOException {
     // Go through all members and add them to the model recursively
     List<Node> members = new ArrayList<Node>();
     for (IResource member : container.members()) {
@@ -111,7 +112,7 @@ public class ProjectListManager {
       switch (member.getType()) {
         case PROJECT:
         case FOLDER:
-          memberNode = createModel((IContainer) member);
+          memberNode = createModel((IFolder_V2) member);
           break;
         case FILE:
           memberNode = createModel((IFile) member);

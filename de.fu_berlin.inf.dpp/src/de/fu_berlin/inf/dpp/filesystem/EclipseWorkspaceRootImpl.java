@@ -12,12 +12,6 @@ public class EclipseWorkspaceRootImpl extends EclipseContainerImpl implements IW
   }
 
   @Override
-  public IProject[] getProjects() {
-
-    return null;
-  }
-
-  @Override
   public IFolder_V2[] getReferenceFolders() {
 
     final List<IFolder_V2> result = new ArrayList<IFolder_V2>();

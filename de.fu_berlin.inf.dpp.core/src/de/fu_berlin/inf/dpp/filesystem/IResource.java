@@ -24,8 +24,6 @@ public interface IResource {
 
   public IContainer getParent();
 
-  public IProject getProject();
-
   public IFolder_V2 getReferenceFolder();
 
   public IPath getProjectRelativePath();
