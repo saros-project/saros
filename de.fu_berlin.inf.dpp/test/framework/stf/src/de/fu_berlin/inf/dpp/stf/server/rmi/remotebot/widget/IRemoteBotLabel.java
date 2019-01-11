@@ -5,36 +5,40 @@ import java.rmi.RemoteException;
 
 public interface IRemoteBotLabel extends Remote {
 
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
-    public IRemoteBotMenu contextMenu(String text) throws RemoteException;
+  /**
+   * ********************************************
+   *
+   * <p>finders
+   *
+   * <p>********************************************
+   */
+  public IRemoteBotMenu contextMenu(String text) throws RemoteException;
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
+  /**
+   * ********************************************
+   *
+   * <p>actions
+   *
+   * <p>********************************************
+   */
+  public void setFocus() throws RemoteException;
 
-    public void setFocus() throws RemoteException;
+  /**
+   * ********************************************
+   *
+   * <p>states
+   *
+   * <p>********************************************
+   */
+  public int alignment() throws RemoteException;
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
-    public int alignment() throws RemoteException;
+  public boolean isEnabled() throws RemoteException;
 
-    public boolean isEnabled() throws RemoteException;
+  public boolean isVisible() throws RemoteException;
 
-    public boolean isVisible() throws RemoteException;
+  public boolean isActive() throws RemoteException;
 
-    public boolean isActive() throws RemoteException;
+  public String getToolTipText() throws RemoteException;
 
-    public String getToolTipText() throws RemoteException;
-
-    public String getText() throws RemoteException;
-
+  public String getText() throws RemoteException;
 }

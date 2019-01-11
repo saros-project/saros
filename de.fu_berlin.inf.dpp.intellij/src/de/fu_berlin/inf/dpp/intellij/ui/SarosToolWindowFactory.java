@@ -8,23 +8,23 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import de.fu_berlin.inf.dpp.intellij.ui.views.SarosMainPanelView;
 
-/**
- * This factory is the starting point of UI of the Saros plugin.
- */
-
+/** This factory is the starting point of UI of the Saros plugin. */
 public class SarosToolWindowFactory implements ToolWindowFactory {
 
-    private SarosMainPanelView sarosMainPanelView;
+  private SarosMainPanelView sarosMainPanelView;
 
-    @Override
-    public void createToolWindowContent(Project project,
-        ToolWindow toolWindow) {
-        sarosMainPanelView = new SarosMainPanelView();
+  @Override
+  public void createToolWindowContent(Project project, ToolWindow toolWindow) {
+    sarosMainPanelView = new SarosMainPanelView();
 
-        Content content = toolWindow.getContentManager().getFactory()
-            .createContent(sarosMainPanelView, PluginManager
-                .getPlugin(PluginId.getId("de.fu_berlin.inf.dpp.intellij"))
-                .getName(), false);
-        toolWindow.getContentManager().addContent(content);
-    }
+    Content content =
+        toolWindow
+            .getContentManager()
+            .getFactory()
+            .createContent(
+                sarosMainPanelView,
+                PluginManager.getPlugin(PluginId.getId("de.fu_berlin.inf.dpp.intellij")).getName(),
+                false);
+    toolWindow.getContentManager().addContent(content);
+  }
 }

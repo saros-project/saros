@@ -7,363 +7,340 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-
 public class SharedProjectMapperTest {
 
-    private SharedProjectMapper mapper;
+  private SharedProjectMapper mapper;
 
-    @Before
-    public void setUp() {
-        mapper = new SharedProjectMapper();
+  @Before
+  public void setUp() {
+    mapper = new SharedProjectMapper();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testAddNullProject() {
+    mapper.addProject("0", null, false);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testAddProjectWithNullID() {
+    mapper.addProject(null, createProjectMock(), false);
+  }
+
+  @Test
+  public void testAddCompletelySharedProject() {
+    IProject projectMock = createProjectMock();
+
+    mapper.addProject("0", projectMock, false);
+
+    assertTrue("project is not shared at all", mapper.isShared(projectMock));
+
+    assertFalse("project is partially shared", mapper.isPartiallyShared(projectMock));
+
+    assertTrue("project is not completely shared", mapper.isCompletelyShared(projectMock));
+  }
+
+  @Test
+  public void testAddPartiallySharedProject() {
+    IProject projectMock = createProjectMock();
+
+    mapper.addProject("0", projectMock, true);
+
+    assertTrue("project is not shared at all", mapper.isShared(projectMock));
+
+    assertFalse("project is completely shared", mapper.isCompletelyShared(projectMock));
+
+    assertTrue("project is not partially shared", mapper.isPartiallyShared(projectMock));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testAddCompletelySharedProjectTwice() {
+    IProject projectMock = createProjectMock();
+
+    try {
+      mapper.addProject("0", projectMock, false);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+    mapper.addProject("0", projectMock, false);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testAddPartiallySharedProjectTwice() {
+    IProject projectMock = createProjectMock();
+
+    try {
+      mapper.addProject("0", projectMock, true);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+    mapper.addProject("0", projectMock, true);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testAddSameProjectWithDifferentID() {
+    IProject projectMock = createProjectMock();
+
+    try {
+      mapper.addProject("0", projectMock, true);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testAddNullProject() {
-        mapper.addProject("0", null, false);
+    mapper.addProject("1", projectMock, true);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testAddNewProjectWithIDAlreadyInUse() {
+    IProject projectMockA = createProjectMock();
+    IProject projectMockB = createProjectMock();
+
+    try {
+      mapper.addProject("0", projectMockA, true);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testAddProjectWithNullID() {
-        mapper.addProject(null, createProjectMock(), false);
+    mapper.addProject("0", projectMockB, true);
+  }
+
+  @Test
+  public void testPartiallySharedProjectUpgrade() {
+    IProject projectMock = createProjectMock();
+
+    mapper.addProject("0", projectMock, true);
+    assertTrue("project is not partially shared", mapper.isPartiallyShared(projectMock));
+
+    assertFalse("project is completely shared", mapper.isCompletelyShared(projectMock));
+
+    mapper.addProject("0", projectMock, false);
+    assertFalse("project is partially shared", mapper.isPartiallyShared(projectMock));
+
+    assertTrue("project is not completely shared", mapper.isCompletelyShared(projectMock));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testCompletelySharedProjectDowngrade() {
+    IProject projectMock = createProjectMock();
+
+    try {
+      mapper.addProject("0", projectMock, false);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
     }
 
-    @Test
-    public void testAddCompletelySharedProject() {
-        IProject projectMock = createProjectMock();
-
-        mapper.addProject("0", projectMock, false);
-
-        assertTrue("project is not shared at all", mapper.isShared(projectMock));
-
-        assertFalse("project is partially shared",
-            mapper.isPartiallyShared(projectMock));
-
-        assertTrue("project is not completely shared",
-            mapper.isCompletelyShared(projectMock));
-    }
-
-    @Test
-    public void testAddPartiallySharedProject() {
-        IProject projectMock = createProjectMock();
-
-        mapper.addProject("0", projectMock, true);
-
-        assertTrue("project is not shared at all", mapper.isShared(projectMock));
-
-        assertFalse("project is completely shared",
-            mapper.isCompletelyShared(projectMock));
-
-        assertTrue("project is not partially shared",
-            mapper.isPartiallyShared(projectMock));
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testAddCompletelySharedProjectTwice() {
-        IProject projectMock = createProjectMock();
-
-        try {
-            mapper.addProject("0", projectMock, false);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-        mapper.addProject("0", projectMock, false);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testAddPartiallySharedProjectTwice() {
-        IProject projectMock = createProjectMock();
-
-        try {
-            mapper.addProject("0", projectMock, true);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-        mapper.addProject("0", projectMock, true);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testAddSameProjectWithDifferentID() {
-        IProject projectMock = createProjectMock();
-
-        try {
-            mapper.addProject("0", projectMock, true);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-
-        mapper.addProject("1", projectMock, true);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testAddNewProjectWithIDAlreadyInUse() {
-        IProject projectMockA = createProjectMock();
-        IProject projectMockB = createProjectMock();
-
-        try {
-            mapper.addProject("0", projectMockA, true);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-
-        mapper.addProject("0", projectMockB, true);
-    }
-
-    @Test
-    public void testPartiallySharedProjectUpgrade() {
-        IProject projectMock = createProjectMock();
-
-        mapper.addProject("0", projectMock, true);
-        assertTrue("project is not partially shared",
-            mapper.isPartiallyShared(projectMock));
-
-        assertFalse("project is completely shared",
-            mapper.isCompletelyShared(projectMock));
-
-        mapper.addProject("0", projectMock, false);
-        assertFalse("project is partially shared",
-            mapper.isPartiallyShared(projectMock));
-
-        assertTrue("project is not completely shared",
-            mapper.isCompletelyShared(projectMock));
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testCompletelySharedProjectDowngrade() {
-        IProject projectMock = createProjectMock();
-
-        try {
-            mapper.addProject("0", projectMock, false);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-
-        mapper.addProject("0", projectMock, true);
-    }
-
-    @Test
-    public void testRemoveProjects() {
-        IProject projectMockA = createProjectMock();
-        IProject projectMockB = createProjectMock();
-
-        mapper.addProject("0", projectMockA, false);
-        mapper.addProject("1", projectMockB, true);
+    mapper.addProject("0", projectMock, true);
+  }
+
+  @Test
+  public void testRemoveProjects() {
+    IProject projectMockA = createProjectMock();
+    IProject projectMockB = createProjectMock();
 
-        mapper.removeProject("0");
-        mapper.removeProject("1");
+    mapper.addProject("0", projectMockA, false);
+    mapper.addProject("1", projectMockB, true);
 
-        assertFalse("project is still shared", mapper.isShared(projectMockA));
-        assertFalse("project is still shared", mapper.isShared(projectMockB));
+    mapper.removeProject("0");
+    mapper.removeProject("1");
 
-        assertFalse("project is still completely shared",
-            mapper.isCompletelyShared(projectMockA));
-        assertFalse("project is still partially shared",
-            mapper.isPartiallyShared(projectMockB));
-    }
+    assertFalse("project is still shared", mapper.isShared(projectMockA));
+    assertFalse("project is still shared", mapper.isShared(projectMockB));
 
-    @Test(expected = IllegalStateException.class)
-    @Ignore("logic is currently not performed - should be enabled after the SarosSession is properly synchronized")
-    public void testAddResourcesToCompletelySharedProject() {
-        IProject projectMock = createProjectMock();
-        mapper.addProject("0", projectMock, false);
-        List<IResource> emptyList = Collections.emptyList();
-        mapper.addResources(projectMock, emptyList);
-    }
+    assertFalse("project is still completely shared", mapper.isCompletelyShared(projectMockA));
+    assertFalse("project is still partially shared", mapper.isPartiallyShared(projectMockB));
+  }
 
-    @Test(expected = IllegalStateException.class)
-    @Ignore("logic is currently not performed - should be enabled after the SarosSession is properly synchronized")
-    public void testAddResourcesToNonSharedProject() {
-        IProject projectMock = createProjectMock();
+  @Test(expected = IllegalStateException.class)
+  @Ignore(
+      "logic is currently not performed - should be enabled after the SarosSession is properly synchronized")
+  public void testAddResourcesToCompletelySharedProject() {
+    IProject projectMock = createProjectMock();
+    mapper.addProject("0", projectMock, false);
+    List<IResource> emptyList = Collections.emptyList();
+    mapper.addResources(projectMock, emptyList);
+  }
 
-        List<IResource> emptyList = Collections.emptyList();
-        mapper.addResources(projectMock, emptyList);
-    }
+  @Test(expected = IllegalStateException.class)
+  @Ignore(
+      "logic is currently not performed - should be enabled after the SarosSession is properly synchronized")
+  public void testAddResourcesToNonSharedProject() {
+    IProject projectMock = createProjectMock();
 
-    @Test(expected = IllegalStateException.class)
-    @Ignore("logic is currently not performed - should be enabled after the SarosSession is properly synchronized")
-    public void testRemoveResourcesFromCompletelySharedProject() {
-        IProject projectMock = createProjectMock();
+    List<IResource> emptyList = Collections.emptyList();
+    mapper.addResources(projectMock, emptyList);
+  }
 
-        mapper.addProject("0", projectMock, false);
+  @Test(expected = IllegalStateException.class)
+  @Ignore(
+      "logic is currently not performed - should be enabled after the SarosSession is properly synchronized")
+  public void testRemoveResourcesFromCompletelySharedProject() {
+    IProject projectMock = createProjectMock();
 
-        List<IResource> emptyList = Collections.emptyList();
-        mapper.removeResources(projectMock, emptyList);
-    }
+    mapper.addProject("0", projectMock, false);
 
-    @Test(expected = IllegalStateException.class)
-    @Ignore("logic is currently not performed - should be enabled after the SarosSession is properly synchronized")
-    public void testRemoveResourcesFromNonSharedProject() {
-        IProject projectMock = createProjectMock();
+    List<IResource> emptyList = Collections.emptyList();
+    mapper.removeResources(projectMock, emptyList);
+  }
 
-        List<IResource> emptyList = Collections.emptyList();
-        mapper.removeResources(projectMock, emptyList);
-    }
+  @Test(expected = IllegalStateException.class)
+  @Ignore(
+      "logic is currently not performed - should be enabled after the SarosSession is properly synchronized")
+  public void testRemoveResourcesFromNonSharedProject() {
+    IProject projectMock = createProjectMock();
 
-    @Test
-    public void testAddRemoveResourcesOfPartiallySharedProject() {
+    List<IResource> emptyList = Collections.emptyList();
+    mapper.removeResources(projectMock, emptyList);
+  }
 
-        IProject projectMock = createProjectMock();
+  @Test
+  public void testAddRemoveResourcesOfPartiallySharedProject() {
 
-        IResource resourceMockA = EasyMock.createNiceMock(IResource.class);
-        EasyMock.expect(resourceMockA.getProject()).andStubReturn(projectMock);
-        IResource resourceMockB = EasyMock.createNiceMock(IResource.class);
-        EasyMock.expect(resourceMockB.getProject()).andStubReturn(projectMock);
-        EasyMock.replay(resourceMockA, resourceMockB);
+    IProject projectMock = createProjectMock();
 
-        mapper.addProject("0", projectMock, true);
-        mapper.addResources(projectMock,
-            Collections.singletonList(resourceMockA));
+    IResource resourceMockA = EasyMock.createNiceMock(IResource.class);
+    EasyMock.expect(resourceMockA.getProject()).andStubReturn(projectMock);
+    IResource resourceMockB = EasyMock.createNiceMock(IResource.class);
+    EasyMock.expect(resourceMockB.getProject()).andStubReturn(projectMock);
+    EasyMock.replay(resourceMockA, resourceMockB);
 
-        assertTrue("resource is not shared", mapper.isShared(resourceMockA));
-        assertEquals(1, mapper.getPartiallySharedResources().size());
+    mapper.addProject("0", projectMock, true);
+    mapper.addResources(projectMock, Collections.singletonList(resourceMockA));
 
-        mapper.removeResources(projectMock,
-            Collections.singletonList(resourceMockA));
+    assertTrue("resource is not shared", mapper.isShared(resourceMockA));
+    assertEquals(1, mapper.getPartiallySharedResources().size());
 
-        assertFalse("resource is still shared", mapper.isShared(resourceMockA));
-        assertEquals(0, mapper.getPartiallySharedResources().size());
+    mapper.removeResources(projectMock, Collections.singletonList(resourceMockA));
 
-        mapper.addResources(projectMock,
-            Collections.singletonList(resourceMockA));
+    assertFalse("resource is still shared", mapper.isShared(resourceMockA));
+    assertEquals(0, mapper.getPartiallySharedResources().size());
 
-        mapper.removeAndAddResources(projectMock,
-            Collections.singletonList(resourceMockA),
-            Collections.singletonList(resourceMockB));
+    mapper.addResources(projectMock, Collections.singletonList(resourceMockA));
 
-        assertFalse("resource is still shared", mapper.isShared(resourceMockA));
-        assertTrue("resource is not shared", mapper.isShared(resourceMockB));
-        assertEquals(1, mapper.getPartiallySharedResources().size());
+    mapper.removeAndAddResources(
+        projectMock,
+        Collections.singletonList(resourceMockA),
+        Collections.singletonList(resourceMockB));
 
-    }
+    assertFalse("resource is still shared", mapper.isShared(resourceMockA));
+    assertTrue("resource is not shared", mapper.isShared(resourceMockB));
+    assertEquals(1, mapper.getPartiallySharedResources().size());
+  }
 
-    @Test
-    public void testDerivedResourcesOnCompletelySharedProject() {
-        IProject projectMock = createProjectMock();
+  @Test
+  public void testDerivedResourcesOnCompletelySharedProject() {
+    IProject projectMock = createProjectMock();
 
-        IResource resourceMock = EasyMock.createNiceMock(IResource.class);
-        EasyMock.expect(resourceMock.getProject()).andStubReturn(projectMock);
-        EasyMock.expect(resourceMock.isDerived(true)).andReturn(true);
+    IResource resourceMock = EasyMock.createNiceMock(IResource.class);
+    EasyMock.expect(resourceMock.getProject()).andStubReturn(projectMock);
+    EasyMock.expect(resourceMock.isDerived(true)).andReturn(true);
 
-        EasyMock.replay(resourceMock);
+    EasyMock.replay(resourceMock);
 
-        mapper.addProject("0", projectMock, false);
+    mapper.addProject("0", projectMock, false);
 
-        assertFalse("derived resource is marked as shared",
-            mapper.isShared(resourceMock));
+    assertFalse("derived resource is marked as shared", mapper.isShared(resourceMock));
 
-        EasyMock.verify(resourceMock);
-    }
+    EasyMock.verify(resourceMock);
+  }
 
-    @Test
-    public void testIsShared() {
+  @Test
+  public void testIsShared() {
 
-        IProject projectMockA = createProjectMock();
-        IProject projectMockB = createProjectMock();
+    IProject projectMockA = createProjectMock();
+    IProject projectMockB = createProjectMock();
 
-        IResource resourceMockA = EasyMock.createNiceMock(IResource.class);
-        EasyMock.expect(resourceMockA.getProject()).andStubReturn(projectMockA);
+    IResource resourceMockA = EasyMock.createNiceMock(IResource.class);
+    EasyMock.expect(resourceMockA.getProject()).andStubReturn(projectMockA);
 
-        IResource resourceMockB = EasyMock.createNiceMock(IResource.class);
-        EasyMock.expect(resourceMockB.getProject()).andStubReturn(projectMockB);
+    IResource resourceMockB = EasyMock.createNiceMock(IResource.class);
+    EasyMock.expect(resourceMockB.getProject()).andStubReturn(projectMockB);
 
-        EasyMock.replay(resourceMockA, resourceMockB);
+    EasyMock.replay(resourceMockA, resourceMockB);
 
-        assertFalse("resource should not be marked as shared",
-            mapper.isShared(resourceMockA));
+    assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockA));
 
-        assertFalse("resource should not be marked as shared",
-            mapper.isShared(resourceMockB));
+    assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockB));
 
-        mapper.addProject("0", projectMockA, false);
-        mapper.addProject("1", projectMockB, true);
+    mapper.addProject("0", projectMockA, false);
+    mapper.addProject("1", projectMockB, true);
 
-        assertTrue("resource is not marked as shared",
-            mapper.isShared(resourceMockA));
+    assertTrue("resource is not marked as shared", mapper.isShared(resourceMockA));
 
-        assertFalse("resource should not be marked as shared",
-            mapper.isShared(resourceMockB));
+    assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockB));
 
-        mapper.addResources(projectMockB,
-            Collections.singletonList(resourceMockB));
+    mapper.addResources(projectMockB, Collections.singletonList(resourceMockB));
 
-        assertTrue("resource is not marked as shared",
-            mapper.isShared(resourceMockB));
-    }
+    assertTrue("resource is not marked as shared", mapper.isShared(resourceMockB));
+  }
 
-    @Test
-    public void testGetProjectResourceMapping() {
-        IProject projectMockA = createProjectMock();
-        IProject projectMockB = createProjectMock();
+  @Test
+  public void testGetProjectResourceMapping() {
+    IProject projectMockA = createProjectMock();
+    IProject projectMockB = createProjectMock();
 
-        IResource resourceMockB = EasyMock.createNiceMock(IResource.class);
-        EasyMock.expect(resourceMockB.getProject()).andStubReturn(projectMockB);
+    IResource resourceMockB = EasyMock.createNiceMock(IResource.class);
+    EasyMock.expect(resourceMockB.getProject()).andStubReturn(projectMockB);
 
-        EasyMock.replay(resourceMockB);
+    EasyMock.replay(resourceMockB);
 
-        mapper.addProject("0", projectMockA, false);
-        mapper.addProject("1", projectMockB, true);
+    mapper.addProject("0", projectMockA, false);
+    mapper.addProject("1", projectMockB, true);
 
-        mapper.addResources(projectMockB,
-            Collections.singletonList(resourceMockB));
+    mapper.addResources(projectMockB, Collections.singletonList(resourceMockB));
 
-        Map<IProject, List<IResource>> mapping = mapper
-            .getProjectResourceMapping();
+    Map<IProject, List<IResource>> mapping = mapper.getProjectResourceMapping();
 
-        assertNull("completely shared projects have no resource list",
-            mapping.get(projectMockA));
+    assertNull("completely shared projects have no resource list", mapping.get(projectMockA));
 
-        assertNotNull("partially shared projects must have a resource list",
-            mapping.get(projectMockB));
+    assertNotNull("partially shared projects must have a resource list", mapping.get(projectMockB));
 
-        assertEquals("resource list does not contain the shared resource", 1,
-            mapping.get(projectMockB).size());
-    }
+    assertEquals(
+        "resource list does not contain the shared resource", 1, mapping.get(projectMockB).size());
+  }
 
-    @Test
-    public void testGetProjects() {
-        IProject projectMockA = createProjectMock();
-        IProject projectMockB = createProjectMock();
+  @Test
+  public void testGetProjects() {
+    IProject projectMockA = createProjectMock();
+    IProject projectMockB = createProjectMock();
 
-        mapper.addProject("0", projectMockA, false);
-        mapper.addProject("1", projectMockB, false);
+    mapper.addProject("0", projectMockA, false);
+    mapper.addProject("1", projectMockB, false);
 
-        assertEquals(2, mapper.getProjects().size());
-        assertEquals(2, mapper.size());
-    }
+    assertEquals(2, mapper.getProjects().size());
+    assertEquals(2, mapper.size());
+  }
 
-    @Test
-    public void testIDToProjectMapping() {
-        IProject projectMock = createProjectMock();
-        mapper.addProject("0", projectMock, false);
-        assertEquals("0", mapper.getID(projectMock));
-        assertEquals(projectMock, mapper.getProject("0"));
+  @Test
+  public void testIDToProjectMapping() {
+    IProject projectMock = createProjectMock();
+    mapper.addProject("0", projectMock, false);
+    assertEquals("0", mapper.getID(projectMock));
+    assertEquals(projectMock, mapper.getProject("0"));
+  }
 
-    }
-
-    /*
-     * aware that misconfigured mocks may throw IllegalState and
-     * IllegalArgumentExceptions as well which may lead to false positive
-     * (passed) test cases
-     */
-    private IProject createProjectMock() {
-        IProject projectMock = EasyMock.createNiceMock(IProject.class);
-        EasyMock.expect(projectMock.getType()).andStubReturn(IResource.PROJECT);
-        EasyMock.replay(projectMock);
-        return projectMock;
-    }
+  /*
+   * aware that misconfigured mocks may throw IllegalState and
+   * IllegalArgumentExceptions as well which may lead to false positive
+   * (passed) test cases
+   */
+  private IProject createProjectMock() {
+    IProject projectMock = EasyMock.createNiceMock(IProject.class);
+    EasyMock.expect(projectMock.getType()).andStubReturn(IResource.PROJECT);
+    EasyMock.replay(projectMock);
+    return projectMock;
+  }
 }

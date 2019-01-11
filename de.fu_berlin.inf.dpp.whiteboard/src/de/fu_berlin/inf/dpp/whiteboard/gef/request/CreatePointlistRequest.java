@@ -1,126 +1,114 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.request;
 
+import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.gef.requests.CreateRequest;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
-
 /**
  * Simple request class to create a line
- * 
+ *
  * @author jurke
- * 
  */
 public class CreatePointlistRequest extends CreateRequest {
 
-    private PointList points = null;
+  private PointList points = null;
 
-    public CreatePointlistRequest() {
-        setType(XYLayoutWithFreehandEditPolicy.REQ_CREATE_POINTLIST);
+  public CreatePointlistRequest() {
+    setType(XYLayoutWithFreehandEditPolicy.REQ_CREATE_POINTLIST);
+  }
+
+  public PointList getPoints() {
+    return points;
+  }
+
+  /**
+   * Updates the last point in the pointlist
+   *
+   * @param p
+   */
+  public void updateEndPoint(Point p) {
+    if (points == null) points = new PointList();
+
+    if (points.size() > 1) {
+      points.setPoint(p, points.size() - 1);
+    } else points.addPoint(p);
+  }
+
+  /**
+   * Updates the last point in the pointlist
+   *
+   * @param p
+   */
+  public void updateArrowPoint(Point p) {
+    if (points == null) {
+      points = new PointList();
+      points.addPoint(p);
+      return;
     }
 
-    public PointList getPoints() {
-        return points;
-    }
+    Point p1 = points.getPoint(0);
+    Point p2 = p;
+    points.removeAllPoints();
 
-    /**
-     * Updates the last point in the pointlist
-     * 
-     * @param p
-     */
-    public void updateEndPoint(Point p) {
-        if (points == null)
-            points = new PointList();
+    double width = p2.x - p1.x;
+    double height = p2.y - p1.y;
 
-        if (points.size() > 1) {
-            points.setPoint(p, points.size() - 1);
-        } else
-            points.addPoint(p);
+    double arrow_end_x = p2.x;
+    double arrow_end_y = p2.y;
 
-    }
+    double angle = -Math.atan2(height, width) + Math.PI / 2.0;
 
-    /**
-     * Updates the last point in the pointlist
-     * 
-     * @param p
-     */
-    public void updateArrowPoint(Point p) {
-        if (points == null) {
-            points = new PointList();
-            points.addPoint(p);
-            return;
-        }
+    // length of the arrow
+    double length = Math.sqrt(width * width + height * height);
 
-        Point p1 = points.getPoint(0);
-        Point p2 = p;
-        points.removeAllPoints();
+    // length of the head
+    double minLengthArrowHead = 5d;
+    double maxLengthArrowHead = 15d;
+    double lengthArrowHead =
+        Math.max(minLengthArrowHead, Math.min(maxLengthArrowHead, length / 8.0));
 
-        double width = p2.x - p1.x;
-        double height = p2.y - p1.y;
+    // arrow head points calculation
+    double arrow_left_x = arrow_end_x - lengthArrowHead * Math.sin(angle - Math.PI / 4.0);
+    double arrow_left_y = arrow_end_y - lengthArrowHead * Math.cos(angle - Math.PI / 4.0);
+    double arrow_right_x = arrow_end_x - lengthArrowHead * Math.sin(angle + Math.PI / 4.0);
+    double arrow_right_y = arrow_end_y - lengthArrowHead * Math.cos(angle + Math.PI / 4.0);
 
-        double arrow_end_x = p2.x;
-        double arrow_end_y = p2.y;
+    Point a_left = new Point((int) arrow_left_x, (int) arrow_left_y);
+    Point a_right = new Point((int) arrow_right_x, (int) arrow_right_y);
 
-        double angle = -Math.atan2(height, width) + Math.PI / 2.0;
+    // creation of the arrow point list model
+    points.addPoint(p1);
+    points.addPoint(p2);
+    points.addPoint(a_left);
+    points.addPoint(p2);
+    points.addPoint(a_right);
+  }
 
-        // length of the arrow
-        double length = Math.sqrt(width * width + height * height);
+  public void addPoint(Point p) {
+    if (points == null) points = new PointList();
+    points.addPoint(p);
+  }
 
-        // length of the head
-        double minLengthArrowHead = 5d;
-        double maxLengthArrowHead = 15d;
-        double lengthArrowHead = Math.max(minLengthArrowHead,
-            Math.min(maxLengthArrowHead, length / 8.0));
+  @Override
+  public Point getLocation() {
+    if (points == null) return null;
+    return points.getBounds().getLocation();
+  }
 
-        // arrow head points calculation
-        double arrow_left_x = arrow_end_x - lengthArrowHead
-            * Math.sin(angle - Math.PI / 4.0);
-        double arrow_left_y = arrow_end_y - lengthArrowHead
-            * Math.cos(angle - Math.PI / 4.0);
-        double arrow_right_x = arrow_end_x - lengthArrowHead
-            * Math.sin(angle + Math.PI / 4.0);
-        double arrow_right_y = arrow_end_y - lengthArrowHead
-            * Math.cos(angle + Math.PI / 4.0);
+  @Override
+  public void setLocation(Point location) {
+    clear();
+    addPoint(location);
+  }
 
-        Point a_left = new Point((int) arrow_left_x, (int) arrow_left_y);
-        Point a_right = new Point((int) arrow_right_x, (int) arrow_right_y);
+  @Override
+  public Dimension getSize() {
+    return points.getBounds().getSize();
+  }
 
-        // creation of the arrow point list model
-        points.addPoint(p1);
-        points.addPoint(p2);
-        points.addPoint(a_left);
-        points.addPoint(p2);
-        points.addPoint(a_right);
-    }
-
-    public void addPoint(Point p) {
-        if (points == null)
-            points = new PointList();
-        points.addPoint(p);
-    }
-
-    @Override
-    public Point getLocation() {
-        if (points == null)
-            return null;
-        return points.getBounds().getLocation();
-    }
-
-    @Override
-    public void setLocation(Point location) {
-        clear();
-        addPoint(location);
-    }
-
-    @Override
-    public Dimension getSize() {
-        return points.getBounds().getSize();
-    }
-
-    public void clear() {
-        points = null;
-    }
-
+  public void clear() {
+    points = null;
+  }
 }

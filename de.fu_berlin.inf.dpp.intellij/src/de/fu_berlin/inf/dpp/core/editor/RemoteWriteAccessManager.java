@@ -6,177 +6,164 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.core.util.AutoHashMap;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
-import org.apache.log4j.Logger;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.apache.log4j.Logger;
 
 /**
- * This class manages state of open editors of all users with
- * {@link Permission#WRITE_ACCESS} and connects to/disconnects from the
- * corresponding DocumentProviders to make sure that TextEditActivities can be
- * executed.
- * <p/>
- * The main idea is to connect at the site of user with
- * {@link Permission#READONLY_ACCESS}, when a user with
- * {@link Permission#WRITE_ACCESS} activates his editor with the document.
- * Disconnect happens, when last user with {@link Permission#WRITE_ACCESS}
- * closes the editor.
+ * This class manages state of open editors of all users with {@link Permission#WRITE_ACCESS} and
+ * connects to/disconnects from the corresponding DocumentProviders to make sure that
+ * TextEditActivities can be executed.
+ *
+ * <p>The main idea is to connect at the site of user with {@link Permission#READONLY_ACCESS}, when
+ * a user with {@link Permission#WRITE_ACCESS} activates his editor with the document. Disconnect
+ * happens, when last user with {@link Permission#WRITE_ACCESS} closes the editor.
  */
 public class RemoteWriteAccessManager {
 
-    private static final Logger LOG = Logger
-        .getLogger(RemoteWriteAccessManager.class);
+  private static final Logger LOG = Logger.getLogger(RemoteWriteAccessManager.class);
 
-    /**
-     * stores users and their opened files (identified by their path)
-     */
-    protected Map<SPath, Set<User>> editorStates = AutoHashMap.getSetHashMap();
+  /** stores users and their opened files (identified by their path) */
+  protected Map<SPath, Set<User>> editorStates = AutoHashMap.getSetHashMap();
 
-    /**
-     * stores files (identified by their path) connected by at least user with
-     * {@link Permission#WRITE_ACCESS}
-     */
-    protected Set<SPath> connectedUserWithWriteAccessFiles = new HashSet<SPath>();
+  /**
+   * stores files (identified by their path) connected by at least user with {@link
+   * Permission#WRITE_ACCESS}
+   */
+  protected Set<SPath> connectedUserWithWriteAccessFiles = new HashSet<SPath>();
 
-    protected ISarosSession sarosSession;
+  protected ISarosSession sarosSession;
 
-    /**
-     * Creates a new RemoteWriteAccessManager and adds the session listener
-     * to the session.
-     *
-     * @param sarosSession
-     */
-    public RemoteWriteAccessManager(final ISarosSession sarosSession) {
-        this.sarosSession = sarosSession;
-        this.sarosSession.addListener(sessionListener);
-    }
+  /**
+   * Creates a new RemoteWriteAccessManager and adds the session listener to the session.
+   *
+   * @param sarosSession
+   */
+  public RemoteWriteAccessManager(final ISarosSession sarosSession) {
+    this.sarosSession = sarosSession;
+    this.sarosSession.addListener(sessionListener);
+  }
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+  protected ISessionListener sessionListener =
+      new ISessionListener() {
 
         /**
-         * Remove the user and potentially disconnect from the document
-         * providers which only this user was connected to.
+         * Remove the user and potentially disconnect from the document providers which only this
+         * user was connected to.
          */
         @Override
         public void userLeft(User user) {
-            for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
-                if (entry.getValue().remove(user))
-                    updateConnectionState(entry.getKey());
-            }
+          for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
+            if (entry.getValue().remove(user)) updateConnectionState(entry.getKey());
+          }
         }
 
         /**
-         * This method takes care of maintaining correct state of class-internal
-         * tables with paths of connected documents, if the permission of a user
-         * changes.
+         * This method takes care of maintaining correct state of class-internal tables with paths
+         * of connected documents, if the permission of a user changes.
          */
         @Override
         public void permissionChanged(User user) {
-            for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
-                if (entry.getValue().contains(user))
-                    updateConnectionState(entry.getKey());
-            }
+          for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
+            if (entry.getValue().contains(user)) updateConnectionState(entry.getKey());
+          }
         }
-    };
+      };
 
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+  protected IActivityReceiver activityReceiver =
+      new AbstractActivityReceiver() {
 
         @Override
         public void receive(final EditorActivity editorActivity) {
-            User sender = editorActivity.getSource();
-            SPath path = editorActivity.getPath();
-            if (path == null) {
-                /*
-                 * sPath == null means that the user has no active editor any
-                 * more.
-                 */
-                return;
-            }
+          User sender = editorActivity.getSource();
+          SPath path = editorActivity.getPath();
+          if (path == null) {
+            /*
+             * sPath == null means that the user has no active editor any
+             * more.
+             */
+            return;
+          }
 
-            switch (editorActivity.getType()) {
+          switch (editorActivity.getType()) {
             case ACTIVATED:
-                editorStates.get(path).add(sender);
-                break;
+              editorStates.get(path).add(sender);
+              break;
             case SAVED:
-                break;
+              break;
             case CLOSED:
-                editorStates.get(path).remove(sender);
-                break;
+              editorStates.get(path).remove(sender);
+              break;
             default:
-                LOG.warn(".receive() Unknown Activity type");
-            }
-            updateConnectionState(path);
+              LOG.warn(".receive() Unknown Activity type");
+          }
+          updateConnectionState(path);
         }
+      };
 
-    };
+  /**
+   * This method is called from the shared project when a new Activity arrives
+   *
+   * @param activity activity to dispatch
+   */
+  public void exec(final IActivity activity) {
+    activity.dispatch(activityReceiver);
+  }
 
-    /**
-     * This method is called from the shared project when a new Activity arrives
-     *
-     * @param activity activity to dispatch
-     */
-    public void exec(final IActivity activity) {
-        activity.dispatch(activityReceiver);
+  /** Removes all listener and clears all editorStates. */
+  public void dispose() {
+    sarosSession.removeListener(sessionListener);
+
+    for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
+      entry.getValue().clear();
+      updateConnectionState(entry.getKey());
     }
 
-    /**
-     * Removes all listener and clears all editorStates.
-     */
-    public void dispose() {
-        sarosSession.removeListener(sessionListener);
+    editorStates.clear();
 
-        for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
-            entry.getValue().clear();
-            updateConnectionState(entry.getKey());
-        }
+    if (!connectedUserWithWriteAccessFiles.isEmpty()) {
+      LOG.warn(
+          "RemoteWriteAccessManager could not"
+              + " be dispose correctly. Still connect to: "
+              + connectedUserWithWriteAccessFiles.toString());
+    }
+  }
 
-        editorStates.clear();
+  /**
+   * Updates the state of the document provider of a document under the given path. This method
+   * looks if this document is already connected, and whether it needs to get connected/disconnected
+   * now.
+   */
+  protected void updateConnectionState(final SPath path) {
 
-        if (!connectedUserWithWriteAccessFiles.isEmpty()) {
-            LOG.warn("RemoteWriteAccessManager could not"
-                + " be dispose correctly. Still connect to: "
-                + connectedUserWithWriteAccessFiles.toString());
-        }
+    LOG.trace(".updateConnectionState(" + path.toString() + ")");
+
+    boolean hadUserWithWriteAccess = connectedUserWithWriteAccessFiles.contains(path);
+    boolean hasUserWithWriteAccess = false;
+
+    for (User user : editorStates.get(path)) {
+      if (user.hasWriteAccess()) {
+        hasUserWithWriteAccess = true;
+        break;
+      }
+    }
+    // FIXME: Test if this works without this commentS
+    /* if (!hadUserWithWriteAccess && hasUserWithWriteAccess) {
+        LOG.trace(".updateConnectionState File " + path.toString()
+                + " will be connected ");
+        connectDocumentProvider(path);
     }
 
-    /**
-     * Updates the state of the document provider of a document under the given
-     * path. This method looks if this document is already connected, and
-     * whether it needs to get connected/disconnected now.
-     */
-    protected void updateConnectionState(final SPath path) {
-
-        LOG.trace(".updateConnectionState(" + path.toString() + ")");
-
-        boolean hadUserWithWriteAccess = connectedUserWithWriteAccessFiles
-            .contains(path);
-        boolean hasUserWithWriteAccess = false;
-
-        for (User user : editorStates.get(path)) {
-            if (user.hasWriteAccess()) {
-                hasUserWithWriteAccess = true;
-                break;
-            }
-        }
-        //FIXME: Test if this works without this commentS
-       /* if (!hadUserWithWriteAccess && hasUserWithWriteAccess) {
-            LOG.trace(".updateConnectionState File " + path.toString()
-                    + " will be connected ");
-            connectDocumentProvider(path);
-        }
-
-        if (hadUserWithWriteAccess && !hasUserWithWriteAccess) {
-            LOG.trace(".updateConnectionState File " + path.toString()
-                    + " will be disconnected ");
-            disconnectDocumentProvider(path);
-        }*/
-    }
+    if (hadUserWithWriteAccess && !hasUserWithWriteAccess) {
+        LOG.trace(".updateConnectionState File " + path.toString()
+                + " will be disconnected ");
+        disconnectDocumentProvider(path);
+    }*/
+  }
 }

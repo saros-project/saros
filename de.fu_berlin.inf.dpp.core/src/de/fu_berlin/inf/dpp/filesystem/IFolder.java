@@ -24,21 +24,14 @@ package de.fu_berlin.inf.dpp.filesystem;
 import java.io.IOException;
 
 /**
- * This interface is under development. It currently equals its Eclipse
- * counterpart. If not mentioned otherwise all offered methods are equivalent to
- * their Eclipse counterpart.
+ * This interface is under development. It currently equals its Eclipse counterpart. If not
+ * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
  */
 public interface IFolder extends IContainer {
 
-    /**
-     * Equivalent to the Eclipse call
-     * <code>IFolder#create(updateFlags, local, null)</code>
-     */
-    public void create(int updateFlags, boolean local) throws IOException;
+  /** Equivalent to the Eclipse call <code>IFolder#create(updateFlags, local, null)</code> */
+  public void create(int updateFlags, boolean local) throws IOException;
 
-    /**
-     * Equivalent to the Eclipse call
-     * <code>IFolder#create(force, local, null)</code>
-     */
-    public void create(boolean force, boolean local) throws IOException;
+  /** Equivalent to the Eclipse call <code>IFolder#create(force, local, null)</code> */
+  public void create(boolean force, boolean local) throws IOException;
 }

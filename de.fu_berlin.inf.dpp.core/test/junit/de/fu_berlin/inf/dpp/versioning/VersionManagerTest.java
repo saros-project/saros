@@ -3,7 +3,7 @@
  * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * (c) Karl Beecher - 2011
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -23,167 +23,152 @@ package de.fu_berlin.inf.dpp.versioning;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Properties;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
+import java.util.Properties;
+import org.junit.Before;
+import org.junit.Test;
 
 public class VersionManagerTest {
 
-    private ITransmitter aliceTransmitter;
-    private ITransmitter bobTransmitter;
+  private ITransmitter aliceTransmitter;
+  private ITransmitter bobTransmitter;
 
-    private IReceiver aliceReceiver;
-    private IReceiver bobReceiver;
+  private IReceiver aliceReceiver;
+  private IReceiver bobReceiver;
 
-    private VersionManager versionManagerRemote;
-    private VersionManager versionManagerLocal;
+  private VersionManager versionManagerRemote;
+  private VersionManager versionManagerLocal;
 
-    private final JID aliceJID = new JID("alice@alice.com/Saros");
-    private final JID bobJID = new JID("bob@bob.com/Saros");
+  private final JID aliceJID = new JID("alice@alice.com/Saros");
+  private final JID bobJID = new JID("bob@bob.com/Saros");
 
-    @Before
-    public void setUp() {
-        FakeConnectionFactoryResult result = FakeConnectionFactory
-            .createConnections(aliceJID, bobJID).get();
+  @Before
+  public void setUp() {
+    FakeConnectionFactoryResult result =
+        FakeConnectionFactory.createConnections(aliceJID, bobJID).get();
 
-        aliceReceiver = result.getReceiver(aliceJID);
-        bobReceiver = result.getReceiver(bobJID);
+    aliceReceiver = result.getReceiver(aliceJID);
+    bobReceiver = result.getReceiver(bobJID);
 
-        aliceTransmitter = result.getTransmitter(aliceJID);
-        bobTransmitter = result.getTransmitter(bobJID);
-    }
+    aliceTransmitter = result.getTransmitter(aliceJID);
+    bobTransmitter = result.getTransmitter(bobJID);
+  }
 
-    private void init(Version local, Version remote) {
+  private void init(Version local, Version remote) {
 
-        versionManagerLocal = new VersionManager(local.toString(),
-            aliceReceiver, aliceTransmitter);
+    versionManagerLocal = new VersionManager(local.toString(), aliceReceiver, aliceTransmitter);
 
-        versionManagerRemote = new VersionManager(remote.toString(),
-            bobReceiver, bobTransmitter);
-    }
+    versionManagerRemote = new VersionManager(remote.toString(), bobReceiver, bobTransmitter);
+  }
 
-    @Test
-    public void testVersionsSame() {
+  @Test
+  public void testVersionsSame() {
 
-        Version local = Version.parseVersion("1.1.1.r1");
-        Version remote = Version.parseVersion("1.1.1.r1");
+    Version local = Version.parseVersion("1.1.1.r1");
+    Version remote = Version.parseVersion("1.1.1.r1");
 
-        init(local, remote);
+    init(local, remote);
 
-        VersionCompatibilityResult result = versionManagerLocal
-            .determineVersionCompatibility(bobJID);
+    VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
-        assertEquals(Compatibility.OK, result.getCompatibility());
-    }
+    assertEquals(Compatibility.OK, result.getCompatibility());
+  }
 
-    @Test
-    public void testVersionsSameOnlyQualifierDiffers() {
+  @Test
+  public void testVersionsSameOnlyQualifierDiffers() {
 
-        Version local = Version.parseVersion("1.1.1.r1");
-        Version remote = Version.parseVersion("1.1.1.r2");
+    Version local = Version.parseVersion("1.1.1.r1");
+    Version remote = Version.parseVersion("1.1.1.r2");
 
-        init(local, remote);
+    init(local, remote);
 
-        VersionCompatibilityResult result = versionManagerLocal
-            .determineVersionCompatibility(bobJID);
+    VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
-        assertEquals(Compatibility.OK, result.getCompatibility());
-    }
+    assertEquals(Compatibility.OK, result.getCompatibility());
+  }
 
-    @Test
-    public void testlocalVersionsTooOld() {
+  @Test
+  public void testlocalVersionsTooOld() {
 
-        Version local = Version.parseVersion("1.1.1.r1");
-        Version remote = Version.parseVersion("1.1.2.r1");
+    Version local = Version.parseVersion("1.1.1.r1");
+    Version remote = Version.parseVersion("1.1.2.r1");
 
-        init(local, remote);
+    init(local, remote);
 
-        VersionCompatibilityResult result = versionManagerLocal
-            .determineVersionCompatibility(bobJID);
+    VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
-        assertEquals(Compatibility.TOO_OLD, result.getCompatibility());
-    }
+    assertEquals(Compatibility.TOO_OLD, result.getCompatibility());
+  }
 
-    @Test
-    public void testlocalVersionsTooNew() {
+  @Test
+  public void testlocalVersionsTooNew() {
 
-        Version local = Version.parseVersion("1.1.2.r1");
-        Version remote = Version.parseVersion("1.1.1.r1");
+    Version local = Version.parseVersion("1.1.2.r1");
+    Version remote = Version.parseVersion("1.1.1.r1");
 
-        init(local, remote);
+    init(local, remote);
 
-        VersionCompatibilityResult result = versionManagerLocal
-            .determineVersionCompatibility(bobJID);
+    VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
-        assertEquals(Compatibility.TOO_NEW, result.getCompatibility());
-    }
+    assertEquals(Compatibility.TOO_NEW, result.getCompatibility());
+  }
 
-    @Test
-    public void testLocalVersionTooNewButCompatible() throws Exception {
+  @Test
+  public void testLocalVersionTooNewButCompatible() throws Exception {
 
-        Version local = Version.parseVersion("999999.1.2.r1");
-        Version remote = Version.parseVersion("999999.1.1.r1");
+    Version local = Version.parseVersion("999999.1.2.r1");
+    Version remote = Version.parseVersion("999999.1.1.r1");
 
-        init(local, remote);
+    init(local, remote);
 
-        Properties chart = new Properties();
+    Properties chart = new Properties();
 
-        chart.put(local.toString(), remote.toString());
-        versionManagerLocal.setCompatibilityChart(chart);
+    chart.put(local.toString(), remote.toString());
+    versionManagerLocal.setCompatibilityChart(chart);
 
-        assertEquals(Compatibility.TOO_OLD,
-            versionManagerRemote.determineCompatibility(remote, local));
+    assertEquals(Compatibility.TOO_OLD, versionManagerRemote.determineCompatibility(remote, local));
 
-        assertEquals(Compatibility.OK,
-            versionManagerLocal.determineCompatibility(local, remote));
+    assertEquals(Compatibility.OK, versionManagerLocal.determineCompatibility(local, remote));
 
-        // do the "real" network check:
+    // do the "real" network check:
 
-        VersionCompatibilityResult resultRemote = versionManagerRemote
-            .determineVersionCompatibility(aliceJID);
+    VersionCompatibilityResult resultRemote =
+        versionManagerRemote.determineVersionCompatibility(aliceJID);
 
-        VersionCompatibilityResult resultLocal = versionManagerLocal
-            .determineVersionCompatibility(bobJID);
+    VersionCompatibilityResult resultLocal =
+        versionManagerLocal.determineVersionCompatibility(bobJID);
 
-        assertEquals(resultLocal.getCompatibility(),
-            resultRemote.getCompatibility());
+    assertEquals(resultLocal.getCompatibility(), resultRemote.getCompatibility());
+  }
 
-    }
+  @Test
+  public void testLocalVersionTooOldButCompatible() throws Exception {
+    Version local = Version.parseVersion("1999999.1.1.r1");
+    Version remote = Version.parseVersion("1999999.1.2.r1");
 
-    @Test
-    public void testLocalVersionTooOldButCompatible() throws Exception {
-        Version local = Version.parseVersion("1999999.1.1.r1");
-        Version remote = Version.parseVersion("1999999.1.2.r1");
+    init(local, remote);
 
-        init(local, remote);
+    Properties chart = new Properties();
 
-        Properties chart = new Properties();
+    chart.put(remote.toString(), local.toString());
+    versionManagerRemote.setCompatibilityChart(chart);
 
-        chart.put(remote.toString(), local.toString());
-        versionManagerRemote.setCompatibilityChart(chart);
+    assertEquals(Compatibility.TOO_OLD, versionManagerLocal.determineCompatibility(local, remote));
 
-        assertEquals(Compatibility.TOO_OLD,
-            versionManagerLocal.determineCompatibility(local, remote));
+    assertEquals(Compatibility.OK, versionManagerRemote.determineCompatibility(remote, local));
 
-        assertEquals(Compatibility.OK,
-            versionManagerRemote.determineCompatibility(remote, local));
+    // do the "real" network check:
 
-        // do the "real" network check:
+    VersionCompatibilityResult resultRemote =
+        versionManagerRemote.determineVersionCompatibility(aliceJID);
 
-        VersionCompatibilityResult resultRemote = versionManagerRemote
-            .determineVersionCompatibility(aliceJID);
+    VersionCompatibilityResult resultLocal =
+        versionManagerLocal.determineVersionCompatibility(bobJID);
 
-        VersionCompatibilityResult resultLocal = versionManagerLocal
-            .determineVersionCompatibility(bobJID);
-
-        assertEquals(resultLocal.getCompatibility(),
-            resultRemote.getCompatibility());
-    }
+    assertEquals(resultLocal.getCompatibility(), resultRemote.getCompatibility());
+  }
 }

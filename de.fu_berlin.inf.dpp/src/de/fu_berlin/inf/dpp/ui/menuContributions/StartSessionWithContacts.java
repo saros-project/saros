@@ -1,10 +1,19 @@
 package de.fu_berlin.inf.dpp.ui.menuContributions;
 
+import de.fu_berlin.inf.dpp.SarosConstants;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
+import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
@@ -16,119 +25,98 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
-import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-
 /**
- * This class fills a {@link Menu} with {@link MenuItem}s. Each entry represents
- * a contact with Saros support. A click starts a session negotiation.
+ * This class fills a {@link Menu} with {@link MenuItem}s. Each entry represents a contact with
+ * Saros support. A click starts a session negotiation.
  */
 public class StartSessionWithContacts extends ContributionItem {
 
-    @Inject
-    private XMPPConnectionService connectionService;
+  @Inject private XMPPConnectionService connectionService;
 
-    @Inject
-    private DiscoveryManager discoveryManager;
+  @Inject private DiscoveryManager discoveryManager;
 
-    public StartSessionWithContacts() {
-        this(null);
+  public StartSessionWithContacts() {
+    this(null);
+  }
+
+  public StartSessionWithContacts(String id) {
+    super(id);
+    SarosPluginContext.initComponent(this);
+  }
+
+  @Override
+  public void fill(Menu menu, int index) {
+    if (!connectionService.isConnected()) return;
+
+    final List<IResource> selectedResources =
+        SelectionRetrieverFactory.getSelectionRetriever(IResource.class).getSelection();
+
+    int numSarosSupportedContacts = 0;
+
+    for (final RosterEntry rosterEntry : getSortedRosterEntries()) {
+      Boolean sarosSupport =
+          discoveryManager.isFeatureSupported(
+              new JID(rosterEntry.getUser()), SarosConstants.XMPP_FEATURE_NAMESPACE);
+
+      if (sarosSupport != null && sarosSupport) {
+        createContactMenuItem(menu, numSarosSupportedContacts++, rosterEntry, selectedResources);
+      }
     }
 
-    public StartSessionWithContacts(String id) {
-        super(id);
-        SarosPluginContext.initComponent(this);
+    if (numSarosSupportedContacts == 0) {
+      createInvalidContactsMenuItem(menu, numSarosSupportedContacts);
     }
+  }
 
-    @Override
-    public void fill(Menu menu, int index) {
-        if (!connectionService.isConnected())
-            return;
+  /** Returns a sorted array of {@link Roster}'s contacts. */
+  private RosterEntry[] getSortedRosterEntries() {
+    RosterEntry[] rosterEntries =
+        connectionService.getRoster().getEntries().toArray(new RosterEntry[0]);
 
-        final List<IResource> selectedResources = SelectionRetrieverFactory
-            .getSelectionRetriever(IResource.class).getSelection();
-
-        int numSarosSupportedContacts = 0;
-
-        for (final RosterEntry rosterEntry : getSortedRosterEntries()) {
-            Boolean sarosSupport = discoveryManager.isFeatureSupported(new JID(
-                rosterEntry.getUser()), SarosConstants.XMPP_FEATURE_NAMESPACE);
-
-            if (sarosSupport != null && sarosSupport) {
-                createContactMenuItem(menu, numSarosSupportedContacts++,
-                    rosterEntry, selectedResources);
-            }
-        }
-
-        if (numSarosSupportedContacts == 0) {
-            createInvalidContactsMenuItem(menu, numSarosSupportedContacts);
-        }
-    }
-
-    /**
-     * Returns a sorted array of {@link Roster}'s contacts.
-     */
-    private RosterEntry[] getSortedRosterEntries() {
-        RosterEntry[] rosterEntries = connectionService.getRoster()
-            .getEntries().toArray(new RosterEntry[0]);
-
-        Arrays.sort(rosterEntries, new Comparator<RosterEntry>() {
-            @Override
-            public int compare(RosterEntry o1, RosterEntry o2) {
-                String name1 = XMPPUtils.getDisplayableName(o1);
-                String name2 = XMPPUtils.getDisplayableName(o2);
-                return name1.compareToIgnoreCase(name2);
-            }
+    Arrays.sort(
+        rosterEntries,
+        new Comparator<RosterEntry>() {
+          @Override
+          public int compare(RosterEntry o1, RosterEntry o2) {
+            String name1 = XMPPUtils.getDisplayableName(o1);
+            String name2 = XMPPUtils.getDisplayableName(o2);
+            return name1.compareToIgnoreCase(name2);
+          }
         });
-        return rosterEntries;
-    }
+    return rosterEntries;
+  }
 
-    /**
-     * Creates a menu entry which shares projects with the given
-     * {@link RosterEntry}.
+  /** Creates a menu entry which shares projects with the given {@link RosterEntry}. */
+  private MenuItem createContactMenuItem(
+      Menu parentMenu, int index, final RosterEntry rosterEntry, final List<IResource> resources) {
+
+    /*
+     * The model knows how to display roster entries best.
      */
-    private MenuItem createContactMenuItem(Menu parentMenu, int index,
-        final RosterEntry rosterEntry, final List<IResource> resources) {
+    RosterEntryElement rosterEntryElement =
+        new RosterEntryElement(connectionService.getRoster(), new JID(rosterEntry.getUser()), true);
 
-        /*
-         * The model knows how to display roster entries best.
-         */
-        RosterEntryElement rosterEntryElement = new RosterEntryElement(
-            connectionService.getRoster(), new JID(rosterEntry.getUser()), true);
+    MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
+    menuItem.setText(rosterEntryElement.getStyledText().toString());
+    menuItem.setImage(rosterEntryElement.getImage());
 
-        MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
-        menuItem.setText(rosterEntryElement.getStyledText().toString());
-        menuItem.setImage(rosterEntryElement.getImage());
-
-        menuItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                CollaborationUtils.startSession(resources,
-                    Collections.singletonList(new JID(rosterEntry.getUser())));
-            }
+    menuItem.addSelectionListener(
+        new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            CollaborationUtils.startSession(
+                resources, Collections.singletonList(new JID(rosterEntry.getUser())));
+          }
         });
 
-        return menuItem;
-    }
+    return menuItem;
+  }
 
-    /**
-     * Creates a menu entry which indicates that no contacts with Saros are
-     * online.
-     */
-    private MenuItem createInvalidContactsMenuItem(Menu parentMenu, int index) {
-        MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
-        menuItem
-            .setText(Messages.SessionWithContacts_menuItem_no_contacts_available_text);
-        menuItem.setEnabled(false);
-        return menuItem;
-    }
-
+  /** Creates a menu entry which indicates that no contacts with Saros are online. */
+  private MenuItem createInvalidContactsMenuItem(Menu parentMenu, int index) {
+    MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
+    menuItem.setText(Messages.SessionWithContacts_menuItem_no_contacts_available_text);
+    menuItem.setEnabled(false);
+    return menuItem;
+  }
 }

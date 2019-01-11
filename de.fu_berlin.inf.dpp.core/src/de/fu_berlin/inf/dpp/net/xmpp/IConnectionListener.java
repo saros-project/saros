@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -19,29 +19,23 @@
  */
 package de.fu_berlin.inf.dpp.net.xmpp;
 
+import de.fu_berlin.inf.dpp.net.ConnectionState;
 import org.jivesoftware.smack.Connection;
 
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-
 /**
- * A listener for changes to the current connection state. Use
- * {@link XMPPConnectionService#addListener(IConnectionListener)} to attach it.
- * 
+ * A listener for changes to the current connection state. Use {@link
+ * XMPPConnectionService#addListener(IConnectionListener)} to attach it.
+ *
  * @author rdjemili
  */
 public interface IConnectionListener {
 
-    /**
-     * Is fired when the state of the connection changes.
-     * 
-     * @param connection
-     *            The affected XMPP-connection that changed its state
-     * @param state
-     *            the new state of the connection. If the state is
-     *            <code>ERROR</code>, you can use
-     *            {@link XMPPConnectionService#getConnectionError()} to get the
-     *            error message.
-     */
-    public void connectionStateChanged(Connection connection,
-        ConnectionState state);
+  /**
+   * Is fired when the state of the connection changes.
+   *
+   * @param connection The affected XMPP-connection that changed its state
+   * @param state the new state of the connection. If the state is <code>ERROR</code>, you can use
+   *     {@link XMPPConnectionService#getConnectionError()} to get the error message.
+   */
+  public void connectionStateChanged(Connection connection, ConnectionState state);
 }

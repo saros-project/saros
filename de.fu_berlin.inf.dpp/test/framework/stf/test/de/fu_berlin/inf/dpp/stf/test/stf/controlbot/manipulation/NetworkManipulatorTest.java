@@ -5,165 +5,133 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
+import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-
 public class NetworkManipulatorTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTester() throws Exception {
-        select(ALICE, BOB);
+  @BeforeClass
+  public static void selectTester() throws Exception {
+    select(ALICE, BOB);
+  }
 
-    }
+  @AfterClass
+  public static void resetNetwork() throws Exception {
+    ALICE.controlBot().getNetworkManipulator().unblockIncomingSessionPackets();
 
-    @AfterClass
-    public static void resetNetwork() throws Exception {
-        ALICE.controlBot().getNetworkManipulator()
-            .unblockIncomingSessionPackets();
+    ALICE.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
 
-        ALICE.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets();
+    BOB.controlBot().getNetworkManipulator().unblockIncomingSessionPackets();
 
-        BOB.controlBot().getNetworkManipulator()
-            .unblockIncomingSessionPackets();
+    BOB.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
+  }
 
-        BOB.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets();
+  @Before
+  public void createProjectandOpenFiles() throws Exception {
+    Util.setUpSessionWithProjectAndFile("foo", "bar.txt", "bla", ALICE, BOB);
+    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/bar.txt");
 
-    }
+    ALICE.superBot().views().packageExplorerView().selectFile("foo", "bar.txt").open();
+    ALICE.remoteBot().editor("bar.txt").waitUntilIsActive();
 
-    @Before
-    public void createProjectandOpenFiles() throws Exception {
-        Util.setUpSessionWithProjectAndFile("foo", "bar.txt", "bla", ALICE, BOB);
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("foo/bar.txt");
+    BOB.superBot().views().packageExplorerView().selectFile("foo", "bar.txt").open();
+    BOB.remoteBot().editor("bar.txt").waitUntilIsActive();
+  }
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("foo", "bar.txt").open();
-        ALICE.remoteBot().editor("bar.txt").waitUntilIsActive();
+  @After
+  public void unblockNetworkAndCleanUp() throws Exception {
+    ALICE.controlBot().getNetworkManipulator().unblockIncomingSessionPackets();
 
-        BOB.superBot().views().packageExplorerView()
-            .selectFile("foo", "bar.txt").open();
-        BOB.remoteBot().editor("bar.txt").waitUntilIsActive();
+    ALICE.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
 
-    }
+    BOB.controlBot().getNetworkManipulator().unblockIncomingSessionPackets();
 
-    @After
-    public void unblockNetworkAndCleanUp() throws Exception {
-        ALICE.controlBot().getNetworkManipulator()
-            .unblockIncomingSessionPackets();
+    BOB.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
 
-        ALICE.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets();
+    leaveSessionPeersFirst(ALICE);
 
-        BOB.controlBot().getNetworkManipulator()
-            .unblockIncomingSessionPackets();
+    closeAllShells();
+    closeAllEditors();
+    clearWorkspaces();
+  }
 
-        BOB.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets();
+  @Test
+  public void testBlockAndUnblockOutgoingTrafficOnAlice() throws Exception {
+    ALICE.controlBot().getNetworkManipulator().blockOutgoingSessionPackets();
 
-        leaveSessionPeersFirst(ALICE);
+    ALICE.remoteBot().editor("bar.txt").typeText("foo");
 
-        closeAllShells();
-        closeAllEditors();
-        clearWorkspaces();
-    }
+    Thread.sleep(1000);
 
-    @Test
-    public void testBlockAndUnblockOutgoingTrafficOnAlice() throws Exception {
-        ALICE.controlBot().getNetworkManipulator()
-            .blockOutgoingSessionPackets();
+    assertEquals("bla", BOB.remoteBot().editor("bar.txt").getText());
 
-        ALICE.remoteBot().editor("bar.txt").typeText("foo");
+    ALICE.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
 
-        Thread.sleep(1000);
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 10000);
 
-        assertEquals("bla", BOB.remoteBot().editor("bar.txt").getText());
+    assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
+  }
 
-        ALICE.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets();
+  @Test
+  public void testBlockAndUnblockIncommingTrafficOnBob() throws Exception {
+    BOB.controlBot().getNetworkManipulator().blockIncomingSessionPackets();
 
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(BOB.getJID(), 10000);
+    ALICE.remoteBot().editor("bar.txt").typeText("foo");
 
-        assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
-    }
+    Thread.sleep(1000);
 
-    @Test
-    public void testBlockAndUnblockIncommingTrafficOnBob() throws Exception {
-        BOB.controlBot().getNetworkManipulator().blockIncomingSessionPackets();
+    assertEquals("bla", BOB.remoteBot().editor("bar.txt").getText());
 
-        ALICE.remoteBot().editor("bar.txt").typeText("foo");
+    BOB.controlBot().getNetworkManipulator().unblockIncomingSessionPackets();
 
-        Thread.sleep(1000);
+    BOB.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(ALICE.getJID(), 10000);
 
-        assertEquals("bla", BOB.remoteBot().editor("bar.txt").getText());
+    assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
+  }
 
-        BOB.controlBot().getNetworkManipulator()
-            .unblockIncomingSessionPackets();
+  @Test
+  public void testBlockNonExistingSessionJID() throws Exception {
+    BOB.controlBot().getNetworkManipulator().blockIncomingSessionPackets(new JID("my@example.com"));
 
-        BOB.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(ALICE.getJID(), 10000);
+    ALICE.remoteBot().editor("bar.txt").typeText("foo");
 
-        assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
-    }
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 10000);
 
-    @Test
-    public void testBlockNonExistingSessionJID() throws Exception {
-        BOB.controlBot().getNetworkManipulator()
-            .blockIncomingSessionPackets(new JID("my@example.com"));
+    assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
+  }
 
-        ALICE.remoteBot().editor("bar.txt").typeText("foo");
+  @Test
+  public void testBlockAndUnblockOutgoingTrafficOnAliceToSingleJID() throws Exception {
+    ALICE.controlBot().getNetworkManipulator().blockOutgoingSessionPackets(BOB.getJID());
 
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(BOB.getJID(), 10000);
+    ALICE.remoteBot().editor("bar.txt").typeText("foo");
 
-        assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
+    Thread.sleep(1000);
 
-    }
+    assertEquals("bla", BOB.remoteBot().editor("bar.txt").getText());
 
-    @Test
-    public void testBlockAndUnblockOutgoingTrafficOnAliceToSingleJID()
-        throws Exception {
-        ALICE.controlBot().getNetworkManipulator()
-            .blockOutgoingSessionPackets(BOB.getJID());
+    ALICE.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets(BOB.getJID());
 
-        ALICE.remoteBot().editor("bar.txt").typeText("foo");
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 10000);
 
-        Thread.sleep(1000);
+    assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
+  }
 
-        assertEquals("bla", BOB.remoteBot().editor("bar.txt").getText());
+  @Test
+  public void testSynchronizeOnActivityQueue() throws Exception {
 
-        ALICE.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets(BOB.getJID());
+    BOB.superBot().internal().createFile("foo", "bigfile", 10 * 1024 * 1024, true);
 
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(BOB.getJID(), 10000);
+    BOB.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
 
-        assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
-    }
+    assertTrue("synchronization failed", ALICE.superBot().internal().existsResource("foo/bigfile"));
 
-    @Test
-    public void testSynchronizeOnActivityQueue() throws Exception {
-
-        BOB.superBot().internal()
-            .createFile("foo", "bigfile", 10 * 1024 * 1024, true);
-
-        BOB.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
-
-        assertTrue("synchronization failed", ALICE.superBot().internal()
-            .existsResource("foo/bigfile"));
-
-        assertEquals(10 * 1024 * 1024,
-            ALICE.superBot().internal().getFileSize("foo", "bigfile"));
-
-    }
+    assertEquals(10 * 1024 * 1024, ALICE.superBot().internal().getFileSize("foo", "bigfile"));
+  }
 }

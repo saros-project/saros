@@ -7,11 +7,11 @@ import org.powermock.mockpolicies.MockPolicyClassLoadingSettings;
 import org.powermock.mockpolicies.MockPolicyInterceptionSettings;
 
 /**
- * This policy can be used to avoid reiterating Eclipse components that need to
- * be prepared by PowerMock because they are final.
- * <p>
- * Usage:
- * 
+ * This policy can be used to avoid reiterating Eclipse components that need to be prepared by
+ * PowerMock because they are final.
+ *
+ * <p>Usage:
+ *
  * <pre>
  * {@literal @}RunWith(PowerMockRunner.class)
  * {@literal @}MockPolicy( { PrepareEclipseComponents.class } )
@@ -21,18 +21,16 @@ import org.powermock.mockpolicies.MockPolicyInterceptionSettings;
  * </pre>
  */
 public class PrepareEclipseComponents implements PowerMockPolicy {
-    @Override
-    public void applyClassLoadingPolicy(MockPolicyClassLoadingSettings settings) {
-        // Add more final classes here, if need be
-        String[] classes = { ResourcesPlugin.class.getName(),
-            Platform.class.getName() };
+  @Override
+  public void applyClassLoadingPolicy(MockPolicyClassLoadingSettings settings) {
+    // Add more final classes here, if need be
+    String[] classes = {ResourcesPlugin.class.getName(), Platform.class.getName()};
 
-        settings
-            .addFullyQualifiedNamesOfClassesToLoadByMockClassloader(classes);
-    }
+    settings.addFullyQualifiedNamesOfClassesToLoadByMockClassloader(classes);
+  }
 
-    @Override
-    public void applyInterceptionPolicy(MockPolicyInterceptionSettings settings) {
-        //
-    }
+  @Override
+  public void applyInterceptionPolicy(MockPolicyInterceptionSettings settings) {
+    //
+  }
 }

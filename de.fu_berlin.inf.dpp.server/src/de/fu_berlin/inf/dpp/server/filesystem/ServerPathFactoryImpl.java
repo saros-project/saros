@@ -5,29 +5,26 @@ import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 
 public class ServerPathFactoryImpl implements IPathFactory {
 
-    @Override
-    public String fromPath(IPath path) {
+  @Override
+  public String fromPath(IPath path) {
 
-        if (path == null)
-            throw new NullPointerException("path is null");
+    if (path == null) throw new NullPointerException("path is null");
 
-        return checkRelative(path).toString();
-    }
+    return checkRelative(path).toString();
+  }
 
-    @Override
-    public IPath fromString(String name) {
+  @Override
+  public IPath fromString(String name) {
 
-        if (name == null)
-            throw new NullPointerException("name is null");
+    if (name == null) throw new NullPointerException("name is null");
 
-        return checkRelative(ServerPathImpl.fromString(name));
-    }
+    return checkRelative(ServerPathImpl.fromString(name));
+  }
 
-    private IPath checkRelative(IPath path) {
+  private IPath checkRelative(IPath path) {
 
-        if (path.isAbsolute())
-            throw new IllegalArgumentException("path is absolute: " + path);
+    if (path.isAbsolute()) throw new IllegalArgumentException("path is absolute: " + path);
 
-        return path;
-    }
+    return path;
+  }
 }

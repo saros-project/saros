@@ -1,13 +1,5 @@
 package de.fu_berlin.inf.dpp;
 
-import java.util.Arrays;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
-
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
@@ -21,43 +13,51 @@ import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
+import java.util.Arrays;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.picocontainer.BindKey;
+import org.picocontainer.MutablePicoContainer;
 
-/**
- * Check the {@link CoreContextFactory} for internal integrity.
- */
+/** Check the {@link CoreContextFactory} for internal integrity. */
 public class SarosCoreContextFactoryTest {
 
-    private MutablePicoContainer container;
+  private MutablePicoContainer container;
 
-    @Before
-    public void setup() {
-        container = ContextMocker.emptyContext();
+  @Before
+  public void setup() {
+    container = ContextMocker.emptyContext();
 
-        // mock dependencies normally provided by the surrounding system (e.g.
-        // an IDE plugin)
-        Class<?>[] dependencies = { IProxyResolver.class,
-            IRemoteProgressIndicatorFactory.class, IContainerContext.class,
-            Preferences.class, IWorkspace.class, IEditorManager.class,
-            IChecksumCache.class };
+    // mock dependencies normally provided by the surrounding system (e.g.
+    // an IDE plugin)
+    Class<?>[] dependencies = {
+      IProxyResolver.class,
+      IRemoteProgressIndicatorFactory.class,
+      IContainerContext.class,
+      Preferences.class,
+      IWorkspace.class,
+      IEditorManager.class,
+      IChecksumCache.class
+    };
 
-        ContextMocker.addMocks(container, Arrays.asList(dependencies));
+    ContextMocker.addMocks(container, Arrays.asList(dependencies));
 
-        // nice mocks aren't clever enough here
-        container.addComponent(BindKey.bindKey(String.class,
-            IContextKeyBindings.SarosVersion.class), "1.0.0.dummy");
+    // nice mocks aren't clever enough here
+    container.addComponent(
+        BindKey.bindKey(String.class, IContextKeyBindings.SarosVersion.class), "1.0.0.dummy");
 
-        // nice mocks aren't clever enough here
-        container.addComponent(IPreferenceStore.class,
-            new MemoryPreferenceStore());
-    }
+    // nice mocks aren't clever enough here
+    container.addComponent(IPreferenceStore.class, new MemoryPreferenceStore());
+  }
 
-    @Test
-    public void testCreateComponents() {
-        IContextFactory factory = new CoreContextFactory();
+  @Test
+  public void testCreateComponents() {
+    IContextFactory factory = new CoreContextFactory();
 
-        factory.createComponents(container);
-        container.start();
+    factory.createComponents(container);
+    container.start();
 
-        Assert.assertNotNull(container.getComponents());
-    }
+    Assert.assertNotNull(container.getComponents());
+  }
 }

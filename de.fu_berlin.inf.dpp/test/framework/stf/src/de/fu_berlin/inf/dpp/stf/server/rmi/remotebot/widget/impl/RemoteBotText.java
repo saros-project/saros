@@ -1,78 +1,73 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
-import java.rmi.RemoteException;
-
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
-
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotText;
+import java.rmi.RemoteException;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 
-public final class RemoteBotText extends StfRemoteObject implements
-    IRemoteBotText {
+public final class RemoteBotText extends StfRemoteObject implements IRemoteBotText {
 
-    private static final RemoteBotText INSTANCE = new RemoteBotText();
+  private static final RemoteBotText INSTANCE = new RemoteBotText();
 
-    private SWTBotText widget;
+  private SWTBotText widget;
 
-    public static RemoteBotText getInstance() {
-        return INSTANCE;
-    }
+  public static RemoteBotText getInstance() {
+    return INSTANCE;
+  }
 
-    public IRemoteBotText setWidget(SWTBotText text) {
-        this.widget = text;
-        return this;
-    }
+  public IRemoteBotText setWidget(SWTBotText text) {
+    this.widget = text;
+    return this;
+  }
 
-    @Override
-    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
+  @Override
+  public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+    return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
+  }
 
-    }
+  @Override
+  public IRemoteBotText selectAll() throws RemoteException {
+    return setWidget(widget.selectAll());
+  }
 
-    @Override
-    public IRemoteBotText selectAll() throws RemoteException {
-        return setWidget(widget.selectAll());
-    }
+  @Override
+  public void setFocus() throws RemoteException {
+    widget.setFocus();
+  }
 
-    @Override
-    public void setFocus() throws RemoteException {
-        widget.setFocus();
-    }
+  @Override
+  public IRemoteBotText setText(String text) throws RemoteException {
+    return setWidget(widget.setText(text));
+  }
 
-    @Override
-    public IRemoteBotText setText(String text) throws RemoteException {
-        return setWidget(widget.setText(text));
-    }
+  @Override
+  public IRemoteBotText typeText(String text) throws RemoteException {
+    return setWidget(widget.typeText(text));
+  }
 
-    @Override
-    public IRemoteBotText typeText(String text) throws RemoteException {
-        return setWidget(widget.typeText(text));
-    }
+  @Override
+  public String getText() throws RemoteException {
+    return widget.getText();
+  }
 
-    @Override
-    public String getText() throws RemoteException {
-        return widget.getText();
-    }
+  @Override
+  public boolean isEnabled() throws RemoteException {
+    return widget.isEnabled();
+  }
 
-    @Override
-    public boolean isEnabled() throws RemoteException {
-        return widget.isEnabled();
-    }
+  @Override
+  public boolean isVisible() throws RemoteException {
+    return widget.isVisible();
+  }
 
-    @Override
-    public boolean isVisible() throws RemoteException {
-        return widget.isVisible();
-    }
+  @Override
+  public boolean isActive() throws RemoteException {
+    return widget.isActive();
+  }
 
-    @Override
-    public boolean isActive() throws RemoteException {
-        return widget.isActive();
-    }
-
-    @Override
-    public String getToolTipText() throws RemoteException {
-        return widget.getText();
-    }
-
+  @Override
+  public String getToolTipText() throws RemoteException {
+    return widget.getText();
+  }
 }

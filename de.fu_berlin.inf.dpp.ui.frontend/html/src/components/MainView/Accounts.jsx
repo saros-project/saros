@@ -1,10 +1,10 @@
-import React from 'react'
-import { Text } from 'react-localize'
+import { Account } from 'Utils/propTypes'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { PropTypes as PM } from 'mobx-react'
-import P from 'prop-types'
-import { Account } from 'Utils/propTypes'
+import { Text } from 'react-localize'
 import { getJid } from 'Utils'
+import P from 'prop-types'
+import React from 'react'
 
 const AccountsProps = {
   activeAccount: Account.isRequired,

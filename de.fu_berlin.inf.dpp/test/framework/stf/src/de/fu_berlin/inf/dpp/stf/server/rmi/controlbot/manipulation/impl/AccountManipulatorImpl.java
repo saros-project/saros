@@ -1,115 +1,103 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl;
 
-import java.rmi.RemoteException;
-
-import org.apache.log4j.Logger;
-
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.IAccountManipulator;
+import java.rmi.RemoteException;
+import org.apache.log4j.Logger;
 
-public class AccountManipulatorImpl extends StfRemoteObject implements
-    IAccountManipulator {
+public class AccountManipulatorImpl extends StfRemoteObject implements IAccountManipulator {
 
-    private static final Logger LOG = Logger
-        .getLogger(AccountManipulatorImpl.class);
+  private static final Logger LOG = Logger.getLogger(AccountManipulatorImpl.class);
 
-    private static final IAccountManipulator INSTANCE = new AccountManipulatorImpl();
+  private static final IAccountManipulator INSTANCE = new AccountManipulatorImpl();
 
-    private AccountManipulatorImpl() {
-        // NOP
+  private AccountManipulatorImpl() {
+    // NOP
+  }
+
+  public static IAccountManipulator getInstance() {
+    return AccountManipulatorImpl.INSTANCE;
+  }
+
+  @Override
+  public void restoreDefaultAccount(String username, String password, String domain)
+      throws RemoteException {
+
+    XMPPAccountStore accountStore = getXmppAccountStore();
+
+    for (XMPPAccount account : accountStore.getAllAccounts()) {
+
+      if (account.equals(accountStore.getActiveAccount())) continue;
+
+      LOG.debug("deleting account: " + account);
+
+      accountStore.deleteAccount(account);
     }
 
-    public static IAccountManipulator getInstance() {
-        return AccountManipulatorImpl.INSTANCE;
+    if (accountStore.isEmpty()) {
+      accountStore.createAccount(username, password, domain, "", 0, true, true);
+      return;
     }
 
-    @Override
-    public void restoreDefaultAccount(String username, String password,
-        String domain) throws RemoteException {
+    XMPPAccount activeAccount = accountStore.getActiveAccount();
 
-        XMPPAccountStore accountStore = getXmppAccountStore();
+    if (accountStore.exists(username, domain, "", 0)) return;
 
-        for (XMPPAccount account : accountStore.getAllAccounts()) {
+    XMPPAccount defaultAccount =
+        accountStore.createAccount(username, password, domain, "", 0, true, true);
 
-            if (account.equals(accountStore.getActiveAccount()))
-                continue;
+    LOG.debug("activating account: " + defaultAccount);
+    accountStore.setAccountActive(defaultAccount);
 
-            LOG.debug("deleting account: " + account);
+    LOG.debug("deleting account: " + activeAccount);
+    accountStore.deleteAccount(activeAccount);
+  }
 
-            accountStore.deleteAccount(account);
-        }
+  @Override
+  public void addAccount(String username, String password, String domain) throws RemoteException {
 
-        if (accountStore.isEmpty()) {
-            accountStore.createAccount(username, password, domain, "", 0, true,
-                true);
-            return;
-        }
+    XMPPAccountStore accountStore = getXmppAccountStore();
 
-        XMPPAccount activeAccount = accountStore.getActiveAccount();
-
-        if (accountStore.exists(username, domain, "", 0))
-            return;
-
-        XMPPAccount defaultAccount = accountStore.createAccount(username,
-            password, domain, "", 0, true, true);
-
-        LOG.debug("activating account: " + defaultAccount);
-        accountStore.setAccountActive(defaultAccount);
-
-        LOG.debug("deleting account: " + activeAccount);
-        accountStore.deleteAccount(activeAccount);
+    if (accountStore.exists(username, domain, "", 0)) {
+      LOG.debug(
+          "account with username '" + username + "' and domain '" + domain + "' already exists");
+      return;
     }
 
-    @Override
-    public void addAccount(String username, String password, String domain)
-        throws RemoteException {
+    LOG.debug("creating account for username '" + username + "' and domain '" + domain + "'");
+    accountStore.createAccount(username, password, domain, "", 0, true, true);
+  }
 
-        XMPPAccountStore accountStore = getXmppAccountStore();
+  @Override
+  public boolean activateAccount(String username, String domain) throws RemoteException {
 
-        if (accountStore.exists(username, domain, "", 0)) {
-            LOG.debug("account with username '" + username + "' and domain '"
-                + domain + "' already exists");
-            return;
-        }
+    final XMPPAccountStore accountStore = getXmppAccountStore();
 
-        LOG.debug("creating account for username '" + username
-            + "' and domain '" + domain + "'");
-        accountStore.createAccount(username, password, domain, "", 0, true,
-            true);
+    XMPPAccount activeAccount = null;
+
+    try {
+      activeAccount = accountStore.getActiveAccount();
+    } catch (IllegalStateException e) {
+      // ignore
     }
 
-    @Override
-    public boolean activateAccount(String username, String domain)
-        throws RemoteException {
+    for (XMPPAccount account : accountStore.getAllAccounts()) {
+      if (account.getUsername().equals(username) && account.getDomain().equals(domain)) {
 
-        final XMPPAccountStore accountStore = getXmppAccountStore();
-
-        XMPPAccount activeAccount = null;
-
-        try {
-            activeAccount = accountStore.getActiveAccount();
-        } catch (IllegalStateException e) {
-            // ignore
+        if (!account.equals(activeAccount)) {
+          LOG.debug("activating account: " + account);
+          accountStore.setAccountActive(account);
+        } else {
+          LOG.debug("account is already activated: " + account);
         }
 
-        for (XMPPAccount account : accountStore.getAllAccounts()) {
-            if (account.getUsername().equals(username)
-                && account.getDomain().equals(domain)) {
-
-                if (!account.equals(activeAccount)) {
-                    LOG.debug("activating account: " + account);
-                    accountStore.setAccountActive(account);
-                } else {
-                    LOG.debug("account is already activated: " + account);
-                }
-
-                return !account.equals(activeAccount);
-            }
-        }
-
-        throw new IllegalArgumentException("an account with username '"
-            + username + "' and domain '" + domain + "' does not exist");
+        return !account.equals(activeAccount);
+      }
     }
+
+    throw new IllegalArgumentException(
+        "an account with username '" + username + "' and domain '" + domain + "' does not exist");
+  }
 }
