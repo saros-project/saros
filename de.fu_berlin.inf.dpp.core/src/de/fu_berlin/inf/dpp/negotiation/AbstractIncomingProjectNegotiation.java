@@ -77,7 +77,6 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     super(
         negotiationID,
         peer,
-        transferType,
         sessionManager,
         session,
         workspace,

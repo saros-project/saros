@@ -68,7 +68,6 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
     super(
         String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()),
         peer,
-        transferType,
         sessionManager,
         session,
         workspace,
