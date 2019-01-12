@@ -673,9 +673,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     try {
       for (User user : recipients) {
 
-        TransferType type =
-            TransferType.valueOf(
-                session.getUserProperties(user).getString(ProjectNegotiationTypeHook.KEY_TYPE));
+        TransferType type = getTransferType(user);
         AbstractOutgoingProjectNegotiation negotiation =
             negotiationFactory.newOutgoingProjectNegotiation(
                 user.getJID(), type, projectSharingData, this, session);
@@ -740,11 +738,7 @@ public class SarosSessionManager implements ISarosSessionManager {
           return;
         }
 
-        TransferType type =
-            TransferType.valueOf(
-                currentSession
-                    .getUserProperties(remoteUser)
-                    .getString(ProjectNegotiationTypeHook.KEY_TYPE));
+        TransferType type = getTransferType(remoteUser);
         negotiation =
             negotiationFactory.newOutgoingProjectNegotiation(
                 user, type, currentSharedProjects, this, currentSession);
@@ -852,5 +846,10 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     return terminated;
+  }
+
+  private TransferType getTransferType(User user) {
+    return TransferType.valueOf(
+        session.getUserProperties(user).getString(ProjectNegotiationTypeHook.KEY_TYPE));
   }
 }
