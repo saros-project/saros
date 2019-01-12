@@ -428,7 +428,6 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   void projectNegotiationRequestReceived(
       JID remoteAddress,
-      TransferType transferType,
       List<ProjectNegotiationData> projectNegotiationData,
       String negotiationID) {
 
