@@ -44,7 +44,6 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
       ) {
     super(
         peer,
-        TransferType.INSTANT,
         negotiationID,
         projectNegotiationData,
         sessionManager,
