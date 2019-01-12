@@ -14,6 +14,8 @@ import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ProjectNegotiationTypeHook;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import java.util.List;
 
@@ -128,11 +130,13 @@ public final class NegotiationFactory {
 
   public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
       final JID remoteAddress,
-      final TransferType transferType,
+      TransferType transferType,
       final ProjectSharingData projectSharingData,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
+    User remoteUser = session.getUser(remoteAddress);
+    transferType = getTransferType(session, remoteUser);
     if (transferType == null) {
       throw new IllegalArgumentException("transferType must not be null");
     }
@@ -169,12 +173,14 @@ public final class NegotiationFactory {
 
   public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
       final JID remoteAddress,
-      final TransferType transferType,
+      TransferType transferType,
       final String negotiationID,
       final List<ProjectNegotiationData> projectNegotiationData,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
+    User remoteUser = session.getUser(remoteAddress);
+    transferType = getTransferType(session, remoteUser);
     if (transferType == null) {
       throw new IllegalArgumentException("transferType must not be null");
     }
@@ -209,5 +215,10 @@ public final class NegotiationFactory {
       default:
         throw new UnsupportedOperationException("transferType not implemented");
     }
+  }
+
+  private TransferType getTransferType(ISarosSession session, User user) {
+    return TransferType.valueOf(
+        session.getUserProperties(user).getString(ProjectNegotiationTypeHook.KEY_TYPE));
   }
 }
