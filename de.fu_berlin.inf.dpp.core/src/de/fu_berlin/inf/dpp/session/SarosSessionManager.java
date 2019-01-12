@@ -439,8 +439,9 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    AbstractIncomingProjectNegotiation negotiation;
+    User remoteUser = session.getUser(remoteAddress);
 
+    AbstractIncomingProjectNegotiation negotiation;
     synchronized (this) {
       if (!startStopSessionLock.tryLock()) {
         log.warn(
@@ -451,7 +452,12 @@ public class SarosSessionManager implements ISarosSessionManager {
       try {
         negotiation =
             negotiationFactory.newIncomingProjectNegotiation(
-                remoteAddress, transferType, negotiationID, projectNegotiationData, this, session);
+                remoteAddress,
+                getTransferType(remoteUser),
+                negotiationID,
+                projectNegotiationData,
+                this,
+                session);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);
