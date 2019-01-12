@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
@@ -39,35 +41,27 @@ public class JGitFacadeTest {
     }
   }
 
-  @Test
-  public void testWrongBundle() {
-    try {
-      JGitFacade.createBundle(localWorkDir, "refs/heads/master", "WrongBasis");
-      fail("Basis isn't existing");
-    } catch (IllegalArgumentException e) {
+  @Test(expected = IOException.class)
+  public void testCreateBundleEmptyWorkDir()
+      throws IllegalArgumentException, NullPointerException, IOException {
+    File emptyDir = tempFolder.newFolder("TempDir3");
+    JGitFacade.createBundle(emptyDir, "refs/heads/master", "CheckoutAtInit");
+  }
 
-    } catch (Exception e) {
-      fail("Expected IllegalArgumentException but thrown" + e);
-    }
-    try {
-      JGitFacade.createBundle(localWorkDir, "refs/heads/wrongRef", "CheckoutAtInit");
-      fail("Ref isn't existing");
-    } catch (IllegalArgumentException e) {
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateBundleWrongRef()
+      throws IllegalArgumentException, NullPointerException, IOException {
+    JGitFacade.createBundle(localWorkDir, "refs/heads/wrongRef", "CheckoutAtInit");
+  }
 
-    } catch (Exception e) {
-      fail("Expected IllegalArgumentException but thrown" + e);
-    }
-    try {
-      File emptyDir = tempFolder.newFolder("TempDir3");
-      JGitFacade.createBundle(emptyDir, "refs/heads/master", "CheckoutAtInit");
-      fail("Dir is empty");
-    } catch (IOException e) {
-
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateBundleWrongBasis()
+      throws IllegalArgumentException, NullPointerException, IOException {
+    JGitFacade.createBundle(localWorkDir, "refs/heads/master", "WrongBasis");
   }
 
   @Test
-  public void testValidBundle() {
+  public void testCreateBundle() {
     try {
       File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "");
       assertNotNull(bundle);
@@ -77,7 +71,7 @@ public class JGitFacadeTest {
   }
 
   @Test
-  public void testValidUnbundle() {
+  public void testFetchFromBundle() {
     try {
 
       File remoteWorkDir = tempFolder.newFolder("TempDir2");
@@ -98,36 +92,26 @@ public class JGitFacadeTest {
     }
   }
 
-  @Test
-  public void testWrongUnbundle() {
-    //      TO-DO: Analyse endless loop
-    //     try {
-    //      testFile = tempFolder.newFile();
-    //      JGitFacade.fetchFromBundle(testFile, remoteWorkDir);
-    //      fail("fetch from empty file");
-    //    } catch (IOException | GitAPIException e) {
-    //
-    //    }
-    try {
-      File emptyDir = tempFolder.newFolder("TempDir3");
-      writeCommitToRepo(localWorkDir, 3);
-      File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "CheckoutAtCommit2");
-      JGitFacade.fetchFromBundle(bundle, emptyDir);
-      fail("fetch into emptyDir");
-    } catch (IOException | GitAPIException e) {
+  @Test(expected = IOException.class)
+  public void testFetchFromBundleEmptyDir()
+      throws NoFilepatternException, IOException, GitAPIException {
 
-    }
-    try {
-      File remoteWorkDir = tempFolder.newFolder("TempDir2");
-      JGitFacade.cloneFromRepo(localWorkDir, remoteWorkDir);
-      writeCommitToRepo(localWorkDir, 3);
-      writeCommitToRepo(localWorkDir, 4);
-      File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "CheckoutAtCommit3");
-      JGitFacade.fetchFromBundle(bundle, remoteWorkDir);
-      fail("fetch but remote havn't the basis");
-    } catch (IOException | GitAPIException e) {
+    File emptyDir = tempFolder.newFolder("TempDir3");
+    writeCommitToRepo(localWorkDir, 3);
+    File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "CheckoutAtCommit2");
+    JGitFacade.fetchFromBundle(bundle, emptyDir);
+  }
 
-    }
+  @Test(expected = GitAPIException.class)
+  public void testFetchFromBundleBasisMissing()
+      throws InvalidRemoteException, TransportException, IOException, GitAPIException {
+
+    File remoteWorkDir = tempFolder.newFolder("TempDir2");
+    JGitFacade.cloneFromRepo(localWorkDir, remoteWorkDir);
+    writeCommitToRepo(localWorkDir, 3);
+    writeCommitToRepo(localWorkDir, 4);
+    File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "CheckoutAtCommit3");
+    JGitFacade.fetchFromBundle(bundle, remoteWorkDir);
   }
 
   /**

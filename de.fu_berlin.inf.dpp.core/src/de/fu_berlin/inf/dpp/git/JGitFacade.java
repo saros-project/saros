@@ -23,7 +23,7 @@ public class JGitFacade {
   private static final Logger LOG = Logger.getLogger(JGitFacade.class);
 
   /**
-   * Create a bundle file with all commits from basis to actual of the given workDir.
+   * Create a bundle file with all commits from basis to actual of the Git repo.
    *
    * @param workDir The directory that contains the .git directory
    * @param actual the name of the ref to lookup. Must not be a short-handform; e.g., "master" is
@@ -60,7 +60,7 @@ public class JGitFacade {
   }
 
   /**
-   * Fetching from a bundle file to an git Repo
+   * Fetching from a bundle file to an Git repo
    *
    * @param bundleFile
    * @param workDir The directory that contains the .git directory
@@ -68,7 +68,7 @@ public class JGitFacade {
    * @throws GitAPIException
    */
   public static void fetchFromBundle(File bundleFile, File workDir)
-      throws IOException, GitAPIException {
+      throws IOException, GitAPIException, InvalidRemoteException {
     Git git = Git.open(workDir);
     URIish bundleURI = new URIish().setPath(bundleFile.getCanonicalPath());
     git.remoteAdd().setUri(bundleURI).setName("bundle").call();
