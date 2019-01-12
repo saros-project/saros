@@ -130,13 +130,12 @@ public final class NegotiationFactory {
 
   public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
       final JID remoteAddress,
-      TransferType transferType,
       final ProjectSharingData projectSharingData,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
     User remoteUser = session.getUser(remoteAddress);
-    transferType = getTransferType(session, remoteUser);
+    TransferType transferType = getTransferType(session, remoteUser);
     if (transferType == null) {
       throw new IllegalArgumentException("transferType must not be null");
     }
@@ -173,14 +172,13 @@ public final class NegotiationFactory {
 
   public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
       final JID remoteAddress,
-      TransferType transferType,
       final String negotiationID,
       final List<ProjectNegotiationData> projectNegotiationData,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
     User remoteUser = session.getUser(remoteAddress);
-    transferType = getTransferType(session, remoteUser);
+    TransferType transferType = getTransferType(session, remoteUser);
     if (transferType == null) {
       throw new IllegalArgumentException("transferType must not be null");
     }
