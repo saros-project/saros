@@ -54,7 +54,6 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
   protected AbstractOutgoingProjectNegotiation( //
       final JID peer, //
-      final TransferType transferType, //
       final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
