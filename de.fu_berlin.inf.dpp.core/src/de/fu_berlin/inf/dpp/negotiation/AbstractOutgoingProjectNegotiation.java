@@ -200,8 +200,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
      * current implementation opens a wizard on the remote side)
      */
     ProjectNegotiationOfferingExtension offering =
-        new ProjectNegotiationOfferingExtension(
-            getSessionID(), getID(), projectInfos, getTransferType());
+        new ProjectNegotiationOfferingExtension(getSessionID(), getID(), projectInfos);
 
     transmitter.send(
         ISarosSession.SESSION_CONNECTION_ID,
