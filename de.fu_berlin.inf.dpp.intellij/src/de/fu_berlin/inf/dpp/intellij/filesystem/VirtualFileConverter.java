@@ -6,6 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -140,6 +142,28 @@ public class VirtualFileConverter {
     return convertToResource(virtualFile, wrappedModule);
   }
 
+  @Nullable
+  public static IFile convertToFile(@NotNull SPath path) {
+
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
+
+    VirtualFile srcRoot = intelliJReferencePointManager.getModuleRoot(referencePoint);
+
+    return new IntelliJFileImpl(srcRoot, referencePointRelativePath);
+  }
+
+  @Nullable
+  public static IFolder convertToFolder(@NotNull SPath path) {
+
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
+
+    VirtualFile srcRoot = intelliJReferencePointManager.getModuleRoot(referencePoint);
+
+    return new IntelliJFolderImpl(srcRoot, referencePointRelativePath);
+  }
+
   /**
    * Returns a <code>VirtualFile</code> for the given resource.
    *
@@ -168,11 +192,6 @@ public class VirtualFileConverter {
    */
   @Nullable
   public static VirtualFile convertToVirtualFile(@NotNull IResource resource) {
-
-    if (resource instanceof IProject) {
-      throw new IllegalArgumentException(
-          "The given resource must be a file or a folder. resource: " + resource);
-    }
 
     IntelliJProjectImpl wrappedModule =
         (IntelliJProjectImpl) resource.getReferenceFolder().getAdapter(IntelliJProjectImpl.class);

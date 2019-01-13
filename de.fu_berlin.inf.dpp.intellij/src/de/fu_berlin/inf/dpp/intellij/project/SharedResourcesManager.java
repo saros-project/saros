@@ -300,17 +300,10 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
     SPath path = activity.getPath();
 
-    IReferencePoint referencePoint = path.getReferencePoint();
-
-    IPath referencePointRelativePath = path.getReferencePointRelativePath();
-
-    VirtualFile file =
-        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
-
-    IFile sarosFile = (IFile) VirtualFileConverter.convertToResource(file);
+    IFile sarosFile = (IFile) VirtualFileConverter.convertToFile(path);
 
     if (!sarosFile.exists()) {
-      LOG.warn("Could not delete file " + file + " as it does not exist.");
+      LOG.warn("Could not delete file " + sarosFile + " as it does not exist.");
 
       return;
     }
@@ -324,7 +317,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
       localEditorHandler.saveDocument(path);
 
-      file.delete(DELETION_FLAGS);
+      sarosFile.delete(DELETION_FLAGS);
 
     } finally {
       localFilesystemModificationHandler.setEnabled(true);
@@ -339,17 +332,10 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
     SPath path = activity.getPath();
 
-    IReferencePoint referencePoint = path.getReferencePoint();
-
-    IPath referencePointRelativePath = path.getReferencePointRelativePath();
-
-    VirtualFile file =
-        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
-
-    IFile sarosFile = (IFile) VirtualFileConverter.convertToResource(file);
+    IFile sarosFile = (IFile) VirtualFileConverter.convertToFile(path);
 
     if (sarosFile.exists()) {
-      LOG.warn("Could not create file " + file + " as it already exists.");
+      LOG.warn("Could not create file " + sarosFile + " as it already exists.");
 
       return;
     }
@@ -369,13 +355,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
   private void handleFolderCreation(@NotNull FolderCreatedActivity activity) throws IOException {
     SPath path = activity.getPath();
 
-    IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getReferencePointRelativePath();
-
-    VirtualFile intelliJFolder =
-        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
-
-    IFolder folder = (IFolder) VirtualFileConverter.convertToResource(intelliJFolder);
+    IFolder folder = (IFolder) VirtualFileConverter.convertToFolder(path);
 
     if (folder.exists()) {
       LOG.warn("Could not create folder " + folder + " as it already exist.");
@@ -408,13 +388,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
     SPath path = activity.getPath();
 
-    IReferencePoint referencePoint = path.getReferencePoint();
-    IPath referencePointRelativePath = path.getReferencePointRelativePath();
-
-    VirtualFile intelliJFolder =
-        intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
-
-    IFolder folder = (IFolder) VirtualFileConverter.convertToResource(intelliJFolder);
+    IFolder folder = (IFolder) VirtualFileConverter.convertToFolder(path);
 
     if (!folder.exists()) {
       LOG.warn("Could not delete folder " + folder + " as it does not exist.");
