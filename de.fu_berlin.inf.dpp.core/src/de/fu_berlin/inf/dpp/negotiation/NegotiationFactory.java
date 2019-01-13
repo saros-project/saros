@@ -136,9 +136,6 @@ public final class NegotiationFactory {
 
     User remoteUser = session.getUser(remoteAddress);
     TransferType transferType = getTransferType(session, remoteUser);
-    if (transferType == null) {
-      throw new IllegalArgumentException("transferType must not be null");
-    }
 
     switch (transferType) {
       case ARCHIVE:
@@ -179,9 +176,6 @@ public final class NegotiationFactory {
 
     User remoteUser = session.getUser(remoteAddress);
     TransferType transferType = getTransferType(session, remoteUser);
-    if (transferType == null) {
-      throw new IllegalArgumentException("transferType must not be null");
-    }
 
     switch (transferType) {
       case ARCHIVE:
@@ -216,7 +210,11 @@ public final class NegotiationFactory {
   }
 
   private TransferType getTransferType(ISarosSession session, User user) {
-    return TransferType.valueOf(
-        session.getUserProperties(user).getString(ProjectNegotiationTypeHook.KEY_TYPE));
+    String type = session.getUserProperties(user).getString(ProjectNegotiationTypeHook.KEY_TYPE);
+    if (type.isEmpty()) {
+      throw new IllegalArgumentException("Missing TransferType for User: " + user);
+    }
+
+    return TransferType.valueOf(type);
   }
 }
