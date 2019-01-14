@@ -47,7 +47,7 @@ public class LocalEditorManipulator {
   }
 
   /** Initializes all fields that require an EditorManager. */
-  public void initialize(EditorManager editorManager) {
+  void initialize(EditorManager editorManager) {
     editorPool = editorManager.getEditorPool();
     manager = editorManager;
   }
@@ -82,7 +82,6 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    // todo: in case it is already open, need to activate only, not open
     Editor editor = projectAPI.openEditor(virtualFile, activate);
 
     manager.startEditor(editor);
@@ -94,9 +93,9 @@ public class LocalEditorManipulator {
   }
 
   /**
-   * Closes the editor under path.
+   * Closes the editor under the given path.
    *
-   * @param path
+   * @param path the path of the file for which to close the editor
    */
   public void closeEditor(SPath path) {
     editorPool.removeEditor(path);
@@ -123,12 +122,13 @@ public class LocalEditorManipulator {
   }
 
   /**
-   * Applies the text operations on the path and marks them in color.
+   * Applies the text operations to the document for the given path and adds matching contribution
+   * annotations if necessary.
    *
-   * @param path
-   * @param operations
+   * @param path the path of the file whose document should be modified
+   * @param operations the operations to apply to the document
    */
-  public void applyTextOperations(SPath path, Operation operations) {
+  void applyTextOperations(SPath path, Operation operations) {
     Document doc = editorPool.getDocument(path);
 
     /*
