@@ -7,11 +7,15 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.project.Project;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
+import java.awt.Point;
+import java.awt.Rectangle;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.
@@ -53,6 +57,26 @@ public class EditorAPI {
         };
 
     application.invokeAndWait(action, ModalityState.defaultModalityState());
+  }
+
+  /**
+   * Returns the logical line range of the local viewport for the given editor.
+   *
+   * @param editor the editor to get the viewport line range for
+   * @return the logical line range of the local viewport for the given editor
+   * @see LogicalPosition
+   */
+  LineRange getLocalViewportRange(Editor editor) {
+    Rectangle visibleAreaRectangle = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
+
+    int basePos = visibleAreaRectangle.y;
+    int endPos = visibleAreaRectangle.y + visibleAreaRectangle.height;
+
+    int currentViewportStartLine = editor.xyToLogicalPosition(new Point(0, basePos)).line;
+    int currentViewportEndLine = editor.xyToLogicalPosition(new Point(0, endPos)).line;
+
+    return new LineRange(
+        currentViewportStartLine, currentViewportEndLine - currentViewportStartLine);
   }
 
   /**

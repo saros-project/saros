@@ -1,17 +1,18 @@
 package de.fu_berlin.inf.dpp.intellij.editor;
 
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.VisibleAreaEvent;
 import com.intellij.openapi.editor.event.VisibleAreaListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for viewport changes. */
 class LocalViewPortChangeHandler implements DisableableHandler {
 
   private final EditorManager editorManager;
+  private final EditorAPI editorAPI;
 
   private final VisibleAreaListener visibleAreaListener = this::generateViewportActivity;
 
@@ -24,34 +25,36 @@ class LocalViewPortChangeHandler implements DisableableHandler {
    *
    * @param editorManager the EditorManager instance
    */
-  LocalViewPortChangeHandler(EditorManager editorManager) {
+  LocalViewPortChangeHandler(EditorManager editorManager, EditorAPI editorAPI) {
     this.editorManager = editorManager;
+    this.editorAPI = editorAPI;
 
     this.enabled = true;
   }
 
   /**
-   * Calls {@link EditorManager#generateViewport(SPath, LineRange)}.
+   * Generates a ViewPortActivity for the viewport change represented by the given activities. The
+   * used line range is calculated using logical positions.
+   *
+   * <p>Calls {@link EditorManager#generateViewport(SPath, LineRange)} to create and dispatch the
+   * activity.
    *
    * @param event the event to react to
    * @see VisibleAreaListener#visibleAreaChanged(VisibleAreaEvent)
+   * @see LogicalPosition
    */
   private void generateViewportActivity(VisibleAreaEvent event) {
     if (!enabled) {
       return;
     }
-    SPath path = editorManager.getEditorPool().getFile(event.getEditor().getDocument());
+
+    Editor editor = event.getEditor();
+
+    SPath path = editorManager.getEditorPool().getFile(editor.getDocument());
 
     if (path != null) {
-      editorManager.generateViewport(path, getLineRange(event));
+      editorManager.generateViewport(path, editorAPI.getLocalViewportRange(editor));
     }
-  }
-
-  private LineRange getLineRange(VisibleAreaEvent event) {
-    Rectangle rec = event.getEditor().getScrollingModel().getVisibleAreaOnScrollingFinished();
-    int lineHeight = event.getEditor().getLineHeight();
-
-    return new LineRange((int) (rec.getMinY() / lineHeight), (int) (rec.getMaxY() / lineHeight));
   }
 
   /**
