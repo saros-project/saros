@@ -355,9 +355,16 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     SelectedEditorState selectedEditorState = new SelectedEditorState();
     selectedEditorState.captureState();
 
-    for (VirtualFile openFile : openFiles) {
-      localEditorHandler.openEditor(openFile, project, false);
-      // TODO create selection activity if there is a current selection
+    try {
+      localEditorStatusChangeHandler.setEnabled(false);
+
+      for (VirtualFile openFile : openFiles) {
+        localEditorHandler.openEditor(openFile, project, false);
+        // TODO create selection activity if there is a current selection
+      }
+
+    } finally {
+      localEditorStatusChangeHandler.setEnabled(true);
     }
 
     selectedEditorState.applyCapturedState();
