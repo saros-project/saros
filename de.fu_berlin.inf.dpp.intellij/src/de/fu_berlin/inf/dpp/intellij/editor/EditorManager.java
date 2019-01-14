@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -469,7 +470,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       LocalEditorManipulator localEditorManipulator,
       ProjectAPI projectAPI,
       AnnotationManager annotationManager,
-      FileReplacementInProgressObservable fileReplacementInProgressObservable) {
+      FileReplacementInProgressObservable fileReplacementInProgressObservable,
+      Project project) {
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     this.localEditorHandler = localEditorHandler;
@@ -481,7 +483,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     localClosedEditorModificationHandler =
         new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
     localEditorStatusChangeHandler =
-        new LocalEditorStatusChangeHandler(localEditorHandler, annotationManager);
+        new LocalEditorStatusChangeHandler(project, localEditorHandler, annotationManager);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
     localViewPortChangeHandler = new LocalViewPortChangeHandler(this);
