@@ -206,9 +206,18 @@ public class LocalEditorHandler {
   /**
    * Calls {@link EditorManager#generateEditorActivated(SPath)}.
    *
-   * @param file
+   * @param file the file whose editor was activated or <code>null</code> if there is no editor open
    */
-  public void activateEditor(@NotNull VirtualFile file) {
+  void activateEditor(@Nullable VirtualFile file) {
+    if (file == null) {
+
+      if (manager.hasSession()) {
+        manager.generateEditorActivated(null);
+      }
+
+      return;
+    }
+
     SPath path = VirtualFileConverter.convertToSPath(file);
 
     if (path != null && SessionUtils.isShared(path)) {

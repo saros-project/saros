@@ -117,13 +117,7 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
   private void generateEditorActivatedActivity(@NotNull FileEditorManagerEvent event) {
     assert enabled : "the selection changed listener was triggered while it was disabled";
 
-    VirtualFile virtualFile = event.getNewFile();
-
-    if (virtualFile == null) {
-      return;
-    }
-
-    localEditorHandler.activateEditor(virtualFile);
+    localEditorHandler.activateEditor(event.getNewFile());
   }
 
   /**
