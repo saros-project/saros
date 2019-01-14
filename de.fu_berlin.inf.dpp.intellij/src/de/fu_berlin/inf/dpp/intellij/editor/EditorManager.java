@@ -406,7 +406,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       ProjectAPI projectAPI,
       AnnotationManager annotationManager,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
-      Project project) {
+      Project project,
+      EditorAPI editorAPI) {
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     this.localEditorHandler = localEditorHandler;
@@ -421,7 +422,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         new LocalEditorStatusChangeHandler(project, localEditorHandler, annotationManager);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
-    localViewPortChangeHandler = new LocalViewPortChangeHandler(this);
+    localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
 
     localEditorHandler.initialize(this);
     localEditorManipulator.initialize(this);
@@ -748,6 +749,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @param path {@inheritDoc}
    * @param range {@inheritDoc}
    * @param selection {@inheritDoc}
+   * @see LocalEditorManipulator#adjustViewport(Editor, LineRange, TextSelection)
    */
   @Override
   public void adjustViewport(
