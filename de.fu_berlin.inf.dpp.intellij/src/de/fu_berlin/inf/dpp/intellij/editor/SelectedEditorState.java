@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.intellij.editor;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -25,8 +24,6 @@ public class SelectedEditorState {
   @Inject private static ProjectAPI projectAPI;
 
   @Inject private static EditorManager editorManager;
-
-  @Inject private static Project project;
 
   static {
     SarosPluginContext.initComponent(new SelectedEditorState());
@@ -61,14 +58,14 @@ public class SelectedEditorState {
     ListIterator<VirtualFile> iterator = selectedEditors.listIterator(selectedEditors.size());
 
     try {
-      editorManager.getLocalEditorStatusChangeHandler().unsubscribe();
+      editorManager.getLocalEditorStatusChangeHandler().setEnabled(false);
 
       while (iterator.hasPrevious()) {
         projectAPI.openEditor(iterator.previous(), true);
       }
 
     } finally {
-      editorManager.getLocalEditorStatusChangeHandler().subscribe(project);
+      editorManager.getLocalEditorStatusChangeHandler().setEnabled(true);
     }
   }
 

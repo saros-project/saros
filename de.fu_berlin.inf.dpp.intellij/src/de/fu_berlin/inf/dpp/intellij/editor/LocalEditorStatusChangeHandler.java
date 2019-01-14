@@ -12,14 +12,12 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for editor changes. */
 class LocalEditorStatusChangeHandler implements DisableableHandler {
 
-  private static final Logger LOG = Logger.getLogger(LocalEditorStatusChangeHandler.class);
-
+  private final Project project;
   private final LocalEditorHandler localEditorHandler;
   private final AnnotationManager annotationManager;
 
@@ -63,17 +61,19 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
       };
 
   /**
-   * Instantiates a LocalEditorStatusChangeHandler object. The handler is enabled by default. The
-   * held listener is disabled by default and has to be activated using {@link #subscribe(Project)}.
+   * Instantiates a LocalEditorStatusChangeHandler object. The handler is enabled by default.
    *
    * @param localEditorHandler the LocalEditorHandler instance
    * @param annotationManager the AnnotationManager instance
    */
   LocalEditorStatusChangeHandler(
-      LocalEditorHandler localEditorHandler, AnnotationManager annotationManager) {
+      Project project, LocalEditorHandler localEditorHandler, AnnotationManager annotationManager) {
+
+    this.project = project;
     this.localEditorHandler = localEditorHandler;
     this.annotationManager = annotationManager;
 
+    subscribe();
     this.enabled = true;
   }
 
@@ -85,9 +85,7 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
    * @see FileEditorManagerListener#fileOpened(FileEditorManager, VirtualFile)
    */
   private void setUpOpenedEditor(@NotNull VirtualFile virtualFile) {
-    if (!enabled) {
-      return;
-    }
+    assert enabled : "the file opened listener was triggered while it was disabled";
 
     Editor editor = localEditorHandler.openEditor(virtualFile, false);
 
@@ -105,9 +103,7 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
    * @see FileEditorManagerListener#fileClosed(FileEditorManager, VirtualFile)
    */
   private void generateEditorClosedActivity(@NotNull VirtualFile virtualFile) {
-    if (!enabled) {
-      return;
-    }
+    assert enabled : "the file closed listener was triggered while it was disabled";
 
     localEditorHandler.closeEditor(virtualFile);
   }
@@ -119,10 +115,11 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
    * @see FileEditorManagerListener#selectionChanged(FileEditorManagerEvent)
    */
   private void generateEditorActivatedActivity(@NotNull FileEditorManagerEvent event) {
+    assert enabled : "the selection changed listener was triggered while it was disabled";
 
     VirtualFile virtualFile = event.getNewFile();
 
-    if (!enabled || virtualFile == null) {
+    if (virtualFile == null) {
       return;
     }
 
@@ -147,19 +144,8 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
     }
   }
 
-  /**
-   * Subscribes the editor listeners to the given project.
-   *
-   * @param project the project whose file operations to listen to
-   */
-  void subscribe(@NotNull Project project) {
-
-    if (messageBusConnection != null) {
-      LOG.warn("Tried to register StoppableEditorListener that was " + "already registered");
-
-      return;
-    }
-
+  /** Subscribes the editor listeners to the given project. */
+  private void subscribe() {
     messageBusConnection = project.getMessageBus().connect();
 
     messageBusConnection.subscribe(
@@ -169,20 +155,31 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
   }
 
   /** Unsubscribes the editor listeners. */
-  void unsubscribe() {
+  private void unsubscribe() {
     messageBusConnection.disconnect();
 
     messageBusConnection = null;
   }
 
   /**
-   * Enables or disabled the handler. This is not done by disabling the underlying listener.
+   * Enables or disables the handler. This is done by registering or unregistering the held
+   * listener.
+   *
+   * <p>This method does nothing if the given state already matches the current state.
    *
    * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
    */
-  // TODO merge subscribe/unsubscribe into setEnabled once annotation handling is extracted
   @Override
   public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
+    if (this.enabled && !enabled) {
+      unsubscribe();
+
+      this.enabled = false;
+
+    } else if (!this.enabled && enabled) {
+      subscribe();
+
+      this.enabled = true;
+    }
   }
 }
