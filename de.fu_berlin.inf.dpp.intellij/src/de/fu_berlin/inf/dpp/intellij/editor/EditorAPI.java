@@ -75,65 +75,58 @@ public class EditorAPI {
   }
 
   /**
-   * Inserts text at the given position inside the UI thread.
+   * Inserts the specified text at the specified offset in the document. Line breaks in the inserted
+   * text must be normalized as \n.
    *
-   * @param doc
-   * @param position
-   * @param text
+   * @param document the document to insert the text into
+   * @param offset the offset to insert the text at
+   * @param text the text to insert
+   * @see Document#insertString(int, CharSequence)
    */
-  public void insertText(final Document doc, final int position, final String text) {
+  void insertText(final Document document, final int offset, final String text) {
 
-    Runnable action =
-        new Runnable() {
-          @Override
-          public void run() {
-            commandProcessor.executeCommand(
-                project,
-                new Runnable() {
+    Runnable insertCommand =
+        () -> {
+          Runnable insertString = () -> document.insertString(offset, text);
 
-                  @Override
-                  public void run() {
-                    doc.insertString(position, text);
-                  }
-                },
-                "Saros text insertion at index " + position + " of \"" + text + "\"",
-                commandProcessor.getCurrentCommandGroupId(),
-                UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-                doc);
-          }
+          String commandName = "Saros text insertion at index " + offset + " of \"" + text + "\"";
+
+          commandProcessor.executeCommand(
+              project,
+              insertString,
+              commandName,
+              commandProcessor.getCurrentCommandGroupId(),
+              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
+              document);
         };
 
-    Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
+    Filesystem.runWriteAction(insertCommand, ModalityState.defaultModalityState());
   }
 
   /**
-   * Deletes text in document in the specified range in the UI thread.
+   * Deletes the specified range of text from the given document.
    *
-   * @param doc
-   * @param start
-   * @param end
+   * @param doc the document to delete text from
+   * @param start the start offset of the range to delete
+   * @param end the end offset of the range to delete
+   * @see Document#deleteString(int, int)
    */
-  public void deleteText(final Document doc, final int start, final int end) {
-    Runnable action =
-        new Runnable() {
-          @Override
-          public void run() {
-            commandProcessor.executeCommand(
-                project,
-                new Runnable() {
+  void deleteText(final Document doc, final int start, final int end) {
+    Runnable deletionCommand =
+        () -> {
+          Runnable deleteRange = () -> doc.deleteString(start, end);
 
-                  @Override
-                  public void run() {
-                    doc.deleteString(start, end);
-                  }
-                },
-                "Saros text deletion from index " + start + " to " + end,
-                commandProcessor.getCurrentCommandGroupId(),
-                UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-                doc);
-          }
+          String commandName = "Saros text deletion from index " + start + " to " + end;
+
+          commandProcessor.executeCommand(
+              project,
+              deleteRange,
+              commandName,
+              commandProcessor.getCurrentCommandGroupId(),
+              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
+              doc);
         };
 
-    Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
+    Filesystem.runWriteAction(deletionCommand, ModalityState.defaultModalityState());
   }
 }
