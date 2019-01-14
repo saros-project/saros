@@ -9,10 +9,8 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.project.Project;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -37,26 +35,23 @@ public class EditorAPI {
   }
 
   /**
-   * Sets the given Editor to the specified line range in the UI thread.
+   * Scrolls the given editor so that the given line is in the center of the local viewport. The
+   * given line represents the logical position in the editor.
    *
-   * @param editor
-   * @param lineStart
-   * @param lineEnd
+   * <p><b>NOTE:</b> The center of the local viewport is at 1/3 for IntelliJ.
+   *
+   * @param editor the editor to scroll
+   * @param line the line to scroll to
+   * @see LogicalPosition
    */
-  public void setViewPort(final Editor editor, final int lineStart, final int lineEnd) {
+  void scrollToViewPortCenter(final Editor editor, final int line) {
+    application.invokeAndWait(
+        () -> {
+          LogicalPosition logicalPosition = new LogicalPosition(line, 0);
 
-    Runnable action =
-        new Runnable() {
-          @Override
-          public void run() {
-
-            VisualPosition posCenter = new VisualPosition((lineStart + lineEnd) / 2, 0);
-            editor.getCaretModel().moveToVisualPosition(posCenter);
-            editor.getScrollingModel().scrollToCaret(ScrollType.MAKE_VISIBLE);
-          }
-        };
-
-    application.invokeAndWait(action, ModalityState.defaultModalityState());
+          editor.getScrollingModel().scrollTo(logicalPosition, ScrollType.CENTER);
+        },
+        ModalityState.defaultModalityState());
   }
 
   /**
@@ -140,51 +135,5 @@ public class EditorAPI {
         };
 
     Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
-  }
-
-  /**
-   * Sets text selection in editor inside the UI thread.
-   *
-   * @param editor
-   * @param start
-   * @param end
-   * @param colorMode
-   */
-  public void setSelection(
-      final Editor editor, final int start, final int end, ColorModel colorMode) {
-
-    Runnable action =
-        new Runnable() {
-          @Override
-          public void run() {
-            application.runReadAction(
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    // set selection
-                    editor.getSelectionModel().setSelection(start, end);
-
-                    // move scroll
-                    int lineStart =
-                        editor.getSelectionModel().getSelectionStartPosition().getLine();
-                    int lineEnd = editor.getSelectionModel().getSelectionEndPosition().getLine();
-
-                    int colStart =
-                        editor.getSelectionModel().getSelectionStartPosition().getColumn();
-                    int colEnd = editor.getSelectionModel().getSelectionEndPosition().getColumn();
-
-                    VisualPosition posCenter =
-                        new VisualPosition((lineStart + lineEnd) / 2, (colStart + colEnd) / 2);
-                    editor.getCaretModel().moveToVisualPosition(posCenter);
-                    editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
-
-                    // move cursor
-                    editor.getCaretModel().moveToOffset(start, true);
-                  }
-                });
-          }
-        };
-
-    application.invokeAndWait(action, ModalityState.defaultModalityState());
   }
 }

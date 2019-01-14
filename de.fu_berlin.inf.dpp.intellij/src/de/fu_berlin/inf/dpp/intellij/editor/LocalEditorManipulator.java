@@ -2,12 +2,14 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -21,6 +23,7 @@ import de.fu_berlin.inf.dpp.session.User;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 /** This class applies the logic for activities that were received from remote. */
 public class LocalEditorManipulator {
@@ -188,24 +191,85 @@ public class LocalEditorManipulator {
   }
 
   /**
-   * Adjusts viewport. Focus is set on the center of the range, but priority is given to selected
-   * lines.
+   * Adjusts the viewport of the given editor. Focus is set on the center of the given range. If no
+   * range is given, focus is set to the center of the given selection instead. Either range or
+   * selection can be <code>null</code>, but not both.
    *
-   * @param editor Editor of the open Editor
-   * @param range viewport of the followed user. Must not be <code>null</code>.
-   * @param selection text selection of the followed user. Must not be <code>null</code>.
+   * @param editor the editor to adjust
+   * @param range viewport of the followed user; can be <code>null</code> if selection is not <code>
+   *     null</code>
+   * @param selection text selection of the followed user; can be <code>null</code> if range is not
+   *     <code>null</code>
+   * @see IEditorManager#adjustViewport(SPath, LineRange, TextSelection)
    */
-  public void adjustViewport(Editor editor, LineRange range, TextSelection selection) {
-    if (editor == null || selection == null || range == null) {
+  void adjustViewport(@NotNull Editor editor, LineRange range, TextSelection selection) {
+    if (selection == null && range == null) {
+      VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
+
+      LOG.warn(
+          "Could not adjust viewport for "
+              + file
+              + " as no target location was given: given line range and text selection were null.");
+
       return;
     }
 
-    editorAPI.setSelection(
-        editor, selection.getOffset(), selection.getOffset() + selection.getLength(), null);
-    editorAPI.setViewPort(
-        editor, range.getStartLine(), range.getStartLine() + range.getNumberOfLines());
+    LineRange localViewport = editorAPI.getLocalViewportRange(editor);
 
-    // todo: implement actual viewport adjustment logic
+    int localStartLine = localViewport.getStartLine();
+    int localEndLine = localViewport.getStartLine() + localViewport.getNumberOfLines();
+
+    int remoteStartLine;
+    int remoteEndLine;
+
+    if (range != null) {
+      remoteStartLine = range.getStartLine();
+      remoteEndLine = range.getStartLine() + range.getNumberOfLines();
+
+    } else {
+      int startCharacter = selection.getOffset();
+      int endCharacter = selection.getOffset() + selection.getLength();
+
+      remoteStartLine = editor.offsetToLogicalPosition(startCharacter).line;
+      remoteEndLine = editor.offsetToLogicalPosition(endCharacter).line;
+    }
+
+    if (localStartLine <= remoteStartLine && localEndLine >= remoteEndLine) {
+      if (LOG.isTraceEnabled()) {
+        LOG.trace(
+            "Ignoring viewport change request as given viewport is already completely visible."
+                + " local viewport: "
+                + localStartLine
+                + " - "
+                + localEndLine
+                + ", given viewport: "
+                + remoteStartLine
+                + " - "
+                + remoteEndLine);
+      }
+
+      return;
+    }
+
+    int remoteViewPortCenter = findCenter(remoteStartLine, remoteEndLine);
+
+    editorAPI.scrollToViewPortCenter(editor, remoteViewPortCenter);
+  }
+
+  /**
+   * Returns the center file of the given line range.
+   *
+   * <p>IntelliJ sets the center position of an editor at 1/3 of the visible line range. This is
+   * taken into account for the calculations.
+   *
+   * @param startLine the first line of the section
+   * @param endLine the last line of the section
+   * @return the center line of the section
+   */
+  private int findCenter(int startLine, int endLine) {
+    int offset = (endLine - startLine) / 3;
+
+    return startLine + offset;
   }
 
   /**
