@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
@@ -185,7 +186,7 @@ class ContactPopMenu extends JPopupMenu {
       }
 
       List<IResource> resources = new ArrayList<>();
-      resources.add(new IntelliJProjectImpl(module));
+      resources.add(new IntelliJProjectImpl(FilesystemUtils.getModuleContentRoot(module)));
 
       JID user = new JID(contactInfo.getRosterEntry().getUser());
       List<JID> contacts = new ArrayList<>();

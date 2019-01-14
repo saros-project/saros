@@ -671,7 +671,7 @@ public class AnnotationManager {
               + ", "
               + end
               + ") for the file "
-              + file.getProject().getName()
+              + file.getReferenceFolder().getName()
               + " - "
               + file.getProjectRelativePath()
               + " failed as the given end position is located after the "

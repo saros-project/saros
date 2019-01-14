@@ -5,9 +5,12 @@ import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,13 +28,11 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   /** Relative path from the given project */
   private final IPath path;
 
-  private final IntelliJProjectImpl project;
+  private VirtualFile srcRoot;
 
-  public IntelliJFileImpl(@NotNull final IntelliJProjectImpl project, @NotNull final IPath path) {
-    this.project = project;
-    this.path = path;
-
-    this.referencePoint = project.getReferencePoint();
+  public IntelliJFileImpl(VirtualFile srcRoot, IPath relPath) {
+    this.srcRoot = srcRoot;
+    this.path = relPath;
   }
 
   /**
@@ -44,7 +45,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
    */
   @Override
   public boolean exists() {
-    final VirtualFile file = project.findVirtualFile(path);
+    final VirtualFile file = FilesystemUtils.findVirtualFile(srcRoot, path);
 
     return file != null && file.exists() && !file.isDirectory();
   }
@@ -52,7 +53,9 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   @NotNull
   @Override
   public IPath getFullPath() {
-    return project.getFullPath().append(path);
+    IPath rootPath =
+        IntelliJPathImpl.fromString(FilesystemUtils.getModuleOfFile(srcRoot).getName());
+    return rootPath.append(path);
   }
 
   @NotNull
@@ -73,15 +76,15 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   @NotNull
   @Override
   public IContainer getParent() {
-    if (path.segmentCount() == 1) return project;
+    if (path.segmentCount() == 1) return new IntelliJProjectImpl(srcRoot);
 
-    return new IntelliJFolderImpl(project, path.removeLastSegments(1));
+    return new IntelliJFolderImpl(srcRoot, path.removeLastSegments(1));
   }
 
   @NotNull
   @Override
-  public IProject getProject() {
-    return project;
+  public IFolder getReferenceFolder() {
+    return new IntelliJProjectImpl(srcRoot);
   }
 
   @NotNull
@@ -114,7 +117,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
           @Override
           public Void compute() throws IOException {
 
-            final VirtualFile file = project.findVirtualFile(path);
+            final VirtualFile file = FilesystemUtils.findVirtualFile(srcRoot, path);
 
             if (file == null)
               throw new FileNotFoundException(
@@ -139,13 +142,13 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   @Override
   public IPath getLocation() {
     // TODO might return a wrong location
-    return project.getLocation().append(path);
+    return IntelliJPathImpl.fromString(srcRoot.getPath()).append(path);
   }
 
   @Nullable
   @Override
   public String getCharset() throws IOException {
-    final VirtualFile file = project.findVirtualFile(path);
+    final VirtualFile file = FilesystemUtils.findVirtualFile(srcRoot, path);
 
     return file == null ? null : file.getCharset().name();
   }
@@ -158,7 +161,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
      * can read from any thread
      */
 
-    final VirtualFile file = project.findVirtualFile(path);
+    final VirtualFile file = FilesystemUtils.findVirtualFile(srcRoot, path);
 
     if (file == null) throw new FileNotFoundException(this + " does not exist or is " + "derived");
 
@@ -185,7 +188,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
           @Override
           public Void compute() throws IOException {
 
-            final VirtualFile file = project.findVirtualFile(path);
+            final VirtualFile file = FilesystemUtils.findVirtualFile(srcRoot, path);
 
             if (file == null) {
               String exceptionText = IntelliJFileImpl.this + " does not exist or is derived";
@@ -240,7 +243,8 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
             final IResource parent = getParent();
 
-            final VirtualFile parentFile = project.findVirtualFile(parent.getProjectRelativePath());
+            final VirtualFile parentFile =
+                FilesystemUtils.findVirtualFile(srcRoot, parent.getProjectRelativePath());
 
             if (parentFile == null)
               throw new FileNotFoundException(
@@ -270,14 +274,14 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
   @Override
   public long getSize() throws IOException {
-    final VirtualFile file = project.findVirtualFile(path);
+    final VirtualFile file = FilesystemUtils.findVirtualFile(srcRoot, path);
 
     return file == null ? 0L : file.getLength();
   }
 
   @Override
   public int hashCode() {
-    return project.hashCode() + 31 * path.hashCode();
+    return FilesystemUtils.getModuleOfFile(srcRoot).getName().hashCode() + 31 * path.hashCode();
   }
 
   @Override
@@ -291,11 +295,16 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
     IntelliJFileImpl other = (IntelliJFileImpl) obj;
 
-    return project.equals(other.project) && path.equals(other.path);
+    return srcRoot.equals(other.srcRoot) && path.equals(other.path);
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " : " + path + " - " + project;
+    return getClass().getSimpleName() + " : " + path + " - " + srcRoot;
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint() {
+    return IntelliJReferencePointManager.create(FilesystemUtils.getModuleOfFile(srcRoot));
   }
 }

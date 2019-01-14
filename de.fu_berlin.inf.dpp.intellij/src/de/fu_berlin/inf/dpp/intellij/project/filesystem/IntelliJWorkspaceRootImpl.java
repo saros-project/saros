@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -12,7 +13,7 @@ import java.io.IOException;
 public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
 
   @Override
-  public IProject[] getProjects() {
+  public IFolder[] getReferenceFolders() {
     /*
      *  FIXME Implement! As IWorkspaceRoot might not be a sufficient concept for the core filesystem,
      *  it is used in the HTML-UI to create a list of files in the workspace that can be shared.
@@ -63,7 +64,7 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
-  public IProject getProject() {
+  public IFolder getReferenceFolder() {
     throw new UnsupportedOperationException();
   }
 

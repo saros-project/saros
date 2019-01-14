@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.intellij.filesystem;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -14,19 +13,16 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.ReferencePointImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class IntelliJProjectImpl extends IntelliJResourceImpl implements IProject {
+public final class IntelliJProjectImpl extends IntelliJAbstractFolderImpl implements IFolder {
 
   /*
    * Used to identify module stubs that were created during the project
@@ -40,13 +36,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
 
-  // Module names are unique (even among different projects)
-  private final String moduleName;
-
-  private volatile Module module;
-
-  private volatile VirtualFile moduleRoot;
-
   /**
    * Creates a core compatible {@link IProject project} using the given IntelliJ module.
    *
@@ -58,23 +47,15 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    * <p><b>Note:</b> Only modules with exactly one content root are currently supported. IProject
    * objects for modules with fewer or more than one content root can not be created.
    *
-   * @param module an IntelliJ <i>module</i>
+   * @param moduleRoot of an IntelliJ <i>module</i>
    * @throws IllegalArgumentException if the given module does not have exactly one content root,
    *     the content root is not located under the project root or the module file is not located in
    *     the base directory of the content root
    * @throws IllegalStateException if the project base dir, the module file or the directory
    *     containing the module file could not be found
    */
-  public IntelliJProjectImpl(@NotNull final Module module) {
-    this.module = module;
-    this.moduleName = module.getName();
-
-    moduleRoot = getModuleContentRoot(module);
-
-    this.referencePoint = new ReferencePointImpl(getFullPath());
-
-    checkIfContentRootLocatedBelowProjectRoot(module, moduleRoot);
-    checkIfModuleFileLocatedInContentRoot(module, moduleRoot);
+  public IntelliJProjectImpl(@NotNull final VirtualFile moduleRoot) {
+    super(moduleRoot, null);
   }
 
   /**
@@ -98,8 +79,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     if (numberOfContentRoots != 1) {
       throw new IllegalArgumentException(
-          "Modules shared with Saros currently must contain exactly one content root. The given "
-              + "module "
+          "Modules shared with Saros currently must contain exactly one "
+              + "content root. The given module "
               + module
               + " has "
               + numberOfContentRoots
@@ -186,7 +167,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
               + moduleFile
               + " for the module "
               + module
-              + " is not located in the base directory of the content root "
+              + " is not located in the base directory of the content"
+              + " root "
               + moduleRoot
               + ".");
     }
@@ -199,7 +181,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    */
   @NotNull
   public Module getModule() {
-    return module;
+    return FilesystemUtils.getModuleOfFile(srcRoot);
   }
 
   /**
@@ -218,26 +200,27 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    *     module with the same name could be found
    */
   public boolean refreshModule() throws ModuleNotFoundException {
+    Module module = FilesystemUtils.getModuleOfFile(srcRoot);
     if (module.isDisposed()) {
       Project project = module.getProject();
 
-      Module newModule = ModuleManager.getInstance(project).findModuleByName(moduleName);
+      Module newModule = ModuleManager.getInstance(project).findModuleByName(module.getName());
 
       if (newModule == null) {
 
         throw new ModuleNotFoundException(
             "The module "
-                + moduleName
-                + " could not be refreshed as no module with the same name could be found in the "
-                + "current project "
+                + module.getName()
+                + " could not be refreshed as no module with the same"
+                + " name could be found in the current project "
                 + project);
       }
 
       module = newModule;
 
-      moduleRoot = getModuleContentRoot(module);
-      checkIfContentRootLocatedBelowProjectRoot(module, moduleRoot);
-      checkIfModuleFileLocatedInContentRoot(module, moduleRoot);
+      srcRoot = getModuleContentRoot(module);
+      checkIfContentRootLocatedBelowProjectRoot(module, srcRoot);
+      checkIfModuleFileLocatedInContentRoot(module, srcRoot);
 
       return true;
     }
@@ -260,41 +243,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     return file != null && file.exists();
   }
 
-  @NotNull
-  @Override
-  public IResource[] members() throws IOException {
-    // TODO run as read action
-
-    final List<IResource> result = new ArrayList<>();
-
-    final VirtualFile[] children = moduleRoot.getChildren();
-
-    ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
-
-    for (final VirtualFile child : children) {
-
-      if (!moduleFileIndex.isInContent(child)) {
-
-        continue;
-      }
-
-      final IPath childPath = IntelliJPathImpl.fromString(child.getName());
-
-      result.add(
-          child.isDirectory()
-              ? new IntelliJFolderImpl(this, childPath)
-              : new IntelliJFileImpl(this, childPath));
-    }
-
-    return result.toArray(new IResource[result.size()]);
-  }
-
-  @NotNull
-  @Override
-  public IResource[] members(final int memberFlags) throws IOException {
-    return members();
-  }
-
   @Nullable
   @Override
   public String getDefaultCharset() throws IOException {
@@ -304,6 +252,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @Override
   public boolean exists() {
+    Module module = FilesystemUtils.getModuleOfFile(srcRoot);
     return !module.isDisposed() && module.isLoaded();
   }
 
@@ -316,7 +265,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   @NotNull
   @Override
   public String getName() {
-    return moduleName;
+    return FilesystemUtils.getModuleOfFile(srcRoot).getName();
   }
 
   @Nullable
@@ -327,7 +276,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @NotNull
   @Override
-  public IProject getProject() {
+  public IFolder getReferenceFolder() {
     return this;
   }
 
@@ -348,22 +297,23 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    */
   @Nullable
   private IPath getProjectRelativePath(@NotNull VirtualFile file) {
+    Module module = FilesystemUtils.getModuleOfFile(srcRoot);
     Module fileModule =
         ProjectFileIndexFacade.getInstance(module.getProject()).getModuleForFile(file);
 
-    if (fileModule == null || !moduleName.equals(fileModule.getName())) {
+    if (fileModule == null || !module.getName().equals(fileModule.getName())) {
       return null;
     }
 
     try {
-      Path relativePath = Paths.get(moduleRoot.getPath()).relativize(Paths.get(file.getPath()));
+      Path relativePath = Paths.get(srcRoot.getPath()).relativize(Paths.get(file.getPath()));
 
       return IntelliJPathImpl.fromString(relativePath.toString());
 
     } catch (IllegalArgumentException e) {
       LOG.warn(
           "Could not find a relative path from the content root "
-              + moduleRoot
+              + srcRoot
               + " to the file "
               + file,
           e);
@@ -400,7 +350,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   @NotNull
   @Override
   public IPath getLocation() {
-    return IntelliJPathImpl.fromString(moduleRoot.getPath());
+    return IntelliJPathImpl.fromString(srcRoot.getPath());
   }
 
   @Nullable
@@ -411,8 +361,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     if (file == null) return null;
 
     return file.isDirectory()
-        ? new IntelliJFolderImpl(this, path)
-        : new IntelliJFileImpl(this, path);
+        ? new IntelliJFolderImpl(srcRoot, path)
+        : new IntelliJFileImpl(srcRoot, path);
   }
 
   @NotNull
@@ -428,7 +378,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     if (path.segmentCount() == 0)
       throw new IllegalArgumentException("cannot create file handle for an empty path");
 
-    return new IntelliJFileImpl(this, path);
+    return new IntelliJFileImpl(srcRoot, path);
   }
 
   /**
@@ -446,7 +396,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     IPath relativePath = getProjectRelativePath(file);
 
-    return relativePath != null ? new IntelliJFileImpl(this, relativePath) : null;
+    return relativePath != null ? new IntelliJFileImpl(srcRoot, relativePath) : null;
   }
 
   @NotNull
@@ -462,7 +412,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     if (path.segmentCount() == 0)
       throw new IllegalArgumentException("cannot create folder handle for an empty path");
 
-    return new IntelliJFolderImpl(this, path);
+    return new IntelliJFolderImpl(srcRoot, path);
   }
 
   /**
@@ -480,7 +430,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     IPath relativePath = getProjectRelativePath(file);
 
-    return relativePath != null ? new IntelliJFolderImpl(this, relativePath) : null;
+    return relativePath != null ? new IntelliJFolderImpl(srcRoot, relativePath) : null;
   }
 
   /**
@@ -511,12 +461,12 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    */
   @Nullable
   public VirtualFile findVirtualFile(final IPath path) {
-
+    Module module = FilesystemUtils.getModuleOfFile(srcRoot);
     if (path.isAbsolute()) return null;
 
-    if (path.segmentCount() == 0) return moduleRoot;
+    if (path.segmentCount() == 0) return srcRoot;
 
-    VirtualFile virtualFile = moduleRoot.findFileByRelativePath(path.toString());
+    VirtualFile virtualFile = srcRoot.findFileByRelativePath(path.toString());
 
     if (virtualFile != null
         && ModuleRootManager.getInstance(module).getFileIndex().isInContent(virtualFile)) {
@@ -528,11 +478,14 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @Override
   public int hashCode() {
-    return moduleName.hashCode();
+    Module module = FilesystemUtils.getModuleOfFile(srcRoot);
+    return module.getName().hashCode();
   }
 
   @Override
   public boolean equals(final Object obj) {
+
+    Module module = FilesystemUtils.getModuleOfFile(srcRoot);
 
     if (this == obj) return true;
 
@@ -542,11 +495,11 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     IntelliJProjectImpl other = (IntelliJProjectImpl) obj;
 
-    return moduleName.equals(other.moduleName);
+    return module.getName().equals(FilesystemUtils.getModuleOfFile(other.srcRoot).getName());
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " : " + moduleName;
+    return getClass().getSimpleName() + " : " + FilesystemUtils.getModuleOfFile(srcRoot).getName();
   }
 }

@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
@@ -72,14 +73,14 @@ public class CollaborationUtils {
    */
   public static void startSession(List<IResource> resources, final List<JID> contacts) {
 
-    final Map<IProject, List<IResource>> newResources = acquireResources(resources, null);
+    final Map<IFolder, List<IResource>> newResources = acquireResources(resources, null);
 
     final Map<IReferencePoint, List<IResource>> referencePointResources = new HashMap<>();
 
     IReferencePointManager referencePointManager = new ReferencePointManager();
 
-    for (Map.Entry<IProject, List<IResource>> entry : newResources.entrySet()) {
-      IProject project = entry.getKey();
+    for (Map.Entry<IFolder, List<IResource>> entry : newResources.entrySet()) {
+      IFolder project = entry.getKey();
 
       fillReferencePointManager(project, referencePointManager);
 
@@ -186,7 +187,7 @@ public class CollaborationUtils {
       return;
     }
 
-    final Map<IProject, List<IResource>> projectResources;
+    final Map<IFolder, List<IResource>> projectResources;
 
     projectResources = acquireResources(resourcesToAdd, sarosSession);
 
@@ -208,8 +209,8 @@ public class CollaborationUtils {
               final IReferencePointManager referencePointManager =
                   sarosSession.getComponent(IReferencePointManager.class);
 
-              for (Map.Entry<IProject, List<IResource>> entry : projectResources.entrySet()) {
-                IProject project = entry.getKey();
+              for (Map.Entry<IFolder, List<IResource>> entry : projectResources.entrySet()) {
+                IFolder project = entry.getKey();
 
                 fillReferencePointManager(project, referencePointManager);
 
@@ -276,12 +277,12 @@ public class CollaborationUtils {
     IReferencePointManager referencePointManager =
         sarosSession.getComponent(IReferencePointManager.class);
 
-    Set<IProject> projects = referencePointManager.getProjects(sarosSession.getReferencePoints());
+    Set<IFolder> projects = referencePointManager.getProjects(sarosSession.getReferencePoints());
 
     StringBuilder result = new StringBuilder();
 
     try {
-      for (IProject project : projects) {
+      for (IFolder project : projects) {
 
         Pair<Long, Long> fileCountAndSize;
 
@@ -321,8 +322,8 @@ public class CollaborationUtils {
    * The result is stored in {@link HashMap}:
    *
    * <ul>
-   *   <li>complete shared project: {@link IProject} --> null
-   *   <li>partial shared project: {@link IProject} --> List<IResource>
+   *   <li>complete shared project: {@link IFolder} --> null
+   *   <li>partial shared project: {@link IFolder} --> List<IResource>
    * </ul>
    *
    * Adds to partial shared projects additional files which are needed for proper project
@@ -332,10 +333,10 @@ public class CollaborationUtils {
    * @param sarosSession
    * @return
    */
-  private static Map<IProject, List<IResource>> acquireResources(
+  private static Map<IFolder, List<IResource>> acquireResources(
       List<IResource> selectedResources, ISarosSession sarosSession) {
 
-    Map<IProject, Set<IResource>> projectsResources = new HashMap<IProject, Set<IResource>>();
+    Map<IFolder, Set<IResource>> projectsResources = new HashMap<IFolder, Set<IResource>>();
 
     if (sarosSession != null) {
       selectedResources.removeAll(sarosSession.getSharedResources());
@@ -360,11 +361,11 @@ public class CollaborationUtils {
     for (IResource resource : preSortedResources) {
 
       if (resource.getType() == IResource.PROJECT) {
-        projectsResources.put((IProject) resource, null);
+        projectsResources.put((IFolder) resource, null);
         continue;
       }
 
-      IProject project = resource.getProject();
+      IFolder project = resource.getReferenceFolder();
 
       if (project == null) {
         continue;
@@ -382,9 +383,9 @@ public class CollaborationUtils {
       }
     }
 
-    for (Entry<IProject, Set<IResource>> entry : projectsResources.entrySet()) {
+    for (Entry<IFolder, Set<IResource>> entry : projectsResources.entrySet()) {
 
-      IProject project = entry.getKey();
+      IFolder project = entry.getKey();
       Set<IResource> resources = entry.getValue();
 
       if (resources == // * full shared *//*
@@ -437,9 +438,9 @@ public class CollaborationUtils {
       resources.addAll(additionalFilesForPartialSharing);
     }
 
-    HashMap<IProject, List<IResource>> resources = new HashMap<IProject, List<IResource>>();
+    HashMap<IFolder, List<IResource>> resources = new HashMap<IFolder, List<IResource>>();
 
-    for (Entry<IProject, Set<IResource>> entry : projectsResources.entrySet()) {
+    for (Entry<IFolder, Set<IResource>> entry : projectsResources.entrySet()) {
       resources.put(
           entry.getKey(),
           entry.getValue() == null ? null : new ArrayList<IResource>(entry.getValue()));
@@ -523,7 +524,7 @@ public class CollaborationUtils {
   }
 
   private static void fillReferencePointManager(
-      de.fu_berlin.inf.dpp.filesystem.IProject project,
+      de.fu_berlin.inf.dpp.filesystem.IFolder project,
       IReferencePointManager referencePointManager) {
     referencePointManager.put(project.getReferencePoint(), project);
 

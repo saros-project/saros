@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.intellij.filesystem;
 
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.ThrowableComputable;
@@ -19,23 +20,17 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder {
+public final class IntelliJFolderImpl extends IntelliJAbstractFolderImpl implements IFolder {
 
-  /** Relative path from the given project */
-  private final IPath path;
-
-  private final IntelliJProjectImpl project;
-
-  public IntelliJFolderImpl(@NotNull final IntelliJProjectImpl project, @NotNull final IPath path) {
-    this.project = project;
-    this.path = path;
-
-    this.referencePoint = project.getReferencePoint();
+  public IntelliJFolderImpl(@NotNull VirtualFile contentRoot, @NotNull final IPath path) {
+    super(contentRoot, path);
   }
 
   @Override
   public boolean exists(@NotNull IPath path) {
-    return project.exists(this.path.append(path));
+    final VirtualFile file = findVirtualFile(path);
+
+    return file != null && file.exists();
   }
 
   @NotNull
@@ -43,7 +38,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   public IResource[] members() throws IOException {
     // TODO run as read action
 
-    final VirtualFile folder = project.findVirtualFile(path);
+    final VirtualFile folder = FilesystemUtils.findVirtualFile(srcRoot, path);
 
     if (folder == null || !folder.exists())
       throw new FileNotFoundException(this + " does not exist or is " + "derived");
@@ -55,7 +50,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
     final VirtualFile[] children = folder.getChildren();
 
     ModuleFileIndex moduleFileIndex =
-        ModuleRootManager.getInstance(project.getModule()).getFileIndex();
+        ModuleRootManager.getInstance(FilesystemUtils.getModuleOfFile(srcRoot)).getFileIndex();
 
     for (final VirtualFile child : children) {
 
@@ -68,8 +63,8 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
 
       result.add(
           child.isDirectory()
-              ? new IntelliJFolderImpl(project, childPath)
-              : new IntelliJFileImpl(project, childPath));
+              ? new IntelliJFolderImpl(srcRoot, childPath)
+              : new IntelliJFileImpl(srcRoot, childPath));
     }
 
     return result.toArray(new IResource[result.size()]);
@@ -98,7 +93,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
    */
   @Override
   public boolean exists() {
-    final VirtualFile file = project.findVirtualFile(path);
+    final VirtualFile file = FilesystemUtils.findVirtualFile(srcRoot, path);
 
     return file != null && file.exists() && file.isDirectory();
   }
@@ -106,7 +101,9 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   @NotNull
   @Override
   public IPath getFullPath() {
-    return project.getFullPath().append(path);
+    IPath rootPath =
+        IntelliJPathImpl.fromString(FilesystemUtils.getModuleOfFile(srcRoot).getName());
+    return rootPath.append(path);
   }
 
   @NotNull
@@ -127,15 +124,14 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   @NotNull
   @Override
   public IContainer getParent() {
-    if (path.segmentCount() == 1) return project;
+    if (path.segmentCount() == 1) return new IntelliJProjectImpl(srcRoot);
 
-    return new IntelliJFolderImpl(project, path.removeLastSegments(1));
+    return new IntelliJFolderImpl(srcRoot, path.removeLastSegments(1));
   }
 
-  @NotNull
   @Override
-  public IProject getProject() {
-    return project;
+  public IFolder getReferenceFolder() {
+    return new IntelliJProjectImpl(srcRoot);
   }
 
   @NotNull
@@ -168,7 +164,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
           @Override
           public Void compute() throws IOException {
 
-            final VirtualFile file = project.findVirtualFile(path);
+            final VirtualFile file = FilesystemUtils.findVirtualFile(srcRoot, path);
 
             if (file == null)
               throw new FileNotFoundException(
@@ -193,65 +189,17 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   @Override
   public IPath getLocation() {
     // TODO might return a wrong location
-    return project.getLocation().append(path);
+    return IntelliJPathImpl.fromString(srcRoot.getPath()).append(path);
   }
 
   @Override
-  public void create(final int updateFlags, final boolean local) throws IOException {
-    this.create((updateFlags & IResource.FORCE) != 0, local);
-  }
-
-  /**
-   * Creates this folder in the local filesystem.
-   *
-   * <p><b>Note:</b> The force flag is not supported. It does not allow the re-creation of an
-   * already existing folder.
-   *
-   * @param force not supported
-   * @param local not supported
-   * @throws FileAlreadyExistsException if the folder already exists
-   * @throws FileNotFoundException if the parent directory of this folder does not exist
-   */
-  @Override
-  public void create(final boolean force, final boolean local) throws IOException {
-
-    Filesystem.runWriteAction(
-        new ThrowableComputable<Void, IOException>() {
-
-          @Override
-          public Void compute() throws IOException {
-
-            final IResource parent = getParent();
-
-            final VirtualFile parentFile = project.findVirtualFile(parent.getProjectRelativePath());
-
-            if (parentFile == null)
-              throw new FileNotFoundException(
-                  parent
-                      + " does not exist or is derived, cannot create folder "
-                      + IntelliJFolderImpl.this);
-
-            final VirtualFile file = parentFile.findChild(getName());
-
-            if (file != null) {
-              String exceptionText = IntelliJFolderImpl.this + " already exists";
-
-              if (force) exceptionText += ", force option is not supported";
-
-              throw new FileAlreadyExistsException(exceptionText);
-            }
-
-            parentFile.createChildDirectory(IntelliJFolderImpl.this, getName());
-
-            return null;
-          }
-        },
-        ModalityState.defaultModalityState());
+  public IFolder getFolder(String name) {
+    return null;
   }
 
   @Override
   public int hashCode() {
-    return project.hashCode() + 31 * path.hashCode();
+    return FilesystemUtils.getModuleOfFile(srcRoot).getName().hashCode() + 31 * path.hashCode();
   }
 
   @Override
@@ -265,11 +213,11 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
 
     IntelliJFolderImpl other = (IntelliJFolderImpl) obj;
 
-    return project.equals(other.project) && path.equals(other.path);
+    return srcRoot.equals(other.srcRoot) && path.equals(other.path);
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " : " + path + " - " + project;
+    return getClass().getSimpleName() + " : " + path + " - " + srcRoot;
   }
 }

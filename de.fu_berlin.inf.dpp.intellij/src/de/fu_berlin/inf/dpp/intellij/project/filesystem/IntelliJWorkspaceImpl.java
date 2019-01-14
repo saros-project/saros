@@ -5,6 +5,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -12,6 +13,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
+import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
@@ -42,10 +44,12 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
   }
 
   @Override
-  public IProject getProject(final String moduleName) {
+  public IFolder getReferenceFolder(final String moduleName) {
     Module module = getModule(moduleName);
 
-    return module == null ? null : new IntelliJProjectImpl(module);
+    return module == null
+        ? null
+        : new IntelliJProjectImpl(FilesystemUtils.getModuleContentRoot(module));
   }
 
   @Override
@@ -55,7 +59,7 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
 
   @Override
   public IReferencePoint getReferencePoint(String moduleName) {
-    IProject project = getProject(moduleName);
+    IFolder project = getReferenceFolder(moduleName);
 
     return project.getReferencePoint();
   }

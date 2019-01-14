@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -92,7 +93,7 @@ public class SarosFileShareGroup extends ActionGroup {
     String moduleName = module.getName();
 
     try {
-      new IntelliJProjectImpl(module);
+      new IntelliJProjectImpl(FilesystemUtils.getModuleContentRoot(module));
 
     } catch (IllegalArgumentException exception) {
       if (LOG.isTraceEnabled()) {
