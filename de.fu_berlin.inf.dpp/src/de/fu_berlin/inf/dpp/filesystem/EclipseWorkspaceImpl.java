@@ -133,7 +133,7 @@ public class EclipseWorkspaceImpl implements IWorkspace {
   }
 
   @Override
-  public IFolder_V2 getReferenceFolder(String project) {
+  public IFolder getReferenceFolder(String project) {
     return ResourceAdapterFactory.create(delegate.getRoot().getProject(project));
   }
 

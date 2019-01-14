@@ -27,5 +27,5 @@ package de.fu_berlin.inf.dpp.filesystem;
  */
 public interface IWorkspaceRoot extends IContainer {
 
-  public IFolder_V2[] getReferenceFolders();
+  public IFolder[] getReferenceFolders();
 }

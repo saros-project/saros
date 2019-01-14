@@ -31,15 +31,15 @@ public class IResourceTest {
 
     EasyMock.replay(folder, project, path);
 
-    final IFolder_V2 coreFolder = new EclipseFolderImpl_V2(folder);
+    final IFolder coreFolder = new EclipseFolderImpl_V2(folder);
 
-    final Object adapted = coreFolder.getAdapter(IFolder_V2.class);
+    final Object adapted = coreFolder.getAdapter(IFolder.class);
 
     EasyMock.verify(folder);
 
     Assert.assertEquals(
         org.eclipse.core.resources.IFolder.class, mappedAdapterClassCapture.getValue());
 
-    Assert.assertTrue("returned adapter is not a folder", adapted instanceof IFolder_V2);
+    Assert.assertTrue("returned adapter is not a folder", adapted instanceof IFolder);
   }
 }

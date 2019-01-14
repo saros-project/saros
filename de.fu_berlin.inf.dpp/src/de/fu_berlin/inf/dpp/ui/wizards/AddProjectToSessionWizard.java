@@ -557,7 +557,7 @@ public class AddProjectToSessionWizard extends Wizard {
       final String projectID = entry.getKey();
       final IProject project = entry.getValue();
 
-      final de.fu_berlin.inf.dpp.filesystem.IFolder_V2 adaptedProject =
+      final de.fu_berlin.inf.dpp.filesystem.IFolder adaptedProject =
           ResourceAdapterFactory.create(entry.getValue());
 
       /*

@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
 
-public interface IFolder_V2 extends IResource {
+public interface IFolder extends IResource {
 
   public boolean exists(IPath path);
 
@@ -22,7 +22,7 @@ public interface IFolder_V2 extends IResource {
 
   public IFile getFile(IPath path);
 
-  public IFolder_V2 getFolder(String name);
+  public IFolder getFolder(String name);
 
-  public IFolder_V2 getFolder(IPath path);
+  public IFolder getFolder(IPath path);
 }

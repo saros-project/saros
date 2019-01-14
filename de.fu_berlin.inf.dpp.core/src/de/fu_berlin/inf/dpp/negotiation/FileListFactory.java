@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.negotiation;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder_V2;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -125,7 +125,7 @@ public class FileListFactory {
           list.addEncoding(((IFile) resource).getCharset());
           break;
         case IResource.FOLDER:
-          stack.addAll(Arrays.asList(((IFolder_V2) resource).members()));
+          stack.addAll(Arrays.asList(((IFolder) resource).members()));
           list.addPath(path, data, true);
           break;
       }

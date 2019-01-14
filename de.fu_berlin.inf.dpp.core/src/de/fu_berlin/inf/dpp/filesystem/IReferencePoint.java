@@ -7,7 +7,7 @@ package de.fu_berlin.inf.dpp.filesystem;
  * {@link IResource}.
  *
  * <p>This interface is under development: The IReferencePoint is the absolute path of {@link
- * IFolder_V2}
+ * IFolder}
  */
 public interface IReferencePoint {
 

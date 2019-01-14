@@ -268,12 +268,12 @@ public class CollaborationUtils {
    */
   private static String getSessionDescription(ISarosSession sarosSession) {
 
-    Set<de.fu_berlin.inf.dpp.filesystem.IFolder_V2> projects =
+    Set<de.fu_berlin.inf.dpp.filesystem.IFolder> projects =
         referencePointManager.getProjects(sarosSession.getReferencePoints());
 
     final StringBuilder result = new StringBuilder();
 
-    for (de.fu_berlin.inf.dpp.filesystem.IFolder_V2 project : projects) {
+    for (de.fu_berlin.inf.dpp.filesystem.IFolder project : projects) {
 
       final Pair<Long, Long> fileCountAndSize;
 
@@ -463,7 +463,7 @@ public class CollaborationUtils {
                 List<de.fu_berlin.inf.dpp.filesystem.IResource>>();
 
     for (Entry<IProject, List<IResource>> entry : data.entrySet()) {
-      de.fu_berlin.inf.dpp.filesystem.IFolder_V2 coreProject =
+      de.fu_berlin.inf.dpp.filesystem.IFolder coreProject =
          new EclipseProjectImpl_V2(entry.getKey());
 
       fillReferencePointManager(coreProject, referencePointManager);
@@ -491,7 +491,7 @@ public class CollaborationUtils {
   }
 
   private static void fillReferencePointManager(
-      de.fu_berlin.inf.dpp.filesystem.IFolder_V2 project,
+      de.fu_berlin.inf.dpp.filesystem.IFolder project,
       IReferencePointManager referencePointManager) {
     referencePointManager.put(project.getReferencePoint(), project);
   }

@@ -52,7 +52,7 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public IFolder_V2 getReferenceFolder() {
+  public IFolder getReferenceFolder() {
     org.eclipse.core.resources.IProject project = delegate.getProject();
 
     if (project == null) return null;
@@ -136,7 +136,7 @@ public class EclipseResourceImpl implements IResource {
     Class<?> classToMap = null;
 
     if (IFile.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFile.class;
-    else if (IFolder_V2.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFolder.class;
+    else if (IFolder.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFolder.class;
     else if (IContainer.class.equals(clazz))
       classToMap = org.eclipse.core.resources.IContainer.class;
     else if (IWorkspaceRoot.class.equals(clazz))

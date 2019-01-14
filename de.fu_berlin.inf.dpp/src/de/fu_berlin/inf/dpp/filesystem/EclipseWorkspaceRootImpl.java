@@ -12,15 +12,15 @@ public class EclipseWorkspaceRootImpl extends EclipseContainerImpl implements IW
   }
 
   @Override
-  public IFolder_V2[] getReferenceFolders() {
+  public IFolder[] getReferenceFolders() {
 
-    final List<IFolder_V2> result = new ArrayList<IFolder_V2>();
+    final List<IFolder> result = new ArrayList<IFolder>();
 
     for (final org.eclipse.core.resources.IProject project :
         ((org.eclipse.core.resources.IWorkspaceRoot) getDelegate()).getProjects()) {
       result.add(ResourceAdapterFactory.create(project));
     }
 
-    return result.toArray(new IFolder_V2[result.size()]);
+    return result.toArray(new IFolder[result.size()]);
   }
 }

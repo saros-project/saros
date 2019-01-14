@@ -71,7 +71,7 @@ public class FileSystem {
    * @param folder the folder to create
    * @throws IOException if an I/O error occurred
    */
-  public static void createFolder(final IFolder_V2 folder) throws IOException {
+  public static void createFolder(final IFolder folder) throws IOException {
     createFolders(folder);
   }
 
@@ -79,9 +79,9 @@ public class FileSystem {
 
     if (!(resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER)) return;
 
-    final List<IFolder_V2> parents = new ArrayList<IFolder_V2>();
+    final List<IFolder> parents = new ArrayList<IFolder>();
 
-    if (resource.getType() == IResource.FOLDER) parents.add((IFolder_V2) resource);
+    if (resource.getType() == IResource.FOLDER) parents.add((IFolder) resource);
 
     IContainer parent = resource.getParent();
 
@@ -89,12 +89,12 @@ public class FileSystem {
 
       if (parent.exists()) break;
 
-      parents.add((IFolder_V2) parent);
+      parents.add((IFolder) parent);
       parent = parent.getParent();
     }
 
     Collections.reverse(parents);
 
-    for (final IFolder_V2 folder : parents) folder.create(false, true);
+    for (final IFolder folder : parents) folder.create(false, true);
   }
 }

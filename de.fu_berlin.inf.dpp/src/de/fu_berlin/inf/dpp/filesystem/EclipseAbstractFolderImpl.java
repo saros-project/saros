@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.filesystem;
 import java.io.IOException;
 import org.apache.commons.lang3.NotImplementedException;
 
-public abstract class EclipseAbstractFolderImpl extends EclipseContainerImpl implements IFolder_V2 {
+public abstract class EclipseAbstractFolderImpl extends EclipseContainerImpl implements IFolder {
 
   public EclipseAbstractFolderImpl(org.eclipse.core.resources.IContainer delegate) {
     super(delegate);
@@ -41,12 +41,12 @@ public abstract class EclipseAbstractFolderImpl extends EclipseContainerImpl imp
   }
 
   @Override
-  public IFolder_V2 getFolder(String name) {
+  public IFolder getFolder(String name) {
     return new EclipseFolderImpl_V2(getDelegate().getFolder(toIPath(name)));
   }
 
   @Override
-  public IFolder_V2 getFolder(IPath path) {
+  public IFolder getFolder(IPath path) {
     return new EclipseFolderImpl_V2(getDelegate().getFolder(((EclipsePathImpl) path).getDelegate()));
   }
 

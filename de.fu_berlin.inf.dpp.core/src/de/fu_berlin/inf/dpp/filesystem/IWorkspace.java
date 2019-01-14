@@ -39,7 +39,7 @@ public interface IWorkspace {
       IReferencePointManager referencePointManager)
       throws IOException, OperationCanceledException;
 
-  public IFolder_V2 getReferenceFolder(String project);
+  public IFolder getReferenceFolder(String project);
 
   /**
    * Return the {@link IReferencePoint} reference point of the project, given by the project name
