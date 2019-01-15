@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
@@ -233,39 +234,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void userFinishedProjectNegotiation(User user) {
-
-          // Send awareness-information
-          User localUser = session.getLocalUser();
-          for (SPath path : getOpenEditors()) {
-            fireActivity(new EditorActivity(localUser, EditorActivity.Type.ACTIVATED, path));
-          }
-
-          fireActivity(new EditorActivity(localUser, EditorActivity.Type.ACTIVATED, activeEditor));
-
-          if (activeEditor == null) {
-            return;
-          }
-          if (localViewport != null) {
-            fireActivity(
-                new ViewportActivity(
-                    localUser,
-                    localViewport.getStartLine(),
-                    localViewport.getNumberOfLines(),
-                    activeEditor));
-          } else {
-            LOG.warn("No viewport for locallyActivateEditor: " + activeEditor);
-          }
-
-          if (localSelection != null) {
-            int offset = localSelection.getNewRange().getStartOffset();
-            int length =
-                localSelection.getNewRange().getEndOffset()
-                    - localSelection.getNewRange().getStartOffset();
-
-            fireActivity(new TextSelectionActivity(localUser, offset, length, activeEditor));
-          } else {
-            LOG.warn("No selection for locallyActivateEditor: " + activeEditor);
-          }
+          sendAwarenessInformation();
         }
 
         @Override
@@ -278,6 +247,75 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           ApplicationManager.getApplication()
               .invokeAndWait(
                   () -> addProjectResources(project), ModalityState.defaultModalityState());
+        }
+
+        /**
+         * Sends awareness information to populate the UserEditorState of the participant that
+         * joined the session.
+         *
+         * <p>This is done by first sending the needed state for all locally open editors. After the
+         * awareness information for all locally open editors (including the active editor) has been
+         * transmitted, a second editor activated activity is send for the locally active editor to
+         * correctly set the active editor in the remote user editor state for the local user.
+         */
+        private void sendAwarenessInformation() {
+          User localUser = session.getLocalUser();
+
+          editorPool
+              .getMapping()
+              .forEach(
+                  (path, editor) -> {
+                    sendEditorOpenInformation(localUser, path);
+
+                    sendViewPortInformation(localUser, path, editor);
+
+                    sendSelectionInformation(localUser, path, editor);
+                  });
+
+          Editor activeEditor = projectAPI.getActiveEditor();
+
+          SPath activeEditorPath;
+
+          if (activeEditor != null) {
+            activeEditorPath = editorPool.getFile(activeEditor.getDocument());
+          } else {
+            activeEditorPath = null;
+          }
+
+          sendEditorOpenInformation(localUser, activeEditorPath);
+        }
+
+        private void sendEditorOpenInformation(@NotNull User user, @Nullable SPath path) {
+          EditorActivity activateEditor =
+              new EditorActivity(user, EditorActivity.Type.ACTIVATED, path);
+
+          fireActivity(activateEditor);
+        }
+
+        private void sendViewPortInformation(
+            @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
+
+          LineRange localViewPort = editorAPI.getLocalViewportRange(editor);
+          int viewPortStartLine = localViewPort.getStartLine();
+          int viewPortLength = localViewPort.getNumberOfLines();
+
+          ViewportActivity setViewPort =
+              new ViewportActivity(user, viewPortStartLine, viewPortLength, path);
+
+          fireActivity(setViewPort);
+        }
+
+        private void sendSelectionInformation(
+            @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
+
+          Pair<Integer, Integer> localSelectionOffsets = editorAPI.getLocalSelectionOffsets(editor);
+          int selectionStartOffset = localSelectionOffsets.first;
+          int selectionLength = localSelectionOffsets.second;
+
+          TextSelectionActivity setSelection =
+              new TextSelectionActivity(user, selectionStartOffset, selectionLength, path);
+
+          fireActivity(setSelection);
         }
       };
 
@@ -297,7 +335,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
       for (VirtualFile openFile : openFiles) {
         localEditorHandler.openEditor(openFile, project, false);
-        // TODO create selection activity if there is a current selection
       }
 
     } finally {
@@ -376,6 +413,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private final LocalEditorManipulator localEditorManipulator;
   private final AnnotationManager annotationManager;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
+  private final EditorAPI editorAPI;
 
   private final EditorPool editorPool = new EditorPool();
 
@@ -414,6 +452,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     this.localEditorManipulator = localEditorManipulator;
     this.annotationManager = annotationManager;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
+    this.editorAPI = editorAPI;
 
     localDocumentModificationHandler = new LocalDocumentModificationHandler(this);
     localClosedEditorModificationHandler =

@@ -4,6 +4,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -137,6 +138,17 @@ public class EditorPool {
   @NotNull
   public Set<SPath> getFiles() {
     return editors.keySet();
+  }
+
+  /**
+   * Returns an unmodifiable representation of the held editor mapping. The mapping will still
+   * reflect any changes made to the editor pool.
+   *
+   * @return an unmodifiable representation of the held editor mapping
+   */
+  @NotNull
+  Map<SPath, Editor> getMapping() {
+    return Collections.unmodifiableMap(editors);
   }
 
   /** Removes all mappings from the editor pool. */

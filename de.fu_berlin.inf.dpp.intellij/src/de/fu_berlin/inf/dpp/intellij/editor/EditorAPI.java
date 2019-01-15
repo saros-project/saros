@@ -10,10 +10,12 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import java.awt.Point;
 import java.awt.Rectangle;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.
@@ -72,6 +74,25 @@ public class EditorAPI {
 
     return new LineRange(
         currentViewportStartLine, currentViewportEndLine - currentViewportStartLine);
+  }
+
+  /**
+   * Returns the offset and length of the local selection for the given editor.
+   *
+   * <p>The values are returned as a {@link Pair}. The first value is the starting offset of the
+   * selection and the second value is the length of the selection.
+   *
+   * @param editor the editor to get the local selection offsets for.
+   * @return a Pair containing the local selection offset and length for the given editor.
+   */
+  @NotNull
+  Pair<Integer, Integer> getLocalSelectionOffsets(Editor editor) {
+    int selectionStartOffset = editor.getSelectionModel().getSelectionStart();
+    int selectionEndOffset = editor.getSelectionModel().getSelectionEnd();
+
+    int selectionLength = selectionEndOffset - selectionStartOffset;
+
+    return new Pair<>(selectionStartOffset, selectionLength);
   }
 
   /**
