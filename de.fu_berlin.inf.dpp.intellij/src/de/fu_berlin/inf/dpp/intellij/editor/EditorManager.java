@@ -405,7 +405,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           userEditorStateManager = null;
           remoteWriteAccessManager.dispose();
           remoteWriteAccessManager = null;
-          activeEditor = null;
         }
       };
 
@@ -413,6 +412,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private final LocalEditorManipulator localEditorManipulator;
   private final AnnotationManager annotationManager;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
+  private final ProjectAPI projectAPI;
   private final EditorAPI editorAPI;
 
   private final EditorPool editorPool = new EditorPool();
@@ -432,10 +432,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private boolean hasWriteAccess;
   // FIXME why is this never assigned? Either assign or remove flag
   private boolean isLocked;
-  private SelectionEvent localSelection;
-  private LineRange localViewport;
-  private SPath activeEditor;
-  private ProjectAPI projectAPI;
 
   public EditorManager(
       ISarosSessionManager sessionManager,
@@ -550,9 +546,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *     <code>null</code> if the local user has no editor open.
    */
   void generateEditorActivated(SPath path) {
-
-    activeEditor = path;
-
     if (path == null || session.isShared(path.getResource())) {
       editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
@@ -586,11 +579,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   /** Generates a {@link TextSelectionActivity} and fires it. */
   void generateSelection(SPath path, SelectionEvent newSelection) {
-
-    if (path.equals(activeEditor)) {
-      localSelection = newSelection;
-    }
-
     int offset = newSelection.getNewRange().getStartOffset();
     int length = newSelection.getNewRange().getLength();
 
@@ -599,21 +587,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   /** Generates a {@link ViewportActivity} and fires it. */
   void generateViewport(SPath path, LineRange viewport) {
-
     if (session == null) {
       LOG.warn("SharedEditorListener not correctly unregistered!");
       return;
     }
 
-    if (path.equals(activeEditor)) {
-      localViewport = viewport;
-    }
-
     fireActivity(
         new ViewportActivity(
             session.getLocalUser(), viewport.getStartLine(), viewport.getNumberOfLines(), path));
-
-    //  editorListenerDispatch.viewportGenerated(part, viewport, path);  //FIXME: add this feature
   }
 
   /** Generates a TextEditActivity and fires it. */
