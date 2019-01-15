@@ -63,7 +63,8 @@ public class EditorAPI {
    * @return the logical line range of the local viewport for the given editor
    * @see LogicalPosition
    */
-  LineRange getLocalViewportRange(Editor editor) {
+  @NotNull
+  LineRange getLocalViewportRange(@NotNull Editor editor) {
     Rectangle visibleAreaRectangle = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
 
     int basePos = visibleAreaRectangle.y;
@@ -86,7 +87,7 @@ public class EditorAPI {
    * @return a Pair containing the local selection offset and length for the given editor.
    */
   @NotNull
-  Pair<Integer, Integer> getLocalSelectionOffsets(Editor editor) {
+  Pair<Integer, Integer> getLocalSelectionOffsets(@NotNull Editor editor) {
     int selectionStartOffset = editor.getSelectionModel().getSelectionStart();
     int selectionEndOffset = editor.getSelectionModel().getSelectionEnd();
 
@@ -106,7 +107,8 @@ public class EditorAPI {
    *     editor
    * @see LogicalPosition
    */
-  LineRange getLineRange(Editor editor, int startOffset, int endOffset) {
+  @NotNull
+  LineRange getLineRange(@NotNull Editor editor, int startOffset, int endOffset) {
     assert startOffset <= endOffset;
 
     int startLine = editor.offsetToLogicalPosition(startOffset).line;
@@ -126,7 +128,7 @@ public class EditorAPI {
    * @param text the text to insert
    * @see Document#insertString(int, CharSequence)
    */
-  void insertText(final Document document, final int offset, final String text) {
+  void insertText(@NotNull final Document document, final int offset, final String text) {
 
     Runnable insertCommand =
         () -> {
@@ -154,7 +156,7 @@ public class EditorAPI {
    * @param end the end offset of the range to delete
    * @see Document#deleteString(int, int)
    */
-  void deleteText(final Document doc, final int start, final int end) {
+  void deleteText(@NotNull final Document doc, final int start, final int end) {
     Runnable deletionCommand =
         () -> {
           Runnable deleteRange = () -> doc.deleteString(start, end);
