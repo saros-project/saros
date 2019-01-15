@@ -75,6 +75,28 @@ public class EditorAPI {
   }
 
   /**
+   * Returns the logical line range of the section represented by the given offsets for the given
+   * editor.
+   *
+   * @param editor the editor to get the line range for
+   * @param startOffset the start offset of the section
+   * @param endOffset the end offset of the section
+   * @return the logical line range of the section represented by the given offsets for the given
+   *     editor
+   * @see LogicalPosition
+   */
+  LineRange getLineRange(Editor editor, int startOffset, int endOffset) {
+    assert startOffset <= endOffset;
+
+    int startLine = editor.offsetToLogicalPosition(startOffset).line;
+    int endLine = editor.offsetToLogicalPosition(endOffset).line;
+
+    int rangeLength = endLine - startLine;
+
+    return new LineRange(startLine, rangeLength);
+  }
+
+  /**
    * Inserts the specified text at the specified offset in the document. Line breaks in the inserted
    * text must be normalized as \n.
    *

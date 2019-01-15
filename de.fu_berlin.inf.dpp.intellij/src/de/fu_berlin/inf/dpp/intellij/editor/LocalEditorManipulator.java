@@ -227,11 +227,13 @@ public class LocalEditorManipulator {
       remoteEndLine = range.getStartLine() + range.getNumberOfLines();
 
     } else {
-      int startCharacter = selection.getOffset();
-      int endCharacter = selection.getOffset() + selection.getLength();
+      int startOffset = selection.getOffset();
+      int endOffset = selection.getOffset() + selection.getLength();
 
-      remoteStartLine = editor.offsetToLogicalPosition(startCharacter).line;
-      remoteEndLine = editor.offsetToLogicalPosition(endCharacter).line;
+      LineRange selectionRange = editorAPI.getLineRange(editor, startOffset, endOffset);
+
+      remoteStartLine = selectionRange.getStartLine();
+      remoteEndLine = selectionRange.getStartLine() + selectionRange.getNumberOfLines();
     }
 
     if (localStartLine <= remoteStartLine && localEndLine >= remoteEndLine) {
