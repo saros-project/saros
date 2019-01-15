@@ -248,7 +248,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
   @Override
   protected void executeCancellation() {
-    if (session.getRemoteUsers().isEmpty())
+    if (session.isHost() && session.getRemoteUsers().isEmpty())
       sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
   }
 

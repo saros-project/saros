@@ -314,7 +314,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     // || session.getRemoteUsers().isEmpty())
     // sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
 
-    sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
+    if (!session.isHost() || session.getRemoteUsers().isEmpty())
+      sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
   }
 
   @Override
