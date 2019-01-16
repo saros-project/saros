@@ -77,7 +77,7 @@ public final class IntelliJFolderImpl extends IntelliJAbstractFolderImpl impleme
   @Override
   public String getDefaultCharset() throws IOException {
     // TODO retrieve encoding for the module or use the project settings
-    return getParent().getDefaultCharset();
+    return getParentFolder().getDefaultCharset();
   }
 
   /**
@@ -137,7 +137,7 @@ public final class IntelliJFolderImpl extends IntelliJAbstractFolderImpl impleme
    */
   @NotNull
   @Override
-  public IFolder getParentFolder(){
+  public IFolder getParentFolder() {
     if (path.segmentCount() == 1) return new IntelliJProjectImpl(srcRoot);
 
     return new IntelliJFolderImpl(srcRoot, path.removeLastSegments(1));

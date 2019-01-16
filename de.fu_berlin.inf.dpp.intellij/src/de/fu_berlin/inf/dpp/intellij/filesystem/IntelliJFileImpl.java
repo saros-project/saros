@@ -257,7 +257,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
           @Override
           public Void compute() throws IOException {
 
-            final IResource parent = getParent();
+            final IResource parent = getParentFolder();
 
             final VirtualFile parentFile =
                 FilesystemUtils.findVirtualFile(srcRoot, parent.getProjectRelativePath());
