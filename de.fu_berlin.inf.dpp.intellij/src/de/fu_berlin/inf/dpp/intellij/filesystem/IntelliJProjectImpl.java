@@ -273,6 +273,12 @@ public final class IntelliJProjectImpl extends IntelliJAbstractFolderImpl implem
     return null;
   }
 
+  @Nullable
+  @Override
+  public IFolder getParentFolder() {
+    return null;
+  }
+
   @NotNull
   @Override
   public IFolder getReferenceFolder() {

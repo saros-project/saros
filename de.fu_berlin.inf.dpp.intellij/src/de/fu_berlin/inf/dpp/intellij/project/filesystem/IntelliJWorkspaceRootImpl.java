@@ -63,6 +63,11 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
+  public IFolder getParentFolder() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public IFolder getReferenceFolder() {
     throw new UnsupportedOperationException();
   }
