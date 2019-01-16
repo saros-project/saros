@@ -83,14 +83,14 @@ public class FileSystem {
 
     if (resource.getType() == IResource.FOLDER) parents.add((IFolder) resource);
 
-    IFolder parent = resource.getParentFolder();
+    IFolder parent = resource.getParent();
 
     while (parent != null && parent.getType() == IResource.FOLDER) {
 
       if (parent.exists()) break;
 
       parents.add(parent);
-      parent = parent.getParentFolder();
+      parent = parent.getParent();
     }
 
     Collections.reverse(parents);

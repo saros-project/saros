@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.intellij.filesystem;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
@@ -74,7 +73,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
    */
   @NotNull
   @Override
-  public IFolder getParentFolder() {
+  public IFolder getParent() {
     if (path.segmentCount() == 1) return new IntelliJProjectImpl(srcRoot);
 
     return new IntelliJFolderImpl(srcRoot, path.removeLastSegments(1));
@@ -240,7 +239,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
           @Override
           public Void compute() throws IOException {
 
-            final IResource parent = getParentFolder();
+            final IResource parent = getParent();
 
             final VirtualFile parentFile =
                 FilesystemUtils.findVirtualFile(srcRoot, parent.getProjectRelativePath());

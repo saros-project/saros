@@ -5,7 +5,6 @@ import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
@@ -77,7 +76,7 @@ public final class IntelliJFolderImpl extends IntelliJAbstractFolderImpl impleme
   @Override
   public String getDefaultCharset() throws IOException {
     // TODO retrieve encoding for the module or use the project settings
-    return getParentFolder().getDefaultCharset();
+    return getParent().getDefaultCharset();
   }
 
   /**
@@ -120,7 +119,7 @@ public final class IntelliJFolderImpl extends IntelliJAbstractFolderImpl impleme
    */
   @NotNull
   @Override
-  public IFolder getParentFolder() {
+  public IFolder getParent() {
     if (path.segmentCount() == 1) return new IntelliJProjectImpl(srcRoot);
 
     return new IntelliJFolderImpl(srcRoot, path.removeLastSegments(1));

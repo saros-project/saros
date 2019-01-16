@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public abstract class IntelliJAbstractFolderImpl extends IntelliJResourceImpl
     implements IFolder, IContainer {
@@ -244,7 +243,7 @@ public abstract class IntelliJAbstractFolderImpl extends IntelliJResourceImpl
           @Override
           public Void compute() throws IOException {
 
-            final IResource parent = getParentFolder();
+            final IResource parent = getParent();
 
             final VirtualFile parentFile =
                 FilesystemUtils.findVirtualFile(srcRoot, parent.getProjectRelativePath());

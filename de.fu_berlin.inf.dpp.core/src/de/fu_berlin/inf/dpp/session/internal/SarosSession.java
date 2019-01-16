@@ -818,7 +818,7 @@ public final class SarosSession implements ISarosSession {
 
       switch (fileActivity.getType()) {
         case CREATED:
-          if (!isShared(file.getParentFolder())) {
+          if (!isShared(file.getParent())) {
             log.error(
                 "PSFIC -"
                     + " unable to update partial sharing state"
@@ -914,7 +914,7 @@ public final class SarosSession implements ISarosSession {
     } else if (activity instanceof FolderCreatedActivity) {
       IFolder folder = project.getFolder(activity.getPath().getReferencePointRelativePath());
 
-      if (!isShared(folder.getParentFolder())) {
+      if (!isShared(folder.getParent())) {
         log.error("PSFOC -" + " folder creation detected for a non shared parent: " + folder);
         return false;
       }

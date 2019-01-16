@@ -34,7 +34,7 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public IFolder getParentFolder() {
+  public IFolder getParent() {
     org.eclipse.core.resources.IContainer container = delegate.getParent();
 
     if (container == null) return null;
