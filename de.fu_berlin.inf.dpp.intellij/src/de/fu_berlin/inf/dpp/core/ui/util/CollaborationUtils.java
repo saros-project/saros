@@ -5,7 +5,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -287,7 +286,7 @@ public class CollaborationUtils {
 
         if (sarosSession.isCompletelyShared(project.getReferencePoint())) {
           fileCountAndSize =
-              getFileCountAndSize(Arrays.asList(project.members()), true, IContainer.FILE);
+              getFileCountAndSize(Arrays.asList(project.members()), true, IResource.FILE);
 
           result.append(
               String.format(
@@ -471,7 +470,7 @@ public class CollaborationUtils {
    * @param resources collection containing the resources that file sizes and file count should be
    *     calculated
    * @param includeMembers <code>true</code> to include the members of resources that represents a
-   *     {@linkplain IContainer container}
+   *     {@linkplain IFolder folder}
    * @param flags additional flags on how to process the members of containers
    * @return a pair containing the {@linkplain de.fu_berlin.inf.dpp.util.Pair#p file size} and
    *     {@linkplain de.fu_berlin.inf.dpp.util.Pair#v file count} for the given resources
@@ -502,16 +501,16 @@ public class CollaborationUtils {
           }
 
           try {
-            IContainer container = ((IContainer) resource.getAdapter(IContainer.class));
+            IFolder folder = ((IFolder) resource.getAdapter(IFolder.class));
 
             Pair<Long, Long> subFileCountAndSize =
-                getFileCountAndSize(Arrays.asList(container.members(flags)), true, flags);
+                getFileCountAndSize(Arrays.asList(folder.members(flags)), true, flags);
 
             totalFileSize += subFileCountAndSize.getLeft();
             totalFileCount += subFileCountAndSize.getRight();
 
           } catch (Exception e) {
-            LOG.warn("failed to process container: " + resource, e);
+            LOG.warn("failed to process folder: " + resource, e);
           }
           break;
         default:

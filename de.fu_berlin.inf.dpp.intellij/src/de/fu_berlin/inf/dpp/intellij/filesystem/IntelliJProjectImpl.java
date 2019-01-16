@@ -7,7 +7,6 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;

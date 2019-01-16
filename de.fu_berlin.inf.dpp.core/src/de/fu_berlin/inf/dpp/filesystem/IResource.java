@@ -22,7 +22,7 @@ public interface IResource {
 
   public String getName();
 
-  public IFolder getParentFolder();
+  public IFolder getParent();
 
   public IFolder getReferenceFolder();
 
