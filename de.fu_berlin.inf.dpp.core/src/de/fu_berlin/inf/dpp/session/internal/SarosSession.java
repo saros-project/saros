@@ -803,7 +803,6 @@ public final class SarosSession implements ISarosSession {
 
     final IReferencePoint referencePoint = activity.getPath().getReferencePoint();
     final IFolder project = referencePointManager.get(referencePoint);
-    
     /*
      * The follow 'if check' assumes that move operations where at least one
      * project is not part of the sharing is announced as create and delete
