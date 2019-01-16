@@ -116,23 +116,6 @@ public final class IntelliJFolderImpl extends IntelliJAbstractFolderImpl impleme
    * return value. This implementation, however, can not return null values, as suggested by its
    * NotNull tag.
    *
-   * @return an <code>IContainer</code> object for the parent of this folder
-   */
-  @NotNull
-  @Override
-  public IContainer getParent() {
-    if (path.segmentCount() == 1) return new IntelliJProjectImpl(srcRoot);
-
-    return new IntelliJFolderImpl(srcRoot, path.removeLastSegments(1));
-  }
-
-  /**
-   * Returns the parent of this folder.
-   *
-   * <p><b>Note:</b> The interface specification for this method does allow <code>null</code> as a
-   * return value. This implementation, however, can not return null values, as suggested by its
-   * NotNull tag.
-   *
    * @return an <code>IFolder</code> object for the parent of this folder
    */
   @NotNull

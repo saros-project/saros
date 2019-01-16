@@ -34,24 +34,6 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public IContainer getParent() {
-    org.eclipse.core.resources.IContainer container = delegate.getParent();
-
-    if (container == null) return null;
-
-    switch (container.getType()) {
-      case org.eclipse.core.resources.IResource.FOLDER:
-        return new EclipseFolderImpl((org.eclipse.core.resources.IFolder) container);
-      case org.eclipse.core.resources.IResource.PROJECT:
-        return new EclipseProjectImpl((org.eclipse.core.resources.IProject) container);
-      case org.eclipse.core.resources.IResource.ROOT:
-        return new EclipseWorkspaceRootImpl((org.eclipse.core.resources.IWorkspaceRoot) container);
-      default:
-        return null;
-    }
-  }
-
-  @Override
   public IFolder getParentFolder() {
     org.eclipse.core.resources.IContainer container = delegate.getParent();
 

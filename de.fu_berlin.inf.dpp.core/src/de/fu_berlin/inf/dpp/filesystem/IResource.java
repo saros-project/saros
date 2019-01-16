@@ -22,9 +22,6 @@ public interface IResource {
 
   public String getName();
 
-  @Deprecated
-  public IContainer getParent();
-
   public IFolder getParentFolder();
 
   public IFolder getReferenceFolder();
