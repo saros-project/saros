@@ -136,10 +136,6 @@ public class ResourceAdapterFactory {
         return new EclipseProjectImpl(
             (org.eclipse.core.resources.IProject)
                 resource.getAdapter(org.eclipse.core.resources.IProject.class));
-      case IResource.ROOT:
-        return new EclipseWorkspaceRootImpl(
-            (org.eclipse.core.resources.IWorkspaceRoot)
-                resource.getAdapter(org.eclipse.core.resources.IWorkspaceRoot.class));
       default:
         return new EclipseResourceImpl(resource);
     }

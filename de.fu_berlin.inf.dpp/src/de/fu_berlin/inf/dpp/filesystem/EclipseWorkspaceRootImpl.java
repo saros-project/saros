@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Eclipse implementation of {@link IWorkspaceRoot}. */
-public class EclipseWorkspaceRootImpl extends EclipseContainerImpl implements IWorkspaceRoot {
+public class EclipseWorkspaceRootImpl implements IWorkspaceRoot {
+
+  org.eclipse.core.resources.IWorkspaceRoot delegate;
 
   public EclipseWorkspaceRootImpl(org.eclipse.core.resources.IWorkspaceRoot delegate) {
-    super(delegate);
+    this.delegate = delegate;
   }
 
   @Override
@@ -16,8 +18,7 @@ public class EclipseWorkspaceRootImpl extends EclipseContainerImpl implements IW
 
     final List<IFolder> result = new ArrayList<IFolder>();
 
-    for (final org.eclipse.core.resources.IProject project :
-        ((org.eclipse.core.resources.IWorkspaceRoot) getDelegate()).getProjects()) {
+    for (final org.eclipse.core.resources.IProject project : delegate.getProjects()) {
       result.add(ResourceAdapterFactory.create(project));
     }
 
