@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl_V2;
+import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -323,7 +323,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
                 fillReferencePointManager(
-                    new EclipseProjectImpl_V2(entry.getValue()), referencePointManager);
+                    new EclipseProjectImpl(entry.getValue()), referencePointManager);
                 convertedMapping.put(entry.getKey(), EclipseReferencePointManager.create(entry.getValue()));
               }
 
@@ -575,7 +575,7 @@ public class AddProjectToSessionWizard extends Wizard {
             session.getComponent(IReferencePointManager.class);
 
         fillReferencePointManager(
-            new EclipseProjectImpl_V2(entry.getValue()), referencePointManager);
+            new EclipseProjectImpl(entry.getValue()), referencePointManager);
 
         localFileList =
             FileListFactory.createFileList(
@@ -687,7 +687,7 @@ public class AddProjectToSessionWizard extends Wizard {
   }
 
   private void fillReferencePointManager(
-      de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl_V2 project,
+      EclipseProjectImpl project,
       IReferencePointManager referencePointManager) {
     referencePointManager.put(project.getReferencePoint(), project);
     eclipseReferencePointManager.put((IProject)project.getDelegate());

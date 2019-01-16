@@ -43,7 +43,7 @@ public class EclipseResourceImpl implements IResource {
       case org.eclipse.core.resources.IResource.FOLDER:
         return new EclipseFolderImpl_V2((org.eclipse.core.resources.IFolder) container);
       case org.eclipse.core.resources.IResource.PROJECT:
-        return new EclipseProjectImpl_V2((org.eclipse.core.resources.IProject) container);
+        return new EclipseProjectImpl((org.eclipse.core.resources.IProject) container);
       case org.eclipse.core.resources.IResource.ROOT:
         return new EclipseWorkspaceRootImpl((org.eclipse.core.resources.IWorkspaceRoot) container);
       default:
@@ -57,7 +57,7 @@ public class EclipseResourceImpl implements IResource {
 
     if (project == null) return null;
 
-    return new EclipseProjectImpl_V2(project);
+    return new EclipseProjectImpl(project);
   }
 
   @Override

@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.ui.util;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl_V2;
+import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -281,7 +281,7 @@ public class CollaborationUtils {
       final List<IResource> resources;
 
       if (isCompletelyShared)
-        resources = Collections.singletonList(((EclipseProjectImpl_V2) project).getDelegate());
+        resources = Collections.singletonList(((EclipseProjectImpl) project).getDelegate());
       else
         resources =
             ResourceAdapterFactory.convertBack(
@@ -462,7 +462,7 @@ public class CollaborationUtils {
 
     for (Entry<IProject, List<IResource>> entry : data.entrySet()) {
       de.fu_berlin.inf.dpp.filesystem.IFolder coreProject =
-         new EclipseProjectImpl_V2(entry.getKey());
+         new EclipseProjectImpl(entry.getKey());
 
       fillReferencePointManager(coreProject, referencePointManager);
 

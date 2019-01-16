@@ -133,7 +133,7 @@ public class ResourceAdapterFactory {
             (org.eclipse.core.resources.IFolder)
                 resource.getAdapter(org.eclipse.core.resources.IFolder.class));
       case IResource.PROJECT:
-        return new EclipseProjectImpl_V2(
+        return new EclipseProjectImpl(
             (org.eclipse.core.resources.IProject)
                 resource.getAdapter(org.eclipse.core.resources.IProject.class));
       case IResource.ROOT:
