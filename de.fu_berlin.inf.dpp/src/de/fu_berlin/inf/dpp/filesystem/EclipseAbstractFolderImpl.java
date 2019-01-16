@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.filesystem;
 import java.io.IOException;
 import org.apache.commons.lang3.NotImplementedException;
 
-public abstract class EclipseAbstractFolderImpl extends EclipseContainerImpl implements IFolder {
+public abstract class EclipseAbstractFolderImpl extends EclipseResourceImpl implements IFolder {
 
   public EclipseAbstractFolderImpl(org.eclipse.core.resources.IContainer delegate) {
     super(delegate);
