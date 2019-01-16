@@ -42,12 +42,12 @@ public abstract class EclipseAbstractFolderImpl extends EclipseContainerImpl imp
 
   @Override
   public IFolder getFolder(String name) {
-    return new EclipseFolderImpl_V2(getDelegate().getFolder(toIPath(name)));
+    return new EclipseFolderImpl(getDelegate().getFolder(toIPath(name)));
   }
 
   @Override
   public IFolder getFolder(IPath path) {
-    return new EclipseFolderImpl_V2(getDelegate().getFolder(((EclipsePathImpl) path).getDelegate()));
+    return new EclipseFolderImpl(getDelegate().getFolder(((EclipsePathImpl) path).getDelegate()));
   }
 
   private org.eclipse.core.runtime.IPath toIPath(String toPath) {

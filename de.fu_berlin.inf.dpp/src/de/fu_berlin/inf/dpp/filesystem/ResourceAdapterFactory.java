@@ -129,7 +129,7 @@ public class ResourceAdapterFactory {
             (org.eclipse.core.resources.IFile)
                 resource.getAdapter(org.eclipse.core.resources.IFile.class));
       case IResource.FOLDER:
-        return new EclipseFolderImpl_V2(
+        return new EclipseFolderImpl(
             (org.eclipse.core.resources.IFolder)
                 resource.getAdapter(org.eclipse.core.resources.IFolder.class));
       case IResource.PROJECT:

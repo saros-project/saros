@@ -41,7 +41,7 @@ public class EclipseResourceImpl implements IResource {
 
     switch (container.getType()) {
       case org.eclipse.core.resources.IResource.FOLDER:
-        return new EclipseFolderImpl_V2((org.eclipse.core.resources.IFolder) container);
+        return new EclipseFolderImpl((org.eclipse.core.resources.IFolder) container);
       case org.eclipse.core.resources.IResource.PROJECT:
         return new EclipseProjectImpl((org.eclipse.core.resources.IProject) container);
       case org.eclipse.core.resources.IResource.ROOT:
