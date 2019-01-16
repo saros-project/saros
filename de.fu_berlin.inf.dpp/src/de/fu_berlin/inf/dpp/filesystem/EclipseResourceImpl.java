@@ -135,8 +135,6 @@ public class EclipseResourceImpl implements IResource {
 
     if (IFile.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFile.class;
     else if (IFolder.class.equals(clazz)) classToMap = org.eclipse.core.resources.IFolder.class;
-    else if (IContainer.class.equals(clazz))
-      classToMap = org.eclipse.core.resources.IContainer.class;
     else if (IWorkspaceRoot.class.equals(clazz))
       classToMap = org.eclipse.core.resources.IWorkspaceRoot.class;
 
