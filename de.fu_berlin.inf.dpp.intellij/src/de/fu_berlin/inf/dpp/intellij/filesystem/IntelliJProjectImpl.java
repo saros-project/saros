@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import java.io.IOException;
@@ -37,7 +36,7 @@ public final class IntelliJProjectImpl extends IntelliJAbstractFolderImpl implem
   private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
 
   /**
-   * Creates a core compatible {@link IProject project} using the given IntelliJ module.
+   * Creates a core compatible {@link IFolder folder} using the given IntelliJ module.
    *
    * <p><b>Note:</b> Only top level modules are fully supported. Modules inside of other modules
    * will be created as top level modules on the receiving side of the session initialization. Inner

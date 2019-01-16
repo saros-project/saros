@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.server.session;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
