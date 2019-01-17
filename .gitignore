@@ -49,6 +49,10 @@ bin_test/
 /de.fu_berlin.inf.dpp.ui/.project
 /de.fu_berlin.inf.dpp.server/.project
 /de.fu_berlin.inf.dpp.whiteboard/.project
+/de.fu_berlin.inf.dpp.whiteboard/frontend/package-lock.json
+/de.fu_berlin.inf.dpp.whiteboard/frontend/node_modules/
+/de.fu_berlin.inf.dpp.whiteboard/frontend/bower_components/
+/de.fu_berlin.inf.dpp.whiteboard/frontend/dist/
 /de.fu_berlin.inf.dpp.intellij/.project
 .DS_Store
 docs/_site
