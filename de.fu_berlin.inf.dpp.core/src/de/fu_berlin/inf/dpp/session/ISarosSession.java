@@ -295,7 +295,15 @@ public interface ISarosSession {
    * @return <code>true</code> if the given {@link IResource resource} is currently shared in this
    *     session, <code>false</code> otherwise
    */
+  @Deprecated
   public boolean isShared(IResource resource);
+
+  /**
+   * @return <code>true</code> if the given {@link IResource resource} and its {@link
+   *     IReferencePoint reference point} is currently shared in this session, <code>false</code>
+   *     otherwise
+   */
+  public boolean isShared(IReferencePoint referencePoint, IResource resource);
 
   /**
    * Checks if selected reference point is a complete shared one or partial shared.

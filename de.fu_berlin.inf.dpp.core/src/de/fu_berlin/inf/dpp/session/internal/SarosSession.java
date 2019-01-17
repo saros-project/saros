@@ -988,6 +988,11 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
+  public boolean isShared(IReferencePoint referencePoint, IResource resource) {
+    return sharedReferencePointMapper.isShared(resource, referencePoint);
+  }
+
+  @Override
   public List<IResource> getSharedResources() {
     return sharedReferencePointMapper.getPartiallySharedResources();
   }
