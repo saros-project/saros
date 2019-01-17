@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.RemoteRemoveCommand;
 import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.lib.Ref;
@@ -22,9 +23,10 @@ public class JGitFacade {
    * Create a bundle file with all commits from basis to actual of the Git repo.
    *
    * @param workDir The directory that contains the .git directory
-   * @param actual The name of the ref to lookup. Must not be a short-handform; e.g., "master" is
-   *     not automatically expanded to"refs/heads/master". Include the object the ref is point at in
-   *     the bundle and (if the basis is an empty string) everything reachable from it.
+   * @param actual The name of the ref to lookup. For example: "HEAD" or "refs/heads/master". Must
+   *     not be a short-handform; e.g., "master" is not automatically expanded
+   *     to"refs/heads/master". Include the object the ref is point at in the bundle and (if the
+   *     basis is an empty string) everything reachable from it.
    * @param basis Assume that the recipient have at least the commit the basis is pointing to. In
    *     order to fetch from a bundle the recipient must have the commit the basis is pointing to.
    * @throws IllegalArgumentException workDir, actual or basis can't be resolved
@@ -55,7 +57,7 @@ public class JGitFacade {
       throw new IllegalArgumentException("actual can't be resolved", e);
     }
     if (actualRef == null) throw new IllegalArgumentException("actual can't be resolved");
-    bundlewriter.include(actualRef);
+    bundlewriter.include("refs/heads/bundle", actualRef.getObjectId());
 
     // Step 3
     if (basis != "") {
@@ -99,6 +101,14 @@ public class JGitFacade {
       git = Git.open(workDir);
     } catch (IOException e) {
       throw new IllegalArgumentException("workDir can't be resolved", e);
+    }
+
+    try {
+      RemoteRemoveCommand rrc = git.remoteRemove();
+      rrc.setName("bundle");
+      rrc.call();
+    } catch (Exception e) {
+      throw new Exception("failed to remove old bundle path", e);
     }
 
     try {
