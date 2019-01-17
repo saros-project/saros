@@ -1,7 +1,7 @@
 import SVG from '../constants/SVG';
 import SXE from '../constants/SXE';
 /**
- * responsible for executing sxe commands and messages comming from java
+ * responsible for executing SXE commands and messages coming from java
  */
 export default class JavaBridge {
   /**
@@ -12,8 +12,6 @@ export default class JavaBridge {
     this.viewManager = viewManager;
     this.canvas = viewManager.getCanvas();
 
-    //queue which contains the to be created paths
-    this.pathQueue = [];
     //updates the whiteboard when a message is received
     window.message = this.message = (sxeMessage) => {
       let records = sxeMessage.records || [];
@@ -24,7 +22,7 @@ export default class JavaBridge {
       records.forEach(record => this.executeRecord(record));
       this.canvas.renderAll();
     };
-    //sets the state of the whiteboard at the begining of the session using data from the Java Model
+    //sets the state of the whiteboard at the beginning of the session using data from Java Model
     window.setState = (state) => {
       //convert recursive data structure to linear structure
       let records = flatten(state);
@@ -32,6 +30,7 @@ export default class JavaBridge {
       records.shift();
       //reset
       this.viewManager.clear();
+      // apply
       records.forEach(record => this.createNew(record));
       this.canvas.renderAll();
     };
@@ -39,7 +38,7 @@ export default class JavaBridge {
 
   /**
    * executes a given record
-   * @param {Object} record
+   * @param {{type: string, valuePairs: Object}} record
    */
   executeRecord(record) {
     let action = record.type.toLowerCase();
@@ -50,7 +49,7 @@ export default class JavaBridge {
       case SXE.ACTIONS.SET:
         return this.set(props);
       //the current java implementation of the SXE protocol uses "SET":visible=false instead of "REMOVE"
-      //because its faster (on java level), that why it is not possible to receive a "REMOVE" action
+      //because its faster (while synchronizing), that why it is not possible to receive a "REMOVE" action
       case SXE.ACTIONS.REMOVE:
         return;
     }
@@ -58,7 +57,7 @@ export default class JavaBridge {
 
   /**
    * executes a "NEW" record
-   * @param {Object} recordProps
+   * @param {{visible: boolean, rid: string, name: string, parent?:string, chdata?:string}} recordProps
    */
   createNew(recordProps) {
     // the value HAS to be false to ignore creation
@@ -81,7 +80,7 @@ export default class JavaBridge {
         let view;
         if (name === SVG.PROPERTIES.D) {
           //path objects cannot be correctly displayed without the "command" or "d" parameter
-          //we have to re-create the path because fabricjs doesnt respond to dynamic changes to the path
+          //we have to re-create the path because fabricjs doesn't respond to dynamic changes to the path
           let old = this.viewManager.getView(parent);
           this.viewManager.deleteView(parent);
           //create the correct path
@@ -97,7 +96,7 @@ export default class JavaBridge {
         if (!view)
           return;
         let attr = view.$createAttr(name, chdata, rid);
-        delete attr.isDirty;
+        attr.isDirty = false;
         this.canvas.$fitObject(view);
         return attr;
       }
