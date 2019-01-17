@@ -29,6 +29,10 @@ export default class FreeDrawing {
     // get needed parameters for the new path
     let pathObj = event.path;
     let { top, left } = pathObj;
+    // fabricjs has its own internal data structure to represent path objects,
+    // however, we need to extract the SVG command that draws that path because
+    // the old whiteboard uses SVG, otherwise it would crash
+    // the command of the path is saved into the "d" parameter of the SVG path object
     let pathStr = pathObj.toSVG().match(/d="([^"]+)"/)[1];
     this.canvas.remove(pathObj);
     // creates new path
