@@ -1,8 +1,8 @@
 import SVG from "../constants/SVG";
 
 /**
- * adds the attributes managment needed to make a fabricjs object easily transferable.
- * NOTE: all functions and attributes start with '$' to seperate them from native fabricjs
+ * adds the attributes management needed to make a fabricjs object easily transferable.
+ * NOTE: all functions and attributes start with '$' to separate them from native fabricjs
  * functions and properties
  * @param {fabric.Object} superClass
  * the class which will be extended and have these attributes
@@ -12,13 +12,13 @@ let AttributeMixin = (superClass) => class extends superClass {
     super(...params);
     //this objects attributes
     this.$attrs = {};
-    //this object can be overwritten by inherted objects to define custom mapping of attributes
+    //this object can be overwritten by inherited objects to define custom mapping of attributes
     this.$objectSpecificAttributes = {};
   }
 
   /**
    * returns the attribute with the given id
-   * @param {String} id
+   * @param {string} id
    * id of the target attribute
    * @returns {Object}
    * attribute with the given id
@@ -29,9 +29,9 @@ let AttributeMixin = (superClass) => class extends superClass {
 
   /**
    * returns attribute's id of the attribute with the given name
-   * @param {String} name
+   * @param {string} name
    * attribute's name
-   * @returns {String}
+   * @returns {string}
    * attribute's id
    */
   $getAttrID(name) {
@@ -43,9 +43,8 @@ let AttributeMixin = (superClass) => class extends superClass {
   /**
    * returns array of attributes which can be directly given to java
    * to be sent to other users
-   * @returns {Array}
-   * attributes in the form:
-   * [{name, chdata, rid}, {name, chdata, rid}...]
+   * @returns {{name: string, chdata: string, rid: string}[]}
+   * array of this object's attributes
    */
   $getTransferableAttrs() {
     this.$refreshAttrs();
@@ -69,7 +68,7 @@ let AttributeMixin = (superClass) => class extends superClass {
   }
 
   /**
-   * converts scaling factors to actual dimensions that can be transfered
+   * converts scaling factors to actual dimensions that can be transferred
    */
   $fixScaling() {
     throw "not implemented";
@@ -112,7 +111,7 @@ let AttributeMixin = (superClass) => class extends superClass {
   }
 
   /**
-   * creates a new attribute attatched to this view.
+   * creates a new attribute attached to this view.
    * @param {String} name
    * @param {String} chdata
    * @param {String} rid
