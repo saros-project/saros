@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 /** Dispatches activities for editor changes. */
 class LocalEditorStatusChangeHandler implements DisableableHandler {
 
+  private final EditorManager editorManager;
   private final Project project;
   private final LocalEditorHandler localEditorHandler;
   private final AnnotationManager annotationManager;
@@ -28,6 +29,8 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
       new FileEditorManagerListener() {
         @Override
         public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+          sendExistingSelection(file);
+
           setUpOpenedEditor(file);
         }
 
@@ -63,18 +66,45 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
   /**
    * Instantiates a LocalEditorStatusChangeHandler object. The handler is enabled by default.
    *
+   * @param editorManager the EditorManager instance
    * @param localEditorHandler the LocalEditorHandler instance
    * @param annotationManager the AnnotationManager instance
    */
   LocalEditorStatusChangeHandler(
-      Project project, LocalEditorHandler localEditorHandler, AnnotationManager annotationManager) {
+      EditorManager editorManager,
+      Project project,
+      LocalEditorHandler localEditorHandler,
+      AnnotationManager annotationManager) {
 
+    this.editorManager = editorManager;
     this.project = project;
     this.localEditorHandler = localEditorHandler;
     this.annotationManager = annotationManager;
 
     subscribe();
     this.enabled = true;
+  }
+
+  /**
+   * Generates and dispatches a TextSelectionActivity for the opened editor. This is done to inform
+   * other participants of pre-existing selections in case the editor has not been opened before
+   * during the current session.
+   *
+   * @param virtualFile the file to send the current selection information for
+   */
+  private void sendExistingSelection(@NotNull VirtualFile virtualFile) {
+
+    if (!enabled) {
+      return;
+    }
+
+    Editor editor = localEditorHandler.openEditor(virtualFile, false);
+
+    SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
+
+    if (sPath != null && SessionUtils.isShared(sPath) && editor != null) {
+      editorManager.sendExistingSelection(sPath, editor);
+    }
   }
 
   /**
