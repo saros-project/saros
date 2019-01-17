@@ -37,7 +37,14 @@ public class JGitFacadeTest {
 
     // lucky paths
     @Test
-    public void testCreateBundle()
+    public void testCreateBundleHEAD()
+        throws IllegalArgumentException, IOException {
+        File bundle = JGitFacade.createBundle(localWorkDir, "HEAD", "");
+        assertNotNull(bundle);
+    }
+
+    @Test
+    public void testCreateBundleRef()
         throws IllegalArgumentException, IOException {
         File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master",
             "");
@@ -56,8 +63,7 @@ public class JGitFacadeTest {
         String basis = JGitFacade.getSHA1HashByRevisionString(remoteWorkDir,
             "HEAD");
 
-        File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master",
-            basis);
+        File bundle = JGitFacade.createBundle(localWorkDir, "HEAD", basis);
 
         assertNotEquals(getObjectIdByRevisionString(localWorkDir, "HEAD"),
             getObjectIdByRevisionString(remoteWorkDir, "FETCH_HEAD"));
@@ -74,8 +80,7 @@ public class JGitFacadeTest {
         throws IllegalArgumentException, IOException {
         File emptyDir = tempFolder.newFolder("TempDir3");
 
-        JGitFacade.createBundle(emptyDir, "refs/heads/master",
-            "CheckoutAtInit");
+        JGitFacade.createBundle(emptyDir, "HEAD", "CheckoutAtInit");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -88,8 +93,7 @@ public class JGitFacadeTest {
     @Test(expected = IllegalArgumentException.class)
     public void testCreateBundleWrongBasis()
         throws IllegalArgumentException, IOException {
-        JGitFacade.createBundle(localWorkDir, "refs/heads/master",
-            "WrongBasis");
+        JGitFacade.createBundle(localWorkDir, "HEAD", "WrongBasis");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -99,7 +103,7 @@ public class JGitFacadeTest {
 
         writeCommitToRepo(localWorkDir, 3);
 
-        File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master",
+        File bundle = JGitFacade.createBundle(localWorkDir, "HEAD",
             "CheckoutAtCommit2");
 
         JGitFacade.fetchFromBundle(emptyDir, bundle);
@@ -115,7 +119,7 @@ public class JGitFacadeTest {
         writeCommitToRepo(localWorkDir, 3);
         writeCommitToRepo(localWorkDir, 4);
 
-        File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master",
+        File bundle = JGitFacade.createBundle(localWorkDir, "HEAD",
             "CheckoutAtCommit3");
 
         JGitFacade.fetchFromBundle(remoteWorkDir, bundle);
