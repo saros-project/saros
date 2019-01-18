@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
@@ -82,7 +83,9 @@ public class CollaborationUtils {
 
       fillReferencePointManager(project, referencePointManager);
 
-      referencePointResources.put(project.getReferencePoint(), entry.getValue());
+      referencePointResources.put(
+          IntelliJReferencePointManager.create(VirtualFileConverter.convertToVirtualFile(project)),
+          entry.getValue());
     }
 
     UIMonitoredJob sessionStartupJob =
@@ -212,7 +215,10 @@ public class CollaborationUtils {
 
                 fillReferencePointManager(project, referencePointManager);
 
-                referencePointResources.put(project.getReferencePoint(), entry.getValue());
+                referencePointResources.put(
+                    IntelliJReferencePointManager.create(
+                        VirtualFileConverter.convertToVirtualFile(project)),
+                    entry.getValue());
               }
 
               sessionManager.addResourcesToSession(referencePointResources);
@@ -284,7 +290,11 @@ public class CollaborationUtils {
 
         Pair<Long, Long> fileCountAndSize;
 
-        if (sarosSession.isCompletelyShared(project.getReferencePoint())) {
+        IReferencePoint referencePoint =
+            IntelliJReferencePointManager.create(
+                VirtualFileConverter.convertToVirtualFile(project));
+
+        if (sarosSession.isCompletelyShared(referencePoint)) {
           fileCountAndSize =
               getFileCountAndSize(Arrays.asList(project.members()), true, IResource.FILE);
 
@@ -295,7 +305,7 @@ public class CollaborationUtils {
                   fileCountAndSize.getRight(),
                   format(fileCountAndSize.getLeft())));
         } else {
-          List<IResource> resources = sarosSession.getSharedResources(project.getReferencePoint());
+          List<IResource> resources = sarosSession.getSharedResources(referencePoint);
 
           fileCountAndSize = getFileCountAndSize(resources, false, IResource.NONE);
 
@@ -524,9 +534,10 @@ public class CollaborationUtils {
   private static void fillReferencePointManager(
       de.fu_berlin.inf.dpp.filesystem.IFolder project,
       IReferencePointManager referencePointManager) {
-    referencePointManager.put(project.getReferencePoint(), project);
-
     IntelliJProjectImpl intelliJProject = (IntelliJProjectImpl) project;
+
+    referencePointManager.put(
+        IntelliJReferencePointManager.create(intelliJProject.getModule()), project);
 
     intelliJReferencePointManager.put(intelliJProject.getModule());
   }

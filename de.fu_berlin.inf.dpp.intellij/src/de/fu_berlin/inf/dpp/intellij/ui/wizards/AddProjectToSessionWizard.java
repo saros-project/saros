@@ -17,12 +17,14 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgessMonitorAdapter;
@@ -474,7 +476,11 @@ public class AddProjectToSessionWizard extends Wizard {
                             .stream()
                             .collect(
                                 Collectors.toMap(
-                                    e -> e.getKey(), e -> e.getValue().getReferencePoint())),
+                                    e -> e.getKey(),
+                                    e ->
+                                        IntelliJReferencePointManager.create(
+                                            VirtualFileConverter.convertToVirtualFile(
+                                                e.getValue())))),
                         new ProgessMonitorAdapter(indicator));
 
                 indicator.stop();
@@ -616,10 +622,14 @@ public class AddProjectToSessionWizard extends Wizard {
 
         fillReferencePointManager(project, referencePointManager);
 
+        IReferencePoint referencePoint =
+            IntelliJReferencePointManager.create(
+                VirtualFileConverter.convertToVirtualFile(project));
+
         FileList localFileList =
             FileListFactory.createFileList(
                 referencePointManager,
-                project.getReferencePoint(),
+                referencePoint,
                 null,
                 checksumCache,
                 new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SETTASKNAME));
@@ -645,9 +655,11 @@ public class AddProjectToSessionWizard extends Wizard {
   private void fillReferencePointManager(
       de.fu_berlin.inf.dpp.filesystem.IFolder project,
       IReferencePointManager referencePointManager) {
-    referencePointManager.put(project.getReferencePoint(), project);
 
     IntelliJProjectImpl intelliJProject = (IntelliJProjectImpl) project;
+
+    referencePointManager.put(
+        intelliJReferencePointManager.create(intelliJProject.getModule()), project);
 
     intelliJReferencePointManager.put(intelliJProject.getModule());
   }

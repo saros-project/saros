@@ -13,6 +13,8 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
+import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import java.io.IOException;
@@ -59,7 +61,7 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
   public IReferencePoint getReferencePoint(String moduleName) {
     IFolder project = getReferenceFolder(moduleName);
 
-    return project.getReferencePoint();
+    return IntelliJReferencePointManager.create(VirtualFileConverter.convertToVirtualFile(project));
   }
 
   public Module getModule(final String moduleName) {

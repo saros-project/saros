@@ -52,7 +52,7 @@ public class VirtualFileConverter {
 
     if (resource == null) return null;
 
-    IReferencePoint referencePoint = resource.getReferencePoint();
+    IReferencePoint referencePoint = IntelliJReferencePointManager.create(virtualFile);
     IPath referencePointRelativePath = resource.getProjectRelativePath();
 
     return new SPath(referencePoint, referencePointRelativePath);
