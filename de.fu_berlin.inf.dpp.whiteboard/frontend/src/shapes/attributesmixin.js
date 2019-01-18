@@ -52,7 +52,7 @@ let AttributeMixin = (superClass) => class extends superClass {
     for (let attr of Object.values(this.$attrs))
       if (attr.isDirty) {
         toSend.push({ name: attr.name, chdata: attr.chdata.toString(), rid: attr.rid });
-        delete attr.isDirty;
+        attr.isDirty = false;
       }
     return toSend;
   }
