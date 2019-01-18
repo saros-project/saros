@@ -45,6 +45,21 @@ public class IntelliJReferencePointManager {
   }
 
   /**
+   * Creates and returns the {@link IReferencePoint} reference point of given {@link VirtualFile}
+   * virtual file. The reference point points on the module's root full path.
+   *
+   * @param virtualFile
+   * @return the reference point of given virtual file
+   */
+  public static IReferencePoint create(VirtualFile virtualFile) {
+    if (virtualFile == null) return null;
+
+    Module module = FilesystemUtils.getModuleOfFile(virtualFile);
+
+    return create(module);
+  }
+
+  /**
    * Insert a pair of {@link IReferencePoint} reference point and {@link Module} module The
    * reference point will created by the IntelliJPointManager.
    *
