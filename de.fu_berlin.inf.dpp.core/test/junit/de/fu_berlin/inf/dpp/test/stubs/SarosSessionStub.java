@@ -44,11 +44,6 @@ public class SarosSessionStub implements ISarosSession {
   }
 
   @Override
-  public boolean isShared(IResource resource) {
-    throw new RuntimeException("Unexpected call to Stub");
-  }
-
-  @Override
   public boolean isShared(IReferencePoint referencePoint, IResource resource) {
     throw new RuntimeException("Unexpected call to Stub");
   }

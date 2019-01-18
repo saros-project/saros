@@ -292,13 +292,6 @@ public interface ISarosSession {
   public boolean userHasReferencePoint(User user, IReferencePoint referencePoint);
 
   /**
-   * @return <code>true</code> if the given {@link IResource resource} is currently shared in this
-   *     session, <code>false</code> otherwise
-   */
-  @Deprecated
-  public boolean isShared(IResource resource);
-
-  /**
    * @return <code>true</code> if the given {@link IResource resource} and its {@link
    *     IReferencePoint reference point} is currently shared in this session, <code>false</code>
    *     otherwise
