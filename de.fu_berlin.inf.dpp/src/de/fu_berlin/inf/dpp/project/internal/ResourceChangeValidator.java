@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -84,7 +84,7 @@ public class ResourceChangeValidator extends ModelProvider {
       if (resource.getType() == IResource.ROOT) return true;
 
       if (resource.getType() == IResource.PROJECT) {
-        if (!session.isShared(ResourceAdapterFactory.create(resource))) return false;
+        if (!session.isShared(EclipseReferencePointManager.create(resource))) return false;
 
         if (delta.getKind() == IResourceDelta.REMOVED) {
           isDeletingSharedProject = true;

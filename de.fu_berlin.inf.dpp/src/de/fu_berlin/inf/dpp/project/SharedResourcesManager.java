@@ -6,7 +6,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
@@ -144,7 +143,10 @@ public class SharedResourcesManager extends AbstractActivityProducer
   }
 
   public SharedResourcesManager(
-      ISarosSession sarosSession, EditorManager editorManager, StopManager stopManager, EclipseReferencePointManager eclipseReferencePointManager) {
+      ISarosSession sarosSession,
+      EditorManager editorManager,
+      StopManager stopManager,
+      EclipseReferencePointManager eclipseReferencePointManager) {
     this.sarosSession = sarosSession;
     this.stopManager = stopManager;
     this.projectDeltaVisitor = new ProjectDeltaVisitor(sarosSession, editorManager);
@@ -236,7 +238,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
       IProject project = (IProject) projectDelta.getResource();
 
-      if (!sarosSession.isShared(ResourceAdapterFactory.create(project))) continue;
+      if (!sarosSession.isShared(EclipseReferencePointManager.create(project))) continue;
 
       if (!checkOpenClosed(project)) {
 

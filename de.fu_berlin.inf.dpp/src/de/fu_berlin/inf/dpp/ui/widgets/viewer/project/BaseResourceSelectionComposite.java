@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -473,10 +475,14 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
           ISarosSession sarosSession = sessionManager.getSession();
           if (sarosSession != null) {
             if (element instanceof IFile || element instanceof IFolder) {
-              return !sarosSession.isShared(ResourceAdapterFactory.create((IResource) element));
+              de.fu_berlin.inf.dpp.filesystem.IResource sarosResource =
+                  ResourceAdapterFactory.create((IResource) element);
+              IReferencePoint referencePoint =
+                  EclipseReferencePointManager.create((IResource) element);
+              return !sarosSession.isShared(referencePoint, sarosResource);
             } else if (element instanceof IProject) {
               return !(sarosSession.isCompletelyShared(
-                  ResourceAdapterFactory.create((IProject) element).getReferencePoint()));
+                  EclipseReferencePointManager.create((IProject) element)));
             }
           }
           return true;

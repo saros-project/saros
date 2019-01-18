@@ -203,7 +203,7 @@ public class CollaborationUtils {
             final List<IProject> projectsToRefresh = new ArrayList<IProject>();
 
             for (IProject project : projectResources.keySet()) {
-              if (!session.isShared(ResourceAdapterFactory.create(project)))
+              if (!session.isShared(EclipseReferencePointManager.create(project)))
                 projectsToRefresh.add(project);
             }
 
@@ -461,13 +461,13 @@ public class CollaborationUtils {
                 List<de.fu_berlin.inf.dpp.filesystem.IResource>>();
 
     for (Entry<IProject, List<IResource>> entry : data.entrySet()) {
-      de.fu_berlin.inf.dpp.filesystem.IFolder coreProject =
-         new EclipseProjectImpl(entry.getKey());
+      de.fu_berlin.inf.dpp.filesystem.IFolder coreProject = new EclipseProjectImpl(entry.getKey());
 
       fillReferencePointManager(coreProject, referencePointManager);
 
       result.put(
-          EclipseReferencePointManager.create(entry.getKey()), ResourceAdapterFactory.convertTo(entry.getValue()));
+          EclipseReferencePointManager.create(entry.getKey()),
+          ResourceAdapterFactory.convertTo(entry.getValue()));
     }
 
     return result;

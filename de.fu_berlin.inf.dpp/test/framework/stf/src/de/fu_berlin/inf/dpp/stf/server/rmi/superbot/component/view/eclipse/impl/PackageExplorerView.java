@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl;
 
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
@@ -264,7 +266,13 @@ public final class PackageExplorerView extends StfRemoteObject implements IPacka
       throw new IllegalStateException(
           "cannot query shared resource status without a running session");
 
-    return session.isShared(ResourceAdapterFactory.create(resource));
+    if (resource == null) return false;
+
+    IReferencePoint referencePoint = EclipseReferencePointManager.create(resource);
+
+    if (resource.getType() == IResource.PROJECT) return session.isShared(referencePoint);
+
+    return session.isShared(referencePoint, ResourceAdapterFactory.create(resource));
   }
 
   @Override

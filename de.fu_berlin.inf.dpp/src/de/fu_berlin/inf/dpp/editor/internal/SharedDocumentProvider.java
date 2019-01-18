@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.editor.internal;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -94,6 +94,6 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
     IFileEditorInput fileEditorInput = (IFileEditorInput) element;
 
     return currentSession.isShared(
-        ResourceAdapterFactory.create(fileEditorInput.getFile().getProject()));
+        EclipseReferencePointManager.create(fileEditorInput.getFile().getProject()));
   }
 }

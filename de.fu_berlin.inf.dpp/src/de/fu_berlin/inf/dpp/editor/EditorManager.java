@@ -495,7 +495,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     this.locallyActiveEditor = path;
 
-    if (path != null && session.isShared(getResource(path))) openEditorPaths.add(path);
+    if (path != null && session.isShared(path.getReferencePoint(), getResource(path)))
+      openEditorPaths.add(path);
 
     editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
@@ -997,7 +998,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     if (resource == null) return false;
 
-    return session.isShared(ResourceAdapterFactory.create(resource));
+    final de.fu_berlin.inf.dpp.filesystem.IResource sarosResource =
+        ResourceAdapterFactory.create(resource);
+    final IReferencePoint referencePoint = EclipseReferencePointManager.create(resource);
+
+    return session.isShared(referencePoint, sarosResource);
   }
 
   /**

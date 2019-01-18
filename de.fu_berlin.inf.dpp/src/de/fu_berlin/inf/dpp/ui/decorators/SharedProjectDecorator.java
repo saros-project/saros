@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.decorators;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -103,15 +104,18 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
     if (currentSession == null) return;
 
     IResource resource = (IResource) element;
+    IReferencePoint referencePoint = EclipseReferencePointManager.create(resource);
 
-    if (!currentSession.isShared(ResourceAdapterFactory.create(resource))) return;
+    boolean isProject = resource.getType() == IResource.PROJECT;
+
+    if (!isProject
+        && !currentSession.isShared(referencePoint, ResourceAdapterFactory.create(resource)))
+      return;
 
     decoration.addOverlay(SharedProjectDecorator.PROJECT_DESCRIPTOR, IDecoration.TOP_LEFT);
 
-    if (resource.getType() == IResource.PROJECT) {
-      boolean isCompletelyShared =
-          currentSession.isCompletelyShared(
-              ResourceAdapterFactory.create(resource).getReferencePoint());
+    if (isProject) {
+      boolean isCompletelyShared = currentSession.isCompletelyShared(referencePoint);
 
       decoration.addSuffix(
           isCompletelyShared

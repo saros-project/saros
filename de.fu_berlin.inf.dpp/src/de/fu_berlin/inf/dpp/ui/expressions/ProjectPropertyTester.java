@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.expressions;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.filesystem.EclipseReferencePointManager;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -39,7 +41,11 @@ public class ProjectPropertyTester extends PropertyTester {
             ResourceAdapterFactory.create((IProject) resource).getReferencePoint());
       }
 
-      return session.isShared(ResourceAdapterFactory.create(resource));
+      de.fu_berlin.inf.dpp.filesystem.IResource sarosResource =
+          ResourceAdapterFactory.create(resource);
+      IReferencePoint referencePoint = EclipseReferencePointManager.create(resource);
+
+      return session.isShared(referencePoint, sarosResource);
     }
 
     return false;

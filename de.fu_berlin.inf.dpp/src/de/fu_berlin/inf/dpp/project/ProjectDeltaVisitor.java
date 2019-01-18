@@ -264,12 +264,13 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     IPath referencePointRelativePath = resource.getProjectRelativePath();
 
+    IReferencePoint referencePoint = EclipseReferencePointManager.create(resource);
+    de.fu_berlin.inf.dpp.filesystem.IResource sarosResource =
+        ResourceAdapterFactory.create(resource);
     final SPath spath =
-        new SPath(
-            EclipseReferencePointManager.create(resource),
-            ResourceAdapterFactory.create(referencePointRelativePath));
+        new SPath(referencePoint, ResourceAdapterFactory.create(referencePointRelativePath));
 
-    if (!session.isShared(ResourceAdapterFactory.create(resource))) return;
+    if (!session.isShared(referencePoint, sarosResource)) return;
 
     if (editorManager.isOpened(spath)
         || editorManager.isManaged((IFile) resource.getAdapter(IFile.class))) return;

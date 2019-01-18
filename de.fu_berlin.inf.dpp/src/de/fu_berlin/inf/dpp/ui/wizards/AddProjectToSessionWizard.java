@@ -324,7 +324,8 @@ public class AddProjectToSessionWizard extends Wizard {
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
                 fillReferencePointManager(
                     new EclipseProjectImpl(entry.getValue()), referencePointManager);
-                convertedMapping.put(entry.getKey(), EclipseReferencePointManager.create(entry.getValue()));
+                convertedMapping.put(
+                    entry.getKey(), EclipseReferencePointManager.create(entry.getValue()));
               }
 
               final ProjectNegotiation.Status status =
@@ -561,7 +562,8 @@ public class AddProjectToSessionWizard extends Wizard {
        * do not refresh already partially shared projects as this may
        * trigger resource change events
        */
-      if (!session.isShared(adaptedProject)) project.refreshLocal(IResource.DEPTH_INFINITE, null);
+      if (!session.isShared(EclipseReferencePointManager.create(project)))
+        project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
       final FileList localFileList;
 
@@ -574,8 +576,7 @@ public class AddProjectToSessionWizard extends Wizard {
         IReferencePointManager referencePointManager =
             session.getComponent(IReferencePointManager.class);
 
-        fillReferencePointManager(
-            new EclipseProjectImpl(entry.getValue()), referencePointManager);
+        fillReferencePointManager(new EclipseProjectImpl(entry.getValue()), referencePointManager);
 
         localFileList =
             FileListFactory.createFileList(
@@ -687,9 +688,8 @@ public class AddProjectToSessionWizard extends Wizard {
   }
 
   private void fillReferencePointManager(
-      EclipseProjectImpl project,
-      IReferencePointManager referencePointManager) {
+      EclipseProjectImpl project, IReferencePointManager referencePointManager) {
     referencePointManager.put(project.getReferencePoint(), project);
-    eclipseReferencePointManager.put((IProject)project.getDelegate());
+    eclipseReferencePointManager.put((IProject) project.getDelegate());
   }
 }
