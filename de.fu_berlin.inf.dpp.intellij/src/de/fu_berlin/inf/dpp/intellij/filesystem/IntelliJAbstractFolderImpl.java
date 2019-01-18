@@ -23,8 +23,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class IntelliJAbstractFolderImpl extends IntelliJResourceImpl
-    implements IFolder {
+public abstract class IntelliJAbstractFolderImpl extends IntelliJResourceImpl implements IFolder {
 
   /** Relative path from the given source root */
   protected final IPath path;
@@ -175,11 +174,6 @@ public abstract class IntelliJAbstractFolderImpl extends IntelliJResourceImpl
 
   public Module getModule() {
     return FilesystemUtils.getModuleOfFile(srcRoot);
-  }
-
-  @Override
-  public IReferencePoint getReferencePoint() {
-    return IntelliJReferencePointManager.create(FilesystemUtils.getModuleOfFile(srcRoot));
   }
 
   @NotNull

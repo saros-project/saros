@@ -6,7 +6,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import java.io.ByteArrayInputStream;
@@ -299,10 +298,5 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   @Override
   public String toString() {
     return getClass().getSimpleName() + " : " + path + " - " + srcRoot;
-  }
-
-  @Override
-  public IReferencePoint getReferencePoint() {
-    return IntelliJReferencePointManager.create(FilesystemUtils.getModuleOfFile(srcRoot));
   }
 }

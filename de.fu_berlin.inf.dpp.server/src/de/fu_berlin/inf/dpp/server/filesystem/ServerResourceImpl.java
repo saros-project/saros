@@ -16,7 +16,6 @@ public abstract class ServerResourceImpl implements IResource {
 
   private IWorkspace workspace;
   private IPath path;
-  private IReferencePoint referencePoint;
 
   /**
    * Creates a ServerResourceImpl.
@@ -27,7 +26,6 @@ public abstract class ServerResourceImpl implements IResource {
   public ServerResourceImpl(IWorkspace workspace, IPath path) {
     this.path = path;
     this.workspace = workspace;
-    this.referencePoint = new ReferencePointImpl(workspace.getLocation());
   }
 
   /**
@@ -124,10 +122,5 @@ public abstract class ServerResourceImpl implements IResource {
    */
   Path toNioPath() {
     return ((ServerPathImpl) getLocation()).getDelegate();
-  }
-
-  @Override
-  public IReferencePoint getReferencePoint() {
-    return referencePoint;
   }
 }
