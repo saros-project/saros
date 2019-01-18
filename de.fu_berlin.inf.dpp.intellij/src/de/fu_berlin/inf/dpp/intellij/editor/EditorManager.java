@@ -555,7 +555,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *     <code>null</code> if the local user has no editor open.
    */
   void generateEditorActivated(SPath path) {
-    if (path == null || session.isShared(getResource(path))) {
+    if (path == null || session.isShared(path.getReferencePoint(), getResource(path))) {
       editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.ACTIVATED, path));
@@ -570,7 +570,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * EditorListenerDispatcher.
    */
   void generateEditorClosed(@NotNull SPath path) {
-    if (session.isShared(getResource(path))) {
+    if (session.isShared(path.getReferencePoint(), getResource(path))) {
       editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));

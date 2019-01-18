@@ -96,7 +96,7 @@ public class LocalEditorHandler {
 
     IResource resource = VirtualFileConverter.convertToResource(virtualFile, referencePoint);
 
-    if (resource == null || !SessionUtils.isShared(resource)) {
+    if (resource == null || !SessionUtils.isShared(referencePoint, resource)) {
       LOG.debug(
           "Could not open Editor for file "
               + virtualFile

@@ -79,7 +79,7 @@ public class LocalEditorManipulator {
     VirtualFile virtualFile =
         intelliJReferencePointManager.getResource(referencePoint, referencePointRelativePath);
 
-    if (!SessionUtils.isShared(VirtualFileConverter.convertToResource(virtualFile))) {
+    if (!SessionUtils.isShared(path)) {
       LOG.warn("Ignored open editor request for path " + path + " as it is not shared");
 
       return null;

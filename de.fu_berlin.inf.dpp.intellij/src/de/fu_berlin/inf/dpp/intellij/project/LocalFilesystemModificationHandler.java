@@ -171,7 +171,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(file);
 
-    if (path == null || !session.isShared(getResource(path))) {
+    if (path == null || !session.isShared(path.getReferencePoint(), getResource(path))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource's contents change: " + file);
       }
@@ -229,7 +229,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(createdVirtualFile);
 
-    if (path == null || !session.isShared(getResource(path))) {
+    if (path == null || !session.isShared(path.getReferencePoint(), getResource(path))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource creation: " + createdVirtualFile);
       }
@@ -287,7 +287,8 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     SPath copyPath = VirtualFileConverter.convertToSPath(copy);
 
-    if (copyPath == null || !session.isShared(getResource(copyPath))) {
+    if (copyPath == null
+        || !session.isShared(copyPath.getReferencePoint(), getResource(copyPath))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource copy: " + copy);
       }
@@ -327,7 +328,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(deletedVirtualFile);
 
-    if (path == null || !session.isShared(getResource(path))) {
+    if (path == null || !session.isShared(path.getReferencePoint(), getResource(path))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource deletion: " + deletedVirtualFile);
       }
@@ -452,8 +453,11 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldPath != null && session.isShared(getResource(oldPath));
-    boolean newPathIsShared = newParentPath != null && session.isShared(getResource(newParentPath));
+    boolean oldPathIsShared =
+        oldPath != null && session.isShared(oldPath.getReferencePoint(), getResource(oldPath));
+    boolean newPathIsShared =
+        newParentPath != null
+            && session.isShared(newParentPath.getReferencePoint(), getResource(newParentPath));
 
     if (!oldPathIsShared && !newPathIsShared) {
       if (LOG.isTraceEnabled()) {
@@ -593,8 +597,12 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldFilePath != null && session.isShared(getResource(oldFilePath));
-    boolean newPathIsShared = newParentPath != null && session.isShared(getResource(newParentPath));
+    boolean oldPathIsShared =
+        oldFilePath != null
+            && session.isShared(oldFilePath.getReferencePoint(), getResource(oldFilePath));
+    boolean newPathIsShared =
+        newParentPath != null
+            && session.isShared(newParentPath.getReferencePoint(), getResource(newParentPath));
 
     boolean fileIsOpen = projectAPI.isOpen(oldFile);
 
@@ -746,7 +754,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
           SPath path = VirtualFileConverter.convertToSPath(file);
 
-          if (path != null && session.isShared(getResource(path))) {
+          if (path != null && session.isShared(path.getReferencePoint(), getResource(path))) {
             LOG.error(
                 "Renamed resource is a root directory. "
                     + "Such an activity can not be shared through Saros.");
