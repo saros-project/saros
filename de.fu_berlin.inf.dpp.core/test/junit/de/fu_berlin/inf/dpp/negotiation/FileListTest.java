@@ -129,7 +129,6 @@ public class FileListTest {
         createFolderMock(project, "foobar", new IResource[] {foobarfooFolder, foobarInfoTxtFile});
 
     EasyMock.expect(project.getName()).andStubReturn("foo");
-    EasyMock.expect(project.getReferencePoint()).andStubReturn(referencePoint);
 
     try {
       EasyMock.expect(project.getDefaultCharset()).andStubReturn("UTF-16");
