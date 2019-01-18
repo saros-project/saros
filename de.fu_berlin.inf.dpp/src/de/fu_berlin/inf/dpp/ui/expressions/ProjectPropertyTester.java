@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.picocontainer.annotations.Inject;
 
@@ -37,8 +36,7 @@ public class ProjectPropertyTester extends PropertyTester {
     if ("isInSarosSession".equals(property)) {
 
       if (resource.getType() == IResource.PROJECT) {
-        return session.isCompletelyShared(
-            ResourceAdapterFactory.create((IProject) resource).getReferencePoint());
+        return session.isCompletelyShared(EclipseReferencePointManager.create(resource));
       }
 
       de.fu_berlin.inf.dpp.filesystem.IResource sarosResource =

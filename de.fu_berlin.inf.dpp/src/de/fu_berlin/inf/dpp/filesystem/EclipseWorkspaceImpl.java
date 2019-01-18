@@ -139,7 +139,8 @@ public class EclipseWorkspaceImpl implements IWorkspace {
 
   @Override
   public IReferencePoint getReferencePoint(String projectName) {
-    return getReferenceFolder(projectName).getReferencePoint();
+    EclipseProjectImpl sarosFolder = (EclipseProjectImpl) getReferenceFolder(projectName);
+    return EclipseReferencePointManager.create(sarosFolder.delegate);
   }
 
   @Override

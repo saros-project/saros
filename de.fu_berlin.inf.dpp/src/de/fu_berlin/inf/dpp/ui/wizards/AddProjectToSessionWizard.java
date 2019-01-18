@@ -689,7 +689,9 @@ public class AddProjectToSessionWizard extends Wizard {
 
   private void fillReferencePointManager(
       EclipseProjectImpl project, IReferencePointManager referencePointManager) {
-    referencePointManager.put(project.getReferencePoint(), project);
-    eclipseReferencePointManager.put((IProject) project.getDelegate());
+    IProject eclipseProject = project.getDelegate();
+
+    referencePointManager.put(EclipseReferencePointManager.create(eclipseProject), project);
+    eclipseReferencePointManager.put(eclipseProject);
   }
 }
