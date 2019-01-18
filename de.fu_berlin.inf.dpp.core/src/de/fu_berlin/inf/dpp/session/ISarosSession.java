@@ -306,6 +306,13 @@ public interface ISarosSession {
   public boolean isShared(IReferencePoint referencePoint, IResource resource);
 
   /**
+   * Checks if selected reference point is shared (either complete or partial)
+   * @param referencePoint
+   * @return <code>true</code> if selected reference point is shared
+   */
+  public boolean isShared(IReferencePoint referencePoint);
+
+  /**
    * Checks if selected reference point is a complete shared one or partial shared.
    *
    * @param referencePoint
