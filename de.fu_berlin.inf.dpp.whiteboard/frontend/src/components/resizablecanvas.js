@@ -1,12 +1,12 @@
 import { fabric } from 'fabric';
-import DEFAULTS from '../constants/fabricconfig';
 import background from '../../assets/images/grad.png';
+import DEFAULTS from '../constants/fabricconfig';
 
 // default expand value for the canvas (in pixels)
 const EXPAND_VALUE = 500;
 /**
  * extended fabricjs canvas which can be easily resized and is responsive to window size.
- * NOTE: all defined functions start with '$' to seperate them from native fabricjs functions
+ * NOTE: all defined functions start with '$' to separate them from native fabricjs functions
  */
 export default class ResizableCanvas extends fabric.Canvas {
   /**
@@ -25,7 +25,7 @@ export default class ResizableCanvas extends fabric.Canvas {
     //add background
     this.setBackgroundColor({ source: background, repeat: 'repeat' });
 
-    //sets up default configurations for diffrent fabricjs object types
+    //sets up default configurations for different fabricjs object types
     Object.assign(fabric.Object.prototype, DEFAULTS.GENERAL);
     Object.assign(fabric.IText.prototype, DEFAULTS.TEXT_DEFAULTS);
     Object.assign(fabric.Path.prototype, DEFAULTS.PATH_DEFAULTS);
@@ -40,7 +40,7 @@ export default class ResizableCanvas extends fabric.Canvas {
    * resizes the canvas to window size or to fit all elements in it
    */
   $fit() {
-    // this is used because of the very old and unpredictble browser in eclipse
+    // this is used because of the very old and unpredictable browser in eclipse
     let windowWidth = window.innerWidth || document.documentElement.clientWidth ||
       document.body.clientWidth;
     let windowHeight = window.innerHeight || document.documentElement.clientHeight ||
@@ -96,20 +96,21 @@ export default class ResizableCanvas extends fabric.Canvas {
 //Utils:
 /**
  * calculates the max values of the given objects in the array using a custom value function
- * @param {Function} valueFunction
+ * @param {(obj: Object) => number} valueFunction
  * used to calculate the value of each object
- * @param {Array} array
+ * @param {Object[]} array
  * array of objects
+ * @returns {number}
  */
 function max(valueFunction, array = []) {
   return Math.max(...array.map(object => valueFunction(object)));
 }
 
 /**
- * sums the left and width cooridnates to find the furthest point to the right
+ * sums the left and width coordinates to find the furthest point to the right
  * @param {Object} obj
  * target object
- * @return {Number}
+ * @return {number}
  * the furthest point to the right of the object
  */
 function rightMostPoint(obj) {
@@ -117,10 +118,10 @@ function rightMostPoint(obj) {
 }
 
 /**
- * sums the top and height cooridnates to find the furthest point to the bottom
+ * sums the top and height coordinates to find the furthest point to the bottom
  * @param {Object} obj
  * target object
- * @return {Number}
+ * @return {number}
  * the furthest point to the bottom of the object
  */
 function bottomMostPoint(obj) {
@@ -130,8 +131,8 @@ function bottomMostPoint(obj) {
 /**
  * sums the values of the given attributes in the object
  * @param {Object} obj
- * @param {Array} attributes
- * @return {Number}
+ * @param {string[]} attributes
+ * @return {number}
  */
 function sumAttributes(obj = {}, attributes = []) {
   return attributes.reduce((acc, attr) => acc + (obj[attr] || 0), 0);
