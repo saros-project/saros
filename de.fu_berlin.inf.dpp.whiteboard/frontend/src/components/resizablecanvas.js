@@ -12,7 +12,7 @@ export default class ResizableCanvas extends fabric.Canvas {
   /**
    * sets up the canvas and its resize listeners as well as the
    * default configurations for its objects
-   * @param {String} htmlID
+   * @param {string} htmlID
    * the id of the html canvas element, out of which a fabricjs
    * canvas element will be created
    */
@@ -72,7 +72,7 @@ export default class ResizableCanvas extends fabric.Canvas {
 
   /**
    * extends the canvas size by the given value in the paramter
-   * @param {Number} value
+   * @param {number} value
    */
   $expand(value = EXPAND_VALUE) {
     this.setWidth(this.width + value);
@@ -81,7 +81,7 @@ export default class ResizableCanvas extends fabric.Canvas {
 
   /**
    * enables or disables the selection mode on the canvas and its elements
-   * @param {Boolean} state
+   * @param {boolean} state
    */
   $setSelectionEnabled(state) {
     let newAttributes = {
