@@ -229,12 +229,12 @@ public class SharedReferencePointMapperTest {
     mapper.addReferencePoint("0", referencePointMock, true);
     mapper.addResources(referencePointMock, Collections.singletonList(resourceMockA));
 
-    assertTrue("resource is not shared", mapper.isShared(resourceMockA));
+    assertTrue("resource is not shared", mapper.isShared(resourceMockA, referencePointMock));
     assertEquals(1, mapper.getPartiallySharedResources().size());
 
     mapper.removeResources(referencePointMock, Collections.singletonList(resourceMockA));
 
-    assertFalse("resource is still shared", mapper.isShared(resourceMockA));
+    assertFalse("resource is still shared", mapper.isShared(resourceMockA, referencePointMock));
     assertEquals(0, mapper.getPartiallySharedResources().size());
 
     mapper.addResources(referencePointMock, Collections.singletonList(resourceMockA));
@@ -244,8 +244,8 @@ public class SharedReferencePointMapperTest {
         Collections.singletonList(resourceMockA),
         Collections.singletonList(resourceMockB));
 
-    assertFalse("resource is still shared", mapper.isShared(resourceMockA));
-    assertTrue("resource is not shared", mapper.isShared(resourceMockB));
+    assertFalse("resource is still shared", mapper.isShared(resourceMockA, referencePointMock));
+    assertTrue("resource is not shared", mapper.isShared(resourceMockB, referencePointMock));
     assertEquals(1, mapper.getPartiallySharedResources().size());
   }
 
@@ -261,7 +261,7 @@ public class SharedReferencePointMapperTest {
 
     mapper.addReferencePoint("0", referencePointMock, false);
 
-    assertFalse("derived resource is marked as shared", mapper.isShared(resourceMock));
+    assertFalse("derived resource is marked as shared", mapper.isShared(resourceMock, referencePointMock));
 
     EasyMock.verify(resourceMock);
   }
@@ -280,20 +280,20 @@ public class SharedReferencePointMapperTest {
 
     EasyMock.replay(resourceMockA, resourceMockB);
 
-    assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockA));
+    assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockA, referencePointMockA));
 
-    assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockB));
+    assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockB, referencePointMockB));
 
     mapper.addReferencePoint("0", referencePointMockA, false);
     mapper.addReferencePoint("1", referencePointMockB, true);
 
-    assertTrue("resource is not marked as shared", mapper.isShared(resourceMockA));
+    assertTrue("resource is not marked as shared", mapper.isShared(resourceMockA, referencePointMockA));
 
-    assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockB));
+    assertFalse("resource should not be marked as shared", mapper.isShared(resourceMockB, referencePointMockB));
 
     mapper.addResources(referencePointMockB, Collections.singletonList(resourceMockB));
 
-    assertTrue("resource is not marked as shared", mapper.isShared(resourceMockB));
+    assertTrue("resource is not marked as shared", mapper.isShared(resourceMockB, referencePointMockB));
   }
 
   @Test
