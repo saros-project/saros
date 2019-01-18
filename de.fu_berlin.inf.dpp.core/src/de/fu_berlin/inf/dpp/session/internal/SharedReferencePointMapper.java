@@ -317,16 +317,6 @@ class SharedReferencePointMapper {
    * Returns whether the given resource is included in one of the currently shared reference points.
    *
    * @param resource the resource to check for
-   * @return <code>true</code> if the resource is shared, <code>false</code> otherwise
-   */
-  public synchronized boolean isShared(IResource resource) {
-    return isShared(resource, resource.getReferencePoint());
-  }
-
-  /**
-   * Returns whether the given resource is included in one of the currently shared reference points.
-   *
-   * @param resource the resource to check for
    * @param referencePoint of resource
    * @return <code>true</code> if the resource is shared, <code>false</code> otherwise
    */

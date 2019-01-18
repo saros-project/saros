@@ -300,6 +300,7 @@ public interface ISarosSession {
 
   /**
    * Checks if selected reference point is shared (either complete or partial)
+   *
    * @param referencePoint
    * @return <code>true</code> if selected reference point is shared
    */
