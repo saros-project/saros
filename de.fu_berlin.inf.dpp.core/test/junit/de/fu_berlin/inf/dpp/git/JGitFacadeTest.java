@@ -53,8 +53,11 @@ public class JGitFacadeTest {
 
         writeCommitToRepo(localWorkDir, 3);
 
+        String basis = JGitFacade.getSHA1HashByRevisionString(remoteWorkDir,
+            "HEAD");
+
         File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master",
-            "CheckoutAtCommit2");
+            basis);
 
         assertNotEquals(getObjectIdByRevisionString(localWorkDir, "HEAD"),
             getObjectIdByRevisionString(remoteWorkDir, "FETCH_HEAD"));

@@ -158,4 +158,9 @@ public class JGitFacade {
         Git git = Git.open(workDir);
         return git.getRepository().getDirectory().getCanonicalPath();
     }
+
+    public static String getSHA1HashByRevisionString(File workDir,
+        String revString) throws IOException {
+        return Git.open(workDir).getRepository().resolve(revString).name();
+    }
 }
