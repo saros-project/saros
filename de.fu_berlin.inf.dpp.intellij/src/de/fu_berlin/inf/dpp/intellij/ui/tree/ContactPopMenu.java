@@ -5,10 +5,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
@@ -183,14 +180,14 @@ class ContactPopMenu extends JPopupMenu {
         return;
       }
 
-      List<IResource> resources = new ArrayList<>();
-      resources.add(new IntelliJProjectImpl(FilesystemUtils.getModuleContentRoot(module)));
+      List<Module> modules = new ArrayList<>();
+      modules.add(module);
 
       JID user = new JID(contactInfo.getRosterEntry().getUser());
       List<JID> contacts = new ArrayList<>();
       contacts.add(user);
 
-      CollaborationUtils.startSession(resources, contacts);
+      CollaborationUtils.startSessionWithModules(modules, contacts);
     }
 
     private boolean exists() {
