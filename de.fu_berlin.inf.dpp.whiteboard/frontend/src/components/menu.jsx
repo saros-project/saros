@@ -62,7 +62,7 @@ export default class Menu extends React.Component {
   }
 
   /**
-   * enables or disables mini mode, making the menu smaller and using less screen space
+   * enables or disables mini mode, mini mode makes the menu smaller and uses less screen space
    */
   switchMiniMode() {
     this.miniMode = !this.miniMode;
@@ -70,7 +70,7 @@ export default class Menu extends React.Component {
   }
 
   /**
-   * sets the css classes on the menu according to the internal state of the menu
+   * sets the css classes on the menu wrapper according to the state of the menu
    */
   updateWrapperCSS() {
     let isMini = this.miniMode || this.contextMenuMode;
