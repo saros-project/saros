@@ -62,16 +62,16 @@ public class CollaborationUtils {
   private CollaborationUtils() {}
 
   /**
-   * Starts a new session and shares the given resources with given contacts.<br>
+   * Starts a new session and shares the given modules with given contacts.<br>
    * Does nothing if a {@link ISarosSession session} is already running.
    *
-   * @param resources
+   * @param modules
    * @param contacts
    * @nonBlocking
    */
-  public static void startSession(List<IResource> resources, final List<JID> contacts) {
+  public static void startSessionWithModules(List<Module> modules, final List<JID> contacts) {
 
-    final Map<IFolder, List<IResource>> newResources = acquireResources(resources, null);
+    final Map<IFolder, List<IResource>> newResources = acquireResourcesFromModules(modules, null);
 
     final Map<IReferencePoint, List<IResource>> referencePointResources = new HashMap<>();
 
@@ -120,6 +120,29 @@ public class CollaborationUtils {
         };
 
     sessionStartupJob.schedule();
+  }
+
+  /**
+   * Starts a new session and shares the given resources with given contacts.<br>
+   * Does nothing if a {@link ISarosSession session} is already running.
+   *
+   * @param resources
+   * @param contacts
+   * @nonBlocking
+   */
+  @Deprecated
+  public static void startSession(List<IResource> resources, final List<JID> contacts) {
+
+    if (resources == null) return;
+
+    List<Module> modules = new ArrayList<>();
+
+    for (IResource resource : resources) {
+      IntelliJProjectImpl project = (IntelliJProjectImpl) resource;
+      modules.add(project.getModule());
+    }
+
+    startSessionWithModules(modules, contacts);
   }
 
   /**
