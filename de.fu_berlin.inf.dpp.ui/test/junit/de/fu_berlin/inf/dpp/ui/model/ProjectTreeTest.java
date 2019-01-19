@@ -17,14 +17,14 @@ public class ProjectTreeTest {
   public void hashCodeAndEquals() {
     HashSet<Node> set = new HashSet<Node>();
 
-    Node base = new Node(new ArrayList<Node>(), "root", Type.PROJECT, true);
+    Node base = new Node(new ArrayList<Node>(), "root", Type.FOLDER, true);
     set.add(base);
 
-    Node same = new Node(new ArrayList<Node>(), "root", Type.PROJECT, true);
+    Node same = new Node(new ArrayList<Node>(), "root", Type.FOLDER, true);
 
     assertTrue("should recognize new object with same properties as same", set.contains(same));
 
-    Node notSelected = new Node(new ArrayList<Node>(), "root", Type.PROJECT, false);
+    Node notSelected = new Node(new ArrayList<Node>(), "root", Type.FOLDER, false);
 
     assertTrue(
         "should recognize new object with irrelevant property changes as same",
@@ -60,12 +60,12 @@ public class ProjectTreeTest {
     List<Node> members = new ArrayList<Node>();
     members.add(childA);
     members.add(childB);
-    return new Node(members, "root", Type.PROJECT, true);
+    return new Node(members, "root", Type.FOLDER, true);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void membersNull() {
-    new Node(null, "foo", Type.PROJECT, true);
+    new Node(null, "foo", Type.FOLDER, true);
   }
 
   @Test
@@ -73,7 +73,7 @@ public class ProjectTreeTest {
     List<Node> members = new ArrayList<Node>();
     Node file = Node.fileNode("file.txt", false);
     members.add(file);
-    Node project = new Node(members, "root", Type.PROJECT, true);
+    Node project = new Node(members, "root", Type.FOLDER, true);
 
     ProjectTree tree = new ProjectTree(project);
 
@@ -81,7 +81,7 @@ public class ProjectTreeTest {
     assertEquals(project, tree.getRoot());
 
     assertEquals("root", project.getLabel());
-    assertEquals(Type.PROJECT, project.getType());
+    assertEquals(Type.FOLDER, project.getType());
     assertTrue(project.isSelectedForSharing());
     List<Node> projectMembers = project.getMembers();
     assertEquals(1, projectMembers.size());

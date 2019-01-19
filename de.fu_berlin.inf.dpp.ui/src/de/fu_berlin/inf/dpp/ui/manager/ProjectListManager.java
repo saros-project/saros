@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.manager;
 
 import static de.fu_berlin.inf.dpp.filesystem.IResource.FILE;
 import static de.fu_berlin.inf.dpp.filesystem.IResource.FOLDER;
-import static de.fu_berlin.inf.dpp.filesystem.IResource.PROJECT;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -108,7 +107,6 @@ public class ProjectListManager {
     for (IResource member : container.members()) {
       Node memberNode = null;
       switch (member.getType()) {
-        case PROJECT:
         case FOLDER:
           memberNode = createModel((IFolder) member);
           break;
@@ -123,7 +121,7 @@ public class ProjectListManager {
 
     // We don't expect any other container types besides projects and folder
     // here
-    Type type = (container.getType() == FOLDER) ? Type.FOLDER : Type.PROJECT;
+    Type type = Type.FOLDER;
 
     Node node = new Node(members, container.getFullPath().lastSegment(), type, true);
 

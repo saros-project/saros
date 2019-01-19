@@ -456,7 +456,6 @@ public class CollaborationUtils {
             LOG.warn("failed to retrieve size of file " + resource, e);
           }
           break;
-        case IResource.PROJECT:
         case IResource.FOLDER:
           if (!includeMembers) {
             break;

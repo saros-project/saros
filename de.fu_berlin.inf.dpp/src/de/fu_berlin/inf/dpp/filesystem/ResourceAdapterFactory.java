@@ -17,7 +17,7 @@ public class ResourceAdapterFactory {
     return new EclipsePathImpl(path);
   }
 
-  public static IFolder create(org.eclipse.core.resources.IProject project){
+  public static IFolder create(org.eclipse.core.resources.IProject project) {
     return (IFolder) adapt(project);
   }
 
@@ -124,15 +124,15 @@ public class ResourceAdapterFactory {
     if (resource == null) return null;
 
     switch (resource.getType()) {
-      case IResource.FILE:
+      case org.eclipse.core.resources.IResource.FILE:
         return new EclipseFileImpl(
             (org.eclipse.core.resources.IFile)
                 resource.getAdapter(org.eclipse.core.resources.IFile.class));
-      case IResource.FOLDER:
+      case org.eclipse.core.resources.IResource.FOLDER:
         return new EclipseFolderImpl(
             (org.eclipse.core.resources.IFolder)
                 resource.getAdapter(org.eclipse.core.resources.IFolder.class));
-      case IResource.PROJECT:
+      case org.eclipse.core.resources.IResource.PROJECT:
         return new EclipseProjectImpl(
             (org.eclipse.core.resources.IProject)
                 resource.getAdapter(org.eclipse.core.resources.IProject.class));

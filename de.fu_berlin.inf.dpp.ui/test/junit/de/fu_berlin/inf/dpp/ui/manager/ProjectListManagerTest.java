@@ -110,7 +110,6 @@ public class ProjectListManagerTest {
     Node projectNode = projectTrees.get(0).getRoot();
     List<Node> members = projectNode.getMembers();
 
-    assertEquals("the root node should be of type project", Type.PROJECT, projectNode.getType());
     assertEquals("the project node should have its proper label", PROJECT, projectNode.getLabel());
     assertEquals(
         "there should be two nodes below the project level of the model", 2, members.size());
@@ -180,9 +179,7 @@ public class ProjectListManagerTest {
 
     for (IResource resource : resources) {
       int type = resource.getType();
-      if (type == IResource.PROJECT) {
-        foundProject = resource.equals(project);
-      } else if (type == IResource.FOLDER) {
+      if (type == IResource.FOLDER) {
         foundFolder = resource.equals(srcFolder);
       } else if (type == IResource.FILE) {
         foundJavaFile = foundJavaFile || resource.equals(javaFile);
@@ -193,7 +190,6 @@ public class ProjectListManagerTest {
     }
 
     String msg = "could not retrieve original resource for ''{0}'' from UI model";
-    assertTrue(format(msg, PROJECT), foundProject);
     assertTrue(format(msg, FOLDER), foundFolder);
     assertTrue(format(msg, JAVA_FILE), foundJavaFile);
     assertTrue(format(msg, TEXT_FILE), foundTextFile);
@@ -215,7 +211,7 @@ public class ProjectListManagerTest {
     }
     expect(project.getFullPath()).andStubReturn(path(name));
     expect(project.getName()).andStubReturn(name);
-    expect(project.getType()).andStubReturn(IResource.PROJECT);
+    expect(project.getType()).andStubReturn(IResource.FOLDER);
     expect(project.exists()).andStubReturn(true);
     replay(project);
     return project;

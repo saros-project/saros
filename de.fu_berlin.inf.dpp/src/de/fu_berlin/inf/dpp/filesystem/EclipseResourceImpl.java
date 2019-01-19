@@ -70,9 +70,6 @@ public class EclipseResourceImpl implements IResource {
       case org.eclipse.core.resources.IResource.FOLDER:
         type = IResource.FOLDER;
         break;
-      case org.eclipse.core.resources.IResource.PROJECT:
-        type = IResource.PROJECT;
-        break;
       case org.eclipse.core.resources.IResource.ROOT:
         type = IResource.ROOT;
         break;

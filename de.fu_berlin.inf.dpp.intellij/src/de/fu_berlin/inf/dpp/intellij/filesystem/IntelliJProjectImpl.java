@@ -321,11 +321,6 @@ public final class IntelliJProjectImpl extends IntelliJAbstractFolderImpl implem
   }
 
   @Override
-  public int getType() {
-    return IResource.PROJECT;
-  }
-
-  @Override
   public boolean isDerived(final boolean checkAncestors) {
     return false;
   }

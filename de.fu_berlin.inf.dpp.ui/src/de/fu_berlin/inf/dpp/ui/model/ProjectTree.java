@@ -15,8 +15,8 @@ public class ProjectTree {
 
   /** @param root the node representing the project itself */
   public ProjectTree(Node root) {
-    if (root.getType() != Type.PROJECT) {
-      throw new IllegalArgumentException("root node needs to be a PROJECT");
+    if (root.getType() != Type.FOLDER) {
+      throw new IllegalArgumentException("root node needs to be a FOLDER");
     }
 
     this.root = root;
@@ -54,7 +54,6 @@ public class ProjectTree {
      * #FILE}.
      */
     public static enum Type {
-      PROJECT,
       FOLDER,
       FILE
     }
