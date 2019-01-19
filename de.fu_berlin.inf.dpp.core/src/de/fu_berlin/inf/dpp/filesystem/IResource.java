@@ -11,7 +11,6 @@ public interface IResource {
   public static final int NONE = 0;
   public static final int FILE = 1;
   public static final int FOLDER = 2;
-  public static final int PROJECT = 4;
   public static final int ROOT = 8;
   public static final int FORCE = 16;
   public static final int KEEP_HISTORY = 32;

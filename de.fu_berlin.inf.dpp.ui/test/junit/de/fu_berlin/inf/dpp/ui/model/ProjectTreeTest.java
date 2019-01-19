@@ -23,18 +23,6 @@ public class ProjectTreeTest {
     Node same = new Node(new ArrayList<Node>(), "root", Type.FOLDER, true);
 
     assertTrue("should recognize new object with same properties as same", set.contains(same));
-
-    Node notSelected = new Node(new ArrayList<Node>(), "root", Type.FOLDER, false);
-
-    assertTrue(
-        "should recognize new object with irrelevant property changes as same",
-        set.contains(notSelected));
-
-    Node differentType = new Node(new ArrayList<Node>(), "root", Type.FOLDER, true);
-
-    assertFalse(
-        "should detect new object with relevant property changes as different",
-        set.contains(differentType));
   }
 
   @Test
