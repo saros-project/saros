@@ -5,7 +5,8 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
-import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
@@ -19,7 +20,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.core.editor.RemoteWriteAccessManager;
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.SharedEditorListenerDispatch;
@@ -33,7 +33,6 @@ import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.LocalClosedEditorModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -52,12 +51,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * IntelliJ implementation of the {@link IEditorManager} interface.
- *
- * <p>FIXME: There are several usages of the "followedUser" field that should have nothing to do
- * with the follow mode. Search for "FIXME followMode" to find all instances.
- */
+/** IntelliJ implementation of the {@link IEditorManager} interface. */
 public class EditorManager extends AbstractActivityProducer implements IEditorManager {
 
   private static final Logger LOG = Logger.getLogger(EditorManager.class);
@@ -67,24 +61,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void unblock() {
-          executeInUIThreadSynchronous(
-              new Runnable() {
-                @Override
-                public void run() {
-                  unlockAllEditors();
-                }
-              });
+          executeInUIThreadSynchronous(EditorManager.this::unlockAllEditors);
         }
 
         @Override
         public void block() {
-          executeInUIThreadSynchronous(
-              new Runnable() {
-                @Override
-                public void run() {
-                  lockAllEditors();
-                }
-              });
+          executeInUIThreadSynchronous(EditorManager.this::lockAllEditors);
         }
       };
 
@@ -115,11 +97,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           execTextSelection(textSelectionActivity);
         }
 
-        @Override
-        public void receive(ViewportActivity viewportActivity) {
-          execViewport(viewportActivity);
-        }
-
         private void execEditorActivity(EditorActivity editorActivity) {
 
           SPath path = editorActivity.getPath();
@@ -133,18 +110,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           switch (editorActivity.getType()) {
             case ACTIVATED:
-              // TODO: Let the FollowModeManager handle this
-              if (isFollowing(user)) {
-                localEditorManipulator.openEditor(path, false);
-              }
               editorListenerDispatch.editorActivated(user, path);
               break;
 
             case CLOSED:
-              // TODO: Let the FollowModeManager handle this
-              if (isFollowing(user)) {
-                localEditorManipulator.closeEditor(path);
-              }
               editorListenerDispatch.editorClosed(user, path);
               break;
             case SAVED:
@@ -244,23 +213,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           editorListenerDispatch.textSelectionChanged(selection);
         }
-
-        private void execViewport(ViewportActivity viewport) {
-
-          SPath path = viewport.getPath();
-          LOG.debug(path + " viewport activity received " + viewport);
-          if (path == null) {
-            return;
-          }
-
-          User user = viewport.getSource();
-          if (isFollowing(user)) {
-            localEditorManipulator.setViewPort(
-                path,
-                viewport.getStartLine(),
-                viewport.getStartLine() + viewport.getNumberOfLines());
-          }
-        }
       };
 
   private final ISessionListener sessionListener =
@@ -278,68 +230,92 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
               unlockAllEditors();
             }
           }
-
-          refreshAnnotations();
         }
 
         @Override
         public void userFinishedProjectNegotiation(User user) {
-
-          // Send awareness-information
-          User localUser = session.getLocalUser();
-          for (SPath path : getOpenEditors()) {
-            fireActivity(new EditorActivity(localUser, EditorActivity.Type.ACTIVATED, path));
-          }
-
-          fireActivity(new EditorActivity(localUser, EditorActivity.Type.ACTIVATED, activeEditor));
-
-          if (activeEditor == null) {
-            return;
-          }
-          if (localViewport != null) {
-            fireActivity(
-                new ViewportActivity(
-                    localUser,
-                    localViewport.getStartLine(),
-                    localViewport.getNumberOfLines(),
-                    activeEditor));
-          } else {
-            LOG.warn("No viewport for locallyActivateEditor: " + activeEditor);
-          }
-
-          if (localSelection != null) {
-            int offset = localSelection.getNewRange().getStartOffset();
-            int length =
-                localSelection.getNewRange().getEndOffset()
-                    - localSelection.getNewRange().getStartOffset();
-
-            fireActivity(new TextSelectionActivity(localUser, offset, length, activeEditor));
-          } else {
-            LOG.warn("No selection for locallyActivateEditor: " + activeEditor);
-          }
+          sendAwarenessInformation();
         }
 
         @Override
         public void userLeft(final User user) {
           annotationManager.removeAnnotations(user);
-
-          // TODO: Let the FollowModeManager handle this
-          if (user.equals(followedUser)) {
-            setFollowing(null);
-          }
         }
 
         @Override
         public void resourcesAdded(final IProject project) {
           ApplicationManager.getApplication()
               .invokeAndWait(
-                  new Runnable() {
-                    @Override
-                    public void run() {
-                      addProjectResources(project);
-                    }
-                  },
-                  ModalityState.defaultModalityState());
+                  () -> addProjectResources(project), ModalityState.defaultModalityState());
+        }
+
+        /**
+         * Sends awareness information to populate the UserEditorState of the participant that
+         * joined the session.
+         *
+         * <p>This is done by first sending the needed state for all locally open editors. After the
+         * awareness information for all locally open editors (including the active editor) has been
+         * transmitted, a second editor activated activity is send for the locally active editor to
+         * correctly set the active editor in the remote user editor state for the local user.
+         */
+        private void sendAwarenessInformation() {
+          User localUser = session.getLocalUser();
+
+          editorPool
+              .getMapping()
+              .forEach(
+                  (path, editor) -> {
+                    sendEditorOpenInformation(localUser, path);
+
+                    sendViewPortInformation(localUser, path, editor);
+
+                    sendSelectionInformation(localUser, path, editor);
+                  });
+
+          Editor activeEditor = projectAPI.getActiveEditor();
+
+          SPath activeEditorPath;
+
+          if (activeEditor != null) {
+            activeEditorPath = editorPool.getFile(activeEditor.getDocument());
+          } else {
+            activeEditorPath = null;
+          }
+
+          sendEditorOpenInformation(localUser, activeEditorPath);
+        }
+
+        private void sendEditorOpenInformation(@NotNull User user, @Nullable SPath path) {
+          EditorActivity activateEditor =
+              new EditorActivity(user, EditorActivity.Type.ACTIVATED, path);
+
+          fireActivity(activateEditor);
+        }
+
+        private void sendViewPortInformation(
+            @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
+
+          LineRange localViewPort = editorAPI.getLocalViewportRange(editor);
+          int viewPortStartLine = localViewPort.getStartLine();
+          int viewPortLength = localViewPort.getNumberOfLines();
+
+          ViewportActivity setViewPort =
+              new ViewportActivity(user, viewPortStartLine, viewPortLength, path);
+
+          fireActivity(setViewPort);
+        }
+
+        private void sendSelectionInformation(
+            @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
+
+          Pair<Integer, Integer> localSelectionOffsets = editorAPI.getLocalSelectionOffsets(editor);
+          int selectionStartOffset = localSelectionOffsets.first;
+          int selectionLength = localSelectionOffsets.second;
+
+          TextSelectionActivity setSelection =
+              new TextSelectionActivity(user, selectionStartOffset, selectionLength, path);
+
+          fireActivity(setSelection);
         }
       };
 
@@ -354,14 +330,21 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     SelectedEditorState selectedEditorState = new SelectedEditorState();
     selectedEditorState.captureState();
 
-    for (VirtualFile openFile : openFiles) {
-      localEditorHandler.openEditor(openFile, project, false);
-      // TODO create selection activity if there is a current selection
+    try {
+      localEditorStatusChangeHandler.setEnabled(false);
+
+      for (VirtualFile openFile : openFiles) {
+        localEditorHandler.openEditor(openFile, project, false);
+      }
+
+    } finally {
+      localEditorStatusChangeHandler.setEnabled(true);
     }
 
     selectedEditorState.applyCapturedState();
   }
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
 
@@ -376,13 +359,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           assert session == oldSarosSession;
           session.getStopManager().removeBlockable(stopManagerListener); // todo
 
-          executeInUIThreadSynchronous(
-              new Runnable() {
-                @Override
-                public void run() {
-                  endSession();
-                }
-              });
+          executeInUIThreadSynchronous(this::endSession);
         }
 
         private void startSession(ISarosSession newSarosSession) {
@@ -411,8 +388,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         private void endSession() {
           annotationManager.removeAllAnnotations();
 
-          setFollowing(null);
-
           // This sets all editors, that were set to read only, writeable
           // again
           unlockAllEditors();
@@ -430,7 +405,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           userEditorStateManager = null;
           remoteWriteAccessManager.dispose();
           remoteWriteAccessManager = null;
-          activeEditor = null;
         }
       };
 
@@ -438,6 +412,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private final LocalEditorManipulator localEditorManipulator;
   private final AnnotationManager annotationManager;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
+  private final ProjectAPI projectAPI;
+  private final EditorAPI editorAPI;
 
   private final EditorPool editorPool = new EditorPool();
 
@@ -453,15 +429,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private final LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
   private final LocalViewPortChangeHandler localViewPortChangeHandler;
 
-  /** The user that is followed or <code>null</code> if no user is followed. */
-  private User followedUser = null;
-
   private boolean hasWriteAccess;
+  // FIXME why is this never assigned? Either assign or remove flag
   private boolean isLocked;
-  private SelectionEvent localSelection;
-  private LineRange localViewport;
-  private SPath activeEditor;
-  private ProjectAPI projectAPI;
 
   public EditorManager(
       ISarosSessionManager sessionManager,
@@ -469,22 +439,25 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       LocalEditorManipulator localEditorManipulator,
       ProjectAPI projectAPI,
       AnnotationManager annotationManager,
-      FileReplacementInProgressObservable fileReplacementInProgressObservable) {
+      FileReplacementInProgressObservable fileReplacementInProgressObservable,
+      Project project,
+      EditorAPI editorAPI) {
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
     this.annotationManager = annotationManager;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
+    this.editorAPI = editorAPI;
 
     localDocumentModificationHandler = new LocalDocumentModificationHandler(this);
     localClosedEditorModificationHandler =
         new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
     localEditorStatusChangeHandler =
-        new LocalEditorStatusChangeHandler(localEditorHandler, annotationManager);
+        new LocalEditorStatusChangeHandler(project, localEditorHandler, annotationManager);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
-    localViewPortChangeHandler = new LocalViewPortChangeHandler(this);
+    localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
 
     localEditorHandler.initialize(this);
     localEditorManipulator.initialize(this);
@@ -500,27 +473,23 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   @Override
   public String getContent(final SPath path) {
     return Filesystem.runReadAction(
-        new Computable<String>() {
+        () -> {
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
 
-          @Override
-          public String compute() {
-            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+          if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
 
-            if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
+            LOG.warn(
+                "Could not retrieve content of "
+                    + path
+                    + " as a matching VirtualFile could not be found,"
+                    + " does not exist, or is a directory");
 
-              LOG.warn(
-                  "Could not retrieve content of "
-                      + path
-                      + " as a matching VirtualFile could not be found,"
-                      + " does not exist, or is a directory");
-
-              return null;
-            }
-
-            Document doc = projectAPI.getDocument(virtualFile);
-
-            return (doc != null) ? doc.getText() : null;
+            return null;
           }
+
+          Document doc = projectAPI.getDocument(virtualFile);
+
+          return (doc != null) ? doc.getText() : null;
         });
   }
 
@@ -541,7 +510,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @see Document
    * @see LocalEditorHandler#saveDocument(SPath)
    */
-  public void saveDocument(SPath path) {
+  private void saveDocument(SPath path) {
     localEditorHandler.saveDocument(path);
   }
 
@@ -551,57 +520,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   public void replaceAllEditorsForPath(SPath oldPath, SPath newPath) {
     editorPool.replacePath(oldPath, newPath);
-  }
-
-  /**
-   * Returns the followed {@link User} or <code>null</code> if currently no user is followed.
-   *
-   * @deprecated Use the {@link FollowModeManager} instead.
-   */
-  @Deprecated
-  public User getFollowedUser() {
-    return followedUser;
-  }
-
-  /** @deprecated Use the {@link UserEditorStateManager} component directly. */
-  @Deprecated
-  public UserEditorStateManager getUserEditorStateManager() {
-    return userEditorStateManager;
-  }
-
-  public boolean isActiveEditorShared() {
-    return activeEditor != null && isSharedEditor(activeEditor);
-  }
-
-  /**
-   * Sets the {@link User} to follow or <code>null</code> if no user should be followed. Calls
-   * {@link SharedEditorListenerDispatch#followModeChanged(User, boolean)} to inform the other
-   * participants of the change.
-   *
-   * <p>Jumps to the newly followed user.
-   *
-   * @deprecated Use the {@link FollowModeManager} instead.
-   */
-  @Deprecated
-  public void setFollowing(User newFollowedUser) {
-    assert newFollowedUser == null || !newFollowedUser.equals(session.getLocalUser())
-        : "local user cannot follow himself!";
-
-    User oldFollowedUser = followedUser;
-    followedUser = newFollowedUser;
-
-    if (oldFollowedUser != null && !oldFollowedUser.equals(newFollowedUser)) {
-      editorListenerDispatch.followModeChanged(oldFollowedUser, false);
-    }
-
-    if (newFollowedUser != null) {
-      editorListenerDispatch.followModeChanged(newFollowedUser, true);
-      jumpToUser(newFollowedUser);
-    }
-  }
-
-  LocalEditorHandler getLocalEditorHandler() {
-    return localEditorHandler;
   }
 
   EditorPool getEditorPool() {
@@ -628,9 +546,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *     <code>null</code> if the local user has no editor open.
    */
   void generateEditorActivated(SPath path) {
-
-    activeEditor = path;
-
     if (path == null || session.isShared(path.getResource())) {
       editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
@@ -642,29 +557,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Fires an EditorActivity.Type.CLOSED event for the given path and leaves following, if closing
-   * the followed editor.
+   * Fires an EditorActivity.Type.CLOSED event for the given path and notifies the local
+   * EditorListenerDispatcher.
    */
-  void generateEditorClosed(SPath path) {
-    // if closing the followed editor, leave follow mode
-    if (followedUser != null) {
-      // TODO Let the FollowModeManager handle this
-      EditorState activeEditor =
-          userEditorStateManager.getState(followedUser).getActiveEditorState();
+  void generateEditorClosed(@NotNull SPath path) {
+    if (session.isShared(path.getResource())) {
+      editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
-      if (activeEditor != null && activeEditor.getPath().equals(path)) {
-        // follower closed the followed editor (no other editor gets
-        // activated)
-        setFollowing(null);
-        NotificationPanel.showInformation(
-            "You closed the followed editor.", "Follow Mode stopped!");
-      }
+      fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));
     }
-
-    // TODO What about cleaning up (editorPool, currentlyOpenEditors, ...)?
-    // TODO What about a editorListenerDispatch.editorClosed() call?
-
-    fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));
   }
 
   /**
@@ -678,11 +579,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   /** Generates a {@link TextSelectionActivity} and fires it. */
   void generateSelection(SPath path, SelectionEvent newSelection) {
-
-    if (path.equals(activeEditor)) {
-      localSelection = newSelection;
-    }
-
     int offset = newSelection.getNewRange().getStartOffset();
     int length = newSelection.getNewRange().getLength();
 
@@ -691,21 +587,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   /** Generates a {@link ViewportActivity} and fires it. */
   void generateViewport(SPath path, LineRange viewport) {
-
     if (session == null) {
       LOG.warn("SharedEditorListener not correctly unregistered!");
       return;
     }
 
-    if (path.equals(activeEditor)) {
-      localViewport = viewport;
-    }
-
     fireActivity(
         new ViewportActivity(
             session.getLocalUser(), viewport.getStartLine(), viewport.getNumberOfLines(), path));
-
-    //  editorListenerDispatch.viewportGenerated(part, viewport, path);  //FIXME: add this feature
   }
 
   /** Generates a TextEditActivity and fires it. */
@@ -755,23 +644,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     editorListenerDispatch.textEdited(textEdit);
   }
 
-  /**
-   * Returns <code>true</code> if it is currently following user, otherwise <code>false</code>.
-   *
-   * @deprecated Use the {@link FollowModeManager} instead.
-   */
-  @Deprecated
-  boolean isFollowing(User user) {
-    return followedUser != null && followedUser.equals(user);
-  }
-
-  /**
-   * Locally opens the editor that the User jumpTo has currently open, adjusts the viewport and
-   * calls {@link SharedEditorListenerDispatch#jumpedToUser(User)} to inform the session
-   * participants of the jump.
-   */
   @Override
-  public void jumpToUser(final User jumpTo) {
+  public void jumpToUser(@NotNull final User jumpTo) {
 
     // you can't jump to yourself
     if (session.getLocalUser().equals(jumpTo)) {
@@ -782,61 +656,25 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         userEditorStateManager.getState(jumpTo).getActiveEditorState();
 
     if (remoteActiveEditor == null) {
-      LOG.info(jumpTo.getJID() + " has no editor open");
+      LOG.info("Remote user " + jumpTo + " does not have an open editor.");
       return;
     }
 
     executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
-            Editor newEditor =
-                localEditorManipulator.openEditor(remoteActiveEditor.getPath(), true);
+        () -> {
+          Editor newEditor = localEditorManipulator.openEditor(remoteActiveEditor.getPath(), true);
 
-            if (newEditor == null) {
-              return;
-            }
-
-            LineRange viewport = remoteActiveEditor.getViewport();
-
-            if (viewport == null) {
-              LOG.warn(
-                  jumpTo.getJID() + " has no viewport in editor: " + remoteActiveEditor.getPath());
-              return;
-            }
-            // FIXME Why are we suddenly interested in the followedUser?
-            EditorState state =
-                userEditorStateManager.getState(followedUser).getActiveEditorState();
-
-            TextSelection selection = (state == null) ? null : state.getSelection();
-
-            // state.getSelection() can return null
-            if (selection != null) {
-              // FIXME Why are we only jumping if we know the selection,
-              // but not if there is no selection but a perfectly usable
-              // viewport?
-              localEditorManipulator.adjustViewport(newEditor, viewport, selection);
-            }
+          if (newEditor == null) {
+            return;
           }
+
+          LineRange viewport = remoteActiveEditor.getViewport();
+          TextSelection textSelection = remoteActiveEditor.getSelection();
+
+          localEditorManipulator.adjustViewport(newEditor, viewport, textSelection);
         });
 
     editorListenerDispatch.jumpedToUser(jumpTo);
-  }
-
-  void refreshAnnotations() {
-    // FIXME: needs implementation
-  }
-
-  boolean isSharedEditor(SPath editorFilePath) {
-    if (session == null) {
-      return false;
-    }
-
-    if (!localEditorHandler.isOpenEditor(editorFilePath)) {
-      return false;
-    }
-
-    return session.isShared(editorFilePath.getResource());
   }
 
   boolean isDocumentModificationHandlerEnabled() {
@@ -858,7 +696,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * localTextSelectionChangeHandler and the localViewPortChangeHandler if the parameter is <code>
    * true</code>, else disables them.
    */
-  void setHandlersEnabled(boolean enable) {
+  private void setHandlersEnabled(boolean enable) {
     localDocumentModificationHandler.setEnabled(enable);
     localClosedEditorModificationHandler.setEnabled(enable);
     localEditorStatusChangeHandler.setEnabled(enable);
@@ -877,22 +715,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /** Unlocks all editors in the editorPool. */
-  void unlockAllEditors() {
+  private void unlockAllEditors() {
     setHandlersEnabled(true);
     editorPool.unlockAllDocuments();
   }
 
   /** Locks all open editors, by setting them to read-only. */
-  void lockAllEditors() {
+  private void lockAllEditors() {
     setHandlersEnabled(false);
     editorPool.lockAllDocuments();
-  }
-
-  /** Unlocks all locally open editors by starting them. */
-  public void unlockAllLocalOpenedEditors() {
-    for (Editor editor : editorPool.getEditors()) {
-      startEditor(editor);
-    }
   }
 
   private void executeInUIThreadSynchronous(Runnable runnable) {
@@ -900,28 +731,20 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         .invokeAndWait(runnable, ModalityState.defaultModalityState());
   }
 
-  private void executeInUIThreadAsynchronous(Runnable runnable) {
-    ApplicationManager.getApplication().invokeLater(runnable);
-  }
-
   @Override
   public void saveEditors(final IProject project) {
     executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
+        () -> {
+          Set<SPath> editorPaths = new HashSet<>(editorPool.getFiles());
 
-            Set<SPath> editorPaths = new HashSet<>(editorPool.getFiles());
+          if (userEditorStateManager != null) {
+            editorPaths.addAll(userEditorStateManager.getOpenEditors());
+          }
 
-            if (userEditorStateManager != null) {
-              editorPaths.addAll(userEditorStateManager.getOpenEditors());
-            }
+          for (SPath editorPath : editorPaths) {
+            if (project == null || project.equals(editorPath.getProject())) {
 
-            for (SPath editorPath : editorPaths) {
-              if (project == null || project.equals(editorPath.getProject())) {
-
-                saveDocument(editorPath);
-              }
+              saveDocument(editorPath);
             }
           }
         });
@@ -929,37 +752,43 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   @Override
   public void openEditor(final SPath path, final boolean activate) {
-    executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
-            localEditorManipulator.openEditor(path, activate);
-          }
-        });
+    executeInUIThreadSynchronous(() -> localEditorManipulator.openEditor(path, activate));
   }
 
   @Override
   public void closeEditor(final SPath path) {
-    executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
-            localEditorManipulator.closeEditor(path);
-          }
-        });
+    executeInUIThreadSynchronous(() -> localEditorManipulator.closeEditor(path));
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Only adjusts the viewport if there currently is an open editor for the given path (meaning
+   * such an editor is contained in the editor pool).
+   *
+   * @param path {@inheritDoc}
+   * @param range {@inheritDoc}
+   * @param selection {@inheritDoc}
+   * @see LocalEditorManipulator#adjustViewport(Editor, LineRange, TextSelection)
+   */
   @Override
   public void adjustViewport(
-      final SPath path, final LineRange range, final TextSelection selection) {
+      @NotNull final SPath path, final LineRange range, final TextSelection selection) {
 
     executeInUIThreadSynchronous(
-        new Runnable() {
-          @Override
-          public void run() {
-            Editor editor = localEditorManipulator.openEditor(path, false);
-            localEditorManipulator.adjustViewport(editor, range, selection);
+        () -> {
+          Editor editor = editorPool.getEditor(path);
+
+          if (editor == null) {
+            LOG.warn(
+                "Failed to adjust viewport for "
+                    + path
+                    + " as it is not known to the editor pool.");
+
+            return;
           }
+
+          localEditorManipulator.adjustViewport(editor, range, selection);
         });
   }
 

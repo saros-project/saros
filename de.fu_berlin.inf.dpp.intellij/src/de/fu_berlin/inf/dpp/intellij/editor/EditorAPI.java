@@ -7,11 +7,15 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
+import com.intellij.openapi.util.Pair;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
+import java.awt.Point;
+import java.awt.Rectangle;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.
@@ -33,134 +37,141 @@ public class EditorAPI {
   }
 
   /**
-   * Sets the given Editor to the specified line range in the UI thread.
+   * Scrolls the given editor so that the given line is in the center of the local viewport. The
+   * given line represents the logical position in the editor.
    *
-   * @param editor
-   * @param lineStart
-   * @param lineEnd
+   * <p><b>NOTE:</b> The center of the local viewport is at 1/3 for IntelliJ.
+   *
+   * @param editor the editor to scroll
+   * @param line the line to scroll to
+   * @see LogicalPosition
    */
-  public void setViewPort(final Editor editor, final int lineStart, final int lineEnd) {
+  void scrollToViewPortCenter(final Editor editor, final int line) {
+    application.invokeAndWait(
+        () -> {
+          LogicalPosition logicalPosition = new LogicalPosition(line, 0);
 
-    Runnable action =
-        new Runnable() {
-          @Override
-          public void run() {
-
-            VisualPosition posCenter = new VisualPosition((lineStart + lineEnd) / 2, 0);
-            editor.getCaretModel().moveToVisualPosition(posCenter);
-            editor.getScrollingModel().scrollToCaret(ScrollType.MAKE_VISIBLE);
-          }
-        };
-
-    application.invokeAndWait(action, ModalityState.defaultModalityState());
+          editor.getScrollingModel().scrollTo(logicalPosition, ScrollType.CENTER);
+        },
+        ModalityState.defaultModalityState());
   }
 
   /**
-   * Inserts text at the given position inside the UI thread.
+   * Returns the logical line range of the local viewport for the given editor.
    *
-   * @param doc
-   * @param position
-   * @param text
+   * @param editor the editor to get the viewport line range for
+   * @return the logical line range of the local viewport for the given editor
+   * @see LogicalPosition
    */
-  public void insertText(final Document doc, final int position, final String text) {
+  @NotNull
+  LineRange getLocalViewportRange(@NotNull Editor editor) {
+    Rectangle visibleAreaRectangle = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
 
-    Runnable action =
-        new Runnable() {
-          @Override
-          public void run() {
-            commandProcessor.executeCommand(
-                project,
-                new Runnable() {
+    int basePos = visibleAreaRectangle.y;
+    int endPos = visibleAreaRectangle.y + visibleAreaRectangle.height;
 
-                  @Override
-                  public void run() {
-                    doc.insertString(position, text);
-                  }
-                },
-                "Saros text insertion at index " + position + " of \"" + text + "\"",
-                commandProcessor.getCurrentCommandGroupId(),
-                UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-                doc);
-          }
-        };
+    int currentViewportStartLine = editor.xyToLogicalPosition(new Point(0, basePos)).line;
+    int currentViewportEndLine = editor.xyToLogicalPosition(new Point(0, endPos)).line;
 
-    Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
+    return new LineRange(
+        currentViewportStartLine, currentViewportEndLine - currentViewportStartLine);
   }
 
   /**
-   * Deletes text in document in the specified range in the UI thread.
+   * Returns the offset and length of the local selection for the given editor.
    *
-   * @param doc
-   * @param start
-   * @param end
+   * <p>The values are returned as a {@link Pair}. The first value is the starting offset of the
+   * selection and the second value is the length of the selection.
+   *
+   * @param editor the editor to get the local selection offsets for.
+   * @return a Pair containing the local selection offset and length for the given editor.
    */
-  public void deleteText(final Document doc, final int start, final int end) {
-    Runnable action =
-        new Runnable() {
-          @Override
-          public void run() {
-            commandProcessor.executeCommand(
-                project,
-                new Runnable() {
+  @NotNull
+  Pair<Integer, Integer> getLocalSelectionOffsets(@NotNull Editor editor) {
+    int selectionStartOffset = editor.getSelectionModel().getSelectionStart();
+    int selectionEndOffset = editor.getSelectionModel().getSelectionEnd();
 
-                  @Override
-                  public void run() {
-                    doc.deleteString(start, end);
-                  }
-                },
-                "Saros text deletion from index " + start + " to " + end,
-                commandProcessor.getCurrentCommandGroupId(),
-                UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-                doc);
-          }
-        };
+    int selectionLength = selectionEndOffset - selectionStartOffset;
 
-    Filesystem.runWriteAction(action, ModalityState.defaultModalityState());
+    return new Pair<>(selectionStartOffset, selectionLength);
   }
 
   /**
-   * Sets text selection in editor inside the UI thread.
+   * Returns the logical line range of the section represented by the given offsets for the given
+   * editor.
    *
-   * @param editor
-   * @param start
-   * @param end
-   * @param colorMode
+   * @param editor the editor to get the line range for
+   * @param startOffset the start offset of the section
+   * @param endOffset the end offset of the section
+   * @return the logical line range of the section represented by the given offsets for the given
+   *     editor
+   * @see LogicalPosition
    */
-  public void setSelection(
-      final Editor editor, final int start, final int end, ColorModel colorMode) {
+  @NotNull
+  LineRange getLineRange(@NotNull Editor editor, int startOffset, int endOffset) {
+    assert startOffset <= endOffset;
 
-    Runnable action =
-        new Runnable() {
-          @Override
-          public void run() {
-            application.runReadAction(
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    // set selection
-                    editor.getSelectionModel().setSelection(start, end);
+    int startLine = editor.offsetToLogicalPosition(startOffset).line;
+    int endLine = editor.offsetToLogicalPosition(endOffset).line;
 
-                    // move scroll
-                    int lineStart =
-                        editor.getSelectionModel().getSelectionStartPosition().getLine();
-                    int lineEnd = editor.getSelectionModel().getSelectionEndPosition().getLine();
+    int rangeLength = endLine - startLine;
 
-                    int colStart =
-                        editor.getSelectionModel().getSelectionStartPosition().getColumn();
-                    int colEnd = editor.getSelectionModel().getSelectionEndPosition().getColumn();
+    return new LineRange(startLine, rangeLength);
+  }
 
-                    VisualPosition posCenter =
-                        new VisualPosition((lineStart + lineEnd) / 2, (colStart + colEnd) / 2);
-                    editor.getCaretModel().moveToVisualPosition(posCenter);
-                    editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+  /**
+   * Inserts the specified text at the specified offset in the document. Line breaks in the inserted
+   * text must be normalized as \n.
+   *
+   * @param document the document to insert the text into
+   * @param offset the offset to insert the text at
+   * @param text the text to insert
+   * @see Document#insertString(int, CharSequence)
+   */
+  void insertText(@NotNull final Document document, final int offset, final String text) {
 
-                    // move cursor
-                    editor.getCaretModel().moveToOffset(start, true);
-                  }
-                });
-          }
+    Runnable insertCommand =
+        () -> {
+          Runnable insertString = () -> document.insertString(offset, text);
+
+          String commandName = "Saros text insertion at index " + offset + " of \"" + text + "\"";
+
+          commandProcessor.executeCommand(
+              project,
+              insertString,
+              commandName,
+              commandProcessor.getCurrentCommandGroupId(),
+              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
+              document);
         };
 
-    application.invokeAndWait(action, ModalityState.defaultModalityState());
+    Filesystem.runWriteAction(insertCommand, ModalityState.defaultModalityState());
+  }
+
+  /**
+   * Deletes the specified range of text from the given document.
+   *
+   * @param doc the document to delete text from
+   * @param start the start offset of the range to delete
+   * @param end the end offset of the range to delete
+   * @see Document#deleteString(int, int)
+   */
+  void deleteText(@NotNull final Document doc, final int start, final int end) {
+    Runnable deletionCommand =
+        () -> {
+          Runnable deleteRange = () -> doc.deleteString(start, end);
+
+          String commandName = "Saros text deletion from index " + start + " to " + end;
+
+          commandProcessor.executeCommand(
+              project,
+              deleteRange,
+              commandName,
+              commandProcessor.getCurrentCommandGroupId(),
+              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
+              doc);
+        };
+
+    Filesystem.runWriteAction(deletionCommand, ModalityState.defaultModalityState());
   }
 }

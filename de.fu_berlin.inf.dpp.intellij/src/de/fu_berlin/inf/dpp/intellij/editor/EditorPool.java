@@ -4,6 +4,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -14,10 +15,10 @@ import org.jetbrains.annotations.Nullable;
  * The Intellij editor pool. It is used to store a mapping of <code>SPath</code>s onto <code>Editor
  * </code>s for all shared files that are open locally.
  */
-public class EditorPool {
+class EditorPool {
   private final Map<SPath, Editor> editors;
 
-  public EditorPool() {
+  EditorPool() {
     this.editors = new HashMap<>();
   }
 
@@ -27,7 +28,7 @@ public class EditorPool {
    * @param file the path for the file
    * @param editor the editor for the file
    */
-  public void add(@NotNull SPath file, @NotNull Editor editor) {
+  void add(@NotNull SPath file, @NotNull Editor editor) {
 
     editors.put(file, editor);
   }
@@ -37,7 +38,7 @@ public class EditorPool {
    *
    * @param file the path that is removed from the editor pool
    */
-  public void removeEditor(@NotNull SPath file) {
+  void removeEditor(@NotNull SPath file) {
 
     editors.remove(file);
   }
@@ -49,7 +50,7 @@ public class EditorPool {
    * @param oldPath the old path
    * @param newPath the new path
    */
-  public void replacePath(@NotNull SPath oldPath, @NotNull SPath newPath) {
+  void replacePath(@NotNull SPath oldPath, @NotNull SPath newPath) {
 
     Editor editor = editors.remove(oldPath);
 
@@ -59,14 +60,14 @@ public class EditorPool {
   }
 
   /** Sets all editors in the editor pool to read/write. */
-  public void unlockAllDocuments() {
+  void unlockAllDocuments() {
     for (Editor editor : editors.values()) {
       editor.getDocument().setReadOnly(false);
     }
   }
 
   /** Sets all editors in the editor pool to read only. */
-  public void lockAllDocuments() {
+  void lockAllDocuments() {
     for (Editor editor : editors.values()) {
       editor.getDocument().setReadOnly(true);
     }
@@ -80,7 +81,7 @@ public class EditorPool {
    *     not contained in the editor pool
    */
   @Nullable
-  public Document getDocument(@NotNull SPath file) {
+  Document getDocument(@NotNull SPath file) {
 
     Editor editor = editors.get(file);
 
@@ -95,7 +96,7 @@ public class EditorPool {
    *     not contained in the editor pool
    */
   @Nullable
-  public Editor getEditor(@NotNull SPath file) {
+  Editor getEditor(@NotNull SPath file) {
 
     return editors.get(file);
   }
@@ -108,7 +109,7 @@ public class EditorPool {
    *     could be found in the editor pool
    */
   @Nullable
-  public SPath getFile(@NotNull Document doc) {
+  SPath getFile(@NotNull Document doc) {
 
     for (Map.Entry<SPath, Editor> entry : editors.entrySet()) {
       if (entry.getValue().getDocument().equals(doc)) {
@@ -125,7 +126,7 @@ public class EditorPool {
    * @return all editors contained in the editor pool
    */
   @NotNull
-  public Collection<Editor> getEditors() {
+  Collection<Editor> getEditors() {
     return editors.values();
   }
 
@@ -135,12 +136,23 @@ public class EditorPool {
    * @return all paths contained in the editor pool
    */
   @NotNull
-  public Set<SPath> getFiles() {
+  Set<SPath> getFiles() {
     return editors.keySet();
   }
 
+  /**
+   * Returns an unmodifiable representation of the held editor mapping. The mapping will still
+   * reflect any changes made to the editor pool.
+   *
+   * @return an unmodifiable representation of the held editor mapping
+   */
+  @NotNull
+  Map<SPath, Editor> getMapping() {
+    return Collections.unmodifiableMap(editors);
+  }
+
   /** Removes all mappings from the editor pool. */
-  public void clear() {
+  void clear() {
     editors.clear();
   }
 }
