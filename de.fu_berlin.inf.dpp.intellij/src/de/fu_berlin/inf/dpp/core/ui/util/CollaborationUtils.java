@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.core.ui.util;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
@@ -10,6 +9,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
+import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -341,120 +340,50 @@ public class CollaborationUtils {
    * @param sarosSession
    * @return
    */
+  @Deprecated
   private static Map<IFolder, List<IResource>> acquireResources(
       List<IResource> selectedResources, ISarosSession sarosSession) {
 
-    Map<IFolder, Set<IResource>> projectsResources = new HashMap<IFolder, Set<IResource>>();
+    List<Module> modules = new ArrayList<>();
+    for (IResource resource : selectedResources) {
+      IntelliJProjectImpl project = (IntelliJProjectImpl) resource;
+      modules.add(project.getModule());
+    }
+
+    return acquireResourcesFromModules(modules, sarosSession);
+  }
+
+  /**
+   * Acquires the IntelliJ resources and transforms them to Saros resources
+   *
+   * <ul>
+   *   *
+   *   <li>complete shared project: {@link IFolder} --> null *
+   *   <li>partial shared project: {@link IFolder} --> List<IResource> *
+   * </ul>
+   *
+   * Because Saros/I only provides sharing completely modules, this algorithm only transform an
+   * module {@link Module module} to {@link IFolder saros folder}
+   *
+   * @param selectedModules
+   * @param sarosSession
+   * @return
+   */
+  private static Map<IFolder, List<IResource>> acquireResourcesFromModules(
+      List<Module> selectedModules, ISarosSession sarosSession) {
+
+    Map<IFolder, List<IResource>> projectsResources = new HashMap<IFolder, List<IResource>>();
 
     if (sarosSession != null) {
-      selectedResources.removeAll(sarosSession.getSharedResources());
+      selectedModules.removeAll(sarosSession.getSharedResources());
     }
 
-    final int resourcesSize = selectedResources.size();
-
-    IResource[] preSortedResources = new IResource[resourcesSize];
-
-    int frontIdx = 0;
-    int backIdx = resourcesSize - 1;
-
-    // move projects to the front so the algorithm is working as expected
-    for (IResource resource : selectedResources) {
-      if (resource.getType() == IResource.PROJECT) {
-        preSortedResources[frontIdx++] = resource;
-      } else {
-        preSortedResources[backIdx--] = resource;
-      }
+    for (Module module : selectedModules) {
+      IntelliJProjectImpl project =
+          new IntelliJProjectImpl(FilesystemUtils.getModuleContentRoot(module));
+      projectsResources.put(project, null);
     }
-
-    for (IResource resource : preSortedResources) {
-
-      if (resource.getType() == IResource.PROJECT) {
-        projectsResources.put((IFolder) resource, null);
-        continue;
-      }
-
-      IFolder project = resource.getReferenceFolder();
-
-      if (project == null) {
-        continue;
-      }
-
-      if (!projectsResources.containsKey(project)) {
-        projectsResources.put(project, new HashSet<IResource>());
-      }
-
-      Set<IResource> resources = projectsResources.get(project);
-
-      // if the resource set is null, it is a full shared project
-      if (resources != null) {
-        resources.add(resource);
-      }
-    }
-
-    for (Entry<IFolder, Set<IResource>> entry : projectsResources.entrySet()) {
-
-      IFolder project = entry.getKey();
-      Set<IResource> resources = entry.getValue();
-
-      if (resources == // * full shared *//*
-          null) {
-        continue;
-      }
-
-      List<IResource> additionalFilesForPartialSharing = new ArrayList<IResource>();
-
-      /*
-       * TODO should be adjusted after partial sharing is implemented
-       *
-       * we need the .iml file, otherwise the project type will not be set
-       * correctly on the other side
-       */
-      IntelliJProjectImpl intelliJProject =
-          (IntelliJProjectImpl) project.getAdapter(IntelliJProjectImpl.class);
-
-      Module module = intelliJProject.getModule();
-      VirtualFile moduleFile = module.getModuleFile();
-
-      if (moduleFile == null || !moduleFile.exists()) {
-        LOG.error(
-            "The module file for the module " + module + " does not exist or could not be found");
-
-        NotificationPanel.showWarning(
-            "The module file for the shared module "
-                + module
-                + " could not be found. This could lead to the session not"
-                + " working as expected.",
-            "Module file not found!");
-      } else {
-        IFile moduleFileResource = intelliJProject.getFile(moduleFile);
-
-        if (moduleFileResource != null) {
-          additionalFilesForPartialSharing.add(moduleFileResource);
-        } else {
-          LOG.error("The module file " + moduleFile + " could not be converted to an IFile.");
-
-          NotificationPanel.showWarning(
-              "There was an error handling the  module file for"
-                  + " the shared module "
-                  + module
-                  + ". This could lead"
-                  + " to the session not working as expected.",
-              "Error handling module file!");
-        }
-      }
-
-      resources.addAll(additionalFilesForPartialSharing);
-    }
-
-    HashMap<IFolder, List<IResource>> resources = new HashMap<IFolder, List<IResource>>();
-
-    for (Entry<IFolder, Set<IResource>> entry : projectsResources.entrySet()) {
-      resources.put(
-          entry.getKey(),
-          entry.getValue() == null ? null : new ArrayList<IResource>(entry.getValue()));
-    }
-
-    return resources;
+    return projectsResources;
   }
 
   private static String format(long size) {
