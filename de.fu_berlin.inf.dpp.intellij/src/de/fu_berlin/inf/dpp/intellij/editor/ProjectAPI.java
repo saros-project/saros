@@ -182,13 +182,4 @@ public class ProjectAPI {
         },
         ModalityState.NON_MODAL);
   }
-
-  /**
-   * Subscribes the given <code>LocalEditorStatusChangeHandler</code> to the current project.
-   *
-   * @param listener the listener that should subscribe to the current project
-   */
-  void addFileEditorManagerListener(@NotNull LocalEditorStatusChangeHandler listener) {
-    listener.subscribe(project);
-  }
 }

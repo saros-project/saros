@@ -34,14 +34,14 @@ public interface IEditorManager {
    * @param activate Determines whether the newly opened editor should get the focus or should be
    *     opened in the background.
    */
-  public void openEditor(SPath path, boolean activate);
+  void openEditor(SPath path, boolean activate);
 
   /**
    * Returns the paths of all shared files for which an editor is currently open locally.
    *
    * @return paths of locally open shared files
    */
-  public Set<SPath> getOpenEditors();
+  Set<SPath> getOpenEditors();
 
   /**
    * Returns the text content of the local editor associated with the specified file, or the content
@@ -51,7 +51,7 @@ public interface IEditorManager {
    * @return the text content of the matching local editor or file, or <code>null</code> if no file
    *     with the given path exists locally
    */
-  public String getContent(SPath path);
+  String getContent(SPath path);
 
   /**
    * Saves the local editors of all shared files belonging to the given project. If <code>null
@@ -60,37 +60,31 @@ public interface IEditorManager {
    * @param project the project whose editors should be saved, or <code>null</code> to save all
    *     editors
    */
-  public void saveEditors(IProject project);
+  void saveEditors(IProject project);
 
   /**
    * Close the editor of given {@link SPath}.
    *
    * @param path Path of the file of which the editor should be closed
    */
-  public void closeEditor(SPath path);
+  void closeEditor(SPath path);
 
   /**
-   * Adjusts viewport. Focus is set on the center of the range, but priority
-   * is given to selected lines. Either range or selection can be
-   * <code>null</null>, but
-   * not both.
+   * Adjusts viewport. Focus is set on the center of the range, but priority is given to selected
+   * lines. Either range or selection can be <code>null</code>, but not both.
    *
-   * @param path
-   *            Path of the open Editor
-   * @param range
-   *            viewport of the followed user. Can be <code>null</code>.
-   * @param selection
-   *            text selection of the followed user. Can be <code>null</code>.
-   *
+   * @param path Path of the open Editor
+   * @param range viewport of the followed user. Can be <code>null</code>.
+   * @param selection text selection of the followed user. Can be <code>null</code>.
    */
-  public void adjustViewport(SPath path, LineRange range, TextSelection selection);
+  void adjustViewport(SPath path, LineRange range, TextSelection selection);
 
   /**
    * Locally opens the editor that the User {@code target} has currently open, adjusts the viewport,
    * and calls {@link ISharedEditorListener#jumpedToUser(User)} to inform the session participants
    * of the jump.
    */
-  public void jumpToUser(User target);
+  void jumpToUser(User target);
 
   /**
    * Adds an {@link ISharedEditorListener} to listen for changes such as editors getting opened,
@@ -98,7 +92,7 @@ public interface IEditorManager {
    *
    * @param listener editor listener to add
    */
-  public void addSharedEditorListener(ISharedEditorListener listener);
+  void addSharedEditorListener(ISharedEditorListener listener);
 
   /**
    * Removes an {@link ISharedEditorListener} that was previously added with {@link
@@ -106,5 +100,5 @@ public interface IEditorManager {
    *
    * @param listener editor listener to remove
    */
-  public void removeSharedEditorListener(ISharedEditorListener listener);
+  void removeSharedEditorListener(ISharedEditorListener listener);
 }
