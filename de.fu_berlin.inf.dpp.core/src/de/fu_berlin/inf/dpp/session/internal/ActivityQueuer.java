@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,12 +17,12 @@ import java.util.Map;
 public class ActivityQueuer {
 
   private static class ProjectQueue {
-    private final IProject project;
+    private final IReferencePoint referencePoint;
     private final List<IResourceActivity> buffer;
     private int readyToFlush;
 
-    private ProjectQueue(IProject project) {
-      this.project = project;
+    private ProjectQueue(IReferencePoint referencePoint) {
+      this.referencePoint = referencePoint;
       buffer = new ArrayList<IResourceActivity>();
       readyToFlush = 1;
     }
@@ -65,19 +65,19 @@ public class ActivityQueuer {
    * project, increasing or decreasing the internal counter. Activities can be flushed when the
    * counter reaches zero.
    *
-   * @param project
+   * @param referencePoint
    */
-  public synchronized void enableQueuing(final IProject project) {
+  public synchronized void enableQueuing(final IReferencePoint referencePoint) {
     for (final ProjectQueue projectQueue : projectQueues) {
 
-      if (projectQueue.project.equals(project)) {
+      if (projectQueue.referencePoint.equals(referencePoint)) {
 
         projectQueue.readyToFlush++;
         return;
       }
     }
 
-    projectQueues.add(new ProjectQueue(project));
+    projectQueues.add(new ProjectQueue(referencePoint));
   }
 
   /**
@@ -92,12 +92,12 @@ public class ActivityQueuer {
    * it stops the queuing for the given project which at least releases the queued activities to
    * prevent memory leaks.
    *
-   * @param project
+   * @param referencePoint
    */
-  public synchronized void disableQueuing(final IProject project) {
+  public synchronized void disableQueuing(final IReferencePoint referencePoint) {
     for (final ProjectQueue projectQueue : projectQueues) {
 
-      if (projectQueue.project.equals(project)) {
+      if (projectQueue.referencePoint.equals(referencePoint)) {
 
         if (projectQueue.readyToFlush > 0) projectQueue.readyToFlush--;
 
@@ -142,8 +142,9 @@ public class ActivityQueuer {
         if (path != null) {
 
           // try to reuse the queue as lookup is O(n)
-          if (projectQueue == null || !projectQueue.project.equals(path.getProject())) {
-            projectQueue = getProjectQueue(path.getProject());
+          if (projectQueue == null
+              || !projectQueue.referencePoint.equals(path.getProject().getReferencePoint())) {
+            projectQueue = getProjectQueue(path.getProject().getReferencePoint());
           }
 
           if (projectQueue != null) {
@@ -210,10 +211,10 @@ public class ActivityQueuer {
       projectQueues.remove(projectQueue);
   }
 
-  private ProjectQueue getProjectQueue(final IProject project) {
+  private ProjectQueue getProjectQueue(final IReferencePoint referencePoint) {
 
     for (final ProjectQueue projectQueue : projectQueues) {
-      if (projectQueue.project.equals(project)) return projectQueue;
+      if (projectQueue.referencePoint.equals(referencePoint)) return projectQueue;
     }
 
     return null;
