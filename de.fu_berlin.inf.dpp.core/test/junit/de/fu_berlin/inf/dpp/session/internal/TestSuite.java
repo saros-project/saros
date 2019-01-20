@@ -8,7 +8,7 @@ import org.junit.runners.Suite;
   ActivityHandlerTest.class,
   ActivityQueuerTest.class,
   ActivitySequencerTest.class,
-  SharedProjectMapperTest.class,
+  SharedReferencePointMapperTest.class,
   UserInformationHandlerTest.class
 })
 public class TestSuite {
