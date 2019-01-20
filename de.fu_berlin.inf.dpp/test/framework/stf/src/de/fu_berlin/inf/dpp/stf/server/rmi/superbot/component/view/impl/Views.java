@@ -30,23 +30,20 @@ public final class Views extends StfRemoteObject implements IViews {
     return INSTANCE;
   }
 
-  private boolean forceUseHtmlGui = false;
+  private boolean shouldTestHtmlGui = false;
 
-  /* Use this method to force the STF to use the HTML-GUI.
-   * This can be removed when the old GUI is fully replaced.
-   * */
   @Override
-  public void forceUseHtmlGui() throws RemoteException {
+  public void runTestsOnHtmlGui() throws RemoteException {
     if (Saros.useHtmlGui() == false) {
       throw new RuntimeException(
-          "HTML-GUI is not enabled. Please set saros.swtbrowser propertie to true.");
+          "HTML-GUI is not enabled. Please set saros.swtbrowser property to true.");
     }
-    forceUseHtmlGui = true;
+    shouldTestHtmlGui = true;
   }
 
   @Override
   public ISarosView sarosView() throws RemoteException {
-    if (Saros.useHtmlGui() && this.forceUseHtmlGui) {
+    if (Saros.useHtmlGui() && this.shouldTestHtmlGui) {
       IHTMLBot htmlBot = HTMLBotImpl.getInstance();
       EclipseHTMLWorkbenchBot.getInstance().openSarosBrowserView();
       htmlBot.view(View.MAIN_VIEW).open();

@@ -10,7 +10,13 @@ import java.rmi.RemoteException;
 
 public interface IViews extends Remote {
 
-  public void forceUseHtmlGui() throws RemoteException;
+  /**
+   * Use this method to force the STF to use the HTML-GUI. This can be removed when the old GUI is
+   * fully replaced.
+   *
+   * @throws RemoteException
+   */
+  public void runTestsOnHtmlGui() throws RemoteException;
 
   public ISarosView sarosView() throws RemoteException;
 
