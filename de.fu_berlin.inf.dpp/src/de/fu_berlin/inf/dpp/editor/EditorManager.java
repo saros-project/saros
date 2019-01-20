@@ -25,7 +25,6 @@ import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -1396,7 +1395,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   @Override
-  public void saveEditors(final IProject project) {
+  public void saveEditors(final IReferencePoint referencePoint) {
     SWTUtils.runSafeSWTSync(
         LOG,
         new Runnable() {
@@ -1415,7 +1414,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             editorPaths.addAll(openEditorPaths);
 
             for (final SPath path : editorPaths) {
-              if (project == null || project.equals(path.getProject())) saveLazy(path);
+              if (referencePoint == null
+                  || referencePoint.equals(path.getProject().getReferencePoint())) saveLazy(path);
             }
           }
         });

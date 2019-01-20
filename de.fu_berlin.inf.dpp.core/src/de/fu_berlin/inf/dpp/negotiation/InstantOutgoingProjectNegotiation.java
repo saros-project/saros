@@ -236,7 +236,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       while (!openedFiles.isEmpty()) {
         SPath openFile = openedFiles.poll();
         /* open files could be changed meanwhile */
-        editorManager.saveEditors(openFile.getProject());
+        editorManager.saveEditors(openFile.getProject().getReferencePoint());
         sendIfRequired(osp, openFile);
       }
 
