@@ -311,8 +311,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
          * force editor buffer flush because we read the files from the
          * underlying storage
          */
-        if (editorManager != null)
-          editorManager.saveEditors(referencePointManager.get(referencePoint));
+        if (editorManager != null) editorManager.saveEditors(referencePoint);
 
         FileList projectFileList =
             FileListFactory.createFileList(

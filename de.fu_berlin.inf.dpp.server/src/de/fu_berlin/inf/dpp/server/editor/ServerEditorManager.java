@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.session.User;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class ServerEditorManager implements IEditorManager {
   }
 
   @Override
-  public void saveEditors(IProject project) {
+  public void saveEditors(IReferencePoint referencePoint) {
     // do nothing?
     // we do not keep dirty editors,
     // because the LRUMap might close Editors at any time

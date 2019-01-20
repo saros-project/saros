@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
@@ -159,8 +158,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
        * force editor buffer flush because we read the files from the
        * underlying storage
        */
-      if (editorManager != null)
-        editorManager.saveEditors(referencePointManager.get(referencePoint));
+      if (editorManager != null) editorManager.saveEditors(referencePoint);
 
       final StringBuilder aliasBuilder = new StringBuilder();
 
