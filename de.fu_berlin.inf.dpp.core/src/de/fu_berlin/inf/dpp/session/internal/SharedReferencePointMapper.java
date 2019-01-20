@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
  * when the local names of shared reference point are different. The ID is determined by the
  * reference point/file-host.
  */
-class SharedProjectMapper {
+class SharedReferencePointMapper {
 
-  private static final Logger LOG = Logger.getLogger(SharedProjectMapper.class);
+  private static final Logger LOG = Logger.getLogger(SharedReferencePointMapper.class);
 
   /** Mapping from reference point IDs to currently registered shared reference point. */
   private Map<String, IReferencePoint> idToReferencePointMapping;
@@ -52,7 +52,7 @@ class SharedProjectMapper {
   /** Set containing the currently partially shared reference points. */
   private Set<IReferencePoint> partiallySharedReferencePoints;
 
-  public SharedProjectMapper() {
+  public SharedReferencePointMapper() {
     idToReferencePointMapping = new HashMap<String, IReferencePoint>();
     referencePointToIDMapping = new HashMap<IReferencePoint, String>();
     referencePointsOfUsers = new HashMap<User, List<String>>();
