@@ -350,12 +350,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     try {
       localEditorStatusChangeHandler.setEnabled(false);
+      localViewPortChangeHandler.setEnabled(false);
 
       for (VirtualFile openFile : openFiles) {
         localEditorHandler.openEditor(openFile, project, false);
       }
 
     } finally {
+      localViewPortChangeHandler.setEnabled(true);
       localEditorStatusChangeHandler.setEnabled(true);
     }
 
@@ -552,8 +554,27 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     return session != null;
   }
 
-  LocalEditorStatusChangeHandler getLocalEditorStatusChangeHandler() {
-    return localEditorStatusChangeHandler;
+  /**
+   * Enables or disables the handler. This is done by registering or unregistering the held
+   * listener.
+   *
+   * <p>This method does nothing if the given state already matches the current state.
+   *
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
+   * @see LocalEditorStatusChangeHandler#setEnabled(boolean)
+   */
+  void setLocalEditorStatusChangeHandlerEnabled(boolean enabled) {
+    localEditorStatusChangeHandler.setEnabled(enabled);
+  }
+
+  /**
+   * Enables or disabled the handler. This is not done by disabling the underlying listener.
+   *
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
+   * @see LocalViewPortChangeHandler#setEnabled(boolean)
+   */
+  void setLocalViewPortChangeHandlerEnabled(boolean enabled) {
+    localViewPortChangeHandler.setEnabled(enabled);
   }
 
   /**
