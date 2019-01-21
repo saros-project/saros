@@ -295,7 +295,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         private void sendViewPortInformation(
             @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
 
-          LineRange localViewPort = editorAPI.getLocalViewportRange(editor);
+          LineRange localViewPort = editorAPI.getLocalViewPortRange(editor);
           int viewPortStartLine = localViewPort.getStartLine();
           int viewPortLength = localViewPort.getNumberOfLines();
 

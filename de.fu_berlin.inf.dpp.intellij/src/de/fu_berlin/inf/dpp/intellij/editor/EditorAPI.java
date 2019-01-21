@@ -64,9 +64,21 @@ public class EditorAPI {
    * @see LogicalPosition
    */
   @NotNull
-  LineRange getLocalViewportRange(@NotNull Editor editor) {
+  LineRange getLocalViewPortRange(@NotNull Editor editor) {
     Rectangle visibleAreaRectangle = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
 
+    return getLocalViewPortRange(editor, visibleAreaRectangle);
+  }
+
+  /**
+   * Returns the logical line range of the given visible rectangle for the given editor.
+   *
+   * @param editor the editor to get the viewport line range for
+   * @param visibleAreaRectangle the visible rectangle to get the line range for
+   * @return the logical line range of the local viewport for the given editor
+   * @see LogicalPosition
+   */
+  LineRange getLocalViewPortRange(@NotNull Editor editor, @NotNull Rectangle visibleAreaRectangle) {
     int basePos = visibleAreaRectangle.y;
     int endPos = visibleAreaRectangle.y + visibleAreaRectangle.height;
 
