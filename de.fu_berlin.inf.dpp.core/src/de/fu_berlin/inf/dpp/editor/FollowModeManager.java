@@ -76,20 +76,26 @@ public class FollowModeManager implements Startable {
             return;
           }
 
-          stopIfDiverted(filePath, Reason.FOLLOWER_CLOSED_OR_SWITCHED_EDITOR);
+          Reason reason = Reason.FOLLOWER_CLOSED_OR_SWITCHED_EDITOR;
+
+          EditorState remoteActiveEditor = followeeEditor();
+
+          if (remoteActiveEditor != null && !remoteActiveEditor.getPath().equals(filePath)) {
+
+            follow(null);
+            notifyStopped(reason);
+          }
         }
 
         @Override
         public void editorClosed(User user, SPath filePath) {
           if (!user.equals(localUser) || !isFollowing()) return;
 
-          stopIfDiverted(filePath, Reason.FOLLOWER_CLOSED_EDITOR);
-        }
+          Reason reason = Reason.FOLLOWER_CLOSED_EDITOR;
 
-        private void stopIfDiverted(SPath filePath, Reason reason) {
           EditorState remoteActiveEditor = followeeEditor();
 
-          if (remoteActiveEditor != null && !remoteActiveEditor.getPath().equals(filePath)) {
+          if (remoteActiveEditor != null && remoteActiveEditor.getPath().equals(filePath)) {
 
             follow(null);
             notifyStopped(reason);
