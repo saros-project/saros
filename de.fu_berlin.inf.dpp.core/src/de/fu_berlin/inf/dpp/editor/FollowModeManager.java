@@ -66,16 +66,6 @@ public class FollowModeManager implements Startable {
         public void editorActivated(User user, SPath filePath) {
           if (!user.equals(localUser) || !isFollowing()) return;
 
-          // TODO Find out which of the code below is actually necessary, as
-          // there is also the editorClosed method!
-
-          if (filePath == null) {
-            follow(null);
-            notifyStopped(Reason.FOLLOWER_CLOSED_OR_SWITCHED_EDITOR);
-
-            return;
-          }
-
           Reason reason = Reason.FOLLOWER_CLOSED_OR_SWITCHED_EDITOR;
 
           EditorState remoteActiveEditor = followeeEditor();
