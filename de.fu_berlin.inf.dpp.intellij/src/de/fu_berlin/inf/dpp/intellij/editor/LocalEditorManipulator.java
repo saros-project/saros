@@ -214,7 +214,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    LineRange localViewport = editorAPI.getLocalViewportRange(editor);
+    LineRange localViewport = editorAPI.getLocalViewPortRange(editor);
 
     int localStartLine = localViewport.getStartLine();
     int localEndLine = localViewport.getStartLine() + localViewport.getNumberOfLines();

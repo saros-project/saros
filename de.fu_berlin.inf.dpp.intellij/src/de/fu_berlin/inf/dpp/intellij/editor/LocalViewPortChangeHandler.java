@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.event.VisibleAreaEvent;
 import com.intellij.openapi.editor.event.VisibleAreaListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for viewport changes. */
@@ -49,11 +50,14 @@ class LocalViewPortChangeHandler implements DisableableHandler {
     }
 
     Editor editor = event.getEditor();
+    Rectangle newVisibleRectangle = event.getNewRectangle();
 
     SPath path = editorManager.getEditorPool().getFile(editor.getDocument());
 
+    LineRange newVisibleLineRange = editorAPI.getLocalViewPortRange(editor, newVisibleRectangle);
+
     if (path != null) {
-      editorManager.generateViewport(path, editorAPI.getLocalViewportRange(editor));
+      editorManager.generateViewport(path, newVisibleLineRange);
     }
   }
 
