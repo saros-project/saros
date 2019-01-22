@@ -53,7 +53,8 @@ public class FollowModeManager implements Startable {
           if (!isFollowing()) return;
 
           if (user.equals(currentlyFollowedUser)) {
-            follow(null);
+
+            dropFollowModeState();
             notifyStopped(Reason.FOLLOWEE_LEFT_SESSION);
           }
         }
@@ -72,7 +73,7 @@ public class FollowModeManager implements Startable {
 
           if (remoteActiveEditor != null && !remoteActiveEditor.getPath().equals(filePath)) {
 
-            follow(null);
+            dropFollowModeState();
             notifyStopped(reason);
           }
         }
@@ -87,7 +88,7 @@ public class FollowModeManager implements Startable {
 
           if (remoteActiveEditor != null && remoteActiveEditor.getPath().equals(filePath)) {
 
-            follow(null);
+            dropFollowModeState();
             notifyStopped(reason);
           }
         }
@@ -288,6 +289,16 @@ public class FollowModeManager implements Startable {
     for (IFollowModeListener listener : listeners) {
       listener.startedFollowing(followee);
     }
+  }
+
+  /**
+   * Drops the currently held state of the follow mode, thereby ending the current follow mode.
+   *
+   * <p>This method does not notify the listener about the end of the follow mode. Notifying the
+   * listener using the correct reason is the responsibility of the caller.
+   */
+  private void dropFollowModeState() {
+    currentlyFollowedUser = null;
   }
 
   /* Helper */
