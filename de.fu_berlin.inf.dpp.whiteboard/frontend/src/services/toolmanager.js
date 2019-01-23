@@ -6,9 +6,9 @@ import Selection from '../tools/selection';
 import FreeDrawing from '../tools/freedrawing';
 
 /**
- * contatins all the tools that can be found in the tools menu,
- * any tool that is added here should have a mount() and unmount() functions which
- * enables and disables the tool respectively.
+ * contains all the tools that can be found in the tools menu,
+ * any tool that is added here should have a mount() and an unmount()
+ * function which enables and disables the tool respectively.
  */
 export default class ToolManager {
   constructor(viewManager) {
@@ -28,7 +28,7 @@ export default class ToolManager {
 
   /**
    * changes the currently active tool
-   * @param {String} newToolName
+   * @param {string} newToolName
    */
   changeTool(newToolName) {
     if (this.currentTool == newToolName)

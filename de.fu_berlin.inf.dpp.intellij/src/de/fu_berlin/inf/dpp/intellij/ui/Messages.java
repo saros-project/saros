@@ -111,5 +111,16 @@ public class Messages {
   public static String LocalEditorManipulator_incompatible_encoding_title;
   public static String LocalEditorManipulator_incompatible_encoding_message;
 
+  public static String FollowModeNotificationDispatcher_started_following_title;
+  public static String FollowModeNotificationDispatcher_started_following_message;
+  public static String FollowModeNotificationDispatcher_stopped_following_title;
+  public static String FollowModeNotificationDispatcher_stopped_following_message;
+  public static String FollowModeNotificationDispatcher_end_reason_FOLLOWEE_LEFT_SESSION;
+  public static String
+      FollowModeNotificationDispatcher_end_reason_FOLLOWER_CLOSED_OR_SWITCHED_EDITOR;
+  public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_CLOSED_EDITOR;
+  public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_STOPPED;
+  public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_SWITCHES_FOLLOWEE;
+
   private Messages() {}
 }

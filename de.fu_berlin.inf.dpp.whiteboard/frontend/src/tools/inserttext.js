@@ -13,7 +13,7 @@ export default class InsertText {
   constructor(viewManager) {
     this.canvas = viewManager.getCanvas();
     this.insertHandler = (event) => {
-      //convert mouse coordinates on the page to coordianates on the canvas
+      //convert mouse coordinates on the page to coordinates on the canvas
       let pointer = this.canvas.getPointer(event.e);
       let x = pointer.x;
       let y = pointer.y;
