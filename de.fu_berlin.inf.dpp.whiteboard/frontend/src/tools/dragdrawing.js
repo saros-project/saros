@@ -24,7 +24,7 @@ export default class DragDrawing extends MouseDownMoveUpListeners {
     let startX, startY, shape, hasMoved;
     super(canvas, {
       onMouseDown: (event) => {
-        //convert mouse coordinates on the page to coordianates on the canvas
+        //convert mouse coordinates on the page to coordinates on the canvas
         let pointer = canvas.getPointer(event.e);
         //save start coordinates
         startX = pointer.x;
@@ -37,7 +37,7 @@ export default class DragDrawing extends MouseDownMoveUpListeners {
       onMouseMove: (event) => {
         hasMoved = true;
         let pointer = canvas.getPointer(event.e);
-        // give paramters to the view which then will be resized as needed
+        // give parameters to the view which then will be resized as needed
         shape.$update(startX, startY, pointer.x, pointer.y);
         canvas.renderAll();
       },
