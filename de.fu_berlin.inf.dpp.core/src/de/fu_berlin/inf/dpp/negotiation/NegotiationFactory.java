@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.negotiation;
 import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -130,7 +129,7 @@ public final class NegotiationFactory {
   public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
       final JID remoteAddress,
       final TransferType transferType,
-      final List<IProject> resources,
+      final ProjectSharingData projectSharingData,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
@@ -142,7 +141,7 @@ public final class NegotiationFactory {
       case ARCHIVE:
         return new ArchiveOutgoingProjectNegotiation(
             remoteAddress,
-            resources,
+            projectSharingData,
             sessionManager,
             session, /* editorManager */
             context.getComponent(IEditorManager.class),
@@ -154,7 +153,7 @@ public final class NegotiationFactory {
       case INSTANT:
         return new InstantOutgoingProjectNegotiation(
             remoteAddress,
-            resources,
+            projectSharingData,
             sessionManager,
             session, /* editorManager */
             context.getComponent(IEditorManager.class),

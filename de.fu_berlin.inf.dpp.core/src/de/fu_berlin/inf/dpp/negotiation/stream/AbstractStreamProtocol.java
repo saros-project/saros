@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.negotiation.stream;
 
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Stream consists of infinite Stream entries. Stream end is signaled by empty <em>projectID</em>.
@@ -54,11 +53,9 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  */
 abstract class AbstractStreamProtocol {
 
-  ISarosSession session;
   IProgressMonitor monitor;
 
-  public AbstractStreamProtocol(ISarosSession session, IProgressMonitor monitor) {
-    this.session = session;
+  public AbstractStreamProtocol(IProgressMonitor monitor) {
     this.monitor = monitor;
   }
 

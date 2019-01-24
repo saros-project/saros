@@ -423,11 +423,18 @@ public final class SarosSession implements ISarosSession {
 
     log.info("user " + user + " started queuing projects and can receive IResourceActivities");
 
-    /**
-     * Updates the projects for the given user, so that host knows that he can now send ever
-     * Activity
-     */
-    projectMapper.addMissingProjectsToUser(user);
+    if (isHost()) {
+      /*
+       * Notify the system that the user's client now knows about all
+       * currently shared projects and can handle (process or queue)
+       * activities related to them.
+       *
+       * Only the host needs this information because non-hosts don't have
+       * to decide whom to send activities to - they just send them to the
+       * host, who decides for them.
+       */
+      projectMapper.addMissingProjectsToUser(user);
+    }
 
     synchronizer.syncExec(
         ThreadUtils.wrapSafe(

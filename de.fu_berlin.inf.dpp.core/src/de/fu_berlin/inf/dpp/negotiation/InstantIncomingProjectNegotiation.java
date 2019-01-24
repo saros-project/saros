@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
@@ -63,30 +61,6 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
   protected void transfer(
       IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
-
-    awaitActivityQueueingActivation(monitor);
-
-    /*
-     * the user who sends this ProjectNegotiation is now responsible for the
-     * resources of the contained projects
-     */
-    for (Entry<String, IProject> entry : projectMapping.entrySet()) {
-      final String projectID = entry.getKey();
-      final IProject project = entry.getValue();
-
-      session.addProjectMapping(projectID, project);
-      /* TODO change queuing to resource based queuing */
-      session.enableQueuing(project);
-    }
-
-    transmitter.send(
-        ISarosSession.SESSION_CONNECTION_ID,
-        getPeer(), //
-        StartActivityQueuingResponse.PROVIDER //
-            .create( //
-            new StartActivityQueuingResponse(getSessionID(), getID())));
-
-    checkCancellation(CancelOption.NOTIFY_PEER);
 
     /* only get files, if something is missing */
     int filesMissing = 0;

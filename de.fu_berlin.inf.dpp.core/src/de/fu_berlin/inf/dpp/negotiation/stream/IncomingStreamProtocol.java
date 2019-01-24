@@ -19,9 +19,11 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol {
   private static final Logger log = Logger.getLogger(IncomingStreamProtocol.class);
 
   private DataInputStream in;
+  private ISarosSession session;
 
   public IncomingStreamProtocol(InputStream in, ISarosSession session, IProgressMonitor monitor) {
-    super(session, monitor);
+    super(monitor);
+    this.session = session;
     this.in = new DataInputStream(in);
   }
 
