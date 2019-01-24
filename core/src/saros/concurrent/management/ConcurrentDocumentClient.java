@@ -188,4 +188,9 @@ public class ConcurrentDocumentClient {
       return false;
     }
   }
+
+  // Package-private function for HeartbeatDispatcher
+  JupiterClient getJupiterClient() {
+    return jupiterClient;
+  }
 }
