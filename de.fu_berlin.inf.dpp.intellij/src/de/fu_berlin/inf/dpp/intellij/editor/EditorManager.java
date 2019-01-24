@@ -245,9 +245,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void resourcesAdded(final IProject project) {
-          ApplicationManager.getApplication()
-              .invokeAndWait(
-                  () -> addProjectResources(project), ModalityState.defaultModalityState());
+          executeInUIThreadSynchronous(() -> addProjectResources(project));
         }
 
         /**
@@ -512,7 +510,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     localClosedEditorModificationHandler =
         new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
     localEditorStatusChangeHandler =
-        new LocalEditorStatusChangeHandler(this, project, localEditorHandler, annotationManager);
+        new LocalEditorStatusChangeHandler(
+            this,
+            project,
+            projectAPI,
+            localEditorHandler,
+            localEditorManipulator,
+            annotationManager);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
     localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
@@ -840,8 +844,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   /**
    * {@inheritDoc}
    *
-   * <p>Only adjusts the viewport if there currently is an open editor for the given path (meaning
-   * such an editor is contained in the editor pool).
+   * <p>Only adjusts the viewport directly if the editor for the path is currently open. Otherwise,
+   * the viewport adjustment will be queued until the editor is selected/opened the next time, at
+   * which point the viewport will be adjusted. If multiple adjustment requests are done while the
+   * editor is not currently visible, only the last one will be applied to the editor once it is
+   * selected/opened.
    *
    * @param path {@inheritDoc}
    * @param range {@inheritDoc}
@@ -852,21 +859,46 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public void adjustViewport(
       @NotNull final SPath path, final LineRange range, final TextSelection selection) {
 
+    Set<String> visibleFilePaths = new HashSet<>();
+
+    for (VirtualFile virtualFile : projectAPI.getSelectedFiles()) {
+      visibleFilePaths.add(virtualFile.getPath());
+    }
+
+    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(path);
+
+    if (passedFile == null) {
+      LOG.warn(
+          "Ignoring request to adjust viewport as no valid VirtualFile could be found for "
+              + path
+              + " - given range: "
+              + range
+              + ", given selection: "
+              + selection);
+
+      return;
+    }
+
+    Editor editor = editorPool.getEditor(path);
+
+    if (!visibleFilePaths.contains(passedFile.getPath())) {
+      localEditorStatusChangeHandler.queueViewPortChange(
+          passedFile.getPath(), editor, range, selection);
+
+      return;
+    }
+
+    if (editor == null) {
+      LOG.warn(
+          "Failed to adjust viewport for "
+              + path
+              + " as it is not known to the editor pool even though it is currently open");
+
+      return;
+    }
+
     executeInUIThreadSynchronous(
-        () -> {
-          Editor editor = editorPool.getEditor(path);
-
-          if (editor == null) {
-            LOG.warn(
-                "Failed to adjust viewport for "
-                    + path
-                    + " as it is not known to the editor pool.");
-
-            return;
-          }
-
-          localEditorManipulator.adjustViewport(editor, range, selection);
-        });
+        () -> localEditorManipulator.adjustViewport(editor, range, selection));
   }
 
   /**

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.editor;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
@@ -8,22 +9,34 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** Dispatches activities for editor changes. */
 class LocalEditorStatusChangeHandler implements DisableableHandler {
 
+  private static final Logger log = Logger.getLogger(LocalEditorStatusChangeHandler.class);
+
   private final EditorManager editorManager;
   private final Project project;
+  private final ProjectAPI projectAPI;
   private final LocalEditorHandler localEditorHandler;
+  private final LocalEditorManipulator localEditorManipulator;
   private final AnnotationManager annotationManager;
 
   private MessageBusConnection messageBusConnection;
   private boolean enabled;
+
+  private final Map<String, QueuedViewPortChange> queuedViewPortChanges;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -42,6 +55,8 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
         @Override
         public void selectionChanged(@NotNull FileEditorManagerEvent event) {
           generateEditorActivatedActivity(event);
+
+          applyQueuedViewportChanges(event.getNewFile());
         }
       };
 
@@ -67,19 +82,28 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
    * Instantiates a LocalEditorStatusChangeHandler object. The handler is enabled by default.
    *
    * @param editorManager the EditorManager instance
+   * @param project the current IntelliJ Project instance
+   * @param projectAPI the ProjectAPI instance
    * @param localEditorHandler the LocalEditorHandler instance
+   * @param localEditorManipulator the LocalEditorManipulator instance
    * @param annotationManager the AnnotationManager instance
    */
   LocalEditorStatusChangeHandler(
       EditorManager editorManager,
       Project project,
+      ProjectAPI projectAPI,
       LocalEditorHandler localEditorHandler,
+      LocalEditorManipulator localEditorManipulator,
       AnnotationManager annotationManager) {
 
     this.editorManager = editorManager;
     this.project = project;
+    this.projectAPI = projectAPI;
     this.localEditorHandler = localEditorHandler;
+    this.localEditorManipulator = localEditorManipulator;
     this.annotationManager = annotationManager;
+
+    this.queuedViewPortChanges = new HashMap<>();
 
     subscribe();
     this.enabled = true;
@@ -136,6 +160,40 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
     assert enabled : "the file closed listener was triggered while it was disabled";
 
     localEditorHandler.closeEditor(virtualFile);
+  }
+
+  /**
+   * Applies any queued viewport changes to the editor representing the given virtual file. Does
+   * nothing if the given file is null or if there are no queued viewport changes.
+   *
+   * @param virtualFile the file whose editor viewport to adjust
+   */
+  private void applyQueuedViewportChanges(@Nullable VirtualFile virtualFile) {
+    if (virtualFile == null) {
+      return;
+    }
+
+    QueuedViewPortChange queuedViewPortChange = queuedViewPortChanges.remove(virtualFile.getPath());
+
+    if (queuedViewPortChange == null) {
+      return;
+    }
+
+    LineRange range = queuedViewPortChange.getRange();
+    TextSelection selection = queuedViewPortChange.getSelection();
+    Editor queuedEditor = queuedViewPortChange.getEditor();
+
+    Editor editor;
+
+    if (queuedEditor != null && !queuedEditor.isDisposed()) {
+      editor = queuedEditor;
+
+    } else {
+      editor = projectAPI.openEditor(virtualFile, false);
+    }
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(() -> localEditorManipulator.adjustViewport(editor, range, selection));
   }
 
   /**
@@ -204,6 +262,57 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
       subscribe();
 
       this.enabled = true;
+    }
+  }
+
+  /**
+   * Queues a viewport adjustment for the given path using the given range and selection as
+   * parameters for the viewport adjustment. If an editor is given, it will be used for the viewport
+   * adjustment.
+   *
+   * @param path the path of the editor
+   * @param editor the editor to queue a viewport adjustment for
+   * @param range the line range used for the viewport adjustment
+   * @param selection the text selection used for the viewport adjustment
+   */
+  void queueViewPortChange(
+      @NotNull String path,
+      @Nullable Editor editor,
+      @Nullable LineRange range,
+      @Nullable TextSelection selection) {
+
+    QueuedViewPortChange requestedViewportChange =
+        new QueuedViewPortChange(editor, range, selection);
+
+    queuedViewPortChanges.put(path, requestedViewportChange);
+  }
+
+  /** Data storage class for queued viewport changes. */
+  private class QueuedViewPortChange {
+    private final Editor editor;
+    private final LineRange range;
+    private final TextSelection selection;
+
+    QueuedViewPortChange(
+        @Nullable Editor editor, @Nullable LineRange range, @Nullable TextSelection selection) {
+      this.editor = editor;
+      this.range = range;
+      this.selection = selection;
+    }
+
+    @Nullable
+    Editor getEditor() {
+      return editor;
+    }
+
+    @Nullable
+    LineRange getRange() {
+      return range;
+    }
+
+    @Nullable
+    TextSelection getSelection() {
+      return selection;
     }
   }
 }
