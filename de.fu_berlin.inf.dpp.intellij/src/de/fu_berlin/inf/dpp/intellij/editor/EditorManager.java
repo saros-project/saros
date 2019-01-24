@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -261,13 +262,19 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         private void sendAwarenessInformation() {
           User localUser = session.getLocalUser();
 
+          Set<String> visibleFilePaths = new HashSet<>();
+
+          for (VirtualFile virtualFile : projectAPI.getSelectedFiles()) {
+            visibleFilePaths.add(virtualFile.getPath());
+          }
+
           editorPool
               .getMapping()
               .forEach(
                   (path, editor) -> {
                     sendEditorOpenInformation(localUser, path);
 
-                    sendViewPortInformation(localUser, path, editor);
+                    sendViewPortInformation(localUser, path, editor, visibleFilePaths);
 
                     sendSelectionInformation(localUser, path, editor);
                   });
@@ -292,8 +299,39 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           fireActivity(activateEditor);
         }
 
+        /**
+         * Sends the viewport information for the given editor if it is currently visible.
+         *
+         * @param user the local user
+         * @param path the path of the editor
+         * @param editor the editor to send the viewport for
+         * @param visibleFilePaths the paths of all currently visible editors
+         */
         private void sendViewPortInformation(
-            @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
+            @NotNull User user,
+            @NotNull SPath path,
+            @NotNull Editor editor,
+            @NotNull Set<String> visibleFilePaths) {
+
+          VirtualFile fileForEditor =
+              FileDocumentManager.getInstance().getFile(editor.getDocument());
+
+          if (fileForEditor == null) {
+            LOG.warn(
+                "Encountered editor without valid virtual file representation - path held in editor pool: "
+                    + path);
+
+            return;
+          }
+
+          if (!visibleFilePaths.contains(fileForEditor.getPath())) {
+            LOG.debug(
+                "Ignoring "
+                    + path
+                    + " while sending viewport awareness information as the editor is not currently visible.");
+
+            return;
+          }
 
           LineRange localViewPort = editorAPI.getLocalViewPortRange(editor);
           int viewPortStartLine = localViewPort.getStartLine();
