@@ -64,9 +64,7 @@ public class StartSessionWithContacts extends ContributionItem {
 
   /** Returns a sorted iterator of xmpp contacts. */
   private Iterator<XMPPContact> getSortedContacts() {
-    return contactsService
-        .getAllContacts()
-        .stream()
+    return contactsService.getAllContacts().stream()
         .sorted(Comparator.comparing(XMPPContact::getDisplayableName))
         .iterator();
   }

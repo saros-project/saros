@@ -189,9 +189,7 @@ public class ModuleConfigurationInitializer implements Startable {
       }
 
       Set<String> localRoots =
-          contentEntry
-              .getSourceFolders(type)
-              .stream()
+          contentEntry.getSourceFolders(type).stream()
               .map(sourceFolder -> ModuleUtils.getRelativeRootPath(basePath, sourceFolder))
               .filter(Objects::nonNull)
               .map(Path::toString)

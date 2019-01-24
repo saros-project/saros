@@ -245,8 +245,7 @@ public final class XMPPAccountStore {
    * @return
    */
   public synchronized List<XMPPAccount> getAllAccounts() {
-    return accounts
-        .stream()
+    return accounts.stream()
         .sorted(XMPPAccountStore::compare)
         .collect(Collectors.toCollection(ArrayList::new));
   }
@@ -542,8 +541,7 @@ public final class XMPPAccountStore {
    */
   public synchronized boolean existsAccount(
       String username, String domain, String server, int port) {
-    return getAllAccounts()
-        .stream()
+    return getAllAccounts().stream()
         .anyMatch(a -> matchesAccount(a, username, domain, server, port));
   }
 
@@ -558,8 +556,7 @@ public final class XMPPAccountStore {
    * @return the account or <code>null</code> if the account does not exist
    */
   public XMPPAccount getAccount(final String username, final String domain) {
-    return getAllAccounts()
-        .stream()
+    return getAllAccounts().stream()
         .filter(a -> matchesAnyServer(a, username, domain))
         .findFirst()
         .orElse(null);
@@ -576,8 +573,7 @@ public final class XMPPAccountStore {
    */
   public XMPPAccount getAccount(
       final String username, final String domain, final String server, final int port) {
-    return getAllAccounts()
-        .stream()
+    return getAllAccounts().stream()
         .filter(a -> matchesAccount(a, username, domain, server, port))
         .findFirst()
         .orElse(null);

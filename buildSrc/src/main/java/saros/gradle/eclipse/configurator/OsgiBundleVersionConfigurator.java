@@ -38,8 +38,7 @@ public class OsgiBundleVersionConfigurator {
       Charset charset = StandardCharsets.UTF_8;
       List<String> oldContentLines = Files.readAllLines(path, charset);
       String newContent =
-          oldContentLines
-              .stream()
+          oldContentLines.stream()
               .map(line -> line.replaceAll(regex, replacement))
               .collect(Collectors.joining("\n"));
       Files.write(path, newContent.getBytes(charset));

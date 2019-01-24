@@ -7,7 +7,7 @@ formatter_jar_name=formatter.jar
 
 function download_formatter() {
   local jar_name=$1
-  local url="https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.6/google-java-format-1.6-all-deps.jar"
+  local url="https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.7/google-java-format-1.7-all-deps.jar"
   echo "Downloading formatter from $url"
   curl -Lo "$jar_name" "$url"
 }

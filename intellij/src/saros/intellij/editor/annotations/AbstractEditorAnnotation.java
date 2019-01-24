@@ -150,8 +150,7 @@ abstract class AbstractEditorAnnotation {
    */
   boolean hasLocalRepresentation() {
     return editor != null
-        && annotationRanges
-            .stream()
+        && annotationRanges.stream()
             .noneMatch(annotationRange -> annotationRange.getRangeHighlighter() == null);
   }
 

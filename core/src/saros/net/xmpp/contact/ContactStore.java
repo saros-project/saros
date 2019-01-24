@@ -62,9 +62,7 @@ class ContactStore {
    * @return list of all known {@link XMPPContact XMPPContacts}
    */
   List<XMPPContact> getAll() {
-    return contactsGrouped
-        .values()
-        .stream()
+    return contactsGrouped.values().stream()
         .flatMap(map -> map.values().stream())
         .distinct()
         .collect(Collectors.toList());
@@ -76,9 +74,7 @@ class ContactStore {
    * @return list of all groups as {@link XMPPContactGroup}
    */
   List<XMPPContactGroup> getGroupsList() {
-    return contactsGrouped
-        .entrySet()
-        .stream()
+    return contactsGrouped.entrySet().stream()
         .filter(group -> !group.getKey().equals(NO_GROUP))
         .map(group -> new XMPPContactGroup(group.getKey(), group.getValue().values()))
         .collect(Collectors.toList());
@@ -183,9 +179,7 @@ class ContactStore {
     String jid = GET_BAREJID_STRING.apply(contact);
 
     long removed =
-        contactsGrouped
-            .entrySet()
-            .stream()
+        contactsGrouped.entrySet().stream()
             .filter(entry -> !exclude.contains(entry.getKey()))
             .map(entry -> Optional.ofNullable(entry.getValue().remove(jid)))
             .filter(Optional::isPresent)

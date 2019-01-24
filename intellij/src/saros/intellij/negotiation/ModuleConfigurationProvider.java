@@ -151,8 +151,7 @@ public class ModuleConfigurationProvider implements ProjectDataProvider {
       return null;
     }
 
-    return sourceFolders
-        .stream()
+    return sourceFolders.stream()
         .map(sourceFolder -> ModuleUtils.getRelativeRootPath(basePath, sourceFolder))
         .filter(Objects::nonNull)
         .map(Path::toString)
