@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.server.filesystem;
 
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.ReferencePointImpl;
 import java.io.File;
 import java.util.HashMap;
 
@@ -10,6 +12,12 @@ public class ServerReferencePointManager {
 
   public ServerReferencePointManager() {
     referencePointToFileMapper = new HashMap<IReferencePoint, File>();
+  }
+
+  public static IReferencePoint create(IWorkspace workspace) {
+    IPath serverWorkspacePath = workspace.getLocation();
+
+    return new ReferencePointImpl(serverWorkspacePath);
   }
 
   /**
