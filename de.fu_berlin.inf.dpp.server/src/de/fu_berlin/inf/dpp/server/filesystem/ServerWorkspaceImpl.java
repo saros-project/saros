@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.server.filesystem;
 
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -29,8 +30,9 @@ public class ServerWorkspaceImpl implements IWorkspace {
   }
 
   @Override
-  public IProject getProject(String name) {
-    return new ServerProjectImpl(this, name);
+  public IFolder getReferenceFolder(String name) {
+    return new ServerFolderImplV2(
+        getLocation().append(name), ServerPathImpl.fromString(new String()));
   }
 
   @Override
@@ -56,6 +58,6 @@ public class ServerWorkspaceImpl implements IWorkspace {
 
   @Override
   public IReferencePoint getReferencePoint(String projectName) {
-    return getProject(projectName).getReferencePoint();
+    return ServerReferencePointManager.create(this);
   }
 }
