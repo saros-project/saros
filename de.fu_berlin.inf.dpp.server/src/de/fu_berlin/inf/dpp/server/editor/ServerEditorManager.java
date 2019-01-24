@@ -10,9 +10,11 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerFileImpl;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerFileImplV2;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerPathFactoryImpl;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerReferencePointManager;
 import de.fu_berlin.inf.dpp.session.User;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.Collections;
@@ -23,7 +25,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
 
 /** Server implementation of the {@link IEditorManager} interface */
 public class ServerEditorManager implements IEditorManager {
@@ -32,7 +33,11 @@ public class ServerEditorManager implements IEditorManager {
 
   private Map<SPath, Editor> openEditors = Collections.synchronizedMap(new LRUMap(10));
   private List<ISharedEditorListener> listeners = new CopyOnWriteArrayList<>();
-  @Inject private IWorkspace workspace;
+  private final ServerReferencePointManager serverReferencePointManager;
+
+  public ServerEditorManager(ServerReferencePointManager serverReferencePointManager) {
+    this.serverReferencePointManager = serverReferencePointManager;
+  }
 
   @Override
   public void openEditor(SPath path, boolean activate) {
@@ -95,9 +100,8 @@ public class ServerEditorManager implements IEditorManager {
   private Editor getOrCreateEditor(SPath path) throws IOException {
     Editor editor = openEditors.get(path);
     if (editor == null) {
-      IPath referencePointRelativePath = path.getReferencePointRelativePath();
+      IResource resource = getFile(path);
 
-      IResource resource = new ServerFileImpl(workspace, referencePointRelativePath);
       if (resource == null || !resource.exists()) {
         throw new NoSuchFileException(path.toString());
       }
@@ -166,5 +170,17 @@ public class ServerEditorManager implements IEditorManager {
         closeEditor(path);
       }
     }
+  }
+
+  private IFile getFile(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
+    IPath referencePointRelativePath = path.getReferencePointRelativePath();
+
+    File file = serverReferencePointManager.get(referencePoint);
+    ServerPathFactoryImpl pathFactory = new ServerPathFactoryImpl();
+
+    IPath referencePointPath = pathFactory.fromString(file.getPath());
+
+    return new ServerFileImplV2(referencePointPath, referencePointRelativePath);
   }
 }

@@ -1,9 +1,12 @@
 package de.fu_berlin.inf.dpp.server.console;
 
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerProjectImpl;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerFolderImplV2;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerPathImpl;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerReferencePointManager;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -17,11 +20,16 @@ public class ShareCommand extends ConsoleCommand {
   private static final Logger log = Logger.getLogger(ShareCommand.class);
   private final ISarosSessionManager sessionManager;
   private final IWorkspace workspace;
+  private final ServerReferencePointManager serverReferencePointManager;
 
   public ShareCommand(
-      ISarosSessionManager sessionManager, IWorkspace workspace, ServerConsole console) {
+      ISarosSessionManager sessionManager,
+      IWorkspace workspace,
+      ServerReferencePointManager serverReferencePointManager,
+      ServerConsole console) {
     this.sessionManager = sessionManager;
     this.workspace = workspace;
+    this.serverReferencePointManager = serverReferencePointManager;
     console.registerCommand(this);
   }
 
@@ -50,9 +58,11 @@ public class ShareCommand extends ConsoleCommand {
           session.getComponent(IReferencePointManager.class);
       for (String path : args) {
         try {
-          IProject project = new ServerProjectImpl(this.workspace, path);
-          IReferencePoint referencePoint = project.getReferencePoint();
-          referencePointManager.put(referencePoint, project);
+          IFolder sourceFolder =
+              new ServerFolderImplV2(this.workspace.getLocation(), ServerPathImpl.fromString(path));
+          IReferencePoint referencePoint = ServerReferencePointManager.create(workspace);
+          referencePointManager.put(referencePoint, sourceFolder);
+          serverReferencePointManager.put(referencePoint, this.workspace.getLocation().toFile());
           referencePoints.put(referencePoint, null);
         } catch (Exception e) {
           log.error(path + " could not be added to the session", e);

@@ -4,13 +4,16 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.server.editor.ServerEditorManager;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerFileImpl;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerWorkspaceImpl;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerFileImplV2;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerPathFactoryImpl;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerReferencePointManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
@@ -22,7 +25,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
 
   private final ISarosSession session;
   private final ServerEditorManager editorManager;
-  private final ServerWorkspaceImpl workspace;
+  private final ServerReferencePointManager serverReferencePointManager;
 
   /**
    * Creates a FileActivityExecutor.
@@ -31,11 +34,13 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
    * @param editorManager the editor manager to update the file mapping on a file move
    */
   public FileActivityExecutor(
-      ISarosSession session, ServerEditorManager editorManager, ServerWorkspaceImpl workspace) {
+      ISarosSession session,
+      ServerEditorManager editorManager,
+      ServerReferencePointManager serverReferencePointManager) {
 
     this.session = session;
     this.editorManager = editorManager;
-    this.workspace = workspace;
+    this.serverReferencePointManager = serverReferencePointManager;
   }
 
   @Override
@@ -97,8 +102,14 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
   }
 
   private IFile getFile(SPath path) {
+    IReferencePoint referencePoint = path.getReferencePoint();
     IPath referencePointRelativePath = path.getReferencePointRelativePath();
 
-    return new ServerFileImpl(workspace, referencePointRelativePath);
+    File file = serverReferencePointManager.get(referencePoint);
+    ServerPathFactoryImpl pathFactory = new ServerPathFactoryImpl();
+
+    IPath referencePointPath = pathFactory.fromString(file.getPath());
+
+    return new ServerFileImplV2(referencePointPath, referencePointRelativePath);
   }
 }
