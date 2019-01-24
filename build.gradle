@@ -57,10 +57,17 @@ configure(projectsToConfigure) { project ->
   apply plugin: 'jacoco' // code coverage tool
 
   repositories {
-    // required for ui build
-    maven { url 'https://maven.atlassian.com/3rdparty/' }
+    // general purpose repository
     mavenCentral()
-    maven { url 'http://maven-eclipse.github.io/maven' }
+    // repositories for specific artifacts
+    maven {
+      url 'https://maven.atlassian.com/3rdparty/'
+      content { includeGroup 'org.igniterealtime.smack' }
+    }
+    maven {
+      url 'http://maven-eclipse.github.io/maven'
+      content { includeGroup 'org.eclipse.swt' }
+    }
   }
 
   configurations {
