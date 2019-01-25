@@ -59,5 +59,3 @@ docs/_site
 docs/Gemfile.lock
 /.gradle/
 /build/
-
-.metadata/
