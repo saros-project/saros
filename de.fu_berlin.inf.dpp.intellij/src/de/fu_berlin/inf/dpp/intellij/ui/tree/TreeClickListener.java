@@ -12,9 +12,6 @@ import org.picocontainer.annotations.Inject;
 
 /** Tree click listener for showing {@link ContactPopMenu} or {@link SessionPopMenu}. */
 public class TreeClickListener extends MouseAdapter {
-  private static final boolean ENABLE_FOLLOW_MODE =
-      Boolean.getBoolean("saros.intellij.ENABLE_FOLLOW_MODE");
-
   private JTree tree;
 
   @Inject private ISarosSessionManager sessionManager;
@@ -53,18 +50,15 @@ public class TreeClickListener extends MouseAdapter {
           ContactPopMenu menu = new ContactPopMenu(contactInfo);
           menu.show(e.getComponent(), e.getX(), e.getY());
         }
+
       } else if (node.getUserObject() instanceof SessionTreeRootNode.UserInfo) {
-
-        if (!ENABLE_FOLLOW_MODE) {
-          return;
-        }
-
         SessionTreeRootNode.UserInfo userInfo = (SessionTreeRootNode.UserInfo) node.getUserObject();
         User user = userInfo.getUser();
         if (!user.equals(sessionManager.getSession().getLocalUser())) {
           SessionPopMenu menu = new SessionPopMenu(user);
           menu.show(e.getComponent(), e.getX(), e.getY());
         }
+
       } else if (node.getUserObject() instanceof SessionTreeRootNode.SessionInfo) {
 
         // TODO implement behavior when clicking on session entry
