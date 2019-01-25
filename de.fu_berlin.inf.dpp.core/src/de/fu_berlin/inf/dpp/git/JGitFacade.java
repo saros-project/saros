@@ -1,15 +1,14 @@
 package de.fu_berlin.inf.dpp.git;
 
-import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.Ref;
-import javax.swing.ProgressMonitor;
 import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteRemoveCommand;
+import org.eclipse.jgit.lib.NullProgressMonitor;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -36,8 +35,8 @@ public class JGitFacade {
       throws IllegalArgumentException, IOException {
 
     // The method can be divided into 4 Steps. After the first, second and third step the
-    // bundlewriter object is expanded with the parameters. The last step exists to write the bundle
-    // file.
+    // bundlewriter object is expanded with the parameters. The last step exists to write the
+    // bundle file.
 
     // Step 1
     Git git;
@@ -76,7 +75,7 @@ public class JGitFacade {
       bundle = File.createTempFile("file", ".bundle");
       OutputStream fos = new FileOutputStream(bundle);
 
-      ProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+      NullProgressMonitor monitor = NullProgressMonitor.INSTANCE;
 
       bundlewriter.writeBundle(monitor, fos);
     } catch (Exception e) {
@@ -138,7 +137,6 @@ public class JGitFacade {
       throw new Exception("failed to clone", e);
     }
   }
-
   /**
    * @param workDir The directory that contains the .git directory
    * @return The URL to access/address directly the .git directory

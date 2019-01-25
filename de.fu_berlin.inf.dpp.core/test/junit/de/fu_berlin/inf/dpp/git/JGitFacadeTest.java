@@ -32,7 +32,6 @@ public class JGitFacadeTest {
     initNewRepo(localWorkDir);
     writeCommitToRepo(localWorkDir, 2);
   }
-
   // lucky paths
   @Test
   public void testCreateBundleHEAD() throws IllegalArgumentException, IOException {
@@ -68,7 +67,6 @@ public class JGitFacadeTest {
         getObjectIdByRevisionString(localWorkDir, "HEAD"),
         getObjectIdByRevisionString(remoteWorkDir, "FETCH_HEAD"));
   }
-
   // handling exceptions
   @Test(expected = IllegalArgumentException.class)
   public void testCreateBundleEmptyWorkDir() throws IllegalArgumentException, IOException {
