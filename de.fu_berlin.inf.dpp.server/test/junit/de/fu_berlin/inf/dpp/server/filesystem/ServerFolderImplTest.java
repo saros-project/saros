@@ -35,7 +35,7 @@ public class ServerFolderImplTest extends EasyMockSupport {
 
     replayAll();
 
-    folder = new ServerFolderImpl(workspace, path(FOLDER_PATH));
+    folder = new ServerFolderImplV2(workspace.getLocation(), path(FOLDER_PATH));
   }
 
   @After

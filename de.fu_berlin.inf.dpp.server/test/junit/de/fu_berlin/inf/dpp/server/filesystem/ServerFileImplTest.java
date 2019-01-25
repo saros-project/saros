@@ -13,6 +13,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import java.io.IOException;
@@ -31,20 +32,21 @@ public class ServerFileImplTest extends EasyMockSupport {
 
   private IFile file;
   private IWorkspace workspace;
-  private IProject project;
+  private IFolder project;
+  private String Project = "PROJECT";
 
   @Before
   public void setUp() throws Exception {
     workspace = createMock(IWorkspace.class);
-    project = createMock(IProject.class);
+    project = createMock(IFolder.class);
 
     expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
 
-    expect(workspace.getProject("project")).andStubReturn(project);
+    expect(workspace.getReferenceFolder(Project)).andStubReturn(project);
     expect(project.getDefaultCharset()).andStubReturn("UTF-8");
 
     replayAll();
-    file = new ServerFileImpl(workspace, path("project/file"));
+    file = new ServerFileImplV2(workspace.getLocation().append("project"), path("file"));
   }
 
   @After
@@ -64,7 +66,7 @@ public class ServerFileImplTest extends EasyMockSupport {
 
   @Test
   public void getCharsetIfExplicitlySet() throws Exception {
-    ((ServerFileImpl) file).setCharset("ISO-8859-1");
+    ((ServerFileImplV2) file).setCharset("ISO-8859-1");
     assertEquals("ISO-8859-1", file.getCharset());
   }
 

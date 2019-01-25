@@ -5,9 +5,9 @@ import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createF
 import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -43,9 +43,8 @@ public class ServerWorkspaceImplTest extends EasyMockSupport {
 
   @Test
   public void getProject() {
-    IProject project = workspace.getProject("project");
+    IFolder project = workspace.getReferenceFolder("project");
     assertEquals("project", project.getName());
-    assertSame(workspace, ((ServerProjectImpl) project).getWorkspace());
   }
 
   @Test
@@ -58,10 +57,9 @@ public class ServerWorkspaceImplTest extends EasyMockSupport {
           public void run(IProgressMonitor monitor) throws IOException, OperationCanceledException {
 
             assertNotNull(monitor);
-            workspace.getProject("project").delete(IResource.NONE);
+            workspace.getReferenceFolder("project").delete(IResource.NONE);
           }
         });
-
     assertResourceNotExists(workspace, "project");
   }
 }
