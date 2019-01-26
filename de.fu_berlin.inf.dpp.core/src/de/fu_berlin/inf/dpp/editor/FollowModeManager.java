@@ -42,8 +42,7 @@ public class FollowModeManager implements Startable {
   private User localUser;
   private User currentlyFollowedUser;
 
-  private final CopyOnWriteArrayList<IFollowModeListener> listeners =
-      new CopyOnWriteArrayList<IFollowModeListener>();
+  private final CopyOnWriteArrayList<IFollowModeListener> listeners = new CopyOnWriteArrayList<>();
 
   /** If the user left which I am following, then stop following him/her */
   private ISessionListener stopFollowingWhenUserLeaves =
@@ -220,14 +219,15 @@ public class FollowModeManager implements Startable {
 
     currentlyFollowedUser = newFollowedUser;
 
-    if (newFollowedUser != null) {
+    if (newFollowedUser != null && !newFollowedUser.equals(previouslyFollowedUser)) {
       editorManager.jumpToUser(newFollowedUser);
 
       if (previouslyFollowedUser != null) {
         notifyStopped(Reason.FOLLOWER_SWITCHES_FOLLOWEE);
       }
       notifyStarted(newFollowedUser);
-    } else if (previouslyFollowedUser != null) {
+
+    } else if (newFollowedUser == null && previouslyFollowedUser != null) {
       notifyStopped(Reason.FOLLOWER_STOPPED);
     }
   }
