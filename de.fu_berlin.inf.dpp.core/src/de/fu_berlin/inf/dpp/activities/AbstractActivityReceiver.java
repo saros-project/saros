@@ -61,6 +61,21 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
   }
 
   @Override
+  public void receive(GitRequestActivity gitRequestActivity) {
+    // do nothing
+  }
+
+  @Override
+  public void receive(GitCollectActivity gitCollectActivity) {
+    // do nothing
+  }
+
+  @Override
+  public void receive(GitSendBundleActivity gitSendBundleActivity) {
+    // do nothing
+  }
+
+  @Override
   public void receive(JupiterActivity jupiterActivity) {
     // do nothing
   }

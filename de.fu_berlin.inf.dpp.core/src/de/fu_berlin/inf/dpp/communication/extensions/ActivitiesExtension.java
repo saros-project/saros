@@ -30,6 +30,9 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.FolderMovedActivity;
+import de.fu_berlin.inf.dpp.activities.GitCollectActivity;
+import de.fu_berlin.inf.dpp.activities.GitRequestActivity;
+import de.fu_berlin.inf.dpp.activities.GitSendBundleActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
@@ -148,6 +151,9 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
           FolderCreatedActivity.class,
           FolderDeletedActivity.class,
           FolderMovedActivity.class,
+          GitRequestActivity.class,
+          GitCollectActivity.class,
+          GitSendBundleActivity.class,
           JupiterActivity.class,
           NOPActivity.class,
           PermissionActivity.class,
