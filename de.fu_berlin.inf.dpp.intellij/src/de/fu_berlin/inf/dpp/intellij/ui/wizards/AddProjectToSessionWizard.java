@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJModuleImpl;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
@@ -174,7 +174,7 @@ public class AddProjectToSessionWizard extends Wizard {
             }
 
             IFolder sharedProject =
-                new IntelliJProjectImpl(FilesystemUtils.getModuleContentRoot(module));
+                new IntelliJModuleImpl(FilesystemUtils.getModuleContentRoot(module));
 
             localProjects.put(remoteProjectID, sharedProject);
 
@@ -257,7 +257,7 @@ public class AddProjectToSessionWizard extends Wizard {
   /**
    * Creates an empty stub module with the given name in the base directory of the current project.
    *
-   * <p>The created module has the module type {@link IntelliJProjectImpl#RELOAD_STUB_MODULE_TYPE}
+   * <p>The created module has the module type {@link IntelliJModuleImpl#RELOAD_STUB_MODULE_TYPE}
    * which allows us to easily identify it as stub.
    *
    * @param moduleName name of the module
@@ -302,7 +302,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                 Module module =
                     modifiableModuleModel.newModule(
-                        moduleFilePath.toString(), IntelliJProjectImpl.RELOAD_STUB_MODULE_TYPE);
+                        moduleFilePath.toString(), IntelliJModuleImpl.RELOAD_STUB_MODULE_TYPE);
 
                 modifiableModuleModel.commit();
                 project.save();
@@ -656,7 +656,7 @@ public class AddProjectToSessionWizard extends Wizard {
       de.fu_berlin.inf.dpp.filesystem.IFolder project,
       IReferencePointManager referencePointManager) {
 
-    IntelliJProjectImpl intelliJProject = (IntelliJProjectImpl) project;
+    IntelliJModuleImpl intelliJProject = (IntelliJModuleImpl) project;
 
     referencePointManager.put(
         intelliJReferencePointManager.create(intelliJProject.getModule()), project);

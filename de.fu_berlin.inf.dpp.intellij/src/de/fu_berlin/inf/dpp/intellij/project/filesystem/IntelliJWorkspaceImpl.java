@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJModuleImpl;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
@@ -49,7 +49,7 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
 
     return module == null
         ? null
-        : new IntelliJProjectImpl(FilesystemUtils.getModuleContentRoot(module));
+        : new IntelliJModuleImpl(FilesystemUtils.getModuleContentRoot(module));
   }
 
   @Override

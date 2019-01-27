@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.filesystem.FilesystemUtils;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJModuleImpl;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
@@ -138,7 +138,7 @@ public class CollaborationUtils {
     List<Module> modules = new ArrayList<>();
 
     for (IResource resource : resources) {
-      IntelliJProjectImpl project = (IntelliJProjectImpl) resource;
+      IntelliJModuleImpl project = (IntelliJModuleImpl) resource;
       modules.add(project.getModule());
     }
 
@@ -369,7 +369,7 @@ public class CollaborationUtils {
 
     List<Module> modules = new ArrayList<>();
     for (IResource resource : selectedResources) {
-      IntelliJProjectImpl project = (IntelliJProjectImpl) resource;
+      IntelliJModuleImpl project = (IntelliJModuleImpl) resource;
       modules.add(project.getModule());
     }
 
@@ -402,8 +402,8 @@ public class CollaborationUtils {
     }
 
     for (Module module : selectedModules) {
-      IntelliJProjectImpl project =
-          new IntelliJProjectImpl(FilesystemUtils.getModuleContentRoot(module));
+      IntelliJModuleImpl project =
+          new IntelliJModuleImpl(FilesystemUtils.getModuleContentRoot(module));
       projectsResources.put(project, null);
     }
     return projectsResources;
@@ -485,7 +485,7 @@ public class CollaborationUtils {
   private static void fillReferencePointManager(
       de.fu_berlin.inf.dpp.filesystem.IFolder project,
       IReferencePointManager referencePointManager) {
-    IntelliJProjectImpl intelliJProject = (IntelliJProjectImpl) project;
+    IntelliJModuleImpl intelliJProject = (IntelliJModuleImpl) project;
 
     referencePointManager.put(
         IntelliJReferencePointManager.create(intelliJProject.getModule()), project);

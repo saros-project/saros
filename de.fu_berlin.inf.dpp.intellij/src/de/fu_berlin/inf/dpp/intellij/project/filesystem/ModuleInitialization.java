@@ -11,7 +11,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
+import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJModuleImpl;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJReferencePointManager;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -86,12 +86,12 @@ public class ModuleInitialization implements Startable {
    * ensure that the transferred module file is used, the <code>VirtualFile</code> representing it
    * is refreshed synchronously.
    *
-   * <p>After the module is reloaded, {@link IntelliJProjectImpl#refreshModule()} is called to
+   * <p>After the module is reloaded, {@link IntelliJModuleImpl#refreshModule()} is called to
    * replace the old <code>Module</code> object held by the given <code>IProject</code>. This is
    * needed as calls on disposed modules result in an exception and the <code>IProject</code> object
    * is at this point already held by other classes.
    *
-   * @see IntelliJProjectImpl#refreshModule()
+   * @see IntelliJModuleImpl#refreshModule()
    */
   private class ModuleReloader implements Runnable {
     private Module module;

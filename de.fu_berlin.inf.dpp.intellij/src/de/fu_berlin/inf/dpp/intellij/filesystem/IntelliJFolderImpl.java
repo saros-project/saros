@@ -120,14 +120,14 @@ public final class IntelliJFolderImpl extends IntelliJAbstractFolderImpl impleme
   @NotNull
   @Override
   public IFolder getParent() {
-    if (path.segmentCount() == 1) return new IntelliJProjectImpl(srcRoot);
+    if (path.segmentCount() == 1) return new IntelliJModuleImpl(srcRoot);
 
     return new IntelliJFolderImpl(srcRoot, path.removeLastSegments(1));
   }
 
   @Override
   public IFolder getReferenceFolder() {
-    return new IntelliJProjectImpl(srcRoot);
+    return new IntelliJModuleImpl(srcRoot);
   }
 
   @NotNull

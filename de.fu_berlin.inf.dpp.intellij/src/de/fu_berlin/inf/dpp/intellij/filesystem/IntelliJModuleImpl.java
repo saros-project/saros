@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class IntelliJProjectImpl extends IntelliJAbstractFolderImpl implements IFolder {
+public final class IntelliJModuleImpl extends IntelliJAbstractFolderImpl implements IFolder {
 
   /*
    * Used to identify module stubs that were created during the project
@@ -32,7 +32,7 @@ public final class IntelliJProjectImpl extends IntelliJAbstractFolderImpl implem
    */
   public static final String RELOAD_STUB_MODULE_TYPE = "SAROS_RELOAD_STUB_MODULE";
 
-  private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
+  private static final Logger LOG = Logger.getLogger(IntelliJModuleImpl.class);
 
   /**
    * Creates a core compatible {@link IFolder folder} using the given IntelliJ module.
@@ -52,7 +52,7 @@ public final class IntelliJProjectImpl extends IntelliJAbstractFolderImpl implem
    * @throws IllegalStateException if the project base dir, the module file or the directory
    *     containing the module file could not be found
    */
-  public IntelliJProjectImpl(@NotNull final VirtualFile moduleRoot) {
+  public IntelliJModuleImpl(@NotNull final VirtualFile moduleRoot) {
     super(moduleRoot, null);
   }
 
@@ -486,7 +486,7 @@ public final class IntelliJProjectImpl extends IntelliJAbstractFolderImpl implem
 
     if (getClass() != obj.getClass()) return false;
 
-    IntelliJProjectImpl other = (IntelliJProjectImpl) obj;
+    IntelliJModuleImpl other = (IntelliJModuleImpl) obj;
 
     return module.getName().equals(FilesystemUtils.getModuleOfFile(other.srcRoot).getName());
   }
