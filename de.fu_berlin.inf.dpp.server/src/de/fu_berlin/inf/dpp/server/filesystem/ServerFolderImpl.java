@@ -15,7 +15,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 /** Server implementation of the {@link IFolder} interface. */
-public class ServerFolderImpl extends ServerResourceImplV2 implements IFolder {
+public class ServerFolderImpl extends ServerResourceImpl implements IFolder {
 
   private static final String DEFAULT_CHARSET = "UTF-8";
 

@@ -12,7 +12,7 @@ import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
 
 /*Server implementation of the {@link IFile} interface. */
-public class ServerFileImpl extends ServerResourceImplV2 implements IFile {
+public class ServerFileImpl extends ServerResourceImpl implements IFile {
 
   private static final Logger LOG = Logger.getLogger(ServerFileImpl.class);
 

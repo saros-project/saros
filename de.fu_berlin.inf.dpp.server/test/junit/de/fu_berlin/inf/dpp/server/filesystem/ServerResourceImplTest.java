@@ -24,7 +24,7 @@ import org.junit.Test;
 
 public class ServerResourceImplTest extends EasyMockSupport {
 
-  private static class ExampleResource extends ServerResourceImplV2 {
+  private static class ExampleResource extends ServerResourceImpl {
 
     public ExampleResource(IPath path, IWorkspace workspace) {
       super(workspace.getLocation(), path);
@@ -87,7 +87,7 @@ public class ServerResourceImplTest extends EasyMockSupport {
   public void getLocation() {
     assertEquals(
         workspace.getLocation().append("project/folder/file"),
-        ((ServerResourceImplV2) resource).getLocation());
+        ((ServerResourceImpl) resource).getLocation());
   }
 
   @Test

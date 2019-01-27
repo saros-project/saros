@@ -11,20 +11,20 @@ import org.apache.log4j.Logger;
  * Server implementation of the {@link IResource} interface. It represents each resource directly as
  * a folder or file in the physical file system.
  */
-public abstract class ServerResourceImplV2 implements IResource {
+public abstract class ServerResourceImpl implements IResource {
 
-  private static final Logger LOG = Logger.getLogger(ServerResourceImplV2.class);
+  private static final Logger LOG = Logger.getLogger(ServerResourceImpl.class);
 
   protected final IPath referencePointsPath;
   private final IPath referencePointRelativePath;
 
   /**
-   * Creates a ServerResourceImplV2.
+   * Creates a ServerResourceImpl.
    *
    * @param referencePointsPath the root source's path
    * @param referencePointRelativePath the resource's path relative to root source
    */
-  public ServerResourceImplV2(IPath referencePointsPath, IPath referencePointRelativePath) {
+  public ServerResourceImpl(IPath referencePointsPath, IPath referencePointRelativePath) {
     this.referencePointsPath = referencePointsPath;
     this.referencePointRelativePath = referencePointRelativePath;
   }
@@ -86,9 +86,9 @@ public abstract class ServerResourceImplV2 implements IResource {
 
     if (this == obj) return true;
 
-    if (!(obj instanceof ServerResourceImplV2)) return false;
+    if (!(obj instanceof ServerResourceImpl)) return false;
 
-    ServerResourceImplV2 other = (ServerResourceImplV2) obj;
+    ServerResourceImpl other = (ServerResourceImpl) obj;
 
     return getType() == other.getType()
         && getLocation().equals(other.getLocation())
