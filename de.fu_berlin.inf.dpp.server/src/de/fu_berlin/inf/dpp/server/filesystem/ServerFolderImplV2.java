@@ -94,7 +94,7 @@ public class ServerFolderImplV2 extends ServerResourceImplV2 implements IFolder 
       if (f.isDirectory()) {
         member = new ServerFolderImplV2(referencePointsPath, memberPath);
       } else {
-        member = new ServerFileImplV2(referencePointsPath, memberPath);
+        member = new ServerFileImpl(referencePointsPath, memberPath);
       }
 
       members.add(member);
@@ -124,7 +124,7 @@ public class ServerFolderImplV2 extends ServerResourceImplV2 implements IFolder 
     File memberFile = memberLocation.toFile();
 
     if (memberFile.isFile()) {
-      return new ServerFileImplV2(referencePointsPath, getFullMemberPath(path));
+      return new ServerFileImpl(referencePointsPath, getFullMemberPath(path));
     } else if (memberFile.isDirectory()) {
       return new ServerFolderImplV2(referencePointsPath, getFullMemberPath(path));
     } else {
@@ -134,7 +134,7 @@ public class ServerFolderImplV2 extends ServerResourceImplV2 implements IFolder 
 
   @Override
   public IFile getFile(IPath path) {
-    return new ServerFileImplV2(referencePointsPath, getFullMemberPath(path));
+    return new ServerFileImpl(referencePointsPath, getFullMemberPath(path));
   }
 
   @Override

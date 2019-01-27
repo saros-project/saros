@@ -46,7 +46,7 @@ public class ServerFileImplTest extends EasyMockSupport {
     expect(project.getDefaultCharset()).andStubReturn("UTF-8");
 
     replayAll();
-    file = new ServerFileImplV2(workspace.getLocation().append("project"), path("file"));
+    file = new ServerFileImpl(workspace.getLocation().append("project"), path("file"));
   }
 
   @After
@@ -66,7 +66,7 @@ public class ServerFileImplTest extends EasyMockSupport {
 
   @Test
   public void getCharsetIfExplicitlySet() throws Exception {
-    ((ServerFileImplV2) file).setCharset("ISO-8859-1");
+    ((ServerFileImpl) file).setCharset("ISO-8859-1");
     assertEquals("ISO-8859-1", file.getCharset());
   }
 

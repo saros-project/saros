@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerFileImplV2;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerFileImpl;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathFactoryImpl;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerReferencePointManager;
 import de.fu_berlin.inf.dpp.session.User;
@@ -181,6 +181,6 @@ public class ServerEditorManager implements IEditorManager {
 
     IPath referencePointPath = pathFactory.fromString(file.getPath());
 
-    return new ServerFileImplV2(referencePointPath, referencePointRelativePath);
+    return new ServerFileImpl(referencePointPath, referencePointRelativePath);
   }
 }

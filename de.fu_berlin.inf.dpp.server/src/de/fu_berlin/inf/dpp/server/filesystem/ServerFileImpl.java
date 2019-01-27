@@ -12,19 +12,19 @@ import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
 
 /*Server implementation of the {@link IFile} interface. */
-public class ServerFileImplV2 extends ServerResourceImplV2 implements IFile {
+public class ServerFileImpl extends ServerResourceImplV2 implements IFile {
 
-  private static final Logger LOG = Logger.getLogger(ServerFileImplV2.class);
+  private static final Logger LOG = Logger.getLogger(ServerFileImpl.class);
 
   private String charset;
 
   /**
-   * Creates a ServerFileImplV2.
+   * Creates a ServerFileImpl.
    *
    * @param referencePointsPath the root source's path
    * @param referencePointRelativePath the resource's path relative to root source
    */
-  public ServerFileImplV2(IPath referencePointsPath, IPath referencePointRelativePath) {
+  public ServerFileImpl(IPath referencePointsPath, IPath referencePointRelativePath) {
     super(referencePointsPath, referencePointRelativePath);
   }
 
