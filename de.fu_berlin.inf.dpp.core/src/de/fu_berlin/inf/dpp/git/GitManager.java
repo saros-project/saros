@@ -35,10 +35,12 @@ public class GitManager extends AbstractActivityProducer {
   }
 
   public void sendCommitRequest() {
+    log.debug("Sending Request");
     fireActivity(new GitRequestActivity(session.getLocalUser()));
   }
 
   public void changeWorkDir(File workDir) {
+    log.debug("Old work dir = " + this.workDir.getPath() + " changed to = " + workDir.getPath());
     this.workDir = workDir;
   }
 

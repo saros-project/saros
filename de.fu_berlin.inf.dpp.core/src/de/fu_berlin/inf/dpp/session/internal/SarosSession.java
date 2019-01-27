@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.git.GitManager;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -56,6 +57,7 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,6 +126,8 @@ public final class SarosSession implements ISarosSession {
   private final StopManager stopManager;
 
   private final ChangeColorManager changeColorManager;
+
+  private final GitManager gitManager;
 
   private final PermissionManager permissionManager;
 
@@ -1039,6 +1043,21 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
+  public void gitSendCommitRequest() {
+    gitManager.sendCommitRequest();
+  }
+
+  @Override
+  public void gitChangeWorkDir(File file) {
+    gitManager.changeWorkDir(file);
+  }
+
+  @Override
+  public GitManager getGitManager() {
+    return gitManager;
+  }
+
+  @Override
   public Set<Integer> getUnavailableColors() {
     return changeColorManager.getUsedColorIDs();
   }
@@ -1114,6 +1133,8 @@ public final class SarosSession implements ISarosSession {
     stopManager = sessionContainer.getComponent(StopManager.class);
 
     changeColorManager = sessionContainer.getComponent(ChangeColorManager.class);
+
+    gitManager = sessionContainer.getComponent(GitManager.class);
 
     permissionManager = sessionContainer.getComponent(PermissionManager.class);
 
