@@ -55,8 +55,8 @@ public class ServerResourceImplTest extends EasyMockSupport {
   public void setUp() throws Exception {
     IPath sourceRoot = createWorkspaceFolder().append("project");
     workspace = createMock(IWorkspace.class);
-    project = new ServerFolderImplV2(sourceRoot, path(""));
-    parent = new ServerFolderImplV2(sourceRoot, path("folder"));
+    project = new ServerFolderImpl(sourceRoot, path(""));
+    parent = new ServerFolderImpl(sourceRoot, path("folder"));
 
     expect(workspace.getLocation()).andStubReturn(sourceRoot);
 

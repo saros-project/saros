@@ -58,7 +58,7 @@ public abstract class ServerResourceImplV2 implements IResource {
 
   @Override
   public IFolder getReferenceFolder() {
-    return new ServerFolderImplV2(referencePointsPath, ServerPathImpl.fromString(new String()));
+    return new ServerFolderImpl(referencePointsPath, ServerPathImpl.fromString(new String()));
   }
 
   @Override

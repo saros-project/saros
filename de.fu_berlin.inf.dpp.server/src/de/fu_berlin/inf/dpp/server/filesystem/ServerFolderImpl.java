@@ -15,7 +15,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 /** Server implementation of the {@link IFolder} interface. */
-public class ServerFolderImplV2 extends ServerResourceImplV2 implements IFolder {
+public class ServerFolderImpl extends ServerResourceImplV2 implements IFolder {
 
   private static final String DEFAULT_CHARSET = "UTF-8";
 
@@ -25,7 +25,7 @@ public class ServerFolderImplV2 extends ServerResourceImplV2 implements IFolder 
    * @param referencePointsPath the root source's path
    * @param referencePointRelativePath the resource's path relative to root source
    */
-  public ServerFolderImplV2(IPath referencePointsPath, IPath referencePointRelativePath) {
+  public ServerFolderImpl(IPath referencePointsPath, IPath referencePointRelativePath) {
     super(referencePointsPath, referencePointRelativePath);
   }
 
@@ -92,7 +92,7 @@ public class ServerFolderImplV2 extends ServerResourceImplV2 implements IFolder 
       IResource member;
 
       if (f.isDirectory()) {
-        member = new ServerFolderImplV2(referencePointsPath, memberPath);
+        member = new ServerFolderImpl(referencePointsPath, memberPath);
       } else {
         member = new ServerFileImpl(referencePointsPath, memberPath);
       }
@@ -126,7 +126,7 @@ public class ServerFolderImplV2 extends ServerResourceImplV2 implements IFolder 
     if (memberFile.isFile()) {
       return new ServerFileImpl(referencePointsPath, getFullMemberPath(path));
     } else if (memberFile.isDirectory()) {
-      return new ServerFolderImplV2(referencePointsPath, getFullMemberPath(path));
+      return new ServerFolderImpl(referencePointsPath, getFullMemberPath(path));
     } else {
       return null;
     }
@@ -144,7 +144,7 @@ public class ServerFolderImplV2 extends ServerResourceImplV2 implements IFolder 
 
   @Override
   public IFolder getFolder(IPath path) {
-    return new ServerFolderImplV2(referencePointsPath, getFullMemberPath(path));
+    return new ServerFolderImpl(referencePointsPath, getFullMemberPath(path));
   }
 
   @Override

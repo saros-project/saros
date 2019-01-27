@@ -4,7 +4,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerFolderImplV2;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerFolderImpl;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathImpl;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerReferencePointManager;
 import de.fu_berlin.inf.dpp.session.IReferencePointManager;
@@ -59,7 +59,7 @@ public class ShareCommand extends ConsoleCommand {
       for (String path : args) {
         try {
           IFolder sourceFolder =
-              new ServerFolderImplV2(this.workspace.getLocation(), ServerPathImpl.fromString(path));
+              new ServerFolderImpl(this.workspace.getLocation(), ServerPathImpl.fromString(path));
           IReferencePoint referencePoint = ServerReferencePointManager.create(workspace);
           referencePointManager.put(referencePoint, sourceFolder);
           serverReferencePointManager.put(referencePoint, this.workspace.getLocation().toFile());

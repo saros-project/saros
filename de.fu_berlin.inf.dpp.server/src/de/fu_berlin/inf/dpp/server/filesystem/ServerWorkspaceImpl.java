@@ -31,7 +31,7 @@ public class ServerWorkspaceImpl implements IWorkspace {
 
   @Override
   public IFolder getReferenceFolder(String name) {
-    return new ServerFolderImplV2(
+    return new ServerFolderImpl(
         getLocation().append(name), ServerPathImpl.fromString(new String()));
   }
 

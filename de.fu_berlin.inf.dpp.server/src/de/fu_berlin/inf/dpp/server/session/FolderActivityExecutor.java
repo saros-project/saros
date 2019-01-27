@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.server.editor.ServerEditorManager;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerFolderImplV2;
+import de.fu_berlin.inf.dpp.server.filesystem.ServerFolderImpl;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerPathFactoryImpl;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerReferencePointManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -99,6 +99,6 @@ public class FolderActivityExecutor extends AbstractActivityConsumer implements 
 
     IPath referencePointPath = pathFactory.fromString(file.getPath());
 
-    return new ServerFolderImplV2(referencePointPath, referencePointRelativePath);
+    return new ServerFolderImpl(referencePointPath, referencePointRelativePath);
   }
 }

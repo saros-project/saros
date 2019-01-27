@@ -52,11 +52,11 @@ public class ServerFolderImplTest extends EasyMockSupport {
     replayAll();
 
     referencedFolder =
-        new ServerFolderImplV2(
+        new ServerFolderImpl(
             workspace.getLocation().append(FOLDER_PARENT_PATH),
             ServerPathImpl.fromString(new String()));
     folder =
-        new ServerFolderImplV2(
+        new ServerFolderImpl(
             workspace.getLocation().append(FOLDER_PARENT_PATH),
             ServerPathImpl.fromString(FOLDER_NAME));
   }
