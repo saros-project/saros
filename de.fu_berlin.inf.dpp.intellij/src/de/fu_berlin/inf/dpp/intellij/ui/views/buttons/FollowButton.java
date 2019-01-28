@@ -5,6 +5,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
+import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -19,7 +20,6 @@ import org.picocontainer.annotations.Inject;
 
 /** Button to follow a user. Displays a PopupMenu containing all session users to choose from. */
 public class FollowButton extends ToolbarButton {
-  private static final String FOLLOW_ICON_PATH = "/icons/famfamfam/followmode.png";
   private JPopupMenu popupMenu;
   private final FollowModeAction followModeAction;
 
@@ -90,7 +90,7 @@ public class FollowButton extends ToolbarButton {
    * <p>The FollowButton is created as disabled.
    */
   public FollowButton() {
-    super(FollowModeAction.NAME, "Follow", FOLLOW_ICON_PATH, "Enter follow mode");
+    super(FollowModeAction.NAME, "Follow", IconManager.FOLLOW_ICON);
     SarosPluginContext.initComponent(this);
 
     followModeAction = new FollowModeAction();
