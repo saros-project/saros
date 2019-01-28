@@ -19,9 +19,9 @@ public class IconManager {
   public static final ImageIcon FOLLOW_ICON = getIcon("/icons/famfamfam/followmode.png", "follow");
 
   public static final ImageIcon IN_SYNC_ICON =
-      getIcon("/icons/famfamfam/in_sync.png", "Files are consistent");
+      getIcon("/icons/etool16/in_sync.png", "Files are consistent");
   public static final ImageIcon OUT_OF_SYNC_ICON =
-      getIcon("/icons/famfamfam/out_sync.png", "Files are NOT consistent");
+      getIcon("/icons/etool16/out_sync.png", "Files are NOT consistent");
 
   /**
    * Creates icon by image path. Path must start with a slash and be relative the the src folder.
