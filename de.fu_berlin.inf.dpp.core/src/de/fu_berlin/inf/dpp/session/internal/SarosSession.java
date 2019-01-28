@@ -281,7 +281,7 @@ public final class SarosSession implements ISarosSession {
 
     if (resource.getType() == IResource.FOLDER) {
       try {
-        IResource[] members = resource.getAdapter(IFolder.class).members();
+        IResource[] members = resource.adaptTo(IFolder.class).members();
 
         for (int i = 0; i < members.length; i++) list.addAll(getAllNonSharedChildren(members[i]));
       } catch (IOException e) {

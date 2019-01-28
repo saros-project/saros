@@ -86,7 +86,7 @@ public abstract class ServerResourceImpl implements IResource {
   }
 
   @Override
-  public <T extends IResource> T getAdapter(Class<T> clazz) {
+  public <T extends IResource> T adaptTo(Class<T> clazz) {
     return clazz.isInstance(this) ? clazz.cast(this) : null;
   }
 

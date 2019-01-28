@@ -105,7 +105,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
     for (final IProject project : sessionManager.getSession().getProjects()) {
 
-      IntelliJProjectImpl intelliJProject = project.getAdapter(IntelliJProjectImpl.class);
+      IntelliJProjectImpl intelliJProject = project.adaptTo(IntelliJProjectImpl.class);
 
       String moduleType = ModuleType.get(intelliJProject.getModule()).getId();
 
