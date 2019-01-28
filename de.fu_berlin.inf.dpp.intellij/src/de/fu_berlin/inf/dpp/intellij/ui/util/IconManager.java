@@ -34,6 +34,9 @@ public class IconManager {
   public static final ImageIcon OPEN_PREFERENCES_ICON =
       getIcon("/icons/famfamfam/test_con.gif", "preferences");
 
+  public static final ImageIcon SESSION_INVITATION_ICON =
+      getIcon("/icons/saros/invitation.png", "invitation");
+
   /**
    * Creates icon by image path. Path must start with a slash and be relative the the src folder.
    */

@@ -37,7 +37,7 @@ public class HeaderPanel extends JPanel {
   private void create(String title, String text) {
     setLayout(new FlowLayout());
 
-    icon = IconManager.getIcon("/icons/saros/invitation.png", "invitation");
+    icon = IconManager.SESSION_INVITATION_ICON;
     textMain = new JTextArea();
     textMain.setEditable(false);
 
