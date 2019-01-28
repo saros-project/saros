@@ -12,8 +12,6 @@ import de.fu_berlin.inf.dpp.intellij.ui.actions.NotImplementedAction;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Scanner;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -25,7 +23,7 @@ import org.picocontainer.annotations.Inject;
 public class ConnectButton extends ToolbarButton {
   private static final Logger LOG = Logger.getLogger(ConnectButton.class);
 
-  public static final String USERID_SEPARATOR = "@";
+  private static final String USER_ID_SEPARATOR = "@";
 
   private static final boolean ENABLE_CONFIGURE_ACCOUNTS =
       Boolean.getBoolean("saros.intellij.ENABLE_CONFIGURE_ACCOUNTS");
@@ -55,23 +53,20 @@ public class ConnectButton extends ToolbarButton {
     createMenuItems();
 
     addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent ev) {
-            if (accountStore.isEmpty()) {
-              XMPPAccount account = createNewAccount();
+        actionEvent -> {
+          if (accountStore.isEmpty()) {
+            XMPPAccount account = createNewAccount();
 
-              if (account != null) {
-                createMenuItems();
+            if (account != null) {
+              createMenuItems();
 
-                askToConnectToAccount(account);
+              askToConnectToAccount(account);
 
-                return;
-              }
+              return;
             }
-
-            popupMenu.show(ConnectButton.this, 0, getBounds().y + getBounds().height);
           }
+
+          popupMenu.show(ConnectButton.this, 0, getBounds().y + getBounds().height);
         });
   }
 
@@ -92,61 +87,41 @@ public class ConnectButton extends ToolbarButton {
   }
 
   private void createAccountMenuItem(XMPPAccount account) {
-    final String userName = account.getUsername() + USERID_SEPARATOR + account.getDomain();
+    final String userName = account.getUsername() + USER_ID_SEPARATOR + account.getDomain();
     JMenuItem accountItem = createMenuItemForUser(userName);
     popupMenu.add(accountItem);
   }
 
   private JMenuItem createMenuItemForUser(final String userName) {
     JMenuItem accountItem = new JMenuItem(userName);
-    accountItem.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            connectAction.executeWithUser(userName);
-          }
-        });
+    accountItem.addActionListener(actionEvent -> connectAction.executeWithUser(userName));
+
     return accountItem;
   }
 
   private void createDisconnectMenuItem() {
     disconnect = new JMenuItem("Disconnect server");
-    disconnect.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            disconnectAction.execute();
-          }
-        });
+    disconnect.addActionListener(actionEvent -> disconnectAction.execute());
   }
 
   private void createConfigureAccountMenuItem() {
     configure = new JMenuItem("Configure accounts...");
-    configure.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent actionEvent) {
-            configureAccounts.execute();
-          }
-        });
+    configure.addActionListener(actionEvent -> configureAccounts.execute());
   }
 
   private void createAddAccountMenuItem() {
     menuItemAdd = new JMenuItem("Add account...");
     menuItemAdd.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            XMPPAccount account = createNewAccount();
+        actionEvent -> {
+          XMPPAccount account = createNewAccount();
 
-            if (account == null) {
-              return;
-            }
-
-            createMenuItems();
-
-            askToConnectToAccount(account);
+          if (account == null) {
+            return;
           }
+
+          createMenuItems();
+
+          askToConnectToAccount(account);
         });
   }
 
@@ -159,7 +134,7 @@ public class ConnectButton extends ToolbarButton {
 
       if (option == com.intellij.openapi.ui.Messages.YES) {
         connectAction.executeWithUser(
-            account.getUsername() + USERID_SEPARATOR + account.getDomain());
+            account.getUsername() + USER_ID_SEPARATOR + account.getDomain());
       }
 
     } catch (IllegalAWTContextException e) {

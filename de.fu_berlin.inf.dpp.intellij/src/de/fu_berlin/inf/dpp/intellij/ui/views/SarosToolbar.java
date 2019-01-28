@@ -15,14 +15,14 @@ import javax.swing.JToolBar;
  *
  * <p>FIXME: Replace by IDEA toolbar class.
  */
-public class SarosToolbar extends JToolBar {
+class SarosToolbar extends JToolBar {
 
   private static final boolean ENABLE_ADD_CONTACT =
       Boolean.getBoolean("saros.intellij.ENABLE_ADD_CONTACT");
   private static final boolean ENABLE_PREFERENCES =
       Boolean.getBoolean("saros.intellij.ENABLE_PREFERENCES");
 
-  public SarosToolbar() {
+  SarosToolbar() {
     super("Saros IDEA toolbar");
     setLayout(new FlowLayout(FlowLayout.RIGHT));
     addToolbarButtons();

@@ -35,6 +35,7 @@ public class ConsistencyButton extends ToolbarButton {
 
   private boolean previouslyInConsistentState = true;
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final ActionListener actionListener =
       new ActionListener() {
         @Override
@@ -46,8 +47,7 @@ public class ConsistencyButton extends ToolbarButton {
           setEnabledFromUIThread(false);
 
           final Set<SPath> paths =
-              new HashSet<SPath>(
-                  sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
+              new HashSet<>(sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
 
           String inconsistentFiles = createConfirmationMessage(paths);
 
@@ -62,6 +62,7 @@ public class ConsistencyButton extends ToolbarButton {
         }
       };
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
         @Override
@@ -77,14 +78,7 @@ public class ConsistencyButton extends ToolbarButton {
         }
       };
 
-  private final ValueChangeListener<Boolean> isConsistencyListener =
-      new ValueChangeListener<Boolean>() {
-
-        @Override
-        public void setValue(Boolean newValue) {
-          handleConsistencyChange(newValue);
-        }
-      };
+  private final ValueChangeListener<Boolean> isConsistencyListener = this::handleConsistencyChange;
 
   @Inject private ISarosSessionManager sessionManager;
 
@@ -123,7 +117,7 @@ public class ConsistencyButton extends ToolbarButton {
     private ConsistencyWatchdogClient watchdogClient;
 
     /** Creates an object to store the inconsistency warning state for a session. */
-    public SessionInconsistencyState(ISarosSession sarosSession) {
+    SessionInconsistencyState(ISarosSession sarosSession) {
 
       watchdogClient = sarosSession.getComponent(ConsistencyWatchdogClient.class);
 
@@ -132,7 +126,7 @@ public class ConsistencyButton extends ToolbarButton {
     }
   }
 
-  public void setInconsistent(boolean isInconsistent) {
+  private void setInconsistent(boolean isInconsistent) {
     sessionInconsistencyState.isInconsistent = isInconsistent;
 
     if (isInconsistent) {
@@ -172,14 +166,7 @@ public class ConsistencyButton extends ToolbarButton {
 
     LOG.debug("Inconsistency indicator goes: " + (isInconsistent ? "on" : "off"));
 
-    ApplicationManager.getApplication()
-        .invokeLater(
-            new Runnable() {
-              @Override
-              public void run() {
-                setInconsistent(isInconsistent);
-              }
-            });
+    ApplicationManager.getApplication().invokeLater(() -> setInconsistent(isInconsistent));
 
     if (!isInconsistent) {
       if (!previouslyInConsistentState) {
@@ -197,28 +184,25 @@ public class ConsistencyButton extends ToolbarButton {
     }
 
     final Set<SPath> paths =
-        new HashSet<SPath>(sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
+        new HashSet<>(sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
 
     final String files = createInconsistentPathsMessage(paths);
 
     ApplicationManager.getApplication()
         .invokeLater(
-            new Runnable() {
-              @Override
-              public void run() {
-                if (files.isEmpty()) {
-                  NotificationPanel.showWarning(
-                      Messages.ConsistencyAction_message_inconsistency_detected_no_files,
-                      Messages.ConsistencyAction_title_inconsistency_detected);
-
-                  return;
-                }
-
+            () -> {
+              if (files.isEmpty()) {
                 NotificationPanel.showWarning(
-                    MessageFormat.format(
-                        Messages.ConsistencyAction_message_inconsistency_detected, files),
+                    Messages.ConsistencyAction_message_inconsistency_detected_no_files,
                     Messages.ConsistencyAction_title_inconsistency_detected);
+
+                return;
               }
+
+              NotificationPanel.showWarning(
+                  MessageFormat.format(
+                      Messages.ConsistencyAction_message_inconsistency_detected, files),
+                  Messages.ConsistencyAction_title_inconsistency_detected);
             });
   }
 
