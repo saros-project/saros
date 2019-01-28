@@ -71,6 +71,10 @@ However Intellij/Gradle supports to run multiple intellij instances from within 
 * Open the task directory `de.fu_berlin.inf.dpp.intellij > Tasks > intellij`
 * Execute task `runIde` for each IntelliJ IDEA instance you need.
 
+Each simultaneously execution of `runIde` creates a sandbox directory in the `build` directory of the intellij project.
+If you want to configure the parent directory of the sandbox directories you have to set the environment variable `SAROS_INTELLIJ_SANDBOX`
+to the corresponding directory.
+
 ## Without an IDE
 
 ### Test IntelliJ by hand
