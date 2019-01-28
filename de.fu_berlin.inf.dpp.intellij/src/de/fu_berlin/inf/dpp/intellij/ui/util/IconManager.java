@@ -26,6 +26,14 @@ public class IconManager {
   public static final ImageIcon CONNECT_ICON =
       getIcon("/icons/famfamfam/connect.png", "Connect to XMPP/Jabber server");
 
+  public static final ImageIcon LEAVE_SESSION_ICON =
+      getIcon("/icons/famfamfam/session_leave_tsk.png", "leave");
+
+  public static final ImageIcon ADD_CONTACT_ICON =
+      getIcon("/icons/famfamfam/contact_add_tsk.png", "addContact");
+  public static final ImageIcon OPEN_PREFERENCES_ICON =
+      getIcon("/icons/famfamfam/test_con.gif", "preferences");
+
   /**
    * Creates icon by image path. Path must start with a slash and be relative the the src folder.
    */
