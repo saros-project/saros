@@ -121,11 +121,6 @@ public class FollowModeManager implements Startable {
               }
               break;
             case CLOSED:
-              // TODO This closes every editor the followee closes -- desired?
-              // Problem: In order to determine whether the followee closed
-              // his/her active editor and just an editor in the background,
-              // one needs to keep track of the last few EditorActivities.
-              editorManager.closeEditor(path);
               break;
             case SAVED:
               break;
