@@ -23,6 +23,9 @@ public class IconManager {
   public static final ImageIcon OUT_OF_SYNC_ICON =
       getIcon("/icons/etool16/out_sync.png", "Files are NOT consistent");
 
+  public static final ImageIcon CONNECT_ICON =
+      getIcon("/icons/famfamfam/connect.png", "Connect to XMPP/Jabber server");
+
   /**
    * Creates icon by image path. Path must start with a slash and be relative the the src folder.
    */

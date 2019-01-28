@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.actions.AbstractSarosAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.ConnectServerAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.DisconnectServerAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.NotImplementedAction;
+import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.awt.event.ActionEvent;
@@ -22,8 +23,6 @@ import org.picocontainer.annotations.Inject;
 
 /** Implementation of connect XMPP/jabber server button */
 public class ConnectButton extends ToolbarButton {
-  public static final String CONNECT_ICON_PATH = "/icons/famfamfam/connect.png";
-
   private static final Logger LOG = Logger.getLogger(ConnectButton.class);
 
   public static final String USERID_SEPARATOR = "@";
@@ -43,7 +42,7 @@ public class ConnectButton extends ToolbarButton {
   @Inject private XMPPAccountStore accountStore;
 
   public ConnectButton() {
-    super(ConnectServerAction.NAME, "Connect", CONNECT_ICON_PATH, "Connect to XMPP/Jabber server");
+    super(ConnectServerAction.NAME, "Connect", IconManager.CONNECT_ICON);
     SarosPluginContext.initComponent(this);
     disconnectAction = new DisconnectServerAction();
     connectAction = new ConnectServerAction();
