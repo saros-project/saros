@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -31,9 +32,6 @@ import org.picocontainer.annotations.Inject;
  */
 public class ConsistencyButton extends ToolbarButton {
   private static final Logger LOG = Logger.getLogger(ConsistencyButton.class);
-
-  private static final String IN_SYNC_ICON_PATH = "/icons/famfamfam/in_sync.png";
-  private static final String OUT_SYNC_ICON_PATH = "/icons/famfamfam/out_sync.png";
 
   private boolean previouslyInConsistentState = true;
 
@@ -96,11 +94,8 @@ public class ConsistencyButton extends ToolbarButton {
 
   /** Creates a Consistency button, adds a sessionListener and disables the button. */
   public ConsistencyButton() {
-    super(
-        ConsistencyAction.NAME,
-        "Recover inconsistencies",
-        IN_SYNC_ICON_PATH,
-        "Files are consistent");
+    super(ConsistencyAction.NAME, "Recover inconsistencies", IconManager.IN_SYNC_ICON);
+
     SarosPluginContext.initComponent(this);
 
     setSarosSession(sessionManager.getSession());
@@ -147,10 +142,10 @@ public class ConsistencyButton extends ToolbarButton {
        * use ConsistencyAction_tooltip_inconsistency_detected
        * this also requires the inconsistent files
        */
-      setIcon(OUT_SYNC_ICON_PATH, "Files are NOT consistent");
+      setIcon(IconManager.OUT_OF_SYNC_ICON);
     } else {
       setEnabledFromUIThread(false);
-      setIcon(IN_SYNC_ICON_PATH, Messages.ConsistencyAction_tooltip_no_inconsistency);
+      setIcon(IconManager.IN_SYNC_ICON);
     }
   }
 
