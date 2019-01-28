@@ -20,13 +20,13 @@ Use the command `npm run build`. When building for production, all of the resour
 ## Technology Stack
 The Saros HTML Whiteboard uses a graphics library called [Fabric.js](http://fabricjs.com/) to display the shapes in the page, it also uses [React](https://reactjs.org/) to render the menu.
 
-As for the bundling, it uses [Webpack](https://webpack.js.org/) to bundle the resources using [Babel](https://babeljs.io/) loader to transpile the code to an older more-browser-friendly version.
+As for the bundling, it uses [Webpack](https://webpack.js.org/) to bundle the resources using [Babel](https://babeljs.io/) loader to transpile the code to a more browser-friendly version.
 
 ## How it works internally
 
-The Saros HTML Whiteboard extends the [GEF (Graphical Editing Framework)](https://www.eclipse.org/gef/) based Whiteboard and uses most of the internal structure such as the [SXE](https://xmpp.org/extensions/xep-0284.html).
+The Saros HTML Whiteboard builds upon the internal infrastructure of the [GEF](https://www.eclipse.org/gef/) based Whiteboard and uses most of its components such as [SXE](https://xmpp.org/extensions/xep-0284.html).
 
-SXE is a synchronization protocol for XML files, which fits GEF since it renders the XML based [SVG](https://www.w3.org/TR/SVG2/) shapes.
+SXE is a synchronization protocol for syncing XML files, which fits GEF since it renders XML-based [SVG](https://www.w3.org/TR/SVG2/) shapes.
 
 The Java part of the whiteboard contains an implementation of SXE and is in turn responsible for the synchronization of the whiteboard's state and data.
 The HTML part of the whiteboard acts as a view and enables the rendering and the manipulation of the aforementioned data.
