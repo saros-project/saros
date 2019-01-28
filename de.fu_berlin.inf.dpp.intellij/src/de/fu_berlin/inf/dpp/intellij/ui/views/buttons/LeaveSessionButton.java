@@ -11,6 +11,7 @@ import org.picocontainer.annotations.Inject;
 
 public class LeaveSessionButton extends SimpleButton {
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
         @Override

@@ -40,7 +40,7 @@ public class IconManager {
   /**
    * Creates icon by image path. Path must start with a slash and be relative the the src folder.
    */
-  public static ImageIcon getIcon(String path, String description) {
+  private static ImageIcon getIcon(String path, String description) {
     URL url = IconManager.class.getResource(path);
     if (url == null) {
       LOG.error("Could not load icon " + path + ". Path does not exist in resources: " + path);

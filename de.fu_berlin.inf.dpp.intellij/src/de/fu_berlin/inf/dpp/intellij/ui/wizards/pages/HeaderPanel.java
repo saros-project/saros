@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
 
+import com.intellij.ui.JBColor;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -11,12 +12,9 @@ import javax.swing.JTextArea;
 
 /** Class presents header panel for wizards. */
 public class HeaderPanel extends JPanel {
-
-  private Icon icon;
-
   private JTextArea textMain;
   private JLabel textTitle;
-  private Color backColor = Color.WHITE;
+  private Color backColor = JBColor.WHITE;
 
   /**
    * Constructor creates header panel with given title and description
@@ -37,7 +35,7 @@ public class HeaderPanel extends JPanel {
   private void create(String title, String text) {
     setLayout(new FlowLayout());
 
-    icon = IconManager.SESSION_INVITATION_ICON;
+    Icon icon = IconManager.SESSION_INVITATION_ICON;
     textMain = new JTextArea();
     textMain.setEditable(false);
 
@@ -92,13 +90,5 @@ public class HeaderPanel extends JPanel {
 
   public void setText(String text) {
     this.textMain.setText(text);
-  }
-
-  public Icon getIcon() {
-    return icon;
-  }
-
-  public void setIcon(Icon icon) {
-    this.icon = icon;
   }
 }
