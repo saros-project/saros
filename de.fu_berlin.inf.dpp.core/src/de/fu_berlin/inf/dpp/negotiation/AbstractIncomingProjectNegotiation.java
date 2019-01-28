@@ -62,7 +62,6 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
   public AbstractIncomingProjectNegotiation(
       final JID peer, //
-      final TransferType transferType, //
       final String negotiationID, //
       final List<ProjectNegotiationData> projectNegotiationData, //
       final ISarosSessionManager sessionManager, //
@@ -77,7 +76,6 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     super(
         negotiationID,
         peer,
-        transferType,
         sessionManager,
         session,
         workspace,

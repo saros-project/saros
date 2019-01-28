@@ -61,12 +61,9 @@ public abstract class ProjectNegotiation extends Negotiation {
    */
   protected FileTransferManager fileTransferManager;
 
-  protected TransferType transferType;
-
   public ProjectNegotiation(
       final String id,
       final JID peer,
-      final TransferType transferType,
       final ISarosSessionManager sessionManager,
       final ISarosSession session,
       final IWorkspace workspace,
@@ -85,8 +82,6 @@ public abstract class ProjectNegotiation extends Negotiation {
     Connection connection = connectionService.getConnection();
 
     if (connection != null) fileTransferManager = new FileTransferManager(connection);
-
-    this.transferType = transferType;
   }
 
   /**
@@ -159,14 +154,5 @@ public abstract class ProjectNegotiation extends Negotiation {
   @Override
   protected void notifyTerminated(NegotiationListener listener) {
     listener.negotiationTerminated(this);
-  }
-
-  /**
-   * Returns the {@link TransferType} used for this negotiation
-   *
-   * @return the {@link TransferType} used for this negotiation
-   */
-  public TransferType getTransferType() {
-    return transferType;
   }
 }

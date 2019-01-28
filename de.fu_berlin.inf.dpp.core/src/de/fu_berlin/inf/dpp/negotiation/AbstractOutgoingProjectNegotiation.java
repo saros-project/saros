@@ -54,7 +54,6 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
   protected AbstractOutgoingProjectNegotiation( //
       final JID peer, //
-      final TransferType transferType, //
       final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
@@ -68,7 +67,6 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
     super(
         String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()),
         peer,
-        transferType,
         sessionManager,
         session,
         workspace,
@@ -200,8 +198,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
      * current implementation opens a wizard on the remote side)
      */
     ProjectNegotiationOfferingExtension offering =
-        new ProjectNegotiationOfferingExtension(
-            getSessionID(), getID(), projectInfos, getTransferType());
+        new ProjectNegotiationOfferingExtension(getSessionID(), getID(), projectInfos);
 
     transmitter.send(
         ISarosSession.SESSION_CONNECTION_ID,
