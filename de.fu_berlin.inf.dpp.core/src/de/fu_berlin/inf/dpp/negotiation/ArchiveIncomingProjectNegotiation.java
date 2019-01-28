@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
@@ -68,35 +67,6 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
   protected void transfer(
       IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
-
-    awaitActivityQueueingActivation(monitor);
-    monitor.subTask("");
-
-    /*
-     * the user who sends this ProjectNegotiation is now responsible for the
-     * resources of the contained projects
-     */
-    for (Entry<String, IProject> entry : projectMapping.entrySet()) {
-
-      final String projectID = entry.getKey();
-      final IProject project = entry.getValue();
-      /*
-       * TODO Queuing responsibility should be moved to Project
-       * Negotiation, since its the only consumer of queuing
-       * functionality. This will enable a specific Queuing mechanism per
-       * TransferType (see github issue #137).
-       */
-      session.addProjectMapping(projectID, project);
-      session.enableQueuing(project);
-    }
-
-    transmitter.send(
-        ISarosSession.SESSION_CONNECTION_ID,
-        getPeer(),
-        StartActivityQueuingResponse.PROVIDER.create(
-            new StartActivityQueuingResponse(getSessionID(), getID())));
-
-    checkCancellation(CancelOption.NOTIFY_PEER);
 
     boolean filesMissing = false;
 

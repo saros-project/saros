@@ -38,7 +38,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
   public ArchiveOutgoingProjectNegotiation( //
       final JID peer, //
-      final List<IProject> projects, //
+      final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -146,7 +146,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     for (final FileList list : fileLists) {
       final String projectID = list.getProjectID();
 
-      final IProject project = session.getProject(projectID);
+      final IProject project = projects.getProject(projectID);
 
       if (project == null)
         throw new LocalCancellationException(
