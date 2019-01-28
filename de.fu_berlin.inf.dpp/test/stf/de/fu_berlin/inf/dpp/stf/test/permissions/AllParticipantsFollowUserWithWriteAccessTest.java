@@ -11,9 +11,7 @@ import static org.junit.Assert.assertTrue;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
-import java.io.IOException;
 import java.rmi.RemoteException;
-import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -81,9 +79,9 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
     DAVE.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
 
     ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).closeWithSave();
-    BOB.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
-    CARL.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
-    DAVE.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
+    BOB.remoteBot().editor(Constants.CLS1_SUFFIX).closeWithSave();
+    CARL.remoteBot().editor(Constants.CLS1_SUFFIX).closeWithSave();
+    DAVE.remoteBot().editor(Constants.CLS1_SUFFIX).closeWithSave();
   }
 
   /**
@@ -133,82 +131,10 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
     assertTrue(DAVE.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
     assertTrue(
         DAVE.remoteBot().editor(Constants.CLS1_SUFFIX).getText().equals(dirtyClsContentOfAlice));
+
+    ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
     BOB.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
     CARL.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
     DAVE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
-    ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
-  }
-
-  /**
-   * Steps:
-   *
-   * <ol>
-   *   <li>Alice open a class.
-   *   <li>Alice set text in the opened java editor and then close it with save.
-   * </ol>
-   *
-   * Result:
-   *
-   * <ol>
-   *   <li>BOB, CARL and DAVE open the class too
-   *   <li>BOB, CARL and DAVE have the same class content as ALICE and their opened editor are
-   *       closed too.
-   * </ol>
-   *
-   * @throws CoreException
-   * @throws IOException
-   */
-  @Test
-  public void testFollowModeByClosingEditorByAlice() throws Exception {
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-        .open();
-
-    BOB.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
-    CARL.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
-    DAVE.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
-
-    ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).setTextFromFile(Constants.CP1_CHANGE);
-
-    ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
-
-    String clsContentOfAlice =
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .getFileContent(
-                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1, Constants.CLS1));
-
-    BOB.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
-    CARL.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
-    DAVE.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
-
-    assertTrue(
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .getFileContent(
-                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1, Constants.CLS1))
-            .equals(clsContentOfAlice));
-
-    assertTrue(
-        CARL.superBot()
-            .views()
-            .packageExplorerView()
-            .getFileContent(
-                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1, Constants.CLS1))
-            .equals(clsContentOfAlice));
-
-    assertTrue(
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .getFileContent(
-                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1, Constants.CLS1))
-            .equals(clsContentOfAlice));
   }
 }
