@@ -365,7 +365,7 @@ public class CollaborationUtils {
        * we need the .iml file, otherwise the project type will not be set
        * correctly on the other side
        */
-      IntelliJProjectImpl intelliJProject = project.getAdapter(IntelliJProjectImpl.class);
+      IntelliJProjectImpl intelliJProject = project.adaptTo(IntelliJProjectImpl.class);
 
       Module module = intelliJProject.getModule();
       VirtualFile moduleFile = module.getModuleFile();
@@ -452,7 +452,7 @@ public class CollaborationUtils {
           totalFileCount++;
 
           try {
-            IFile file = resource.getAdapter(IFile.class);
+            IFile file = resource.adaptTo(IFile.class);
 
             totalFileSize += file.getSize();
           } catch (IOException e) {
@@ -466,7 +466,7 @@ public class CollaborationUtils {
           }
 
           try {
-            IContainer container = resource.getAdapter(IContainer.class);
+            IContainer container = resource.adaptTo(IContainer.class);
 
             Pair<Long, Long> subFileCountAndSize =
                 getFileCountAndSize(Arrays.asList(container.members(flags)), true, flags);

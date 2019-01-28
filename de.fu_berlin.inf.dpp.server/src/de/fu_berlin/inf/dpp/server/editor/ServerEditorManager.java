@@ -95,7 +95,7 @@ public class ServerEditorManager implements IEditorManager {
         throw new NoSuchFileException(path.toString());
       }
 
-      IFile file = resource.getAdapter(IFile.class);
+      IFile file = resource.adaptTo(IFile.class);
       if (file == null) {
         throw new IOException("Not a file: " + path);
       }

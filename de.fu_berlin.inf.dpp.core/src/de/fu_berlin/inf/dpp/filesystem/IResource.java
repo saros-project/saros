@@ -9,7 +9,7 @@ import java.io.IOException;
  * <p>Represents an element (normally a file or folder) in the (virtual) file system.
  *
  * <p><b>Note:</b> Instances of this class should <b>NOT</b> be casted using the Java type cast
- * operator. Instead use the {@link #getAdapter(Class)} method.
+ * operator. Instead use the {@link #adaptTo(Class)} method.
  *
  * <p>Example:
  *
@@ -17,7 +17,7 @@ import java.io.IOException;
  *     IResource resource = getAResource();
  *
  *     if (resource == IResource.File) {
- *         IFile file = resource.getAdapter(IFile.class) // you may assume this will never return null
+ *         IFile file = resource.adaptTo(IFile.class) // you may assume this will never return null
  *
  *         // do stuff
  *     }
@@ -66,5 +66,5 @@ public interface IResource {
 
   public IPath getLocation();
 
-  public <T extends IResource> T getAdapter(Class<T> clazz);
+  public <T extends IResource> T adaptTo(Class<T> clazz);
 }

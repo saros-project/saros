@@ -142,7 +142,7 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public <T extends IResource> T getAdapter(Class<T> clazz) {
+  public <T extends IResource> T adaptTo(Class<T> clazz) {
 
     /*
      * As we do not know what Eclipse is doing in the background play it safe and let Eclipse always
