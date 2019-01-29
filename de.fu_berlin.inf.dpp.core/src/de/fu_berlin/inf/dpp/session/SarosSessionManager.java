@@ -34,8 +34,8 @@ import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationCollector;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ProjectSharingData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.TransferType;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
@@ -133,6 +133,26 @@ public class SarosSessionManager implements ISarosSessionManager {
         @Override
         public void negotiationTerminated(final ProjectNegotiation negotiation) {
           currentProjectNegotiations.remove(negotiation);
+
+          if (session != null
+              && session.isHost()
+              && negotiation instanceof AbstractIncomingProjectNegotiation
+              && !negotiation.isCanceled()) {
+            AbstractIncomingProjectNegotiation ipn =
+                (AbstractIncomingProjectNegotiation) negotiation;
+
+            ProjectSharingData projectSharingData = new ProjectSharingData();
+            for (ProjectNegotiationData projectNegotiationData : ipn.getProjectNegotiationData()) {
+              String projectID = projectNegotiationData.getProjectID();
+              IProject project = session.getProject(projectID);
+              List<IResource> resourcesToShare = session.getSharedResources(project);
+
+              projectSharingData.addProject(project, projectID, resourcesToShare);
+            }
+
+            User originUser = session.getUser(negotiation.getPeer());
+            executeOutgoingProjectNegotiation(projectSharingData, originUser);
+          }
 
           if (currentProjectNegotiations.isEmpty()) {
             synchronized (nextProjectNegotiation) {
@@ -407,7 +427,6 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   void projectNegotiationRequestReceived(
       JID remoteAddress,
-      TransferType transferType,
       List<ProjectNegotiationData> projectNegotiationData,
       String negotiationID) {
 
@@ -419,7 +438,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     AbstractIncomingProjectNegotiation negotiation;
-
     synchronized (this) {
       if (!startStopSessionLock.tryLock()) {
         log.warn(
@@ -430,7 +448,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       try {
         negotiation =
             negotiationFactory.newIncomingProjectNegotiation(
-                remoteAddress, transferType, negotiationID, projectNegotiationData, this, session);
+                remoteAddress, negotiationID, projectNegotiationData, this, session);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);
@@ -565,24 +583,41 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    List<IProject> projectsToShare = new ArrayList<IProject>();
+    ProjectSharingData projectsToShare = new ProjectSharingData();
     Map<IProject, List<IResource>> mapping = nextProjectNegotiation.get();
 
+    /*
+     * Put all information about which projects and resources to share into
+     * a ProjectsToShare instance, for passing to
+     * OutgoingProjectNegotiation. On the way, generate session-wide ID's
+     * for the projects that don't have them yet. (A project might already
+     * have an ID if it is a already-partially-shared project that is now
+     * being re-added, e.g. to share additional resources from it.)
+     */
     for (Entry<IProject, List<IResource>> mapEntry : mapping.entrySet()) {
       final IProject project = mapEntry.getKey();
       final List<IResource> resourcesList = mapEntry.getValue();
 
       // side effect: non shared projects are always partial -.-
-      if (!currentSession.isCompletelyShared(project)) {
-        String projectID = currentSession.getProjectID(project);
+      String projectID = currentSession.getProjectID(project);
 
-        if (projectID == null) {
-          projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
-        }
+      if (projectID == null) {
+        projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+      }
+      projectsToShare.addProject(project, projectID, resourcesList);
 
+      /*
+       * If this is the host, add the project directly to the session
+       * before sending it to the other clients. (Non-hosts, on the other
+       * hand, wait until the host has accepted the project and offers it
+       * back with a second project negotiation.)
+       *
+       * Note that partial projects are re-added even if they were already
+       * registered as being part of the session. This is because their
+       * lists of shared resources may have changed.
+       */
+      if (currentSession.isHost() && !currentSession.isCompletelyShared(project)) {
         currentSession.addSharedResources(project, projectID, resourcesList);
-
-        projectsToShare.add(project);
       }
     }
 
@@ -592,6 +627,11 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
+    executeOutgoingProjectNegotiation(projectsToShare, session.getLocalUser());
+  }
+
+  private void executeOutgoingProjectNegotiation(
+      ProjectSharingData projectSharingData, User originUser) {
     INegotiationHandler handler = negotiationHandler;
     if (handler == null) {
       log.warn("could not start a project negotiation because no handler is installed");
@@ -607,17 +647,31 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    try {
-      for (User user : currentSession.getRemoteUsers()) {
+    List<User> recipients = new ArrayList<>();
+    if (session.isHost()) {
+      /*
+       * If we received these project from a non-host user previously,
+       * that user already has the project.
+       */
+      for (User user : session.getRemoteUsers()) {
+        if (!user.equals(originUser)) {
+          recipients.add(user);
+        }
+      }
+    } else {
+      /*
+       * As a non-host, we share the project to the host only, who
+       * takes care of sharing it with all other users in the session
+       * (see negotiationListener in this class).
+       */
+      recipients.add(session.getHost());
+    }
 
-        TransferType type =
-            TransferType.valueOf(
-                currentSession
-                    .getUserProperties(user)
-                    .getString(ProjectNegotiationTypeHook.KEY_TYPE));
+    try {
+      for (User user : recipients) {
         AbstractOutgoingProjectNegotiation negotiation =
             negotiationFactory.newOutgoingProjectNegotiation(
-                user.getJID(), type, projectsToShare, this, currentSession);
+                user.getJID(), projectSharingData, this, session);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);
@@ -645,7 +699,11 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    List<IProject> currentSharedProjects = new ArrayList<IProject>(currentSession.getProjects());
+    ProjectSharingData currentSharedProjects = new ProjectSharingData();
+    for (IProject project : currentSession.getProjects()) {
+      currentSharedProjects.addProject(
+          project, session.getProjectID(project), session.getSharedResources(project));
+    }
 
     if (currentSharedProjects.isEmpty()) return;
 
@@ -675,14 +733,9 @@ public class SarosSessionManager implements ISarosSessionManager {
           return;
         }
 
-        TransferType type =
-            TransferType.valueOf(
-                currentSession
-                    .getUserProperties(remoteUser)
-                    .getString(ProjectNegotiationTypeHook.KEY_TYPE));
         negotiation =
             negotiationFactory.newOutgoingProjectNegotiation(
-                user, type, currentSharedProjects, this, currentSession);
+                user, currentSharedProjects, this, currentSession);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);

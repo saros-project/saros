@@ -49,6 +49,8 @@ If you develop on Eclipse you should have already installed the Eclipse version 
 It is necessary to import the saros project and change the project setting so that all build/test/debug actions are processed
 by Gradle.
 
+See [the saros testing framework documentation](saros-testing-framework.md) for more information about interactive testing in the Intellij environment.
+
 ### Configure
 
 #### Install and Enable Google Java Formatter

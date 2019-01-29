@@ -247,10 +247,13 @@ public class AddProjectToSessionWizard extends Wizard {
   @Override
   public boolean performCancel() {
     if (!isExceptionCancel) {
-      if (!DialogUtils.popUpYesNoQuestion(
-          Messages.AddProjectToSessionWizard_leave_session,
-          Messages.AddProjectToSessionWizard_leave_session_text,
-          false)) {
+      ISarosSession session = sessionManager.getSession();
+      if (session != null
+          && !session.isHost()
+          && !DialogUtils.popUpYesNoQuestion(
+              Messages.AddProjectToSessionWizard_leave_session,
+              Messages.AddProjectToSessionWizard_leave_session_text,
+              false)) {
         return false;
       }
       ThreadUtils.runSafeAsync(

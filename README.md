@@ -1,5 +1,7 @@
 # Saros
 
+[![Gitter chat](https://badges.gitter.im/saros-project/user.png)](https://gitter.im/saros-project/saros/user)
+
 Saros is an Open Source IDE plugin for distributed collaborative software
 development.
 

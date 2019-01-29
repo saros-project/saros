@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.negotiation;
 
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
+import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
@@ -61,7 +62,6 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
   public AbstractIncomingProjectNegotiation(
       final JID peer, //
-      final TransferType transferType, //
       final String negotiationID, //
       final List<ProjectNegotiationData> projectNegotiationData, //
       final ISarosSessionManager sessionManager, //
@@ -76,7 +76,6 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     super(
         negotiationID,
         peer,
-        transferType,
         sessionManager,
         session,
         workspace,
@@ -134,6 +133,48 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
           getPeer(),
           ProjectNegotiationMissingFilesExtension.PROVIDER.create(
               new ProjectNegotiationMissingFilesExtension(getSessionID(), getID(), missingFiles)));
+
+      awaitActivityQueueingActivation(monitor);
+
+      /*
+       * the user who sends this ProjectNegotiation is now responsible for the
+       * resources of the contained projects
+       */
+      for (Entry<String, IProject> entry : projectMapping.entrySet()) {
+        final String projectID = entry.getKey();
+        final IProject project = entry.getValue();
+        /*
+         * TODO Queuing responsibility should be moved to Project
+         * Negotiation, since its the only consumer of queuing
+         * functionality. This will enable a specific Queuing mechanism per
+         * TransferType (see github issue #137).
+         */
+        session.addProjectMapping(projectID, project);
+        /* TODO change queuing to resource based queuing */
+        session.enableQueuing(project);
+      }
+
+      /*
+       * If we are the session's host and are receiving projects from a
+       * non-host user, we need to notify all components that the user
+       * already has these projects and can process (and send) activities
+       * targeting them. Otherwise, activities generated while we are
+       * still receiving the project archive will get lost.
+       *
+       * FIXME: userStartedQueuing() needs a better name which is less
+       * bound to its use in OutgoingProjectNegotiation.
+       */
+      if (session.isHost()) {
+        session.userStartedQueuing(session.getUser(getPeer()));
+      }
+
+      transmitter.send(
+          ISarosSession.SESSION_CONNECTION_ID,
+          getPeer(),
+          StartActivityQueuingResponse.PROVIDER.create(
+              new StartActivityQueuingResponse(getSessionID(), getID())));
+
+      checkCancellation(CancelOption.NOTIFY_PEER);
 
       transfer(monitor, projectMapping, missingFiles);
 
@@ -271,7 +312,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     // || session.getRemoteUsers().isEmpty())
     // sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
 
-    sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
+    if (!session.isHost() || session.getRemoteUsers().isEmpty())
+      sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
   }
 
   @Override

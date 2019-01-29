@@ -63,7 +63,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
   public InstantOutgoingProjectNegotiation(
       final JID peer, //
-      final List<IProject> projects, //
+      final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -75,7 +75,6 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       {
     super(
         peer,
-        TransferType.INSTANT,
         projects,
         sessionManager,
         session,
@@ -117,7 +116,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       fileCount += list.getPaths().size();
 
       final String projectID = list.getProjectID();
-      final IProject project = session.getProject(projectID);
+      final IProject project = projects.getProject(projectID);
 
       if (project == null)
         throw new LocalCancellationException(
@@ -150,7 +149,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
     try {
       OutgoingStreamProtocol osp;
-      osp = new OutgoingStreamProtocol(out, session, monitor);
+      osp = new OutgoingStreamProtocol(out, projects, monitor);
 
       /* id in description needed to bypass SendFileAction handler */
       String streamName = TRANSFER_ID_PREFIX + getID();
@@ -183,7 +182,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   private void createTransferList(List<FileList> fileLists, int fileCount) {
     List<SPath> files = new ArrayList<SPath>(fileCount);
     for (final FileList list : fileLists) {
-      IProject project = session.getProject(list.getProjectID());
+      IProject project = projects.getProject(list.getProjectID());
       for (String file : list.getPaths()) {
         files.add(new SPath(project.getFile(file)));
       }
