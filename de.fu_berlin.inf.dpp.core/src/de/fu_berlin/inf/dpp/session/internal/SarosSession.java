@@ -1049,7 +1049,13 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public void gitChangeWorkDir(File file) {
-    gitManager.changeWorkDir(file);
+    log.debug("session recieved: change Work Dir");
+    if (gitManager == null) {
+      log.debug("No git manager");
+    } else {
+      log.debug("Git manager active");
+      gitManager.changeWorkDir(file);
+    }
   }
 
   @Override

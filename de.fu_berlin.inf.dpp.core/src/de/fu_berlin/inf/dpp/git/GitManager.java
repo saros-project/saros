@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.git;
 import de.fu_berlin.inf.dpp.activities.GitCollectActivity;
 import de.fu_berlin.inf.dpp.activities.GitRequestActivity;
 import de.fu_berlin.inf.dpp.activities.GitSendBundleActivity;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
@@ -11,27 +12,31 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.File;
 import java.io.IOException;
 import org.apache.log4j.Logger;
+import org.picocontainer.Startable;
 
-public class GitManager extends AbstractActivityProducer {
+@Component(module = "core")
+public class GitManager extends AbstractActivityProducer implements Startable {
 
-  private static final Logger log = Logger.getLogger(GitManager.class);
+  private static final Logger log = Logger.getLogger(GitManager.class.getName());
 
   private final ISarosSession session;
 
-  private File workDir;
+  private File workDir = null;
 
   public GitManager(ISarosSession session) {
     this.session = session;
   }
 
-  void start() {
-    session.addActivityProducer(this);
+  @Override
+  public synchronized void start() {
     session.addActivityConsumer(consumer, Priority.ACTIVE);
+    session.addActivityProducer(this);
   }
 
-  void stop() {
-    session.removeActivityProducer(this);
+  @Override
+  public synchronized void stop() {
     session.removeActivityConsumer(consumer);
+    session.removeActivityProducer(this);
   }
 
   public void sendCommitRequest() {
@@ -40,8 +45,11 @@ public class GitManager extends AbstractActivityProducer {
   }
 
   public void changeWorkDir(File workDir) {
-    log.debug("Old work dir = " + this.workDir.getPath() + " changed to = " + workDir.getPath());
     this.workDir = workDir;
+  }
+
+  public File getWorkDir() {
+    return workDir;
   }
 
   private final IActivityConsumer consumer =

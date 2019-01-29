@@ -119,8 +119,7 @@ public class JGitFacadeTest {
    * @throws IllegalStateException
    * @throws IOException
    */
-  private static void initNewRepo(File workDir)
-      throws IllegalStateException, GitAPIException, IOException {
+  static void initNewRepo(File workDir) throws IllegalStateException, GitAPIException, IOException {
     Git git = Git.init().setDirectory(workDir).call();
 
     File testFile1 = new File(workDir, "testFile1");
@@ -142,7 +141,7 @@ public class JGitFacadeTest {
    * @throws GitAPIException
    * @throws NoFilepatternException
    */
-  private static void writeCommitToRepo(File workDir, int numberOfCommit)
+  static void writeCommitToRepo(File workDir, int numberOfCommit)
       throws IOException, NoFilepatternException, GitAPIException {
     Git git = Git.open(workDir);
 
@@ -159,7 +158,7 @@ public class JGitFacadeTest {
         .call();
   }
 
-  private static ObjectId getObjectIdByRevisionString(File workDir, String rev)
+  static ObjectId getObjectIdByRevisionString(File workDir, String rev)
       throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException,
           IOException {
     return Git.open(workDir).getRepository().resolve(rev);
