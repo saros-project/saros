@@ -195,6 +195,10 @@ public class LocalEditorManipulator {
    * range is given, focus is set to the center of the given selection instead. Either range or
    * selection can be <code>null</code>, but not both.
    *
+   * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
+   * outside the editor package. If you still need to access this method, please consider whether
+   * your class should rather be located in the editor package.
+   *
    * @param editor the editor to adjust
    * @param range viewport of the followed user; can be <code>null</code> if selection is not <code>
    *     null</code>
@@ -202,7 +206,7 @@ public class LocalEditorManipulator {
    *     <code>null</code>
    * @see IEditorManager#adjustViewport(SPath, LineRange, TextSelection)
    */
-  void adjustViewport(@NotNull Editor editor, LineRange range, TextSelection selection) {
+  public void adjustViewport(@NotNull Editor editor, LineRange range, TextSelection selection) {
     if (selection == null && range == null) {
       VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
 

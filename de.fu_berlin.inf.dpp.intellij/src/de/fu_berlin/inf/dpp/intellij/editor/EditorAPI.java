@@ -86,7 +86,8 @@ public class EditorAPI {
    * @return the logical line range of the local viewport for the given editor
    * @see LogicalPosition
    */
-  LineRange getLocalViewPortRange(@NotNull Editor editor, @NotNull Rectangle visibleAreaRectangle) {
+  public LineRange getLocalViewPortRange(
+      @NotNull Editor editor, @NotNull Rectangle visibleAreaRectangle) {
     int basePos = visibleAreaRectangle.y;
     int endPos = visibleAreaRectangle.y + visibleAreaRectangle.height;
 

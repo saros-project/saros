@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.project;
+package de.fu_berlin.inf.dpp.intellij.eventhandler.filesystem;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -24,13 +24,14 @@ import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.intellij.editor.DisableableHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
-import de.fu_berlin.inf.dpp.intellij.editor.LocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.DisableableHandler;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
+import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -110,7 +111,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
    * @param editorManager the EditorManager instance
    * @param session the current SarosSession instance
    */
-  LocalFilesystemModificationHandler(
+  public LocalFilesystemModificationHandler(
       SharedResourcesManager resourceManager, EditorManager editorManager, ISarosSession session) {
 
     this.resourceManager = resourceManager;

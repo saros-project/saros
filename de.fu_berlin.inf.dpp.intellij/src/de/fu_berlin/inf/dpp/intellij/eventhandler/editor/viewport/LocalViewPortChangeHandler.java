@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.viewport;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -8,12 +8,15 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import de.fu_berlin.inf.dpp.intellij.editor.EditorAPI;
+import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.DisableableHandler;
 import java.awt.Rectangle;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for viewport changes. */
-class LocalViewPortChangeHandler implements DisableableHandler {
+public class LocalViewPortChangeHandler implements DisableableHandler {
   private static final Logger log = Logger.getLogger(LocalViewPortChangeHandler.class);
 
   private final EditorManager editorManager;
@@ -30,7 +33,7 @@ class LocalViewPortChangeHandler implements DisableableHandler {
    *
    * @param editorManager the EditorManager instance
    */
-  LocalViewPortChangeHandler(EditorManager editorManager, EditorAPI editorAPI) {
+  public LocalViewPortChangeHandler(EditorManager editorManager, EditorAPI editorAPI) {
     this.editorManager = editorManager;
     this.editorAPI = editorAPI;
 
@@ -97,7 +100,7 @@ class LocalViewPortChangeHandler implements DisableableHandler {
    *
    * @param editor the editor to register
    */
-  void register(@NotNull Editor editor) {
+  public void register(@NotNull Editor editor) {
     editor.getScrollingModel().addVisibleAreaListener(visibleAreaListener);
   }
 

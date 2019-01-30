@@ -1,13 +1,15 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.selection;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.editor.event.SelectionListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.DisableableHandler;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for selection changes. */
-class LocalTextSelectionChangeHandler implements DisableableHandler {
+public class LocalTextSelectionChangeHandler implements DisableableHandler {
 
   private final EditorManager editorManager;
 
@@ -28,7 +30,7 @@ class LocalTextSelectionChangeHandler implements DisableableHandler {
    *
    * @param editorManager the EditorManager instance
    */
-  LocalTextSelectionChangeHandler(EditorManager editorManager) {
+  public LocalTextSelectionChangeHandler(EditorManager editorManager) {
     this.editorManager = editorManager;
 
     this.enabled = true;
@@ -56,7 +58,7 @@ class LocalTextSelectionChangeHandler implements DisableableHandler {
    *
    * @param editor the editor to register
    */
-  void register(@NotNull Editor editor) {
+  public void register(@NotNull Editor editor) {
     editor.getSelectionModel().addSelectionListener(selectionListener);
   }
 
