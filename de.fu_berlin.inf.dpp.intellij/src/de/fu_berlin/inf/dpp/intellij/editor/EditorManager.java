@@ -588,6 +588,19 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     return editorPool;
   }
 
+  /**
+   * Returns an SPath representing the file corresponding to the given document if the editor for
+   * the document is known to the editor pool.
+   *
+   * @param document the document to get an SPath for
+   * @return an SPath representing the file corresponding to the given document or <code>null</code>
+   *     if the given document is <code>null</code> or is not known to the editor pool.
+   */
+  @Nullable
+  public SPath getFileForOpenEditor(@Nullable Document document) {
+    return editorPool.getFile(document);
+  }
+
   ISarosSession getSession() {
     return session;
   }

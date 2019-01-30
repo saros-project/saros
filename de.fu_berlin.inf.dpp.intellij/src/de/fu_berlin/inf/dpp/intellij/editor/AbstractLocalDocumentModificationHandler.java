@@ -77,7 +77,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
    * @see VirtualFileConverter#convertToSPath(VirtualFile)
    */
   protected final SPath getSPath(Document document) {
-    SPath path = editorManager.getEditorPool().getFile(document);
+    SPath path = editorManager.getFileForOpenEditor(document);
 
     if (path != null) {
       return path;

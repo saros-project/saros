@@ -56,7 +56,7 @@ class LocalViewPortChangeHandler implements DisableableHandler {
     Editor editor = event.getEditor();
     Rectangle newVisibleRectangle = event.getNewRectangle();
 
-    SPath path = editorManager.getEditorPool().getFile(editor.getDocument());
+    SPath path = editorManager.getFileForOpenEditor(editor.getDocument());
 
     if (path == null) {
       if (log.isTraceEnabled()) {
