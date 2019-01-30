@@ -75,7 +75,6 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       {
     super(
         peer,
-        TransferType.INSTANT,
         projects,
         sessionManager,
         session,
