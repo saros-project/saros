@@ -168,7 +168,7 @@ public class LocalEditorManipulator {
        * Disable documentListener temporarily to avoid being notified of
        * the change
        */
-      manager.disableDocumentHandlers();
+      manager.setLocalDocumentModificationHandlersEnabled(false);
 
       for (ITextOperation op : operations.getTextOperations()) {
         if (op instanceof DeleteOperation) {
@@ -186,7 +186,7 @@ public class LocalEditorManipulator {
       }
 
     } finally {
-      manager.enableDocumentHandlers();
+      manager.setLocalDocumentModificationHandlersEnabled(true);
     }
   }
 
@@ -344,7 +344,7 @@ public class LocalEditorManipulator {
       }
 
       if (wasDocumentListenerEnabled) {
-        manager.disableDocumentHandlers();
+        manager.setLocalDocumentModificationHandlersEnabled(false);
       }
 
       editorAPI.deleteText(document, 0, documentLength);
@@ -353,7 +353,7 @@ public class LocalEditorManipulator {
     } finally {
 
       if (wasDocumentListenerEnabled) {
-        manager.enableDocumentHandlers();
+        manager.setLocalDocumentModificationHandlersEnabled(true);
       }
 
       if (wasReadOnly) {

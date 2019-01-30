@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.AbstractLocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate.LocalEditorStatusChangeHandler;
@@ -393,16 +394,16 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     selectedEditorState.captureState();
 
     try {
-      localEditorStatusChangeHandler.setEnabled(false);
-      localViewPortChangeHandler.setEnabled(false);
+      setLocalEditorStatusChangeHandlersEnabled(false);
+      setLocalViewPortChangeHandlersEnabled(false);
 
       for (VirtualFile openFile : openFiles) {
         localEditorHandler.openEditor(openFile, project, false);
       }
 
     } finally {
-      localViewPortChangeHandler.setEnabled(true);
-      localEditorStatusChangeHandler.setEnabled(true);
+      setLocalViewPortChangeHandlersEnabled(true);
+      setLocalEditorStatusChangeHandlersEnabled(true);
     }
 
     selectedEditorState.applyCapturedState();
@@ -438,8 +439,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.addActivityProducer(EditorManager.this);
           session.addActivityConsumer(consumer, Priority.ACTIVE);
 
-          localDocumentModificationHandler.setEnabled(true);
-          localClosedEditorModificationHandler.setEnabled(true);
+          setLocalDocumentModificationHandlersEnabled(true);
 
           userEditorStateManager = session.getComponent(UserEditorStateManager.class);
           remoteWriteAccessManager = new RemoteWriteAccessManager(session);
@@ -461,8 +461,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.removeActivityProducer(EditorManager.this);
           session.removeActivityConsumer(consumer);
 
-          localDocumentModificationHandler.setEnabled(false);
-          localClosedEditorModificationHandler.setEnabled(false);
+          setLocalDocumentModificationHandlersEnabled(false);
 
           session = null;
 
@@ -615,29 +614,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   boolean hasSession() {
     return session != null;
-  }
-
-  /**
-   * Enables or disables the handler. This is done by registering or unregistering the held
-   * listener.
-   *
-   * <p>This method does nothing if the given state already matches the current state.
-   *
-   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
-   * @see LocalEditorStatusChangeHandler#setEnabled(boolean)
-   */
-  void setLocalEditorStatusChangeHandlerEnabled(boolean enabled) {
-    localEditorStatusChangeHandler.setEnabled(enabled);
-  }
-
-  /**
-   * Enables or disabled the handler. This is not done by disabling the underlying listener.
-   *
-   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
-   * @see LocalViewPortChangeHandler#setEnabled(boolean)
-   */
-  void setLocalViewPortChangeHandlerEnabled(boolean enabled) {
-    localViewPortChangeHandler.setEnabled(enabled);
   }
 
   /**
@@ -797,31 +773,78 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     editorListenerDispatch.jumpedToUser(jumpTo);
   }
 
+  /**
+   * Enables or disables all editor state change listeners. This is done by registering or
+   * unregistering the held listeners.
+   *
+   * <p>This method does nothing if the given state already matches the current state.
+   *
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
+   * @see LocalEditorStatusChangeHandler#setEnabled(boolean)
+   */
+  void setLocalEditorStatusChangeHandlersEnabled(boolean enabled) {
+    localEditorStatusChangeHandler.setEnabled(enabled);
+  }
+
+  /**
+   * Enables or disables all viewport change handler. This is not done by disabling the underlying
+   * listener.
+   *
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
+   * @see LocalViewPortChangeHandler#setEnabled(boolean)
+   */
+  void setLocalViewPortChangeHandlersEnabled(boolean enabled) {
+    localViewPortChangeHandler.setEnabled(enabled);
+  }
+
   boolean isDocumentModificationHandlerEnabled() {
     return localDocumentModificationHandler.isEnabled();
   }
 
-  void enableDocumentHandlers() {
-    localDocumentModificationHandler.setEnabled(true);
-    localClosedEditorModificationHandler.setEnabled(true);
-  }
-
-  void disableDocumentHandlers() {
-    localDocumentModificationHandler.setEnabled(false);
-    localClosedEditorModificationHandler.setEnabled(false);
+  /**
+   * Enables or disabled all document modification handlers. Enables or disables the handler. This
+   * is done by registering or unregistering the held listener.
+   *
+   * <p>This method does nothing if the given state already matches the current state.
+   *
+   * @param enabled <code>true</code> to enable the handlers, <code>false</code> disable the
+   *     handlers
+   * @see AbstractLocalDocumentModificationHandler#setEnabled(boolean)
+   */
+  void setLocalDocumentModificationHandlersEnabled(boolean enabled) {
+    localDocumentModificationHandler.setEnabled(enabled);
+    localClosedEditorModificationHandler.setEnabled(enabled);
   }
 
   /**
-   * Enables the localDocumentModificationHandler, the localEditorStatusChangeHandler, the
-   * localTextSelectionChangeHandler and the localViewPortChangeHandler if the parameter is <code>
-   * true</code>, else disables them.
+   * Enables or disabled all text selection change handlers. This is not done by disabling the
+   * underlying listeners.
+   *
+   * @param enabled <code>true</code> to enable the handlers, <code>false</code> disable the
+   *     handlers
+   * @see LocalTextSelectionChangeHandler#setEnabled(boolean)
+   */
+  private void setLocalTextSelectionChangeHandlersEnabled(boolean enabled) {
+    localTextSelectionChangeHandler.setEnabled(enabled);
+  }
+
+  /**
+   * Updates the state of all held editor event handlers to match the given state.
+   *
+   * <p>Enables all listeners when <code> true</code> is passed and disables all listeners if <code>
+   * false</code> is passed.
+   *
+   * @param enable the state to set the handlers to
+   * @see #setLocalDocumentModificationHandlersEnabled(boolean)
+   * @see #setLocalEditorStatusChangeHandlersEnabled(boolean)
+   * @see #setLocalTextSelectionChangeHandlersEnabled(boolean)
+   * @see #setLocalViewPortChangeHandlersEnabled(boolean)
    */
   private void setHandlersEnabled(boolean enable) {
-    localDocumentModificationHandler.setEnabled(enable);
-    localClosedEditorModificationHandler.setEnabled(enable);
-    localEditorStatusChangeHandler.setEnabled(enable);
-    localTextSelectionChangeHandler.setEnabled(enable);
-    localViewPortChangeHandler.setEnabled(enable);
+    setLocalDocumentModificationHandlersEnabled(enable);
+    setLocalEditorStatusChangeHandlersEnabled(enable);
+    setLocalTextSelectionChangeHandlersEnabled(enable);
+    setLocalViewPortChangeHandlersEnabled(enable);
   }
 
   /**
