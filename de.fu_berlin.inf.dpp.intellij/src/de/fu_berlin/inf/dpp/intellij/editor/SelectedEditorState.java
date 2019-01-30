@@ -58,16 +58,16 @@ public class SelectedEditorState {
     ListIterator<VirtualFile> iterator = selectedEditors.listIterator(selectedEditors.size());
 
     try {
-      editorManager.setLocalEditorStatusChangeHandlerEnabled(false);
-      editorManager.setLocalViewPortChangeHandlerEnabled(false);
+      editorManager.setLocalEditorStatusChangeHandlersEnabled(false);
+      editorManager.setLocalViewPortChangeHandlersEnabled(false);
 
       while (iterator.hasPrevious()) {
         projectAPI.openEditor(iterator.previous(), true);
       }
 
     } finally {
-      editorManager.setLocalViewPortChangeHandlerEnabled(true);
-      editorManager.setLocalEditorStatusChangeHandlerEnabled(true);
+      editorManager.setLocalViewPortChangeHandlersEnabled(true);
+      editorManager.setLocalEditorStatusChangeHandlersEnabled(true);
     }
   }
 
