@@ -45,7 +45,7 @@ class LocalTextSelectionChangeHandler implements DisableableHandler {
       return;
     }
 
-    SPath path = editorManager.getEditorPool().getFile(event.getEditor().getDocument());
+    SPath path = editorManager.getFileForOpenEditor(event.getEditor().getDocument());
     if (path != null) {
       editorManager.generateSelection(path, event);
     }

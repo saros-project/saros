@@ -109,7 +109,7 @@ class EditorPool {
    *     could be found in the editor pool
    */
   @Nullable
-  SPath getFile(@NotNull Document doc) {
+  SPath getFile(@Nullable Document doc) {
 
     for (Map.Entry<SPath, Editor> entry : editors.entrySet()) {
       if (entry.getValue().getDocument().equals(doc)) {
