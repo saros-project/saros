@@ -31,7 +31,11 @@ import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
-import de.fu_berlin.inf.dpp.intellij.editor.annotations.LocalClosedEditorModificationHandler;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate.LocalEditorStatusChangeHandler;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.selection.LocalTextSelectionChangeHandler;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -351,10 +355,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * participants about new selections, {@link #generateSelection(SPath, SelectionEvent)} should be
    * used instead.
    *
+   * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
+   * outside the editor package. If you still need to access this method, please consider whether
+   * your class should rather be located in the editor package.
+   *
    * @param path the path representing the given editor
    * @param editor the editor to send the selection for
    */
-  void sendExistingSelection(@NotNull SPath path, @NotNull Editor editor) {
+  public void sendExistingSelection(@NotNull SPath path, @NotNull Editor editor) {
     User localUser = session.getLocalUser();
 
     sendSelectionInformation(localUser, path, editor);
@@ -671,16 +679,28 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED, path));
   }
 
-  /** Generates a {@link TextSelectionActivity} and fires it. */
-  void generateSelection(SPath path, SelectionEvent newSelection) {
+  /**
+   * Generates a {@link TextSelectionActivity} and fires it.
+   *
+   * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
+   * outside the editor package. If you still need to access this method, please consider whether
+   * your class should rather be located in the editor package.
+   */
+  public void generateSelection(SPath path, SelectionEvent newSelection) {
     int offset = newSelection.getNewRange().getStartOffset();
     int length = newSelection.getNewRange().getLength();
 
     fireActivity(new TextSelectionActivity(session.getLocalUser(), offset, length, path));
   }
 
-  /** Generates a {@link ViewportActivity} and fires it. */
-  void generateViewport(SPath path, LineRange viewport) {
+  /**
+   * Generates a {@link ViewportActivity} and fires it.
+   *
+   * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
+   * outside the editor package. If you still need to access this method, please consider whether
+   * your class should rather be located in the editor package.
+   */
+  public void generateViewport(SPath path, LineRange viewport) {
     if (session == null) {
       LOG.warn("SharedEditorListener not correctly unregistered!");
       return;
@@ -691,8 +711,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             session.getLocalUser(), viewport.getStartLine(), viewport.getNumberOfLines(), path));
   }
 
-  /** Generates a TextEditActivity and fires it. */
-  void generateTextEdit(int offset, String newText, String replacedText, SPath path) {
+  /**
+   * Generates a TextEditActivity and fires it.
+   *
+   * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
+   * outside the editor package. If you still need to access this method, please consider whether
+   * your class should rather be located in the editor package.
+   */
+  public void generateTextEdit(int offset, String newText, String replacedText, SPath path) {
 
     if (session == null) {
       return;

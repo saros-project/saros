@@ -1,9 +1,10 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 
 /**
  * Tracks modifications of Documents and triggers matching TextEditActivities. These activities are
@@ -21,7 +22,7 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
         }
       };
 
-  LocalDocumentModificationHandler(EditorManager editorManager) {
+  public LocalDocumentModificationHandler(EditorManager editorManager) {
     super(editorManager);
   }
 

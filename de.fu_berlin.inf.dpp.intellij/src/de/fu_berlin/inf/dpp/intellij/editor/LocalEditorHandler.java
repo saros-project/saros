@@ -206,9 +206,13 @@ public class LocalEditorHandler {
   /**
    * Calls {@link EditorManager#generateEditorActivated(SPath)}.
    *
+   * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
+   * outside the editor package. If you still need to access this method, please consider whether
+   * your class should rather be located in the editor package.
+   *
    * @param file the file whose editor was activated or <code>null</code> if there is no editor open
    */
-  void activateEditor(@Nullable VirtualFile file) {
+  public void activateEditor(@Nullable VirtualFile file) {
     if (file == null) {
 
       if (manager.hasSession()) {

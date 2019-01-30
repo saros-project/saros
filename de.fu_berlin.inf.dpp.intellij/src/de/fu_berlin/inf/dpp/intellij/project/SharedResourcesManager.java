@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.SelectedEditorState;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -371,7 +372,16 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     }
   }
 
-  void internalFireActivity(IActivity activity) {
+  /**
+   * Fires the given activity.
+   *
+   * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
+   * outside the filesystem package. If you still need to access this method, please consider
+   * whether your class should rather be located in the filesystem package.
+   *
+   * @param activity the activity to fire
+   */
+  public void internalFireActivity(IActivity activity) {
     // HACK for now
     if (fileReplacementInProgressObservable.isReplacementInProgress()) {
       if (LOG.isTraceEnabled()) {

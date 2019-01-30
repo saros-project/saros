@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.caret;
 
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;

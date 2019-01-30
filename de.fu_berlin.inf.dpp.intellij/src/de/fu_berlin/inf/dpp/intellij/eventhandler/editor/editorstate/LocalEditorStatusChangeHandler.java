@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
@@ -12,7 +12,12 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
+import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
+import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.DisableableHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import java.util.HashMap;
@@ -22,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** Dispatches activities for editor changes. */
-class LocalEditorStatusChangeHandler implements DisableableHandler {
+public class LocalEditorStatusChangeHandler implements DisableableHandler {
 
   private static final Logger log = Logger.getLogger(LocalEditorStatusChangeHandler.class);
 
@@ -88,7 +93,7 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
    * @param localEditorManipulator the LocalEditorManipulator instance
    * @param annotationManager the AnnotationManager instance
    */
-  LocalEditorStatusChangeHandler(
+  public LocalEditorStatusChangeHandler(
       EditorManager editorManager,
       Project project,
       ProjectAPI projectAPI,
@@ -275,7 +280,7 @@ class LocalEditorStatusChangeHandler implements DisableableHandler {
    * @param range the line range used for the viewport adjustment
    * @param selection the text selection used for the viewport adjustment
    */
-  void queueViewPortChange(
+  public void queueViewPortChange(
       @NotNull String path,
       @Nullable Editor editor,
       @Nullable LineRange range,

@@ -6,7 +6,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
   de.fu_berlin.inf.dpp.intellij.context.TestSuite.class,
-  de.fu_berlin.inf.dpp.intellij.editor.TestSuite.class,
+  de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.TestSuite.class,
   de.fu_berlin.inf.dpp.intellij.project.filesystem.TestSuite.class,
   de.fu_berlin.inf.dpp.intellij.ui.swt_browser.TestSuite.class,
 })
