@@ -51,7 +51,7 @@ public class LocalViewPortChangeHandler implements DisableableHandler {
    * @see VisibleAreaListener#visibleAreaChanged(VisibleAreaEvent)
    * @see LogicalPosition
    */
-  private void generateViewportActivity(VisibleAreaEvent event) {
+  private void generateViewportActivity(@NotNull VisibleAreaEvent event) {
     if (!enabled) {
       return;
     }

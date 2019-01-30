@@ -29,9 +29,7 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
       };
 
   public LocalClosedEditorModificationHandler(
-      @NotNull EditorManager editorManager,
-      @NotNull ProjectAPI projectAPI,
-      @NotNull AnnotationManager annotationManager) {
+      EditorManager editorManager, ProjectAPI projectAPI, AnnotationManager annotationManager) {
 
     super(editorManager);
 
@@ -47,7 +45,7 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
    * @param event the event to react to
    * @see DocumentListener#beforeDocumentChange(DocumentEvent)
    */
-  private void cleanUpAnnotations(DocumentEvent event) {
+  private void cleanUpAnnotations(@NotNull DocumentEvent event) {
     Document document = event.getDocument();
 
     SPath path = getSPath(document);

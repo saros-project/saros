@@ -42,7 +42,7 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler {
    * @param event the event to react to
    * @see SelectionListener#selectionChanged(SelectionEvent)
    */
-  private void generateSelectionActivity(SelectionEvent event) {
+  private void generateSelectionActivity(@NotNull SelectionEvent event) {
     if (!enabled) {
       return;
     }
