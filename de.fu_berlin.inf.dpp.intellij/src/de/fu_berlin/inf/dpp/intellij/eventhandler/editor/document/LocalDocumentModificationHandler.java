@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Tracks modifications of Documents and triggers matching TextEditActivities. These activities are
@@ -33,7 +34,7 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
    * @param event the event to react to
    * @see DocumentListener#beforeDocumentChange(DocumentEvent)
    */
-  private void generateTextEditActivity(DocumentEvent event) {
+  private void generateTextEditActivity(@NotNull DocumentEvent event) {
     Document document = event.getDocument();
 
     SPath path = getSPath(document);

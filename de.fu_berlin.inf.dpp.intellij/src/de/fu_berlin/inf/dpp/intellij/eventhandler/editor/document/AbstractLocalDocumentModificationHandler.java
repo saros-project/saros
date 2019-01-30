@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.intellij.eventhandler.DisableableHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 /** Parent class containing utility methods when working with document listeners. */
 public abstract class AbstractLocalDocumentModificationHandler implements DisableableHandler {
@@ -42,7 +43,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
    * @param enabled the new state of the listener
    * @param documentListener the listener whose state to change
    */
-  public void setEnabled(boolean enabled, DocumentListener documentListener) {
+  public void setEnabled(boolean enabled, @NotNull DocumentListener documentListener) {
     if (!this.enabled && enabled) {
       LOG.debug("Started listening for document events");
 
@@ -78,7 +79,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
    *     resources represented by the given document is not shared
    * @see VirtualFileConverter#convertToSPath(VirtualFile)
    */
-  final SPath getSPath(Document document) {
+  final SPath getSPath(@NotNull Document document) {
     SPath path = editorManager.getFileForOpenEditor(document);
 
     if (path != null) {
