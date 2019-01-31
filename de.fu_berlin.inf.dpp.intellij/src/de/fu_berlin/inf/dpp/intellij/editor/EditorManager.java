@@ -34,7 +34,10 @@ import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
 import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.AbstractLocalDocumentModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
 import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
-import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate.LocalEditorStatusChangeHandler;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate.AnnotationUpdater;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate.EditorStatusChangeActivityDispatcher;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate.PreexistingSelectionDispatcher;
+import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
 import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.selection.LocalTextSelectionChangeHandler;
 import de.fu_berlin.inf.dpp.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
 import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
@@ -486,10 +489,21 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private RemoteWriteAccessManager remoteWriteAccessManager;
   private ISarosSession session;
 
+  /* Event handlers */
+  // document changes
   private final LocalDocumentModificationHandler localDocumentModificationHandler;
   private final LocalClosedEditorModificationHandler localClosedEditorModificationHandler;
-  private final LocalEditorStatusChangeHandler localEditorStatusChangeHandler;
+
+  // editor state changes
+  private final AnnotationUpdater annotationUpdater;
+  private final EditorStatusChangeActivityDispatcher editorStatusChangeActivityDispatcher;
+  private final PreexistingSelectionDispatcher preexistingSelectionDispatcher;
+  private final ViewportAdjustmentExecutor viewportAdjustmentExecutor;
+
+  // text selection changes
   private final LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
+
+  // viewport changes
   private final LocalViewPortChangeHandler localViewPortChangeHandler;
 
   private boolean hasWriteAccess;
@@ -516,16 +530,17 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     localDocumentModificationHandler = new LocalDocumentModificationHandler(this);
     localClosedEditorModificationHandler =
         new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
-    localEditorStatusChangeHandler =
-        new LocalEditorStatusChangeHandler(
-            this,
-            project,
-            projectAPI,
-            localEditorHandler,
-            localEditorManipulator,
-            annotationManager);
+
+    annotationUpdater = new AnnotationUpdater(project, annotationManager, localEditorHandler);
+    editorStatusChangeActivityDispatcher =
+        new EditorStatusChangeActivityDispatcher(project, localEditorHandler);
+    preexistingSelectionDispatcher =
+        new PreexistingSelectionDispatcher(project, this, localEditorHandler);
+    viewportAdjustmentExecutor =
+        new ViewportAdjustmentExecutor(project, projectAPI, localEditorManipulator);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
+
     localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
 
     localEditorHandler.initialize(this);
@@ -780,10 +795,16 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * <p>This method does nothing if the given state already matches the current state.
    *
    * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
-   * @see LocalEditorStatusChangeHandler#setEnabled(boolean)
+   * @see AnnotationUpdater#setEnabled(boolean)
+   * @see EditorStatusChangeActivityDispatcher#setEnabled(boolean)
+   * @see PreexistingSelectionDispatcher#setEnabled(boolean)
+   * @see ViewportAdjustmentExecutor#setEnabled(boolean)
    */
   void setLocalEditorStatusChangeHandlersEnabled(boolean enabled) {
-    localEditorStatusChangeHandler.setEnabled(enabled);
+    annotationUpdater.setEnabled(enabled);
+    editorStatusChangeActivityDispatcher.setEnabled(enabled);
+    preexistingSelectionDispatcher.setEnabled(enabled);
+    viewportAdjustmentExecutor.setEnabled(enabled);
   }
 
   /**
@@ -944,7 +965,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     Editor editor = editorPool.getEditor(path);
 
     if (!visibleFilePaths.contains(passedFile.getPath())) {
-      localEditorStatusChangeHandler.queueViewPortChange(
+      viewportAdjustmentExecutor.queueViewPortChange(
           passedFile.getPath(), editor, range, selection);
 
       return;
