@@ -304,20 +304,38 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           fireActivity(setViewPort);
         }
-
-        private void sendSelectionInformation(
-            @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
-
-          Pair<Integer, Integer> localSelectionOffsets = editorAPI.getLocalSelectionOffsets(editor);
-          int selectionStartOffset = localSelectionOffsets.first;
-          int selectionLength = localSelectionOffsets.second;
-
-          TextSelectionActivity setSelection =
-              new TextSelectionActivity(user, selectionStartOffset, selectionLength, path);
-
-          fireActivity(setSelection);
-        }
       };
+
+  /**
+   * Generates and dispatches a TextSelectionActivity for the current selection in the given editor.
+   * The local user will be used as the source of the activity and the given path will be used as
+   * the path for the editor.
+   *
+   * <p><b>NOTE:</b> This should only be used to transfer pre-existing selection. To notify other
+   * participants about new selections, {@link #generateSelection(SPath, SelectionEvent)} should be
+   * used instead.
+   *
+   * @param path the path representing the given editor
+   * @param editor the editor to send the selection for
+   */
+  void sendExistingSelection(@NotNull SPath path, @NotNull Editor editor) {
+    User localUser = session.getLocalUser();
+
+    sendSelectionInformation(localUser, path, editor);
+  }
+
+  private void sendSelectionInformation(
+      @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
+
+    Pair<Integer, Integer> localSelectionOffsets = editorAPI.getLocalSelectionOffsets(editor);
+    int selectionStartOffset = localSelectionOffsets.first;
+    int selectionLength = localSelectionOffsets.second;
+
+    TextSelectionActivity setSelection =
+        new TextSelectionActivity(user, selectionStartOffset, selectionLength, path);
+
+    fireActivity(setSelection);
+  }
 
   /**
    * Adds all currently open editors belonging to the passed project to the pool of open editors.
@@ -454,7 +472,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     localClosedEditorModificationHandler =
         new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
     localEditorStatusChangeHandler =
-        new LocalEditorStatusChangeHandler(project, localEditorHandler, annotationManager);
+        new LocalEditorStatusChangeHandler(this, project, localEditorHandler, annotationManager);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
     localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
