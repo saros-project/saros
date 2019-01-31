@@ -64,12 +64,12 @@ public class SarosIntellijContextFactoryTest {
     EasyMock.replay(messageBusConnection);
 
     MessageBus messageBus = EasyMock.createNiceMock(MessageBus.class);
-    EasyMock.expect(messageBus.connect()).andReturn(messageBusConnection);
+    EasyMock.expect(messageBus.connect()).andReturn(messageBusConnection).anyTimes();
 
     EasyMock.replay(messageBus);
 
     project = EasyMock.createNiceMock(Project.class);
-    EasyMock.expect(project.getMessageBus()).andReturn(messageBus);
+    EasyMock.expect(project.getMessageBus()).andReturn(messageBus).anyTimes();
 
     EasyMock.replay(project);
 
