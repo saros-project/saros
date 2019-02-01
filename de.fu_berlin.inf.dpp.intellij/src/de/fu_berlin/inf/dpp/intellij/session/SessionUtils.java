@@ -41,6 +41,12 @@ public class SessionUtils {
 
   private static volatile ISarosSession currentSarosSession;
 
+  /**
+   * Initializes the SessionUtils. This is only used as part of the plugin context initialization by
+   * the PicoContainer and should not be called otherwise.
+   *
+   * @param sarosSessionManager the current SarosSessionManager instance
+   */
   public SessionUtils(ISarosSessionManager sarosSessionManager) {
     sarosSessionManager.addSessionLifecycleListener(lifecycleListener);
   }
