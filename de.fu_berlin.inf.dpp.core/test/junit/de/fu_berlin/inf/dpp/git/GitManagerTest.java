@@ -11,8 +11,8 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import java.io.File;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -24,19 +24,19 @@ import org.junit.rules.TemporaryFolder;
 
 public class GitManagerTest {
 
-  private ISarosSession alicesSession;
+  private SarosSession alicesSession;
   private IActivityConsumer alicesConsumer;
   private User alicesAlice;
   private User alicesBob;
 
-  private ISarosSession bobsSession;
+  private SarosSession bobsSession;
   private IActivityConsumer bobsConsumer;
   private User bobsAlice;
   private User bobsBob;
 
   @Before
   public void createSessionsMocks() {
-    alicesSession = EasyMock.createMock(ISarosSession.class);
+    alicesSession = EasyMock.createMock(SarosSession.class);
 
     alicesSession.addActivityProducer(isA(GitManager.class));
     alicesSession.removeActivityProducer(isA(GitManager.class));
@@ -65,7 +65,7 @@ public class GitManagerTest {
 
     EasyMock.replay(alicesSession);
 
-    bobsSession = EasyMock.createMock(ISarosSession.class);
+    bobsSession = EasyMock.createMock(SarosSession.class);
 
     bobsSession.addActivityProducer(isA(GitManager.class));
     bobsSession.removeActivityProducer(isA(GitManager.class));

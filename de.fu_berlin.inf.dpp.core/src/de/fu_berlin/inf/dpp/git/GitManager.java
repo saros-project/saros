@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import java.io.File;
 import java.io.IOException;
 import org.apache.log4j.Logger;
@@ -19,11 +19,11 @@ public class GitManager extends AbstractActivityProducer implements Startable {
 
   private static final Logger log = Logger.getLogger(GitManager.class.getName());
 
-  private final ISarosSession session;
+  private final SarosSession session;
 
   private File workDir = null;
 
-  public GitManager(ISarosSession session) {
+  public GitManager(SarosSession session) {
     this.session = session;
   }
 

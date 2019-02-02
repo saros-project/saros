@@ -1042,12 +1042,10 @@ public final class SarosSession implements ISarosSession {
     changeColorManager.changeColorID(colorID);
   }
 
-  @Override
   public void gitSendCommitRequest() {
     gitManager.sendCommitRequest();
   }
 
-  @Override
   public void gitChangeWorkDir(File file) {
     log.debug("session recieved: change Work Dir");
     if (gitManager == null) {
@@ -1058,7 +1056,6 @@ public final class SarosSession implements ISarosSession {
     }
   }
 
-  @Override
   public GitManager getGitManager() {
     return gitManager;
   }

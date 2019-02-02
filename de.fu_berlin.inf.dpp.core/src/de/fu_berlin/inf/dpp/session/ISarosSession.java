@@ -25,13 +25,11 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.git.GitManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -387,12 +385,6 @@ public interface ISarosSession {
    * @param colorID the new color id that should be used during the session
    */
   public void changeColor(int colorID);
-
-  public void gitSendCommitRequest();
-
-  public void gitChangeWorkDir(File file);
-
-  public GitManager getGitManager();
 
   /**
    * FOR INTERNAL USE ONLY !
