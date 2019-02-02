@@ -68,7 +68,7 @@ public class JGitFacadeTest {
         getObjectIdByRevisionString(remoteWorkDir, "FETCH_HEAD"));
   }
   // handling exceptions
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = IOException.class)
   public void testCreateBundleEmptyWorkDir() throws IllegalArgumentException, IOException {
     File emptyDir = tempFolder.newFolder("TempDir3");
 
@@ -80,13 +80,14 @@ public class JGitFacadeTest {
     JGitFacade.createBundle(localWorkDir, "refs/heads/wrongRef", "CheckoutAtInit");
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = IOException.class)
   public void testCreateBundleWrongBasis() throws IllegalArgumentException, IOException {
     JGitFacade.createBundle(localWorkDir, "HEAD", "WrongBasis");
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testFetchFromBundleEmptyDir() throws IllegalArgumentException, Exception {
+  @Test(expected = IOException.class)
+  public void testFetchFromBundleEmptyDir()
+      throws IllegalArgumentException, IOException, GitAPIException {
     File emptyDir = tempFolder.newFolder("TempDir3");
 
     writeCommitToRepo(localWorkDir, 3);

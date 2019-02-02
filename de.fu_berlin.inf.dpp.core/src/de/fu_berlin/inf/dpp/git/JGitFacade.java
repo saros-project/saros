@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteRemoveCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -28,8 +30,9 @@ public class JGitFacade {
    *     basis is an empty string) everything reachable from it.
    * @param basis Assume that the recipient have at least the commit the basis is pointing to. In
    *     order to fetch from a bundle the recipient must have the commit the basis is pointing to.
-   * @throws IllegalArgumentException workDir, actual or basis can't be resolved
-   * @throws IOException Error while writing bundle, after resolving parameters
+   * @throws IllegalArgumentException workDir is null or if resolving actual leds to a not exitsting
+   *     ref
+   * @throws IOException failed while read/resolved parameters or while written to the bundleFile
    */
   public static File createBundle(File workDir, String actual, String basis)
       throws IllegalArgumentException, IOException {
@@ -41,9 +44,11 @@ public class JGitFacade {
     // Step 1
     Git git;
     try {
+      if (workDir == null)
+        throw new IllegalArgumentException("workDir is null and can't be resolved");
       git = Git.open(workDir);
     } catch (IOException e) {
-      throw new IllegalArgumentException("workDir can't be resolved", e);
+      throw new IOException("failed while read from workDir", e);
     }
     Repository repo = git.getRepository();
     BundleWriter bundlewriter = new BundleWriter(repo);
@@ -53,33 +58,45 @@ public class JGitFacade {
     try {
       actualRef = repo.exactRef(actual);
     } catch (IOException e) {
-      throw new IllegalArgumentException("actual can't be resolved", e);
+      throw new IOException("failed while resolved second parameter", e);
     }
-    if (actualRef == null) throw new IllegalArgumentException("actual can't be resolved");
+    if (actualRef == null)
+      throw new IllegalArgumentException(
+          "failed to resolve the second parameter: not existing ref");
+
     bundlewriter.include("refs/heads/bundle", actualRef.getObjectId());
 
     // Step 3
     if (basis != "") {
       try {
         RevWalk walk = new RevWalk(repo);
+
         RevCommit basisCommit = walk.parseCommit(repo.resolve(basis));
+
+        walk.close();
+
         bundlewriter.assume(basisCommit);
-      } catch (Exception e) {
-        throw new IllegalArgumentException("basis can't be resolved", e);
+      } catch (NullPointerException | IOException e) {
+        throw new IOException("failed while resolved third parameter", e);
       }
     }
 
     // Step 4
     File bundle;
+    OutputStream fos = null;
     try {
       bundle = File.createTempFile("file", ".bundle");
-      OutputStream fos = new FileOutputStream(bundle);
+      fos = new FileOutputStream(bundle);
 
       NullProgressMonitor monitor = NullProgressMonitor.INSTANCE;
 
       bundlewriter.writeBundle(monitor, fos);
-    } catch (Exception e) {
-      throw new IOException("failed to write bundle", e);
+
+      fos.close();
+    } catch (IOException e) {
+      if (fos != null) fos.close();
+
+      throw new IOException("failed while written bundle", e);
     }
     return bundle;
   }
@@ -89,66 +106,88 @@ public class JGitFacade {
    *
    * @param workDir The directory that contains the .git directory
    * @param bundleFile
-   * @throws IllegalArgumentException workDir or bundleFile can't be resolved
-   * @throws Exception Error while adding the bundle as a remote or during fetch
+   * @throws IllegalArgumentException workDir or bundleFile is null and can't be resolved
+   * @throws IOException failed while read from workDir or bundleFile handling
    */
   public static void fetchFromBundle(File workDir, File bundleFile)
-      throws IllegalArgumentException, Exception {
+      throws IllegalArgumentException, IOException {
 
     Git git;
     try {
+      if (workDir == null)
+        throw new IllegalArgumentException("workDir is null and can't be resolved");
       git = Git.open(workDir);
     } catch (IOException e) {
-      throw new IllegalArgumentException("workDir can't be resolved", e);
+      throw new IOException("failed while read from workDir", e);
     }
 
     try {
-      RemoteRemoveCommand rrc = git.remoteRemove();
-      rrc.setName("bundle");
-      rrc.call();
-    } catch (Exception e) {
-      throw new Exception("failed to remove old bundle path", e);
+      RemoteRemoveCommand remoteRemoveCommand = git.remoteRemove();
+      remoteRemoveCommand.setName("bundle");
+      remoteRemoveCommand.call();
+    } catch (GitAPIException e) {
+      throw new IOException("failed to remove old bundle path", e);
     }
 
     try {
+      if (bundleFile == null)
+        throw new IllegalArgumentException("bundleFile is null and can't be resolved");
       git.remoteAdd()
           .setUri(new URIish().setPath(bundleFile.getCanonicalPath()))
           .setName("bundle")
           .call();
-    } catch (IOException e) {
-      throw new IllegalArgumentException("bundleFile can't be resolved", e);
-    } catch (Exception e) {
-      throw new Exception("failed to add bundle as remote", e);
+    } catch (GitAPIException | IOException e) {
+      throw new IOException("failed while added bundle as remote", e);
     }
 
     try {
       git.fetch().setRemote("bundle").call();
-    } catch (Exception e) {
-      throw new Exception("failed to fetch from bundle", e);
+    } catch (GitAPIException e) {
+      throw new IOException("failed while fetched from bundle", e);
     }
   }
-
-  public static void cloneFromRepo(File from, File to) throws IllegalArgumentException, Exception {
+  /**
+   * @throws IllegalArgumentException parameters can't be resolved. Maybe null
+   * @throws IOException failed while cloned
+   */
+  public static void cloneFromRepo(File from, File to)
+      throws IllegalArgumentException, IOException {
     try {
-      Git.cloneRepository().setURI(getUrlByWorkDir(from)).setDirectory(to).call();
-    } catch (IOException e) {
-      throw new IllegalArgumentException("first parameter can't be resolved", e);
-    } catch (Exception e) {
-      throw new Exception("failed to clone", e);
+      if (from == null) {
+        throw new IllegalArgumentException("first parameter is null and can't be resolved");
+      } else if (to == null) {
+        throw new IllegalArgumentException("second parameter is null and can't be resolved");
+      } else {
+        Git.cloneRepository().setURI(getUrlByWorkDir(from)).setDirectory(to).call();
+      }
+    } catch (InvalidRemoteException e) {
+      throw new IllegalArgumentException("second parameter can't be resolved", e);
+    } catch (GitAPIException | IOException e) {
+      throw new IOException("clone failed", e);
     }
   }
   /**
    * @param workDir The directory that contains the .git directory
    * @return The URL to access/address directly the .git directory
-   * @throws IOException
+   * @throws IllegalArgumentException workDir is null and can't be resolved
+   * @throws IOException failed while read
    */
-  static String getUrlByWorkDir(File workDir) throws IOException {
+  static String getUrlByWorkDir(File workDir) throws IllegalArgumentException, IOException {
+    if (workDir == null)
+      throw new IllegalArgumentException("workDir is null and can't be resolved");
     Git git = Git.open(workDir);
     return git.getRepository().getDirectory().getCanonicalPath();
   }
-
+  /**
+   * @param workDir The directory that contains the .git directory
+   * @param revString
+   * @throws IllegalArgumentException workDir is null and can't be resolved
+   * @throws IOException failed while read
+   */
   public static String getSHA1HashByRevisionString(File workDir, String revString)
-      throws IOException {
+      throws IllegalArgumentException, IOException {
+    if (workDir == null)
+      throw new IllegalArgumentException("workDir is null and can't be resolved");
     return Git.open(workDir).getRepository().resolve(revString).name();
   }
 }
