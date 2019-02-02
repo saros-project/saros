@@ -28,13 +28,13 @@ public class GitManager extends AbstractActivityProducer implements Startable {
   }
 
   @Override
-  public synchronized void start() {
+  public void start() {
     session.addActivityConsumer(consumer, Priority.ACTIVE);
     session.addActivityProducer(this);
   }
 
   @Override
-  public synchronized void stop() {
+  public void stop() {
     session.removeActivityConsumer(consumer);
     session.removeActivityProducer(this);
   }
