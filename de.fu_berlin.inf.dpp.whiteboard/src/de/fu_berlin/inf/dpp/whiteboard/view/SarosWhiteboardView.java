@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
@@ -209,7 +210,8 @@ public class SarosWhiteboardView extends ViewPart {
        * ISelection selection).
        */
 
-      if (SarosWhiteboardView.this.equals(getSite().getPage().getActivePart())) {
+      IWorkbenchPage page = getSite().getPage();
+      if (page != null && SarosWhiteboardView.this.equals(page.getActivePart())) {
         updateActions(getSelectionActions());
       }
     }
