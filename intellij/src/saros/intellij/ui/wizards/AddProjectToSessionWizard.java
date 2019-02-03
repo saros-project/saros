@@ -285,7 +285,7 @@ public class AddProjectToSessionWizard extends Wizard {
   private Module createModuleStub(@NotNull final String moduleName)
       throws IOException, ModuleWithNameAlreadyExists {
 
-    for (Module module : ModuleManager.getInstance(project).getModules()) {
+    for (Module module : ModuleManager.getInstance(projectWrapper.getProject()).getModules()) {
       if (moduleName.equals(module.getName()))
         throw new ModuleWithNameAlreadyExists(
             "Could not create stub module as a module with the chosen name already exists",
@@ -298,11 +298,13 @@ public class AddProjectToSessionWizard extends Wizard {
 
               @Override
               public Module compute() throws IOException {
-                VirtualFile baseDir = project.getBaseDir();
+                VirtualFile baseDir = projectWrapper.getProject().getBaseDir();
 
                 if (baseDir == null) {
                   throw new FileNotFoundException(
-                      "Could not find base directory for project " + project + ".");
+                      "Could not find base directory for project "
+                          + projectWrapper.getProject()
+                          + ".");
                 }
 
                 Path moduleBasePath = Paths.get(baseDir.getPath()).resolve(moduleName);
@@ -311,14 +313,14 @@ public class AddProjectToSessionWizard extends Wizard {
                     moduleBasePath.resolve(moduleName + ModuleFileType.DOT_DEFAULT_EXTENSION);
 
                 ModifiableModuleModel modifiableModuleModel =
-                    ModuleManager.getInstance(project).getModifiableModel();
+                    ModuleManager.getInstance(projectWrapper.getProject()).getModifiableModel();
 
                 Module module =
                     modifiableModuleModel.newModule(
                         moduleFilePath.toString(), IntelliJProjectImpl.RELOAD_STUB_MODULE_TYPE);
 
                 modifiableModuleModel.commit();
-                project.save();
+                projectWrapper.getProject().save();
 
                 ModifiableRootModel modifiableRootModel =
                     ModuleRootManager.getInstance(module).getModifiableModel();
@@ -469,7 +471,10 @@ public class AddProjectToSessionWizard extends Wizard {
     ProgressManager.getInstance()
         .run(
             new Task.Backgroundable(
-                project, "Sharing project...", true, PerformInBackgroundOption.DEAF) {
+                projectWrapper.getProject(),
+                "Sharing project...",
+                true,
+                PerformInBackgroundOption.DEAF) {
 
               @Override
               public void run(ProgressIndicator indicator) {

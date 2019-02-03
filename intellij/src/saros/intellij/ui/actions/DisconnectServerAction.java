@@ -24,7 +24,7 @@ public class DisconnectServerAction extends AbstractSarosAction {
     // AnActionEvent.getDataContext().getData(DataConstants.PROJECT)
     ProgressManager.getInstance()
         .run(
-            new Task.Modal(project, "Disconnecting...", false) {
+            new Task.Modal(projectWrapper.getProject(), "Disconnecting...", false) {
 
               @Override
               public void run(ProgressIndicator indicator) {

@@ -3,7 +3,6 @@ package saros.intellij.eventhandler.editor.editorstate;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +11,7 @@ import saros.filesystem.IFile;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.project.ProjectWrapper;
 import saros.session.ISarosSession;
 
 /**
@@ -46,12 +46,12 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       };
 
   public AnnotationUpdater(
-      Project project,
+      ProjectWrapper projectWrapper,
       AnnotationManager annotationManager,
       LocalEditorHandler localEditorHandler,
       ISarosSession sarosSession) {
 
-    super(project);
+    super(projectWrapper);
 
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;

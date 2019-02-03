@@ -2,7 +2,6 @@ package saros.intellij.project.filesystem;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import java.io.IOException;
 import org.apache.log4j.Logger;
@@ -14,15 +13,16 @@ import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.project.ProjectWrapper;
 import saros.monitoring.NullProgressMonitor;
 
 public class IntelliJWorkspaceImpl implements IWorkspace {
   public static final Logger LOG = Logger.getLogger(IntelliJWorkspaceImpl.class);
 
-  private Project project;
+  private final ProjectWrapper projectWrapper;
 
-  public IntelliJWorkspaceImpl(Project project) {
-    this.project = project;
+  public IntelliJWorkspaceImpl(ProjectWrapper projectWrapper) {
+    this.projectWrapper = projectWrapper;
   }
 
   @Override
@@ -43,7 +43,8 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
             new Computable<Module>() {
               @Override
               public Module compute() {
-                return ModuleManager.getInstance(project).findModuleByName(moduleName);
+                return ModuleManager.getInstance(projectWrapper.getProject())
+                    .findModuleByName(moduleName);
               }
             });
 
@@ -52,6 +53,6 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
 
   @Override
   public IPath getLocation() {
-    return IntelliJPathImpl.fromString(project.getBasePath());
+    return IntelliJPathImpl.fromString(projectWrapper.getProject().getBasePath());
   }
 }

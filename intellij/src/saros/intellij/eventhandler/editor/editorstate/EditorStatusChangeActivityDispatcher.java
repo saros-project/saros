@@ -3,11 +3,11 @@ package saros.intellij.eventhandler.editor.editorstate;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import saros.intellij.editor.LocalEditorHandler;
+import saros.intellij.project.ProjectWrapper;
 
 /**
  * Dispatches matching editor activities when an editor for a shared file is opened/selected or
@@ -35,9 +35,9 @@ public class EditorStatusChangeActivityDispatcher extends AbstractLocalEditorSta
       };
 
   public EditorStatusChangeActivityDispatcher(
-      Project project, LocalEditorHandler localEditorHandler) {
+      ProjectWrapper projectWrapper, LocalEditorHandler localEditorHandler) {
 
-    super(project);
+    super(projectWrapper);
 
     this.localEditorHandler = localEditorHandler;
 

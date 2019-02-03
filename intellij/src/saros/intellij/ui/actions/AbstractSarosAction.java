@@ -1,6 +1,5 @@
 package saros.intellij.ui.actions;
 
-import com.intellij.openapi.project.Project;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -8,6 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
+import saros.intellij.project.ProjectWrapper;
 
 /** Parent class for all Saros actions */
 public abstract class AbstractSarosAction {
@@ -15,7 +15,7 @@ public abstract class AbstractSarosAction {
 
   private final List<ActionListener> actionListeners = new ArrayList<ActionListener>();
 
-  @Inject protected Project project;
+  @Inject protected ProjectWrapper projectWrapper;
 
   protected AbstractSarosAction() {
     SarosPluginContext.initComponent(this);

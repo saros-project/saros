@@ -1,6 +1,5 @@
 package saros.intellij.context;
 
-import com.intellij.openapi.project.Project;
 import java.util.Arrays;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
@@ -26,6 +25,7 @@ import saros.intellij.editor.ProjectAPI;
 import saros.intellij.negotiation.hooks.ModuleTypeNegotiationHook;
 import saros.intellij.preferences.IntelliJPreferences;
 import saros.intellij.preferences.PropertiesComponentAdapter;
+import saros.intellij.project.ProjectWrapper;
 import saros.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import saros.intellij.project.filesystem.IntelliJWorkspaceRootImpl;
 import saros.intellij.project.filesystem.PathFactory;
@@ -82,10 +82,10 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
     };
   }
 
-  private Project project;
+  private ProjectWrapper projectWrapper;
 
-  public SarosIntellijContextFactory(Project project) {
-    this.project = project;
+  public SarosIntellijContextFactory(ProjectWrapper projectWrapper) {
+    this.projectWrapper = projectWrapper;
   }
 
   @Override
@@ -94,7 +94,7 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
     // Saros Core PathIntl Support
     container.addComponent(IPathFactory.class, new PathFactory());
 
-    container.addComponent(Project.class, project);
+    container.addComponent(ProjectWrapper.class, projectWrapper);
     container.addComponent(IWorkspace.class, IntelliJWorkspaceImpl.class);
 
     for (Component component : Arrays.asList(getContextComponents())) {

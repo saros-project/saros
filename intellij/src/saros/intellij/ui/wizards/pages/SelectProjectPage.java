@@ -2,7 +2,6 @@ package saros.intellij.ui.wizards.pages;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.project.Project;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -23,6 +22,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
+import saros.intellij.project.ProjectWrapper;
 import saros.intellij.ui.Messages;
 
 /** Selects local project. FIXME: Add tabs for multiple projects. */
@@ -79,7 +79,7 @@ public class SelectProjectPage extends AbstractWizardPage {
   private JLabel lblNewProject;
   private JLabel lblExistingProject;
 
-  @Inject private transient Project project;
+  @Inject private transient ProjectWrapper projectWrapper;
 
   public SelectProjectPage(
       String id,
@@ -218,7 +218,7 @@ public class SelectProjectPage extends AbstractWizardPage {
         };
     browseButton.addActionListener(browseListener);
 
-    ModuleManager moduleManager = ModuleManager.getInstance(project);
+    ModuleManager moduleManager = ModuleManager.getInstance(projectWrapper.getProject());
 
     Optional<Module> module =
         Arrays.stream(moduleManager.getModules())

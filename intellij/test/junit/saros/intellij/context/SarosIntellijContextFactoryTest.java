@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.powermock.core.classloader.annotations.MockPolicy;
 import saros.context.CoreContextFactory;
 import saros.context.IContextFactory;
+import saros.intellij.project.ProjectWrapper;
 import saros.test.mocks.ContextMocker;
 import saros.test.mocks.PrepareCoreComponents;
 
@@ -24,7 +25,7 @@ public class SarosIntellijContextFactoryTest extends AbstractContextTest {
 
   @Test
   public void testCreateComponents() {
-    IContextFactory factory = new SarosIntellijContextFactory(project);
+    IContextFactory factory = new SarosIntellijContextFactory(new ProjectWrapper(project));
 
     factory.createComponents(container);
     container.start();

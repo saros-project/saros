@@ -1,11 +1,11 @@
 package saros.intellij.ui.swt_browser;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import saros.intellij.project.ProjectWrapper;
 import saros.synchronize.UISynchronizer;
 import saros.ui.ide_embedding.DialogManager;
 import saros.ui.ide_embedding.IBrowserDialog;
@@ -14,17 +14,17 @@ import saros.ui.pages.IBrowserPage;
 /** Implements the dialog manager for the IntelliJ platform. */
 public class IntelliJDialogManager extends DialogManager {
 
-  private Project project;
+  private ProjectWrapper projectWrapper;
 
-  public IntelliJDialogManager(UISynchronizer uiSynchronizer, Project project) {
+  public IntelliJDialogManager(UISynchronizer uiSynchronizer, ProjectWrapper projectWrapper) {
     super(uiSynchronizer);
 
-    this.project = project;
+    this.projectWrapper = projectWrapper;
   }
 
   @Override
   protected IBrowserDialog createDialog(final IBrowserPage startPage) {
-    JFrame parent = WindowManager.getInstance().getFrame(project);
+    JFrame parent = WindowManager.getInstance().getFrame(projectWrapper.getProject());
     JDialog jDialog = new JDialog(parent);
     jDialog.addWindowListener(
         new WindowAdapter() {

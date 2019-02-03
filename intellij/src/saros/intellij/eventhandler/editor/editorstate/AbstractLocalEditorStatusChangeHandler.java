@@ -1,11 +1,11 @@
 package saros.intellij.eventhandler.editor.editorstate;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.Startable;
 import saros.intellij.eventhandler.DisableableHandler;
+import saros.intellij.project.ProjectWrapper;
 
 /**
  * Abstract class defining the base functionality needed to create and register/unregister a
@@ -23,7 +23,7 @@ import saros.intellij.eventhandler.DisableableHandler;
 public abstract class AbstractLocalEditorStatusChangeHandler
     implements DisableableHandler, Startable {
 
-  private final Project project;
+  private final ProjectWrapper projectWrapper;
 
   private boolean enabled;
   private boolean disposed;
@@ -34,10 +34,10 @@ public abstract class AbstractLocalEditorStatusChangeHandler
    * Abstract class for local editor status change handlers. The handler is enabled by default and
    * the listeners are also registered by default.
    *
-   * @param project the current Intellij project instance
+   * @param projectWrapper the current Intellij project wrapper instance
    */
-  AbstractLocalEditorStatusChangeHandler(Project project) {
-    this.project = project;
+  AbstractLocalEditorStatusChangeHandler(ProjectWrapper projectWrapper) {
+    this.projectWrapper = projectWrapper;
 
     this.enabled = false;
     this.disposed = false;
@@ -59,7 +59,7 @@ public abstract class AbstractLocalEditorStatusChangeHandler
    * #registerListeners(MessageBusConnection)} to register any needed handlers.
    */
   private void subscribe() {
-    messageBusConnection = project.getMessageBus().connect();
+    messageBusConnection = projectWrapper.getProject().getMessageBus().connect();
 
     registerListeners(messageBusConnection);
   }
