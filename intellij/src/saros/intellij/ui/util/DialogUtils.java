@@ -1,6 +1,5 @@
 package saros.intellij.ui.util;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
 import java.awt.Component;
 import java.awt.Container;
@@ -8,12 +7,13 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
+import saros.intellij.project.ProjectWrapper;
 
 /** Dialog message helper that shows Dialogs in the current Thread. */
 public class DialogUtils {
   private static final Logger LOG = Logger.getLogger(DialogUtils.class);
 
-  @Inject private static Project project;
+  @Inject private static ProjectWrapper projectWrapper;
 
   private DialogUtils() {}
 
@@ -92,6 +92,8 @@ public class DialogUtils {
   }
 
   private static Component notNullOrDefaultParent(Component parent) {
-    return parent != null ? parent : WindowManager.getInstance().getFrame(project);
+    return parent != null
+        ? parent
+        : WindowManager.getInstance().getFrame(projectWrapper.getProject());
   }
 }

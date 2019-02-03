@@ -9,6 +9,7 @@ import saros.HTMLUIContextFactory;
 import saros.context.CoreContextFactory;
 import saros.context.IContainerContext;
 import saros.context.IContextFactory;
+import saros.intellij.project.ProjectWrapper;
 import saros.test.mocks.ContextMocker;
 
 /** Checks the Saros/I context for integrity. */
@@ -27,7 +28,7 @@ public class SarosIntellijContextTest extends AbstractContextTest {
   public void createComponentsWithoutSWT() {
     List<IContextFactory> factories = new ArrayList<>();
 
-    factories.add(new SarosIntellijContextFactory(project));
+    factories.add(new SarosIntellijContextFactory(new ProjectWrapper(project)));
     factories.add(new CoreContextFactory());
 
     for (IContextFactory factory : factories) {
@@ -43,7 +44,7 @@ public class SarosIntellijContextTest extends AbstractContextTest {
   public void createComponentsWithSWT() {
     List<IContextFactory> factories = new ArrayList<>();
 
-    factories.add(new SarosIntellijContextFactory(project));
+    factories.add(new SarosIntellijContextFactory(new ProjectWrapper(project)));
     factories.add(new CoreContextFactory());
     factories.add(new HTMLUIContextFactory());
 

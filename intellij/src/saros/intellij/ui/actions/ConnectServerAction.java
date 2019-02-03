@@ -46,7 +46,7 @@ public class ConnectServerAction extends AbstractSarosAction {
     // AnActionEvent.getDataContext().getData(DataConstants.PROJECT)
     ProgressManager.getInstance()
         .run(
-            new Task.Modal(project, "Connecting...", false) {
+            new Task.Modal(projectWrapper.getProject(), "Connecting...", false) {
 
               @Override
               public void run(ProgressIndicator indicator) {

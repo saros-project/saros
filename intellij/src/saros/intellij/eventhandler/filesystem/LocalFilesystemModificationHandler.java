@@ -6,7 +6,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -41,6 +40,7 @@ import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.DisableableHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.project.ProjectWrapper;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityProducer;
@@ -65,7 +65,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
   private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
-  private final Project project;
+  private final ProjectWrapper projectWrapper;
   private final LocalEditorHandler localEditorHandler;
 
   private boolean enabled;
@@ -170,7 +170,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       ProjectAPI projectAPI,
       AnnotationManager annotationManager,
-      Project project,
+      ProjectWrapper projectWrapper,
       LocalEditorHandler localEditorHandler) {
 
     this.editorManager = editorManager;
@@ -178,7 +178,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
-    this.project = project;
+    this.projectWrapper = projectWrapper;
     this.localEditorHandler = localEditorHandler;
 
     this.enabled = false;
@@ -502,8 +502,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
      */
     VirtualFileFilter virtualFileFilter =
         file -> {
-          Module baseModule = ModuleUtil.findModuleForFile(oldFile, project);
-          Module module = ModuleUtil.findModuleForFile(file, project);
+          Module baseModule = ModuleUtil.findModuleForFile(oldFile, projectWrapper.getProject());
+          Module module = ModuleUtil.findModuleForFile(file, projectWrapper.getProject());
 
           return baseModule != null && baseModule.equals(module);
         };

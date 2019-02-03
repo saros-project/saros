@@ -7,10 +7,10 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
+import saros.intellij.project.ProjectWrapper;
 
 /** Class uses IntelliJ API to show notifications */
 public class NotificationPanel {
@@ -22,7 +22,7 @@ public class NotificationPanel {
   private static final NotificationListener.UrlOpeningListener URL_OPENING_LISTENER =
       new NotificationListener.UrlOpeningListener(false);
 
-  @Inject private static Project project;
+  @Inject private static ProjectWrapper projectWrapper;
 
   static {
     SarosPluginContext.initComponent(new NotificationPanel());
@@ -57,7 +57,7 @@ public class NotificationPanel {
             new Runnable() {
               @Override
               public void run() {
-                Notifications.Bus.notify(notification, project);
+                Notifications.Bus.notify(notification, projectWrapper.getProject());
               }
             });
   }

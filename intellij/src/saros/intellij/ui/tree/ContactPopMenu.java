@@ -2,7 +2,6 @@ package saros.intellij.ui.tree;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.project.Project;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -20,6 +19,7 @@ import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
+import saros.intellij.project.ProjectWrapper;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.NotificationPanel;
@@ -34,17 +34,17 @@ class ContactPopMenu extends JPopupMenu {
 
   @Inject private IWorkspace workspace;
 
-  @Inject private Project project;
+  @Inject private ProjectWrapper projectWrapper;
 
   private final ContactTreeRootNode.ContactInfo contactInfo;
 
   ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
     this.contactInfo = contactInfo;
 
-    if (workspace == null || project == null) {
+    if (workspace == null || projectWrapper == null) {
       SarosPluginContext.initComponent(this);
 
-      if (workspace == null || project == null) {
+      if (workspace == null || projectWrapper == null) {
         LOG.error("PicoContainer injection failed. Objects still not present after injection.");
 
         return;
@@ -54,7 +54,7 @@ class ContactPopMenu extends JPopupMenu {
     JMenu menuShareProject = new JMenu("Work together on...");
     menuShareProject.setIcon(IconManager.SESSIONS_ICON);
 
-    ModuleManager moduleManager = ModuleManager.getInstance(project);
+    ModuleManager moduleManager = ModuleManager.getInstance(projectWrapper.getProject());
 
     if (moduleManager == null) {
 
@@ -73,7 +73,7 @@ class ContactPopMenu extends JPopupMenu {
     for (Module module : moduleManager.getModules()) {
       String moduleName = module.getName();
 
-      if (project.getName().equalsIgnoreCase(moduleName)) {
+      if (projectWrapper.getProject().getName().equalsIgnoreCase(moduleName)) {
         continue;
       }
 

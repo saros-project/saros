@@ -4,27 +4,24 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.intellij.filesystem.Filesystem;
+import saros.intellij.project.ProjectWrapper;
 
 /** IntellIJ API for project-level operations on editors and documents. */
 public class ProjectAPI {
   private FileDocumentManager fileDocumentManager;
 
-  private Project project;
-  private FileEditorManager editorFileManager;
+  private ProjectWrapper projectWrapper;
 
   /** Creates an ProjectAPI with the current Project and initializes Fields. */
-  public ProjectAPI(Project project) {
-    this.project = project;
+  public ProjectAPI(ProjectWrapper projectWrapper) {
+    this.projectWrapper = projectWrapper;
 
-    this.editorFileManager = FileEditorManager.getInstance(project);
     this.fileDocumentManager = FileDocumentManager.getInstance();
   }
 
@@ -35,7 +32,7 @@ public class ProjectAPI {
    * @return
    */
   public boolean isOpen(VirtualFile file) {
-    return editorFileManager.isFileOpen(file);
+    return projectWrapper.getFileEditorManager().isFileOpen(file);
   }
 
   /**
@@ -62,8 +59,10 @@ public class ProjectAPI {
 
           @Override
           public Editor compute() {
-            return editorFileManager.openTextEditor(
-                new OpenFileDescriptor(project, path), activate);
+            return projectWrapper
+                .getFileEditorManager()
+                .openTextEditor(
+                    new OpenFileDescriptor(projectWrapper.getProject(), path), activate);
           }
         });
   }
@@ -103,7 +102,7 @@ public class ProjectAPI {
 
           @Override
           public void run() {
-            editorFileManager.closeFile(file);
+            projectWrapper.getFileEditorManager().closeFile(file);
           }
         });
   }
@@ -120,11 +119,11 @@ public class ProjectAPI {
    * @return
    */
   public VirtualFile[] getOpenFiles() {
-    return editorFileManager.getOpenFiles();
+    return projectWrapper.getFileEditorManager().getOpenFiles();
   }
 
   public Editor getActiveEditor() {
-    return editorFileManager.getSelectedTextEditor();
+    return projectWrapper.getFileEditorManager().getSelectedTextEditor();
   }
 
   /**
@@ -134,7 +133,7 @@ public class ProjectAPI {
    * @return
    */
   public VirtualFile[] getSelectedFiles() {
-    return editorFileManager.getSelectedFiles();
+    return projectWrapper.getFileEditorManager().getSelectedFiles();
   }
 
   /**

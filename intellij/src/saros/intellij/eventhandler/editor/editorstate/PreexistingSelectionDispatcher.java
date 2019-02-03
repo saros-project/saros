@@ -3,7 +3,6 @@ package saros.intellij.eventhandler.editor.editorstate;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +10,7 @@ import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.project.ProjectWrapper;
 import saros.session.ISarosSession;
 
 /**
@@ -39,12 +39,12 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
       };
 
   public PreexistingSelectionDispatcher(
-      Project project,
+      ProjectWrapper projectWrapper,
       EditorManager editorManager,
       LocalEditorHandler localEditorHandler,
       ISarosSession sarosSession) {
 
-    super(project);
+    super(projectWrapper);
 
     this.editorManager = editorManager;
     this.localEditorHandler = localEditorHandler;

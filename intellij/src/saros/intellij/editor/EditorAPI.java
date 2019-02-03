@@ -9,13 +9,13 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import java.awt.Point;
 import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
 import saros.editor.text.LineRange;
 import saros.intellij.filesystem.Filesystem;
+import saros.intellij.project.ProjectWrapper;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.
@@ -27,11 +27,11 @@ public class EditorAPI {
   private Application application;
   private CommandProcessor commandProcessor;
 
-  private Project project;
+  private ProjectWrapper projectWrapper;
 
   /** Creates an EditorAPI with the current Project and initializes Fields. */
-  public EditorAPI(Project project) {
-    this.project = project;
+  public EditorAPI(ProjectWrapper projectWrapper) {
+    this.projectWrapper = projectWrapper;
     this.application = ApplicationManager.getApplication();
     this.commandProcessor = CommandProcessor.getInstance();
   }
@@ -158,7 +158,7 @@ public class EditorAPI {
           String commandName = "Saros text insertion at index " + offset + " of \"" + text + "\"";
 
           commandProcessor.executeCommand(
-              project,
+              projectWrapper.getProject(),
               insertString,
               commandName,
               commandProcessor.getCurrentCommandGroupId(),
@@ -185,7 +185,7 @@ public class EditorAPI {
           String commandName = "Saros text deletion from index " + start + " to " + end;
 
           commandProcessor.executeCommand(
-              project,
+              projectWrapper.getProject(),
               deleteRange,
               commandName,
               commandProcessor.getCurrentCommandGroupId(),

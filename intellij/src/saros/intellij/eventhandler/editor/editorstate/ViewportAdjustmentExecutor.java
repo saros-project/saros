@@ -4,7 +4,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import java.util.HashMap;
@@ -15,6 +14,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.ProjectAPI;
+import saros.intellij.project.ProjectWrapper;
 
 /**
  * Queues viewport adjustments for editors that are not currently visible and executes the queued
@@ -37,9 +37,11 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
       };
 
   public ViewportAdjustmentExecutor(
-      Project project, ProjectAPI projectAPI, LocalEditorManipulator localEditorManipulator) {
+      ProjectWrapper projectWrapper,
+      ProjectAPI projectAPI,
+      LocalEditorManipulator localEditorManipulator) {
 
-    super(project);
+    super(projectWrapper);
 
     this.projectAPI = projectAPI;
     this.localEditorManipulator = localEditorManipulator;
