@@ -14,7 +14,8 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "react": "^16.7.0",
-    "react-dom": "^16.7.0"
+    "react-dom": "^16.7.0",
+    "terser": "^3.14.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
