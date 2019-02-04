@@ -86,9 +86,9 @@ public class EclipseReferencePointManager {
    */
   public synchronized IResource getResource(
       IReferencePoint referencePoint, IPath referencePointRelativePath) {
-    if (referencePoint == null) throw new NullPointerException("Reference point is null");
+    if (referencePoint == null) throw new IllegalStateException("Reference point is null");
 
-    if (referencePointRelativePath == null) throw new NullPointerException("Path is null");
+    if (referencePointRelativePath == null) throw new IllegalStateException("Path is null");
 
     org.eclipse.core.resources.IProject project = get(referencePoint);
 
@@ -108,9 +108,9 @@ public class EclipseReferencePointManager {
    */
   public synchronized IFile getFile(
       IReferencePoint referencePoint, IPath referencePointRelativePath) {
-    if (referencePoint == null) throw new NullPointerException("Reference point is null");
+    if (referencePoint == null) throw new IllegalStateException("Reference point is null");
 
-    if (referencePointRelativePath == null) throw new NullPointerException("Path is null");
+    if (referencePointRelativePath == null) throw new IllegalStateException("Path is null");
 
     org.eclipse.core.resources.IProject project = get(referencePoint);
 
@@ -130,9 +130,9 @@ public class EclipseReferencePointManager {
    */
   public synchronized IFolder getFolder(
       IReferencePoint referencePoint, IPath referencePointRelativePath) {
-    if (referencePoint == null) throw new NullPointerException("Reference point is null");
+    if (referencePoint == null) throw new IllegalStateException("Reference point is null");
 
-    if (referencePointRelativePath == null) throw new NullPointerException("Path is null");
+    if (referencePointRelativePath == null) throw new IllegalStateException("Path is null");
 
     org.eclipse.core.resources.IProject project = get(referencePoint);
 
