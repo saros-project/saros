@@ -9,7 +9,9 @@ The Saros Whiteboard was designed to enable Saros users to communicate ideas gra
 ## Developing the Whiteboard
 
 ### Setup
-Use the command `npm run setup`, note that `npm install` does not suffice.
+First of all, The view has to be un-commented from `de.fu_berlin.inf.dpp.whiteboard/plugin.xml`, the view has the following id: `de.fu_berlin.inf.dpp.whiteboard.ui.HTMLWhiteboardView`.
+
+Then install the dependencies using the command `npm run setup`, note that `npm install` does not suffice.
 
 ### Build for Development
 Use the command `npm run dev` to run webpack in watch mode, any changes to the code will automatically trigger the bundling. To test the whiteboard, simply open the `index.html`. You can adjust the build configurations in the `webpack.config.js` file.
