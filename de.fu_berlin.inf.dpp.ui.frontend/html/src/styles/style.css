@@ -1,2 +1,18 @@
 @import '~bootstrap/dist/css/bootstrap.css';
 @import './bootstrap-theme.css';
+
+/* Avoids navbar (of ToolBar) width restriction:
+  react-bootstrap generates a <div class='container'> into the navbar,
+  which creates a navbar that fills only the center of the window. */
+.navbar > .container {
+  width: auto;
+}
+
+.navbar {
+  min-height:auto
+}
+
+/* Avoid that the navbar covers content */
+.content-container {
+  margin-top: 50px;
+}
