@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.intellij.session;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -8,7 +7,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import org.jetbrains.annotations.NotNull;
-import org.picocontainer.annotations.Inject;
 
 /**
  * A utility class to provide easy access to functionality needing a session object.
@@ -24,31 +22,33 @@ import org.picocontainer.annotations.Inject;
 // separated
 @Deprecated
 public class SessionUtils {
+
+  @SuppressWarnings("FieldCanBeLocal")
+  private ISessionLifecycleListener lifecycleListener =
+      new ISessionLifecycleListener() {
+        @Override
+        public void sessionStarted(ISarosSession session) {
+
+          currentSarosSession = session;
+        }
+
+        @Override
+        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
+
+          currentSarosSession = null;
+        }
+      };
+
   private static volatile ISarosSession currentSarosSession;
 
-  @Inject private static ISarosSessionManager sarosSessionManager;
-
-  static {
-    SarosPluginContext.initComponent(new SessionUtils());
-
-    sarosSessionManager.addSessionLifecycleListener(
-        new ISessionLifecycleListener() {
-          @Override
-          public void sessionStarted(ISarosSession session) {
-
-            currentSarosSession = session;
-          }
-
-          @Override
-          public void sessionEnded(ISarosSession session, SessionEndReason reason) {
-
-            currentSarosSession = null;
-          }
-        });
-  }
-
-  private SessionUtils() {
-    // NOP
+  /**
+   * Initializes the SessionUtils. This is only used as part of the plugin context initialization by
+   * the PicoContainer and should not be called otherwise.
+   *
+   * @param sarosSessionManager the current SarosSessionManager instance
+   */
+  public SessionUtils(ISarosSessionManager sarosSessionManager) {
+    sarosSessionManager.addSessionLifecycleListener(lifecycleListener);
   }
 
   /**
