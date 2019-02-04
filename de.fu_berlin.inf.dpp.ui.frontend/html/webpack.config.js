@@ -64,7 +64,17 @@ module.exports = (env = {}) => {
         { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, use: 'file-loader?name=assets/[name].[ext]' },
         { test: /\.(woff|woff2)$/, use: 'url-loader?prefix=font/&limit=5000&name=assets/[name].[ext]' },
         { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=application/octet-stream&name=assets/[name].[ext]' },
-        { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=image/svg+xml&name=assets/[name].[ext]' }
+        { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=image/svg+xml&name=assets/[name].[ext]' },
+        {
+          test: /\.(png|jp(e*)g)$/,
+          use: [{
+            loader: 'url-loader',
+            options: {
+              limit: 8000, // Convert images < 8kb to base64 strings
+              name: 'images/[hash]-[name].[ext]'
+            }
+          }]
+        }
       ]
     },
     plugins: [

@@ -28,6 +28,16 @@ module.exports = {
         test: /\.css$/,
         use: 'null-loader',
       },
+      {
+        test: /\.(png|jp(e*)g)$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 8000, // Convert images < 8kb to base64 strings
+            name: 'images/[hash]-[name].[ext]'
+          }
+        }]
+      }
     ],
   },
   resolve: config.resolve,
