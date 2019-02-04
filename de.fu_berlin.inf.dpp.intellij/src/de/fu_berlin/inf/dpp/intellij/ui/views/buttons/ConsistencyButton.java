@@ -171,6 +171,9 @@ public class ConsistencyButton extends ToolbarButton {
    * displays a tooltip.
    */
   private void handleConsistencyChange(final Boolean isInconsistent) {
+    if (sessionManager.getSession() == null) {
+      return;
+    }
 
     LOG.debug("Inconsistency indicator goes: " + (isInconsistent ? "on" : "off"));
 
