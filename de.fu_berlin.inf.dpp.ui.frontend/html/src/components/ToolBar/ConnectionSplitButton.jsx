@@ -1,5 +1,5 @@
 import { Account } from 'Utils/propTypes'
-import { MenuItem, SplitButton } from 'react-bootstrap'
+import { MenuItem, OverlayTrigger, SplitButton, Tooltip } from 'react-bootstrap'
 import { PropTypes as PM } from 'mobx-react'
 import { Text } from 'react-localize'
 import { getJid, noop } from 'Utils'
@@ -29,23 +29,25 @@ class ConnectionSplitButton extends React.Component {
     const { onClick, messageId, icon } = this.connectionStateMap[connectionState]
 
     return (
-      <SplitButton
-        id='connection-split-button'
-        title={<img src={icon} />}
-        onClick={onClick}>
+      <OverlayTrigger placement='bottom' overlay={<Tooltip><Text message={messageId} /></Tooltip>}>
+        <SplitButton
+          id='connection-split-button'
+          title={<img src={icon} />}
+          onClick={onClick}>
 
-        {accounts.length <= 0 &&
-        <MenuItem disabled><Text message='message.noAccountConfigured' /></MenuItem>
+          {accounts.length <= 0 &&
+          <MenuItem disabled><Text message='message.noAccountConfigured' /></MenuItem>
         }
-        {accounts.map(getJid).map(jid => (
-          <MenuItem
-            key={jid}
-            eventKey={jid}
+          {accounts.map(getJid).map(jid => (
+            <MenuItem
+              key={jid}
+              eventKey={jid}
       >
-            {jid}
-          </MenuItem>
+              {jid}
+            </MenuItem>
     ))}
-      </SplitButton>
+        </SplitButton>
+      </OverlayTrigger>
     )
   }
 }
