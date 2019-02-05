@@ -136,10 +136,10 @@ public class ConsistencyButton extends ToolbarButton {
        * use ConsistencyAction_tooltip_inconsistency_detected
        * this also requires the inconsistent files
        */
-      setIcon(IconManager.OUT_OF_SYNC_ICON);
+      setButtonIcon(IconManager.OUT_OF_SYNC_ICON);
     } else {
       setEnabledFromUIThread(false);
-      setIcon(IconManager.IN_SYNC_ICON);
+      setButtonIcon(IconManager.IN_SYNC_ICON);
     }
   }
 
