@@ -52,7 +52,10 @@ public class ConsistencyButton extends ToolbarButton {
           String inconsistentFiles = createConfirmationMessage(paths);
 
           if (!DialogUtils.showQuestion(
-              null, Messages.ConsistencyButton_confirm_dialog_title, inconsistentFiles)) {
+              null,
+              Messages.ConsistencyButton_confirm_dialog_title,
+              MessageFormat.format(
+                  Messages.ConsistencyButton_confirm_dialog_message, inconsistentFiles))) {
 
             setEnabledFromUIThread(true);
             return;
@@ -216,18 +219,15 @@ public class ConsistencyButton extends ToolbarButton {
 
   private String createConfirmationMessage(Set<SPath> paths) {
     StringBuilder sbInconsistentFiles = new StringBuilder();
+
     for (SPath path : paths) {
-      sbInconsistentFiles.append("project: ");
+      sbInconsistentFiles.append("module: ");
       sbInconsistentFiles.append(path.getProject().getName());
       sbInconsistentFiles.append(", file: ");
       sbInconsistentFiles.append(path.getProjectRelativePath().toOSString());
       sbInconsistentFiles.append("\n");
     }
 
-    sbInconsistentFiles.append(
-        "Please confirm project modifications.\n\n"
-            + "                + The recovery process will perform changes to files and folders of the current shared project(s).\n\n"
-            + "                + The affected files and folders may be either modified, created, or deleted.");
     return sbInconsistentFiles.toString();
   }
 
