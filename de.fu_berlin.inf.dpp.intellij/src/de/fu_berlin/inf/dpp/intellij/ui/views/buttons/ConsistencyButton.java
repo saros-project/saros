@@ -52,7 +52,7 @@ public class ConsistencyButton extends ToolbarButton {
           String inconsistentFiles = createConfirmationMessage(paths);
 
           if (!DialogUtils.showQuestion(
-              null, Messages.ConsistencyAction_confirm_dialog_title, inconsistentFiles)) {
+              null, Messages.ConsistencyButton_confirm_dialog_title, inconsistentFiles)) {
 
             setEnabledFromUIThread(true);
             return;
@@ -137,7 +137,7 @@ public class ConsistencyButton extends ToolbarButton {
       setEnabledFromUIThread(true);
       /*
        * TODO tooltip should be set using messages.properties
-       * use ConsistencyAction_tooltip_inconsistency_detected
+       * use ConsistencyButton_tooltip_inconsistency_detected
        * this also requires the inconsistent files
        */
       setButtonIcon(IconManager.OUT_OF_SYNC_ICON);
@@ -197,16 +197,16 @@ public class ConsistencyButton extends ToolbarButton {
             () -> {
               if (files.isEmpty()) {
                 NotificationPanel.showWarning(
-                    Messages.ConsistencyAction_message_inconsistency_detected_no_files,
-                    Messages.ConsistencyAction_title_inconsistency_detected);
+                    Messages.ConsistencyButton_message_inconsistency_detected_no_files,
+                    Messages.ConsistencyButton_title_inconsistency_detected);
 
                 return;
               }
 
               NotificationPanel.showWarning(
                   MessageFormat.format(
-                      Messages.ConsistencyAction_message_inconsistency_detected, files),
-                  Messages.ConsistencyAction_title_inconsistency_detected);
+                      Messages.ConsistencyButton_message_inconsistency_detected, files),
+                  Messages.ConsistencyButton_title_inconsistency_detected);
             });
   }
 
