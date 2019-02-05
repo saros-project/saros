@@ -92,7 +92,10 @@ public class ConsistencyButton extends ToolbarButton {
 
   /** Creates a Consistency button, adds a sessionListener and disables the button. */
   public ConsistencyButton() {
-    super(ConsistencyAction.NAME, "Recover inconsistencies", IconManager.IN_SYNC_ICON);
+    super(
+        ConsistencyAction.NAME,
+        Messages.ConsistencyButton_tooltip_functionality,
+        IconManager.IN_SYNC_ICON);
 
     SarosPluginContext.initComponent(this);
 
@@ -177,7 +180,8 @@ public class ConsistencyButton extends ToolbarButton {
         previouslyInConsistentState = true;
 
         NotificationPanel.showInformation(
-            "No inconsistencies remaining", "Inconsistencies resolved");
+            Messages.ConsistencyButton_message_no_inconsistencies_remaining,
+            Messages.ConsistencyButton_title_no_inconsistencies_remaining);
       }
 
       return;
