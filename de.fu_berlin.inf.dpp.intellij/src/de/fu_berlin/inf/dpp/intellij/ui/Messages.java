@@ -37,6 +37,9 @@ public class Messages {
   public static String ConsistencyButton_title_inconsistency_detected;
   public static String ConsistencyButton_message_inconsistency_detected;
   public static String ConsistencyButton_message_inconsistency_detected_no_files;
+  public static String ConsistencyButton_title_no_inconsistencies_remaining;
+  public static String ConsistencyButton_message_no_inconsistencies_remaining;
+  public static String ConsistencyButton_tooltip_functionality;
   public static String ConsistencyButton_tooltip_inconsistency_detected;
   public static String ConsistencyButton_tooltip_no_inconsistency;
 
