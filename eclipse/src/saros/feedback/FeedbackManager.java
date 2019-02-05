@@ -187,6 +187,20 @@ public class FeedbackManager extends AbstractFeedbackManager implements Startabl
     return getFeedbackStatus() != FEEDBACK_ENABLED;
   }
 
+  /*
+   * Returns true if the feature is enabled via the feature toggle
+   * de.fu_berlin.dpp.preferences.feedback.ENABLED in the saros.properties
+   * file
+   *
+   * This method is just a temporary solution until we remove or rework the
+   * feedback functionality
+   *
+   * @return value of de.fu_berlin.dpp.preferences.feedback.ENABLED
+   */
+  public static boolean isFeedbackFeatureRequired() {
+    return Boolean.getBoolean("saros.feedback.ENABLED");
+  }
+
   /**
    * Sets if the feedback is disabled or not.
    *
