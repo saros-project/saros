@@ -69,7 +69,6 @@ public class ConsistencyButton extends ToolbarButton {
         public void sessionStarted(ISarosSession newSarosSession) {
           if (!newSarosSession.isHost()) {
             setSarosSession(newSarosSession);
-            setEnabledFromUIThread(true);
           }
         }
 
@@ -77,8 +76,9 @@ public class ConsistencyButton extends ToolbarButton {
         public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
           if (!oldSarosSession.isHost()) {
             setSarosSession(null);
-            setEnabledFromUIThread(false);
           }
+
+          setEnabledFromUIThread(false);
         }
       };
 
