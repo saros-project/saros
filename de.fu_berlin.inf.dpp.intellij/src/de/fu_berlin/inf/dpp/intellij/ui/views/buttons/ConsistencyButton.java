@@ -73,6 +73,8 @@ public class ConsistencyButton extends ToolbarButton {
           if (!newSarosSession.isHost()) {
             setSarosSession(newSarosSession);
           }
+
+          setToolTipText(Messages.ConsistencyButton_tooltip_no_inconsistency);
         }
 
         @Override
@@ -82,6 +84,7 @@ public class ConsistencyButton extends ToolbarButton {
           }
 
           setEnabledFromUIThread(false);
+          setToolTipText(Messages.ConsistencyButton_tooltip_functionality);
         }
       };
 
@@ -141,15 +144,12 @@ public class ConsistencyButton extends ToolbarButton {
 
     if (isInconsistent) {
       setEnabledFromUIThread(true);
-      /*
-       * TODO tooltip should be set using messages.properties
-       * use ConsistencyButton_tooltip_inconsistency_detected
-       * this also requires the inconsistent files
-       */
       setButtonIcon(IconManager.OUT_OF_SYNC_ICON);
+      setToolTipText(Messages.ConsistencyButton_tooltip_inconsistency_detected);
     } else {
       setEnabledFromUIThread(false);
       setButtonIcon(IconManager.IN_SYNC_ICON);
+      setToolTipText(Messages.ConsistencyButton_tooltip_no_inconsistency);
     }
   }
 
