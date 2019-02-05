@@ -31,13 +31,14 @@ public class Messages {
   public static String CollaborationUtils_insufficient_privileges_text;
   public static String CollaborationUtils_partial;
 
-  public static String ConsistencyAction_confirm_dialog_title;
-  public static String ConsistencyAction_message_inconsistency_detected;
-  public static String ConsistencyAction_message_inconsistency_detected_no_files;
   public static String ConsistencyAction_progress_perform_recovery;
-  public static String ConsistencyAction_title_inconsistency_detected;
-  public static String ConsistencyAction_tooltip_inconsistency_detected;
-  public static String ConsistencyAction_tooltip_no_inconsistency;
+
+  public static String ConsistencyButton_confirm_dialog_title;
+  public static String ConsistencyButton_title_inconsistency_detected;
+  public static String ConsistencyButton_message_inconsistency_detected;
+  public static String ConsistencyButton_message_inconsistency_detected_no_files;
+  public static String ConsistencyButton_tooltip_inconsistency_detected;
+  public static String ConsistencyButton_tooltip_no_inconsistency;
 
   public static String NegotiationHandler_canceled_invitation;
   public static String NegotiationHandler_canceled_invitation_text;
