@@ -6,6 +6,7 @@ import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.editor.colorstorage.UserColorID;
 import saros.feedback.ErrorLogManager;
+import saros.feedback.FeedbackManager;
 import saros.feedback.StatisticManagerConfiguration;
 import saros.preferences.PreferenceConstants;
 import saros.ui.ImageManager;
@@ -83,15 +84,15 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
     if (UserColorID.isValid(colorID))
       preferences.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID, colorID);
 
-    boolean statisticSubmissionAllowed =
-        configurationSettingsWizardPage.isStatisticSubmissionAllowed();
+    if (FeedbackManager.isFeedbackFeatureRequired()) {
+      boolean statisticSubmissionAllowed =
+          configurationSettingsWizardPage.isStatisticSubmissionAllowed();
+      boolean errorLogSubmissionAllowed =
+          configurationSettingsWizardPage.isErrorLogSubmissionAllowed();
 
-    boolean errorLogSubmissionAllowed =
-        configurationSettingsWizardPage.isErrorLogSubmissionAllowed();
-
-    StatisticManagerConfiguration.setStatisticSubmissionAllowed(statisticSubmissionAllowed);
-
-    ErrorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
+      StatisticManagerConfiguration.setStatisticSubmissionAllowed(statisticSubmissionAllowed);
+      ErrorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
+    }
 
     GatewayDevice gatewayDevice = configurationSettingsWizardPage.getPortmappingDevice();
 

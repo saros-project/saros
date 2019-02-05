@@ -212,7 +212,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
 
   @Override
   public void disableAutomaticReminder() throws RemoteException {
-    if (!FeedbackManager.isFeedbackDisabled()) {
+    if (FeedbackManager.isFeedbackFeatureRequired() && !FeedbackManager.isFeedbackDisabled()) {
       clickMenuSarosPreferences();
 
       SWTBotShell shell = new SWTBot().shell(SHELL_PREFERNCES);
@@ -233,7 +233,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
 
   @Override
   public void disableAutomaticReminderNoGUI() throws RemoteException {
-    if (!FeedbackManager.isFeedbackDisabled()) {
+    if (FeedbackManager.isFeedbackFeatureRequired() && !FeedbackManager.isFeedbackDisabled()) {
 
       FeedbackManager.setFeedbackDisabled(true);
     }
