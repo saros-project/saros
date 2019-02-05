@@ -51,17 +51,18 @@ public class ConsistencyButton extends ToolbarButton {
 
           String inconsistentFiles = createConfirmationMessage(paths);
 
-          if (!DialogUtils.showQuestion(
-              null,
-              Messages.ConsistencyButton_confirm_dialog_title,
-              MessageFormat.format(
-                  Messages.ConsistencyButton_confirm_dialog_message, inconsistentFiles))) {
+          boolean userConfirmedRecovery =
+              DialogUtils.showQuestion(
+                  null,
+                  Messages.ConsistencyButton_confirm_dialog_title,
+                  MessageFormat.format(
+                      Messages.ConsistencyButton_confirm_dialog_message, inconsistentFiles));
 
-            setEnabledFromUIThread(true);
-            return;
+          if (userConfirmedRecovery) {
+            sessionInconsistencyState.action.execute();
           }
 
-          sessionInconsistencyState.action.execute();
+          setEnabledFromUIThread(true);
         }
       };
 
