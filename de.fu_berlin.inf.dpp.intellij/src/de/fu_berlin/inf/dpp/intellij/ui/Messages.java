@@ -34,6 +34,7 @@ public class Messages {
   public static String ConsistencyAction_progress_perform_recovery;
 
   public static String ConsistencyButton_confirm_dialog_title;
+  public static String ConsistencyButton_confirm_dialog_message;
   public static String ConsistencyButton_title_inconsistency_detected;
   public static String ConsistencyButton_message_inconsistency_detected;
   public static String ConsistencyButton_message_inconsistency_detected_no_files;
