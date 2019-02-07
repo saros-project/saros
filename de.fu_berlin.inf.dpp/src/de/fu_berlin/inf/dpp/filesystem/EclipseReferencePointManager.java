@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -13,11 +13,11 @@ import org.eclipse.core.runtime.IPath;
  */
 public class EclipseReferencePointManager {
 
-  HashMap<IReferencePoint, org.eclipse.core.resources.IProject> referencePointToProjectMapper;
+  private final ConcurrentHashMap<IReferencePoint, IProject> referencePointToProjectMapper;
 
   public EclipseReferencePointManager() {
     referencePointToProjectMapper =
-        new HashMap<IReferencePoint, org.eclipse.core.resources.IProject>();
+        new ConcurrentHashMap<IReferencePoint, org.eclipse.core.resources.IProject>();
   }
 
   /**
@@ -44,7 +44,7 @@ public class EclipseReferencePointManager {
    *
    * @param project
    */
-  public synchronized void putIfAbsent(IProject project) {
+  public void putIfAbsent(IProject project) {
     IReferencePoint referencePoint = create(project);
 
     putIfAbsent(referencePoint, project);
@@ -57,7 +57,7 @@ public class EclipseReferencePointManager {
    * @param referencePoint the key of the pair
    * @param project the value of the pair
    */
-  public synchronized void putIfAbsent(
+  public void putIfAbsent(
       IReferencePoint referencePoint, org.eclipse.core.resources.IProject project) {
     if (!referencePointToProjectMapper.containsKey(referencePoint)) {
       referencePointToProjectMapper.put(referencePoint, project);
@@ -70,7 +70,7 @@ public class EclipseReferencePointManager {
    * @param referencePoint the key for which the IProject should be returned
    * @return the IProject given by referencePoint
    */
-  public synchronized org.eclipse.core.resources.IProject get(IReferencePoint referencePoint) {
+  public org.eclipse.core.resources.IProject get(IReferencePoint referencePoint) {
     return referencePointToProjectMapper.get(referencePoint);
   }
 
@@ -84,8 +84,7 @@ public class EclipseReferencePointManager {
    * @return the resource of the reference point from referencePointRelativePath or null if resource
    *     does not exist.
    */
-  public synchronized IResource getResource(
-      IReferencePoint referencePoint, IPath referencePointRelativePath) {
+  public IResource getResource(IReferencePoint referencePoint, IPath referencePointRelativePath) {
     if (referencePoint == null) throw new IllegalStateException("Reference point is null");
 
     if (referencePointRelativePath == null) throw new IllegalStateException("Path is null");
@@ -106,8 +105,7 @@ public class EclipseReferencePointManager {
    * @param referencePointRelativePath the relative path from the reference point to the file
    * @return a handle to the file
    */
-  public synchronized IFile getFile(
-      IReferencePoint referencePoint, IPath referencePointRelativePath) {
+  public IFile getFile(IReferencePoint referencePoint, IPath referencePointRelativePath) {
     if (referencePoint == null) throw new IllegalStateException("Reference point is null");
 
     if (referencePointRelativePath == null) throw new IllegalStateException("Path is null");
@@ -128,8 +126,7 @@ public class EclipseReferencePointManager {
    * @param referencePointRelativePath
    * @return a handle to the folder
    */
-  public synchronized IFolder getFolder(
-      IReferencePoint referencePoint, IPath referencePointRelativePath) {
+  public IFolder getFolder(IReferencePoint referencePoint, IPath referencePointRelativePath) {
     if (referencePoint == null) throw new IllegalStateException("Reference point is null");
 
     if (referencePointRelativePath == null) throw new IllegalStateException("Path is null");
