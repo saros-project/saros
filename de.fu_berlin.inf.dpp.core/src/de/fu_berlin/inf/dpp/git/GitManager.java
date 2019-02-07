@@ -68,7 +68,7 @@ public class GitManager extends AbstractActivityProducer implements Startable {
         public void receive(GitCollectActivity activity) {
           String basis = activity.getBasis();
           try {
-            File bundle = JGitFacade.createBundle(workDir, "HEAD", basis);
+            byte[] bundle = JGitFacade.createBundle(workDir, "HEAD", basis);
             if (bundle == null) {
               log.debug("bundle == NULL");
             } else {
@@ -84,10 +84,10 @@ public class GitManager extends AbstractActivityProducer implements Startable {
 
         @Override
         public void receive(GitSendBundleActivity activity) {
-          File bundleFile = activity.getBundleFile();
+          byte[] bundle = activity.getBundle();
           try {
             log.debug(session.getLocalUser() + "is fetching");
-            JGitFacade.fetchFromBundle(workDir, bundleFile);
+            JGitFacade.fetchFromBundle(workDir, bundle);
           } catch (Exception e) {
             log.debug(e);
           }

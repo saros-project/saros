@@ -218,8 +218,7 @@ public class GitManagerTest {
 
   private static GitSendBundleActivity rewriteGitSendBundleActivity(
       GitSendBundleActivity inActivity) {
-    return new GitSendBundleActivity(
-        rewriteUser(inActivity.getSource()), inActivity.getBundleFile());
+    return new GitSendBundleActivity(rewriteUser(inActivity.getSource()), inActivity.getBundle());
   }
 
   private static User rewriteUser(User user) {

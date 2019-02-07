@@ -3,15 +3,14 @@ package de.fu_berlin.inf.dpp.activities;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import de.fu_berlin.inf.dpp.session.User;
-import java.io.File;
 
 @XStreamAlias("GitSendBundleActivity")
 public class GitSendBundleActivity extends AbstractActivity {
-  @XStreamAsAttribute File bundleFile;
+  @XStreamAsAttribute byte[] bundle;
 
-  public GitSendBundleActivity(User source, File bundleFile) {
+  public GitSendBundleActivity(User source, byte[] bundle) {
     super(source);
-    setBundleFile(bundleFile);
+    setBundle(bundle);
   }
 
   @Override
@@ -19,11 +18,11 @@ public class GitSendBundleActivity extends AbstractActivity {
     receiver.receive(this);
   }
 
-  private void setBundleFile(File bundleFile) {
-    this.bundleFile = bundleFile;
+  private void setBundle(byte[] bundle) {
+    this.bundle = bundle;
   }
 
-  public File getBundleFile() {
-    return bundleFile;
+  public byte[] getBundle() {
+    return bundle;
   }
 }
