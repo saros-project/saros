@@ -5,13 +5,13 @@ import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.ReferencePointImpl;
 import java.io.File;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerReferencePointManager {
-  HashMap<IReferencePoint, File> referencePointToFileMapper;
+  private final ConcurrentHashMap<IReferencePoint, File> referencePointToFileMapper;
 
   public ServerReferencePointManager() {
-    referencePointToFileMapper = new HashMap<IReferencePoint, File>();
+    referencePointToFileMapper = new ConcurrentHashMap<IReferencePoint, File>();
   }
 
   public static IReferencePoint create(IWorkspace workspace) {
@@ -26,7 +26,7 @@ public class ServerReferencePointManager {
    * @param referencePoint the key of the pair
    * @param directory the value of the pair
    */
-  public synchronized void putIfAbsent(IReferencePoint referencePoint, File directory) {
+  public void putIfAbsent(IReferencePoint referencePoint, File directory) {
     if (!referencePointToFileMapper.containsKey(referencePoint)) {
       referencePointToFileMapper.put(referencePoint, directory);
     }
@@ -38,7 +38,7 @@ public class ServerReferencePointManager {
    * @param referencePoint the key for which the directory should be returned
    * @return the directory given by referencePoint
    */
-  public synchronized File get(IReferencePoint referencePoint) {
+  public File get(IReferencePoint referencePoint) {
 
     return referencePointToFileMapper.get(referencePoint);
   }
@@ -51,8 +51,7 @@ public class ServerReferencePointManager {
    * @param referencePointRelativePath the relative path from the reference point to the resource
    * @return the resource of the reference point from referencePointRelativePath
    */
-  public synchronized File getResource(
-      IReferencePoint referencePoint, IPath referencePointRelativePath) {
+  public File getResource(IReferencePoint referencePoint, IPath referencePointRelativePath) {
     if (referencePoint == null) throw new NullPointerException("Reference point is null");
 
     if (referencePointRelativePath == null) throw new NullPointerException("Path is null");
