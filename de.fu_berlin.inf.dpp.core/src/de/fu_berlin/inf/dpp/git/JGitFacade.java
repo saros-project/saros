@@ -1,9 +1,12 @@
 package de.fu_berlin.inf.dpp.git;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteRemoveCommand;
@@ -15,13 +18,15 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.BundleWriter;
+import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.TransportBundleStream;
 import org.eclipse.jgit.transport.URIish;
 
 public class JGitFacade {
   private static final Logger log = Logger.getLogger(JGitFacade.class);
 
   /**
-   * Create a bundle file with all commits from basis to actual of the Git repo.
+   * Create a bundle with all commits from basis to actual of the Git repo.
    *
    * @param workDir The directory that contains the .git directory
    * @param actual The name of the ref to lookup. For example: "HEAD" or "refs/heads/master". Must
@@ -30,16 +35,16 @@ public class JGitFacade {
    *     basis is an empty string) everything reachable from it.
    * @param basis Assume that the recipient have at least the commit the basis is pointing to. In
    *     order to fetch from a bundle the recipient must have the commit the basis is pointing to.
-   * @throws IllegalArgumentException workDir is null or if resolving actual leds to a not exitsting
+   * @throws IllegalArgumentException workDir is null or if resolving actual leads to a not existing
    *     ref
-   * @throws IOException failed while read/resolved parameters or while written to the bundleFile
+   * @throws IOException failed while read/resolved parameters or while written to the bundle
    */
-  public static File createBundle(File workDir, String actual, String basis)
+  public static byte[] createBundle(File workDir, String actual, String basis)
       throws IllegalArgumentException, IOException {
 
     // The method can be divided into 4 Steps. After the first, second and third step the
     // bundlewriter object is expanded with the parameters. The last step exists to write the
-    // bundle file.
+    // bundle.
 
     // Step 1
     Git git;
@@ -82,35 +87,28 @@ public class JGitFacade {
     }
 
     // Step 4
-    File bundle;
-    OutputStream fos = null;
-    try {
-      bundle = File.createTempFile("file", ".bundle");
-      fos = new FileOutputStream(bundle);
+    NullProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-      NullProgressMonitor monitor = NullProgressMonitor.INSTANCE;
+    bundlewriter.writeBundle(monitor, byteArrayOutputStream);
 
-      bundlewriter.writeBundle(monitor, fos);
-
-      fos.close();
-    } catch (IOException e) {
-      if (fos != null) fos.close();
-
-      throw new IOException("failed while written bundle", e);
-    }
-    return bundle;
+    return byteArrayOutputStream.toByteArray();
   }
 
   /**
-   * Fetching from a bundle file to an Git repo
+   * Fetching from a bundle to an Git repo
    *
    * @param workDir The directory that contains the .git directory
-   * @param bundleFile
-   * @throws IllegalArgumentException workDir or bundleFile is null and can't be resolved
-   * @throws IOException failed while read from workDir or bundleFile handling
+   * @param bundle
+   * @throws IllegalArgumentException workDir or bundle is null and can't be resolved
+   * @throws IOException failed while read from workDir, bundle handling or while fetch
+   * @throws URISyntaxException
    */
-  public static void fetchFromBundle(File workDir, File bundleFile)
-      throws IllegalArgumentException, IOException {
+  public static void fetchFromBundle(File workDir, byte[] bundle)
+      throws IllegalArgumentException, IOException, URISyntaxException {
+    if (workDir == null)
+      throw new IllegalArgumentException("workDir is null and can't be resolved");
+    if (bundle == null) throw new IllegalArgumentException("bundle is null and can't be resolved");
 
     Git git;
     try {
@@ -129,23 +127,19 @@ public class JGitFacade {
       throw new IOException("failed to remove old bundle path", e);
     }
 
-    try {
-      if (bundleFile == null)
-        throw new IllegalArgumentException("bundleFile is null and can't be resolved");
-      git.remoteAdd()
-          .setUri(new URIish().setPath(bundleFile.getCanonicalPath()))
-          .setName("bundle")
-          .call();
-    } catch (GitAPIException | IOException e) {
-      throw new IOException("failed while added bundle as remote", e);
-    }
+    final URIish uri = new URIish("in-memory://");
+    final ByteArrayInputStream in = new ByteArrayInputStream(bundle);
+    final RefSpec rs = new RefSpec("refs/heads/*:refs/heads/*");
+    final Set<RefSpec> refs = Collections.singleton(rs);
 
-    try {
-      git.fetch().setRemote("bundle").call();
-    } catch (GitAPIException e) {
-      throw new IOException("failed while fetched from bundle", e);
+    try (TransportBundleStream transport =
+        new TransportBundleStream(git.getRepository(), uri, in)) {
+      transport.fetch(NullProgressMonitor.INSTANCE, refs);
+    } catch (org.eclipse.jgit.errors.TransportException e) {
+      throw new IOException("fetch failed", e);
     }
   }
+
   /**
    * @throws IllegalArgumentException parameters can't be resolved. Maybe null
    * @throws IOException failed while cloned

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
@@ -35,13 +36,13 @@ public class JGitFacadeTest {
   // lucky paths
   @Test
   public void testCreateBundleHEAD() throws IllegalArgumentException, IOException {
-    File bundle = JGitFacade.createBundle(localWorkDir, "HEAD", "");
+    byte[] bundle = JGitFacade.createBundle(localWorkDir, "HEAD", "");
     assertNotNull(bundle);
   }
 
   @Test
   public void testCreateBundleRef() throws IllegalArgumentException, IOException {
-    File bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "");
+    byte[] bundle = JGitFacade.createBundle(localWorkDir, "refs/heads/master", "");
     assertNotNull(bundle);
   }
 
@@ -55,7 +56,7 @@ public class JGitFacadeTest {
 
     String basis = JGitFacade.getSHA1HashByRevisionString(remoteWorkDir, "HEAD");
 
-    File bundle = JGitFacade.createBundle(localWorkDir, "HEAD", basis);
+    byte[] bundle = JGitFacade.createBundle(localWorkDir, "HEAD", basis);
 
     assertNotEquals(
         getObjectIdByRevisionString(localWorkDir, "HEAD"),
@@ -87,12 +88,12 @@ public class JGitFacadeTest {
 
   @Test(expected = IOException.class)
   public void testFetchFromBundleEmptyDir()
-      throws IllegalArgumentException, IOException, GitAPIException {
+      throws IllegalArgumentException, IOException, GitAPIException, URISyntaxException {
     File emptyDir = tempFolder.newFolder("TempDir3");
 
     writeCommitToRepo(localWorkDir, 3);
 
-    File bundle = JGitFacade.createBundle(localWorkDir, "HEAD", "CheckoutAtCommit2");
+    byte[] bundle = JGitFacade.createBundle(localWorkDir, "HEAD", "CheckoutAtCommit2");
 
     JGitFacade.fetchFromBundle(emptyDir, bundle);
   }
@@ -106,7 +107,7 @@ public class JGitFacadeTest {
     writeCommitToRepo(localWorkDir, 3);
     writeCommitToRepo(localWorkDir, 4);
 
-    File bundle = JGitFacade.createBundle(localWorkDir, "HEAD", "CheckoutAtCommit3");
+    byte[] bundle = JGitFacade.createBundle(localWorkDir, "HEAD", "CheckoutAtCommit3");
 
     JGitFacade.fetchFromBundle(remoteWorkDir, bundle);
   }
