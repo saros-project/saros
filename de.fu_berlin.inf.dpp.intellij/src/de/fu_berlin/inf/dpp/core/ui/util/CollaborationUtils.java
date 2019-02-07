@@ -487,9 +487,9 @@ public class CollaborationUtils {
       IReferencePointManager referencePointManager) {
     IntelliJModuleImpl intelliJProject = (IntelliJModuleImpl) project;
 
-    referencePointManager.put(
+    referencePointManager.putIfAbsent(
         IntelliJReferencePointManager.create(intelliJProject.getModule()), project);
 
-    intelliJReferencePointManager.put(intelliJProject.getModule());
+    intelliJReferencePointManager.putIfAbsent(intelliJProject.getModule());
   }
 }

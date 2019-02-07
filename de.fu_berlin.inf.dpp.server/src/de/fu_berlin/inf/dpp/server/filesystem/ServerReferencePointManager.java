@@ -26,7 +26,7 @@ public class ServerReferencePointManager {
    * @param referencePoint the key of the pair
    * @param directory the value of the pair
    */
-  public synchronized void put(IReferencePoint referencePoint, File directory) {
+  public synchronized void putIfAbsent(IReferencePoint referencePoint, File directory) {
     if (!referencePointToFileMapper.containsKey(referencePoint)) {
       referencePointToFileMapper.put(referencePoint, directory);
     }

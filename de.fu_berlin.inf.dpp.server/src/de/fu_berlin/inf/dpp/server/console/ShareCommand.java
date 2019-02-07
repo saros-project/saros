@@ -61,8 +61,9 @@ public class ShareCommand extends ConsoleCommand {
           IFolder sourceFolder =
               new ServerFolderImpl(this.workspace.getLocation(), ServerPathImpl.fromString(path));
           IReferencePoint referencePoint = ServerReferencePointManager.create(workspace);
-          referencePointManager.put(referencePoint, sourceFolder);
-          serverReferencePointManager.put(referencePoint, this.workspace.getLocation().toFile());
+          referencePointManager.putIfAbsent(referencePoint, sourceFolder);
+          serverReferencePointManager.putIfAbsent(
+              referencePoint, this.workspace.getLocation().toFile());
           referencePoints.put(referencePoint, null);
         } catch (Exception e) {
           log.error(path + " could not be added to the session", e);

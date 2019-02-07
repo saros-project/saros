@@ -71,7 +71,7 @@ public class IntelliJReferencePointManagerTest {
   @Test
   public void testPutIfAbsent() {
     IReferencePoint referencePoint = IntelliJReferencePointManager.create(module);
-    intelliJReferencePointManager.put(referencePoint, module);
+    intelliJReferencePointManager.putIfAbsent(referencePoint, module);
     Module m = intelliJReferencePointManager.get(referencePoint);
 
     Assert.assertNotNull(m);

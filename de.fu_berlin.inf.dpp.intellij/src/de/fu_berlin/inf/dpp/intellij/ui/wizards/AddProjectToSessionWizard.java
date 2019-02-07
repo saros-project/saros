@@ -136,7 +136,7 @@ public class AddProjectToSessionWizard extends Wizard {
             try {
               module = createModuleStub(moduleName);
 
-              intelliJReferencePointManager.put(module);
+              intelliJReferencePointManager.putIfAbsent(module);
 
             } catch (IOException e) {
               LOG.error("Could not create the shared module " + moduleName + ".", e);
@@ -658,9 +658,9 @@ public class AddProjectToSessionWizard extends Wizard {
 
     IntelliJModuleImpl intelliJProject = (IntelliJModuleImpl) project;
 
-    referencePointManager.put(
+    referencePointManager.putIfAbsent(
         intelliJReferencePointManager.create(intelliJProject.getModule()), project);
 
-    intelliJReferencePointManager.put(intelliJProject.getModule());
+    intelliJReferencePointManager.putIfAbsent(intelliJProject.getModule());
   }
 }

@@ -16,7 +16,7 @@ public class ReferencePointManager implements IReferencePointManager {
   }
 
   @Override
-  public synchronized void put(IReferencePoint referencePoint, IFolder project) {
+  public synchronized void putIfAbsent(IReferencePoint referencePoint, IFolder project) {
     if (!referencePointToProjectMapper.containsKey(referencePoint)) {
       referencePointToProjectMapper.put(referencePoint, project);
     }

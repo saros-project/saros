@@ -65,14 +65,14 @@ public class EclipseReferencePointManagerTest {
 
   @Test
   public void testPutIfAbsent() {
-    eclipseReferencePointManager.put(referencePoint, project);
+    eclipseReferencePointManager.putIfAbsent(referencePoint, project);
     IProject p = eclipseReferencePointManager.get(referencePoint);
     Assert.assertNotNull(p);
   }
 
   @Test
   public void testGetResource() {
-    eclipseReferencePointManager.put(referencePoint, project);
+    eclipseReferencePointManager.putIfAbsent(referencePoint, project);
     IProject p = eclipseReferencePointManager.get(referencePoint);
     IResource resource =
         eclipseReferencePointManager.getResource(referencePoint, fileReferencePointRelativePath);
@@ -81,7 +81,7 @@ public class EclipseReferencePointManagerTest {
 
   @Test
   public void testGetFile() {
-    eclipseReferencePointManager.put(referencePoint, project);
+    eclipseReferencePointManager.putIfAbsent(referencePoint, project);
     IProject p = eclipseReferencePointManager.get(referencePoint);
     IFile file =
         eclipseReferencePointManager.getFile(referencePoint, fileReferencePointRelativePath);
@@ -90,7 +90,7 @@ public class EclipseReferencePointManagerTest {
 
   @Test
   public void testGetFolder() {
-    eclipseReferencePointManager.put(referencePoint, project);
+    eclipseReferencePointManager.putIfAbsent(referencePoint, project);
     IProject p = eclipseReferencePointManager.get(referencePoint);
     IFolder folder =
         eclipseReferencePointManager.getFolder(referencePoint, folderReferencePointRelativePath);

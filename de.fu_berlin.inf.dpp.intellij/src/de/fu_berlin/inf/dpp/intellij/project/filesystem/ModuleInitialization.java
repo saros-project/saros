@@ -182,7 +182,7 @@ public class ModuleInitialization implements Startable {
         module = newModule;
 
         // Put the refreshed module to the intelliJReferencePointManager;
-        intelliJReferencePointManager.put(module);
+        intelliJReferencePointManager.putIfAbsent(module);
 
         return true;
       }

@@ -11,9 +11,9 @@ public interface IReferencePointManager {
    * Insert a pair of reference point and project
    *
    * @param referencePoint the key of the pair
-   * @param project the value of the pair
+   * @param folder the value of the pair
    */
-  void put(IReferencePoint referencePoint, IFolder folder);
+  void putIfAbsent(IReferencePoint referencePoint, IFolder folder);
 
   /**
    * Returns the IProject given by the IReferencePoint

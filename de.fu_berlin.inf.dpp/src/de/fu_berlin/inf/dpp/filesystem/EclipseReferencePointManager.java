@@ -44,10 +44,10 @@ public class EclipseReferencePointManager {
    *
    * @param project
    */
-  public synchronized void put(org.eclipse.core.resources.IProject project) {
+  public synchronized void putIfAbsent(IProject project) {
     IReferencePoint referencePoint = create(project);
 
-    put(referencePoint, project);
+    putIfAbsent(referencePoint, project);
   }
 
   /**
@@ -57,7 +57,7 @@ public class EclipseReferencePointManager {
    * @param referencePoint the key of the pair
    * @param project the value of the pair
    */
-  public synchronized void put(
+  public synchronized void putIfAbsent(
       IReferencePoint referencePoint, org.eclipse.core.resources.IProject project) {
     if (!referencePointToProjectMapper.containsKey(referencePoint)) {
       referencePointToProjectMapper.put(referencePoint, project);

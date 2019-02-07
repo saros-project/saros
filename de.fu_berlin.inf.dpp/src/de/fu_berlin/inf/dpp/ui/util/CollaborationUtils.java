@@ -492,12 +492,13 @@ public class CollaborationUtils {
 
   private static void fillReferencePointManager(
       EclipseProjectImpl project, IReferencePointManager referencePointManager) {
-    referencePointManager.put(EclipseReferencePointManager.create(project.getDelegate()), project);
+    referencePointManager.putIfAbsent(
+        EclipseReferencePointManager.create(project.getDelegate()), project);
   }
 
   private static void fillReferencePointManager(Collection<IProject> projects) {
     for (IProject project : projects) {
-      eclipseReferencePointManager.put(project);
+      eclipseReferencePointManager.putIfAbsent(project);
     }
   }
 }

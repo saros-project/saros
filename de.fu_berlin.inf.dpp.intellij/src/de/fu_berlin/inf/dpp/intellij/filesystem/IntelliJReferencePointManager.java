@@ -65,12 +65,12 @@ public class IntelliJReferencePointManager {
    *
    * @param module the value of the pair
    */
-  public synchronized void put(Module module) {
+  public synchronized void putIfAbsent(Module module) {
     IReferencePoint referencePoint = create(module);
 
     if (referencePoint == null) throw new IllegalStateException("Reference point can't be null");
 
-    put(referencePoint, module);
+    putIfAbsent(referencePoint, module);
   }
 
   /**
@@ -79,7 +79,7 @@ public class IntelliJReferencePointManager {
    * @param referencePoint the key of the pair
    * @param module the value of the pair
    */
-  public synchronized void put(@NotNull IReferencePoint referencePoint, Module module) {
+  public synchronized void putIfAbsent(@NotNull IReferencePoint referencePoint, Module module) {
 
     if (referencePointToModuleMapper.containsKey(referencePoint))
       referencePointToModuleMapper.remove(referencePoint);
@@ -178,6 +178,6 @@ public class IntelliJReferencePointManager {
 
     module = ModuleManager.getInstance(project).findModuleByName(module.getName());
 
-    put(module);
+    putIfAbsent(module);
   }
 }
