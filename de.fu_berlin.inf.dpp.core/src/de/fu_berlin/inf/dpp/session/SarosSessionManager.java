@@ -264,7 +264,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     assert session == null;
 
-    session = new SarosSession(id, host, localProperties, hostProperties, context);
+    session =
+        new SarosSession(
+            id, host, localProperties, hostProperties, context, new ReferencePointManager());
 
     log.info("joined uninitialized Saros session");
 

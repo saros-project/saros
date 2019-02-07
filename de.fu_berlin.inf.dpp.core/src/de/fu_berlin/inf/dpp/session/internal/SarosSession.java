@@ -246,8 +246,9 @@ public final class SarosSession implements ISarosSession {
       JID hostJID,
       IPreferenceStore localProperties,
       IPreferenceStore hostProperties,
-      IContainerContext containerContext) {
-    this(id, containerContext, localProperties, hostJID, hostProperties, null);
+      IContainerContext containerContext,
+      IReferencePointManager referencePointManager) {
+    this(id, containerContext, localProperties, hostJID, hostProperties, referencePointManager);
   }
 
   @Override
@@ -1133,7 +1134,7 @@ public final class SarosSession implements ISarosSession {
     sessionContainer = context.createChildContainer();
     sessionContainer.addComponent(ISarosSession.class, this);
     sessionContainer.addComponent(IActivityHandlerCallback.class, activityCallback);
-    sessionContainer.addComponent(IReferencePointManager.class, new ReferencePointManager());
+    sessionContainer.addComponent(IReferencePointManager.class, referencePointManager);
     ISarosSessionContextFactory factory = context.getComponent(ISarosSessionContextFactory.class);
     factory.createComponents(this, sessionContainer);
 
