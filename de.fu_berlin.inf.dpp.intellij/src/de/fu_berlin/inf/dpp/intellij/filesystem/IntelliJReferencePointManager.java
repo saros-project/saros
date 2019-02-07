@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.filesystem;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
@@ -10,7 +8,7 @@ import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.ReferencePointImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,10 +17,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public class IntelliJReferencePointManager {
 
-  HashMap<IReferencePoint, Module> referencePointToModuleMapper;
+  private final ConcurrentHashMap<IReferencePoint, Module> referencePointToModuleMapper;
 
   public IntelliJReferencePointManager() {
-    referencePointToModuleMapper = new HashMap<IReferencePoint, Module>();
+    referencePointToModuleMapper = new ConcurrentHashMap<IReferencePoint, Module>();
   }
 
   /**
@@ -65,7 +63,7 @@ public class IntelliJReferencePointManager {
    *
    * @param module the value of the pair
    */
-  public synchronized void putIfAbsent(Module module) {
+  public void putIfAbsent(Module module) {
     IReferencePoint referencePoint = create(module);
 
     if (referencePoint == null) throw new IllegalStateException("Reference point can't be null");
@@ -79,7 +77,7 @@ public class IntelliJReferencePointManager {
    * @param referencePoint the key of the pair
    * @param module the value of the pair
    */
-  public synchronized void putIfAbsent(@NotNull IReferencePoint referencePoint, Module module) {
+  public void putIfAbsent(@NotNull IReferencePoint referencePoint, Module module) {
 
     if (referencePointToModuleMapper.containsKey(referencePoint))
       referencePointToModuleMapper.remove(referencePoint);
@@ -94,7 +92,7 @@ public class IntelliJReferencePointManager {
    * @param referencePoint the key for which the module should be returned
    * @return the module root given by referencePoint
    */
-  public synchronized VirtualFile getModuleRoot(IReferencePoint referencePoint) {
+  public VirtualFile getModuleRoot(IReferencePoint referencePoint) {
     Module module = get(referencePoint);
 
     return getModuleRoot(module);
@@ -106,7 +104,7 @@ public class IntelliJReferencePointManager {
    * @param referencePoint the key for which the module should be returned
    * @return the module given by referencePoint
    */
-  public synchronized Module get(IReferencePoint referencePoint) {
+  public Module get(IReferencePoint referencePoint) {
     Module module = referencePointToModuleMapper.get(referencePoint);
 
     return module;
@@ -120,8 +118,7 @@ public class IntelliJReferencePointManager {
    * @param referencePointRelativePath the relative path from the reference point to the resource
    * @return the resource of the reference point from referencePointRelativePath
    */
-  public synchronized VirtualFile getResource(
-      IReferencePoint referencePoint, IPath referencePointRelativePath) {
+  public VirtualFile getResource(IReferencePoint referencePoint, IPath referencePointRelativePath) {
     if (referencePoint == null) throw new NullPointerException("Reference point is null");
 
     if (referencePointRelativePath == null) throw new NullPointerException("Path is null");
@@ -169,15 +166,5 @@ public class IntelliJReferencePointManager {
     VirtualFile moduleRoot = contentRoots[0];
 
     return moduleRoot;
-  }
-
-  public void refresh(Module module) {
-    if (!module.isDisposed() || !referencePointToModuleMapper.containsValue(module)) return;
-
-    Project project = module.getProject();
-
-    module = ModuleManager.getInstance(project).findModuleByName(module.getName());
-
-    putIfAbsent(module);
   }
 }
