@@ -2,33 +2,33 @@ package de.fu_berlin.inf.dpp.session;
 
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** The implementation of {@link IReferencePointManager} */
 public class ReferencePointManager implements IReferencePointManager {
 
-  private final HashMap<IReferencePoint, IFolder> referencePointToProjectMapper;
+  private final ConcurrentHashMap<IReferencePoint, IFolder> referencePointToProjectMapper;
 
   public ReferencePointManager() {
-    referencePointToProjectMapper = new HashMap<IReferencePoint, IFolder>();
+    referencePointToProjectMapper = new ConcurrentHashMap<IReferencePoint, IFolder>();
   }
 
   @Override
-  public synchronized void putIfAbsent(IReferencePoint referencePoint, IFolder project) {
+  public void putIfAbsent(IReferencePoint referencePoint, IFolder project) {
     if (!referencePointToProjectMapper.containsKey(referencePoint)) {
       referencePointToProjectMapper.put(referencePoint, project);
     }
   }
 
   @Override
-  public synchronized IFolder get(IReferencePoint referencePoint) {
+  public IFolder get(IReferencePoint referencePoint) {
     return referencePointToProjectMapper.get(referencePoint);
   }
 
   @Override
-  public synchronized Set<IFolder> getProjects(Set<IReferencePoint> referencePoints) {
+  public Set<IFolder> getProjects(Set<IReferencePoint> referencePoints) {
     Set<IFolder> projectSet = new HashSet<IFolder>();
 
     for (IReferencePoint referencePoint : referencePoints) {
