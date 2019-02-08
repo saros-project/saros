@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -77,7 +78,9 @@ public class RemoteBotEditor extends StfRemoteObject implements IRemoteBotEditor
 
   @Override
   public void setTextFromFile(String contentPath) throws RemoteException {
-    String contents = FileUtils.read(getSaros().getBundle().getEntry(contentPath));
+
+    String contents =
+        FileUtils.read(Platform.getBundle("de.fu_berlin.inf.dpp.stf").getEntry(contentPath));
     widget.setText(contents);
   }
 
