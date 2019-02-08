@@ -18,7 +18,7 @@ function start_container_master()
 function setup_container_master()
 {
   echo "Build testees"
-  docker exec -t "$stf_master_name" "$SCRIPT_DIR_CONTAINER/build/build_java.sh"
+  docker exec -t "$stf_master_name" sh -c "$SCRIPT_DIR_CONTAINER/build/build_java.sh stf"
   echo "Executing setup_stf_ws.sh on $stf_master_name"
   docker exec -t "$stf_master_name" "$SCRIPT_DIR_CONTAINER/stf/master/setup_stf_ws.sh"
 }
