@@ -24,10 +24,10 @@ eclipse_dropin_dir="${eclipse_dir}/dropins"
 
 workspace="${STF_WS}/ws/workspace_${user}"
 
-plugin_id_prefix="de.fu_berlin.inf.dpp"
+plugin_id_prefix="de.fu_berlin.inf.dpp.stf"
 saros_plugin_dir="${STF_WS}/plugins"
 
-# determine (versioned) filename of plugin (_ suppresses .source versions)
+# determine (versioned) filename of stf server plugin (_ suppresses .source versions)
 saros_plugin_filename=`ls -1 $saros_plugin_dir | grep "$plugin_id_prefix.jar"`
 
 if [ -z $saros_plugin_filename ]; then
@@ -75,6 +75,7 @@ echo $DISPLAY
 $eclipse_dir/eclipse \
   -name "eclipse_${user}" \
   -consoleLog \
+  -debug \
   -data "${workspace}" \
   -vm "$java_cmd" \
   -vmargs \
@@ -89,5 +90,5 @@ $eclipse_dir/eclipse \
   -Dorg.eclipse.swtbot.keyboard.strategy=org.eclipse.swtbot.swt.finder.keyboard.MockKeyboardStrategy \
   -Dorg.eclipse.swtbot.keyboard.layout=de.fu_berlin.inf.dpp.stf.server.bot.default \
   -Dfile.encoding=UTF-8 \
-  -Dosgi.parentClassloader=app \
+  -Dosgi.parentClassloader=app
 
