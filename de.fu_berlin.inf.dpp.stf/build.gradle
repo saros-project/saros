@@ -4,7 +4,6 @@ eclipse{
   }
 }
 
-
 buildscript {
   repositories {
     maven {
@@ -26,19 +25,15 @@ repositories {
 }
 
 sourceSets {
-  main.java.srcDirs = ['src',
-                       'ext-src']
-
   main {
+    java.srcDirs = ['src']
     resources {
       srcDir 'src'
       exclude '**/*.java'
     }
   }
-
-  test {
-    java.srcDir 'test/junit'
-    resources.srcDir 'test/resources'
+  test { 
+    java.srcDirs = ['test']
   }
 }
 
@@ -47,35 +42,31 @@ manifestDependencies {
 
     dependencyHandling {
       def ids = [:]
-      if (it.matches('org.junit'))
-      {
-        ids['groupId'] = 'junit'
-        ids['artifactId'] = 'junit'
-        ids['version'] = '4.11'
-      }
+
       return ids
     }
 }
 
 dependencies {
+  compile junitVersion
   compile project(':de.fu_berlin.inf.dpp.core')
   compile project(':de.fu_berlin.inf.dpp.ui')
+  compile project(':de.fu_berlin.inf.dpp')
 
-  compile project(path: ':de.fu_berlin.inf.dpp.core', configuration: 'testing')
   compile project(path: ':de.fu_berlin.inf.dpp.ui', configuration: 'testing')
+  compile project(path: ':de.fu_berlin.inf.dpp', configuration: 'testing')
 
-  testImplementation configurations.testConfig
+  releaseDep fileTree(dir: 'libs', include: '*.jar', exclude: '*source*.jar')
+  compile fileTree(dir: eclipseHome + '/plugins').matching {
+    include '*.jar'
+    exclude '*commons.lang*'
+    exclude 'de.fu_berlin.*'
+  }
+  compile configurations.releaseDep
 }
-
-tasks.withType(Test) {
-  enableAssertions = false
-}
-
-compileJava.dependsOn rootProject.mavenizeP2Repository
 
 jar {
   manifest {
-      // benutze das im Projekt vorliegende File, falls vorhanden:
       def manif = "${projectDir}/META-INF/MANIFEST.MF"
       if (new File(manif).exists()) {
          from (manif)
@@ -83,26 +74,13 @@ jar {
   }
 
   from sourceSets.main.output
+  from 'plugin.xml'
 
   into('lib') {
     from configurations.getByName('releaseDep')
   }
-  into('assets') {
-    from 'assets'
-  }
-  into('icons') {
-    from 'icons'
-  }
   into('test/resources') {
     from('test/resources')
-  }
-  from('.') {
-    include '*.properties'
-    include 'readme.html'
-    include 'plugin.xml'
-    include 'version.comp'
-    include 'LICENSE'
-    include 'CHANGELOG'
   }
 }
 
@@ -111,20 +89,6 @@ task testJar(type: Jar) {
   from sourceSets.test.output
 }
 
-compileJava.dependsOn rootProject.mavenizeP2Repository
-
 artifacts {
   testing testJar
-}
-
-sonarqube {
-  properties {
-    property 'sonar.projectName', 'Saros/Eclipse'
-    property 'sonar.projectDescription', 'Saros plugin for the Eclipse IDE'
-    property 'sonar.projectVersion', '14.11.28.DEVEL'
-    property 'sonar.exclusion', '**/Messages.java'
-    // necessary to avoid the scanning of stf
-    property 'sonar.sources', 'src'
-    property 'sonar.tests', 'test/junit, test/stf'
-  }
 }
