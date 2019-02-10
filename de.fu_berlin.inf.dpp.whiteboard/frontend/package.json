@@ -2,6 +2,12 @@
   "name": "whiteboard",
   "version": "0.0.1",
   "description": "Whiteboard for Saros built with HTML",
+  "author": "Abdullah Barhoum",
+  "license": "GPL-2.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saros-project/saros.git"
+  },
   "main": "app.js",
   "scripts": {
     "setup": "npm install && bower install fabric --allow-root",
@@ -9,8 +15,6 @@
     "build": "webpack --mode=production && inline-source ./index.html ./dist/index.html --root ./ --compress && del-cli dist/bundle.js",
     "lint": "eslint --ext .js,.jsx ./app.js src"
   },
-  "author": "Abdullah Barhoum",
-  "license": "GPLv2",
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "react": "^16.8.1",
