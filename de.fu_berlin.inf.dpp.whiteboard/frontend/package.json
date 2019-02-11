@@ -2,7 +2,6 @@
   "name": "whiteboard",
   "version": "0.0.1",
   "description": "Whiteboard for Saros built with HTML",
-  "author": "Abdullah Barhoum",
   "license": "GPL-2.0-only",
   "repository": {
     "type": "git",
