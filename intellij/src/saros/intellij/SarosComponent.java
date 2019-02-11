@@ -18,7 +18,7 @@ import saros.session.SessionEndReason;
 import saros.util.ThreadUtils;
 
 /**
- * Component that is initalized when a project is loaded. It initializes the logging, shortcuts and
+ * Component that is initialized when a project is loaded. It initializes the logging, shortcuts and
  * the {@link IntellijProjectLifecycle} singleton.
  */
 public class SarosComponent implements com.intellij.openapi.components.ProjectComponent {
@@ -34,10 +34,27 @@ public class SarosComponent implements com.intellij.openapi.components.ProjectCo
 
   private final IntellijProjectLifecycle intellijProjectLifecycle;
 
+  /**
+   * Loads the given project project into the current <code>IntellijProjectLifecycle</code>.
+   *
+   * @param project the opened project
+   */
   public SarosComponent(final Project project) {
     loadLoggers();
     log = Logger.getLogger(SarosComponent.class);
 
+    this.project = project;
+
+    intellijProjectLifecycle = IntellijProjectLifecycle.getInstance(project);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Initializes the Saros plugin lifecycle and other needed components.
+   */
+  @Override
+  public void initComponent() {
     Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
     keymap.addShortcut(
         "ActivateSarosToolWindow",
@@ -62,10 +79,61 @@ public class SarosComponent implements com.intellij.openapi.components.ProjectCo
       LogLog.error("could not load saros property file 'saros.properties'", e);
     }
 
-    this.project = project;
-
-    intellijProjectLifecycle = IntellijProjectLifecycle.getInstance(project);
     intellijProjectLifecycle.start();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Does nothing for the Saros plugin.
+   */
+  @Override
+  public void disposeComponent() {
+    // NOP
+  }
+
+  @Override
+  @NotNull
+  public String getComponentName() {
+    return "Saros";
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Does nothing for the Saros plugin as the initialization is already done in {@link
+   * #initComponent()}.
+   */
+  @Override
+  public void projectOpened() {
+    // NOP
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Stops the currently running session if such a session exists.
+   */
+  @Override
+  public void projectClosed() {
+    ISarosSessionManager sarosSessionManager =
+        intellijProjectLifecycle.getSarosContext().getComponent(ISarosSessionManager.class);
+
+    ISarosSession currentSession = sarosSessionManager.getSession();
+
+    if (currentSession != null
+        && currentSession.getComponent(ProjectWrapper.class).getProject().equals(project)) {
+
+      log.debug(
+          "Leaving current session as the project "
+              + project.getName()
+              + " containing the shared module was closed");
+
+      ThreadUtils.runSafeAsync(
+          "StopSession",
+          log,
+          () -> sarosSessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT));
+    }
   }
 
   public static boolean isSwtBrowserEnabled() {
@@ -86,49 +154,6 @@ public class SarosComponent implements com.intellij.openapi.components.ProjectCo
       LogLog.error("initializing loggers failed", e);
     } finally {
       Thread.currentThread().setContextClassLoader(contextClassLoader);
-    }
-  }
-
-  @Override
-  public void initComponent() {
-    // NOP
-  }
-
-  @Override
-  public void disposeComponent() {
-    // NOP
-  }
-
-  @NotNull
-  @Override
-  public String getComponentName() {
-    return "Saros";
-  }
-
-  @Override
-  public void projectOpened() {
-    // TODO: Update project
-  }
-
-  @Override
-  public void projectClosed() {
-    ISarosSessionManager sarosSessionManager =
-        intellijProjectLifecycle.getSarosContext().getComponent(ISarosSessionManager.class);
-
-    ISarosSession currentSession = sarosSessionManager.getSession();
-
-    if (currentSession != null
-        && currentSession.getComponent(ProjectWrapper.class).getProject().equals(project)) {
-
-      log.debug(
-          "Leaving current session as the project "
-              + project.getName()
-              + " containing the shared module was closed");
-
-      ThreadUtils.runSafeAsync(
-          "StopSession",
-          log,
-          () -> sarosSessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT));
     }
   }
 }
