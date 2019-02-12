@@ -2,15 +2,11 @@
 title: Release Process
 ---
 
-# {{ page.title }}
-
-{% include toc.html %}
-
 ## When?
 
 Daily releases are created automatically by the CI Server. These releases are located in [GitHub](https://github.com/saros-project/saros/releases)
 and have the naming pattern 'daily-<branch>'. These releases are tagged as 'prerelease', because it is necessary that the users directly see that
-these releases are not stable and final. 
+these releases are not stable and final.
 
 Stable releases happen if a relevant set of changes is integrated in the master branch and the team wants to release.
 
@@ -320,10 +316,10 @@ development for the next release, `14.1.31`.
         `de.fu_berlin.inf.dpp.debug=true`
     *   The commit message should be something like
         "`[BUILD] Open release branch 13.12.6`"
-        
+
 *   Travis CI will run the JUnit tests; the **ARM** will review this pull request.
     * After Travis CI and ARM approved: Merge the pull request.
-    
+
 *   Announce the release branch to `saros-devel` as open for testing using the
     following template:
 

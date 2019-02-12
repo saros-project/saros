@@ -2,13 +2,8 @@
 title: Saros Development Environment
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
-{% include toc.html %}
-
 The following page describes how a development environment can be set up in order to develop all Saros products (Eclipse-Plugin, IntelliJ-Plugin and Server).
-If you want to execute the STF tests it is recommended to use eclipse. Otherwise it is also possible to develop with IntelliJ IDEA and execute the stf tests in a docker container. 
+If you want to execute the STF tests it is recommended to use eclipse. Otherwise it is also possible to develop with IntelliJ IDEA and execute the stf tests in a docker container.
 
 ## Common
 * You have to [clone](https://help.github.com/articles/cloning-a-repository/) the Saros repository with [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).

@@ -2,11 +2,6 @@
 title: Troubleshooting
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
-{% include toc.html %}
-
 ## Technical Questions {#Technical_Questions}
 
 ### Setting up {#Setting_up}

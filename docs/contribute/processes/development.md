@@ -2,8 +2,6 @@
 title: Development Process
 ---
 
-# {{ page.title }}
-
 Our development workflow bases on the standard [GitHub workflow](https://guides.github.com/introduction/flow/) and consists of the following steps:
 
 1. [Create a remote branch](https://help.github.com/articles/creating-and-deleting-branches-within-your-repository/) with a meaningful name.

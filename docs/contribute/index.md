@@ -2,8 +2,6 @@
 title: Contribution
 ---
 
-# {{ page.title }}
-
 In this area you will find all information about contributing to Saros. Please feel free to [modify this documentation](documentation.md) as
 well as the user documentation.
 

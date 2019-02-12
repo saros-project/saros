@@ -2,14 +2,9 @@
 title:  What Others Say
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
 These are links to coverage, testimonials or notable uses of Saros from
 people in the "outside world". Contact us if you'd like us to link to
 you.
-
-{% include toc.html %}
 
 ## Testimonials
 

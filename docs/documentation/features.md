@@ -1,9 +1,7 @@
 ---
 title: Features of Saros
+toc: false
 ---
-
-# {{ page.title }}
-{:.no_toc}
 
 Saros comes with a **boundle of nice features**.
 

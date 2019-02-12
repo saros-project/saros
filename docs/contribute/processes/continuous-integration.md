@@ -2,8 +2,6 @@
 title: Continuous Integration Process
 ---
 
-# {{ page.title }}
-
 ## Push triggered jobs
 If a new commit arrives in branch, Travis CI triggers a new job which builds and tests the current state. During the
 test phase only the JUnit tests (not STF tests) are executed. If the build and test was successful a the static

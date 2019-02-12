@@ -2,11 +2,6 @@
 title: Best Practices
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
-{% include toc.html %}
-
 ## Code Structure
 
 ### Getters and Setters
@@ -71,25 +66,25 @@ is not acceptable to make a member part of a package's API
     much less readable and makes you more likely to forget unregistering
     your listener.
     *   Anonymous inner-classes assigned to fields are much better:
-    
+
 Instead of:
-        
+
 ```java
-public class A implements B, C, D { 
+public class A implements B, C, D {
   ...
 }
 ```
 you should write:
 ```java
 public class A implements D {
-  ... 
- 
+  ...
+
   B b = new B(){
     ...
   };
- 
+
   C c = new C(){
-    ... 
+    ...
   };
 
   ...
@@ -101,11 +96,11 @@ Test whether you can return from a method instead of testing whether
 you should execute a block of code.
 
 Instead of:
-    
+
 ```java
     public void foo(){
       //some code
-      
+
       if (condition){
         // long block of code
       }
@@ -113,14 +108,14 @@ Instead of:
 ```
 
 you should write:
-        
+
 ```java
     public void foo(){
       //some code
-      
+
       if (!condition)
         return;
-        
+
       // long block of code
     }
 ```
@@ -135,13 +130,13 @@ level of block-nesting.
     unless the method specifies that it allows incorrect or null input.
 *   If a parameter may be `null `or is checked add a `@param`-JavaDoc
     that indicates this.
-    
+
 
 ```java
         /**
          * Get positions of slashes in the filename.
          * @param filename may be null
-         * @return Null-based indices into the string 
+         * @return Null-based indices into the string
                    pointing to the slash positions.
          */
 
@@ -163,7 +158,7 @@ level of block-nesting.
         this important boundary with many callers.
 *   Use assert to check for complex preconditions, that cost a lot
     during runtime.
-    
+
 ## Usability
 
 Saros/E is an Eclipse IDE Plugin. Therefore it needs to meet
@@ -242,16 +237,16 @@ operations as well. To solve this problem, we need to create **child
 progress monitors**, which consume a given number of work steps from
 their parent:
 
-```java 
+```java
 public void computeInTwoSteps(IProgressMonitor monitor){
     SubMonitor subMonitor = SubMonitor.convert(
-                                     monitor, 
-                                     "Compute in two steps", 
+                                     monitor,
+                                     "Compute in two steps",
                                      2
                                    );
-    progress.beginTask("Compute in two steps", 2); 
-    computeFirstStep(subMonitor.newChild(1)); 
-    computeSecondStep(subMonitor.newChild(1)); 
+    progress.beginTask("Compute in two steps", 2);
+    computeFirstStep(subMonitor.newChild(1));
+    computeSecondStep(subMonitor.newChild(1));
     progress.done();
 }
 ```
@@ -261,7 +256,7 @@ free to use them just as the parent method did:
 
 ```java
 public void computeFirstStep(SubMonitor progress){
- 
+
   progress.beginTask("Compute the first step", 140);
   ...
   progress.worked(5); // etc.
@@ -294,15 +289,15 @@ sub-task needs to be used:
 
 ```java
 public void computeInTwoSteps(SubMonitor progress){
- 
+
   progress.beginTask("Compute in two steps", 2);
- 
+
   progress.subTask("Two Step Computation: Step 1");
   computeFirstStep(progress.newChild(1));
- 
+
   progress.subTask("Two Step Computation: Step 2");
   computeSecondStep(progress.newChild(1));
- 
+
   progress.done();
 
 }
@@ -349,19 +344,19 @@ can recognize that the operation was canceled:
 
 ```java
 public BigInteger factorial(int n, SubMonitor progress){
- 
+
   progress.beginTask("Computing Factorial of " + n, n);
- 
+
   BigInteger result = BigInteger.ONE;
- 
+
   for (int i = 1; i < n; i++) {
     if (progress.isCanceled())
       throw new CancellationException();
- 
+
     result = result.multiply(BigInteger.valueOf(i));
     progress.worked(1);
   }
- 
+
   progress.done();
   return result;
 }
@@ -456,7 +451,7 @@ Anti-example:
 ```
 How to do it right:
 ```java
-    public Javadoc updateJavadoc(String filename, String name, String newJavadocText, int isType) 
+    public Javadoc updateJavadoc(String filename, String name, String newJavadocText, int isType)
       throws IOException {
 
       Javadoc jd = null;
@@ -552,11 +547,11 @@ How to do it right:
 To avoid repeated code blocks in an Observable like
 ```java
 class Observable {
- 
+
   List listeners = new ...
   public void addListener(Listener listener){listeners.add(listener)}
   public void removeListener(Listener listener){...}
- 
+
   public void someMethod() {
     ...
     // notify all listeners
@@ -564,7 +559,7 @@ class Observable {
       l.notify();
     }
   }
- 
+
   public void someMethod2() {
     ...
     // notify all listeners again
@@ -572,7 +567,7 @@ class Observable {
      l.notify();
     }
   }
- 
+
 }
 ```
 It is recommended to use a helper class `BroadcastListener` that
@@ -580,17 +575,17 @@ provides a method to notify all its registered listeners. The
 `BroadcastListener` should be a singleton managed by `PicoContainer`.
 ```java
 public class BroadcastListener implements Listener {
- 
+
   List listeners = new ...
   public void add(Listener listener){listeners.add(listener)}
   public void remove(Listener listener){...}
- 
+
   public void notify() {
     for (Listener l : listeners) {
       l.notify();
     }
   }
- 
+
 }
 ```
 
@@ -599,14 +594,14 @@ to know the `BroadcastListener` and can easily notify all registered
 listeners at once.
 ```java
 class Observable {
- 
+
   BroadcastListener listener = new BroadcastListener();
- 
+
   public void someMethod(){
     ...
     listener.notify();
   }
- 
+
   public void someMethod2(){
     ...
     listener.notify();

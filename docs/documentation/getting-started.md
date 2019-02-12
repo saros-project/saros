@@ -2,15 +2,10 @@
 title: Getting Started
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
 Here you will find a guideline **on how to set up Saros**.
 
 After that you might want to find out **what Saros can do**: Here is the
 complete [feature list](features.md).
-
-{% include toc.html %}
 
 ## The Host
 

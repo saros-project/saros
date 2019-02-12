@@ -2,10 +2,6 @@
 title: History of Saros
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
-
 This is very roughly how Saros happened:
 
 *   Saros started as an idea of **Stephan Salinger** (research associate
