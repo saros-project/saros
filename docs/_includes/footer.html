@@ -1,6 +1,10 @@
-<footer>
-  <div class="container small-container">
-    <span id="copyright">Copyright &copy; {{ site.time | date: '%Y' }}, <a href="{{ '/documentation/history.html' | relative_url }}">Saros Team</a></span>
-    <span id="impressum"><a href="http://www.mi.fu-berlin.de/fb/impressum/" id="impressum" target="_blank">Imprint</a></span>
-  </div>
+<footer class="px-5 page-footer">
+  <span class="text-muted" id="copyright">Copyright &copy; {{ site.time | date: '%Y' }}, <a class="no-underline" href="{{ '/documentation/history.html' | relative_url }}">Saros Team</a></span>
+  <span class="float-right no-underline">
+    <a href="{{ site.contact.gitter.channel-link }}"><i class="fab fa-gitter"></i></a>
+    <a href="{{ site.contact.twitter.user-link }}"><i class="fab fa-twitter"></i></a>
+    <a href="{{ site.contact.github.project-link }}"><i class="fab fa-github"></i></a>
+    <a class="pr-3" href="{{ site.contact.google-groups.user-group-link }}"><i class="fas fa-envelope"></i></a>
+    <a href="http://www.mi.fu-berlin.de/fb/impressum/" id="impressum" target="_blank">Imprint</a>
+  </span>
 </footer>

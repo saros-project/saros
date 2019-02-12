@@ -26,7 +26,7 @@
         </h1>
         <img src="{{ '/assets/images/comics/dpp_0.png' | relative_url }}"/>
       </div>
-  
+
       <div class="d-flex justify-content-center">
       </div>
 
@@ -37,10 +37,10 @@
 
         <div class="col-lg-6">
           <a class="center twitter-timeline"
-             href="https://twitter.com/{{ site.twitter.username }}"
+             href="{{ site.contact.twitter.user-link }}"
              data-tweet-limit="1"
              data-chrome="noheader nofooter transparent noborders noscrollbar">
-             Tweets by @{{ site.twitter.username }}
+             Tweets by @{{ site.contact.twitter.username }}
           </a>
           <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
         </div>
