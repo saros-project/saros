@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
+import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -35,7 +36,7 @@ public class SwtToolWindowFactory implements ToolWindowFactory {
             .getFactory()
             .createContent(
                 swtBrowserPanel,
-                PluginManager.getPlugin(PluginId.getId("de.fu_berlin.inf.dpp.intellij")).getName(),
+                PluginManager.getPlugin(PluginId.getId(SarosComponent.PLUGIN_ID)).getName(),
                 false);
     toolWindow.getContentManager().addContent(content);
     swtBrowserPanel.initialize();
