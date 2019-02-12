@@ -1,10 +1,12 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark" >
-  <div class="container w-50">
-    <a href="{{ '/' | absolute_url }}">
-    <div class="logo">
+<nav class="border rounded navbar fixed-top navbar-expand-lg navbar-light bg-light py-1" >
+  <!--div class="container w-100"-->
+
+    <div class="navbar-header pr-5">
+      <a class="logo" href="{{ '/' | absolute_url }}">
         <img src="{{ '/assets/images/logo/saros-logo-100x100.png' | relative_url }}"/>
-    </div></a>
-    <a class="navbar-brand" href="{{ '/' | absolute_url }}">{{ site.title }}<small>{{ site.subtitle }}</small></a>
+        <span>{{ site.title }}</span>
+      </a>
+    </div>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
@@ -20,5 +22,5 @@
         {% endfor %}
       </ul>
     </div>
-  </div>
+  <!--/div-->
 </nav>

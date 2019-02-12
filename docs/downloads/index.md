@@ -2,8 +2,6 @@
 title: Download
 ---
 
-# {{ page.title }}
-
 See the [installation documentation](/documentation/installation.md) for more information about prerequisites.
 
 ## Eclipse Update Site
