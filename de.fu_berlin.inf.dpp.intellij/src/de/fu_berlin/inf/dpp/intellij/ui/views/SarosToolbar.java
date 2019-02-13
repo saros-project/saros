@@ -18,8 +18,6 @@ public class SarosToolbar extends JToolBar {
   public static final String ADD_CONTACT_ICON_PATH = "/icons/famfamfam/contact_add_tsk.png";
   public static final String OPEN_REFS_ICON_PATH = "/icons/famfamfam/test_con.gif";
 
-  private static final boolean ENABLE_FOLLOW_MODE =
-      Boolean.getBoolean("saros.intellij.ENABLE_FOLLOW_MODE");
   private static final boolean ENABLE_ADD_CONTACT =
       Boolean.getBoolean("saros.intellij.ENABLE_ADD_CONTACT");
   private static final boolean ENABLE_PREFERENCES =
@@ -53,9 +51,7 @@ public class SarosToolbar extends JToolBar {
               "preferences"));
     }
 
-    if (ENABLE_FOLLOW_MODE) {
-      add(new FollowButton());
-    }
+    add(new FollowButton());
 
     add(new ConsistencyButton());
 

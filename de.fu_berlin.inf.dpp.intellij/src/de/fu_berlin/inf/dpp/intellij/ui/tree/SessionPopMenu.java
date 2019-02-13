@@ -2,10 +2,7 @@ package de.fu_berlin.inf.dpp.intellij.ui.tree;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -13,39 +10,26 @@ import org.picocontainer.annotations.Inject;
 
 /** Session pop-up menu that displays the option to follow a participant. */
 class SessionPopMenu extends JPopupMenu {
+  @Inject private static ISarosSessionManager sarosSessionManager;
 
-  @SuppressWarnings("FieldCanBeLocal")
-  private ISessionLifecycleListener sessionLifecycleListener =
-      new ISessionLifecycleListener() {
-        @Override
-        public void sessionStarted(ISarosSession session) {
-          followModeManager = session.getComponent(FollowModeManager.class);
-        }
+  static {
+    SarosPluginContext.initComponent(new SessionPopMenu());
+  }
 
-        @Override
-        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
-          followModeManager = null;
-        }
-      };
-
-  @Inject private ISarosSessionManager sarosSessionManager;
-
-  private volatile FollowModeManager followModeManager;
+  /** NOP Constructor used for static dependency injection. */
+  private SessionPopMenu() {
+    // NOP
+  }
 
   SessionPopMenu(final User user) {
-    SarosPluginContext.initComponent(this);
-
-    sarosSessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-
     JMenuItem menuItemFollowParticipant = new JMenuItem("Follow participant");
 
     menuItemFollowParticipant.addActionListener(
         actionEvent -> {
-          FollowModeManager currentFollowModeManager = followModeManager;
+          FollowModeManager followModeManager =
+              sarosSessionManager.getSession().getComponent(FollowModeManager.class);
 
-          if (currentFollowModeManager != null) {
-            currentFollowModeManager.follow(user);
-          }
+          followModeManager.follow(user);
         });
 
     add(menuItemFollowParticipant);

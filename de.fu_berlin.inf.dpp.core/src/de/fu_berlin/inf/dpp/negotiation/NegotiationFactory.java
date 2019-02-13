@@ -14,6 +14,8 @@ import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ProjectNegotiationTypeHook;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import java.util.List;
 
@@ -128,14 +130,11 @@ public final class NegotiationFactory {
 
   public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
       final JID remoteAddress,
-      final TransferType transferType,
       final ProjectSharingData projectSharingData,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
-    if (transferType == null) {
-      throw new IllegalArgumentException("transferType must not be null");
-    }
+    TransferType transferType = getTransferType(session, remoteAddress);
 
     switch (transferType) {
       case ARCHIVE:
@@ -169,15 +168,12 @@ public final class NegotiationFactory {
 
   public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
       final JID remoteAddress,
-      final TransferType transferType,
       final String negotiationID,
       final List<ProjectNegotiationData> projectNegotiationData,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
-    if (transferType == null) {
-      throw new IllegalArgumentException("transferType must not be null");
-    }
+    TransferType transferType = getTransferType(session, remoteAddress);
 
     switch (transferType) {
       case ARCHIVE:
@@ -209,5 +205,19 @@ public final class NegotiationFactory {
       default:
         throw new UnsupportedOperationException("transferType not implemented");
     }
+  }
+
+  private TransferType getTransferType(ISarosSession session, JID remoteAddress) {
+    User user = session.getUser(remoteAddress);
+    if (user == null) {
+      throw new IllegalStateException("User <" + user + "> is not part of the session.");
+    }
+
+    String type = session.getUserProperties(user).getString(ProjectNegotiationTypeHook.KEY_TYPE);
+    if (type.isEmpty()) {
+      throw new IllegalArgumentException("Missing TransferType for User: " + user);
+    }
+
+    return TransferType.valueOf(type);
   }
 }

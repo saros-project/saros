@@ -42,8 +42,7 @@ public class FollowModeManager implements Startable {
   private User localUser;
   private User currentlyFollowedUser;
 
-  private final CopyOnWriteArrayList<IFollowModeListener> listeners =
-      new CopyOnWriteArrayList<IFollowModeListener>();
+  private final CopyOnWriteArrayList<IFollowModeListener> listeners = new CopyOnWriteArrayList<>();
 
   /** If the user left which I am following, then stop following him/her */
   private ISessionListener stopFollowingWhenUserLeaves =
@@ -53,7 +52,8 @@ public class FollowModeManager implements Startable {
           if (!isFollowing()) return;
 
           if (user.equals(currentlyFollowedUser)) {
-            follow(null);
+
+            dropFollowModeState();
             notifyStopped(Reason.FOLLOWEE_LEFT_SESSION);
           }
         }
@@ -66,32 +66,28 @@ public class FollowModeManager implements Startable {
         public void editorActivated(User user, SPath filePath) {
           if (!user.equals(localUser) || !isFollowing()) return;
 
-          // TODO Find out which of the code below is actually necessary, as
-          // there is also the editorClosed method!
+          Reason reason = Reason.FOLLOWER_CLOSED_OR_SWITCHED_EDITOR;
 
-          if (filePath == null) {
-            follow(null);
-            notifyStopped(Reason.FOLLOWER_CLOSED_OR_SWITCHED_EDITOR);
+          EditorState remoteActiveEditor = followeeEditor();
 
-            return;
+          if (remoteActiveEditor != null && !remoteActiveEditor.getPath().equals(filePath)) {
+
+            dropFollowModeState();
+            notifyStopped(reason);
           }
-
-          stopIfDiverted(filePath, Reason.FOLLOWER_CLOSED_OR_SWITCHED_EDITOR);
         }
 
         @Override
         public void editorClosed(User user, SPath filePath) {
           if (!user.equals(localUser) || !isFollowing()) return;
 
-          stopIfDiverted(filePath, Reason.FOLLOWER_CLOSED_EDITOR);
-        }
+          Reason reason = Reason.FOLLOWER_CLOSED_EDITOR;
 
-        private void stopIfDiverted(SPath filePath, Reason reason) {
           EditorState remoteActiveEditor = followeeEditor();
 
-          if (remoteActiveEditor != null && !remoteActiveEditor.getPath().equals(filePath)) {
+          if (remoteActiveEditor != null && remoteActiveEditor.getPath().equals(filePath)) {
 
-            follow(null);
+            dropFollowModeState();
             notifyStopped(reason);
           }
         }
@@ -125,11 +121,6 @@ public class FollowModeManager implements Startable {
               }
               break;
             case CLOSED:
-              // TODO This closes every editor the followee closes -- desired?
-              // Problem: In order to determine whether the followee closed
-              // his/her active editor and just an editor in the background,
-              // one needs to keep track of the last few EditorActivities.
-              editorManager.closeEditor(path);
               break;
             case SAVED:
               break;
@@ -228,14 +219,15 @@ public class FollowModeManager implements Startable {
 
     currentlyFollowedUser = newFollowedUser;
 
-    if (newFollowedUser != null) {
+    if (newFollowedUser != null && !newFollowedUser.equals(previouslyFollowedUser)) {
       editorManager.jumpToUser(newFollowedUser);
 
       if (previouslyFollowedUser != null) {
         notifyStopped(Reason.FOLLOWER_SWITCHES_FOLLOWEE);
       }
       notifyStarted(newFollowedUser);
-    } else if (previouslyFollowedUser != null) {
+
+    } else if (newFollowedUser == null && previouslyFollowedUser != null) {
       notifyStopped(Reason.FOLLOWER_STOPPED);
     }
   }
@@ -297,6 +289,16 @@ public class FollowModeManager implements Startable {
     for (IFollowModeListener listener : listeners) {
       listener.startedFollowing(followee);
     }
+  }
+
+  /**
+   * Drops the currently held state of the follow mode, thereby ending the current follow mode.
+   *
+   * <p>This method does not notify the listener about the end of the follow mode. Notifying the
+   * listener using the correct reason is the responsibility of the caller.
+   */
+  private void dropFollowModeState() {
+    currentlyFollowedUser = null;
   }
 
   /* Helper */

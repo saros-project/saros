@@ -40,6 +40,10 @@ public class EditorAPI {
    * Scrolls the given editor so that the given line is in the center of the local viewport. The
    * given line represents the logical position in the editor.
    *
+   * <p><b>NOTE:</b> This function only works correctly when the given editor is currently visible.
+   * If the given editor is not currently visible, it is not guaranteed that the editor will scroll
+   * to the correct position.
+   *
    * <p><b>NOTE:</b> The center of the local viewport is at 1/3 for IntelliJ.
    *
    * @param editor the editor to scroll
@@ -59,14 +63,30 @@ public class EditorAPI {
   /**
    * Returns the logical line range of the local viewport for the given editor.
    *
+   * <p><b>NOTE:</b> This function only works correctly when the given editor is currently visible.
+   * If the given editor is not currently visible, it is not guaranteed that the returned line range
+   * actually corresponds to the visible part of the editor.
+   *
    * @param editor the editor to get the viewport line range for
    * @return the logical line range of the local viewport for the given editor
    * @see LogicalPosition
    */
   @NotNull
-  LineRange getLocalViewportRange(@NotNull Editor editor) {
+  LineRange getLocalViewPortRange(@NotNull Editor editor) {
     Rectangle visibleAreaRectangle = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
 
+    return getLocalViewPortRange(editor, visibleAreaRectangle);
+  }
+
+  /**
+   * Returns the logical line range of the given visible rectangle for the given editor.
+   *
+   * @param editor the editor to get the viewport line range for
+   * @param visibleAreaRectangle the visible rectangle to get the line range for
+   * @return the logical line range of the local viewport for the given editor
+   * @see LogicalPosition
+   */
+  LineRange getLocalViewPortRange(@NotNull Editor editor, @NotNull Rectangle visibleAreaRectangle) {
     int basePos = visibleAreaRectangle.y;
     int endPos = visibleAreaRectangle.y + visibleAreaRectangle.height;
 

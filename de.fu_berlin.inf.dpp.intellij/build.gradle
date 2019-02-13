@@ -55,6 +55,7 @@ jar {
 
 // Intellij configuration
 ext.intellijLockFileName = 'saros_sandbox.lock'
+ext.intellijSandboxBaseDir = System.getenv('SAROS_INTELLIJ_SANDBOX') ?: project.buildDir
 ext.intellijSandboxDir = null
 
 intellij {
@@ -67,7 +68,7 @@ intellij {
     new File(sandboxDir, intellijLockFileName).exists()
   }
   Closure getSandboxDir = { sandboxCount ->
-    "${project.buildDir}/idea-sandbox$sandboxCount" as File
+    "${project.ext.intellijSandboxBaseDir}/idea-sandbox$sandboxCount" as File
   }
 
   // Download intellij only if the home property is not set

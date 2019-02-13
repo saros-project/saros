@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -244,9 +245,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void resourcesAdded(final IProject project) {
-          ApplicationManager.getApplication()
-              .invokeAndWait(
-                  () -> addProjectResources(project), ModalityState.defaultModalityState());
+          executeInUIThreadSynchronous(() -> addProjectResources(project));
         }
 
         /**
@@ -261,13 +260,19 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         private void sendAwarenessInformation() {
           User localUser = session.getLocalUser();
 
+          Set<String> visibleFilePaths = new HashSet<>();
+
+          for (VirtualFile virtualFile : projectAPI.getSelectedFiles()) {
+            visibleFilePaths.add(virtualFile.getPath());
+          }
+
           editorPool
               .getMapping()
               .forEach(
                   (path, editor) -> {
                     sendEditorOpenInformation(localUser, path);
 
-                    sendViewPortInformation(localUser, path, editor);
+                    sendViewPortInformation(localUser, path, editor, visibleFilePaths);
 
                     sendSelectionInformation(localUser, path, editor);
                   });
@@ -292,10 +297,41 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           fireActivity(activateEditor);
         }
 
+        /**
+         * Sends the viewport information for the given editor if it is currently visible.
+         *
+         * @param user the local user
+         * @param path the path of the editor
+         * @param editor the editor to send the viewport for
+         * @param visibleFilePaths the paths of all currently visible editors
+         */
         private void sendViewPortInformation(
-            @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
+            @NotNull User user,
+            @NotNull SPath path,
+            @NotNull Editor editor,
+            @NotNull Set<String> visibleFilePaths) {
 
-          LineRange localViewPort = editorAPI.getLocalViewportRange(editor);
+          VirtualFile fileForEditor =
+              FileDocumentManager.getInstance().getFile(editor.getDocument());
+
+          if (fileForEditor == null) {
+            LOG.warn(
+                "Encountered editor without valid virtual file representation - path held in editor pool: "
+                    + path);
+
+            return;
+          }
+
+          if (!visibleFilePaths.contains(fileForEditor.getPath())) {
+            LOG.debug(
+                "Ignoring "
+                    + path
+                    + " while sending viewport awareness information as the editor is not currently visible.");
+
+            return;
+          }
+
+          LineRange localViewPort = editorAPI.getLocalViewPortRange(editor);
           int viewPortStartLine = localViewPort.getStartLine();
           int viewPortLength = localViewPort.getNumberOfLines();
 
@@ -304,20 +340,38 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           fireActivity(setViewPort);
         }
-
-        private void sendSelectionInformation(
-            @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
-
-          Pair<Integer, Integer> localSelectionOffsets = editorAPI.getLocalSelectionOffsets(editor);
-          int selectionStartOffset = localSelectionOffsets.first;
-          int selectionLength = localSelectionOffsets.second;
-
-          TextSelectionActivity setSelection =
-              new TextSelectionActivity(user, selectionStartOffset, selectionLength, path);
-
-          fireActivity(setSelection);
-        }
       };
+
+  /**
+   * Generates and dispatches a TextSelectionActivity for the current selection in the given editor.
+   * The local user will be used as the source of the activity and the given path will be used as
+   * the path for the editor.
+   *
+   * <p><b>NOTE:</b> This should only be used to transfer pre-existing selection. To notify other
+   * participants about new selections, {@link #generateSelection(SPath, SelectionEvent)} should be
+   * used instead.
+   *
+   * @param path the path representing the given editor
+   * @param editor the editor to send the selection for
+   */
+  void sendExistingSelection(@NotNull SPath path, @NotNull Editor editor) {
+    User localUser = session.getLocalUser();
+
+    sendSelectionInformation(localUser, path, editor);
+  }
+
+  private void sendSelectionInformation(
+      @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
+
+    Pair<Integer, Integer> localSelectionOffsets = editorAPI.getLocalSelectionOffsets(editor);
+    int selectionStartOffset = localSelectionOffsets.first;
+    int selectionLength = localSelectionOffsets.second;
+
+    TextSelectionActivity setSelection =
+        new TextSelectionActivity(user, selectionStartOffset, selectionLength, path);
+
+    fireActivity(setSelection);
+  }
 
   /**
    * Adds all currently open editors belonging to the passed project to the pool of open editors.
@@ -332,12 +386,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     try {
       localEditorStatusChangeHandler.setEnabled(false);
+      localViewPortChangeHandler.setEnabled(false);
 
       for (VirtualFile openFile : openFiles) {
         localEditorHandler.openEditor(openFile, project, false);
       }
 
     } finally {
+      localViewPortChangeHandler.setEnabled(true);
       localEditorStatusChangeHandler.setEnabled(true);
     }
 
@@ -454,7 +510,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     localClosedEditorModificationHandler =
         new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
     localEditorStatusChangeHandler =
-        new LocalEditorStatusChangeHandler(project, localEditorHandler, annotationManager);
+        new LocalEditorStatusChangeHandler(
+            this,
+            project,
+            projectAPI,
+            localEditorHandler,
+            localEditorManipulator,
+            annotationManager);
 
     localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
     localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
@@ -534,8 +596,27 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     return session != null;
   }
 
-  LocalEditorStatusChangeHandler getLocalEditorStatusChangeHandler() {
-    return localEditorStatusChangeHandler;
+  /**
+   * Enables or disables the handler. This is done by registering or unregistering the held
+   * listener.
+   *
+   * <p>This method does nothing if the given state already matches the current state.
+   *
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
+   * @see LocalEditorStatusChangeHandler#setEnabled(boolean)
+   */
+  void setLocalEditorStatusChangeHandlerEnabled(boolean enabled) {
+    localEditorStatusChangeHandler.setEnabled(enabled);
+  }
+
+  /**
+   * Enables or disabled the handler. This is not done by disabling the underlying listener.
+   *
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
+   * @see LocalViewPortChangeHandler#setEnabled(boolean)
+   */
+  void setLocalViewPortChangeHandlerEnabled(boolean enabled) {
+    localViewPortChangeHandler.setEnabled(enabled);
   }
 
   /**
@@ -763,8 +844,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   /**
    * {@inheritDoc}
    *
-   * <p>Only adjusts the viewport if there currently is an open editor for the given path (meaning
-   * such an editor is contained in the editor pool).
+   * <p>Only adjusts the viewport directly if the editor for the path is currently open. Otherwise,
+   * the viewport adjustment will be queued until the editor is selected/opened the next time, at
+   * which point the viewport will be adjusted. If multiple adjustment requests are done while the
+   * editor is not currently visible, only the last one will be applied to the editor once it is
+   * selected/opened.
    *
    * @param path {@inheritDoc}
    * @param range {@inheritDoc}
@@ -775,21 +859,46 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public void adjustViewport(
       @NotNull final SPath path, final LineRange range, final TextSelection selection) {
 
+    Set<String> visibleFilePaths = new HashSet<>();
+
+    for (VirtualFile virtualFile : projectAPI.getSelectedFiles()) {
+      visibleFilePaths.add(virtualFile.getPath());
+    }
+
+    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(path);
+
+    if (passedFile == null) {
+      LOG.warn(
+          "Ignoring request to adjust viewport as no valid VirtualFile could be found for "
+              + path
+              + " - given range: "
+              + range
+              + ", given selection: "
+              + selection);
+
+      return;
+    }
+
+    Editor editor = editorPool.getEditor(path);
+
+    if (!visibleFilePaths.contains(passedFile.getPath())) {
+      localEditorStatusChangeHandler.queueViewPortChange(
+          passedFile.getPath(), editor, range, selection);
+
+      return;
+    }
+
+    if (editor == null) {
+      LOG.warn(
+          "Failed to adjust viewport for "
+              + path
+              + " as it is not known to the editor pool even though it is currently open");
+
+      return;
+    }
+
     executeInUIThreadSynchronous(
-        () -> {
-          Editor editor = editorPool.getEditor(path);
-
-          if (editor == null) {
-            LOG.warn(
-                "Failed to adjust viewport for "
-                    + path
-                    + " as it is not known to the editor pool.");
-
-            return;
-          }
-
-          localEditorManipulator.adjustViewport(editor, range, selection);
-        });
+        () -> localEditorManipulator.adjustViewport(editor, range, selection));
   }
 
   /**

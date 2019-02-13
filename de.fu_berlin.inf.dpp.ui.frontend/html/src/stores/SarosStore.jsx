@@ -77,4 +77,14 @@ export default class SarosStore {
   doSendInvitation (projectTrees, contacts) {
     this.sarosApi.sendInvitation(projectTrees, contacts)
   }
+
+  @action.bound
+  doConnect () {
+    this.sarosApi.connect(this.state.activeAccount)
+  }
+
+  @action.bound
+  doDisconnect () {
+    this.sarosApi.disconnect()
+  }
 }
