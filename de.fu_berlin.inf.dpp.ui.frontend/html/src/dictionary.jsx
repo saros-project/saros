@@ -11,6 +11,7 @@ export default {
     'connect': 'Connect',
     'disconnect': 'Disconnect',
     'connecting': 'Connecting...',
+    'connectionError': 'Connection Error',
     'disconnecting': 'Disconnecting...',
     'addContact': 'Add Contact...',
     'renameContact': 'Rename Contact',
@@ -38,6 +39,7 @@ export default {
   },
   'message': {
     'noAccount': 'No account selected',
+    'noAccountConfigured': 'No account configured',
     'renameContact': 'If no nickname is given, the JID will be displayed: ',
     'deleteContact': 'Do you really want to delete this contact?',
     'selectProjects': 'Select the projects, folders or files you want to work on. You can choose projects completely or partially.',

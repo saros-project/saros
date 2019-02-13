@@ -50,7 +50,6 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       ) {
     super(
         peer,
-        TransferType.ARCHIVE,
         projects,
         sessionManager,
         session,

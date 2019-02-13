@@ -4,12 +4,17 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.VisibleAreaEvent;
 import com.intellij.openapi.editor.event.VisibleAreaListener;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import java.awt.Rectangle;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /** Dispatches activities for viewport changes. */
 class LocalViewPortChangeHandler implements DisableableHandler {
+  private static final Logger log = Logger.getLogger(LocalViewPortChangeHandler.class);
 
   private final EditorManager editorManager;
   private final EditorAPI editorAPI;
@@ -49,12 +54,42 @@ class LocalViewPortChangeHandler implements DisableableHandler {
     }
 
     Editor editor = event.getEditor();
+    Rectangle newVisibleRectangle = event.getNewRectangle();
 
     SPath path = editorManager.getEditorPool().getFile(editor.getDocument());
 
-    if (path != null) {
-      editorManager.generateViewport(path, editorAPI.getLocalViewportRange(editor));
+    if (path == null) {
+      if (log.isTraceEnabled()) {
+        VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
+
+        log.trace(
+            "Ignoring local view port change for "
+                + file
+                + " as the editor is not known to the editor pool.");
+      }
+
+      return;
     }
+
+    if (newVisibleRectangle.x < 0
+        || newVisibleRectangle.y < 0
+        || newVisibleRectangle.width < 0
+        || newVisibleRectangle.height < 0) {
+
+      if (log.isTraceEnabled()) {
+        log.trace(
+            "Ignoring local viewport change for "
+                + path
+                + " as the new visible rectangle does not have valid dimensions: "
+                + newVisibleRectangle);
+      }
+
+      return;
+    }
+
+    LineRange newVisibleLineRange = editorAPI.getLocalViewPortRange(editor, newVisibleRectangle);
+
+    editorManager.generateViewport(path, newVisibleLineRange);
   }
 
   /**

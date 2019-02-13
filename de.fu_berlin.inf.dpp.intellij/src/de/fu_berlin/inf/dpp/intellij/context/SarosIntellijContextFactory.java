@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceRootImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.PathFactory;
 import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
+import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.eventhandler.SessionStatusChangeHandler;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJUIResourceLocator;
@@ -87,6 +88,9 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
       // Proxy Support for the XMPP server connection
       Component.create(IProxyResolver.class, NullProxyResolver.class),
+
+      // Utility
+      Component.create(SessionUtils.class),
     };
   }
 

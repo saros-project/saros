@@ -36,6 +36,7 @@
     "json3": "^3.3.2",
     "style-loader": "^0.21.0",
     "webpack": "^4.28.1",
+    "terser": "3.14.1",
     "webpack-cli": "^3.2.1"
   }
 }

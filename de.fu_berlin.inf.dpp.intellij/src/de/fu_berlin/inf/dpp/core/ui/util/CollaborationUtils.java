@@ -438,8 +438,8 @@ public class CollaborationUtils {
    * @param includeMembers <code>true</code> to include the members of resources that represents a
    *     {@linkplain IContainer container}
    * @param flags additional flags on how to process the members of containers
-   * @return a pair containing the {@linkplain de.fu_berlin.inf.dpp.util.Pair#p file size} and
-   *     {@linkplain de.fu_berlin.inf.dpp.util.Pair#v file count} for the given resources
+   * @return a pair containing the file size (left element) and file count (right element) for the
+   *     given resources
    */
   private static Pair<Long, Long> getFileCountAndSize(
       Collection<? extends IResource> resources, boolean includeMembers, int flags) {

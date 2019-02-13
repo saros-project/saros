@@ -18,12 +18,12 @@ describe('<MainView />', () => {
   itRendersWithoutExploding(wrap.find('MainView'))
 
   it('opens the SessionWizard when the Start Session button is clicked', () => {
-    wrap.find('.ssw-btn').simulate('click')
+    wrap.find('#start-session').simulate('click')
     expect(fakeApi.showStartSessionWizard.calledOnce).to.equal(true)
   })
 
   it('opens the AddContact View when the Add Contact button is clicked', () => {
-    wrap.find('.ac-btn').simulate('click')
+    wrap.find('#add-contact').simulate('click')
     expect(stores.mainUI.doShowAddContactView.calledOnce).to.equal(true)
   })
 })
