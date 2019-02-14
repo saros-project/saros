@@ -5,7 +5,7 @@ module.exports = {
   //devtool: "source-map",
   entry: [
     // We need this polyfill so that native functions defined in JavaScript ES5 can be used
-    path.join(__dirname, 'node_modules/babel-polyfill/dist/polyfill.min.js'),
+    path.join(__dirname, 'node_modules/@babel/polyfill/dist/polyfill.min.js'),
     path.join(__dirname, 'app.js')
   ],
   module: {
@@ -13,6 +13,12 @@ module.exports = {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
+        options: {
+          presets: [
+            "@babel/preset-react",
+            "@babel/preset-env"
+          ]
+        }
       }, {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
@@ -33,4 +39,4 @@ module.exports = {
       fabric: path.resolve(__dirname, './bower_components/fabric.js/dist/fabric.min.js')
     }
   }
-}
+};

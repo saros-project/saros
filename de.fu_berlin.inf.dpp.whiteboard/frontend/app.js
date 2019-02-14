@@ -6,6 +6,7 @@ import CanvasResizer from './src/services/canvasresizer';
 import JavaBridge from './src/services/javabridge';
 import ToolManager from './src/services/toolmanager';
 import ViewManager from './src/services/viewmanager';
+import ShortcutManager from './src/services/shortcutmanager.js';
 
 /**
  * Main Whiteboard app
@@ -23,8 +24,11 @@ class Whiteboard {
 
     ReactDOM.render(
       <Menu toolManager={this.toolManager}
-      canvasResizer={this.canvasResizer}/> ,
-      document.getElementById('menuContainer'));
+        canvasResizer={this.canvasResizer}
+        ref={menu => this.menu = menu} />,
+      document.getElementById('menuContainer'), () => {
+        this.shortcutManager = new ShortcutManager(this.menu);
+      });
   }
 }
 
