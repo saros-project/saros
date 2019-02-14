@@ -1,11 +1,25 @@
-- title: Development Process
-  url: /contribute/processes/development.html
-
-- title: Review Process
-  url: /contribute/processes/review.html
-
-- title: Continuous Integration
-  url: /contribute/processes/continuous-integration.html
-
 - title: Guidelines
   url: /contribute/guidelines.html
+
+- title: Best Practices
+  url: /contribute/best-practices.html
+
+- title: Development Environment
+  url: /contribute/development-environment.html
+
+- title: Documentation Writing
+  url: /contribute/documentation.html
+
+- title: Saros Testing Framework
+  url: /contribute/saros-testing-framework.html
+
+- title: Processes
+  sublinks:
+  - title: Development Process
+    url: /contribute/processes/development.html
+
+  - title: Continuous Integration
+    url: /contribute/processes/continuous-integration.html
+
+  - title: Review Process
+    url: /contribute/processes/review.html

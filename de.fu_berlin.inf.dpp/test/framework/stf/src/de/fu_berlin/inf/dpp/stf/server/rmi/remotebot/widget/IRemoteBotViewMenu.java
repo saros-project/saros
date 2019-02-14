@@ -5,21 +5,25 @@ import java.rmi.RemoteException;
 
 public interface IRemoteBotViewMenu extends Remote {
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-    public void click() throws RemoteException;
+  /**
+   * ********************************************
+   *
+   * <p>actions
+   *
+   * <p>********************************************
+   */
+  public void click() throws RemoteException;
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
-    public String getToolTipText() throws RemoteException;
+  /**
+   * ********************************************
+   *
+   * <p>states
+   *
+   * <p>********************************************
+   */
+  public String getToolTipText() throws RemoteException;
 
-    public String getText() throws RemoteException;
+  public String getText() throws RemoteException;
 
-    public boolean isChecked() throws RemoteException;
+  public boolean isChecked() throws RemoteException;
 }

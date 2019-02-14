@@ -4,16 +4,6 @@
 [ ! -z "$DEBUG_BASH" ] && set -x
 
 echo "STARTING REGRESSION: TIMEOUT IS 60 MINUTES"
+cd $WORKSPACE
 
-timeout 60m ant -Dsrc.dir=$STF_WS/src \
-    -Dlib.dir=$STF_WS/lib \
-    -Declipse.dir=$STF_WS \
-    -Djunit.dir=$STF_WS/junit \
-    -Dsaros.plugin.dir=$STF_WS/plugins \
-    -Dstf.client.config.files=$CONFIG_DIR/stf_config \
-    -lib $JUNIT_HOME -lib $COBERTURA_HOME -f $CONFIG_DIR/saros_stf_test.xml
-
-return_code=$?
-
-[ $return_code = 124 ] && echo "TIMEOUT EXCEEDED!"
-exit "$return_code"
+timeout -t 3600 ./gradlew --stacktrace --no-daemon -Dstf.client.configuration.files=/home/ci/saros_src/travis/config/stf_config cleanAll :de.fu_berlin.inf.dpp:stfTest

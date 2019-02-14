@@ -1,0 +1,129 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.3.4"
+  }
+}
+
+apply plugin: 'org.jetbrains.intellij'
+
+dependencies {
+  compile project(':de.fu_berlin.inf.dpp.core')
+  compile project(':de.fu_berlin.inf.dpp.ui')
+  compile project(path: ':de.fu_berlin.inf.dpp.ui', configuration: 'testing')
+
+  compile 'org.easytesting:fest-assert:1.2'
+  compile 'org.easytesting:fest-reflect:1.2'
+  compile 'org.easytesting:fest-swing:1.2.1'
+  compile 'org.easytesting:fest-util:1.1.3'
+
+  testCompile project(path: ':de.fu_berlin.inf.dpp.core', configuration: 'testing')
+  testCompile configurations.testConfig
+}
+
+sourceSets {
+  main {
+    java.srcDir 'src'
+    resources.srcDir 'resources'
+
+    resources {
+      srcDir 'src'
+      exclude '**/*.java'
+    }
+  }
+
+  test.java.srcDir 'test/junit'
+}
+
+jar {
+  manifest {
+    attributes (['Created-By': 'IntelliJ IDEA',
+                 'Manifest-Version': '1.0'])
+  }
+  version = null
+  into ('META-INF')
+  {
+    from 'META-INF/plugin.xml'
+  }
+
+  from sourceSets.main.output
+}
+
+// Intellij configuration
+ext.intellijLockFileName = 'saros_sandbox.lock'
+ext.intellijSandboxBaseDir = System.getenv('SAROS_INTELLIJ_SANDBOX') ?: project.buildDir
+ext.intellijSandboxDir = null
+
+intellij {
+  // helper functions
+  Closure lockSandbox = { File sandboxDir ->
+    sandboxDir.mkdirs()
+    new File(sandboxDir, intellijLockFileName).createNewFile()
+  }
+  Closure isSandboxLocked = { File sandboxDir ->
+    new File(sandboxDir, intellijLockFileName).exists()
+  }
+  Closure getSandboxDir = { sandboxCount ->
+    "${project.ext.intellijSandboxBaseDir}/idea-sandbox$sandboxCount" as File
+  }
+
+  // Download intellij only if the home property is not set
+  if (project.hasProperty('intellijHome')) {
+    localPath = intellijHome
+  } else {
+    version = 'IC-2018.2'
+  }
+
+  pluginName 'Saros'
+  configureDefaultDependencies = false
+
+  // determine new sandbox dir that is not locked
+  Integer sandboxCount = 1
+  File currentSandboxDir = getSandboxDir(sandboxCount)
+  while (isSandboxLocked(currentSandboxDir)) {
+    sandboxCount++
+    currentSandboxDir = getSandboxDir(sandboxCount)
+  }
+  project.ext.intellijSandboxDir = currentSandboxDir
+  sandboxDirectory = currentSandboxDir
+}
+
+task lockIntellijSandbox {
+  doLast {
+    File sandboxDir = project.ext.intellijSandboxDir
+    sandboxDir.mkdirs()
+    new File(sandboxDir, intellijLockFileName).createNewFile()
+  }
+}
+
+// remove lock file if sandbox is closed
+task unlockIntellijSandbox {
+  doLast {
+    new File(project.ext.intellijSandboxDir, intellijLockFileName).delete()
+  }
+}
+
+runIde.dependsOn(lockIntellijSandbox)
+runIde.finalizedBy(unlockIntellijSandbox)
+
+afterEvaluate {
+  dependencies {
+    compile intellij {exclude 'picocontainer*.jar', 'junit*.jar'}
+  }
+}
+
+artifacts {
+  archives buildPlugin
+}
+
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/Intellij'
+    property 'sonar.projectDescription', 'Saros plugin for IntelliJ IDEA'
+    property 'sonar.projectVersion', '0.1.0.DEVEL'
+  }
+}

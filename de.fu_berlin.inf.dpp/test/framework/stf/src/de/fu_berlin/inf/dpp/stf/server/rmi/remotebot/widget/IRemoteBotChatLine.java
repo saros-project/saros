@@ -5,5 +5,5 @@ import java.rmi.RemoteException;
 
 public interface IRemoteBotChatLine extends Remote {
 
-    public String getText() throws RemoteException;
+  public String getText() throws RemoteException;
 }

@@ -8,30 +8,26 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 
 /**
- * Instances of this class are controls which are capable of containing exactly
- * <strong>one</strong> content {@link Control} and {@link ExplanationComposite}
- * s to display explanatory information.<br>
- * Although this composite may be subclasses <strong>only the control registered
- * trough {@link ExplanatoryComposite#setContentControl(Control)} can be
- * displayed</strong>.
- * 
+ * Instances of this class are controls which are capable of containing exactly <strong>one</strong>
+ * content {@link Control} and {@link ExplanationComposite} s to display explanatory information.
+ * <br>
+ * Although this composite may be subclasses <strong>only the control registered trough {@link
+ * ExplanatoryComposite#setContentControl(Control)} can be displayed</strong>.
+ *
  * <p>
- * 
+ *
  * <dl>
- * <dt><b>Styles:</b></dt>
- * <dd>Styles supported by {@link Composite}</dd>
- * <dt><b>Events:</b></dt>
- * <dd>
- * (none)</dd>
- * <dt>
- * <b>Example:</b></dt>
- * <dd>
- * 
- * <pre>
+ *   <dt><b>Styles:</b>
+ *   <dd>Styles supported by {@link Composite}
+ *   <dt><b>Events:</b>
+ *   <dd>(none)
+ *   <dt><b>Example:</b>
+ *   <dd>
+ *       <pre>
  * <code>
  * final ExplanatoryComposite explanatoryComposite = new ExplanatoryComposite(
  *      tabFolder, SWT.NONE);
- * 
+ *
  *      final ExplanationComposite expl = new ExplanationComposite(explanatoryComposite, SWT.NONE, SWT.ICON_INFORMATION);
  *      Composite explContent = new Composite(expl, SWT.NONE);
  *      explContent.setLayout(new FillLayout());
@@ -42,7 +38,7 @@ import org.eclipse.swt.widgets.Layout;
  *                    explanatoryComposite.hideExplanation();
  *              }
  *      });
- * 
+ *
  *      Button contentControl = new Button(explanatoryComposite, SWT.PUSH);
  *      explanatoryComposite.setContentControl(contentControl);
  *      contentControl.setText("Show the explanation...");
@@ -53,107 +49,94 @@ import org.eclipse.swt.widgets.Layout;
  *      });
  * </code>
  * </pre>
- * 
- * </dd>
  * </dl>
- * 
+ *
  * @see ExplanationComposite
  * @see Composite
  * @author bkahlert
- * 
  */
 public class ExplanatoryComposite extends Composite {
-    /**
-     * Uses a {@link StackLayout} to allow the switch between the contents and
-     * explanations.
-     */
-    protected StackLayout stackLayout = new StackLayout();
+  /** Uses a {@link StackLayout} to allow the switch between the contents and explanations. */
+  protected StackLayout stackLayout = new StackLayout();
 
-    protected Control contentControl;
+  protected Control contentControl;
 
-    /**
-     * Because we want the content (and not the explanation) layer to be
-     * initially displayed, we add a PaintListener which sets marks the
-     * eventually added content layer as the visible layer.
-     */
-    protected PaintListener showContentControlListener = new PaintListener() {
+  /**
+   * Because we want the content (and not the explanation) layer to be initially displayed, we add a
+   * PaintListener which sets marks the eventually added content layer as the visible layer.
+   */
+  protected PaintListener showContentControlListener =
+      new PaintListener() {
         @Override
         public void paintControl(PaintEvent e) {
-            ExplanatoryComposite.this
-                .removePaintListener(showContentControlListener);
-            hideExplanation();
+          ExplanatoryComposite.this.removePaintListener(showContentControlListener);
+          hideExplanation();
         }
-    };
+      };
 
-    /**
-     * Constructs a new {@link ExplanatoryComposite} with a given parent and the
-     * passed style information.
-     * 
-     * @param parent
-     * @param style
-     */
-    public ExplanatoryComposite(Composite parent, int style) {
-        super(parent, style);
+  /**
+   * Constructs a new {@link ExplanatoryComposite} with a given parent and the passed style
+   * information.
+   *
+   * @param parent
+   * @param style
+   */
+  public ExplanatoryComposite(Composite parent, int style) {
+    super(parent, style);
 
-        super.setLayout(stackLayout);
-        this.addPaintListener(showContentControlListener);
+    super.setLayout(stackLayout);
+    this.addPaintListener(showContentControlListener);
+  }
+
+  /**
+   * Hides the content and displays an explanation.
+   *
+   * @param composite The explanation to be displayed; if null the explanation gets hidden
+   */
+  public void showExplanation(ExplanationComposite composite) {
+
+    if (composite == null) {
+      if (contentControl == null)
+        throw new IllegalStateException("The content control was not set!", null);
+
+      this.stackLayout.topControl = contentControl;
+      if (contentControl instanceof Composite) {
+        ((Composite) contentControl).layout();
+      }
+    } else {
+      this.stackLayout.topControl = composite;
     }
 
-    /**
-     * Hides the content and displays an explanation.
-     * 
-     * @param composite
-     *            The explanation to be displayed; if null the explanation gets
-     *            hidden
-     */
-    public void showExplanation(ExplanationComposite composite) {
+    ExplanatoryComposite.this.removePaintListener(showContentControlListener);
 
-        if (composite == null) {
-            if (contentControl == null)
-                throw new IllegalStateException(
-                    "The content control was not set!", null);
+    this.layout();
+  }
 
-            this.stackLayout.topControl = contentControl;
-            if (contentControl instanceof Composite) {
-                ((Composite) contentControl).layout();
-            }
-        } else {
-            this.stackLayout.topControl = composite;
-        }
+  /** Hides the explanation and displays the content. */
+  public void hideExplanation() {
+    this.showExplanation(null);
+  }
 
-        ExplanatoryComposite.this
-            .removePaintListener(showContentControlListener);
+  /**
+   * Sets the control that is visible when the explanation is hidden.
+   *
+   * @param contentControl
+   */
+  public void setContentControl(Control contentControl) {
+    this.contentControl = contentControl;
+  }
 
-        this.layout();
-    }
+  /**
+   * Returns the control that is visible when the explanation is hidden.
+   *
+   * @return
+   */
+  public Control getContentControl() {
+    return this.contentControl;
+  }
 
-    /**
-     * Hides the explanation and displays the content.
-     */
-    public void hideExplanation() {
-        this.showExplanation(null);
-    }
-
-    /**
-     * Sets the control that is visible when the explanation is hidden.
-     * 
-     * @param contentControl
-     */
-    public void setContentControl(Control contentControl) {
-        this.contentControl = contentControl;
-    }
-
-    /**
-     * Returns the control that is visible when the explanation is hidden.
-     * 
-     * @return
-     */
-    public Control getContentControl() {
-        return this.contentControl;
-    }
-
-    @Override
-    public void setLayout(Layout layout) {
-        // this composite controls its layout itself
-    }
+  @Override
+  public void setLayout(Layout layout) {
+    // this composite controls its layout itself
+  }
 }

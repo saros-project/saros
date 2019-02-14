@@ -7,13 +7,18 @@
         {% if page.url contains link.url %}
         {% assign class = 'active' %}
         {% endif %}
+
         {% if link.sublinks %}
 
-        <li class="{{ class }}">
+        <li>
             <a  href="{{ link.url | absolute_url }}">{{ link.title }}</a>
             <ul>
                 {% for sublink in link.sublinks %}
-                <li><a href="{{ sublink.url | absolute_url }}">{{ sublink.title }}</a></li>
+                {% assign class = nil %}
+                {% if page.url contains sublink.url %}
+                {% assign class = 'active' %}
+                {% endif %}
+                <li class="{{ class }}"><a href="{{ sublink.url | absolute_url }}">{{ sublink.title }}</a></li>
                 {% endfor %}
             </ul>
         </li>

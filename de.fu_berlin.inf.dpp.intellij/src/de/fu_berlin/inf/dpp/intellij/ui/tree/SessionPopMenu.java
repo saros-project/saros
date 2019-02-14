@@ -1,34 +1,37 @@
 package de.fu_berlin.inf.dpp.intellij.ui.tree;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
-import org.picocontainer.annotations.Inject;
-
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import org.picocontainer.annotations.Inject;
 
-/**
- * Session pop-up menu that displays the option to follow a participant.
- */
+/** Session pop-up menu that displays the option to follow a participant. */
 class SessionPopMenu extends JPopupMenu {
+  @Inject private static ISarosSessionManager sarosSessionManager;
 
-    @Inject
-    private EditorManager editorManager;
+  static {
+    SarosPluginContext.initComponent(new SessionPopMenu());
+  }
 
-    public SessionPopMenu(final User user) {
-        SarosPluginContext.initComponent(this);
-        JMenuItem menuItemFollowParticipant = new JMenuItem(
-            "Follow participant");
-        menuItemFollowParticipant.addActionListener(new ActionListener() {
+  /** NOP Constructor used for static dependency injection. */
+  private SessionPopMenu() {
+    // NOP
+  }
 
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                editorManager.setFollowing(user);
-            }
+  SessionPopMenu(final User user) {
+    JMenuItem menuItemFollowParticipant = new JMenuItem("Follow participant");
+
+    menuItemFollowParticipant.addActionListener(
+        actionEvent -> {
+          FollowModeManager followModeManager =
+              sarosSessionManager.getSession().getComponent(FollowModeManager.class);
+
+          followModeManager.follow(user);
         });
-        add(menuItemFollowParticipant);
-    }
+
+    add(menuItemFollowParticipant);
+  }
 }

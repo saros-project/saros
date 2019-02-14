@@ -1,10 +1,5 @@
 package de.fu_berlin.inf.dpp.context;
 
-import java.util.Arrays;
-
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
-
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
@@ -41,89 +36,76 @@ import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.session.ProjectNegotiationTypeHook;
 import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
+import java.util.Arrays;
+import org.picocontainer.BindKey;
+import org.picocontainer.MutablePicoContainer;
 
 /**
- * This is the basic core factory for Saros. All components that are created by
- * this factory <b>must</b> be working on any platform the application is
- * running on.
- * 
+ * This is the basic core factory for Saros. All components that are created by this factory
+ * <b>must</b> be working on any platform the application is running on.
+ *
  * @author srossbach
  */
 public class CoreContextFactory extends AbstractContextFactory {
 
-    /**
-     * Must not be static in order to avoid heavy work during class
-     * initialization
-     * 
-     * @see <a
-     *      href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
-     */
-    private final Component[] getContextComponents() {
-        return new Component[] {
+  /**
+   * Must not be static in order to avoid heavy work during class initialization
+   *
+   * @see <a href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
+   */
+  private final Component[] getContextComponents() {
+    return new Component[] {
 
-            // Facades
-            Component.create(ConnectionHandler.class),
+      // Facades
+      Component.create(ConnectionHandler.class),
 
-            // Version support
-            Component.create(VersionManager.class),
+      // Version support
+      Component.create(VersionManager.class),
+      Component.create(MultiUserChatService.class),
+      Component.create(SingleUserChatService.class),
+      Component.create(SarosSessionManager.class),
+      Component.create(XMPPAccountStore.class),
+      Component.create(ColorIDSetStorage.class),
 
-            Component.create(MultiUserChatService.class),
-            Component.create(SingleUserChatService.class),
+      // Negotiation
+      Component.create(NegotiationFactory.class),
 
-            Component.create(SarosSessionManager.class),
+      // Negotiation hooks
+      Component.create(SessionNegotiationHookManager.class),
+      Component.create(ColorNegotiationHook.class),
+      Component.create(ProjectNegotiationTypeHook.class),
 
-            Component.create(XMPPAccountStore.class),
-            Component.create(ColorIDSetStorage.class),
+      // Network
+      Component.create(DispatchThreadContext.class),
+      Component.create(IConnectionManager.class, DataTransferManager.class),
+      Component.create(DiscoveryManager.class),
+      Component.create(
+          BindKey.bindKey(IStreamService.class, IContextKeyBindings.IBBStreamService.class),
+          IBBStreamService.class),
+      Component.create(
+          BindKey.bindKey(IStreamService.class, IContextKeyBindings.Socks5StreamService.class),
+          Socks5StreamService.class),
+      Component.create(RosterTracker.class),
+      Component.create(XMPPConnectionService.class),
+      Component.create(MDNSService.class),
+      Component.create(TCPServer.class),
+      Component.create(IStunService.class, StunServiceImpl.class),
+      Component.create(SubscriptionHandler.class),
+      Component.create(IUPnPService.class, UPnPServiceImpl.class),
+      Component.create(IUPnPAccess.class, UPnPAccessImpl.class),
+      Component.create(IReceiver.class, XMPPReceiver.class),
+      Component.create(ITransmitter.class, XMPPTransmitter.class),
+      Component.create(RemoteProgressManager.class),
 
-            // Negotiation
-            Component.create(NegotiationFactory.class),
+      // Observables
+      Component.create(FileReplacementInProgressObservable.class),
+      Component.create(IsInconsistentObservable.class)
+    };
+  }
 
-            // Negotiation hooks
-            Component.create(SessionNegotiationHookManager.class),
-            Component.create(ColorNegotiationHook.class),
-            Component.create(ProjectNegotiationTypeHook.class),
-
-            // Network
-            Component.create(DispatchThreadContext.class),
-
-            Component.create(IConnectionManager.class,
-                DataTransferManager.class),
-
-            Component.create(DiscoveryManager.class),
-
-            Component.create(BindKey.bindKey(IStreamService.class,
-                IContextKeyBindings.IBBStreamService.class),
-                IBBStreamService.class),
-
-            Component.create(BindKey.bindKey(IStreamService.class,
-                IContextKeyBindings.Socks5StreamService.class),
-                Socks5StreamService.class),
-
-            Component.create(RosterTracker.class),
-            Component.create(XMPPConnectionService.class),
-            Component.create(MDNSService.class),
-            Component.create(TCPServer.class),
-
-            Component.create(IStunService.class, StunServiceImpl.class),
-
-            Component.create(SubscriptionHandler.class),
-
-            Component.create(IUPnPService.class, UPnPServiceImpl.class),
-            Component.create(IUPnPAccess.class, UPnPAccessImpl.class),
-            Component.create(IReceiver.class, XMPPReceiver.class),
-            Component.create(ITransmitter.class, XMPPTransmitter.class),
-
-            Component.create(RemoteProgressManager.class),
-
-            // Observables
-            Component.create(FileReplacementInProgressObservable.class),
-            Component.create(IsInconsistentObservable.class) };
-    }
-
-    @Override
-    public void createComponents(MutablePicoContainer container) {
-        for (Component component : Arrays.asList(getContextComponents()))
-            container.addComponent(component.getBindKey(),
-                component.getImplementation());
-    }
+  @Override
+  public void createComponents(MutablePicoContainer container) {
+    for (Component component : Arrays.asList(getContextComponents()))
+      container.addComponent(component.getBindKey(), component.getImplementation());
+  }
 }

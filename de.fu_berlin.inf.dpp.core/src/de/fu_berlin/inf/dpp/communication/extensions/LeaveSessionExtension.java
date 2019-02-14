@@ -2,19 +2,18 @@ package de.fu_berlin.inf.dpp.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias(/* SessionLeave */"SNLV")
+@XStreamAlias(/* SessionLeave */ "SNLV")
 public class LeaveSessionExtension extends SarosSessionPacketExtension {
 
-    public static final Provider PROVIDER = new Provider();
+  public static final Provider PROVIDER = new Provider();
 
-    public LeaveSessionExtension(String sessionID) {
-        super(sessionID);
-    }
+  public LeaveSessionExtension(String sessionID) {
+    super(sessionID);
+  }
 
-    public static class Provider extends
-        SarosSessionPacketExtension.Provider<LeaveSessionExtension> {
-        private Provider() {
-            super("snlv", LeaveSessionExtension.class);
-        }
+  public static class Provider extends SarosSessionPacketExtension.Provider<LeaveSessionExtension> {
+    private Provider() {
+      super("snlv", LeaveSessionExtension.class);
     }
+  }
 }

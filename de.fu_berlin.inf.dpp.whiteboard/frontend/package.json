@@ -1,0 +1,42 @@
+{
+  "name": "whiteboard",
+  "version": "0.0.1",
+  "description": "Whiteboard for Saros built with HTML",
+  "main": "app.js",
+  "scripts": {
+    "setup": "npm install && bower install fabric --allow-root",
+    "dev": "webpack -w",
+    "build": "webpack --mode=production && inline-source ./index.html ./dist/index.html --root ./ && del-cli dist/bundle.js",
+    "lint": "eslint --ext .js,.jsx ./app.js src"
+  },
+  "author": "Abdullah Barhoum",
+  "license": "GPLv2",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-minify": "^0.4.3",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "base64-inline-loader": "^1.1.1",
+    "bower": "^1.8.4",
+    "css-loader": "^0.28.11",
+    "del-cli": "^1.1.0",
+    "eslint": "^4.19.1",
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-react": "^7.12.3",
+    "inline-source-cli": "^1.2.0",
+    "json3": "^3.3.2",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.28.1",
+    "terser": "3.14.1",
+    "webpack-cli": "^3.2.1"
+  }
+}

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface TestLink {
-    String id();
+  String id();
 
-    String bugId() default "";
+  String bugId() default "";
 }

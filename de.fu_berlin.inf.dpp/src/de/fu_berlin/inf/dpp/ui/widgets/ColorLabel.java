@@ -1,6 +1,4 @@
-/**
- * 
- */
+/** */
 package de.fu_berlin.inf.dpp.ui.widgets;
 
 import org.eclipse.swt.SWT;
@@ -16,255 +14,204 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-/**
- * Displays a colored rectangle with a line of text to the right.
- */
+/** Displays a colored rectangle with a line of text to the right. */
 public class ColorLabel extends Canvas {
-    /**
-     * The radius of the arc of the color label
-     */
-    protected final static int RECTANGLE_ARC = 4;
-    /**
-     * The horizontal gap between the label the right end of the widget
-     */
-    protected final static int HORIZONTAL_GAP = 5;
-    /**
-     * The gap between the color rectangle and the edges of the widget
-     */
-    protected final static int BORDER_GAP = 2;
-    /**
-     * The vertical offset of the color rectangle within the widget
-     */
-    protected final static int VERTICAL_OFFSET = 4;
+  /** The radius of the arc of the color label */
+  protected static final int RECTANGLE_ARC = 4;
+  /** The horizontal gap between the label the right end of the widget */
+  protected static final int HORIZONTAL_GAP = 5;
+  /** The gap between the color rectangle and the edges of the widget */
+  protected static final int BORDER_GAP = 2;
+  /** The vertical offset of the color rectangle within the widget */
+  protected static final int VERTICAL_OFFSET = 4;
 
-    /**
-     * The width of the frame surrounding a color rectangle when it is selected
-     */
-    protected final static int FRAME_WIDTH_SELECTED = 3;
+  /** The width of the frame surrounding a color rectangle when it is selected */
+  protected static final int FRAME_WIDTH_SELECTED = 3;
 
-    /**
-     * The width of the frame surrounding a color rectangle when it is not
-     * selected
-     */
-    protected final static int FRAME_WIDTH_UNSELECTED = 1;
+  /** The width of the frame surrounding a color rectangle when it is not selected */
+  protected static final int FRAME_WIDTH_UNSELECTED = 1;
 
-    /**
-     * The colors look differently when they are disabled
-     */
-    protected final static float DISABLED_COLOR_SATURATION = 0.02f;
+  /** The colors look differently when they are disabled */
+  protected static final float DISABLED_COLOR_SATURATION = 0.02f;
 
-    /**
-     * The colors look differently when they are disabled
-     */
-    protected final static float DISABLED_COLOR_BRIGHTNESS = 0.9f;
+  /** The colors look differently when they are disabled */
+  protected static final float DISABLED_COLOR_BRIGHTNESS = 0.9f;
 
-    /**
-     * The color of the frame around the color rectangle when it is enabled
-     */
-    protected final Color frameEnabledColor;
-    /**
-     * The color of the frame around the color rectangle when it is disabled
-     */
-    protected final Color frameDisabledColor;
-    /**
-     * The enabled color
-     */
-    protected Color enabledColor;
-    /**
-     * The disabled color
-     */
-    protected Color disabledColor;
+  /** The color of the frame around the color rectangle when it is enabled */
+  protected final Color frameEnabledColor;
+  /** The color of the frame around the color rectangle when it is disabled */
+  protected final Color frameDisabledColor;
+  /** The enabled color */
+  protected Color enabledColor;
+  /** The disabled color */
+  protected Color disabledColor;
 
-    /**
-     * The width of the color rectangle
-     */
-    protected int rectangleWidth = 20;
+  /** The width of the color rectangle */
+  protected int rectangleWidth = 20;
 
-    /**
-     * Is the current frame selected?
-     */
-    protected boolean selected = false;
+  /** Is the current frame selected? */
+  protected boolean selected = false;
 
-    /**
-     * The height of the color rectangle
-     */
-    protected int rectangleHeight = 10;
+  /** The height of the color rectangle */
+  protected int rectangleHeight = 10;
 
-    public ColorLabel(Composite parent, int style) {
-        super(parent, style);
+  public ColorLabel(Composite parent, int style) {
+    super(parent, style);
 
-        frameEnabledColor = Display.getCurrent()
-            .getSystemColor(SWT.COLOR_BLACK);
+    frameEnabledColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
 
-        frameDisabledColor = Display.getCurrent()
-            .getSystemColor(SWT.COLOR_GRAY);
+    frameDisabledColor = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
 
-        addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                onPaint(e);
-            }
+    addPaintListener(
+        new PaintListener() {
+          @Override
+          public void paintControl(PaintEvent e) {
+            onPaint(e);
+          }
         });
 
-        addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(DisposeEvent e) {
-                onDispose(e);
-            }
+    addDisposeListener(
+        new DisposeListener() {
+          @Override
+          public void widgetDisposed(DisposeEvent e) {
+            onDispose(e);
+          }
         });
+  }
+
+  /**
+   * Set size of the color rectangle.
+   *
+   * @param width width of the rectangle
+   * @param height height of the rectangle
+   */
+  public void setPreferredSize(int width, int height) {
+    if (width <= 0 || height <= 0) {
+      return;
     }
 
-    /**
-     * Set size of the color rectangle.
-     * 
-     * @param width
-     *            width of the rectangle
-     * @param height
-     *            height of the rectangle
-     */
-    public void setPreferredSize(int width, int height) {
-        if (width <= 0 || height <= 0) {
-            return;
-        }
+    this.rectangleWidth = width;
+    this.rectangleHeight = height;
 
-        this.rectangleWidth = width;
-        this.rectangleHeight = height;
+    this.layout();
+  }
 
-        this.layout();
+  @Override
+  public Point computeSize(int width, int height, boolean changed) {
+    int localWidth = 0, localHeight = 0;
+
+    // consider colored rectangle
+    if (enabledColor != null) {
+      localWidth = rectangleWidth + HORIZONTAL_GAP;
+      localHeight = rectangleHeight;
     }
 
-    @Override
-    public Point computeSize(int width, int height, boolean changed) {
-        int localWidth = 0, localHeight = 0;
+    // calculate width according to given hints
+    if (width != SWT.DEFAULT) localWidth = width;
+    if (height != SWT.DEFAULT) localHeight = height;
 
-        // consider colored rectangle
-        if (enabledColor != null) {
-            localWidth = rectangleWidth + HORIZONTAL_GAP;
-            localHeight = rectangleHeight;
-        }
+    return new Point(localWidth + BORDER_GAP, localHeight + BORDER_GAP + VERTICAL_OFFSET);
+  }
 
-        // calculate width according to given hints
-        if (width != SWT.DEFAULT)
-            localWidth = width;
-        if (height != SWT.DEFAULT)
-            localHeight = height;
+  /**
+   * Draws the color label
+   *
+   * @param e
+   */
+  protected void onPaint(PaintEvent e) {
+    GC gc = e.gc;
 
-        return new Point(localWidth + BORDER_GAP, localHeight + BORDER_GAP
-            + VERTICAL_OFFSET);
+    int frameWidth = selected ? FRAME_WIDTH_SELECTED : FRAME_WIDTH_UNSELECTED;
+
+    int x = frameWidth;
+    int y = VERTICAL_OFFSET + frameWidth;
+    int width = rectangleWidth - 2 * frameWidth;
+    int height = rectangleHeight - 2 * frameWidth;
+
+    if (enabledColor != null) {
+      /*
+       * Save the old background color and set it back to this after
+       * drawing the rectangle. Otherwise the text will have the same
+       * background color as the rectangle.
+       */
+      final Color oldBackground = gc.getBackground();
+      final Color oldForeground = gc.getForeground();
+
+      // set frame color
+      Color colorToPaint = isEnabled() ? frameEnabledColor : frameDisabledColor;
+
+      gc.setForeground(colorToPaint);
+      gc.setBackground(colorToPaint);
+
+      // Draw the frame
+      gc.fillRoundRectangle(
+          0, VERTICAL_OFFSET, rectangleWidth, rectangleHeight, RECTANGLE_ARC, RECTANGLE_ARC);
+
+      // set label color
+      colorToPaint = isEnabled() ? enabledColor : disabledColor;
+
+      gc.setForeground(colorToPaint);
+      gc.setBackground(colorToPaint);
+
+      // Draw the label
+      gc.fillRoundRectangle(x, y, width, height, RECTANGLE_ARC, RECTANGLE_ARC);
+      // setting back the colors like they were before
+      gc.setForeground(oldForeground);
+      gc.setBackground(oldBackground);
     }
+  }
 
-    /**
-     * Draws the color label
-     * 
-     * @param e
-     */
-    protected void onPaint(PaintEvent e) {
-        GC gc = e.gc;
+  /**
+   * Creates a greyish color value on the basis of the color the label represents.
+   *
+   * @return
+   */
+  private Color getDisabledColor(Color color) {
 
-        int frameWidth = selected ? FRAME_WIDTH_SELECTED
-            : FRAME_WIDTH_UNSELECTED;
+    // Use HSB-value because it's easier to transform the values
+    float[] hsb = color.getRGB().getHSB();
 
-        int x = frameWidth;
-        int y = VERTICAL_OFFSET + frameWidth;
-        int width = rectangleWidth - 2 * frameWidth;
-        int height = rectangleHeight - 2 * frameWidth;
+    // Converts to a greyish color
+    hsb[1] = DISABLED_COLOR_SATURATION;
+    hsb[2] = DISABLED_COLOR_BRIGHTNESS;
 
-        if (enabledColor != null) {
-            /*
-             * Save the old background color and set it back to this after
-             * drawing the rectangle. Otherwise the text will have the same
-             * background color as the rectangle.
-             */
-            final Color oldBackground = gc.getBackground();
-            final Color oldForeground = gc.getForeground();
+    return new Color(Display.getCurrent(), new RGB(hsb[0], hsb[1], hsb[2]));
+  }
 
-            // set frame color
-            Color colorToPaint = isEnabled() ? frameEnabledColor
-                : frameDisabledColor;
+  protected void onDispose(DisposeEvent e) {
+    if (disabledColor != null && !disabledColor.isDisposed()) disabledColor.dispose();
+  }
 
-            gc.setForeground(colorToPaint);
-            gc.setBackground(colorToPaint);
+  /** @return the color of this color label */
+  public Color getColor() {
+    return enabledColor;
+  }
 
-            // Draw the frame
-            gc.fillRoundRectangle(0, VERTICAL_OFFSET, rectangleWidth,
-                rectangleHeight, RECTANGLE_ARC, RECTANGLE_ARC);
+  /**
+   * Changes the color of this color label.
+   *
+   * @param color the new color for this label
+   */
+  public void setColor(Color color) {
 
-            // set label color
-            colorToPaint = isEnabled() ? enabledColor : disabledColor;
+    enabledColor = color;
 
-            gc.setForeground(colorToPaint);
-            gc.setBackground(colorToPaint);
+    if (disabledColor != null && !disabledColor.isDisposed()) disabledColor.dispose();
 
-            // Draw the label
-            gc.fillRoundRectangle(x, y, width, height, RECTANGLE_ARC,
-                RECTANGLE_ARC);
-            // setting back the colors like they were before
-            gc.setForeground(oldForeground);
-            gc.setBackground(oldBackground);
+    disabledColor = getDisabledColor(color);
 
-        }
-    }
+    redraw();
+  }
 
-    /**
-     * Creates a greyish color value on the basis of the color the label
-     * represents.
-     * 
-     * @return
-     */
-    private Color getDisabledColor(Color color) {
+  /**
+   * Set label as selected, causing a frame to be drawn around the color rectangle.
+   *
+   * @param selected
+   */
+  public void setSelected(boolean selected) {
+    if (this.selected == selected) return;
 
-        // Use HSB-value because it's easier to transform the values
-        float[] hsb = color.getRGB().getHSB();
-
-        // Converts to a greyish color
-        hsb[1] = DISABLED_COLOR_SATURATION;
-        hsb[2] = DISABLED_COLOR_BRIGHTNESS;
-
-        return new Color(Display.getCurrent(), new RGB(hsb[0], hsb[1], hsb[2]));
-
-    }
-
-    protected void onDispose(DisposeEvent e) {
-        if (disabledColor != null && !disabledColor.isDisposed())
-            disabledColor.dispose();
-    }
-
-    /**
-     * @return the color of this color label
-     */
-    public Color getColor() {
-        return enabledColor;
-    }
-
-    /**
-     * Changes the color of this color label.
-     * 
-     * @param color
-     *            the new color for this label
-     */
-    public void setColor(Color color) {
-
-        enabledColor = color;
-
-        if (disabledColor != null && !disabledColor.isDisposed())
-            disabledColor.dispose();
-
-        disabledColor = getDisabledColor(color);
-
-        redraw();
-    }
-
-    /**
-     * Set label as selected, causing a frame to be drawn around the color
-     * rectangle.
-     * 
-     * @param selected
-     */
-    public void setSelected(boolean selected) {
-        if (this.selected == selected)
-            return;
-
-        this.selected = selected;
-        redraw();
-    }
+    this.selected = selected;
+    redraw();
+  }
 }

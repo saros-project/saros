@@ -1,48 +1,36 @@
 package de.fu_berlin.inf.dpp.communication.extensions;
 
-import java.util.List;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
-import de.fu_berlin.inf.dpp.negotiation.TransferType;
+import java.util.List;
 
-@XStreamAlias(/* ProjectNegotiationOffering */"PNOF")
-public class ProjectNegotiationOfferingExtension extends
-    ProjectNegotiationExtension {
+@XStreamAlias(/* ProjectNegotiationOffering */ "PNOF")
+public class ProjectNegotiationOfferingExtension extends ProjectNegotiationExtension {
 
-    public static final Provider PROVIDER = new Provider();
+  public static final Provider PROVIDER = new Provider();
 
-    private List<ProjectNegotiationData> projectNegotiationData;
-    private TransferType transferType;
+  private List<ProjectNegotiationData> projectNegotiationData;
 
-    public ProjectNegotiationOfferingExtension(String sessionID,
-        String negotiationID,
-        List<ProjectNegotiationData> projectNegotiationData,
-        TransferType transferType) {
-        super(sessionID, negotiationID);
-        this.projectNegotiationData = projectNegotiationData;
-        this.transferType = transferType;
+  public ProjectNegotiationOfferingExtension(
+      String sessionID, String negotiationID, List<ProjectNegotiationData> projectNegotiationData) {
+    super(sessionID, negotiationID);
+    this.projectNegotiationData = projectNegotiationData;
+  }
+
+  public List<ProjectNegotiationData> getProjectNegotiationData() {
+    return projectNegotiationData;
+  }
+
+  public static class Provider
+      extends ProjectNegotiationExtension.Provider<ProjectNegotiationOfferingExtension> {
+
+    private Provider() {
+      super(
+          "pnof",
+          ProjectNegotiationOfferingExtension.class,
+          ProjectNegotiationData.class,
+          FileList.class);
     }
-
-    public List<ProjectNegotiationData> getProjectNegotiationData() {
-        return projectNegotiationData;
-    }
-
-    public TransferType getTransferType() {
-        return transferType;
-    }
-
-    public static class Provider
-        extends
-        ProjectNegotiationExtension.Provider<ProjectNegotiationOfferingExtension> {
-
-        private Provider() {
-            super("pnof", ProjectNegotiationOfferingExtension.class,
-                ProjectNegotiationData.class, TransferType.class,
-                FileList.class);
-        }
-    }
-
+  }
 }

@@ -1,108 +1,103 @@
 package de.fu_berlin.inf.dpp.feedback;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-
 /**
- * A Collector class that collects information for each shared project during a
- * session.
- * 
+ * A Collector class that collects information for each shared project during a session.
+ *
  * @author srossbach
  */
 @Component(module = "feedback")
 public class ProjectCollector extends AbstractStatisticCollector {
 
-    // Keys for shared project information
-    private static final String KEY_COMPLETE_SHARED_PROJECTS = "session.shared.project.complete.count";
-    private static final String KEY_PARTIAL_SHARED_PROJECTS = "session.shared.project.partial.count";
-    private static final String KEY_PARTIAL_SHARED_PROJECTS_FILES = "session.shared.project.partial.files.count";
+  // Keys for shared project information
+  private static final String KEY_COMPLETE_SHARED_PROJECTS =
+      "session.shared.project.complete.count";
+  private static final String KEY_PARTIAL_SHARED_PROJECTS = "session.shared.project.partial.count";
+  private static final String KEY_PARTIAL_SHARED_PROJECTS_FILES =
+      "session.shared.project.partial.files.count";
 
-    private static class ProjectInformation {
-        public boolean isPartial;
-        public int files;
-    }
+  private static class ProjectInformation {
+    public boolean isPartial;
+    public int files;
+  }
 
-    private final Map<String, ProjectInformation> sharedProjects = new HashMap<String, ProjectInformation>();
+  private final Map<String, ProjectInformation> sharedProjects =
+      new HashMap<String, ProjectInformation>();
 
-    private final ISessionListener sessionListener = new AbstractSessionListener() {
+  private final ISessionListener sessionListener =
+      new ISessionListener() {
         @Override
         public void resourcesAdded(IProject project) {
-            String projectID = sarosSession.getProjectID(project);
+          String projectID = sarosSession.getProjectID(project);
 
-            ProjectInformation info = sharedProjects.get(projectID);
+          ProjectInformation info = sharedProjects.get(projectID);
 
-            if (info == null) {
-                info = new ProjectInformation();
-                sharedProjects.put(projectID, info);
+          if (info == null) {
+            info = new ProjectInformation();
+            sharedProjects.put(projectID, info);
+          }
+
+          boolean isPartial = !sarosSession.isCompletelyShared(project);
+
+          /*
+           * ignore partial shared projects that were upgraded to full shared
+           * projects so we now that the users use at least partial sharing
+           */
+          if (!info.isPartial && isPartial) info.isPartial = true;
+
+          List<IResource> sharedResources = sarosSession.getSharedResources(project);
+
+          if (sharedResources != null) {
+            for (Iterator<IResource> it = sharedResources.iterator(); it.hasNext(); ) {
+
+              IResource resource = it.next();
+
+              if (resource.getType() != IResource.FILE) it.remove();
             }
 
-            boolean isPartial = !sarosSession.isCompletelyShared(project);
-
-            /*
-             * ignore partial shared projects that were upgraded to full shared
-             * projects so we now that the users use at least partial sharing
-             */
-            if (!info.isPartial && isPartial)
-                info.isPartial = true;
-
-            List<IResource> sharedResources = sarosSession
-                .getSharedResources(project);
-
-            if (sharedResources != null) {
-                for (Iterator<IResource> it = sharedResources.iterator(); it
-                    .hasNext();) {
-
-                    IResource resource = it.next();
-
-                    if (resource.getType() != IResource.FILE)
-                        it.remove();
-                }
-
-                info.files = sharedResources.size();
-            }
+            info.files = sharedResources.size();
+          }
         }
-    };
+      };
 
-    public ProjectCollector(StatisticManager statisticManager,
-        ISarosSession session) {
-        super(statisticManager, session);
+  public ProjectCollector(StatisticManager statisticManager, ISarosSession session) {
+    super(statisticManager, session);
+  }
+
+  @Override
+  protected void processGatheredData() {
+    int completeSharedProjects = 0;
+    int partialSharedProjects = 0;
+    int partialSharedFiles = 0;
+
+    for (ProjectInformation info : sharedProjects.values()) {
+      if (info.isPartial) {
+        partialSharedProjects++;
+        partialSharedFiles += info.files;
+      } else completeSharedProjects++;
     }
 
-    @Override
-    protected void processGatheredData() {
-        int completeSharedProjects = 0;
-        int partialSharedProjects = 0;
-        int partialSharedFiles = 0;
+    data.put(KEY_COMPLETE_SHARED_PROJECTS, completeSharedProjects);
+    data.put(KEY_PARTIAL_SHARED_PROJECTS, partialSharedProjects);
+    data.put(KEY_PARTIAL_SHARED_PROJECTS_FILES, partialSharedFiles);
+  }
 
-        for (ProjectInformation info : sharedProjects.values()) {
-            if (info.isPartial) {
-                partialSharedProjects++;
-                partialSharedFiles += info.files;
-            } else
-                completeSharedProjects++;
-        }
+  @Override
+  protected void doOnSessionStart(ISarosSession sarosSession) {
+    sarosSession.addListener(sessionListener);
+  }
 
-        data.put(KEY_COMPLETE_SHARED_PROJECTS, completeSharedProjects);
-        data.put(KEY_PARTIAL_SHARED_PROJECTS, partialSharedProjects);
-        data.put(KEY_PARTIAL_SHARED_PROJECTS_FILES, partialSharedFiles);
-    }
-
-    @Override
-    protected void doOnSessionStart(ISarosSession sarosSession) {
-        sarosSession.addListener(sessionListener);
-    }
-
-    @Override
-    protected void doOnSessionEnd(ISarosSession sarosSession) {
-        sarosSession.removeListener(sessionListener);
-    }
+  @Override
+  protected void doOnSessionEnd(ISarosSession sarosSession) {
+    sarosSession.removeListener(sessionListener);
+  }
 }

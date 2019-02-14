@@ -5,72 +5,102 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 import java.rmi.RemoteException;
 import java.util.regex.Pattern;
-
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
-
 public class PackageExplorerViewTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        select(ALICE, BOB);
-    }
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    select(ALICE, BOB);
+  }
 
-    @After
-    public void afterEveryTest() throws Exception {
-        clearWorkspaces();
-    }
+  @After
+  public void afterEveryTest() throws Exception {
+    clearWorkspaces();
+  }
 
-    @Test
-    public void testIsFileExist() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
-        assertTrue(ALICE.superBot().views().packageExplorerView()
+  @Test
+  public void testIsFileExist() throws RemoteException {
+    ALICE.superBot().views().packageExplorerView().tree().newC().javaProject(Constants.PROJECT1);
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .tree()
+        .newC()
+        .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    assertTrue(
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
-        ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-            .delete();
-        assertFalse(ALICE.superBot().views().packageExplorerView()
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+        .delete();
+    assertFalse(
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
-    }
+  }
 
-    @Test
-    public void testIsFileExistWithGUI() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
-        assertTrue(ALICE.superBot().views().packageExplorerView()
+  @Test
+  public void testIsFileExistWithGUI() throws RemoteException {
+    ALICE.superBot().views().packageExplorerView().tree().newC().javaProject(Constants.PROJECT1);
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .tree()
+        .newC()
+        .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    assertTrue(
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-            .delete();
-        assertFalse(ALICE.superBot().views().packageExplorerView()
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+        .delete();
+    assertFalse(
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
+  }
 
-    }
-
-    @Test
-    @Ignore("can't click the menu 'Multiple Contacts...'")
-    public void testShareWith() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
-        ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).shareWith()
-            .multipleContacts(Constants.PROJECT1, BOB.getJID());
-    }
+  @Test
+  @Ignore("can't click the menu 'Multiple Contacts...'")
+  public void testShareWith() throws RemoteException {
+    ALICE.superBot().views().packageExplorerView().tree().newC().javaProject(Constants.PROJECT1);
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectProject(Constants.PROJECT1)
+        .shareWith()
+        .multipleContacts(Constants.PROJECT1, BOB.getJID());
+  }
 }

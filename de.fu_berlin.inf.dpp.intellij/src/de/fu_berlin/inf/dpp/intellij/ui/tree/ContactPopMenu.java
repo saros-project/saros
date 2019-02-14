@@ -8,128 +8,187 @@ import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
+import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.List;
+import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
 
 /**
- * Contact pop-up menu for selecting a project to share. Opened when
- * right-clicking on a contact.
+ * Contact pop-up menu for selecting a project to share. Opened when right-clicking on a contact.
  */
 class ContactPopMenu extends JPopupMenu {
 
-    private static final Logger LOG = Logger.getLogger(ContactPopMenu.class);
+  private static final Logger LOG = Logger.getLogger(ContactPopMenu.class);
 
-    @Inject
-    private IWorkspace workspace;
+  @Inject private IWorkspace workspace;
 
-    @Inject
-    private Project project;
+  @Inject private Project project;
 
-    private final ContactTreeRootNode.ContactInfo contactInfo;
+  private final ContactTreeRootNode.ContactInfo contactInfo;
 
-    public ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
-        this.contactInfo = contactInfo;
+  ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
+    this.contactInfo = contactInfo;
 
-        if (workspace == null && project == null) {
-            SarosPluginContext.initComponent(this);
-        }
+    if (workspace == null || project == null) {
+      SarosPluginContext.initComponent(this);
 
-        JMenu menuShareProject = new JMenu("Work together on...");
-        menuShareProject.setIcon(IconManager.SESSIONS_ICON);
+      if (workspace == null || project == null) {
+        LOG.error("PicoContainer injection failed. Objects still not present after injection.");
 
-        if (project == null) {
-            return;
-        }
-
-        ModuleManager moduleManager = ModuleManager.getInstance(project);
-
-        if(moduleManager == null){
-
-            SafeDialogUtils.showError("The local module manager could not be " +
-                "found. This most likely means that you are not using " +
-                "IntelliJ IDEA or are using an unsupported version.\n" +
-                "If you are using a supported version of IntelliJ IDEA," +
-                "please contact the Saros development team. You can reach us " +
-                "by  writing to our mailing list " +
-                "(saros-devel@googlegroups.com) or by using our contact form " +
-                "(https://www.saros-project.org/contact/Website%20feedback).",
-                "Unsupported IDE!");
-
-            return;
-        }
-
-        for (Module module : moduleManager.getModules()) {
-            String moduleName = module.getName();
-
-            if (project.getName().equalsIgnoreCase(moduleName)) {
-                continue;
-            }
-
-            JMenuItem moduleItem = new JMenuItem(moduleName);
-            moduleItem.addActionListener(
-                new ShareDirectoryAction(moduleName));
-
-            menuShareProject.add(moduleItem);
-        }
-
-        add(menuShareProject);
+        return;
+      }
     }
 
-    /**
-     * Action that is executed, when a project is selected for sharing.
-     */
-    private class ShareDirectoryAction implements ActionListener {
-        private final String moduleName;
+    JMenu menuShareProject = new JMenu("Work together on...");
+    menuShareProject.setIcon(IconManager.SESSIONS_ICON);
 
-        private ShareDirectoryAction(String moduleName) {
-            this.moduleName = moduleName;
-        }
+    ModuleManager moduleManager = ModuleManager.getInstance(project);
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
+    if (moduleManager == null) {
 
-            List<IResource> resources;
+      NotificationPanel.showError(
+          MessageFormat.format(
+              Messages.Contact_saros_message_conditional,
+              Messages.ContactPopMenu_unsupported_ide_message_condition),
+          Messages.ContactPopMenu_unsupported_ide_title);
 
-            IProject module = workspace.getProject(moduleName);
-
-            if (module == null) {
-                LOG.error("The IProject object for the module " + moduleName
-                    + " could not be created. This most likely means that the"
-                    + " local IntelliJ instance does not know any module with"
-                    + " the given name.");
-
-                SafeDialogUtils.showError("Saros could not find the chosen " +
-                    "module " + moduleName + ". Please make sure that the " +
-                    "module is correctly configured in the current project " +
-                    "and exists on disk.\n" +
-                    "If there seems to be no problem with the module, please " +
-                    "contact the Saros development team. You can reach us by " +
-                    "writing to our mailing list " +
-                    "(saros-devel@googlegroups.com) or by using our contact " +
-                    "form " +
-                    "(https://www.saros-project.org/contact/Website%20feedback).",
-                    "Error - Project sharing aborted!");
-
-                return;
-            }
-
-            resources = Arrays.asList((IResource) module);
-
-            JID user = new JID(contactInfo.getRosterEntry().getUser());
-            List<JID> contacts = Arrays.asList(user);
-
-            CollaborationUtils.startSession(resources, contacts);
-        }
+      return;
     }
+
+    List<JMenuItem> shownModules = new LinkedList<>();
+    List<String> nonCompliantModules = new LinkedList<>();
+
+    for (Module module : moduleManager.getModules()) {
+      String moduleName = module.getName();
+
+      if (project.getName().equalsIgnoreCase(moduleName)) {
+        continue;
+      }
+
+      IProject wrappedModule;
+
+      try {
+        wrappedModule = workspace.getProject(moduleName);
+
+      } catch (IllegalArgumentException exception) {
+        LOG.debug(
+            "Ignoring module "
+                + moduleName
+                + " as it does not meet the current release restrictions.");
+
+        nonCompliantModules.add(moduleName);
+
+        continue;
+
+      } catch (IllegalStateException exception) {
+        LOG.warn(
+            "Ignoring module "
+                + moduleName
+                + " as an error "
+                + "occurred while trying to create an IProject object.",
+            exception);
+
+        NotificationPanel.showWarning(
+            MessageFormat.format(
+                Messages.ContactPopMenu_error_creating_module_object_message,
+                moduleName,
+                exception),
+            MessageFormat.format(
+                Messages.ContactPopMenu_error_creating_module_object_title, moduleName));
+
+        continue;
+      }
+
+      JMenuItem moduleItem = new JMenuItem(moduleName);
+      moduleItem.addActionListener(new ShareDirectoryAction(moduleName, wrappedModule));
+
+      shownModules.add(moduleItem);
+    }
+
+    if (!nonCompliantModules.isEmpty()) {
+      NotificationPanel.showWarning(
+          MessageFormat.format(
+              Messages.Contact_saros_message_conditional,
+              MessageFormat.format(
+                  Messages.ContactPopMenu_invalid_module_message_condition, nonCompliantModules)),
+          Messages.ContactPopMenu_invalid_module_title);
+    }
+
+    if (!shownModules.isEmpty()) {
+      shownModules.sort(Comparator.comparing(JMenuItem::getText));
+
+      for (JMenuItem moduleItem : shownModules) {
+        menuShareProject.add(moduleItem);
+      }
+    } else {
+      LOG.debug(
+          "No modules shown to user as no modules "
+              + (nonCompliantModules.isEmpty()
+                  ? ""
+                  : "complying with our current release restrictions ")
+              + "were found");
+
+      menuShareProject.add(
+          new JMenuItem(
+              "No modules "
+                  + (nonCompliantModules.isEmpty()
+                      ? ""
+                      : "complying with our current release restrictions ")
+                  + " found!"));
+    }
+
+    add(menuShareProject);
+  }
+
+  /** Action that is executed, when a project is selected for sharing. */
+  private class ShareDirectoryAction implements ActionListener {
+    private final String moduleName;
+    private final IProject module;
+
+    private ShareDirectoryAction(String moduleName, IProject module) {
+      this.moduleName = moduleName;
+      this.module = module;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (module == null || !module.exists()) {
+        LOG.error(
+            "The IProject object for the module "
+                + moduleName
+                + " could not be created. This most likely means that the local IntelliJ instance "
+                + "does not know any module with the given name.");
+
+        NotificationPanel.showError(
+            MessageFormat.format(
+                Messages.Contact_saros_message_conditional,
+                MessageFormat.format(
+                    Messages.ContactPopMenu_module_not_found_message_condition, moduleName)),
+            Messages.ContactPopMenu_module_not_found_title);
+
+        return;
+      }
+
+      List<IResource> resources = new ArrayList<>();
+      resources.add(module);
+
+      JID user = new JID(contactInfo.getRosterEntry().getUser());
+      List<JID> contacts = new ArrayList<>();
+      contacts.add(user);
+
+      CollaborationUtils.startSession(resources, contacts);
+    }
+  }
 }

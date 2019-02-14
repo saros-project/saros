@@ -14,5 +14,6 @@ Require-Bundle: org.eclipse.ui,
  de.fu_berlin.inf.dpp
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- lib/log4j-1.2.16.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+ lib/log4j-1.2.15.jar,
+ lib/gson-2.8.5.jar
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

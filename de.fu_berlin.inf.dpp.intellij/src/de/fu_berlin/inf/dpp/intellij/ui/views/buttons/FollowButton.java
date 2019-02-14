@@ -2,175 +2,166 @@ package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 
 import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
+import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
-import org.picocontainer.annotations.Inject;
-
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import org.picocontainer.annotations.Inject;
 
-/**
- * Button to follow a user. Displays a PopupMenu containing all session users to choose
- * from.
- */
+/** Button to follow a user. Displays a PopupMenu containing all session users to choose from. */
 public class FollowButton extends ToolbarButton {
-    private static final String FOLLOW_ICON_PATH = "/icons/famfamfam/followmode.png";
-    private JPopupMenu popupMenu;
-    private final FollowModeAction followModeAction;
+  private static final String FOLLOW_ICON_PATH = "/icons/famfamfam/followmode.png";
+  private JPopupMenu popupMenu;
+  private final FollowModeAction followModeAction;
 
-    private final ISessionListener sessionListener = new AbstractSessionListener() {
+  private final ISessionListener sessionListener =
+      new ISessionListener() {
         @Override
         public void userLeft(final User user) {
-            updateMenu();
+          updateMenu();
         }
 
         @Override
         public void userJoined(final User user) {
-            updateMenu();
+          updateMenu();
         }
-    };
+      };
 
-    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
+  private final IFollowModeListener followModeListener =
+      new IFollowModeListener() {
+        @Override
+        public void stoppedFollowing(Reason reason) {
+          updateMenu();
+        }
+
+        @Override
+        public void startedFollowing(User target) {
+          updateMenu();
+        }
+      };
+
+  @SuppressWarnings("FieldCanBeLocal")
+  private final ISessionLifecycleListener sessionLifecycleListener =
+      new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession session) {
-            session.addListener(sessionListener);
-            updateMenu();
-            setEnabledFromUIThread(true);
+          FollowButton.this.session = session;
+          FollowButton.this.session.addListener(sessionListener);
+
+          followModeManager = session.getComponent(FollowModeManager.class);
+          followModeManager.addListener(followModeListener);
+
+          updateMenu();
+          setEnabledFromUIThread(true);
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession,
-            SessionEndReason reason) {
+        public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
+          FollowButton.this.session.removeListener(sessionListener);
+          FollowButton.this.session = null;
 
-            oldSarosSession.removeListener(sessionListener);
-            updateMenu();
-            setEnabledFromUIThread(false);
+          followModeManager.removeListener(followModeListener);
+          followModeManager = null;
+
+          updateMenu();
+          setEnabledFromUIThread(false);
         }
-    };
+      };
 
-    private final ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
-        @Override
-        public void followModeChanged(final User target,
-            final boolean isFollowed) {
-            updateMenu();
-        }
-    };
+  private String menuItemPrefix;
 
-    private String menuItemPrefix;
+  @Inject private ISarosSessionManager sessionManager;
 
-    @Inject
-    private ISarosSessionManager sessionManager;
+  private volatile ISarosSession session;
+  private volatile FollowModeManager followModeManager;
 
-    @Inject
-    private EditorManager editorManager;
+  /**
+   * Creates a Follow button with a JPopupMenu, registers session listeners and editor listeners.
+   *
+   * <p>The FollowButton is created as disabled.
+   */
+  public FollowButton() {
+    super(FollowModeAction.NAME, "Follow", FOLLOW_ICON_PATH, "Enter follow mode");
+    SarosPluginContext.initComponent(this);
 
-    /**
-     * Creates a Follow button with Popupmenu, registers sessionListeners and
-     * editorlisteners.
-     * <p/>
-     * The FollowButton is created as dissabled.
-     */
-    public FollowButton() {
-        super(FollowModeAction.NAME, "Follow", FOLLOW_ICON_PATH,
-            "Enter follow mode");
-        SarosPluginContext.initComponent(this);
+    followModeAction = new FollowModeAction();
 
-        followModeAction = new FollowModeAction();
+    sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 
-        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+    createMenu();
+    setEnabled(false);
 
-        editorManager.addSharedEditorListener(editorListener);
+    final JButton button = this;
+    addActionListener(
+        ev -> popupMenu.show(button, 0, button.getBounds().y + button.getBounds().height));
+  }
 
-        createMenu();
-        setEnabled(false);
+  private void createMenu() {
+    popupMenu = new JPopupMenu();
 
-        final JButton button = this;
-        addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ev) {
-                popupMenu.show(button, 0,
-                    button.getBounds().y + button.getBounds().height);
-            }
+    menuItemPrefix = "Follow ";
 
-        });
+    ISarosSession currentSession = session;
+    FollowModeManager currentFollowModeManager = followModeManager;
+
+    if (currentSession == null || currentFollowModeManager == null) {
+      return;
     }
 
-    private void createMenu() {
-        popupMenu = new JPopupMenu();
-
-        menuItemPrefix = "Follow ";
-
-        for (User user : followModeAction.getCurrentRemoteSessionUsers()) {
-            JMenuItem menuItem = createItemForUser(user);
-            popupMenu.add(menuItem);
-        }
-
-        popupMenu.addSeparator();
-
-        JMenuItem leaveItem = new JMenuItem("Leave follow mode");
-        leaveItem.setActionCommand(null);
-        leaveItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                followModeAction.execute(e.getActionCommand());
-            }
-        });
-        leaveItem
-            .setEnabled(followModeAction.getCurrentlyFollowedUser() != null);
-
-        popupMenu.add(leaveItem);
+    for (User user : currentSession.getRemoteUsers()) {
+      JMenuItem menuItem = createItemForUser(user);
+      popupMenu.add(menuItem);
     }
 
-    private JMenuItem createItemForUser(User user) {
-        String userName = ModelFormatUtils.getDisplayName(user);
-        String userNameShort = userName;
-        int index = userNameShort.indexOf("@");
-        if (index > -1) {
-            userNameShort = userNameShort.substring(0, index);
-        }
+    popupMenu.addSeparator();
 
-        JMenuItem menuItem = new JMenuItem(menuItemPrefix + userNameShort);
+    JMenuItem leaveItem = new JMenuItem("Leave follow mode");
+    leaveItem.addActionListener(e -> followModeAction.execute(null));
+    leaveItem.setEnabled(currentFollowModeManager.getFollowedUser() != null);
 
-        User currentlyFollowedUser = followModeAction
-            .getCurrentlyFollowedUser();
-        if (currentlyFollowedUser != null) {
-            String currentUserName = ModelFormatUtils
-                .getDisplayName(currentlyFollowedUser);
-            if (currentUserName.equalsIgnoreCase(userNameShort)) {
-                menuItem.setEnabled(false);
-            }
-        }
+    popupMenu.add(leaveItem);
+  }
 
-        menuItem.setActionCommand(userName);
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                followModeAction.execute(e.getActionCommand());
-            }
-        });
-        return menuItem;
+  private JMenuItem createItemForUser(User user) {
+    String userName = ModelFormatUtils.getDisplayName(user);
+    String userNameShort = userName;
+    int index = userNameShort.indexOf("@");
+    if (index > -1) {
+      userNameShort = userNameShort.substring(0, index);
     }
 
-    private void updateMenu() {
-        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
-            @Override
-            public void run() {
-                createMenu();
-            }
-        });
+    JMenuItem menuItem = new JMenuItem(menuItemPrefix + userNameShort);
+
+    FollowModeManager currentFollowModeManager = followModeManager;
+
+    User currentlyFollowedUser = null;
+
+    if (currentFollowModeManager != null) {
+      currentlyFollowedUser = currentFollowModeManager.getFollowedUser();
     }
+
+    if (currentlyFollowedUser != null) {
+      String currentUserName = ModelFormatUtils.getDisplayName(currentlyFollowedUser);
+      if (currentUserName.equalsIgnoreCase(userNameShort)) {
+        menuItem.setEnabled(false);
+      }
+    }
+
+    menuItem.setActionCommand(userName);
+    menuItem.addActionListener(e -> followModeAction.execute(e.getActionCommand()));
+    return menuItem;
+  }
+
+  private void updateMenu() {
+    UIUtil.invokeAndWaitIfNeeded((Runnable) this::createMenu);
+  }
 }

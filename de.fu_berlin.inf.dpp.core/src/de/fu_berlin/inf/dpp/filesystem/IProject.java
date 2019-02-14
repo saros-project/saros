@@ -22,19 +22,18 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
 /**
- * This interface is under development. It currently equals its Eclipse
- * counterpart. If not mentioned otherwise all offered methods are equivalent to
- * their Eclipse counterpart.
+ * This interface is under development. It currently equals its Eclipse counterpart. If not
+ * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
  */
 public interface IProject extends IContainer {
 
-    public IResource findMember(IPath path);
+  public IResource findMember(IPath path);
 
-    public IFile getFile(String name);
+  public IFile getFile(String name);
 
-    public IFile getFile(IPath path);
+  public IFile getFile(IPath path);
 
-    public IFolder getFolder(String name);
+  public IFolder getFolder(String name);
 
-    public IFolder getFolder(IPath path);
+  public IFolder getFolder(IPath path);
 }

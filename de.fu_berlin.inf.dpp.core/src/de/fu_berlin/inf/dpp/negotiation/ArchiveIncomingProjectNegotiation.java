@@ -1,17 +1,5 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
-
-import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
@@ -29,200 +17,177 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
 /**
- * Implementation of {@link AbstractIncomingProjectNegotiation} utilizing
- * a transferred zip archive to exchange differences in the project files.
+ * Implementation of {@link AbstractIncomingProjectNegotiation} utilizing a transferred zip archive
+ * to exchange differences in the project files.
  */
-public class ArchiveIncomingProjectNegotiation extends
-    AbstractIncomingProjectNegotiation {
+public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNegotiation {
 
-    private static final Logger LOG = Logger
-        .getLogger(ArchiveIncomingProjectNegotiation.class);
+  private static final Logger LOG = Logger.getLogger(ArchiveIncomingProjectNegotiation.class);
 
-    public ArchiveIncomingProjectNegotiation(
-        final JID peer, //
-        final String negotiationID, //
-        final List<ProjectNegotiationData> projectNegotiationData, //
+  public ArchiveIncomingProjectNegotiation(
+      final JID peer, //
+      final String negotiationID, //
+      final List<ProjectNegotiationData> projectNegotiationData, //
+      final ISarosSessionManager sessionManager, //
+      final ISarosSession session, //
+      final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
+      final IWorkspace workspace, //
+      final IChecksumCache checksumCache, //
+      final XMPPConnectionService connectionService, //
+      final ITransmitter transmitter, //
+      final IReceiver receiver //
+      ) {
+    super(
+        peer,
+        negotiationID,
+        projectNegotiationData,
+        sessionManager,
+        session,
+        fileReplacementInProgressObservable,
+        workspace,
+        checksumCache,
+        connectionService,
+        transmitter,
+        receiver);
+  }
 
-        final ISarosSessionManager sessionManager, //
-        final ISarosSession session, //
+  @Override
+  protected void transfer(
+      IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
+      throws IOException, SarosCancellationException {
 
-        final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
-        final IWorkspace workspace, //
-        final IChecksumCache checksumCache, //
+    boolean filesMissing = false;
 
-        final XMPPConnectionService connectionService, //
-        final ITransmitter transmitter, //
-        final IReceiver receiver //
-    ) {
-        super(peer, TransferType.ARCHIVE, negotiationID, projectNegotiationData,
-            sessionManager, session, fileReplacementInProgressObservable,
-            workspace, checksumCache, connectionService, transmitter, receiver);
+    for (FileList list : missingFiles) filesMissing |= list.getPaths().size() > 0;
+
+    // the host do not send an archive if we do not need any files
+    if (filesMissing) {
+      receiveAndUnpackArchive(projectMapping, transferListener, monitor);
     }
+  }
 
-    @Override
-    protected void transfer(IProgressMonitor monitor,
-        Map<String, IProject> projectMapping, List<FileList> missingFiles)
-        throws IOException, SarosCancellationException {
+  /** Receives the archive with all missing files and unpacks it. */
+  private void receiveAndUnpackArchive(
+      final Map<String, IProject> localProjectMapping,
+      final TransferListener archiveTransferListener,
+      final IProgressMonitor monitor)
+      throws IOException, SarosCancellationException {
 
-        awaitActivityQueueingActivation(monitor);
-        monitor.subTask("");
+    // waiting for the big archive to come in
 
-        /*
-         * the user who sends this ProjectNegotiation is now responsible for the
-         * resources of the contained projects
-         */
-        for (Entry<String, IProject> entry : projectMapping.entrySet()) {
+    monitor.beginTask(null, 100);
 
-            final String projectID = entry.getKey();
-            final IProject project = entry.getValue();
-            /*
-             * TODO Queuing responsibility should be moved to Project
-             * Negotiation, since its the only consumer of queuing
-             * functionality. This will enable a specific Queuing mechanism per
-             * TransferType (see github issue #137).
-             */
-            session.addProjectMapping(projectID, project);
-            session.enableQueuing(project);
-        }
+    File archiveFile = receiveArchive(archiveTransferListener, new SubProgressMonitor(monitor, 50));
 
-        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
-            StartActivityQueuingResponse.PROVIDER
-                .create(new StartActivityQueuingResponse(getSessionID(),
-                    getID())));
-
-        checkCancellation(CancelOption.NOTIFY_PEER);
-
-        boolean filesMissing = false;
-
-        for (FileList list : missingFiles)
-            filesMissing |= list.getPaths().size() > 0;
-
-        // the host do not send an archive if we do not need any files
-        if (filesMissing) {
-            receiveAndUnpackArchive(projectMapping, transferListener, monitor);
-        }
-    }
-
-    /**
-     * Receives the archive with all missing files and unpacks it.
+    /*
+     * FIXME at this point it makes no sense to report the cancellation to
+     * the remote side, because his negotiation is already finished !
      */
-    private void receiveAndUnpackArchive(
-        final Map<String, IProject> localProjectMapping,
-        final TransferListener archiveTransferListener,
-        final IProgressMonitor monitor) throws IOException,
-        SarosCancellationException {
 
-        // waiting for the big archive to come in
+    try {
+      unpackArchive(localProjectMapping, archiveFile, new SubProgressMonitor(monitor, 50));
+      monitor.done();
+    } finally {
+      if (archiveFile != null && !archiveFile.delete()) {
+        LOG.warn("Could not clean up archive file " + archiveFile.getAbsolutePath());
+      }
+    }
+  }
 
-        monitor.beginTask(null, 100);
+  private void unpackArchive(
+      final Map<String, IProject> localProjectMapping,
+      final File archiveFile,
+      final IProgressMonitor monitor)
+      throws LocalCancellationException, IOException {
 
-        File archiveFile = receiveArchive(archiveTransferListener,
-            new SubProgressMonitor(monitor, 50));
+    final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
 
-        /*
-         * FIXME at this point it makes no sense to report the cancellation to
-         * the remote side, because his negotiation is already finished !
-         */
+    for (Entry<String, IProject> entry : localProjectMapping.entrySet())
+      projectMapping.put(entry.getKey(), entry.getValue());
 
-        try {
-            unpackArchive(localProjectMapping, archiveFile,
-                new SubProgressMonitor(monitor, 50));
-            monitor.done();
-        } finally {
-            if (archiveFile != null && !archiveFile.delete()) {
-                LOG.warn("Could not clean up archive file "
-                    + archiveFile.getAbsolutePath());
-            }
-        }
+    final DecompressArchiveTask decompressTask =
+        new DecompressArchiveTask(archiveFile, projectMapping, PATH_DELIMITER, monitor);
+
+    long startTime = System.currentTimeMillis();
+
+    LOG.debug(this + " : unpacking archive file...");
+
+    /*
+     * TODO: calculate the ADLER32 checksums during decompression and add
+     * them into the ChecksumCache. The insertion must be done after the
+     * WorkspaceRunnable has run or all checksums will be invalidated during
+     * the IResourceChangeListener updates inside the WorkspaceRunnable or
+     * after it finished!
+     */
+
+    try {
+      workspace.run(decompressTask, projectMapping.values().toArray(new IResource[0]));
+    } catch (de.fu_berlin.inf.dpp.exceptions.OperationCanceledException e) {
+      LocalCancellationException canceled =
+          new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
+      canceled.initCause(e);
+      throw canceled;
     }
 
-    private void unpackArchive(final Map<String, IProject> localProjectMapping,
-        final File archiveFile, final IProgressMonitor monitor)
-        throws LocalCancellationException, IOException {
+    LOG.debug(
+        String.format("unpacked archive in %d s", (System.currentTimeMillis() - startTime) / 1000));
 
-        final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
+    // TODO: now add the checksums into the cache
+  }
 
-        for (Entry<String, IProject> entry : localProjectMapping.entrySet())
-            projectMapping.put(entry.getKey(), entry.getValue());
+  private File receiveArchive(TransferListener archiveTransferListener, IProgressMonitor monitor)
+      throws IOException, SarosCancellationException {
 
-        final DecompressArchiveTask decompressTask = new DecompressArchiveTask(
-            archiveFile, projectMapping, PATH_DELIMITER, monitor);
+    monitor.beginTask("Receiving archive file...", 100);
+    LOG.debug("waiting for incoming archive stream request");
 
-        long startTime = System.currentTimeMillis();
+    monitor.subTask("Host is compressing project files. Waiting for the archive file...");
 
-        LOG.debug(this + " : unpacking archive file...");
+    awaitTransferRequest();
 
-        /*
-         * TODO: calculate the ADLER32 checksums during decompression and add
-         * them into the ChecksumCache. The insertion must be done after the
-         * WorkspaceRunnable has run or all checksums will be invalidated during
-         * the IResourceChangeListener updates inside the WorkspaceRunnable or
-         * after it finished!
-         */
+    monitor.subTask("Receiving archive file...");
 
-        try {
-            workspace.run(decompressTask,
-                projectMapping.values().toArray(new IResource[0]));
-        } catch (de.fu_berlin.inf.dpp.exceptions.OperationCanceledException e) {
-            LocalCancellationException canceled = new LocalCancellationException(
-                null, CancelOption.DO_NOT_NOTIFY_PEER);
-            canceled.initCause(e);
-            throw canceled;
-        }
+    LOG.debug(this + " : receiving archive");
 
-        LOG.debug(String.format("unpacked archive in %d s",
-            (System.currentTimeMillis() - startTime) / 1000));
+    IncomingFileTransfer transfer = archiveTransferListener.getRequest().accept();
 
-        // TODO: now add the checksums into the cache
+    File archiveFile = File.createTempFile("saros_archive_" + System.currentTimeMillis(), null);
+
+    boolean transferFailed = true;
+
+    try {
+      transfer.recieveFile(archiveFile);
+
+      monitorFileTransfer(transfer, monitor);
+      transferFailed = false;
+    } catch (XMPPException e) {
+      throw new IOException(e.getMessage(), e.getCause());
+    } finally {
+      if (transferFailed && !archiveFile.delete()) {
+        LOG.warn("Could not clean up archive file " + archiveFile.getAbsolutePath());
+      }
     }
 
-    private File receiveArchive(TransferListener archiveTransferListener,
-        IProgressMonitor monitor) throws IOException,
-        SarosCancellationException {
+    monitor.done();
 
-        monitor.beginTask("Receiving archive file...", 100);
-        LOG.debug("waiting for incoming archive stream request");
-
-        monitor
-            .subTask("Host is compressing project files. Waiting for the archive file...");
-
-        awaitTransferRequest();
-
-        monitor.subTask("Receiving archive file...");
-
-        LOG.debug(this + " : receiving archive");
-
-        IncomingFileTransfer transfer = archiveTransferListener.getRequest()
-            .accept();
-
-        File archiveFile = File.createTempFile(
-            "saros_archive_" + System.currentTimeMillis(), null);
-
-        boolean transferFailed = true;
-
-        try {
-            transfer.recieveFile(archiveFile);
-
-            monitorFileTransfer(transfer, monitor);
-            transferFailed = false;
-        } catch (XMPPException e) {
-            throw new IOException(e.getMessage(), e.getCause());
-        } finally {
-            if (transferFailed && !archiveFile.delete()) {
-                LOG.warn("Could not clean up archive file "
-                    + archiveFile.getAbsolutePath());
-            }
-        }
-
-        monitor.done();
-
-        LOG.debug(this + " : stored archive in file "
-            + archiveFile.getAbsolutePath() + ", size: "
+    LOG.debug(
+        this
+            + " : stored archive in file "
+            + archiveFile.getAbsolutePath()
+            + ", size: "
             + CoreUtils.formatByte(archiveFile.length()));
 
-        return archiveFile;
-    }
-
+    return archiveFile;
+  }
 }

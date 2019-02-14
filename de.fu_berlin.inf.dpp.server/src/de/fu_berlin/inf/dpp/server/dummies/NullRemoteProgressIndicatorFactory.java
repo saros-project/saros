@@ -6,18 +6,15 @@ import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
- * An implementation of {@link IRemoteProgressIndicatorFactory} which returns
- * {@link NullRemoteProgressIndicator} instances.
+ * An implementation of {@link IRemoteProgressIndicatorFactory} which returns {@link
+ * NullRemoteProgressIndicator} instances.
  */
-public class NullRemoteProgressIndicatorFactory implements
-    IRemoteProgressIndicatorFactory {
+public class NullRemoteProgressIndicatorFactory implements IRemoteProgressIndicatorFactory {
 
-    @Override
-    public IRemoteProgressIndicator create(
-        RemoteProgressManager remoteProgressManager, String remoteProgressID,
-        User remoteUser) {
+  @Override
+  public IRemoteProgressIndicator create(
+      RemoteProgressManager remoteProgressManager, String remoteProgressID, User remoteUser) {
 
-        return new NullRemoteProgressIndicator(remoteProgressID, remoteUser);
-    }
-
+    return new NullRemoteProgressIndicator(remoteProgressID, remoteUser);
+  }
 }
