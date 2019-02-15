@@ -1,5 +1,7 @@
 package saros.intellij.eventhandler.filesystem;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
@@ -23,8 +25,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.picocontainer.annotations.Inject;
-import saros.SarosPluginContext;
+import org.picocontainer.Startable;
 import saros.activities.EditorActivity;
 import saros.activities.FileActivity;
 import saros.activities.FileActivity.Type;
@@ -40,33 +41,32 @@ import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.DisableableHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.intellij.project.SharedResourcesManager;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
+import saros.observables.FileReplacementInProgressObservable;
+import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.User;
 
 /**
- * Uses a VirtualFileListener to generate and dispatch FileActivities for shared files. Activities
- * are dispatched using {@link SharedResourcesManager#fireActivity(IActivity)}.
+ * Uses a VirtualFileListener to generate and dispatch FileActivities for shared files.
  *
  * <p>The listener is enabled by default when the session context is created.
  *
  * @see VirtualFileListener
  */
-// TODO decouple from SharedResourceManager and add to session context instead
-public class LocalFilesystemModificationHandler implements DisableableHandler {
+public class LocalFilesystemModificationHandler extends AbstractActivityProducer
+    implements DisableableHandler, Startable {
 
   private static final Logger LOG = Logger.getLogger(LocalFilesystemModificationHandler.class);
 
   private final EditorManager editorManager;
-  private final SharedResourcesManager resourceManager;
   private final ISarosSession session;
   private final LocalFileSystem localFileSystem;
-
-  @Inject private ProjectAPI projectAPI;
-  @Inject private AnnotationManager annotationManager;
-  @Inject private Project project;
-  @Inject private LocalEditorHandler localEditorHandler;
+  private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
+  private final ProjectAPI projectAPI;
+  private final AnnotationManager annotationManager;
+  private final Project project;
+  private final LocalEditorHandler localEditorHandler;
 
   private boolean enabled;
 
@@ -103,22 +103,45 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
         }
       };
 
+  @Override
+  public void start() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> session.addActivityProducer(LocalFilesystemModificationHandler.this),
+            ModalityState.defaultModalityState());
+  }
+
+  @Override
+  public void stop() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> session.removeActivityProducer(LocalFilesystemModificationHandler.this),
+            ModalityState.defaultModalityState());
+  }
+
   /**
    * Instantiates a LocalFilesystemModificationHandler object. The handler, including the held
    * filesystem listener, is enabled by default.
    *
-   * @param resourceManager the ResourceManager instance
-   * @param editorManager the EditorManager instance
-   * @param session the current SarosSession instance
+   * @see #start()
+   * @see #stop()
    */
   public LocalFilesystemModificationHandler(
-      SharedResourcesManager resourceManager, EditorManager editorManager, ISarosSession session) {
+      EditorManager editorManager,
+      ISarosSession session,
+      FileReplacementInProgressObservable fileReplacementInProgressObservable,
+      ProjectAPI projectAPI,
+      AnnotationManager annotationManager,
+      Project project,
+      LocalEditorHandler localEditorHandler) {
 
-    this.resourceManager = resourceManager;
     this.editorManager = editorManager;
     this.session = session;
-
-    SarosPluginContext.initComponent(this);
+    this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
+    this.projectAPI = projectAPI;
+    this.annotationManager = annotationManager;
+    this.project = project;
+    this.localEditorHandler = localEditorHandler;
 
     this.enabled = true;
 
@@ -248,7 +271,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       editorManager.openEditor(path, false);
     }
 
-    fireActivity(activity);
+    dispatchActivity(activity);
   }
 
   /**
@@ -296,7 +319,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
         new FileActivity(
             user, Type.CREATED, FileActivity.Purpose.ACTIVITY, copyPath, null, content, charset);
 
-    fireActivity(activity);
+    dispatchActivity(activity);
   }
 
   /**
@@ -346,7 +369,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       annotationManager.removeAnnotations(path.getFile());
     }
 
-    fireActivity(activity);
+    dispatchActivity(activity);
 
     // TODO reset the vector time for the deleted file or contained files if folder
   }
@@ -507,7 +530,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
             IActivity newFolderCreatedActivity = new FolderCreatedActivity(user, newFolderPath);
 
-            fireActivity(newFolderCreatedActivity);
+            dispatchActivity(newFolderCreatedActivity);
           }
 
           if (oldPathIsShared) {
@@ -532,7 +555,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
     VfsUtilCore.iterateChildrenRecursively(oldFile, virtualFileFilter, contentIterator);
 
     while (!queuedDeletionActivities.isEmpty()) {
-      fireActivity(queuedDeletionActivities.pop());
+      dispatchActivity(queuedDeletionActivities.pop());
     }
   }
 
@@ -680,14 +703,14 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       return;
     }
 
-    fireActivity(activity);
+    dispatchActivity(activity);
 
     if (oldPathIsShared) {
       if (fileIsOpen) {
         EditorActivity closeOldEditorActivity =
             new EditorActivity(user, EditorActivity.Type.CLOSED, oldFilePath);
 
-        fireActivity(closeOldEditorActivity);
+        dispatchActivity(closeOldEditorActivity);
       }
 
       // TODO reset the vector time for the old file
@@ -702,7 +725,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       EditorActivity openNewEditorActivity =
           new EditorActivity(user, EditorActivity.Type.ACTIVATED, newFilePath);
 
-      fireActivity(openNewEditorActivity);
+      dispatchActivity(openNewEditorActivity);
     }
   }
 
@@ -842,16 +865,25 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
   }
 
   /**
-   * Dispatches the given activity.
+   * Dispatches the given activity. Drops the activity instead if there is currently a file
+   * replacement in progress.
    *
    * @param activity the activity to fire
-   * @see SharedResourcesManager#internalFireActivity(IActivity)
+   * @see FileReplacementInProgressObservable
    */
-  private void fireActivity(@NotNull IActivity activity) {
+  private void dispatchActivity(@NotNull IActivity activity) {
+    // HACK for now
+    if (fileReplacementInProgressObservable.isReplacementInProgress()) {
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("File replacement in progress - Ignoring local activity " + activity);
+      }
+
+      return;
+    }
 
     LOG.debug("Dispatching resource activity " + activity);
 
-    resourceManager.internalFireActivity(activity);
+    fireActivity(activity);
   }
 
   /**
