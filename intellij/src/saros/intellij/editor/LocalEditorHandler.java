@@ -27,23 +27,11 @@ public class LocalEditorHandler {
 
   private EditorManager manager;
 
-  public LocalEditorHandler(ProjectAPI projectAPI) {
+  public LocalEditorHandler(ProjectAPI projectAPI, EditorManager editorManager) {
 
     this.projectAPI = projectAPI;
-  }
-
-  /**
-   * Initializes all fields that require an EditorManager. It has to be called after the constructor
-   * and before the object is used, otherwise it will not work.
-   *
-   * <p>The reason for this late initialization is that this way the LocalEditorHandler can be
-   * instantiated by the PicoContainer, otherwise there would be a cyclic dependency.
-   *
-   * @param editorManager - an EditorManager
-   */
-  public void initialize(EditorManager editorManager) {
-    this.editorPool = editorManager.getEditorPool();
     this.manager = editorManager;
+    this.editorPool = manager.getEditorPool();
   }
 
   /**
