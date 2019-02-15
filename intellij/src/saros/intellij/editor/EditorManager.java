@@ -419,7 +419,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         public void sessionStarted(ISarosSession newSarosSession) {
           getSessionContextComponents(newSarosSession);
 
-          startSession(newSarosSession);
+          startSession();
         }
 
         @Override
@@ -439,6 +439,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
          * @param sarosSession the session to read from
          */
         private void getSessionContextComponents(ISarosSession sarosSession) {
+
+          session = sarosSession;
+
+          userEditorStateManager = session.getComponent(UserEditorStateManager.class);
+
           localEditorHandler = sarosSession.getComponent(LocalEditorHandler.class);
           localEditorManipulator = sarosSession.getComponent(LocalEditorManipulator.class);
 
@@ -462,6 +467,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         /** Drops all held components that were read from the session context. */
         private void dropHeldSessionContextComponents() {
+
+          session = null;
+
+          userEditorStateManager = null;
+
           localEditorHandler = null;
           localEditorManipulator = null;
 
@@ -478,10 +488,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           localViewPortChangeHandler = null;
         }
 
-        private void startSession(ISarosSession newSarosSession) {
+        /** Initializes all local components for the new session. */
+        private void startSession() {
           assert editorPool.getEditors().isEmpty() : "EditorPool was not correctly reset!";
 
-          session = newSarosSession;
           session.getStopManager().addBlockable(stopManagerListener);
 
           hasWriteAccess = session.hasWriteAccess();
@@ -492,7 +502,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           setLocalDocumentModificationHandlersEnabled(true);
 
-          userEditorStateManager = session.getComponent(UserEditorStateManager.class);
           remoteWriteAccessManager = new RemoteWriteAccessManager(session);
 
           // TODO: Test, whether this leads to problems because it is not called
@@ -500,6 +509,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           LocalFileSystem.getInstance().refresh(true);
         }
 
+        /** Resets all local components for the session. */
         private void endSession() {
           annotationManager.removeAllAnnotations();
 
@@ -514,9 +524,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           setLocalDocumentModificationHandlersEnabled(false);
 
-          session = null;
-
-          userEditorStateManager = null;
           remoteWriteAccessManager.dispose();
           remoteWriteAccessManager = null;
         }
@@ -527,14 +534,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private final ProjectAPI projectAPI;
   private final EditorAPI editorAPI;
 
-  private final EditorPool editorPool = new EditorPool();
-
-  private final SharedEditorListenerDispatch editorListenerDispatch =
-      new SharedEditorListenerDispatch();
+  /* Session Components */
   private UserEditorStateManager userEditorStateManager;
-  private RemoteWriteAccessManager remoteWriteAccessManager;
   private ISarosSession session;
-
   private LocalEditorHandler localEditorHandler;
   private LocalEditorManipulator localEditorManipulator;
 
@@ -551,6 +553,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
   // viewport changes
   private LocalViewPortChangeHandler localViewPortChangeHandler;
+
+  /* Session state */
+  private final EditorPool editorPool = new EditorPool();
+
+  private final SharedEditorListenerDispatch editorListenerDispatch =
+      new SharedEditorListenerDispatch();
+
+  private RemoteWriteAccessManager remoteWriteAccessManager;
 
   private boolean hasWriteAccess;
   // FIXME why is this never assigned? Either assign or remove flag
