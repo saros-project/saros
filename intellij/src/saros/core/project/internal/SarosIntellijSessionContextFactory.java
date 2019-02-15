@@ -1,6 +1,7 @@
 package saros.core.project.internal;
 
 import org.picocontainer.MutablePicoContainer;
+import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
 import saros.intellij.followmode.FollowModeNotificationDispatcher;
 import saros.intellij.project.SharedResourcesManager;
 import saros.intellij.project.filesystem.ModuleInitialization;
@@ -19,6 +20,9 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
       container.addComponent(ModuleInitialization.class);
     }
     container.addComponent(SharedResourcesManager.class);
+
+    // Intellij resource event handlers
+    container.addComponent(LocalFilesystemModificationHandler.class);
 
     // User notifications
     container.addComponent(FollowModeNotificationDispatcher.class);
