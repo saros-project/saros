@@ -40,16 +40,17 @@ public class LocalEditorManipulator {
   private EditorManager manager;
 
   public LocalEditorManipulator(
-      ProjectAPI projectAPI, EditorAPI editorAPI, AnnotationManager annotationManager) {
+      ProjectAPI projectAPI,
+      EditorAPI editorAPI,
+      AnnotationManager annotationManager,
+      EditorManager editorManager) {
+
     this.projectAPI = projectAPI;
     this.editorAPI = editorAPI;
     this.annotationManager = annotationManager;
-  }
+    this.manager = editorManager;
 
-  /** Initializes all fields that require an EditorManager. */
-  void initialize(EditorManager editorManager) {
-    editorPool = editorManager.getEditorPool();
-    manager = editorManager;
+    this.editorPool = manager.getEditorPool();
   }
 
   /**

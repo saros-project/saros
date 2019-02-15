@@ -9,8 +9,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.util.messages.MessageBus;
-import com.intellij.util.messages.MessageBusConnection;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -47,18 +45,7 @@ public class AbstractContextTest {
     mockStaticGetInstance(PropertiesComponent.class, null);
     mockStaticGetInstance(ModuleTypeManager.class, null);
 
-    // mock IntelliJ message bus used to listen for editor activities
-    MessageBusConnection messageBusConnection = EasyMock.createNiceMock(MessageBusConnection.class);
-
-    EasyMock.replay(messageBusConnection);
-
-    MessageBus messageBus = EasyMock.createNiceMock(MessageBus.class);
-    EasyMock.expect(messageBus.connect()).andReturn(messageBusConnection).anyTimes();
-
-    EasyMock.replay(messageBus);
-
     project = EasyMock.createNiceMock(Project.class);
-    EasyMock.expect(project.getMessageBus()).andReturn(messageBus).anyTimes();
 
     EasyMock.replay(project);
 

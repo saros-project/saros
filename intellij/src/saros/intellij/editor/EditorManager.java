@@ -6,7 +6,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -418,6 +417,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
+          getSessionContextComponents(newSarosSession);
+
           startSession(newSarosSession);
         }
 
@@ -428,6 +429,53 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.getStopManager().removeBlockable(stopManagerListener); // todo
 
           executeInUIThreadSynchronous(this::endSession);
+
+          dropHeldSessionContextComponents();
+        }
+
+        /**
+         * Reads the needed components from the session context.
+         *
+         * @param sarosSession the session to read from
+         */
+        private void getSessionContextComponents(ISarosSession sarosSession) {
+          localEditorHandler = sarosSession.getComponent(LocalEditorHandler.class);
+          localEditorManipulator = sarosSession.getComponent(LocalEditorManipulator.class);
+
+          localDocumentModificationHandler =
+              sarosSession.getComponent(LocalDocumentModificationHandler.class);
+          localClosedEditorModificationHandler =
+              sarosSession.getComponent(LocalClosedEditorModificationHandler.class);
+
+          annotationUpdater = sarosSession.getComponent(AnnotationUpdater.class);
+          editorStatusChangeActivityDispatcher =
+              sarosSession.getComponent(EditorStatusChangeActivityDispatcher.class);
+          preexistingSelectionDispatcher =
+              sarosSession.getComponent(PreexistingSelectionDispatcher.class);
+          viewportAdjustmentExecutor = sarosSession.getComponent(ViewportAdjustmentExecutor.class);
+
+          localTextSelectionChangeHandler =
+              sarosSession.getComponent(LocalTextSelectionChangeHandler.class);
+
+          localViewPortChangeHandler = sarosSession.getComponent(LocalViewPortChangeHandler.class);
+        }
+
+        /** Drops all held components that were read from the session context. */
+        private void dropHeldSessionContextComponents() {
+          localEditorHandler = null;
+          localEditorManipulator = null;
+
+          localDocumentModificationHandler = null;
+          localClosedEditorModificationHandler = null;
+
+          annotationUpdater = null;
+          editorStatusChangeActivityDispatcher = null;
+          preexistingSelectionDispatcher = null;
+          viewportAdjustmentExecutor = null;
+
+          localTextSelectionChangeHandler = null;
+
+          localViewPortChangeHandler = null;
         }
 
         private void startSession(ISarosSession newSarosSession) {
@@ -474,8 +522,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
       };
 
-  private final LocalEditorHandler localEditorHandler;
-  private final LocalEditorManipulator localEditorManipulator;
   private final AnnotationManager annotationManager;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
   private final ProjectAPI projectAPI;
@@ -489,22 +535,22 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private RemoteWriteAccessManager remoteWriteAccessManager;
   private ISarosSession session;
 
+  private LocalEditorHandler localEditorHandler;
+  private LocalEditorManipulator localEditorManipulator;
+
   /* Event handlers */
   // document changes
-  private final LocalDocumentModificationHandler localDocumentModificationHandler;
-  private final LocalClosedEditorModificationHandler localClosedEditorModificationHandler;
-
+  private LocalDocumentModificationHandler localDocumentModificationHandler;
+  private LocalClosedEditorModificationHandler localClosedEditorModificationHandler;
   // editor state changes
-  private final AnnotationUpdater annotationUpdater;
-  private final EditorStatusChangeActivityDispatcher editorStatusChangeActivityDispatcher;
-  private final PreexistingSelectionDispatcher preexistingSelectionDispatcher;
-  private final ViewportAdjustmentExecutor viewportAdjustmentExecutor;
-
+  private AnnotationUpdater annotationUpdater;
+  private EditorStatusChangeActivityDispatcher editorStatusChangeActivityDispatcher;
+  private PreexistingSelectionDispatcher preexistingSelectionDispatcher;
+  private ViewportAdjustmentExecutor viewportAdjustmentExecutor;
   // text selection changes
-  private final LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
-
+  private LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
   // viewport changes
-  private final LocalViewPortChangeHandler localViewPortChangeHandler;
+  private LocalViewPortChangeHandler localViewPortChangeHandler;
 
   private boolean hasWriteAccess;
   // FIXME why is this never assigned? Either assign or remove flag
@@ -512,39 +558,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   public EditorManager(
       ISarosSessionManager sessionManager,
-      LocalEditorHandler localEditorHandler,
-      LocalEditorManipulator localEditorManipulator,
       ProjectAPI projectAPI,
       AnnotationManager annotationManager,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
-      Project project,
       EditorAPI editorAPI) {
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-    this.localEditorHandler = localEditorHandler;
-    this.localEditorManipulator = localEditorManipulator;
     this.annotationManager = annotationManager;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.editorAPI = editorAPI;
-
-    localDocumentModificationHandler = new LocalDocumentModificationHandler(this);
-    localClosedEditorModificationHandler =
-        new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
-
-    annotationUpdater = new AnnotationUpdater(project, annotationManager, localEditorHandler);
-    editorStatusChangeActivityDispatcher =
-        new EditorStatusChangeActivityDispatcher(project, localEditorHandler);
-    preexistingSelectionDispatcher =
-        new PreexistingSelectionDispatcher(project, this, localEditorHandler);
-    viewportAdjustmentExecutor =
-        new ViewportAdjustmentExecutor(project, projectAPI, localEditorManipulator);
-
-    localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
-
-    localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
-
-    localEditorHandler.initialize(this);
-    localEditorManipulator.initialize(this);
 
     this.projectAPI = projectAPI;
   }
