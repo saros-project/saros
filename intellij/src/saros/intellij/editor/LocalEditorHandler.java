@@ -10,7 +10,7 @@ import saros.activities.SPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.intellij.session.SessionUtils;
+import saros.session.ISarosSession;
 
 /**
  * Class for handling activities on local editors and transforming them to calls to {@link
@@ -21,16 +21,19 @@ public class LocalEditorHandler {
   private static final Logger LOG = Logger.getLogger(LocalEditorHandler.class);
 
   private final ProjectAPI projectAPI;
+  private final EditorManager manager;
+  private final ISarosSession sarosSession;
 
   /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
-  private EditorPool editorPool;
+  private final EditorPool editorPool;
 
-  private EditorManager manager;
-
-  public LocalEditorHandler(ProjectAPI projectAPI, EditorManager editorManager) {
+  public LocalEditorHandler(
+      ProjectAPI projectAPI, EditorManager editorManager, ISarosSession sarosSession) {
 
     this.projectAPI = projectAPI;
     this.manager = editorManager;
+    this.sarosSession = sarosSession;
+
     this.editorPool = manager.getEditorPool();
   }
 
@@ -54,7 +57,7 @@ public class LocalEditorHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(virtualFile);
 
-    if (path == null || !SessionUtils.isShared(path)) {
+    if (path == null || !sarosSession.isShared(path.getResource())) {
       LOG.debug(
           "Ignored open editor request for file "
               + virtualFile
@@ -84,7 +87,7 @@ public class LocalEditorHandler {
 
     IResource resource = VirtualFileConverter.convertToResource(virtualFile, project);
 
-    if (resource == null || !SessionUtils.isShared(resource)) {
+    if (resource == null || !sarosSession.isShared(resource)) {
       LOG.debug(
           "Could not open Editor for file "
               + virtualFile
@@ -121,7 +124,7 @@ public class LocalEditorHandler {
 
       return null;
 
-    } else if (!SessionUtils.isShared(path)) {
+    } else if (!sarosSession.isShared(path.getResource())) {
       LOG.debug("Ignored open editor request for file " + virtualFile + " as it is not shared");
 
       return null;
@@ -145,7 +148,7 @@ public class LocalEditorHandler {
   public void closeEditor(@NotNull VirtualFile virtualFile) {
     SPath path = VirtualFileConverter.convertToSPath(virtualFile);
 
-    if (path != null && SessionUtils.isShared(path)) {
+    if (path != null && sarosSession.isShared(path.getResource())) {
       editorPool.removeEditor(path);
       manager.generateEditorClosed(path);
     }
@@ -212,7 +215,7 @@ public class LocalEditorHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(file);
 
-    if (path != null && SessionUtils.isShared(path)) {
+    if (path != null && sarosSession.isShared(path.getResource())) {
       manager.generateEditorActivated(path);
     }
   }

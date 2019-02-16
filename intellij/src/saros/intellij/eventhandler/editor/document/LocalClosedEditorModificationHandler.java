@@ -9,6 +9,7 @@ import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
+import saros.session.ISarosSession;
 
 /**
  * Tracks modifications of Documents and adjusts the local annotations accordingly if the document
@@ -29,9 +30,12 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
       };
 
   public LocalClosedEditorModificationHandler(
-      EditorManager editorManager, ProjectAPI projectAPI, AnnotationManager annotationManager) {
+      EditorManager editorManager,
+      ISarosSession sarosSession,
+      ProjectAPI projectAPI,
+      AnnotationManager annotationManager) {
 
-    super(editorManager);
+    super(editorManager, sarosSession);
 
     this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
