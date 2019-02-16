@@ -447,6 +447,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           localEditorHandler = sarosSession.getComponent(LocalEditorHandler.class);
           localEditorManipulator = sarosSession.getComponent(LocalEditorManipulator.class);
 
+          annotationManager = sarosSession.getComponent(AnnotationManager.class);
+
           localDocumentModificationHandler =
               sarosSession.getComponent(LocalDocumentModificationHandler.class);
           localClosedEditorModificationHandler =
@@ -474,6 +476,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           localEditorHandler = null;
           localEditorManipulator = null;
+
+          annotationManager = null;
 
           localDocumentModificationHandler = null;
           localClosedEditorModificationHandler = null;
@@ -511,8 +515,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         /** Resets all local components for the session. */
         private void endSession() {
-          annotationManager.removeAllAnnotations();
-
           // This sets all editors, that were set to read only, writeable
           // again
           unlockAllEditors();
@@ -529,7 +531,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
       };
 
-  private final AnnotationManager annotationManager;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
   private final ProjectAPI projectAPI;
   private final EditorAPI editorAPI;
@@ -539,6 +540,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private ISarosSession session;
   private LocalEditorHandler localEditorHandler;
   private LocalEditorManipulator localEditorManipulator;
+  private AnnotationManager annotationManager;
 
   /* Event handlers */
   // document changes
@@ -569,12 +571,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public EditorManager(
       ISarosSessionManager sessionManager,
       ProjectAPI projectAPI,
-      AnnotationManager annotationManager,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       EditorAPI editorAPI) {
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-    this.annotationManager = annotationManager;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.editorAPI = editorAPI;
 

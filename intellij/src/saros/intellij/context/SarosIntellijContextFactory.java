@@ -23,7 +23,6 @@ import saros.filesystem.NullChecksumCache;
 import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.ProjectAPI;
-import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.negotiation.hooks.ModuleTypeNegotiationHook;
 import saros.intellij.preferences.IntelliJPreferences;
 import saros.intellij.preferences.PropertiesComponentAdapter;
@@ -59,9 +58,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
       Component.create(ProjectAPI.class),
       Component.create(IEditorManager.class, EditorManager.class),
       Component.create(ISarosSessionContextFactory.class, SarosIntellijSessionContextFactory.class),
-
-      // Annotation utility to create, remove, and manage annotations
-      Component.create(AnnotationManager.class),
 
       // UI handlers
       Component.create(NegotiationHandler.class),
