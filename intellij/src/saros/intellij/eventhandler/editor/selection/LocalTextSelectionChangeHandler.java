@@ -1,6 +1,6 @@
 package saros.intellij.eventhandler.editor.selection;
 
-import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.editor.event.SelectionListener;
 import org.jetbrains.annotations.NotNull;
@@ -25,9 +25,8 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
   private boolean enabled;
 
   /**
-   * Instantiates a LocalTextSelectionChangeHandler object. The handler is enabled by default. The
-   * contained listener is disabled by default and has to be enabled separately for every editor
-   * using {@link #register(Editor)}.
+   * Instantiates a LocalTextSelectionChangeHandler object. The handler is enabled by default and
+   * the contained listener is registered by default.
    *
    * @param editorManager the EditorManager instance
    */
@@ -50,27 +49,19 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
   /**
    * Calls {@link EditorManager#generateSelection(SPath, SelectionEvent)}.
    *
+   * <p>This method relies on the EditorPool to filter editor events.
+   *
    * @param event the event to react to
    * @see SelectionListener#selectionChanged(SelectionEvent)
    */
   private void generateSelectionActivity(@NotNull SelectionEvent event) {
-    if (!enabled) {
-      return;
-    }
+    assert enabled : "the selection changed listener was triggered while it was disabled";
 
     SPath path = editorManager.getFileForOpenEditor(event.getEditor().getDocument());
+
     if (path != null) {
       editorManager.generateSelection(path, event);
     }
-  }
-
-  /**
-   * Registers the contained SelectionListener to the given editor.
-   *
-   * @param editor the editor to register
-   */
-  public void register(@NotNull Editor editor) {
-    editor.getSelectionModel().addSelectionListener(selectionListener);
   }
 
   /**
@@ -80,6 +71,15 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
    */
   @Override
   public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
+    if (this.enabled && !enabled) {
+      EditorFactory.getInstance().getEventMulticaster().removeSelectionListener(selectionListener);
+
+      this.enabled = false;
+
+    } else if (!this.enabled && enabled) {
+      EditorFactory.getInstance().getEventMulticaster().addSelectionListener(selectionListener);
+
+      this.enabled = true;
+    }
   }
 }
