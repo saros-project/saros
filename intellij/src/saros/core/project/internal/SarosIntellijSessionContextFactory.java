@@ -3,6 +3,7 @@ package saros.core.project.internal;
 import org.picocontainer.MutablePicoContainer;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
+import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import saros.intellij.eventhandler.editor.editorstate.AnnotationUpdater;
@@ -27,6 +28,9 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
     // Editor interaction
     container.addComponent(LocalEditorHandler.class);
     container.addComponent(LocalEditorManipulator.class);
+
+    // Annotation utility to create, remove, and manage annotations
+    container.addComponent(AnnotationManager.class);
 
     // Other
     if (!session.isHost()) {
