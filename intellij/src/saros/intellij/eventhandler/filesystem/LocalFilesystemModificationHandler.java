@@ -69,6 +69,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private final LocalEditorHandler localEditorHandler;
 
   private boolean enabled;
+  private boolean disposed;
 
   private final VirtualFileListener virtualFileListener =
       new VirtualFileListener() {
@@ -120,6 +121,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
             () -> session.removeActivityProducer(LocalFilesystemModificationHandler.this),
             ModalityState.defaultModalityState());
 
+    disposed = true;
     setEnabled(false);
   }
 
@@ -148,6 +150,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     this.localEditorHandler = localEditorHandler;
 
     this.enabled = false;
+    this.disposed = false;
 
     this.localFileSystem = LocalFileSystem.getInstance();
   }
@@ -886,6 +889,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    */
   @Override
   public void setEnabled(boolean enabled) {
+    assert !disposed || !enabled : "disposed handlers must not be enabled";
+
     if (this.enabled && !enabled) {
       LOG.trace("Disabling filesystem listener");
 
