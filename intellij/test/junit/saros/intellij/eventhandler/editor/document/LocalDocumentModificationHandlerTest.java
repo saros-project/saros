@@ -28,7 +28,8 @@ public class LocalDocumentModificationHandlerTest {
   @Before
   public void before() {
     mockEditorFactory();
-    localDocumentModificationHandler = new LocalDocumentModificationHandler(dummyEditorManager());
+    localDocumentModificationHandler =
+        new LocalDocumentModificationHandler(dummyEditorManager(), null);
     listening = false;
   }
 

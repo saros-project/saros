@@ -11,7 +11,7 @@ import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.intellij.session.SessionUtils;
+import saros.session.ISarosSession;
 
 /** Parent class containing utility methods when working with document listeners. */
 public abstract class AbstractLocalDocumentModificationHandler implements DisableableHandler {
@@ -20,6 +20,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
 
   protected final EditorManager editorManager;
+  private final ISarosSession sarosSession;
 
   private boolean enabled;
 
@@ -30,8 +31,11 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
    *
    * @param editorManager the EditorManager instance
    */
-  AbstractLocalDocumentModificationHandler(EditorManager editorManager) {
+  AbstractLocalDocumentModificationHandler(
+      EditorManager editorManager, ISarosSession sarosSession) {
+
     this.editorManager = editorManager;
+    this.sarosSession = sarosSession;
 
     this.enabled = false;
   }
@@ -102,7 +106,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
 
     path = VirtualFileConverter.convertToSPath(virtualFile);
 
-    if (path == null || !SessionUtils.isShared(path)) {
+    if (path == null || !sarosSession.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring Event for document " + document + " - document is not shared");
       }
