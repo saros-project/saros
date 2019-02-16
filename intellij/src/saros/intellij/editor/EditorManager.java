@@ -42,7 +42,6 @@ import saros.intellij.eventhandler.editor.editorstate.AnnotationUpdater;
 import saros.intellij.eventhandler.editor.editorstate.EditorStatusChangeActivityDispatcher;
 import saros.intellij.eventhandler.editor.editorstate.PreexistingSelectionDispatcher;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
-import saros.intellij.eventhandler.editor.selection.LocalTextSelectionChangeHandler;
 import saros.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.VirtualFileConverter;
@@ -461,9 +460,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
               sarosSession.getComponent(PreexistingSelectionDispatcher.class);
           viewportAdjustmentExecutor = sarosSession.getComponent(ViewportAdjustmentExecutor.class);
 
-          localTextSelectionChangeHandler =
-              sarosSession.getComponent(LocalTextSelectionChangeHandler.class);
-
           localViewPortChangeHandler = sarosSession.getComponent(LocalViewPortChangeHandler.class);
         }
 
@@ -486,8 +482,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           editorStatusChangeActivityDispatcher = null;
           preexistingSelectionDispatcher = null;
           viewportAdjustmentExecutor = null;
-
-          localTextSelectionChangeHandler = null;
 
           localViewPortChangeHandler = null;
         }
@@ -551,8 +545,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private EditorStatusChangeActivityDispatcher editorStatusChangeActivityDispatcher;
   private PreexistingSelectionDispatcher preexistingSelectionDispatcher;
   private ViewportAdjustmentExecutor viewportAdjustmentExecutor;
-  // text selection changes
-  private LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
   // viewport changes
   private LocalViewPortChangeHandler localViewPortChangeHandler;
 
@@ -870,37 +862,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Enables or disabled all text selection change handlers. This is not done by disabling the
-   * underlying listeners.
-   *
-   * @param enabled <code>true</code> to enable the handlers, <code>false</code> disable the
-   *     handlers
-   * @see LocalTextSelectionChangeHandler#setEnabled(boolean)
-   */
-  private void setLocalTextSelectionChangeHandlersEnabled(boolean enabled) {
-    localTextSelectionChangeHandler.setEnabled(enabled);
-  }
-
-  /**
-   * Updates the state of all held editor event handlers to match the given state.
-   *
-   * <p>Enables all listeners when <code> true</code> is passed and disables all listeners if <code>
-   * false</code> is passed.
-   *
-   * @param enable the state to set the handlers to
-   * @see #setLocalDocumentModificationHandlersEnabled(boolean)
-   * @see #setLocalEditorStatusChangeHandlersEnabled(boolean)
-   * @see #setLocalTextSelectionChangeHandlersEnabled(boolean)
-   * @see #setLocalViewPortChangeHandlersEnabled(boolean)
-   */
-  private void setHandlersEnabled(boolean enable) {
-    setLocalDocumentModificationHandlersEnabled(enable);
-    setLocalEditorStatusChangeHandlersEnabled(enable);
-    setLocalTextSelectionChangeHandlersEnabled(enable);
-    setLocalViewPortChangeHandlersEnabled(enable);
-  }
-
-  /**
    * Sets the editor's document writable and adds LocalTextSelectionChangeHandler,
    * LocalViewPortChangeHandler and the localDocumentModificationHandler.
    */
@@ -910,13 +871,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   /** Unlocks all editors in the editorPool. */
   private void unlockAllEditors() {
-    setHandlersEnabled(true);
     editorPool.unlockAllDocuments();
   }
 
   /** Locks all open editors, by setting them to read-only. */
   private void lockAllEditors() {
-    setHandlersEnabled(false);
     editorPool.lockAllDocuments();
   }
 
