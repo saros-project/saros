@@ -1,6 +1,7 @@
 package saros.intellij.eventhandler.editor.viewport;
 
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.VisibleAreaEvent;
 import com.intellij.openapi.editor.event.VisibleAreaListener;
@@ -28,9 +29,8 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
   private boolean enabled;
 
   /**
-   * Instantiates a LocalViewPortChangeHandler object. The handler is enabled by default. The
-   * contained listener is disabled by default and has to be enabled separately for every editor
-   * using {@link #register(Editor)}.
+   * Instantiates a LocalViewPortChangeHandler object. The handler is enabled by default and the
+   * contained listener is registered by default.
    *
    * @param editorManager the EditorManager instance
    */
@@ -58,14 +58,14 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
    * <p>Calls {@link EditorManager#generateViewport(SPath, LineRange)} to create and dispatch the
    * activity.
    *
+   * <p>This method relies on the EditorPool to filter editor events.
+   *
    * @param event the event to react to
    * @see VisibleAreaListener#visibleAreaChanged(VisibleAreaEvent)
    * @see LogicalPosition
    */
   private void generateViewportActivity(@NotNull VisibleAreaEvent event) {
-    if (!enabled) {
-      return;
-    }
+    assert enabled : "the visible area listener was triggered while it was disabled";
 
     Editor editor = event.getEditor();
     Rectangle newVisibleRectangle = event.getNewRectangle();
@@ -107,21 +107,23 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
   }
 
   /**
-   * Registers the contained VisibleAreaListener to the given editor.
-   *
-   * @param editor the editor to register
-   */
-  public void register(@NotNull Editor editor) {
-    editor.getScrollingModel().addVisibleAreaListener(visibleAreaListener);
-  }
-
-  /**
    * Enables or disabled the handler. This is not done by disabling the underlying listener.
    *
    * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
    */
   @Override
   public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
+    if (this.enabled && !enabled) {
+      EditorFactory.getInstance()
+          .getEventMulticaster()
+          .removeVisibleAreaListener(visibleAreaListener);
+
+      this.enabled = false;
+
+    } else if (!this.enabled && enabled) {
+      EditorFactory.getInstance().getEventMulticaster().addVisibleAreaListener(visibleAreaListener);
+
+      this.enabled = true;
+    }
   }
 }
