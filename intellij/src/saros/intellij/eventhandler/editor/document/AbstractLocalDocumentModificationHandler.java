@@ -7,6 +7,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.picocontainer.Startable;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
@@ -14,7 +15,8 @@ import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
 /** Parent class containing utility methods when working with document listeners. */
-public abstract class AbstractLocalDocumentModificationHandler implements DisableableHandler {
+public abstract class AbstractLocalDocumentModificationHandler
+    implements DisableableHandler, Startable {
 
   private static final Logger LOG =
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
@@ -38,6 +40,16 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
     this.sarosSession = sarosSession;
 
     this.enabled = false;
+  }
+
+  @Override
+  public void start() {
+    setEnabled(true);
+  }
+
+  @Override
+  public void stop() {
+    setEnabled(false);
   }
 
   /**

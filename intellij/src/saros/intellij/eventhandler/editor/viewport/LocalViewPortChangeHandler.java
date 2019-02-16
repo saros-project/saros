@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.Rectangle;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.picocontainer.Startable;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
 import saros.intellij.editor.EditorAPI;
@@ -16,7 +17,7 @@ import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
 
 /** Dispatches activities for viewport changes. */
-public class LocalViewPortChangeHandler implements DisableableHandler {
+public class LocalViewPortChangeHandler implements DisableableHandler, Startable {
   private static final Logger log = Logger.getLogger(LocalViewPortChangeHandler.class);
 
   private final EditorManager editorManager;
@@ -37,7 +38,17 @@ public class LocalViewPortChangeHandler implements DisableableHandler {
     this.editorManager = editorManager;
     this.editorAPI = editorAPI;
 
-    this.enabled = true;
+    this.enabled = false;
+  }
+
+  @Override
+  public void start() {
+    setEnabled(true);
+  }
+
+  @Override
+  public void stop() {
+    setEnabled(false);
   }
 
   /**

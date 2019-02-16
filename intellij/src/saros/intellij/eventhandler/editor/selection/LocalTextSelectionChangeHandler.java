@@ -4,12 +4,13 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.editor.event.SelectionListener;
 import org.jetbrains.annotations.NotNull;
+import org.picocontainer.Startable;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
 
 /** Dispatches activities for selection changes. */
-public class LocalTextSelectionChangeHandler implements DisableableHandler {
+public class LocalTextSelectionChangeHandler implements DisableableHandler, Startable {
 
   private final EditorManager editorManager;
 
@@ -33,7 +34,17 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler {
   public LocalTextSelectionChangeHandler(EditorManager editorManager) {
     this.editorManager = editorManager;
 
-    this.enabled = true;
+    this.enabled = false;
+  }
+
+  @Override
+  public void start() {
+    setEnabled(true);
+  }
+
+  @Override
+  public void stop() {
+    setEnabled(false);
   }
 
   /**

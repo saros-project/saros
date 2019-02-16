@@ -109,6 +109,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         .invokeAndWait(
             () -> session.addActivityProducer(LocalFilesystemModificationHandler.this),
             ModalityState.defaultModalityState());
+
+    setEnabled(true);
   }
 
   @Override
@@ -117,6 +119,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         .invokeAndWait(
             () -> session.removeActivityProducer(LocalFilesystemModificationHandler.this),
             ModalityState.defaultModalityState());
+
+    setEnabled(false);
   }
 
   /**
@@ -143,24 +147,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     this.project = project;
     this.localEditorHandler = localEditorHandler;
 
-    this.enabled = true;
+    this.enabled = false;
 
     this.localFileSystem = LocalFileSystem.getInstance();
-
-    String projectBasePath = project.getBasePath();
-    if (projectBasePath == null) {
-      LOG.error(
-          "Could not register the VirtualFileListener as the current project does not have a base "
-              + "path. Saros will not be able to react to local filesystem changes. project: "
-              + project);
-
-      return;
-    }
-
-    // FIXME listen to all relevant roots; currently assuming all roots are located in project root
-    localFileSystem.addRootToWatch(projectBasePath, true);
-
-    localFileSystem.addVirtualFileListener(virtualFileListener);
   }
 
   /**
