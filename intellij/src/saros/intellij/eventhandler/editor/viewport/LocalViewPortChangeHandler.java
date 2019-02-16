@@ -27,6 +27,7 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
   private final VisibleAreaListener visibleAreaListener = this::generateViewportActivity;
 
   private boolean enabled;
+  private boolean disposed;
 
   /**
    * Instantiates a LocalViewPortChangeHandler object. The handler is enabled by default and the
@@ -39,6 +40,7 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
     this.editorAPI = editorAPI;
 
     this.enabled = false;
+    this.disposed = false;
   }
 
   @Override
@@ -48,6 +50,7 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
 
   @Override
   public void stop() {
+    disposed = true;
     setEnabled(false);
   }
 
@@ -107,12 +110,14 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
   }
 
   /**
-   * Enables or disabled the handler. This is not done by disabling the underlying listener.
+   * Enables or disables the handler. This is not done by disabling the underlying listener.
    *
    * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
    */
   @Override
   public void setEnabled(boolean enabled) {
+    assert !disposed || !enabled : "disposed listeners must not be enabled";
+
     if (this.enabled && !enabled) {
       EditorFactory.getInstance()
           .getEventMulticaster()

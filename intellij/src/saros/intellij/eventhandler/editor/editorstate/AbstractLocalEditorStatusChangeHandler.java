@@ -26,6 +26,7 @@ public abstract class AbstractLocalEditorStatusChangeHandler
   private final Project project;
 
   private boolean enabled;
+  private boolean disposed;
 
   private MessageBusConnection messageBusConnection;
 
@@ -39,6 +40,7 @@ public abstract class AbstractLocalEditorStatusChangeHandler
     this.project = project;
 
     this.enabled = false;
+    this.disposed = false;
   }
 
   @Override
@@ -48,6 +50,7 @@ public abstract class AbstractLocalEditorStatusChangeHandler
 
   @Override
   public void stop() {
+    disposed = true;
     setEnabled(false);
   }
 
@@ -88,6 +91,8 @@ public abstract class AbstractLocalEditorStatusChangeHandler
    */
   @Override
   public void setEnabled(boolean enabled) {
+    assert !disposed || !enabled : "disposed listeners must not be enabled";
+
     if (this.enabled && !enabled) {
       unsubscribe();
 

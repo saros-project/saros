@@ -23,6 +23,7 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
       };
 
   private boolean enabled;
+  private boolean disposed;
 
   /**
    * Instantiates a LocalTextSelectionChangeHandler object. The handler is enabled by default and
@@ -34,6 +35,7 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
     this.editorManager = editorManager;
 
     this.enabled = false;
+    this.disposed = false;
   }
 
   @Override
@@ -43,6 +45,7 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
 
   @Override
   public void stop() {
+    disposed = true;
     setEnabled(false);
   }
 
@@ -65,12 +68,14 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
   }
 
   /**
-   * Enables or disabled the handler. This is not done by disabling the underlying listener.
+   * Enables or disables the handler. This is not done by disabling the underlying listener.
    *
    * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
    */
   @Override
   public void setEnabled(boolean enabled) {
+    assert !disposed || !enabled : "disposed listeners must not be enabled";
+
     if (this.enabled && !enabled) {
       EditorFactory.getInstance().getEventMulticaster().removeSelectionListener(selectionListener);
 

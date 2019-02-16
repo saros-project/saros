@@ -25,6 +25,7 @@ public abstract class AbstractLocalDocumentModificationHandler
   private final ISarosSession sarosSession;
 
   private boolean enabled;
+  private boolean disposed;
 
   /**
    * Sets the internal listener state flag to be disabled by default. The default state is set to
@@ -40,6 +41,7 @@ public abstract class AbstractLocalDocumentModificationHandler
     this.sarosSession = sarosSession;
 
     this.enabled = false;
+    this.disposed = false;
   }
 
   @Override
@@ -49,6 +51,7 @@ public abstract class AbstractLocalDocumentModificationHandler
 
   @Override
   public void stop() {
+    disposed = true;
     setEnabled(false);
   }
 
@@ -60,6 +63,8 @@ public abstract class AbstractLocalDocumentModificationHandler
    * @param documentListener the listener whose state to change
    */
   public void setEnabled(boolean enabled, @NotNull DocumentListener documentListener) {
+    assert !disposed || !enabled : "disposed listeners must not be enabled";
+
     if (!this.enabled && enabled) {
       LOG.debug("Started listening for document events");
 
