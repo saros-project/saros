@@ -126,9 +126,9 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
   @Test
   public void getAdapterDefault() {
-    assertSame(resource, resource.getAdapter(ExampleResource.class));
-    assertSame(resource, resource.getAdapter(IResource.class));
-    assertNull(resource.getAdapter(IFile.class));
+    assertSame(resource, resource.adaptTo(ExampleResource.class));
+    assertSame(resource, resource.adaptTo(IResource.class));
+    assertNull(resource.adaptTo(IFile.class));
   }
 
   private void createFileForResource() throws IOException {

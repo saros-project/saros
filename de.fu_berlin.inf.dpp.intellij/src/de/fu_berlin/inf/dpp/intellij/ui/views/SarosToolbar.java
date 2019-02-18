@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.intellij.ui.views;
 
 import de.fu_berlin.inf.dpp.intellij.ui.actions.NotImplementedAction;
+import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.intellij.ui.views.buttons.ConnectButton;
 import de.fu_berlin.inf.dpp.intellij.ui.views.buttons.ConsistencyButton;
 import de.fu_berlin.inf.dpp.intellij.ui.views.buttons.FollowButton;
@@ -14,16 +15,14 @@ import javax.swing.JToolBar;
  *
  * <p>FIXME: Replace by IDEA toolbar class.
  */
-public class SarosToolbar extends JToolBar {
-  public static final String ADD_CONTACT_ICON_PATH = "/icons/famfamfam/contact_add_tsk.png";
-  public static final String OPEN_REFS_ICON_PATH = "/icons/famfamfam/test_con.gif";
+class SarosToolbar extends JToolBar {
 
   private static final boolean ENABLE_ADD_CONTACT =
       Boolean.getBoolean("saros.intellij.ENABLE_ADD_CONTACT");
   private static final boolean ENABLE_PREFERENCES =
       Boolean.getBoolean("saros.intellij.ENABLE_PREFERENCES");
 
-  public SarosToolbar() {
+  SarosToolbar() {
     super("Saros IDEA toolbar");
     setLayout(new FlowLayout(FlowLayout.RIGHT));
     addToolbarButtons();
@@ -38,8 +37,7 @@ public class SarosToolbar extends JToolBar {
           new SimpleButton(
               new NotImplementedAction("addContact"),
               "Add contact to list",
-              ADD_CONTACT_ICON_PATH,
-              "addContact"));
+              IconManager.ADD_CONTACT_ICON));
     }
 
     if (ENABLE_PREFERENCES) {
@@ -47,8 +45,7 @@ public class SarosToolbar extends JToolBar {
           new SimpleButton(
               new NotImplementedAction("preferences"),
               "Open preferences",
-              OPEN_REFS_ICON_PATH,
-              "preferences"));
+              IconManager.OPEN_PREFERENCES_ICON));
     }
 
     add(new FollowButton());

@@ -102,7 +102,7 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
-  public Object getAdapter(Class<? extends IResource> clazz) {
+  public <T extends IResource> T adaptTo(Class<T> clazz) {
     return null;
   }
 }

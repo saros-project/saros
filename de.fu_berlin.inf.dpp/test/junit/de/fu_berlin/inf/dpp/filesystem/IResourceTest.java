@@ -8,7 +8,7 @@ import org.junit.Test;
 public class IResourceTest {
 
   @Test
-  public void testGetAdapter() {
+  public void testAdaptTo() {
 
     org.eclipse.core.resources.IFolder folder =
         EasyMock.createMock(org.eclipse.core.resources.IFolder.class);
@@ -24,7 +24,7 @@ public class IResourceTest {
 
     final IFolder coreFolder = new EclipseFolderImpl(folder);
 
-    final Object adapted = coreFolder.getAdapter(IFolder.class);
+    final Object adapted = coreFolder.adaptTo(IFolder.class);
 
     EasyMock.verify(folder);
 

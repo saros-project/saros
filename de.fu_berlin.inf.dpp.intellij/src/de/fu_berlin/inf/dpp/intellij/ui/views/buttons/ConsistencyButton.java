@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -32,11 +33,9 @@ import org.picocontainer.annotations.Inject;
 public class ConsistencyButton extends ToolbarButton {
   private static final Logger LOG = Logger.getLogger(ConsistencyButton.class);
 
-  private static final String IN_SYNC_ICON_PATH = "/icons/famfamfam/in_sync.png";
-  private static final String OUT_SYNC_ICON_PATH = "/icons/famfamfam/out_sync.png";
-
   private boolean previouslyInConsistentState = true;
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final ActionListener actionListener =
       new ActionListener() {
         @Override
@@ -48,45 +47,49 @@ public class ConsistencyButton extends ToolbarButton {
           setEnabledFromUIThread(false);
 
           final Set<SPath> paths =
-              new HashSet<SPath>(
-                  sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
+              new HashSet<>(sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
 
           String inconsistentFiles = createConfirmationMessage(paths);
 
-          if (!DialogUtils.showQuestion(
-              null, Messages.ConsistencyAction_confirm_dialog_title, inconsistentFiles)) {
+          boolean userConfirmedRecovery =
+              DialogUtils.showQuestion(
+                  null,
+                  Messages.ConsistencyButton_confirm_dialog_title,
+                  MessageFormat.format(
+                      Messages.ConsistencyButton_confirm_dialog_message, inconsistentFiles));
 
-            setEnabledFromUIThread(true);
-            return;
+          if (userConfirmedRecovery) {
+            sessionInconsistencyState.action.execute();
           }
 
-          sessionInconsistencyState.action.execute();
+          setEnabledFromUIThread(true);
         }
       };
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-          setSarosSession(newSarosSession);
-          setEnabledFromUIThread(true);
+          if (!newSarosSession.isHost()) {
+            setSarosSession(newSarosSession);
+          }
+
+          setToolTipText(Messages.ConsistencyButton_tooltip_no_inconsistency);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
-          setSarosSession(null);
+          if (!oldSarosSession.isHost()) {
+            setSarosSession(null);
+          }
+
           setEnabledFromUIThread(false);
+          setToolTipText(Messages.ConsistencyButton_tooltip_functionality);
         }
       };
 
-  private final ValueChangeListener<Boolean> isConsistencyListener =
-      new ValueChangeListener<Boolean>() {
-
-        @Override
-        public void setValue(Boolean newValue) {
-          handleConsistencyChange(newValue);
-        }
-      };
+  private final ValueChangeListener<Boolean> isConsistencyListener = this::handleConsistencyChange;
 
   @Inject private ISarosSessionManager sessionManager;
 
@@ -98,9 +101,9 @@ public class ConsistencyButton extends ToolbarButton {
   public ConsistencyButton() {
     super(
         ConsistencyAction.NAME,
-        "Recover inconsistencies",
-        IN_SYNC_ICON_PATH,
-        "Files are consistent");
+        Messages.ConsistencyButton_tooltip_functionality,
+        IconManager.IN_SYNC_ICON);
+
     SarosPluginContext.initComponent(this);
 
     setSarosSession(sessionManager.getSession());
@@ -128,7 +131,7 @@ public class ConsistencyButton extends ToolbarButton {
     private ConsistencyWatchdogClient watchdogClient;
 
     /** Creates an object to store the inconsistency warning state for a session. */
-    public SessionInconsistencyState(ISarosSession sarosSession) {
+    SessionInconsistencyState(ISarosSession sarosSession) {
 
       watchdogClient = sarosSession.getComponent(ConsistencyWatchdogClient.class);
 
@@ -137,20 +140,17 @@ public class ConsistencyButton extends ToolbarButton {
     }
   }
 
-  public void setInconsistent(boolean isInconsistent) {
+  private void setInconsistent(boolean isInconsistent) {
     sessionInconsistencyState.isInconsistent = isInconsistent;
 
     if (isInconsistent) {
       setEnabledFromUIThread(true);
-      /*
-       * TODO tooltip should be set using messages.properties
-       * use ConsistencyAction_tooltip_inconsistency_detected
-       * this also requires the inconsistent files
-       */
-      setIcon(OUT_SYNC_ICON_PATH, "Files are NOT consistent");
+      setButtonIcon(IconManager.OUT_OF_SYNC_ICON);
+      setToolTipText(Messages.ConsistencyButton_tooltip_inconsistency_detected);
     } else {
       setEnabledFromUIThread(false);
-      setIcon(IN_SYNC_ICON_PATH, Messages.ConsistencyAction_tooltip_no_inconsistency);
+      setButtonIcon(IconManager.IN_SYNC_ICON);
+      setToolTipText(Messages.ConsistencyButton_tooltip_no_inconsistency);
     }
   }
 
@@ -171,24 +171,21 @@ public class ConsistencyButton extends ToolbarButton {
    * displays a tooltip.
    */
   private void handleConsistencyChange(final Boolean isInconsistent) {
+    if (sessionManager.getSession() == null) {
+      return;
+    }
 
     LOG.debug("Inconsistency indicator goes: " + (isInconsistent ? "on" : "off"));
 
-    ApplicationManager.getApplication()
-        .invokeLater(
-            new Runnable() {
-              @Override
-              public void run() {
-                setInconsistent(isInconsistent);
-              }
-            });
+    ApplicationManager.getApplication().invokeLater(() -> setInconsistent(isInconsistent));
 
     if (!isInconsistent) {
       if (!previouslyInConsistentState) {
         previouslyInConsistentState = true;
 
         NotificationPanel.showInformation(
-            "No inconsistencies remaining", "Inconsistencies resolved");
+            Messages.ConsistencyButton_message_no_inconsistencies_remaining,
+            Messages.ConsistencyButton_title_no_inconsistencies_remaining);
       }
 
       return;
@@ -199,45 +196,39 @@ public class ConsistencyButton extends ToolbarButton {
     }
 
     final Set<SPath> paths =
-        new HashSet<SPath>(sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
+        new HashSet<>(sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
 
     final String files = createInconsistentPathsMessage(paths);
 
     ApplicationManager.getApplication()
         .invokeLater(
-            new Runnable() {
-              @Override
-              public void run() {
-                if (files.isEmpty()) {
-                  NotificationPanel.showWarning(
-                      Messages.ConsistencyAction_message_inconsistency_detected_no_files,
-                      Messages.ConsistencyAction_title_inconsistency_detected);
-
-                  return;
-                }
-
+            () -> {
+              if (files.isEmpty()) {
                 NotificationPanel.showWarning(
-                    MessageFormat.format(
-                        Messages.ConsistencyAction_message_inconsistency_detected, files),
-                    Messages.ConsistencyAction_title_inconsistency_detected);
+                    Messages.ConsistencyButton_message_inconsistency_detected_no_files,
+                    Messages.ConsistencyButton_title_inconsistency_detected);
+
+                return;
               }
+
+              NotificationPanel.showWarning(
+                  MessageFormat.format(
+                      Messages.ConsistencyButton_message_inconsistency_detected, files),
+                  Messages.ConsistencyButton_title_inconsistency_detected);
             });
   }
 
   private String createConfirmationMessage(Set<SPath> paths) {
     StringBuilder sbInconsistentFiles = new StringBuilder();
+
     for (SPath path : paths) {
-      sbInconsistentFiles.append("project: ");
+      sbInconsistentFiles.append("module: ");
       sbInconsistentFiles.append(path.getProject().getName());
       sbInconsistentFiles.append(", file: ");
       sbInconsistentFiles.append(path.getProjectRelativePath().toOSString());
       sbInconsistentFiles.append("\n");
     }
 
-    sbInconsistentFiles.append(
-        "Please confirm project modifications.\n\n"
-            + "                + The recovery process will perform changes to files and folders of the current shared project(s).\n\n"
-            + "                + The affected files and folders may be either modified, created, or deleted.");
     return sbInconsistentFiles.toString();
   }
 

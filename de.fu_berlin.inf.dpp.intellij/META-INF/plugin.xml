@@ -1,23 +1,27 @@
-<idea-plugin version="2">
-    <id>de.fu_berlin.inf.dpp.intellij</id>
+<idea-plugin>
+
     <name>Saros</name>
-    <version>0.1.0</version>
-    <vendor url="http://www.saros-project.org">Saros Project</vendor>
 
-    <description><![CDATA[
-      This is the brand new IntelliJ version of Saros.
-      ]]></description>
+    <id>saros</id>
 
-    <change-notes><![CDATA[
-      We just started, so don't expect too much functionality yet.
-      ]]>
+    <description>
+        Saros is an Open Source IDE plugin for distributed collaborative software development.
+    </description>
+
+    <change-notes>
+        This is the first alpha version of Saros for IntelliJ. Use at your own risk.
     </change-notes>
 
-    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="107.105"/>
+    <version>0.1.0</version>
 
-    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-         on how to target different products -->
+    <vendor url="http://www.saros-project.org" email="saros-devel@googlegroups.com">
+        Saros Project
+    </vendor>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="173.4674.33"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
     <!-- uncomment to enable plugin in all products
     <depends>com.intellij.modules.lang</depends>
     -->

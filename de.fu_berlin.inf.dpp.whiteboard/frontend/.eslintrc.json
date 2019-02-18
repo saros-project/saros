@@ -10,7 +10,7 @@
   ],
   "parserOptions": {
     "ecmaFeatures": {
-      "experimentalObjectRestSpread": true,
+      "ecmaVersion": 6,
       "jsx": true
     },
     "sourceType": "module"
