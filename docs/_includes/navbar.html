@@ -1,10 +1,11 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark" >
-  <div class="container w-50">
-    <a href="{{ '/' | absolute_url }}">
-    <div class="logo">
+<nav class="border rounded navbar fixed-top navbar-expand-lg navbar-light bg-light py-1" >
+
+    <div class="navbar-header pr-5">
+      <a class="logo" href="{{ '/' | absolute_url }}">
         <img src="{{ '/assets/images/logo/saros-logo-100x100.png' | relative_url }}"/>
-    </div></a>
-    <a class="navbar-brand" href="{{ '/' | absolute_url }}">{{ site.title }}<small>{{ site.subtitle }}</small></a>
+        <span>{{ site.title }}</span>
+      </a>
+    </div>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
@@ -20,5 +21,21 @@
         {% endfor %}
       </ul>
     </div>
-  </div>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ site.contact.gitter.channel-link }}"><i class="fab fa-gitter"></i></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ site.contact.twitter.user-link }}"><i class="fab fa-twitter"></i></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ site.contact.github.project-link }}"><i class="fab fa-github"></i></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ site.contact.google-groups.user-group-link }}"><i class="fas fa-envelope"></i></a>
+        </li>
+      </ul>
+    </div>
 </nav>

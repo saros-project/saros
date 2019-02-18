@@ -2,9 +2,6 @@
 title: Screenshots
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
 Let's gather some impressions of Saros.
 
 ![Saros

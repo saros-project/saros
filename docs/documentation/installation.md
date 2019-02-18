@@ -2,11 +2,6 @@
 title: Install Saros for Eclipse
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
-{% include toc.html %}
-
 ## Prerequisites
 
 *   Saros requires **Java SE 6** or higher

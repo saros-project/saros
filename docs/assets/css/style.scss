@@ -15,25 +15,9 @@ body {
 }
 
 footer {
-  position: absolute;
+  width: 95%;
   bottom: 0;
-  width: 100%;
-  height: 60px; /* Set the fixed height of the footer here */
-  line-height: 60px; /* Vertically center the text there */
-}
-
-.active a {
-  color: black;
-}
-
-a:hover {
-  color: #0056b3;
-}
-
-a {
-  text-decoration: none;
-  color: #0F79D0;
-  text-shadow: none;
+  position: absolute;
 }
 
 ul {
@@ -82,16 +66,21 @@ h6 {
   font-size: 16px;
 }
 
-.small-container {
-  max-width: 640px;
-}
-
 .jumbotron-index {
   text-align: center;
   background: #fff;
 }
 
+.no-underline {
+  text-decoration: none !important;
+}
+
 /* GitHub banner*/
+.fixed-top {
+  /* Avoid that the forkme banner is covered by the navbar*/
+  z-index: 1;
+}
+
 .forkme_banner {
   display: block;
   position: absolute;
@@ -115,7 +104,7 @@ h6 {
 .logo span {
   color: #222222;
   text-decoration: none;
-  font-size: 40px;
+  font-size: 30px;
   font-weight: 700;
   padding-left: 10px;
 
@@ -123,69 +112,76 @@ h6 {
 
 .logo img {
   float: left;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-style: none;
   box-shadow: none;
-}
-
-.logo a {
-  text-decoration: none;
-}
-
-.navbar {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.bg-dark {
-  background: #212121;
-  background: -moz-linear-gradient(top, #373737, #212121);
-  background: -webkit-linear-gradient(top, #373737, #212121);
-  background: -ms-linear-gradient(top, #373737, #212121);
-  background: -o-linear-gradient(top, #373737, #212121);
-  background: linear-gradient(to top, #373737, #212121);
 }
 
 .bg-blue {
   background: rgba(0, 144, 255, 0.2)
 }
 
-.navbar-brand small {
-  display:block;
-  font-size:12px;
-}
-
-/* footer */
-#copyright {
-  color: #949494;
-  float: left;
-}
-
-#impressum {
-  text-decoration: none;
-  float: right;
-}
-
 /* sidebar */
 
-.sidenav {
-  position: relative;
-  height: 100%;
-  float:left;
-  padding-top: 20px;
+.collapsable-side-item:before {
+   font-family: "Font Awesome 5 Free";
+   content: "\f078";
+   float:right;
+   margin-right: 6px;
 }
 
-.sidenav ul {
+.toc-bar {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .toc-bar {
+    display: block !important;
+  }
+}
+
+.main-content, .sidenav, .toc-bar {
+  top: 40px;
+}
+
+.sidenav, .toc-bar {
+  position: -webkit-sticky;
+  position: sticky;
+  padding-top: 30px;
+}
+
+.sidenav ul, .toc-bar ul {
   list-style-type: none;
 }
 
 .sidenav a {
-  padding: 6px 8px 6px 16px;
+  display: block;
+  color: #343a40;
+}
+
+.sidenav a:hover {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.active-sidelink {
+  color: #007bff !important;
+}
+
+.toc-bar ul {
+  padding-left: 10px;
+}
+
+.toc-bar a {
   text-decoration: none;
   display: block;
 }
 
-.sidenav a:hover {
-  color: #212121;
+.toc-bar a {
+  color: #6c757d;
+}
+
+.toc-bar a:hover {
+  color: #007bff;
 }

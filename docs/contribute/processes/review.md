@@ -2,11 +2,6 @@
 title: Review Process
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
-{% include toc.html %}
-
 ## Review rules at a glance
 
 Make sure that your change:
@@ -145,9 +140,9 @@ are nice to have during the reviewing process, but not necessary in the whole hi
 ##### Rebase and merge
 This method rebases the branch which should be merged into the master branch and subsequently merges the change
 into the master branch. This has the effect that the history of the branches is linearized before merging and a merge commit
-becomes superfluous. 
+becomes superfluous.
 
-Use this method if you want to preserve the commit history. But make sure that **all of your commits in the pull requests comply with our guidelines for commit messages!**. 
+Use this method if you want to preserve the commit history. But make sure that **all of your commits in the pull requests comply with our guidelines for commit messages!**.
 
 ## How to perform a review
 

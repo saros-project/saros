@@ -2,13 +2,8 @@
 title: Documentation writing
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
-{% include toc.html %}
-
 The whole documentation is hosted by [GitHub Pages](https://pages.github.com/) and the corresponding markdown sources are
-located in the `docs` directory of the [Saros main repository](https://github.com/saros-project/saros). Therefore the 
+located in the `docs` directory of the [Saros main repository](https://github.com/saros-project/saros). Therefore the
 process of the documentation modification is the same as the common [development process](processes/development.md).
 
 ## Guidelines
@@ -36,14 +31,14 @@ In order to remove the corresponding container simply execute `docker stop jekyl
 * Install bundler:
   * Execute:`gem install bundler`
 * Install jekyll and its dependencies
-  * Change dir to this directory (`<repository_dir>/docs`) 
+  * Change dir to this directory (`<repository_dir>/docs`)
   * Execute `bundle install`
 
 See [here](https://help.github.com/articles/setting-up-your-github-pages-site-locally-with-jekyll) for more information.
 
 #### Compile and show documentation
 
-* Move into this directory (`<repository_dir>/docs`) 
+* Move into this directory (`<repository_dir>/docs`)
 * Execute `bundle exec jekyll serve`
   * This command spawns a webserver on port 4000
 * Open you browser and open `localhost:4000`

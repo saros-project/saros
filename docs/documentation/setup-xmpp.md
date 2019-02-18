@@ -2,9 +2,6 @@
 title: Setup Own XMPP Server
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
 If you are an experienced user or if you want to use Saros in your
 company and you want to use another XMPP Server or set up your own with
 Openfire, you will find information below.

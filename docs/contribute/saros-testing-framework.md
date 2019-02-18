@@ -2,11 +2,6 @@
 title: Saros Testing Framework (STF)
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
-{% include toc.html %}
-
 For further information about STF take a look at the [STF User Manual](https://saros-build.imp.fu-berlin.de/stf/STF_Manual.pdf).
 This document is not up-to-date, but still contains useful information about the STF.
 

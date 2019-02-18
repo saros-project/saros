@@ -2,11 +2,6 @@
 title: Coding and Commit Guidelines
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
-{% include toc.html %}
-
 ## Git
 
 ### Configuration
@@ -34,7 +29,7 @@ title: Coding and Commit Guidelines
     line to make it easier for people to understand what your commit was
     about:
 
-|Tag|Includes|Description 
+|Tag|Includes|Description
 |----------|----------|-----------------------------------
 |`[NOP]`|          | This commit did not have any effect and only concerns whitespace, removing unused methods, fixing documentation typos, etc.
 |`[TASK]`  | `[NOP]` | Adds things that need to be done.
@@ -113,8 +108,8 @@ is not acceptable to make a member part of a package's API
 *   For methods: By default, don't make them final, unless you have good
     reason not to. After all, we want to use
     object-oriented programming.
-    
-    
+
+
 #### Classes and Interfaces
 
 *   Take your time, look at the environment of your code and think. When
@@ -139,25 +134,25 @@ is not acceptable to make a member part of a package's API
     much less readable and makes you more likely to forget unregistering
     your listener.
     *   Anonymous inner-classes assigned to fields are much better:
-    
+
 Instead of:
-        
+
 ```
-public class A implements B, C, D { 
+public class A implements B, C, D {
   ...
 }
 ```
 you should write:
 ```
 public class A implements D {
-  ... 
- 
+  ...
+
   B b = new B(){
     ...
   };
- 
+
   C c = new C(){
-    ... 
+    ...
   };
 
   ...
@@ -169,11 +164,11 @@ Test whether you can return from a method instead of testing whether
 you should execute a block of code.
 
 Instead of:
-    
+
 ```
     public void foo(){
       //some code
-      
+
       if (condition){
         // long block of code
       }
@@ -181,14 +176,14 @@ Instead of:
 ```
 
 you should write:
-        
+
 ```
     public void foo(){
       //some code
-      
+
       if (!condition)
         return;
-        
+
       // long block of code
     }
 ```
@@ -203,13 +198,13 @@ level of block-nesting.
     unless the method specifies that it allows incorrect or null input.
 *   If a parameter may be `null `or is checked add a `@param`-JavaDoc
     that indicates this.
-    
+
 
 ```
         /**
          * Get positions of slashes in the filename.
          * @param filename may be null
-         * @return Null-based indices into the string 
+         * @return Null-based indices into the string
                    pointing to the slash positions.
          */
 

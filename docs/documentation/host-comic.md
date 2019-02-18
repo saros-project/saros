@@ -1,9 +1,7 @@
 ---
 title: A graphical introduction to the Saros Host concept.
+toc: false
 ---
-
-# {{ page.title }}
-{:.no_toc}
 
 ![](images/comics/6-1_host-comic_frame-1_sm.jpg)
 

@@ -2,15 +2,10 @@
 title: Frequently asked questions about the Saros project
 ---
 
-# {{ page.title }}
-{:.no_toc}
-
 This page lists common questions about Saros. If your question is not
 answered here you should look aroud the
 [Support](../support/) area. There you will
 find more information that may help you.
-
-{% include toc.html %}
 
 ## General
 

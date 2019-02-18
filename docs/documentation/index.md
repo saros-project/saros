@@ -1,11 +1,7 @@
 ---
 title: Saros Documentation
+toc: false
 ---
-
-# {{ page.title }}
-{:.no-toc}
-
-{% include toc.html %}
 
 ## What is Saros? What is it not?
 
