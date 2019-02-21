@@ -2,6 +2,7 @@ package saros.core.project.internal;
 
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
+import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
@@ -28,6 +29,7 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
     // Editor interaction
     container.addComponent(LocalEditorHandler.class);
     container.addComponent(LocalEditorManipulator.class);
+    container.addComponent(SelectedEditorStateSnapshotFactory.class);
 
     // Annotation utility to create, remove, and manage annotations
     container.addComponent(AnnotationManager.class);

@@ -380,8 +380,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private void addProjectResources(IProject project) {
     VirtualFile[] openFiles = projectAPI.getOpenFiles();
 
-    SelectedEditorStateSnapshot selectedEditorStateSnapshot = new SelectedEditorStateSnapshot();
-    selectedEditorStateSnapshot.captureState();
+    SelectedEditorStateSnapshot selectedEditorStateSnapshot =
+        selectedEditorStateSnapshotFactory.capturedState();
 
     try {
       setLocalEditorStatusChangeHandlersEnabled(false);
@@ -437,6 +437,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           annotationManager = sarosSession.getComponent(AnnotationManager.class);
 
+          selectedEditorStateSnapshotFactory =
+              sarosSession.getComponent(SelectedEditorStateSnapshotFactory.class);
+
           localDocumentModificationHandler =
               sarosSession.getComponent(LocalDocumentModificationHandler.class);
           localClosedEditorModificationHandler =
@@ -463,6 +466,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           localEditorManipulator = null;
 
           annotationManager = null;
+
+          selectedEditorStateSnapshotFactory = null;
 
           localDocumentModificationHandler = null;
           localClosedEditorModificationHandler = null;
@@ -519,6 +524,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private LocalEditorHandler localEditorHandler;
   private LocalEditorManipulator localEditorManipulator;
   private AnnotationManager annotationManager;
+  private SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory;
 
   /* Event handlers */
   // document changes
@@ -551,7 +557,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.editorAPI = editorAPI;
-
     this.projectAPI = projectAPI;
   }
 
