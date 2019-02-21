@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.ListIterator;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import saros.SarosPluginContext;
 import saros.filesystem.IFile;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Class used to capture and re-apply which editors are currently selected by the user. */
 // TODO consider duplicated open editors during screen splitting
@@ -19,42 +17,31 @@ public class SelectedEditorStateSnapshot {
 
   private final List<VirtualFile> selectedEditors;
 
-  private boolean hasCapturedState;
+  private final ProjectAPI projectAPI;
+  private final EditorManager editorManager;
 
-  @Inject private static ProjectAPI projectAPI;
+  /**
+   * Initializes the object and captures the current selected editor state.
+   *
+   * @param projectAPI the ProjectAPI object
+   * @param editorManager the EditorManager object
+   */
+  SelectedEditorStateSnapshot(ProjectAPI projectAPI, EditorManager editorManager) {
+    this.projectAPI = projectAPI;
+    this.editorManager = editorManager;
 
-  @Inject private static EditorManager editorManager;
-
-  static {
-    SarosPluginContext.initComponent(new SelectedEditorStateSnapshot());
-  }
-
-  public SelectedEditorStateSnapshot() {
     this.selectedEditors = new ArrayList<>();
-    this.hasCapturedState = false;
+
+    captureState();
   }
 
   /** Captures the local selected editor state. */
-  public void captureState() {
-    if (hasCapturedState) {
-      log.warn("Overwriting existing captured selected editor state.");
-
-      selectedEditors.clear();
-    }
-
+  private void captureState() {
     selectedEditors.addAll(Arrays.asList(projectAPI.getSelectedFiles()));
-
-    hasCapturedState = true;
   }
 
   /** Applies the captured selected editor state to the local IDE. */
   public void applyHeldState() {
-    if (!hasCapturedState) {
-      log.warn("Trying to applying state before capturing a local state to" + "re-apply.");
-
-      return;
-    }
-
     ListIterator<VirtualFile> iterator = selectedEditors.listIterator(selectedEditors.size());
 
     try {
@@ -79,18 +66,6 @@ public class SelectedEditorStateSnapshot {
    *     old file
    */
   public void replaceSelectedFile(@NotNull VirtualFile oldFile, @NotNull VirtualFile newFile) {
-
-    if (!hasCapturedState) {
-      log.warn(
-          "Trying to replace file in state before capturing a local "
-              + "state. old file: "
-              + oldFile
-              + ", new file: "
-              + newFile);
-
-      return;
-    }
-
     int index = selectedEditors.indexOf(oldFile);
 
     if (index != -1) {
@@ -117,7 +92,6 @@ public class SelectedEditorStateSnapshot {
    *     VirtualFile
    */
   public void replaceSelectedFile(@NotNull IFile oldFile, @NotNull IFile newFile) {
-
     VirtualFile oldVirtualFile = VirtualFileConverter.convertToVirtualFile(oldFile);
 
     VirtualFile newVirtualFile = VirtualFileConverter.convertToVirtualFile(newFile);

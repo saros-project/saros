@@ -18,6 +18,7 @@ import saros.filesystem.IFolder;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.SelectedEditorStateSnapshot;
+import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
 import saros.repackaged.picocontainer.Startable;
@@ -36,14 +37,11 @@ public class SharedResourcesManager implements Startable {
   private static final boolean LOCAL = false;
 
   private final ISarosSession sarosSession;
-
   private final LocalFilesystemModificationHandler localFilesystemModificationHandler;
-
   private final LocalEditorHandler localEditorHandler;
-
   private final LocalEditorManipulator localEditorManipulator;
-
   private final AnnotationManager annotationManager;
+  private final SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory;
 
   @Override
   public void start() {
@@ -66,13 +64,15 @@ public class SharedResourcesManager implements Startable {
       LocalEditorHandler localEditorHandler,
       LocalEditorManipulator localEditorManipulator,
       AnnotationManager annotationManager,
-      LocalFilesystemModificationHandler localFilesystemModificationHandler) {
+      LocalFilesystemModificationHandler localFilesystemModificationHandler,
+      SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory) {
 
     this.sarosSession = sarosSession;
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
     this.annotationManager = annotationManager;
     this.localFilesystemModificationHandler = localFilesystemModificationHandler;
+    this.selectedEditorStateSnapshotFactory = selectedEditorStateSnapshotFactory;
   }
 
   private final IActivityConsumer consumer =
@@ -210,8 +210,7 @@ public class SharedResourcesManager implements Startable {
     SelectedEditorStateSnapshot selectedEditorStateSnapshot = null;
 
     if (fileOpen) {
-      selectedEditorStateSnapshot = new SelectedEditorStateSnapshot();
-      selectedEditorStateSnapshot.captureState();
+      selectedEditorStateSnapshot = selectedEditorStateSnapshotFactory.capturedState();
     }
 
     localEditorManipulator.closeEditor(oldPath);
