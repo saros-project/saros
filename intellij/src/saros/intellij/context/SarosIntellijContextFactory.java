@@ -18,7 +18,6 @@ import saros.filesystem.IPathFactory;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRoot;
 import saros.filesystem.NullChecksumCache;
-import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.negotiation.hooks.ModuleTypeNegotiationHook;
@@ -54,7 +53,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
     return new Component[] {
       // Core Managers
 
-      Component.create(EditorAPI.class),
       Component.create(ProjectAPI.class),
       Component.create(IEditorManager.class, EditorManager.class),
       Component.create(ISarosSessionContextFactory.class, SarosIntellijSessionContextFactory.class),
