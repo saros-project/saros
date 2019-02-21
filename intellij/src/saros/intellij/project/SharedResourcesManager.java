@@ -17,7 +17,7 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
-import saros.intellij.editor.SelectedEditorState;
+import saros.intellij.editor.SelectedEditorStateSnapshot;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
 import saros.repackaged.picocontainer.Startable;
@@ -207,11 +207,11 @@ public class SharedResourcesManager implements Startable {
 
     boolean fileOpen = localEditorHandler.isOpenEditor(oldPath);
 
-    SelectedEditorState selectedEditorState = null;
+    SelectedEditorStateSnapshot selectedEditorStateSnapshot = null;
 
     if (fileOpen) {
-      selectedEditorState = new SelectedEditorState();
-      selectedEditorState.captureState();
+      selectedEditorStateSnapshot = new SelectedEditorStateSnapshot();
+      selectedEditorStateSnapshot.captureState();
     }
 
     localEditorManipulator.closeEditor(oldPath);
@@ -229,12 +229,12 @@ public class SharedResourcesManager implements Startable {
         localEditorManipulator.openEditor(newPath, false);
 
         try {
-          selectedEditorState.replaceSelectedFile(oldFile, newFile);
+          selectedEditorStateSnapshot.replaceSelectedFile(oldFile, newFile);
         } catch (IllegalStateException e) {
           LOG.warn("Failed to update the captured selected editor state", e);
         }
 
-        selectedEditorState.applyCapturedState();
+        selectedEditorStateSnapshot.applyHeldState();
       }
 
       oldFile.delete(DELETION_FLAGS);

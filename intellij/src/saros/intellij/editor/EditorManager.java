@@ -380,8 +380,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private void addProjectResources(IProject project) {
     VirtualFile[] openFiles = projectAPI.getOpenFiles();
 
-    SelectedEditorState selectedEditorState = new SelectedEditorState();
-    selectedEditorState.captureState();
+    SelectedEditorStateSnapshot selectedEditorStateSnapshot = new SelectedEditorStateSnapshot();
+    selectedEditorStateSnapshot.captureState();
 
     try {
       setLocalEditorStatusChangeHandlersEnabled(false);
@@ -396,7 +396,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalEditorStatusChangeHandlersEnabled(true);
     }
 
-    selectedEditorState.applyCapturedState();
+    selectedEditorStateSnapshot.applyHeldState();
   }
 
   @SuppressWarnings("FieldCanBeLocal")
