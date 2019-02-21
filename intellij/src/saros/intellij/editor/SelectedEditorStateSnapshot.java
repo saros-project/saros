@@ -14,8 +14,8 @@ import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Class used to capture and re-apply which editors are currently selected by the user. */
 // TODO consider duplicated open editors during screen splitting
-public class SelectedEditorState {
-  private static final Logger log = Logger.getLogger(SelectedEditorState.class);
+public class SelectedEditorStateSnapshot {
+  private static final Logger log = Logger.getLogger(SelectedEditorStateSnapshot.class);
 
   private final List<VirtualFile> selectedEditors;
 
@@ -26,10 +26,10 @@ public class SelectedEditorState {
   @Inject private static EditorManager editorManager;
 
   static {
-    SarosPluginContext.initComponent(new SelectedEditorState());
+    SarosPluginContext.initComponent(new SelectedEditorStateSnapshot());
   }
 
-  public SelectedEditorState() {
+  public SelectedEditorStateSnapshot() {
     this.selectedEditors = new ArrayList<>();
     this.hasCapturedState = false;
   }
@@ -48,7 +48,7 @@ public class SelectedEditorState {
   }
 
   /** Applies the captured selected editor state to the local IDE. */
-  public void applyCapturedState() {
+  public void applyHeldState() {
     if (!hasCapturedState) {
       log.warn("Trying to applying state before capturing a local state to" + "re-apply.");
 
