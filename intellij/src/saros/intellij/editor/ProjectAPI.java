@@ -2,7 +2,6 @@ package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
@@ -11,8 +10,6 @@ import saros.intellij.filesystem.Filesystem;
 
 /** Wrapper for interacting with the project-level Intellij editor API. */
 public class ProjectAPI {
-  private FileDocumentManager fileDocumentManager;
-
   private Project project;
   private FileEditorManager editorFileManager;
 
@@ -20,7 +17,6 @@ public class ProjectAPI {
     this.project = project;
 
     this.editorFileManager = FileEditorManager.getInstance(project);
-    this.fileDocumentManager = FileDocumentManager.getInstance();
   }
 
   /**
@@ -40,7 +36,7 @@ public class ProjectAPI {
    * @return Returns whether there is an open editor for the given document.
    */
   public boolean isOpen(Document document) {
-    VirtualFile file = fileDocumentManager.getFile(document);
+    VirtualFile file = DocumentAPI.getVirtualFile(document);
 
     return isOpen(file);
   }

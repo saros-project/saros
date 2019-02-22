@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -306,8 +305,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             @NotNull Editor editor,
             @NotNull Set<String> visibleFilePaths) {
 
-          VirtualFile fileForEditor =
-              FileDocumentManager.getInstance().getFile(editor.getDocument());
+          VirtualFile fileForEditor = DocumentAPI.getVirtualFile(editor.getDocument());
 
           if (fileForEditor == null) {
             LOG.warn(

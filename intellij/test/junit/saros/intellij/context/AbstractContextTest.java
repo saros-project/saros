@@ -4,7 +4,6 @@ import static saros.intellij.test.IntellijMocker.mockStaticGetInstance;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.openapi.project.Project;
@@ -21,7 +20,6 @@ import saros.test.mocks.ContextMocker;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
   CommandProcessor.class,
-  FileDocumentManager.class,
   FileEditorManager.class,
   LocalFileSystem.class,
   PropertiesComponent.class,
@@ -39,7 +37,6 @@ public class AbstractContextTest {
 
     // mock IntelliJ dependencies
     mockStaticGetInstance(CommandProcessor.class, null);
-    mockStaticGetInstance(FileDocumentManager.class, null);
     mockStaticGetInstance(FileEditorManager.class, Project.class);
     mockStaticGetInstance(LocalFileSystem.class, null);
     mockStaticGetInstance(PropertiesComponent.class, null);

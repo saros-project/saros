@@ -37,6 +37,18 @@ public class DocumentAPI {
   }
 
   /**
+   * Returns the VirtualFile for the given document.
+   *
+   * @param document the Document whose VirtualFile to get
+   * @return the VirtualFile for the given document or <code>null</code> if the document was not
+   *     created from a VirtualFile
+   */
+  @Nullable
+  public static VirtualFile getVirtualFile(@NotNull final Document document) {
+    return fileDocumentManager.getFile(document);
+  }
+
+  /**
    * Saves the given document in the UI thread.
    *
    * @param document the document to save.
