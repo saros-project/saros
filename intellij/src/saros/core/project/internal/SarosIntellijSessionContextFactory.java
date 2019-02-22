@@ -3,6 +3,7 @@ package saros.core.project.internal;
 import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
+import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
@@ -28,6 +29,9 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
 
   @Override
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {
+    // Project interaction
+    container.addComponent(ProjectAPI.class);
+
     // Editor interaction
     container.addComponent(EditorAPI.class);
     container.addComponent(LocalEditorHandler.class);
