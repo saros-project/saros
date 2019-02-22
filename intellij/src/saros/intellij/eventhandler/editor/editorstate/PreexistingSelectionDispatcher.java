@@ -27,6 +27,7 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
   private final EditorManager editorManager;
   private final LocalEditorHandler localEditorHandler;
   private final ISarosSession sarosSession;
+  private final VirtualFileConverter virtualFileConverter;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -42,13 +43,15 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
       Project project,
       EditorManager editorManager,
       LocalEditorHandler localEditorHandler,
-      ISarosSession sarosSession) {
+      ISarosSession sarosSession,
+      VirtualFileConverter virtualFileConverter) {
 
     super(project);
 
     this.editorManager = editorManager;
     this.localEditorHandler = localEditorHandler;
     this.sarosSession = sarosSession;
+    this.virtualFileConverter = virtualFileConverter;
 
     setEnabled(true);
   }
@@ -63,7 +66,7 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
   private void sendExistingSelection(@NotNull VirtualFile virtualFile) {
     Editor editor = localEditorHandler.openEditor(virtualFile, false);
 
-    SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
+    SPath sPath = virtualFileConverter.convertToSPath(virtualFile);
 
     if (sPath != null && sarosSession.isShared(sPath.getResource()) && editor != null) {
       editorManager.sendExistingSelection(sPath, editor);

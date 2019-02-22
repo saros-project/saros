@@ -9,6 +9,7 @@ import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
+import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
 /**
@@ -31,11 +32,12 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
 
   public LocalClosedEditorModificationHandler(
       EditorManager editorManager,
+      VirtualFileConverter virtualFileConverter,
       ISarosSession sarosSession,
       ProjectAPI projectAPI,
       AnnotationManager annotationManager) {
 
-    super(editorManager, sarosSession);
+    super(editorManager, sarosSession, virtualFileConverter);
 
     this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
