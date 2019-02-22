@@ -582,7 +582,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return null;
           }
 
-          Document doc = projectAPI.getDocument(virtualFile);
+          Document doc = DocumentAPI.getDocument(virtualFile);
 
           return (doc != null) ? doc.getText() : null;
         });
