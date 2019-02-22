@@ -22,7 +22,9 @@ public abstract class AbstractLocalDocumentModificationHandler
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
 
   protected final EditorManager editorManager;
+
   private final ISarosSession sarosSession;
+  private final VirtualFileConverter virtualFileConverter;
 
   private boolean enabled;
   private boolean disposed;
@@ -35,10 +37,14 @@ public abstract class AbstractLocalDocumentModificationHandler
    * @param editorManager the EditorManager instance
    */
   AbstractLocalDocumentModificationHandler(
-      EditorManager editorManager, ISarosSession sarosSession) {
+      EditorManager editorManager,
+      ISarosSession sarosSession,
+      VirtualFileConverter virtualFileConverter) {
 
     this.editorManager = editorManager;
+
     this.sarosSession = sarosSession;
+    this.virtualFileConverter = virtualFileConverter;
 
     this.enabled = false;
     this.disposed = false;
@@ -121,7 +127,7 @@ public abstract class AbstractLocalDocumentModificationHandler
       return null;
     }
 
-    path = VirtualFileConverter.convertToSPath(virtualFile);
+    path = virtualFileConverter.convertToSPath(virtualFile);
 
     if (path == null || !sarosSession.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {

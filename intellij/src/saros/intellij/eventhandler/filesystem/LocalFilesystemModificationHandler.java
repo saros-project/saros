@@ -67,6 +67,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private final AnnotationManager annotationManager;
   private final Project project;
   private final LocalEditorHandler localEditorHandler;
+  private final VirtualFileConverter virtualFileConverter;
 
   private boolean enabled;
   private boolean disposed;
@@ -171,7 +172,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       ProjectAPI projectAPI,
       AnnotationManager annotationManager,
       Project project,
-      LocalEditorHandler localEditorHandler) {
+      LocalEditorHandler localEditorHandler,
+      VirtualFileConverter virtualFileConverter) {
 
     this.editorManager = editorManager;
     this.session = session;
@@ -180,6 +182,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     this.annotationManager = annotationManager;
     this.project = project;
     this.localEditorHandler = localEditorHandler;
+    this.virtualFileConverter = virtualFileConverter;
 
     this.enabled = false;
     this.disposed = false;
@@ -204,7 +207,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting before resource contents changed: " + file);
     }
 
-    SPath path = VirtualFileConverter.convertToSPath(file);
+    SPath path = virtualFileConverter.convertToSPath(file);
 
     if (path == null || !session.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
@@ -262,7 +265,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting to resource creation: " + createdVirtualFile);
     }
 
-    SPath path = VirtualFileConverter.convertToSPath(createdVirtualFile);
+    SPath path = virtualFileConverter.convertToSPath(createdVirtualFile);
 
     if (path == null || !session.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
@@ -322,7 +325,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               + copy);
     }
 
-    SPath copyPath = VirtualFileConverter.convertToSPath(copy);
+    SPath copyPath = virtualFileConverter.convertToSPath(copy);
 
     if (copyPath == null || !session.isShared(copyPath.getResource())) {
       if (LOG.isTraceEnabled()) {
@@ -362,7 +365,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting before resource deletion: " + deletedVirtualFile);
     }
 
-    SPath path = VirtualFileConverter.convertToSPath(deletedVirtualFile);
+    SPath path = virtualFileConverter.convertToSPath(deletedVirtualFile);
 
     if (path == null || !session.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
@@ -468,8 +471,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String folderName = newFolderName != null ? newFolderName : oldFile.getName();
 
-    SPath oldPath = VirtualFileConverter.convertToSPath(oldFile);
-    SPath newParentPath = VirtualFileConverter.convertToSPath(newParent);
+    SPath oldPath = virtualFileConverter.convertToSPath(oldFile);
+    SPath newParentPath = virtualFileConverter.convertToSPath(newParent);
 
     User user = session.getLocalUser();
 
@@ -609,8 +612,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String encoding = oldFile.getCharset().name();
 
-    SPath oldFilePath = VirtualFileConverter.convertToSPath(oldFile);
-    SPath newParentPath = VirtualFileConverter.convertToSPath(newBaseParent);
+    SPath oldFilePath = virtualFileConverter.convertToSPath(oldFile);
+    SPath newParentPath = virtualFileConverter.convertToSPath(newBaseParent);
 
     User user = session.getLocalUser();
 
@@ -776,7 +779,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
         if (parent == null) {
 
-          SPath path = VirtualFileConverter.convertToSPath(file);
+          SPath path = virtualFileConverter.convertToSPath(file);
 
           if (path != null && session.isShared(path.getResource())) {
             LOG.error(

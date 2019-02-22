@@ -23,16 +23,21 @@ public class LocalEditorHandler {
   private final ProjectAPI projectAPI;
   private final EditorManager manager;
   private final ISarosSession sarosSession;
+  private final VirtualFileConverter virtualFileConverter;
 
   /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
   private final EditorPool editorPool;
 
   public LocalEditorHandler(
-      ProjectAPI projectAPI, EditorManager editorManager, ISarosSession sarosSession) {
+      ProjectAPI projectAPI,
+      EditorManager editorManager,
+      ISarosSession sarosSession,
+      VirtualFileConverter virtualFileConverter) {
 
     this.projectAPI = projectAPI;
     this.manager = editorManager;
     this.sarosSession = sarosSession;
+    this.virtualFileConverter = virtualFileConverter;
 
     this.editorPool = manager.getEditorPool();
   }
@@ -55,7 +60,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    SPath path = VirtualFileConverter.convertToSPath(virtualFile);
+    SPath path = virtualFileConverter.convertToSPath(virtualFile);
 
     if (path == null || !sarosSession.isShared(path.getResource())) {
       LOG.debug(
@@ -146,7 +151,7 @@ public class LocalEditorHandler {
    * @param virtualFile
    */
   public void closeEditor(@NotNull VirtualFile virtualFile) {
-    SPath path = VirtualFileConverter.convertToSPath(virtualFile);
+    SPath path = virtualFileConverter.convertToSPath(virtualFile);
 
     if (path != null && sarosSession.isShared(path.getResource())) {
       editorPool.removeEditor(path);
@@ -213,7 +218,7 @@ public class LocalEditorHandler {
       return;
     }
 
-    SPath path = VirtualFileConverter.convertToSPath(file);
+    SPath path = virtualFileConverter.convertToSPath(file);
 
     if (path != null && sarosSession.isShared(path.getResource())) {
       manager.generateEditorActivated(path);

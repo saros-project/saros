@@ -14,6 +14,7 @@ import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor
 import saros.intellij.eventhandler.editor.selection.LocalTextSelectionChangeHandler;
 import saros.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
 import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
+import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.followmode.FollowModeNotificationDispatcher;
 import saros.intellij.project.SharedResourcesManager;
 import saros.intellij.project.filesystem.ModuleInitialization;
@@ -60,5 +61,8 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
 
     // User notifications
     container.addComponent(FollowModeNotificationDispatcher.class);
+
+    // Utility
+    container.addComponent(VirtualFileConverter.class);
   }
 }
