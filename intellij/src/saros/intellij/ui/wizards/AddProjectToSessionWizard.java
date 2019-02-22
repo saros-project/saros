@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
-import saros.intellij.editor.ProjectAPI;
+import saros.intellij.editor.DocumentAPI;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.Messages;
@@ -97,8 +97,6 @@ public class AddProjectToSessionWizard extends Wizard {
 
   @Inject private IWorkspace workspace;
 
-  @Inject private ProjectAPI projectAPI;
-
   private final SelectProjectPage selectProjectPage;
   private final TextAreaPage fileListPage;
 
@@ -116,7 +114,7 @@ public class AddProjectToSessionWizard extends Wizard {
         @Override
         public void next() {
 
-          projectAPI.saveAllDocuments();
+          DocumentAPI.saveAllDocuments();
 
           // FIXME: Only projects with the same name are supported,
           // because the project name is connected to the name of the .iml file

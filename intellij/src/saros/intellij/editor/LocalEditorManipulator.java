@@ -153,7 +153,7 @@ public class LocalEditorManipulator {
         return;
       }
 
-      doc = projectAPI.getDocument(virtualFile);
+      doc = DocumentAPI.getDocument(virtualFile);
 
       if (doc == null) {
         LOG.warn(
@@ -306,7 +306,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Document document = projectAPI.getDocument(virtualFile);
+    Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {
       LOG.warn(
           "Could not recover file content of "

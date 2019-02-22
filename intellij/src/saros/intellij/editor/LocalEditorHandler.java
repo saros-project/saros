@@ -187,7 +187,7 @@ public class LocalEditorHandler {
         return;
       }
 
-      document = projectAPI.getDocument(file);
+      document = DocumentAPI.getDocument(file);
 
       if (document == null) {
         LOG.warn("Failed to save document for " + file + " - could not get a matching Document");
@@ -196,7 +196,7 @@ public class LocalEditorHandler {
       }
     }
 
-    projectAPI.saveDocument(document);
+    DocumentAPI.saveDocument(document);
   }
 
   /**

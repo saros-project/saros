@@ -33,6 +33,7 @@ import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
 import saros.filesystem.IPath;
+import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.ProjectAPI;
@@ -850,7 +851,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @see VirtualFile
    */
   private byte[] getContent(VirtualFile file) {
-    Document document = projectAPI.getDocument(file);
+    Document document = DocumentAPI.getDocument(file);
 
     try {
       if (document != null) {
