@@ -2,7 +2,6 @@ package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -210,7 +209,7 @@ public class LocalEditorManipulator {
    */
   public void adjustViewport(@NotNull Editor editor, LineRange range, TextSelection selection) {
     if (selection == null && range == null) {
-      VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
+      VirtualFile file = DocumentAPI.getVirtualFile(editor.getDocument());
 
       LOG.warn(
           "Could not adjust viewport for "

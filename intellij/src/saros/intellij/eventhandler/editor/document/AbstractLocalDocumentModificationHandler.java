@@ -3,11 +3,11 @@ package saros.intellij.eventhandler.editor.document;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
+import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
@@ -113,7 +113,7 @@ public abstract class AbstractLocalDocumentModificationHandler
       return path;
     }
 
-    VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(document);
+    VirtualFile virtualFile = DocumentAPI.getVirtualFile(document);
 
     if (virtualFile == null) {
       if (LOG.isTraceEnabled()) {
