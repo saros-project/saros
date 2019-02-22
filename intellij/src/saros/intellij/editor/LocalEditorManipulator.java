@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import saros.activities.FileActivity;
 import saros.activities.SPath;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.text.DeleteOperation;
@@ -19,7 +18,6 @@ import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.intellij.project.SharedResourcesManager;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.session.ISarosSession;
@@ -293,7 +291,6 @@ public class LocalEditorManipulator {
    * @param encoding the encoding of the content
    * @param source the user that send the recovery action
    * @see Document
-   * @see SharedResourcesManager#handleFileRecovery(FileActivity)
    */
   public void handleContentRecovery(SPath path, byte[] content, String encoding, User source) {
     VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
