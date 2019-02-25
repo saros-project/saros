@@ -42,16 +42,6 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
 
           cleanUpAnnotations(file);
         }
-
-        /**
-         * NOP. Only needed to preserve backwards compatibility to Intellij versions older than
-         * 2018.2.6.
-         */
-        // TODO remove once requiring the users to use Intellij 2018.2.6 or newer is acceptable
-        @Override
-        public void beforeFileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-          // NOP
-        }
       };
 
   public AnnotationUpdater(
