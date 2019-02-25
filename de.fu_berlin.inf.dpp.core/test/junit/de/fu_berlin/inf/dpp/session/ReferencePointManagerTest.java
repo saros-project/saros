@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.session;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.fail;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
@@ -54,7 +53,7 @@ public class ReferencePointManagerTest {
     IProject mappedProject = referencePointManager.get(referencePoint);
 
     Assert.assertNotNull(mappedProject);
-    Assert.assertEquals(newProject, mappedProject);
+    Assert.assertEquals(project, mappedProject);
   }
 
   @Test
@@ -69,7 +68,7 @@ public class ReferencePointManagerTest {
 
     projects = referencePointManager.getProjects(referencePoints);
 
-    Assert.assertEquals(1, projects);
+    Assert.assertEquals(1, projects.size());
 
     IProject mappedProject = (IProject) projects.toArray()[0];
 
@@ -78,12 +77,7 @@ public class ReferencePointManagerTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void putMappingWithNullProject() {
-    try {
-      referencePointManager.put(referencePoint, null);
-    } catch (RuntimeException e) {
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
+    referencePointManager.put(referencePoint, null);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -93,7 +87,7 @@ public class ReferencePointManagerTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void putGetWithNullReferencePoint() {
-    referencePointManager.get(referencePoint);
+    referencePointManager.get(null);
   }
 
   @Test(expected = IllegalArgumentException.class)
