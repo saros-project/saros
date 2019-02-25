@@ -12,10 +12,10 @@ If you want to execute the STF tests it is recommended to use eclipse. Otherwise
 * Install [GEF Legacy](https://projects.eclipse.org/projects/tools.gef/downloads) into Eclipse
 * You need an **Intellij IDEA** installation which is used for dependency resolution. Install a current version of [**IntelliJ IDEA**](https://www.jetbrains.com/idea/download/#section=linux) (we have only tested Saros/I for IntelliJ releases 2017.X and later)
 
-Set the **system-wide environment variable `ECLIPSE_HOME`** to the eclipse installation dir that contains the directory `plugins`.
+Set the **system-wide environment variable `ECLIPSE_HOME`** to the eclipse installation dir that contains the directory `plugins`.  
 Set the **system-wide environment variable `INTELLIJ_HOME`** to the intellij installation dir that contains the directory `lib`.
 
-If the `ECLIPSE_HOME` variable is not set or not global the correponding eclipse specific dependencies cannot be found during build.
+If the `ECLIPSE_HOME` variable is not set or not global the correponding eclipse specific dependencies cannot be found during build.  
 If the `INTELLIJ_HOME` variable is not set or not global the intellij-gradle plugin will download a version of IntelliJ which is
 defined in the gradle build description.
 
@@ -95,33 +95,33 @@ If you want to check that your commit does not contain wrong formatted code use 
 ### Example git hook
 Example hook that checks only java files that are staged.
 ```bash
-#!/bin/bash
-# check for dependent tools
-commands="grep tr curl java"
-for cmd in $commands; do
-  which $cmd > /dev/null
-  [ "$?" != "0" ] && echo "Command '$cmd' not available git hook is disabled" && exit 0
-done
-# define jar location
-formatter_jar_path=/tmp/formatter.jar
-# download stand-alone formatter
-function download_formatter() {
-  local jar_path=$1
-  local url="https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.6/google-java-format-1.6-all-deps.jar"
-  set -e
-  curl -Lo $jar_path "$url" > /dev/null
-  set +e
-}
-# check whether formatter already exist
-[ ! -f "$formatter_jar_path" ] && download_formatter "$formatter_jar_path"
-# get staged java files (deleted files are excluded)
-files_to_check=`git diff --cached --name-only --diff-filter=d | grep "^.*.java$" | tr '\n' ' '`
-# execute formatter if java files are staged
-if [[ ! -z "${files_to_check// }" ]]; then
-  java -jar "$formatter_jar_path" --dry-run --set-exit-if-changed $files_to_check
-  rc=$?
-  [ "$rc" != "0" ] && printf "\nGit hook: Formatting issues in the file listed above\n"
-  exit $rc
-fi
-exit 0
+  #!/bin/bash
+  # check for dependent tools
+  commands="grep tr curl java"
+  for cmd in $commands; do
+    which $cmd > /dev/null
+    [ "$?" != "0" ] && echo "Command '$cmd' not available git hook is disabled" && exit 0
+  done
+  # define jar location
+  formatter_jar_path=/tmp/formatter.jar
+  # download stand-alone formatter
+  function download_formatter() {
+    local jar_path=$1
+    local url="https://repo.maven.apache.org/maven2/com/google/googlejavaformat/google-java-format/1.6/google-java-format-1.6-all-deps.jar"
+    set -e
+    curl -Lo $jar_path "$url" > /dev/null
+    set +e
+  }
+  # check whether formatter already exist
+  [ ! -f "$formatter_jar_path" ] && download_formatter "$formatter_jar_path"
+  # get staged java files (deleted files are excluded)
+  files_to_check=`git diff --cached --name-only --diff-filter=d | grep "^.*.java$" | tr '\n' ' '`
+  # execute formatter if java files are staged
+  if [[ ! -z "${files_to_check// }" ]]; then
+    java -jar "$formatter_jar_path" --dry-run --set-exit-if-changed $files_to_check
+    rc=$?
+    [ "$rc" != "0" ] && printf "\nGit hook: Formatting issues in the file listed above\n"
+    exit $rc
+  fi
+  exit 0
 ```
