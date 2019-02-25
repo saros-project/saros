@@ -2,7 +2,7 @@
 title: Download
 ---
 
-See the [installation documentation](/documentation/installation.md) for more information about prerequisites.
+See the [installation documentation](../documentation/installation.md) for more information about prerequisites.
 
 ## Eclipse Update Site
 

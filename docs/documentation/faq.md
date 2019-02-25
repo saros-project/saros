@@ -1,5 +1,5 @@
 ---
-title: Frequently asked questions about the Saros project
+title: Frequently asked questions
 ---
 
 This page lists common questions about Saros. If your question is not
@@ -76,22 +76,22 @@ repositories adhering to the one-project-per-repository policy.
 **Safe layout** ("multiple projects per repository")
 ```
 my-project
-  .git/
-  module-a/  <-- totally safe to share
-    src/
-    test/
-  module-b/  <-- so is this one
-    src/
-    test/
+├── .git
+├── module-a  <-- totally safe to share
+│   ├── src
+│   ├── test
+└── module-b  <-- so is this one
+    ├── src
+    └── test
 ```
 
 **Risky Layout** ("one project per repository"")
 ```
-my-project/  <-- you shouldn't share this one
-  .git/
-  src/
-  test/
-  readme.html
+my-project  <-- you shouldn't share this one
+├── .git
+├── src
+├── test
+└── readme.html
 ```
 
 ## Network Issues
@@ -115,9 +115,8 @@ So how can two Saros users that both sit behind a NAT create a joint
 Saros session?
 
 -   Saros uses an [XMPP](http://en.wikipedia.org/wiki/XMPP) server to
-    get in contact with the other participant(s). Companies can [run
-    their own XMPP server](setup-xmpp.md) for maximum privacy; home
-    users can use almost any public XMPP server.
+    get in contact with the other participant(s). Companies can [run their own XMPP server](setup-xmpp.md)
+    for maximum privacy; home users can use almost any public XMPP server.
 -   Thoughout the session (if possible) Saros uses
     [Socks5](http://en.wikipedia.org/wiki/SOCKS) connections (direct
     or mediated) between the participants. Saros supports optional [UPnP
