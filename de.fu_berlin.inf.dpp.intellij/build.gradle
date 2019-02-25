@@ -71,7 +71,7 @@ intellij {
   if (project.hasProperty('intellijHome')) {
     localPath = intellijHome
   } else {
-    version = 'IC-2018.2'
+    version = 'IC-2018.2.6'
   }
 
   // don't overwrite the version compatibility defined in the plugin.xml
