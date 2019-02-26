@@ -1,11 +1,21 @@
 package de.fu_berlin.inf.dpp.session;
 
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,15 +23,36 @@ import org.junit.Test;
 
 public class ReferencePointManagerTest {
 
+  private final String PROJECT_RELATIVE_PATH_TO_FILE = "/toFile";
+  private final String PROJECT_RELATIVE_PATH_TO_FOLDER = "/toFolder/";
+  private final String PROJECT_NAME = "Bar";
+  private final String CHARSET = "UTF-8";
+
   private IReferencePointManager referencePointManager;
   private IReferencePoint referencePoint;
   private IProject project;
+  private IFolder folder;
+  private IFile file;
+  private IPath projectRelativePath;
 
   @Before
-  public void prepare() {
-    referencePoint = createMock(IReferencePoint.class);
-    project = createMock(IProject.class);
+  public void prepare() throws IOException {
+    file = createMock(IFile.class);
+    folder = createMock(IFolder.class);
+    projectRelativePath = createMock(IPath.class);
+    expect(projectRelativePath.isAbsolute()).andStubReturn(false);
 
+    replay(file, folder, projectRelativePath);
+
+    referencePoint = createMock(IReferencePoint.class);
+
+    project = createMock(IProject.class);
+    expect(project.exists()).andStubReturn(true);
+    expect(project.getFile(PROJECT_RELATIVE_PATH_TO_FILE)).andStubReturn(file);
+    expect(project.getFolder(PROJECT_RELATIVE_PATH_TO_FOLDER)).andStubReturn(folder);
+    expect(project.getName()).andStubReturn(PROJECT_NAME);
+    expect(project.getDefaultCharset()).andStubReturn(CHARSET);
+    expect(project.members()).andStubReturn(new IResource[] {file, folder});
     replay(referencePoint, project);
 
     referencePointManager = new ReferencePointManager();
@@ -93,5 +124,70 @@ public class ReferencePointManagerTest {
   @Test(expected = IllegalArgumentException.class)
   public void putGetWithNullReferencePointsSet() {
     referencePointManager.getProjects(null);
+  }
+
+  @Test
+  public void testGetFolder() {
+    referencePointManager.put(referencePoint, project);
+    IFolder testFolder =
+        referencePointManager.getFolder(referencePoint, PROJECT_RELATIVE_PATH_TO_FOLDER);
+
+    Assert.assertEquals(folder, testFolder);
+  }
+
+  @Test
+  public void testGetFile() {
+    referencePointManager.put(referencePoint, project);
+    IFile testFile = referencePointManager.getFile(referencePoint, PROJECT_RELATIVE_PATH_TO_FILE);
+
+    Assert.assertEquals(file, testFile);
+  }
+
+  @Test
+  public void testProjectExist() {
+    referencePointManager.put(referencePoint, project);
+    boolean projectExists = referencePointManager.projectExists(referencePoint);
+
+    Assert.assertTrue(projectExists);
+  }
+
+  @Test
+  public void testGetName() {
+    referencePointManager.put(referencePoint, project);
+    String testName = referencePointManager.getName(referencePoint);
+
+    Assert.assertEquals(PROJECT_NAME, testName);
+  }
+
+  @Test
+  public void testGetDefaultCharset() throws IOException {
+    referencePointManager.put(referencePoint, project);
+    String testCharset = referencePointManager.getDefaultCharSet(referencePoint);
+
+    Assert.assertEquals(CHARSET, testCharset);
+  }
+
+  @Test
+  public void testGetMembers() throws IOException {
+    referencePointManager.put(referencePoint, project);
+    IResource[] members = referencePointManager.members(referencePoint);
+
+    Assert.assertEquals(2, members.length);
+
+    List<IResource> membersList = new ArrayList<IResource>(Arrays.asList(members));
+
+    Assert.assertTrue(membersList.contains(file));
+    Assert.assertTrue(membersList.contains(folder));
+  }
+
+  @Test
+  public void testCreateSPath() {
+    referencePointManager.put(referencePoint, project);
+
+    SPath expectedSPath = new SPath(project, projectRelativePath);
+
+    SPath testSPath = referencePointManager.createSPath(referencePoint, projectRelativePath);
+
+    Assert.assertEquals(expectedSPath, testSPath);
   }
 }
