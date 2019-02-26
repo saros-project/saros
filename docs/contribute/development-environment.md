@@ -12,10 +12,10 @@ If you want to execute the STF tests it is recommended to use eclipse. Otherwise
 * Install [GEF Legacy](https://projects.eclipse.org/projects/tools.gef/downloads) into Eclipse
 * You need an **Intellij IDEA** installation which is used for dependency resolution. Install a current version of [**IntelliJ IDEA**](https://www.jetbrains.com/idea/download/#section=linux) (we have only tested Saros/I for IntelliJ releases 2017.X and later)
 
-Set the **system-wide environment variable `ECLIPSE_HOME`** to the eclipse installation dir that contains the directory `plugins`.  
+Set the **system-wide environment variable `ECLIPSE_HOME`** to the eclipse installation dir that contains the directory `plugins`.<br/>
 Set the **system-wide environment variable `INTELLIJ_HOME`** to the intellij installation dir that contains the directory `lib`.
 
-If the `ECLIPSE_HOME` variable is not set or not global the correponding eclipse specific dependencies cannot be found during build.  
+If the `ECLIPSE_HOME` variable is not set or not global the correponding eclipse specific dependencies cannot be found during build.<br/>
 If the `INTELLIJ_HOME` variable is not set or not global the intellij-gradle plugin will download a version of IntelliJ which is
 defined in the gradle build description.
 
@@ -26,7 +26,7 @@ If you develop on Eclipse you should have already installed the Eclipse version 
 
 #### Use the Saros Clean-Up Profile
 
-* Right-click the "Saros" project in the project explorer and navigate to  
+* Right-click the "Saros" project in the project explorer and navigate to<br/>
   `Properties > Java Code Style > Clean up`
 * Under the box `Active profile:`, click `Import...`
 * Select the profile [`de.fu_berlin.inf.dpp/clean-up-profile.xml`](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/clean-up-profile.xml)
