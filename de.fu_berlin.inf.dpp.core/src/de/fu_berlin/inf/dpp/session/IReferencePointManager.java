@@ -22,11 +22,12 @@ public interface IReferencePointManager {
   void put(IReferencePoint referencePoint, IProject project);
 
   /**
-   * Returns the IProject given by the IReferencePoint
+   * ATTENTION: Don't use this in Saros Core! Returns the IProject given by the IReferencePoint
    *
    * @param referencePoint the key for which the IProject should be returned
    * @return the IProject given by referencePoint
    */
+  @Deprecated
   IProject get(IReferencePoint referencePoint);
 
   /**
