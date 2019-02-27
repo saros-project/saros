@@ -101,7 +101,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
           continue;
         }
 
-        final IFile decompressedFile = referencePointManager.get(referencePoint).getFile(path);
+        final IFile decompressedFile = referencePointManager.getFile(referencePoint, path);
 
         FileSystem.createFolder(decompressedFile);
 

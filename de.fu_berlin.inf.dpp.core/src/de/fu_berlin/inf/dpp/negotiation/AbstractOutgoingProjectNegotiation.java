@@ -333,7 +333,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         ProjectNegotiationData data =
             new ProjectNegotiationData(
                 referencePointID,
-                referencePointManager.get(referencePoint).getName(),
+                referencePointManager.getName(referencePoint),
                 partial,
                 projectFileList);
 

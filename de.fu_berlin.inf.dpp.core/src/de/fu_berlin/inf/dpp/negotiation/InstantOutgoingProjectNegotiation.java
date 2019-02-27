@@ -182,8 +182,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     List<SPath> files = new ArrayList<SPath>(fileCount);
     for (final FileList list : fileLists) {
       IReferencePoint referencePoint = session.getReferencePoint(list.getProjectID());
-      for (String file : list.getPaths()) {
-        files.add(new SPath(referencePointManager.get(referencePoint).getFile(file)));
+      for (String fileName : list.getPaths()) {
+        files.add(new SPath(referencePointManager.getFile(referencePoint, fileName)));
       }
     }
 
@@ -222,9 +222,9 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       ".settings/org.eclipse.jdt.ui.prefs"
     };
 
-    for (String string : eclipseProjFiles) {
+    for (String fileName : eclipseProjFiles) {
       for (IReferencePoint referencePoint : referencePoints) {
-        SPath file = new SPath(referencePointManager.get(referencePoint).getFile(string));
+        SPath file = new SPath(referencePointManager.getFile(referencePoint, fileName));
         sendIfRequired(osp, file);
       }
     }

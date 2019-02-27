@@ -169,7 +169,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       for (final String path : list.getPaths()) {
 
         // assert path is relative !
-        filesToCompress.add(referencePointManager.get(referencePoint).getFile(path));
+        filesToCompress.add(referencePointManager.getFile(referencePoint, path));
         aliasBuilder.append(path);
         fileAlias.add(aliasBuilder.toString());
         aliasBuilder.setLength(prefixLength);

@@ -399,7 +399,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       }
 
       for (final String path : diff.getAddedFolders()) {
-        final IFolder folder = referencePointManager.get(referencePoint).getFolder(path);
+        final IFolder folder = referencePointManager.getFolder(referencePoint, path);
 
         if (!folder.exists()) {
 
@@ -478,15 +478,15 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
       if (data == null) throw new IllegalArgumentException("invalid project id: " + id);
 
-      if (!referencePointManager.get(referencePoint).exists())
+      if (!referencePointManager.projectExists(referencePoint))
         throw new IllegalArgumentException("project does not exist: " + referencePoint);
     }
   }
 
   protected IResource getResource(IReferencePoint referencePoint, String path) {
     if (path.endsWith(FileList.DIR_SEPARATOR))
-      return referencePointManager.get(referencePoint).getFolder(path);
-    else return referencePointManager.get(referencePoint).getFile(path);
+      return referencePointManager.getFolder(referencePoint, path);
+    else return referencePointManager.getFile(referencePoint, path);
   }
 
   @Override

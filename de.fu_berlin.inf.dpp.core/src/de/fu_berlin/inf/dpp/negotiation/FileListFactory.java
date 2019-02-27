@@ -86,8 +86,8 @@ public class FileListFactory {
     FileList list = new FileList();
 
     if (resources == null) {
-      list.addEncoding(referencePointManager.get(referencePoint).getDefaultCharset());
-      resources = Arrays.asList(referencePointManager.get(referencePoint).members());
+      list.addEncoding(referencePointManager.getDefaultCharSet(referencePoint));
+      resources = Arrays.asList(referencePointManager.members(referencePoint));
     }
 
     addMembersToList(list, resources);

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -350,13 +351,14 @@ public class EnterProjectNamePage extends WizardPage {
 
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
-      String projectID = entry.getKey();
+      String referencePointID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      de.fu_berlin.inf.dpp.filesystem.IProject project =
-          referencePointManager.get(session.getReferencePoint(projectID));
+      IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
-      if (project == null) continue;
+      if (referencePoint == null) continue;
+
+      de.fu_berlin.inf.dpp.filesystem.IProject project = referencePointManager.get(referencePoint);
 
       projectOptionComposite.setProjectName(true, project.getName());
       projectOptionComposite.setEnabled(false);
@@ -365,17 +367,17 @@ public class EnterProjectNamePage extends WizardPage {
 
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
-      String projectID = entry.getKey();
+      String referencePointID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      de.fu_berlin.inf.dpp.filesystem.IProject project =
-          referencePointManager.get(session.getReferencePoint(projectID));
+      IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
-      if (project != null) continue;
+      if (referencePoint != null) continue;
 
       String projectNameProposal =
           findProjectNameProposal(
-              remoteProjectMapping.get(projectID), reservedProjectNames.toArray(new String[0]));
+              remoteProjectMapping.get(referencePointID),
+              reservedProjectNames.toArray(new String[0]));
 
       projectOptionComposite.setProjectName(false, projectNameProposal);
       reservedProjectNames.add(projectNameProposal);
