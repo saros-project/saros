@@ -33,8 +33,7 @@ to add the root certificate manually. (Also refer to [the bugtracker
 entry in
 SourceForge](https://sourceforge.net/p/forge/site-support/14016/) -- we
 are not the only project suffering from this issue.) Alternatively, you
-can download the dropin archive and follow the [instructions for
-installation as dropin](installation.md).
+can download the dropin archive and follow the [instructions for installation as dropin](installation.md).
 
 #### I cannot connect with my jabber account?
 
@@ -127,8 +126,6 @@ sides attempts to connect each other. This improves chances of one peer
 connect to the other one. You can check your contact list to see which
 bytestream type is established between you and a contact (if any).
 
- 
-
 For further information check out data connections in Saros on our
 networklayer
 page [here](../old/networklayer.md#Data%20connections%20in%20Saros).
@@ -166,10 +163,6 @@ page [here](../old/networklayer.md#Data%20connections%20in%20Saros).
     width, TAB/spaces handling and character encoding.
 
 ### About Eclipse plugins
-
-*   Saros is compatible with most but not all other Eclipse plugins. See
-    also our incomplete list of [compatible
-    plugins](compatibility.md).
 
 *   If you are sharing a project which is managed by a source code
     management system such as Subversion, make sure that all
