@@ -47,6 +47,7 @@ jobs:
       if: type in (push, pull_request)
       script:
         - $PWD/travis/script/format/check_java.sh $PWD
+        - $PWD/travis/script/lint/lint_js.sh $PWD
 
     - stage: build
       if: type in (push, pull_request)
