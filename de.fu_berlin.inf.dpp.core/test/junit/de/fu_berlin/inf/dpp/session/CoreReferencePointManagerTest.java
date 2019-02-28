@@ -21,7 +21,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ReferencePointManagerTest {
+public class CoreReferencePointManagerTest {
 
   private final String PROJECT_RELATIVE_PATH_TO_FILE = "/toFile";
   private final String PROJECT_RELATIVE_PATH_TO_FOLDER = "/toFolder/";
@@ -55,7 +55,7 @@ public class ReferencePointManagerTest {
     expect(project.members()).andStubReturn(new IResource[] {file, folder});
     replay(referencePoint, project);
 
-    referencePointManager = new ReferencePointManager();
+    referencePointManager = new CoreReferencePointManager();
   }
 
   @Test

@@ -13,11 +13,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** The implementation of {@link IReferencePointManager} */
-public class ReferencePointManager implements IReferencePointManager {
+public class CoreReferencePointManager implements IReferencePointManager {
 
   ConcurrentHashMap<IReferencePoint, IProject> referencePointToProjectMapper;
 
-  public ReferencePointManager() {
+  public CoreReferencePointManager() {
     referencePointToProjectMapper = new ConcurrentHashMap<>();
   }
 

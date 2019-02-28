@@ -48,7 +48,7 @@ public class SPathConverter implements Converter, Startable {
     this.referencePointManager = session.getComponent(IReferencePointManager.class);
 
     if (this.referencePointManager == null)
-      throw new IllegalStateException("ReferencePointManager is null. Session is not running");
+      throw new IllegalStateException("CoreReferencePointManager is null. Session is not running");
   }
 
   @Override
