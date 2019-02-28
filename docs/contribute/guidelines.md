@@ -137,13 +137,13 @@ is not acceptable to make a member part of a package's API
 
 Instead of:
 
-```
+```java
 public class A implements B, C, D {
   ...
 }
 ```
 you should write:
-```
+```java
 public class A implements D {
   ...
 
@@ -165,7 +165,7 @@ you should execute a block of code.
 
 Instead of:
 
-```
+```java
     public void foo(){
       //some code
 
@@ -177,7 +177,7 @@ Instead of:
 
 you should write:
 
-```
+```java
     public void foo(){
       //some code
 
@@ -200,7 +200,7 @@ level of block-nesting.
     that indicates this.
 
 
-```
+```java
         /**
          * Get positions of slashes in the filename.
          * @param filename may be null

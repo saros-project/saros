@@ -20,7 +20,6 @@ toc: false
 ------------------------------------------------------------------------
 
 -   Artwork by ISD Group
-    ([http://en.isd-group.com)](http://en.isd-group.com/about)
 -   Available on Design Comics
     ([http://www.designcomics.org)](http://www.designcomics.org)
 -   Composition by Maria Spiering
@@ -29,4 +28,4 @@ toc: false
 ------------------------------------------------------------------------
 
 
--   [History](history.md "Development history and people involved")
+-   [History](history.md)
