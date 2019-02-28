@@ -117,29 +117,8 @@ public class FileListTest {
 
     final IProject project = EasyMock.createMock(IProject.class);
 
-    final IFolder barFolder = createFolderMock(project, "bar", new IResource[0]);
-
-    final IFolder foobarfooFolder = createFolderMock(project, "foobar/foo", new IResource[0]);
-
-    final IFile infoTxtFile = createFileMock(project, "info.txt", "1234", "UTF-8");
-
-    final IFile foobarInfoTxtFile =
-        createFileMock(project, "foobar/info.txt", "12345", "ISO-8859-1");
-
-    final IFolder foobarFolder =
-        createFolderMock(project, "foobar", new IResource[] {foobarfooFolder, foobarInfoTxtFile});
-
     EasyMock.expect(project.getName()).andStubReturn("foo");
     EasyMock.expect(project.getReferencePoint()).andStubReturn(referencePoint);
-
-    try {
-      EasyMock.expect(project.getDefaultCharset()).andStubReturn("UTF-16");
-
-      EasyMock.expect(project.members())
-          .andStubReturn(new IResource[] {barFolder, infoTxtFile, foobarFolder});
-    } catch (IOException e) {
-      // cannot happen
-    }
 
     EasyMock.replay(project);
 
@@ -225,9 +204,35 @@ public class FileListTest {
 
   private static IReferencePointManager createReferencePointManagerMock(
       IReferencePoint referencePoint, IProject project) {
+
+    final IFolder barFolder = createFolderMock(project, "bar", new IResource[0]);
+
+    final IFolder foobarfooFolder = createFolderMock(project, "foobar/foo", new IResource[0]);
+
+    final IFile infoTxtFile = createFileMock(project, "info.txt", "1234", "UTF-8");
+
+    final IFile foobarInfoTxtFile =
+        createFileMock(project, "foobar/info.txt", "12345", "ISO-8859-1");
+
+    final IFolder foobarFolder =
+        createFolderMock(project, "foobar", new IResource[] {foobarfooFolder, foobarInfoTxtFile});
+
     IReferencePointManager referencePointManager =
         EasyMock.createMock(IReferencePointManager.class);
     EasyMock.expect(referencePointManager.get(referencePoint)).andStubReturn(project);
+
+    EasyMock.expect(referencePointManager.getName(referencePoint)).andStubReturn("foo");
+
+    try {
+      EasyMock.expect(referencePointManager.getDefaultCharSet(referencePoint))
+          .andStubReturn("UTF-16");
+
+      EasyMock.expect(referencePointManager.members(referencePoint))
+          .andStubReturn(new IResource[] {barFolder, infoTxtFile, foobarFolder});
+    } catch (IOException e) {
+      // cannot happen
+    }
+
     EasyMock.replay(referencePointManager);
     return referencePointManager;
   }

@@ -38,9 +38,14 @@ public class SPathConverterTest {
     referencePoint = EasyMock.createNiceMock(IReferencePoint.class);
     project = EasyMock.createNiceMock(IProject.class);
     expect(project.getReferencePoint()).andStubReturn(referencePoint);
+    EasyMock.replay(pathFactory, referencePoint, path, project);
+
     referencePointManager = EasyMock.createNiceMock(IReferencePointManager.class);
     expect(referencePointManager.get(referencePoint)).andStubReturn(project);
-    EasyMock.replay(pathFactory, referencePoint, path, project, referencePointManager);
+    expect(referencePointManager.createSPath(referencePoint, path))
+        .andStubReturn(new SPath(project, path));
+
+    EasyMock.replay(referencePointManager);
   }
 
   @Test
