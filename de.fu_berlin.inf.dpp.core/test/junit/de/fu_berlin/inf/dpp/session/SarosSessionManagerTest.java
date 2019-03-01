@@ -110,22 +110,22 @@ public class SarosSessionManagerTest {
   @Test
   public void testStartStopListenerCallback() {
     manager.addSessionLifecycleListener(new StateVerifyListener());
-    manager.startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
+    manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
     manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
   }
 
   @Test
   public void testMultipleStarts() {
     manager.addSessionLifecycleListener(new StateVerifyListener());
-    manager.startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
-    manager.startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
+    manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
+    manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
     manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
   }
 
   @Test
   public void testMultipleStops() {
     manager.addSessionLifecycleListener(new StateVerifyListener());
-    manager.startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
+    manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
     manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
   }
@@ -133,7 +133,7 @@ public class SarosSessionManagerTest {
   @Test(expected = DummyError.class)
   public void testListenerDispatchIsNotCatchingErrors() {
     manager.addSessionLifecycleListener(new ErrorThrowingListener());
-    manager.startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
+    manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
     manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
   }
 
@@ -151,7 +151,7 @@ public class SarosSessionManagerTest {
           }
         };
     manager.addSessionLifecycleListener(listener);
-    manager.startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
+    manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
     manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
   }
 
@@ -165,12 +165,11 @@ public class SarosSessionManagerTest {
           public void sessionStarting(ISarosSession oldSarosSession) {
             assertTrue("startSession is executed recusive", count == 0);
             count++;
-            manager.startSessionWithReferencePoints(
-                new HashMap<IReferencePoint, List<IResource>>());
+            manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
           }
         };
     manager.addSessionLifecycleListener(listener);
-    manager.startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
+    manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
   }
 
   @Test(expected = IllegalStateException.class)
@@ -190,7 +189,7 @@ public class SarosSessionManagerTest {
           }
         };
     manager.addSessionLifecycleListener(listener);
-    manager.startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
+    manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
 
     RuntimeException rte = exception.get();
 
@@ -207,15 +206,14 @@ public class SarosSessionManagerTest {
           @Override
           public void sessionEnding(ISarosSession oldSarosSession) {
             try {
-              manager.startSessionWithReferencePoints(
-                  new HashMap<IReferencePoint, List<IResource>>());
+              manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
             } catch (RuntimeException e) {
               exception.set(e);
             }
           }
         };
     manager.addSessionLifecycleListener(listener);
-    manager.startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
+    manager.startSession(new HashMap<IReferencePoint, List<IResource>>());
     manager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
 
     RuntimeException rte = exception.get();

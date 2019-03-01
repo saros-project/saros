@@ -77,7 +77,7 @@ public class CollaborationUtils {
           protected IStatus run(IProgressMonitor monitor) {
             monitor.beginTask("Starting session...", IProgressMonitor.UNKNOWN);
             try {
-              sessionManager.startSessionWithReferencePoints(newResources);
+              sessionManager.startSession(newResources);
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
               monitor.worked(50);
@@ -186,7 +186,7 @@ public class CollaborationUtils {
           public void run() {
 
             if (sarosSession.hasWriteAccess()) {
-              sessionManager.addReferencePointResourcesToSession(referencePointResources);
+              sessionManager.addResourcesToSession(referencePointResources);
               return;
             }
 
@@ -407,7 +407,8 @@ public class CollaborationUtils {
       resources.addAll(additionalFilesForPartialSharing);
     }
 
-    HashMap<IReferencePoint, List<IResource>> resources = new HashMap<IReferencePoint, List<IResource>>();
+    HashMap<IReferencePoint, List<IResource>> resources =
+        new HashMap<IReferencePoint, List<IResource>>();
 
     for (Entry<IProject, Set<IResource>> entry : projectsResources.entrySet()) {
       resources.put(

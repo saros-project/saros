@@ -84,7 +84,7 @@ public class CollaborationUtils {
 
             try {
               refreshProjects(newResources.keySet(), null);
-              sessionManager.startSessionWithReferencePoints(convert(newResources));
+              sessionManager.startSession(convert(newResources));
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
               ISarosSession session = sessionManager.getSession();
@@ -212,7 +212,7 @@ public class CollaborationUtils {
                */
             }
 
-            sessionManager.addReferencePointResourcesToSession(convert(projectResources));
+            sessionManager.addResourcesToSession(convert(projectResources));
           }
         });
   }
