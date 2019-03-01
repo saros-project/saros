@@ -1,7 +1,6 @@
-include 'saros.core'
-include 'saros.ui'
-include 'saros.ui.frontend'
-include 'saros'
-include 'saros.whiteboard'
-include 'saros.intellij'
-include 'saros.server'
+String prefix = 'saros.'
+List projectDirs = ['core', 'ui', 'ui.frontend', 'eclipse', 'whiteboard', 'intellij', 'server'].each { dir ->
+  String projectName = prefix + dir
+  include projectName
+  project(":$projectName").projectDir = file(dir)
+}
