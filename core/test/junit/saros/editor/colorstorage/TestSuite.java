@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.editor.colorstorage;
+package saros.editor.colorstorage;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

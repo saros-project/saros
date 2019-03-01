@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view;
+package saros.stf.server.rmi.superbot.component.view;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPackageExplorerView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IProgressView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import saros.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
+import saros.stf.server.rmi.superbot.component.view.eclipse.IPackageExplorerView;
+import saros.stf.server.rmi.superbot.component.view.eclipse.IProgressView;
+import saros.stf.server.rmi.superbot.component.view.saros.ISarosView;
+import saros.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
 
 public interface IViews extends Remote {
 

@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.model.mdns;
+package saros.ui.model.mdns;
 
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import javax.jmdns.ServiceInfo;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
+import saros.ui.ImageManager;
+import saros.ui.model.TreeElement;
 
 public class MDNSEntryElement extends TreeElement {
 

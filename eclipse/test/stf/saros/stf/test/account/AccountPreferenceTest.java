@@ -1,31 +1,31 @@
-package de.fu_berlin.inf.dpp.stf.test.account;
+package saros.stf.test.account;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACTIVATE_ACCOUNT_DIALOG_TITLE;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.BUTTON_ACTIVATE_ACCOUNT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.BUTTON_ADD_ACCOUNT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.BUTTON_EDIT_ACCOUNT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.BUTTON_REMOVE_ACCOUNT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.GROUP_TITLE_XMPP_JABBER_ACCOUNTS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_PREFERENCES;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.NO;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.OK;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.REMOVE_ACCOUNT_DIALOG_TITLE;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_PREFERNCES;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.YES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.shared.Constants.ACTIVATE_ACCOUNT_DIALOG_TITLE;
+import static saros.stf.shared.Constants.BUTTON_ACTIVATE_ACCOUNT;
+import static saros.stf.shared.Constants.BUTTON_ADD_ACCOUNT;
+import static saros.stf.shared.Constants.BUTTON_EDIT_ACCOUNT;
+import static saros.stf.shared.Constants.BUTTON_REMOVE_ACCOUNT;
+import static saros.stf.shared.Constants.GROUP_TITLE_XMPP_JABBER_ACCOUNTS;
+import static saros.stf.shared.Constants.MENU_PREFERENCES;
+import static saros.stf.shared.Constants.MENU_SAROS;
+import static saros.stf.shared.Constants.NO;
+import static saros.stf.shared.Constants.NODE_SAROS;
+import static saros.stf.shared.Constants.OK;
+import static saros.stf.shared.Constants.REMOVE_ACCOUNT_DIALOG_TITLE;
+import static saros.stf.shared.Constants.SHELL_PREFERNCES;
+import static saros.stf.shared.Constants.YES;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import java.util.Arrays;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.net.xmpp.JID;
+import saros.stf.client.StfTestCase;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
 public class AccountPreferenceTest extends StfTestCase {
 

@@ -1,24 +1,24 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createFile;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createFolder;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.path;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static saros.server.filesystem.FileSystemTestUtils.createFile;
+import static saros.server.filesystem.FileSystemTestUtils.createFolder;
+import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
+import static saros.server.filesystem.FileSystemTestUtils.path;
 
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
 
 public class ServerProjectImplTest extends EasyMockSupport {
 

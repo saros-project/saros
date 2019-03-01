@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.util.selection.retriever;
+package saros.ui.util.selection.retriever;
 
 import java.util.List;
 import org.eclipse.jface.viewers.ISelection;

@@ -31,4 +31,4 @@
  *       transformation function of the Jupiter Algorithm
  * </ul>
  */
-package de.fu_berlin.inf.dpp.concurrent.jupiter;
+package saros.concurrent.jupiter;

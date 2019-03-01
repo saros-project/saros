@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.intellij.project.filesystem;
+package saros.intellij.project.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 import java.io.IOException;
+import saros.filesystem.IContainer;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspaceRoot;
 
 /** IntelliJ implementation of {@link IWorkspaceRoot}. */
 public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {

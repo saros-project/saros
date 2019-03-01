@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer;
+package saros.ui.widgetGallery.demoExplorer;
 
-import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.MainDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Tree;
+import saros.ui.model.TreeLabelProvider;
+import saros.ui.util.LayoutUtils;
+import saros.ui.util.ViewerUtils;
+import saros.ui.widgetGallery.demoSuits.MainDemo;
+import saros.ui.widgets.viewer.ViewerComposite;
 
 public class DemoExplorer extends ViewerComposite<TreeViewer> {
 

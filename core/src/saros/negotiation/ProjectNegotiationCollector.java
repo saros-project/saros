@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
 
 /**
  * This class collects resources that should be added to a session to add them at once in

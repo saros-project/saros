@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
+package saros.ui.widgets.viewer.project;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ViewerSorter;

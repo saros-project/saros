@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import java.util.ArrayList;
 import java.util.List;
+import saros.editor.colorstorage.UserColorID;
 
 /**
  * Preferences provide methods to get and set preferences on an IDE-specific level (i.e. they are

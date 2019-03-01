@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.communication.connection;
+package saros.communication.connection;
 
 import org.jivesoftware.smack.proxy.ProxyInfo;
 

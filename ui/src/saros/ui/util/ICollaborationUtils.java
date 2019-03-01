@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.util.List;
+import saros.filesystem.IResource;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
 
 /** Offers convenient methods for collaboration actions like sharing a project resources. */
 public interface ICollaborationUtils {

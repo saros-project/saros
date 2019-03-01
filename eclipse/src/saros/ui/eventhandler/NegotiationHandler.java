@@ -1,27 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.INegotiationHandler;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,6 +8,28 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.progress.IProgressConstants;
+import saros.Saros;
+import saros.monitoring.ProgressMonitorAdapterFactory;
+import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.IncomingSessionNegotiation;
+import saros.negotiation.OutgoingSessionNegotiation;
+import saros.negotiation.ProjectNegotiation;
+import saros.negotiation.SessionNegotiation;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.session.INegotiationHandler;
+import saros.session.ISarosSessionManager;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.DialogUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.ViewUtils;
+import saros.ui.views.SarosView;
+import saros.ui.wizards.AddProjectToSessionWizard;
+import saros.ui.wizards.JoinSessionWizard;
+import saros.ui.wizards.dialogs.WizardDialogAccessable;
 
 /**
  * This handler is responsible for presenting and running the session and project negotiations that

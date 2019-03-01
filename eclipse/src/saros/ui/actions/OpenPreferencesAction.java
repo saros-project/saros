@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.actions;
+package saros.ui.actions;
 
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
 
 public class OpenPreferencesAction extends Action {
 
@@ -34,7 +34,7 @@ public class OpenPreferencesAction extends Action {
                 .getService(IHandlerService.class);
     try {
       service.executeCommand(
-          "de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences", //$NON-NLS-1$
+          "saros.ui.commands.OpenSarosPreferences", //$NON-NLS-1$
           null);
     } catch (Exception e) {
       LOG.error("Could not execute command", e); // $NON-NLS-1$

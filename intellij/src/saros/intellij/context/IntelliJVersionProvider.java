@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.intellij.context;
+package saros.intellij.context;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.extensions.PluginId;
-import de.fu_berlin.inf.dpp.intellij.SarosComponent;
+import saros.intellij.SarosComponent;
 
 /**
  * Methods in this class can be used to access version information about the running IntelliJ IDEA

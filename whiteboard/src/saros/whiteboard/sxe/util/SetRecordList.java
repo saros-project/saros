@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.util;
+package saros.whiteboard.sxe.util;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SetRecord;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import saros.whiteboard.sxe.records.SetRecord;
 
 /**
  * A specialized list to ensure a proper set record list with increasing versions by overriding

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

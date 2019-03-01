@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
+package saros.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import java.io.File;
+import saros.filesystem.IPath;
 
 public class PathFake implements IPath {
 

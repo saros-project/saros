@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.core.monitoring.remote;
+package saros.core.monitoring.remote;
 
-import de.fu_berlin.inf.dpp.activities.ProgressActivity;
-import de.fu_berlin.inf.dpp.activities.ProgressActivity.ProgressAction;
-import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
-import de.fu_berlin.inf.dpp.core.monitoring.Status;
-import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicator;
-import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.Logger;
+import saros.activities.ProgressActivity;
+import saros.activities.ProgressActivity.ProgressAction;
+import saros.core.monitoring.IStatus;
+import saros.core.monitoring.Status;
+import saros.intellij.runtime.UIMonitoredJob;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.remote.IRemoteProgressIndicator;
+import saros.monitoring.remote.RemoteProgressManager;
+import saros.session.User;
+import saros.ui.util.ModelFormatUtils;
 
 /** IntelliJ implementation of the {@link IRemoteProgressIndicator} interface. */
 final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndicator {

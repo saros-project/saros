@@ -1,25 +1,25 @@
-package de.fu_berlin.inf.dpp.concurrent;
+package saros.concurrent;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.PathFake;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.internal.text.DeleteOperation;
+import saros.concurrent.jupiter.internal.text.InsertOperation;
+import saros.concurrent.jupiter.internal.text.NoOperation;
+import saros.concurrent.jupiter.internal.text.SplitOperation;
+import saros.concurrent.jupiter.test.util.JupiterTestCase;
+import saros.concurrent.jupiter.test.util.PathFake;
+import saros.filesystem.IProject;
+import saros.session.User;
 
 /** testing SplitOperation.toTextEdit() */
 public class SplitOperationTest {

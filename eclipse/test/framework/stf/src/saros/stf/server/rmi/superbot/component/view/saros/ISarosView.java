@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros;
+package saros.stf.server.rmi.superbot.component.view.saros;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInContactListArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import saros.net.xmpp.JID;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.superbot.ISuperBot;
+import saros.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInContactListArea;
+import saros.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
 
 /**
  * This interface contains convenience API to perform actions in the Saros view. If not mentioned

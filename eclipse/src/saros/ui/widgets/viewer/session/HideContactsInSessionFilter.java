@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
+package saros.ui.widgets.viewer.session;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.jivesoftware.smack.Roster;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.ui.model.roster.RosterEntryElement;
 
 /**
  * This filter is responsible for hiding those contacts in the {@linkplain Roster contact list} that

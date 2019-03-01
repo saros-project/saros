@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.test.fakes.net;
+package saros.test.fakes.net;
 
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
 
 class FakePacketTransmitter implements ITransmitter {
 

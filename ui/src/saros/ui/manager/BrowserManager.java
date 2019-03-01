@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.manager;
+package saros.ui.manager;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
-import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 import java.util.HashMap;
 import java.util.Map;
+import saros.ui.pages.IBrowserPage;
+import saros.ui.renderer.Renderer;
 
 /**
  * This class manages the different browser instances for the dialogs and the main window. As the

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 import com.thoughtworks.xstream.converters.ErrorWriter;
 import com.thoughtworks.xstream.io.StreamException;

@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
-import de.fu_berlin.inf.dpp.session.User;
 import org.apache.commons.lang3.ObjectUtils;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.Timestamp;
+import saros.session.User;
 
 /** A JupiterActivity is an Activity that can be handled by the Jupiter Algorithm. */
 @XStreamAlias("jupiterActivity")

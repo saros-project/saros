@@ -17,14 +17,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.communication.chat.muc;
+package saros.communication.chat.muc;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.chat.AbstractChatService;
-import de.fu_berlin.inf.dpp.communication.chat.IChat;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,6 +26,12 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ChatState;
+import saros.annotations.Component;
+import saros.communication.chat.AbstractChatService;
+import saros.communication.chat.IChat;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.XMPPConnectionService;
 
 /**
  * This class manages the creation and destruction of {@link MultiUserChat}s.

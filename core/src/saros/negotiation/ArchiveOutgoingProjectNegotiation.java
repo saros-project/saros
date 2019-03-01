@@ -1,24 +1,5 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +7,25 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import saros.editor.IEditorManager;
+import saros.exceptions.LocalCancellationException;
+import saros.exceptions.OperationCanceledException;
+import saros.exceptions.SarosCancellationException;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IFile;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
+import saros.monitoring.IProgressMonitor;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.User;
+import saros.synchronize.StartHandle;
 
 /**
  * Implementation of {@link AbstractOutgoingProjectNegotiation} utilizing a transferred zip archive

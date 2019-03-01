@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard;
+package saros.stf.server.rmi.superbot.component.view.whiteboard;
 
 import java.awt.Color;
 import java.awt.Dimension;

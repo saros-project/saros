@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.commandHandlers;
+package saros.ui.commandHandlers;
 
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.AddResourcesToSessionWizard;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
+import saros.session.ISarosSession;
+import saros.ui.util.WizardUtils;
+import saros.ui.wizards.AddResourcesToSessionWizard;
 
 /**
  * Handles the addition of {@link IResource}s that must explicitly be selected in the opening {@link

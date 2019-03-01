@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.util.selection.retriever;
+package saros.ui.util.selection.retriever;
 
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.impl.AbstractSelectionConvertingRetriever;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.impl.SelectionRetriever;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPart;
+import saros.ui.util.selection.retriever.impl.AbstractSelectionConvertingRetriever;
+import saros.ui.util.selection.retriever.impl.SelectionRetriever;
 
 /**
  * Instances of this class can return an {@link ISelectionRetriever} which is capable of filtering

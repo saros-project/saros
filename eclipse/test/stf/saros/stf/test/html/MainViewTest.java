@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.stf.test.html;
+package saros.stf.test.html;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.ui.View.MAIN_VIEW;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.ui.View.MAIN_VIEW;
 
-import de.fu_berlin.inf.dpp.stf.client.StfHtmlTestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfHtmlTestCase;
 
 public class MainViewTest extends StfHtmlTestCase {
   @BeforeClass

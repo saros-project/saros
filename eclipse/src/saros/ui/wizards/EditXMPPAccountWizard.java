@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package saros.ui.wizards;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.EditXMPPAccountWizardPage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.net.xmpp.JID;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.wizards.pages.EditXMPPAccountWizardPage;
 
 /**
  * Wizard for editing an existing {@link XMPPAccount}.

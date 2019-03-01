@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.ui;
+package saros.ui;
 
-import de.fu_berlin.inf.dpp.ui.pages.AbstractBrowserPage;
-import de.fu_berlin.inf.dpp.ui.pages.MainPage;
-import de.fu_berlin.inf.dpp.ui.pages.SessionWizardPage;
+import saros.ui.pages.AbstractBrowserPage;
+import saros.ui.pages.MainPage;
+import saros.ui.pages.SessionWizardPage;
 
 /**
  * This enum make the connection between conceptual View and their technical realization. It allows

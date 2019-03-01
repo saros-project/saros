@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.server.editor;
+package saros.server.editor;
 
 /** Gap buffer implementation used by {@link Editor} for performant text edits. */
 public class GapBuffer {

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project;
+package saros.project;
 
 import java.util.HashMap;
 import java.util.Map;

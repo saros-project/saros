@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.ui.actions;
+package saros.ui.actions;
 
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
+import saros.ui.views.SarosView;
 
 public interface Disposable {
 

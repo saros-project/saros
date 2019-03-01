@@ -1,27 +1,27 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.communication.extensions.CancelProjectNegotiationExtension;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
-import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import saros.communication.extensions.CancelProjectNegotiationExtension;
+import saros.exceptions.LocalCancellationException;
+import saros.exceptions.RemoteCancellationException;
+import saros.exceptions.SarosCancellationException;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IWorkspace;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.MonitorableFileTransfer;
+import saros.monitoring.MonitorableFileTransfer.TransferStatus;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
 
 /**
  * This abstract class is the superclass for {@link AbstractOutgoingProjectNegotiation} and {@link
@@ -43,7 +43,7 @@ public abstract class ProjectNegotiation extends Negotiation {
 
   /** Timeout for all packet exchanges during the project negotiation */
   protected static final long PACKET_TIMEOUT =
-      Long.getLong("de.fu_berlin.inf.dpp.negotiation.project.PACKET_TIMEOUT", 30000L);
+      Long.getLong("saros.negotiation.project.PACKET_TIMEOUT", 30000L);
 
   protected final ISarosSessionManager sessionManager;
 

@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package saros.ui.browser_functions;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.HTMLUIStrings;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunction.Policy;
-import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
-import de.fu_berlin.inf.dpp.ui.model.Contact;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree;
-import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.HTMLUIContextFactory;
+import saros.HTMLUIStrings;
+import saros.filesystem.IResource;
+import saros.net.xmpp.JID;
+import saros.ui.JavaScriptAPI;
+import saros.ui.browser_functions.BrowserFunction.Policy;
+import saros.ui.manager.ProjectListManager;
+import saros.ui.model.Contact;
+import saros.ui.model.ProjectTree;
+import saros.ui.util.ICollaborationUtils;
 
 /** Send an invitation to a number of {@link Contact}s. */
 public class SendInvitation extends TypedJavascriptFunction {

@@ -24,7 +24,7 @@ eclipse_dropin_dir="${eclipse_dir}/dropins"
 
 workspace="${STF_WS}/ws/workspace_${user}"
 
-plugin_id_prefix="de.fu_berlin.inf.dpp"
+plugin_id_prefix="saros.eclipse"
 saros_plugin_dir="${STF_WS}/plugins"
 
 # determine (versioned) filename of plugin (_ suppresses .source versions)
@@ -39,7 +39,7 @@ fi
 dropins_content=$(ls -1 $eclipse_dropin_dir)
 if [ -z "$dropins_content" ]; then
   echo "installing plugins via dropin directory"
-  cp -v "${saros_plugin_dir}/de.fu_berlin.inf"* "${eclipse_dropin_dir}"
+  cp -v "${saros_plugin_dir}/saros"* "${eclipse_dropin_dir}"
 fi
 
 mkdir -p "${workspace}"
@@ -83,11 +83,11 @@ $eclipse_dir/eclipse \
   -Djava.security.manager \
   -Djava.security.policy="file:${workspace}/stf.policy" \
   -Djava.rmi.server.hostname="${host_ip}" \
-  -Dde.fu_berlin.inf.dpp.debug=true \
-  -Dde.fu_berlin.inf.dpp.testmode="${rmi_port}" \
-  -Dde.fu_berlin.inf.dpp.sleepTime=200 \
+  -Dsaros.debug=true \
+  -Dsaros.testmode="${rmi_port}" \
+  -Dsaros.sleepTime=200 \
   -Dorg.eclipse.swtbot.keyboard.strategy=org.eclipse.swtbot.swt.finder.keyboard.MockKeyboardStrategy \
-  -Dorg.eclipse.swtbot.keyboard.layout=de.fu_berlin.inf.dpp.stf.server.bot.default \
+  -Dorg.eclipse.swtbot.keyboard.layout=saros.stf.server.bot.default \
   -Dfile.encoding=UTF-8 \
   -Dosgi.parentClassloader=app \
 

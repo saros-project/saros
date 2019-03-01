@@ -18,12 +18,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
+package saros.concurrent.jupiter.internal.text;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import java.security.InvalidParameterException;
 import org.apache.log4j.Logger;
+import saros.concurrent.jupiter.InclusionTransformation;
+import saros.concurrent.jupiter.Operation;
 
 /**
  * Implementation of the GOTO operational transformation functions. The pseudo code can be found in

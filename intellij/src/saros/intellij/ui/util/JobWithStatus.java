@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.util;
+package saros.intellij.ui.util;
 
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import saros.negotiation.ProjectNegotiation;
 
 /** Helper class to run Runnables that return a */
 public abstract class JobWithStatus implements Runnable {

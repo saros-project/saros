@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.actions;
+package saros.whiteboard.gef.actions;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.DeleteRecordsCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.part.ElementRecordPart;
 import java.util.List;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.ui.actions.DeleteAction;
 import org.eclipse.ui.IWorkbenchPart;
+import saros.whiteboard.gef.commands.DeleteRecordsCommand;
+import saros.whiteboard.gef.part.ElementRecordPart;
 
 /**
  * For efficiency reasons we use a custom DeleteAction that uses a {@link
- * de.fu_berlin.inf.dpp.whiteboard.sxe.util.HierarchicalRecordSet} to create only <code>RemoveRecord
+ * saros.whiteboard.sxe.util.HierarchicalRecordSet} to create only <code>RemoveRecord
  * </code>s for the top-most <code>ElementRecord</code>s.
  *
  * @author jurke

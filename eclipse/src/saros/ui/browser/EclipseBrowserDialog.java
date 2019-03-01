@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.browser;
+package saros.ui.browser;
 
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import saros.ui.ide_embedding.IBrowserDialog;
 
 /** Implements the Eclipse wrapper for the SWT-specific dialog shell. */
 public class EclipseBrowserDialog implements IBrowserDialog {

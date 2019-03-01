@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.whiteboard;
+package saros.whiteboard;
 
-import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
 import org.eclipse.ui.IStartup;
+import saros.whiteboard.net.WhiteboardManager;
 
 /**
  * Initializes the whitboard manager singleton

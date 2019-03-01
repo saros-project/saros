@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.ui.pages;
+package saros.ui.pages;
 
-import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 import java.util.ArrayList;
 import java.util.List;
+import saros.ui.renderer.Renderer;
 
 /**
  * Abstract implementation of {@link IBrowserPage} which offers convenience methods for registering

@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package saros.stf.test.invitation;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.OK;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.OK;
+import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import java.rmi.RemoteException;
 import java.util.List;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
 public class InviteWithDifferentVersionsTest extends StfTestCase {
 

@@ -1,14 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
+package saros.ui.widgets.viewer.project;
 
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionListener;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +26,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.DialogUtils;
+import saros.ui.util.LayoutUtils;
+import saros.ui.util.WizardUtils;
+import saros.ui.views.SarosView;
+import saros.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
+import saros.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
+import saros.ui.widgets.viewer.project.events.ResourceSelectionListener;
 
 public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
   protected boolean filterClosedProjects;

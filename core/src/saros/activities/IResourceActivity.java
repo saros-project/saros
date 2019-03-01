@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 /** An interface for Activities that are resource-related (e.g. FileActivity) */
 public interface IResourceActivity extends IActivity {

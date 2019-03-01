@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl;
+package saros.stf.server.rmi.superbot.component.menubar.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.IMenuBar;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.ISarosMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.IWindowMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl.SarosMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl.WindowMenu;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.superbot.component.menubar.IMenuBar;
+import saros.stf.server.rmi.superbot.component.menubar.menu.ISarosMenu;
+import saros.stf.server.rmi.superbot.component.menubar.menu.IWindowMenu;
+import saros.stf.server.rmi.superbot.component.menubar.menu.impl.SarosMenu;
+import saros.stf.server.rmi.superbot.component.menubar.menu.impl.WindowMenu;
 
 public final class MenuBar extends StfRemoteObject implements IMenuBar {
 

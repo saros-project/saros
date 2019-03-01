@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.net.xmpp.roster;
+package saros.net.xmpp.roster;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +10,11 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
+import saros.annotations.Component;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
 
 /**
  * The RosterTracker is responsible for offering a convenient access for receiving roster listener

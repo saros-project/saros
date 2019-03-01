@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;

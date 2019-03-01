@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.util;
+package saros.intellij.util;
 
 import com.intellij.openapi.application.PathManager;
 import java.io.File;

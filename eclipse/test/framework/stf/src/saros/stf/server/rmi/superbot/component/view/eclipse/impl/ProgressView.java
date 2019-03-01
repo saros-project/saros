@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl;
+package saros.stf.server.rmi.superbot.component.view.eclipse.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IProgressView;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.superbot.component.view.eclipse.IProgressView;
 
 public final class ProgressView extends StfRemoteObject implements IProgressView {
 

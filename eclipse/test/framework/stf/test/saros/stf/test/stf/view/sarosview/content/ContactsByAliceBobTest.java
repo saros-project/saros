@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.view.sarosview.content;
+package saros.stf.test.stf.view.sarosview.content;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 import java.rmi.RemoteException;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.test.Constants;
 
 public class ContactsByAliceBobTest extends StfTestCase {
 

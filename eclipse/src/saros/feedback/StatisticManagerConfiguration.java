@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
+import saros.preferences.EclipsePreferenceConstants;
 
 public class StatisticManagerConfiguration {
 

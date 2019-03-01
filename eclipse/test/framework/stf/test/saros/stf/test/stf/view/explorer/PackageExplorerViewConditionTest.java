@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.view.explorer;
+package saros.stf.test.stf.view.explorer;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.ALICE;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import java.rmi.RemoteException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
 
 public class PackageExplorerViewConditionTest extends StfTestCase {
   @BeforeClass

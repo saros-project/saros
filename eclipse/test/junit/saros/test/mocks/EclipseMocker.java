@@ -1,15 +1,10 @@
-package de.fu_berlin.inf.dpp.test.mocks;
+package saros.test.mocks;
 
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceStoreAdapter;
-import de.fu_berlin.inf.dpp.test.util.EclipseMemoryPreferenceStore;
-import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
 import org.easymock.EasyMock;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -21,6 +16,11 @@ import org.osgi.framework.Version;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.MutablePicoContainer;
 import org.powermock.api.easymock.PowerMock;
+import saros.Saros;
+import saros.preferences.EclipsePreferenceInitializer;
+import saros.preferences.EclipsePreferenceStoreAdapter;
+import saros.test.util.EclipseMemoryPreferenceStore;
+import saros.test.util.MemoryPreferences;
 
 public class EclipseMocker {
   /** Mock the static call {@link ResourcesPlugin#getWorkspace()}. */

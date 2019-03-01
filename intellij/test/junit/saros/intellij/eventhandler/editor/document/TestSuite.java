@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document;
+package saros.intellij.eventhandler.editor.document;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

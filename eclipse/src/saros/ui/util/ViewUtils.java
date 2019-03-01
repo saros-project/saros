@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import org.apache.log4j.Logger;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import saros.ui.views.SarosView;
 
 public class ViewUtils {
 

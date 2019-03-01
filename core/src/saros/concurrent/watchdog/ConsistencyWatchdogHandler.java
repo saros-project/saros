@@ -1,29 +1,29 @@
-package de.fu_berlin.inf.dpp.concurrent.watchdog;
+package saros.concurrent.watchdog;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
-import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TargetedFileActivity;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.synchronize.StartHandle;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.ChecksumActivity;
+import saros.activities.ChecksumErrorActivity;
+import saros.activities.FileActivity.Purpose;
+import saros.activities.FileActivity.Type;
+import saros.activities.SPath;
+import saros.activities.TargetedFileActivity;
+import saros.annotations.Component;
+import saros.editor.IEditorManager;
+import saros.filesystem.IFile;
+import saros.session.AbstractActivityConsumer;
+import saros.session.AbstractActivityProducer;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityConsumer.Priority;
+import saros.session.ISarosSession;
+import saros.session.User;
+import saros.synchronize.StartHandle;
+import saros.synchronize.UISynchronizer;
+import saros.util.ThreadUtils;
 
 /**
  * This component is responsible for handling Consistency Errors on the host. It both produces and

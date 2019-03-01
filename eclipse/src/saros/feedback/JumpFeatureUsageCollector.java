@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
+import saros.annotations.Component;
+import saros.editor.IEditorManager;
+import saros.editor.ISharedEditorListener;
+import saros.session.ISarosSession;
+import saros.session.User;
+import saros.session.User.Permission;
 
 /**
  * This Collector collects data about the jump feature usage. It stores data about the total count

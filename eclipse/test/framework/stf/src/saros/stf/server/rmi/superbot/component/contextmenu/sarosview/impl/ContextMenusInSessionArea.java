@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl;
+package saros.stf.server.rmi.superbot.component.contextmenu.sarosview.impl;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import saros.net.xmpp.JID;
+import saros.stf.server.bot.widget.ContextMenuHelper;
+import saros.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
+import saros.stf.server.rmi.superbot.impl.SuperBot;
 
 public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     implements IContextMenusInSessionArea {

@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl;
+package saros.stf.server.rmi.controlbot.manipulation.impl;
 
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.IAccountManipulator;
 import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.controlbot.manipulation.IAccountManipulator;
 
 public class AccountManipulatorImpl extends StfRemoteObject implements IAccountManipulator {
 

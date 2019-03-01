@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +9,11 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.widget.ContextMenuHelper;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotTree;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 
 public final class RemoteBotTree extends StfRemoteObject implements IRemoteBotTree {
 

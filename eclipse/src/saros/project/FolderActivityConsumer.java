@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.project;
+package saros.project;
 
-import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
-import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFolderImpl;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.picocontainer.Startable;
+import saros.activities.FolderCreatedActivity;
+import saros.activities.FolderDeletedActivity;
+import saros.activities.IActivity;
+import saros.activities.SPath;
+import saros.filesystem.EclipseFolderImpl;
+import saros.session.AbstractActivityConsumer;
+import saros.session.ISarosSession;
+import saros.util.FileUtils;
 
 public final class FolderActivityConsumer extends AbstractActivityConsumer implements Startable {
 

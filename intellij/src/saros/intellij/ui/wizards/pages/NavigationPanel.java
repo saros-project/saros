@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
+package saros.intellij.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.Wizard;
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
@@ -10,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
+import saros.intellij.ui.wizards.Wizard;
 
 /** Default navigation panel with a progress bar and back, next, cancel buttons. */
 public class NavigationPanel extends JPanel {

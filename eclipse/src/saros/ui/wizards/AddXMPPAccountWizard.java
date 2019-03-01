@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package saros.ui.wizards;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterXMPPAccountWizardPage;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.communication.connection.ConnectionHandler;
+import saros.net.xmpp.JID;
+import saros.preferences.Preferences;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.wizards.pages.EnterXMPPAccountWizardPage;
+import saros.util.ThreadUtils;
 
 /**
  * A wizard that allows to enter an existing {@link XMPPAccount} or to create new one.

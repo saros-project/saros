@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
 /**
  * Implementations of IPreferences store key-value pairs and notify listeners upon value changes.

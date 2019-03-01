@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.menu;
+package saros.intellij.ui.menu;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;

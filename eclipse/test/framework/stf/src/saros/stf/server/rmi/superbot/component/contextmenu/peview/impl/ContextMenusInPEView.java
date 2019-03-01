@@ -1,17 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl;
+package saros.stf.server.rmi.superbot.component.contextmenu.peview.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.INewC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRunAsContextMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.NewC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.RefactorC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.RunAsContextMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.ShareWithC;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +10,18 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.SarosSWTBotPreferences;
+import saros.stf.server.bot.widget.ContextMenuHelper;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.INewC;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRunAsContextMenu;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.NewC;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.RefactorC;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.RunAsContextMenu;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.ShareWithC;
 
 public final class ContextMenusInPEView extends StfRemoteObject implements IContextMenusInPEView {
 

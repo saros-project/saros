@@ -1,17 +1,5 @@
-package de.fu_berlin.inf.dpp.project;
+package saros.project;
 
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
-import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
-import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
-import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
-import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -22,6 +10,18 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import saros.activities.FileActivity;
+import saros.activities.FileActivity.Purpose;
+import saros.activities.FileActivity.Type;
+import saros.activities.FolderCreatedActivity;
+import saros.activities.FolderDeletedActivity;
+import saros.activities.IResourceActivity;
+import saros.activities.SPath;
+import saros.editor.EditorManager;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.session.ISarosSession;
+import saros.session.User;
+import saros.util.FileUtils;
 
 /**
  * Visits the resource changes in a shared project.

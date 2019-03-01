@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.internal;
+package saros.stf.test.stf.internal;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import java.rmi.RemoteException;
 import java.util.zip.Deflater;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
 
 public class InternalTest extends StfTestCase {
 

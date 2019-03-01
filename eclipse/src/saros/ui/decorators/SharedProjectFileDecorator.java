@@ -1,20 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.decorators;
+package saros.ui.decorators;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +21,21 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.activities.SPath;
+import saros.annotations.Component;
+import saros.editor.EditorManager;
+import saros.editor.ISharedEditorListener;
+import saros.editor.annotations.SarosAnnotation;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.ISessionListener;
+import saros.session.SessionEndReason;
+import saros.session.User;
+import saros.ui.ImageManager;
+import saros.ui.util.SWTUtils;
 
 /*
  * This class MUST be thread safe !

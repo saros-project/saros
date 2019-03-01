@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
+package saros.concurrent.jupiter.internal.text;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.Operation;
 
 /**
  * An ITextOperation is an operation which describes a text change, either insert or delete, so

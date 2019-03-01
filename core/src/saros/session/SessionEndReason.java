@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
 /**
  * Denotes the reasons why a session has ended.

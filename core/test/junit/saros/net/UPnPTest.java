@@ -1,12 +1,9 @@
-package de.fu_berlin.inf.dpp.net;
+package saros.net;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
-import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -21,6 +18,9 @@ import org.bitlet.weupnp.PortMappingEntry;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
+import saros.net.upnp.IUPnPAccess;
+import saros.net.upnp.IUPnPService;
+import saros.net.upnp.internal.UPnPServiceImpl;
 
 /** Test class to perform tests on UPnP management functionality in Saros. */
 public class UPnPTest {

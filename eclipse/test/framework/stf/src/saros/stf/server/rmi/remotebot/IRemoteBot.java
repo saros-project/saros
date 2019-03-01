@@ -1,27 +1,27 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot;
+package saros.stf.server.rmi.remotebot;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCCombo;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCLabel;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCTabItem;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCheckBox;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotLabel;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotList;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotRadio;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotStyledText;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotText;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToggleButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotButton;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotCCombo;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotCLabel;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotCTabItem;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotCheckBox;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotLabel;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotList;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotRadio;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotStyledText;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotTable;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotText;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotToggleButton;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotToolbarButton;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 
 /* FIXME either just link to the wrapped SWTBot methods or copy the IFSPEC */
 public interface IRemoteBot extends Remote {

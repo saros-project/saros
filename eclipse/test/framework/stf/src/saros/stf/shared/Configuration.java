@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.shared;
+package saros.stf.shared;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -12,10 +12,10 @@ import java.util.ResourceBundle;
 public class Configuration {
 
   private static final String[] BUNDLE_NAMES = {
-    "de.fu_berlin.inf.dpp.project.messages",
-    "de.fu_berlin.inf.dpp.feedback.messages",
-    "de.fu_berlin.inf.dpp.ui.messages",
-    "de.fu_berlin.inf.dpp.stf.shared.configuration"
+    "saros.project.messages",
+    "saros.feedback.messages",
+    "saros.ui.messages",
+    "saros.stf.shared.configuration"
   };
 
   private static final ResourceBundle[] RESOURCE_BUNDLES;

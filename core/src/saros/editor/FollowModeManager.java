@@ -1,26 +1,26 @@
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.editor.IFollowModeListener.Reason;
-import de.fu_berlin.inf.dpp.editor.remote.EditorState;
-import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.picocontainer.Startable;
+import saros.activities.EditorActivity;
+import saros.activities.IActivity;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.activities.TextSelectionActivity;
+import saros.activities.ViewportActivity;
+import saros.context.IContextFactory;
+import saros.editor.IFollowModeListener.Reason;
+import saros.editor.remote.EditorState;
+import saros.editor.remote.UserEditorStateManager;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
+import saros.session.AbstractActivityConsumer;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityConsumer.Priority;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionContextFactory;
+import saros.session.ISessionListener;
+import saros.session.User;
 
 /**
  * Allows to follow other session participants. To be in the Follow Mode means to locally mirror

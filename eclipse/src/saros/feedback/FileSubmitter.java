@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package saros.project.internal;
 
-import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
-import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.StartFollowingActivity;
+import saros.activities.StopFollowingActivity;
+import saros.annotations.Component;
+import saros.awareness.AwarenessInformationCollector;
+import saros.session.AbstractActivityConsumer;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityConsumer.Priority;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
 
 /*
  * TODO Move this class into the core once another Saros implementation also wants to display which

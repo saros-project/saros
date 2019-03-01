@@ -84,11 +84,11 @@ manifestDependencies {
 }
 
 dependencies {
-  compile project(':de.fu_berlin.inf.dpp.core')
-  compile project(':de.fu_berlin.inf.dpp.ui')
+  compile project(':saros.core')
+  compile project(':saros.ui')
 
-  compile project(path: ':de.fu_berlin.inf.dpp.core', configuration: 'testing')
-  compile project(path: ':de.fu_berlin.inf.dpp.ui', configuration: 'testing')
+  compile project(path: ':saros.core', configuration: 'testing')
+  compile project(path: ':saros.ui', configuration: 'testing')
 
   releaseDep fileTree(dir: 'libs', include: '*.jar', exclude: '*source*.jar')
 
@@ -98,9 +98,9 @@ dependencies {
 
   stfTestCompile junitVersion
   stfTestCompile sourceSets.main.output
-  stfTestCompile project(':de.fu_berlin.inf.dpp.core')
-  stfTestCompile project(':de.fu_berlin.inf.dpp.ui')
-  stfTestCompile project(path: ':de.fu_berlin.inf.dpp.ui', configuration: 'testing')
+  stfTestCompile project(':saros.core')
+  stfTestCompile project(':saros.ui')
+  stfTestCompile project(path: ':saros.ui', configuration: 'testing')
   stfTestCompile fileTree(dir: 'libs', include: '*.jar', exclude: '*source*.jar')
   stfTestCompile fileTree(dir: eclipseHome + '/plugins').matching {
     include '*.jar'
@@ -109,13 +109,13 @@ dependencies {
   }
 }
 
-task stfTest (type: Test, dependsOn: [':de.fu_berlin.inf.dpp:build']) {
+task stfTest (type: Test, dependsOn: [':saros.eclipse:build']) {
   group 'Verification'
   description 'Runs the stf tests. Requires a corresponding test environment'
 
   testClassesDirs = sourceSets.stfTest.output.classesDirs
 
-  systemProperty 'de.fu_berlin.inf.dpp.stf.client.configuration.files', System.getProperty('stf.client.configuration.files', '') 
+  systemProperty 'saros.stf.client.configuration.files', System.getProperty('stf.client.configuration.files', '') 
 
   classpath = sourceSets.stfTest.runtimeClasspath
 

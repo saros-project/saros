@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
+package saros.concurrent.jupiter.test.util;
 
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
+import saros.net.xmpp.JID;
+import saros.session.User;
 
 public abstract class JupiterTestCase {
 

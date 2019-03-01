@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.stream;
+package saros.net.stream;
 
 import java.io.IOException;
 import java.io.InputStream;

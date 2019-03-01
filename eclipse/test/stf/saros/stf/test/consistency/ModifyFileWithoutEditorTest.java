@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.stf.test.consistency;
+package saros.stf.test.consistency;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
 
-import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.annotation.TestLink;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
 
 @TestLink(id = "Saros-84_synchronize_file_modifications_outside_of_editors")
 public class ModifyFileWithoutEditorTest extends StfTestCase {

@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.negotiation.hooks;
+package saros.negotiation.hooks;
 
-import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import java.util.Map;
+import saros.negotiation.IncomingSessionNegotiation;
+import saros.negotiation.OutgoingSessionNegotiation;
+import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.session.SarosSessionManager;
 
 /**
  * A SessionNegotiationHook is a component that wishes to take part in the SessionNegotiation. On

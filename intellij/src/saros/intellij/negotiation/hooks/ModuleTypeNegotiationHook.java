@@ -1,15 +1,7 @@
-package de.fu_berlin.inf.dpp.intellij.negotiation.hooks;
+package saros.intellij.negotiation.hooks;
 
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.filesystem.IProject;
+import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.ui.util.NotificationPanel;
+import saros.negotiation.hooks.ISessionNegotiationHook;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.session.ISarosSessionManager;
 
 /**
  * Negotiation Hook to exchange information about possible module types as well as the types of the
@@ -49,7 +49,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
    *
    * @param hookManager the <code>SessionNegotiationHookManager</code>
    * @param sessionManager the <code>SessionManger</code>
-   * @see de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory
+   * @see saros.intellij.context.SarosIntellijContextFactory
    */
   public ModuleTypeNegotiationHook(
       SessionNegotiationHookManager hookManager, ISarosSessionManager sessionManager) {

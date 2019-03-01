@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.stf.shared;
+package saros.stf.shared;
 
-import static de.fu_berlin.inf.dpp.stf.shared.Configuration.get;
+import static saros.stf.shared.Configuration.get;
 
 public interface Constants {
   public enum TypeOfCreateProject {

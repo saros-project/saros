@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.net.xmpp.subscription;
+package saros.net.xmpp.subscription;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import saros.net.xmpp.JID;
 
 /** Listener for {@link SubscriptionHandler} events */
 public interface SubscriptionListener {

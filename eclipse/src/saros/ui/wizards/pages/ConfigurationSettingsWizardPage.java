@@ -1,18 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.LinkListener;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.IllustratedComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -35,6 +22,19 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.feedback.ErrorLogManager;
+import saros.feedback.StatisticManagerConfiguration;
+import saros.net.upnp.IUPnPService;
+import saros.preferences.Preferences;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.LayoutUtils;
+import saros.ui.util.LinkListener;
+import saros.ui.util.SWTUtils;
+import saros.ui.widgets.IllustratedComposite;
+import saros.ui.widgets.decoration.EmptyText;
+import saros.util.ThreadUtils;
 
 /**
  * Allows the user to enter general configuration parameters for use with Saros.
@@ -45,10 +45,9 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
   private static final Logger LOG = Logger.getLogger(ConfigurationSettingsWizardPage.class);
 
-  public static final String TITLE =
-      de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_title;
+  public static final String TITLE = saros.ui.Messages.ConfigurationSettingsWizardPage_title;
   public static final String DESCRIPTION =
-      de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_description;
+      saros.ui.Messages.ConfigurationSettingsWizardPage_description;
 
   @Inject protected Preferences preferences;
 
@@ -97,8 +96,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
   protected Composite createLeftColumn(Composite composite) {
     Group leftColumn = new Group(composite, SWT.NONE);
     leftColumn.setLayout(LayoutUtils.createGridLayout(5, 0));
-    leftColumn.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_left_column_connection);
+    leftColumn.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_left_column_connection);
 
     /*
      * prepare network setting composite
@@ -114,12 +112,11 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
      */
     Label autoConnectLabel = new Label(autoconnectComposite, SWT.WRAP);
     autoConnectLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    autoConnectLabel.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_label_autoconnect);
+    autoConnectLabel.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_label_autoconnect);
 
     this.autoConnectButton = new Button(autoconnectComposite, SWT.CHECK | SWT.LEFT);
     this.autoConnectButton.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_button_autoconnect);
+        saros.ui.Messages.ConfigurationSettingsWizardPage_button_autoconnect);
 
     /*
      * separator
@@ -136,15 +133,13 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
     portmappingLabel = new Label(gatewayComposite, SWT.WRAP);
     portmappingLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    portmappingLabel.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_label_portmapping);
+    portmappingLabel.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_label_portmapping);
 
     this.setupPortmappingButton = new Button(gatewayComposite, SWT.CHECK | SWT.LEFT | SWT.WRAP);
     this.setupPortmappingButton.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_button_portmapping);
+        saros.ui.Messages.ConfigurationSettingsWizardPage_button_portmapping);
     this.setupPortmappingButton.setToolTipText(
-        de.fu_berlin.inf.dpp.ui.Messages
-            .ConfigurationSettingsWizardPage_button_portmapping_tooltip);
+        saros.ui.Messages.ConfigurationSettingsWizardPage_button_portmapping_tooltip);
     setupPortmappingButton.setEnabled(false);
 
     Composite comboCompo = new Composite(gatewayComposite, SWT.TOP | SWT.LEFT);
@@ -172,22 +167,19 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
     Label skypeLabel = new Label(skypeComposite, SWT.WRAP);
     skypeLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-    skypeLabel.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_label_skype);
+    skypeLabel.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_label_skype);
 
     Composite skypeUsageComposite = new Composite(skypeComposite, SWT.NONE);
     skypeUsageComposite.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     skypeUsageComposite.setLayout(LayoutUtils.createGridLayout(2, false, 0, 5));
     this.skypeUsageButton = new Button(skypeUsageComposite, SWT.CHECK);
-    this.skypeUsageButton.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_yes_use);
+    this.skypeUsageButton.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_yes_use);
 
     Text skypeUsernameText = new Text(skypeComposite, SWT.BORDER);
     skypeUsernameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     this.skypeUsernameText =
         new EmptyText(
-            skypeUsernameText,
-            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_skype_username);
+            skypeUsernameText, saros.ui.Messages.ConfigurationSettingsWizardPage_skype_username);
 
     return leftColumn;
   }
@@ -195,7 +187,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
   protected Composite createRightColumn(Composite composite) {
     Group rightColumn = new Group(composite, SWT.NONE);
     rightColumn.setLayout(LayoutUtils.createGridLayout(5, 0));
-    rightColumn.setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_statistic);
+    rightColumn.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_statistic);
 
     /*
      * statistic submission
@@ -217,14 +209,13 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     data.widthHint = 400;
 
     message.setLayoutData(data);
-    message.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_feedback_descr);
+    message.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_feedback_descr);
     message.addListener(SWT.Selection, new LinkListener());
 
     statisticSubmissionButton = new Button(statisticSubmissionComposite, SWT.CHECK | SWT.WRAP);
     statisticSubmissionButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     statisticSubmissionButton.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_feedback_allow_data);
+        saros.ui.Messages.ConfigurationSettingsWizardPage_feedback_allow_data);
     statisticSubmissionButton.setSelection(true);
 
     /*
@@ -245,7 +236,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     errorLogSubmissionButton = new Button(crashReportSubmissionComposite, SWT.CHECK | SWT.WRAP);
     errorLogSubmissionButton.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false));
     errorLogSubmissionButton.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_feedback_allow_crash);
+        saros.ui.Messages.ConfigurationSettingsWizardPage_feedback_allow_crash);
     errorLogSubmissionButton.setSelection(true);
 
     return rightColumn;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.util;
+package saros.intellij.ui.util;
 
 import java.net.URL;
 import javax.swing.ImageIcon;

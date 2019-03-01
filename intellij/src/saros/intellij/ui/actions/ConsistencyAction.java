@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.intellij.ui.actions;
+package saros.intellij.ui.actions;
 
 import com.intellij.openapi.application.ApplicationManager;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.MonitorProgressBar;
-import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgressFrame;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
+import saros.concurrent.watchdog.ConsistencyWatchdogClient;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.widgets.progress.MonitorProgressBar;
+import saros.intellij.ui.widgets.progress.ProgressFrame;
+import saros.monitoring.IProgressMonitor;
+import saros.util.ThreadUtils;
 
 /** Performs project recovery, when inconsistency was detected. */
 public class ConsistencyAction extends AbstractSarosAction {

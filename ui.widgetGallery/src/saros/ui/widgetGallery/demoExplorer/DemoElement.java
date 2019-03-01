@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer;
+package saros.ui.widgetGallery.demoExplorer;
 
-import de.fu_berlin.inf.dpp.ui.model.TreeElement;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.ImageManager;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
+import saros.ui.model.TreeElement;
+import saros.ui.widgetGallery.ImageManager;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
 
 /**
  * Wrapper for {@link AbstractDemo}s for use with {@link Viewer Viewers}

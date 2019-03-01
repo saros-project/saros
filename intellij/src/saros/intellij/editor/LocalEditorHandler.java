@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
-import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.activities.SPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.session.SessionUtils;
 
 /**
  * Class for handling activities on local editors and transforming them to calls to {@link

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions;
+package saros.whiteboard.sxe.exceptions;
 
 /**
  * A record committed to the document cannot be changed directly, SetRecords have to be used else a

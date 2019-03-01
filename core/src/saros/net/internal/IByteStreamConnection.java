@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.IOException;
+import saros.net.stream.StreamMode;
+import saros.net.xmpp.JID;
 
 /** A IByteStreamConnection is responsible for sending data to a particular user */
 public interface IByteStreamConnection {

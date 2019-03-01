@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package saros.ui.browser_functions;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.HTMLUIStrings;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.model.ValidationResult;
+import saros.HTMLUIContextFactory;
+import saros.HTMLUIStrings;
+import saros.net.xmpp.JID;
+import saros.ui.model.ValidationResult;
 
 /** Validate if a given string is a valid {@link JID}. */
 public class GetValidJID extends TypedJavascriptFunction {

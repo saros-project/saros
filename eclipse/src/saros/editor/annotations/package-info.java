@@ -11,12 +11,12 @@
  *   <li>the {@link SarosAnnotation} extends {@link org.eclipse.jface.text.source.Annotation}.
  *       Manages the coloring of text-highlighting.
  *   <li>the {@link ContributionAnnotation} used by {@link
- *       de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager}. Marks text
- *       contribution done by a user
+ *       saros.editor.internal.ContributionAnnotationManager}. Marks text contribution done by a
+ *       user
  *   <li>the {@link SelectionAnnotation} extends {@link SarosAnnotation}. Marks selected text done
  *       by user
  *   <li>the {@link ViewportAnnotation} extends {@link SarosAnnotation}. Marks the viewport on the
  *       side of the editor view.
  * </ul>
  */
-package de.fu_berlin.inf.dpp.editor.annotations;
+package saros.editor.annotations;

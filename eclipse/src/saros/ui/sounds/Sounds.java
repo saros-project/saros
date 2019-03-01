@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.sounds;
+package saros.ui.sounds;
 
 public interface Sounds {
   public static final String USER_ONLINE = "UserComesOnline.wav";

@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.whiteboard.ui.browser;
+package saros.whiteboard.ui.browser;
 
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.whiteboard.ui.HTMLWhiteboardView;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
+import saros.ui.util.SWTUtils;
+import saros.whiteboard.ui.HTMLWhiteboardView;
 
 /**
  * the eclipse implementation of the IWhiteboardBrowser, this implementation uses the SWT browser to

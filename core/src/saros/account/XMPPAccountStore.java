@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.account;
+package saros.account;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -35,6 +33,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import saros.annotations.Component;
+import saros.net.xmpp.JID;
 
 /**
  * The XMPPAccountStore is responsible for administering XMPP account credentials. All data will

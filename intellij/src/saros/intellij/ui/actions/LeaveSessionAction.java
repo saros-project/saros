@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.actions;
+package saros.intellij.ui.actions;
 
-import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
+import saros.core.ui.util.CollaborationUtils;
 
 /** Action to leave session */
 public class LeaveSessionAction extends AbstractSarosAction {

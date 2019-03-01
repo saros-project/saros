@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
+package saros.concurrent.jupiter.internal;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.log4j.Logger;
+import saros.activities.ChecksumActivity;
+import saros.activities.JupiterActivity;
+import saros.activities.SPath;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.Timestamp;
+import saros.concurrent.jupiter.TransformationException;
+import saros.session.User;
 
 /**
  * The JupiterDocumentServer is the host side component managing all server Jupiter instances.

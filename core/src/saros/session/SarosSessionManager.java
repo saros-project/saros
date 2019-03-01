@@ -17,38 +17,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationCollector;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
-import de.fu_berlin.inf.dpp.negotiation.ProjectSharingData;
-import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
-import de.fu_berlin.inf.dpp.session.internal.SarosSession;
-import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,6 +31,36 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
+import saros.annotations.Component;
+import saros.context.IContainerContext;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.monitoring.IProgressMonitor;
+import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.IncomingSessionNegotiation;
+import saros.negotiation.NegotiationFactory;
+import saros.negotiation.NegotiationListener;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.negotiation.OutgoingSessionNegotiation;
+import saros.negotiation.ProjectNegotiation;
+import saros.negotiation.ProjectNegotiationCollector;
+import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.ProjectSharingData;
+import saros.negotiation.SessionNegotiation;
+import saros.negotiation.hooks.ISessionNegotiationHook;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.ConnectionState;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.PreferenceStore;
+import saros.session.internal.SarosSession;
+import saros.util.StackTrace;
+import saros.util.ThreadUtils;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for reacting to

@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package saros.ui.wizards;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.AddContactWizardPage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -24,6 +13,17 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
+import saros.SarosConstants;
+import saros.SarosPluginContext;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.subscription.SubscriptionHandler;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.DialogUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.wizards.pages.AddContactWizardPage;
 
 /**
  * Wizard for adding a new contact to the {@link Roster roster} of the currently connected user.

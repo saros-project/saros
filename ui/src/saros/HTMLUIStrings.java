@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
 /**
  * This class encapsulates all labels, messages, titles, etc. which will be visible in the HTML UI.

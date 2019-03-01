@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.stf.test.editing;
+package saros.stf.test.editing;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertEquals;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.client.tester.SarosTester.CARL;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.test.util.EclipseTestThread;
 
 /**
  * This class tests the concurrent editing of three users during a session.

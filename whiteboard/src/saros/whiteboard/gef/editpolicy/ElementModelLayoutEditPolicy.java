@@ -1,17 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy;
+package saros.whiteboard.gef.editpolicy;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.ElementRecordAddCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.ElementRecordChangeLayoutCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.ElementRecordCreateCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.PolylineRecordCreateCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.TextboxCreateCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGPolylineRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.part.ElementRecordPart;
-import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
-import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateTextBoxRequest;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.LayoutUtils;
 import java.util.Arrays;
 import org.apache.batik.util.SVGConstants;
 import org.apache.log4j.Logger;
@@ -28,6 +16,18 @@ import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.swt.graphics.Color;
+import saros.whiteboard.gef.commands.ElementRecordAddCommand;
+import saros.whiteboard.gef.commands.ElementRecordChangeLayoutCommand;
+import saros.whiteboard.gef.commands.ElementRecordCreateCommand;
+import saros.whiteboard.gef.commands.PolylineRecordCreateCommand;
+import saros.whiteboard.gef.commands.TextboxCreateCommand;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.gef.model.SVGPolylineRecord;
+import saros.whiteboard.gef.part.ElementRecordPart;
+import saros.whiteboard.gef.request.CreatePointlistRequest;
+import saros.whiteboard.gef.request.CreateTextBoxRequest;
+import saros.whiteboard.gef.util.ColorUtils;
+import saros.whiteboard.gef.util.LayoutUtils;
 
 /**
  * Whiteboard application specific edit policy that returns adequate commands.

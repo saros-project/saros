@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.bot;
+package saros.stf.server.bot;
 
 public class BotPreferences {
   public static final long DEFAULT_TIMEOUT = 30 * 1000;

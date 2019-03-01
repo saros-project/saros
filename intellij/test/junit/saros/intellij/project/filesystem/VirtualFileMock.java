@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.project.filesystem;
+package saros.intellij.project.filesystem;
 
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;

@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.intellij.editor.annotations;
+package saros.intellij.editor.annotations;
 
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+import saros.filesystem.IFile;
+import saros.session.User;
 
 /**
  * A class to store all current annotations of a certain type.

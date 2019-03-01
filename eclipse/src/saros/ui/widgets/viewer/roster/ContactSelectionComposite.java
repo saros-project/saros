@@ -1,22 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster;
+package saros.ui.widgets.viewer.roster;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
-import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterCheckStateProvider;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterComparator;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionListener;
-import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +21,23 @@ import org.eclipse.swt.widgets.Tree;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.RosterEntry;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.ui.model.ITreeElement;
+import saros.ui.model.TreeLabelProvider;
+import saros.ui.model.roster.RosterCheckStateProvider;
+import saros.ui.model.roster.RosterComparator;
+import saros.ui.model.roster.RosterContentProvider;
+import saros.ui.model.roster.RosterEntryElement;
+import saros.ui.util.LayoutUtils;
+import saros.ui.util.ViewerUtils;
+import saros.ui.widgets.viewer.ViewerComposite;
+import saros.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
+import saros.ui.widgets.viewer.roster.events.ContactSelectionListener;
+import saros.util.ArrayUtils;
 
 /**
  * This {@link Composite} displays {@link RosterEntry roster entries} and allows to check (via check

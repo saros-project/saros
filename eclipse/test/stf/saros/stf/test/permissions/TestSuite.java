@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.permissions;
+package saros.stf.test.permissions;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

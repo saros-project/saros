@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.session.User;
 
 /** @deprecated not used at the moment */
 @Deprecated

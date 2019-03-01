@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.part;
+package saros.whiteboard.gef.part;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGEllipseRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.swt.graphics.Color;
+import saros.whiteboard.gef.model.SVGEllipseRecord;
+import saros.whiteboard.gef.util.ColorUtils;
 
 public class SVGEllipsePart extends ElementRecordPart {
 

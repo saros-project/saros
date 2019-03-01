@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.pages;
+package saros.ui.pages;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.HTMLUIStrings;
-import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
-import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
+import saros.HTMLUIContextFactory;
+import saros.HTMLUIStrings;
+import saros.ui.renderer.AccountRenderer;
+import saros.ui.renderer.StateRenderer;
 
 /** Represents the Saros main view. */
 public class MainPage extends AbstractBrowserPage {

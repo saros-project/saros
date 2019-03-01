@@ -14,9 +14,9 @@
  *       editor.
  *   <li>the {@link EditorAPI} realises basic text editor interactions.
  *   <li>the {@link EditorListener} listen for selection and viewport changes in the text content of
- *       the editor view. Transmit the result to {@link de.fu_berlin.inf.dpp.editor.EditorManager}
+ *       the editor view. Transmit the result to {@link saros.editor.EditorManager}
  *   <li>the {@link EditorPartListener} listens to the editor's view state changes.Transmit the
- *       result to {@link de.fu_berlin.inf.dpp.editor.EditorManager}
+ *       result to {@link saros.editor.EditorManager}
  *   <li>the {@link RevertBufferListener} listens for buffers of changes in saros-session-documments
  *       to react for "bufferDispose()" events and get control over the file revert operation
  *   <li>the {@link SafeDelegatingFileBufferListener} makes calls to the listener safe and is used
@@ -27,4 +27,4 @@
  *       edit the shared document.
  * </ul>
  */
-package de.fu_berlin.inf.dpp.editor.internal;
+package saros.editor.internal;

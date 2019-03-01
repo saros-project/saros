@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.monitoring.remote;
+package saros.monitoring.remote;
 
-import de.fu_berlin.inf.dpp.activities.ProgressActivity;
-import de.fu_berlin.inf.dpp.activities.ProgressActivity.ProgressAction;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import java.util.Collection;
 import org.apache.log4j.Logger;
+import saros.activities.ProgressActivity;
+import saros.activities.ProgressActivity.ProgressAction;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.NullProgressMonitor;
+import saros.session.User;
+import saros.util.StackTrace;
 
 /**
  * An {@link IProgressMonitor} implementation which sends all progress as activities to a specific

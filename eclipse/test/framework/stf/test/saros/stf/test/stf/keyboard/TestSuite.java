@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.keyboard;
+package saros.stf.test.stf.keyboard;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

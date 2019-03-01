@@ -1,21 +1,10 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.NOPActivity;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
-import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
-import de.fu_berlin.inf.dpp.test.stubs.SarosSessionStub;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +16,17 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import saros.activities.IActivity;
+import saros.activities.NOPActivity;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.PreferenceStore;
+import saros.session.User;
+import saros.test.fakes.net.FakeConnectionFactory;
+import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
+import saros.test.stubs.SarosSessionStub;
 
 public class ActivitySequencerTest {
 

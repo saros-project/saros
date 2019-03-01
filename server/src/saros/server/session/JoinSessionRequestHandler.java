@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.server.session;
+package saros.server.session;
 
-import de.fu_berlin.inf.dpp.communication.extensions.JoinSessionRequestExtension;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -12,6 +7,11 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
+import saros.communication.extensions.JoinSessionRequestExtension;
+import saros.net.IReceiver;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSessionManager;
+import saros.util.NamedThreadFactory;
 
 /** Listens for and handles JoinSessionRequests allowing clients to join server sessions. */
 public final class JoinSessionRequestHandler {

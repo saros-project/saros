@@ -17,19 +17,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
-import de.fu_berlin.inf.dpp.activities.ActivityOptimizer;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
-import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +34,17 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.Startable;
+import saros.activities.ActivityOptimizer;
+import saros.activities.FileActivity;
+import saros.activities.IActivity;
+import saros.communication.extensions.ActivitiesExtension;
+import saros.net.DispatchThreadContext;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.User;
+import saros.util.ThreadUtils;
 
 /**
  * The ActivitySequencer is responsible for making sure that transformed {@linkplain IActivity

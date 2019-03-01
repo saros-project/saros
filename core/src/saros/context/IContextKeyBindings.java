@@ -17,7 +17,7 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package de.fu_berlin.inf.dpp.context;
+package saros.context;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

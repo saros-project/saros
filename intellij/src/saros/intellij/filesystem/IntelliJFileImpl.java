@@ -1,13 +1,8 @@
-package de.fu_berlin.inf.dpp.intellij.filesystem;
+package saros.intellij.filesystem;
 
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,6 +12,11 @@ import java.nio.file.FileAlreadyExistsException;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.filesystem.IContainer;
+import saros.filesystem.IFile;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
 
 public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
 

@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.ITransferListener;
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import saros.annotations.Component;
+import saros.net.IConnectionManager;
+import saros.net.ITransferListener;
+import saros.net.stream.StreamMode;
+import saros.session.ISarosSession;
 
 /**
  * Collects information about the amount of data transfered with the different {@link StreamMode}s

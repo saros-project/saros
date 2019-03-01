@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.editor.internal;
+package saros.editor.internal;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.Logger;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.annotations.Component;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.ISessionListener;
+import saros.session.SessionEndReason;
+import saros.session.User;
 
 /**
  * This Document provider tries tell others that files are not editable if the local user has no

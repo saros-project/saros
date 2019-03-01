@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.ui.browser;
+package saros.whiteboard.ui.browser;
 
 /**
  * Describes the functionality of the browser used to display the HTMLWhiteboard, this allows for an

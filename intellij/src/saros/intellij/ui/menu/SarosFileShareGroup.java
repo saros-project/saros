@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.menu;
+package saros.intellij.ui.menu;
 
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -6,11 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -20,6 +15,11 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.session.ISarosSessionManager;
 
 /** Saros action group for the pop-up menu when right-clicking on a module. */
 public class SarosFileShareGroup extends ActionGroup {

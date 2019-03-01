@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.CommittedRecordException;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.SetRecordDataObject;
+import saros.whiteboard.sxe.constants.NodeType;
+import saros.whiteboard.sxe.constants.RecordEntry;
+import saros.whiteboard.sxe.constants.RecordType;
+import saros.whiteboard.sxe.exceptions.CommittedRecordException;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
+import saros.whiteboard.sxe.records.serializable.SetRecordDataObject;
 
 /**
  * A record that can change the target {@link NodeRecord}'s mutable fields.

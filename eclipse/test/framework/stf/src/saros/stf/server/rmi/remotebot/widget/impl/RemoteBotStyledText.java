@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotStyledText;
 import java.rmi.RemoteException;
 import java.util.List;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotStyledText;
 
 public final class RemoteBotStyledText extends StfRemoteObject implements IRemoteBotStyledText {
 

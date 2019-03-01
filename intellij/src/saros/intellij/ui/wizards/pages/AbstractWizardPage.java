@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
+package saros.intellij.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.Wizard;
 import javax.swing.JPanel;
+import saros.intellij.ui.wizards.Wizard;
 
 /**
  * Abstract base class for wizard pages.

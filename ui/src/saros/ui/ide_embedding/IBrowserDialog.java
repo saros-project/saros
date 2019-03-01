@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.ide_embedding;
+package saros.ui.ide_embedding;
 
 /** This interface abstracts GUI toolkit dialogs by providing just the needed functionality. */
 public interface IBrowserDialog {

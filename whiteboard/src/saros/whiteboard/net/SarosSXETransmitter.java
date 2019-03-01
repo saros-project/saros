@@ -1,22 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.net;
+package saros.whiteboard.net;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.ISXETransmitter;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEIncomingSynchronizationProcess;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +12,23 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.PacketCollector;
+import saros.net.internal.XMPPTransmitter;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.User;
+import saros.ui.util.SWTUtils;
+import saros.util.NamedThreadFactory;
+import saros.util.ThreadUtils;
+import saros.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.constants.SXEMessageType;
+import saros.whiteboard.sxe.net.ISXETransmitter;
+import saros.whiteboard.sxe.net.SXEIncomingSynchronizationProcess;
+import saros.whiteboard.sxe.net.SXEMessage;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
 
 /**
  * Uses Smack and Saros to establish the SXE communication.</br>

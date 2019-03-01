@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.view.html;
+package saros.stf.test.stf.view.html;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

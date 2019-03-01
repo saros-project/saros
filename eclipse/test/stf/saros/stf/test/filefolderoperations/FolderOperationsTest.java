@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.stf.test.filefolderoperations;
+package saros.stf.test.filefolderoperations;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
 
-import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.annotation.TestLink;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.shared.Constants.TypeOfCreateProject;
 
 @TestLink(id = "Saros-43_folder_operations")
 public class FolderOperationsTest extends StfTestCase {

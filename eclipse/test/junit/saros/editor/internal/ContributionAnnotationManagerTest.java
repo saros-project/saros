@@ -1,14 +1,9 @@
-package de.fu_berlin.inf.dpp.editor.internal;
+package saros.editor.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.test.util.EclipseMemoryPreferenceStore;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +18,11 @@ import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import saros.net.xmpp.JID;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.ISarosSession;
+import saros.session.User;
+import saros.test.util.EclipseMemoryPreferenceStore;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(User.class)

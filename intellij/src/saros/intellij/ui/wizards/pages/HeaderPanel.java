@@ -1,7 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
+package saros.intellij.ui.wizards.pages;
 
 import com.intellij.ui.JBColor;
-import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import javax.swing.BoxLayout;
@@ -9,6 +8,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import saros.intellij.ui.util.IconManager;
 
 /** Class presents header panel for wizards. */
 public class HeaderPanel extends JPanel {

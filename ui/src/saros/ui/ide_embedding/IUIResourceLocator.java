@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.ide_embedding;
+package saros.ui.ide_embedding;
 
 /**
  * This interface couples the IDE-specific locating of resources. Concretely, the URL to the

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.views;
+package saros.ui.widgetGallery.views;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.IPostSelectionProvider;

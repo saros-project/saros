@@ -1,23 +1,23 @@
-package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
+package saros.intellij.ui.views.buttons;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.exceptions.IllegalAWTContextException;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.actions.AbstractSarosAction;
-import de.fu_berlin.inf.dpp.intellij.ui.actions.ConnectServerAction;
-import de.fu_berlin.inf.dpp.intellij.ui.actions.DisconnectServerAction;
-import de.fu_berlin.inf.dpp.intellij.ui.actions.NotImplementedAction;
-import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.Scanner;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.exceptions.IllegalAWTContextException;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.actions.AbstractSarosAction;
+import saros.intellij.ui.actions.ConnectServerAction;
+import saros.intellij.ui.actions.DisconnectServerAction;
+import saros.intellij.ui.actions.NotImplementedAction;
+import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.util.SafeDialogUtils;
+import saros.net.xmpp.JID;
 
 /** Implementation of connect XMPP/jabber server button */
 public class ConnectButton extends ToolbarButton {

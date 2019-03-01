@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer;
+package saros.ui.widgetGallery.demoExplorer;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
 
 public abstract class PreferencePageDemo extends AbstractDemo {
   protected IPreferencePage prefpage;

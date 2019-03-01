@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy;
+package saros.whiteboard.gef.editpolicy;
 
 import java.util.ArrayList;
 import java.util.List;

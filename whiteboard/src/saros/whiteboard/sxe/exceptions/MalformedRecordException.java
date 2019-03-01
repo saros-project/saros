@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions;
+package saros.whiteboard.sxe.exceptions;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
+import saros.whiteboard.sxe.constants.RecordEntry;
 
 /**
  * Used if a RecordDataObject is received that does not correspond to a valid record or that lacks a

@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
+package saros.whiteboard.gef.commands;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.GEFRecordFactory;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.TestUtils;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.junit.Test;
+import saros.whiteboard.gef.model.GEFRecordFactory;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.sxe.TestUtils;
+import saros.whiteboard.sxe.records.DocumentRecord;
 
 public class ConflictingCommandsTest {
 

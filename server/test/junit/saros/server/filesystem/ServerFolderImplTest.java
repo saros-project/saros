@@ -1,17 +1,14 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.assertIsFolder;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.assertResourceExists;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.assertResourceNotExists;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createFile;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createFolder;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.path;
 import static org.easymock.EasyMock.expect;
+import static saros.server.filesystem.FileSystemTestUtils.assertIsFolder;
+import static saros.server.filesystem.FileSystemTestUtils.assertResourceExists;
+import static saros.server.filesystem.FileSystemTestUtils.assertResourceNotExists;
+import static saros.server.filesystem.FileSystemTestUtils.createFile;
+import static saros.server.filesystem.FileSystemTestUtils.createFolder;
+import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
+import static saros.server.filesystem.FileSystemTestUtils.path;
 
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMockSupport;
@@ -19,6 +16,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Test.None;
+import saros.filesystem.IFolder;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
 
 public class ServerFolderImplTest extends EasyMockSupport {
 

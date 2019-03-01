@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.communication.connection.IConnectingFailureCallback;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.XMPPError;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectingFailureCallback;
+import saros.ui.util.DialogUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.WizardUtils;
+import saros.util.ThreadUtils;
 
 /**
  * This UI handler is responsible for displaying error information to the user if a connection

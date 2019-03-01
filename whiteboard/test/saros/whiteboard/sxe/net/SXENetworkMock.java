@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
+package saros.whiteboard.sxe.net;
 
 public class SXENetworkMock {
 

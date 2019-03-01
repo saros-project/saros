@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.util;
+package saros.whiteboard.sxe.util;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.NodeRecord;
 import java.util.Collection;
 import java.util.Random;
 import java.util.TreeSet;
+import saros.whiteboard.sxe.records.NodeRecord;
 
 /**
  * This extension of a TreeSet ensures that records with empty primary-weight are initialized to be

@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget;
+package saros.stf.server.rmi.remotebot.widget;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import saros.stf.server.rmi.remotebot.IRemoteBot;
 
 public interface IRemoteBotView extends Remote {
 

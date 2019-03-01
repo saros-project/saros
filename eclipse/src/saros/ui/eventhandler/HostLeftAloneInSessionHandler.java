@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.ISessionListener;
+import saros.session.SessionEndReason;
+import saros.session.User;
+import saros.ui.Messages;
+import saros.ui.util.CollaborationUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.views.SarosView;
 
 /**
  * Checks if the host remains alone after a user left the session. If so, ask if the session should
@@ -91,7 +91,7 @@ public class HostLeftAloneInSessionHandler {
            * TRACE 16:49:09,060 [main] (SharedProjectFileDecorator.java:133) User: jenkins_alice_stf activated an editor -> SPath [editorType=txt, path=src/de/alice/HelloWorld.java, project=java]
            * TRACE 16:49:09,070 [Worker-10] (SharedProjectFileDecorator.java:301) No Deco: L/java/src/de/alice/HelloWorld.java
            * TRACE 16:49:09,083 [Worker-10] (SharedProjectFileDecorator.java:301) No Deco: P/java
-           * TRACE 16:49:09,122 [RMI TCP Connection(5)-127.0.0.1] (RemoteWorkbenchBot.java:75) opening view with id: de.fu_berlin.inf.dpp.ui.views.SarosView
+           * TRACE 16:49:09,122 [RMI TCP Connection(5)-127.0.0.1] (RemoteWorkbenchBot.java:75) opening view with id: saros.ui.views.SarosView
            * DEBUG 16:49:09,422 [Worker-9] (OutgoingProjectNegotiation.java:433) OPN [remote side: jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros] : archive send
            * DEBUG 16:49:09,422 [Worker-9] (CancelableProcess.java:280) process OPN [remote side: jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros] exit status: OK
            * </pre>
@@ -108,10 +108,10 @@ public class HostLeftAloneInSessionHandler {
            * TRACE 16:49:09,453 [main] (EditorPool.java:278) EditorPool.getAllEditors invoked
            * DEBUG 16:49:09,455 [Worker-6] (SharedProjectDecorator.java:80) PROJECT ADDED: 1212967801
            * ERROR 16:49:09,455 [Worker-6] (SarosSessionManager.java:782) Internal error in notifying listener of an added project: java.lang.NullPointerException
-           * at de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator$1.projectAdded(SharedProjectDecorator.java:81)
-           * at de.fu_berlin.inf.dpp.project.SarosSessionManager.projectAdded(SarosSessionManager.java:780)
-           * at de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation.accept(IncomingProjectNegotiation.java:241)
-           * at de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard$2.run(AddProjectToSessionWizard.java:267)
+           * at saros.ui.decorators.SharedProjectDecorator$1.projectAdded(SharedProjectDecorator.java:81)
+           * at saros.project.SarosSessionManager.projectAdded(SarosSessionManager.java:780)
+           * at saros.negotiation.IncomingProjectNegotiation.accept(IncomingProjectNegotiation.java:241)
+           * at saros.ui.wizards.AddProjectToSessionWizard$2.run(AddProjectToSessionWizard.java:267)
            * at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
            * DEBUG 16:49:09,456 [Worker-6] (CancelableProcess.java:280) process IPN [remote side: jenkins_alice_stf@saros-con.imp.fu-berlin.de/Saros] exit status: OK
            * </pre>

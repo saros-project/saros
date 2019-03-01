@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.UserFormatUtils;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import saros.session.User;
+import saros.session.UserFormatUtils;
 
 /** Utility class for formatting model elements for display in the UI. */
 public class ModelFormatUtils {

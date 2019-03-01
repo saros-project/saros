@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chat.parts;
+package saros.ui.widgets.chat.parts;
 
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleRoundedComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLine;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLineSeparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,6 +16,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import saros.ui.Messages;
+import saros.ui.widgets.SimpleRoundedComposite;
+import saros.ui.widgets.chat.events.ChatClearedEvent;
+import saros.ui.widgets.chat.events.IChatDisplayListener;
+import saros.ui.widgets.chat.items.ChatLine;
+import saros.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
+import saros.ui.widgets.chat.items.ChatLineSeparator;
 
 /**
  * This control displays a chat conversation between n users

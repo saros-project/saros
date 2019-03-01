@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
 /** Constant definitions for plug-in preferences */
 public class EclipsePreferenceConstants {

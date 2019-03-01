@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.core.project.internal;
+package saros.core.project.internal;
 
-import de.fu_berlin.inf.dpp.intellij.followmode.FollowModeNotificationDispatcher;
-import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.ModuleInitialization;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
-import de.fu_berlin.inf.dpp.session.SarosCoreSessionContextFactory;
 import org.picocontainer.MutablePicoContainer;
+import saros.intellij.followmode.FollowModeNotificationDispatcher;
+import saros.intellij.project.SharedResourcesManager;
+import saros.intellij.project.filesystem.ModuleInitialization;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionContextFactory;
+import saros.session.SarosCoreSessionContextFactory;
 
 /** IntelliJ implementation of the {@link ISarosSessionContextFactory} interface. */
 public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextFactory {

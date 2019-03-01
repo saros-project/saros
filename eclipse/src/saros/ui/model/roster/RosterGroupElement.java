@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.model.roster;
+package saros.ui.model.roster;
 
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.jivesoftware.smack.RosterGroup;
+import saros.ui.ImageManager;
+import saros.ui.model.TreeElement;
 
 /**
  * Wrapper for {@link RosterGroup RosterGroups} in use with {@link Viewer Viewers}

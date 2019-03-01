@@ -1,9 +1,6 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package saros.ui.browser_functions;
 
 import com.google.gson.Gson;
-import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunction.Policy;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -11,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.ui.JavaScriptAPI;
+import saros.ui.browser_functions.BrowserFunction.Policy;
+import saros.util.ThreadUtils;
 
 /**
  * Offers type-safety at the boundary between the JavaScript and Java worlds by overwriting the

@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.stf.test.consistency;
+package saros.stf.test.consistency;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_PROJECTS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertEquals;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.client.tester.SarosTester.CARL;
+import static saros.stf.shared.Constants.ACCEPT;
+import static saros.stf.shared.Constants.SHELL_ADD_PROJECTS;
+import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.test.Constants;
 
 public class ModifyDocumentBeforeProjectNegotiationTest extends StfTestCase {
 

@@ -1,11 +1,6 @@
 /** */
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.dialogs.FeedbackDialog;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.util.Date;
 import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
@@ -17,6 +12,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.Startable;
+import saros.annotations.Component;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.ISarosSessionManager;
+import saros.ui.dialogs.FeedbackDialog;
+import saros.ui.util.SWTUtils;
 
 /**
  * The FeedbackManager registers himself as a listener with the {@link ISarosSessionManager} to show

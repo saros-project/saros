@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.util;
+package saros.intellij.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

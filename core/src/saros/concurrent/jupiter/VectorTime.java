@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter;
+package saros.concurrent.jupiter;
 
 /**
  * Vector time is a concept used in almost all Operational Transformation algorithms to determine

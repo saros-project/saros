@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable;
+package saros.whiteboard.sxe.records.serializable;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.MalformedRecordException;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.MissingRecordException;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.AttributeRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.NodeRecord;
+import saros.whiteboard.sxe.constants.NodeType;
+import saros.whiteboard.sxe.constants.RecordEntry;
+import saros.whiteboard.sxe.constants.RecordType;
+import saros.whiteboard.sxe.exceptions.MalformedRecordException;
+import saros.whiteboard.sxe.exceptions.MissingRecordException;
+import saros.whiteboard.sxe.records.AttributeRecord;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.IRecord;
+import saros.whiteboard.sxe.records.ISXERecordFactory;
+import saros.whiteboard.sxe.records.NodeRecord;
 
 public class NewRecordDataObject extends RecordDataObject {
 

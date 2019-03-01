@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.exceptions;
+package saros.exceptions;
 
 /** Exception used for signaling that a operation has been canceled */
 public class OperationCanceledException extends Exception {

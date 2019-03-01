@@ -1,8 +1,7 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.activities.SPath;
 
 /**
  * The Intellij editor pool. It is used to store a mapping of <code>SPath</code>s onto <code>Editor

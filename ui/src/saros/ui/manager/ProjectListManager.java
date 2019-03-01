@@ -1,23 +1,23 @@
-package de.fu_berlin.inf.dpp.ui.manager;
+package saros.ui.manager;
 
-import static de.fu_berlin.inf.dpp.filesystem.IResource.FILE;
-import static de.fu_berlin.inf.dpp.filesystem.IResource.FOLDER;
-import static de.fu_berlin.inf.dpp.filesystem.IResource.PROJECT;
+import static saros.filesystem.IResource.FILE;
+import static saros.filesystem.IResource.FOLDER;
+import static saros.filesystem.IResource.PROJECT;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree.Node;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree.Node.Type;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import saros.HTMLUIContextFactory;
+import saros.filesystem.IContainer;
+import saros.filesystem.IFile;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspaceRoot;
+import saros.ui.model.ProjectTree;
+import saros.ui.model.ProjectTree.Node;
+import saros.ui.model.ProjectTree.Node.Type;
 
 /**
  * This class is responsible for creating and managing the {@link ProjectTree} models for the HTML

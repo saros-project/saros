@@ -1,7 +1,7 @@
-diff --git a/de.fu_berlin.inf.dpp/ext-src/org/picocontainer/parameters/BasicComponentParameter.java b/de.fu_berlin.inf.dpp/ext-src/org/picocontainer/parameters/BasicComponentParameter.java
+diff --git a/saros/ext-src/org/picocontainer/parameters/BasicComponentParameter.java b/saros/ext-src/org/picocontainer/parameters/BasicComponentParameter.java
 index 055b443..bf13dcb 100644
---- a/de.fu_berlin.inf.dpp/ext-src/org/picocontainer/parameters/BasicComponentParameter.java
-+++ b/de.fu_berlin.inf.dpp/ext-src/org/picocontainer/parameters/BasicComponentParameter.java
+--- a/saros/ext-src/org/picocontainer/parameters/BasicComponentParameter.java
++++ b/saros/ext-src/org/picocontainer/parameters/BasicComponentParameter.java
 @@ -275,7 +275,7 @@
          if (container.getParent() != null) {
              if (binding != null) {

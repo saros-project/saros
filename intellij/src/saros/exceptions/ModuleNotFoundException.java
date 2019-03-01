@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.exceptions;
+package saros.exceptions;
 
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntelliJProjectImpl;
 
 /**
  * Signals that a needed module object could not be found in the current project.

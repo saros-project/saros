@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.negotiation.TransferType;
-import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
 import java.util.Collections;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.negotiation.TransferType;
+import saros.negotiation.hooks.ISessionNegotiationHook;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.Preferences;
 
 /**
  * Hooks for negotiating the used {@link TransferType} to determine a strategy used between two

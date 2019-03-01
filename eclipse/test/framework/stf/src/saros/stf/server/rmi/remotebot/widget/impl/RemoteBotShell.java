@@ -1,11 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import java.rmi.RemoteException;
 import java.util.Map;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -13,6 +7,12 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.StringResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.condition.SarosConditions;
+import saros.stf.server.rmi.remotebot.IRemoteBot;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
 public final class RemoteBotShell extends StfRemoteObject implements IRemoteBotShell {
 

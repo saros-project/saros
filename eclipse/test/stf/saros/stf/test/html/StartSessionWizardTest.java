@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.stf.test.html;
+package saros.stf.test.html;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.ui.View.MAIN_VIEW;
-import static de.fu_berlin.inf.dpp.ui.View.SESSION_WIZARD;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.ui.View.MAIN_VIEW;
+import static saros.ui.View.SESSION_WIZARD;
 
-import de.fu_berlin.inf.dpp.stf.client.StfHtmlTestCase;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfHtmlTestCase;
+import saros.stf.test.Constants;
 
 public class StartSessionWizardTest extends StfHtmlTestCase {
 

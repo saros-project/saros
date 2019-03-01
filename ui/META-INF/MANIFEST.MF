@@ -1,11 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Saros HTML UI
-Bundle-SymbolicName: de.fu_berlin.inf.dpp.ui
+Bundle-SymbolicName: saros.ui
 Bundle-Version: 0.1.0.DEVEL
 Bundle-Vendor: FU-Berlin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: de.fu_berlin.inf.dpp.core,
+Require-Bundle: saros.core,
  org.eclipse.swt
 Bundle-ClassPath: .,
  lib/gson-2.3.jar,
@@ -14,16 +14,16 @@ Export-Package: de.fu_berlin.inf.ag_se.browser,
  de.fu_berlin.inf.ag_se.browser.extensions,
  de.fu_berlin.inf.ag_se.browser.functions,
  de.fu_berlin.inf.ag_se.browser.swt,
- de.fu_berlin.inf.dpp,
- de.fu_berlin.inf.dpp.stf.server,
- de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot,
- de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.impl,
- de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget,
- de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl,
- de.fu_berlin.inf.dpp.ui,
- de.fu_berlin.inf.dpp.ui.browser_functions,
- de.fu_berlin.inf.dpp.ui.ide_embedding,
- de.fu_berlin.inf.dpp.ui.manager,
- de.fu_berlin.inf.dpp.ui.model,
- de.fu_berlin.inf.dpp.ui.pages,
- de.fu_berlin.inf.dpp.ui.util
+ saros,
+ saros.stf.server,
+ saros.stf.server.rmi.htmlbot,
+ saros.stf.server.rmi.htmlbot.impl,
+ saros.stf.server.rmi.htmlbot.widget,
+ saros.stf.server.rmi.htmlbot.widget.impl,
+ saros.ui,
+ saros.ui.browser_functions,
+ saros.ui.ide_embedding,
+ saros.ui.manager,
+ saros.ui.model,
+ saros.ui.pages,
+ saros.ui.util

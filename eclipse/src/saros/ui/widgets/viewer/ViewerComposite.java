@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer;
+package saros.ui.widgets.viewer;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.StructuredViewer;

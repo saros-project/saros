@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl;
+package saros.stf.server.rmi.superbot.component.view.whiteboard.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.IWhiteboardFigure;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -9,6 +7,8 @@ import java.rmi.RemoteException;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.Result;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.superbot.component.view.whiteboard.IWhiteboardFigure;
 
 /**
  * Implementation of the IWhiteboardFigure providing figure information being necessary for testing.

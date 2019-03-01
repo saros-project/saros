@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.concurrent.undo;
+package saros.concurrent.undo;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

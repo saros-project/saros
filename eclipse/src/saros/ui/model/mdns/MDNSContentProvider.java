@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.ui.model.mdns;
+package saros.ui.model.mdns;
 
-import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
-import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import org.eclipse.jface.viewers.Viewer;
+import saros.net.mdns.MDNSService;
+import saros.ui.model.TreeContentProvider;
+import saros.ui.util.ViewerUtils;
 
 public final class MDNSContentProvider extends TreeContentProvider {
 

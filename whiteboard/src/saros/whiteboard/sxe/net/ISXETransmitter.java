@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
+package saros.whiteboard.sxe.net;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import java.io.IOException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import saros.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.constants.SXEMessageType;
 
 /**
  * Interface to offer some abstraction to the network layer.

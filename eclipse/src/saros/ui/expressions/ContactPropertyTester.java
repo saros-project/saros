@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.expressions;
+package saros.ui.expressions;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
 import org.eclipse.core.expressions.PropertyTester;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.User;
 
 /** Adds tests to a contact represented by a {@link JID}. */
 public class ContactPropertyTester extends PropertyTester {

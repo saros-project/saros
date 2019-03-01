@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot;
+package saros.stf.server.rmi.remotebot;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotPerspective;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotChatLine;
 import java.rmi.RemoteException;
 import java.util.List;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.hamcrest.Matcher;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotPerspective;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotView;
+import saros.stf.server.rmi.remotebot.widget.impl.RemoteBotChatLine;
 
 public interface IRemoteWorkbenchBot extends IRemoteBot {
   public IRemoteBotView view(String viewTitle) throws RemoteException;

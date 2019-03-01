@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.concurrent.watchdog;
+package saros.concurrent.watchdog;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
+import saros.activities.SPath;
 
 /**
  * Represents a checksum of a document in the workspace. It consists of the document's

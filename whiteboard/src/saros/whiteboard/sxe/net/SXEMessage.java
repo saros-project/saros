@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
+package saros.whiteboard.sxe.net;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
 import java.util.List;
+import saros.whiteboard.sxe.constants.SXEMessageType;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
 
 /**
  * At the moment this message object is used for all SXE messages. The tags are defined by the

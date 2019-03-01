@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.model.roster;
+package saros.ui.model.roster;
 
-import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.jivesoftware.smack.Roster;
+import saros.ui.model.ITreeElement;
 
 /**
  * Comparator for {@link ITreeElement} describing {@link Roster} entities.

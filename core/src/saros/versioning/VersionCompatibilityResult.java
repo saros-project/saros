@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.versioning;
+package saros.versioning;
 
 /** This class represents the result of a version compatibility negotiation. */
 public class VersionCompatibilityResult {

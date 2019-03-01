@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editor;
+package saros.whiteboard.gef.editor;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.GEFRecordFactory;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.NodeRecord;
 import org.eclipse.gef.requests.CreationFactory;
+import saros.whiteboard.gef.model.GEFRecordFactory;
+import saros.whiteboard.sxe.records.NodeRecord;
 
 /**
  * Adapts the SXE <code>GEFRecordFactory</code> for the GEF CreationFactory.

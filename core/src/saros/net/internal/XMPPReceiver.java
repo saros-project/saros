@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.PacketCollector.CancelHook;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +16,14 @@ import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParser;
+import saros.annotations.Component;
+import saros.net.ConnectionState;
+import saros.net.DispatchThreadContext;
+import saros.net.IReceiver;
+import saros.net.PacketCollector;
+import saros.net.PacketCollector.CancelHook;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.XMPPConnectionService;
 
 @Component(module = "net")
 public class XMPPReceiver implements IReceiver {

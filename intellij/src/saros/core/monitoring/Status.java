@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.core.monitoring;
+package saros.core.monitoring;
 
 /**
  * This is a dummy implementation to ease the copy-paste-adapt process of creating Saros/I out of

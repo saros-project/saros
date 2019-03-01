@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.AddContactsToSessionWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.AddResourcesToSessionWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.AddXMPPAccountWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.EditXMPPAccountWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.StartSessionWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.dialogs.ConfigurationWizardDialog;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
@@ -22,6 +12,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.NewProjectAction;
+import saros.account.XMPPAccount;
+import saros.ui.wizards.AddContactWizard;
+import saros.ui.wizards.AddContactsToSessionWizard;
+import saros.ui.wizards.AddResourcesToSessionWizard;
+import saros.ui.wizards.AddXMPPAccountWizard;
+import saros.ui.wizards.ConfigurationWizard;
+import saros.ui.wizards.CreateXMPPAccountWizard;
+import saros.ui.wizards.EditXMPPAccountWizard;
+import saros.ui.wizards.StartSessionWizard;
+import saros.ui.wizards.dialogs.ConfigurationWizardDialog;
 
 /** Utility class for {@link IWizard}s */
 public class WizardUtils {

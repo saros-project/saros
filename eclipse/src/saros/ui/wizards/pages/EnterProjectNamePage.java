@@ -1,17 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.ProjectOptionComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.ProjectNameChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.ProjectOptionListener;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +30,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import saros.negotiation.ProjectNegotiationData;
+import saros.net.IConnectionManager;
+import saros.net.xmpp.JID;
+import saros.preferences.Preferences;
+import saros.session.ISarosSession;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.SWTUtils;
+import saros.ui.views.SarosView;
+import saros.ui.widgets.wizard.ProjectOptionComposite;
+import saros.ui.widgets.wizard.events.ProjectNameChangedEvent;
+import saros.ui.widgets.wizard.events.ProjectOptionListener;
 
 /** A wizard page that allows to enter the new project name or to choose to overwrite a project. */
 public class EnterProjectNamePage extends WizardPage {
@@ -353,7 +353,7 @@ public class EnterProjectNamePage extends WizardPage {
       String projectID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      de.fu_berlin.inf.dpp.filesystem.IProject project = session.getProject(projectID);
+      saros.filesystem.IProject project = session.getProject(projectID);
 
       if (project == null) continue;
 
@@ -367,7 +367,7 @@ public class EnterProjectNamePage extends WizardPage {
       String projectID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      de.fu_berlin.inf.dpp.filesystem.IProject project = session.getProject(projectID);
+      saros.filesystem.IProject project = session.getProject(projectID);
 
       if (project != null) continue;
 

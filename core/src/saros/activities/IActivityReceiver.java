@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 /**
  * This interface is for implementing multiple dispatch in Java (see <a

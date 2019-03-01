@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.stf.test.session;
+package saros.stf.test.session;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.client.tester.SarosTester.CARL;
 
-import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.annotation.TestLink;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.shared.Constants.TypeOfCreateProject;
 
 @TestLink(id = "Saros-18_creating_new_files")
 public class CreatingNewFileTest extends StfTestCase {

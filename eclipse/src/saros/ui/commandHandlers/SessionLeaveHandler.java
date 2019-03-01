@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.commandHandlers;
+package saros.ui.commandHandlers;
 
-import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import saros.ui.util.CollaborationUtils;
 
 public class SessionLeaveHandler extends AbstractHandler {
 

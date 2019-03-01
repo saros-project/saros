@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.communication.extensions.SessionStatusRequestExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.SessionStatusResponseExtension;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
+import saros.communication.extensions.SessionStatusRequestExtension;
+import saros.communication.extensions.SessionStatusResponseExtension;
+import saros.filesystem.IProject;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.ui.util.SWTUtils;
 
 public final class SessionStatusRequestHandler {
 
@@ -55,7 +55,7 @@ public final class SessionStatusRequestHandler {
     this.receiver = receiver;
     this.preferenceStore = preferenceStore;
 
-    if (Boolean.getBoolean("de.fu_berlin.inf.dpp.server.SUPPORTED")) {
+    if (Boolean.getBoolean("saros.server.SUPPORTED")) {
       this.receiver.addPacketListener(
           statusRequestListener, SessionStatusRequestExtension.PROVIDER.getPacketFilter());
     }

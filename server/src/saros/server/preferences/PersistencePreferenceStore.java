@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.server.preferences;
+package saros.server.preferences;
 
-import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -12,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.InvalidPropertiesFormatException;
 import org.apache.log4j.Logger;
+import saros.preferences.PreferenceStore;
 
 /** Preference store allowing the storing and retrieving of the preferences to and from a file. */
 public final class PersistencePreferenceStore extends PreferenceStore {

@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.request;
+package saros.whiteboard.gef.request;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
 import org.eclipse.gef.requests.CreateRequest;
+import saros.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
 
 public class CreateTextBoxRequest extends CreateRequest {
 

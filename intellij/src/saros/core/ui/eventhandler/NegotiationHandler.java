@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.core.ui.eventhandler;
+package saros.core.ui.eventhandler;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -7,28 +7,28 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
-import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
-import de.fu_berlin.inf.dpp.core.monitoring.Status;
-import de.fu_berlin.inf.dpp.intellij.SarosComponent;
-import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.JoinSessionWizard;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.INegotiationHandler;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.awt.Window;
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
+import saros.core.monitoring.IStatus;
+import saros.core.monitoring.Status;
+import saros.intellij.SarosComponent;
+import saros.intellij.runtime.UIMonitoredJob;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.NotificationPanel;
+import saros.intellij.ui.wizards.AddProjectToSessionWizard;
+import saros.intellij.ui.wizards.JoinSessionWizard;
+import saros.monitoring.IProgressMonitor;
+import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.IncomingSessionNegotiation;
+import saros.negotiation.OutgoingSessionNegotiation;
+import saros.negotiation.ProjectNegotiation;
+import saros.negotiation.SessionNegotiation;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.session.INegotiationHandler;
+import saros.session.ISarosSessionManager;
 
 /**
  * This handler is responsible for presenting and running the session and project negotiations that

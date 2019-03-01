@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.concurrent.management;
+package saros.concurrent.management;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.util.HashMap;
+import saros.activities.ChecksumActivity;
+import saros.activities.JupiterActivity;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.TransformationException;
+import saros.concurrent.jupiter.internal.Jupiter;
+import saros.session.ISarosSession;
 
 /** A JupiterClient manages Jupiter client docs for a single user with several paths */
 public class JupiterClient {

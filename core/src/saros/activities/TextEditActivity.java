@@ -17,18 +17,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
-import de.fu_berlin.inf.dpp.session.User;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.internal.text.DeleteOperation;
+import saros.concurrent.jupiter.internal.text.InsertOperation;
+import saros.concurrent.jupiter.internal.text.NoOperation;
+import saros.concurrent.jupiter.internal.text.SplitOperation;
+import saros.session.User;
 
 /**
  * An immutable TextEditActivity.

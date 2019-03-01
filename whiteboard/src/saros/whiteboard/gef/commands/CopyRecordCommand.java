@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
+package saros.whiteboard.gef.commands;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGRootRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.NodeRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.util.HierarchicalRecordSet;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.ui.actions.Clipboard;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.gef.model.SVGRootRecord;
+import saros.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.records.NodeRecord;
+import saros.whiteboard.sxe.util.HierarchicalRecordSet;
 
 /**
  * We create a copy to store the current state.

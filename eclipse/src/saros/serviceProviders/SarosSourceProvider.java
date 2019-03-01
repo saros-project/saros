@@ -1,14 +1,5 @@
-package de.fu_berlin.inf.dpp.serviceProviders;
+package saros.serviceProviders;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.core.expressions.Expression;
@@ -16,6 +7,15 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 import org.picocontainer.annotations.Inject;
+import saros.Saros;
+import saros.SarosPluginContext;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
+import saros.net.ConnectionState;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.ui.util.SWTUtils;
 
 /**
  * Adds variables to Eclipse's Core {@link Expression}s in order to be used in plugin.xml.
@@ -25,10 +25,10 @@ import org.picocontainer.annotations.Inject;
 public class SarosSourceProvider extends AbstractSourceProvider {
 
   /** Corresponds to a serviceProvider variable as defined in Extension org.eclipse.ui.services. */
-  public static final String SAROS = "de.fu_berlin.inf.dpp.Saros";
+  public static final String SAROS = "saros.Saros";
 
   /** Corresponds to a serviceProvider variable as defined in Extension org.eclipse.ui.services. */
-  public static final String SAROS_SESSION = "de.fu_berlin.inf.dpp.SarosSession";
+  public static final String SAROS_SESSION = "saros.SarosSession";
 
   @Inject private Saros saros;
 

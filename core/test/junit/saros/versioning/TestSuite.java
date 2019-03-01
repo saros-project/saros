@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.versioning;
+package saros.versioning;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

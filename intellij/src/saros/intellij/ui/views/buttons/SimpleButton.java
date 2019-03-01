@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
+package saros.intellij.ui.views.buttons;
 
-import de.fu_berlin.inf.dpp.intellij.ui.actions.AbstractSarosAction;
 import javax.swing.ImageIcon;
+import saros.intellij.ui.actions.AbstractSarosAction;
 
 /** Simple button used to create actions that just call {@link AbstractSarosAction#execute()}. */
 public class SimpleButton extends ToolbarButton {

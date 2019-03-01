@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.net.stun.internal;
+package saros.net.stun.internal;
 
-import de.fu_berlin.inf.dpp.net.stun.IStunService;
-import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -23,6 +21,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
+import saros.net.stun.IStunService;
+import saros.net.util.NetworkingUtils;
 
 public final class StunServiceImpl implements IStunService {
 

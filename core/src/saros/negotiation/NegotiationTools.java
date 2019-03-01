@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
 public class NegotiationTools {
   public enum CancelOption {

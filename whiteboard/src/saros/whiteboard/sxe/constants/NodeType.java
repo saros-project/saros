@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.constants;
+package saros.whiteboard.sxe.constants;
 
 /**
  * Enumeration for the type attribute value of a new record respective SXE.

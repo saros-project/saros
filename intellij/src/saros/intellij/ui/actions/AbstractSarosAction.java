@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.intellij.ui.actions;
+package saros.intellij.ui.actions;
 
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
 
 /** Parent class for all Saros actions */
 public abstract class AbstractSarosAction {

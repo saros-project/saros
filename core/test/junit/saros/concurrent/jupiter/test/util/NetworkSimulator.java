@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
+package saros.concurrent.jupiter.test.util;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.session.User;
 
 /**
  * This class simulates a network.

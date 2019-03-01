@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package saros.ui.browser_functions;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.HTMLUIStrings;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import org.apache.log4j.Logger;
+import saros.HTMLUIContextFactory;
+import saros.HTMLUIStrings;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.ui.JavaScriptAPI;
 
 /** Set an existing account as active. The currently active account can't be deleted. */
 public class SetActiveAccount extends TypedJavascriptFunction {

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StyledString.Styler;

@@ -1,29 +1,29 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.menubar;
+package saros.stf.test.stf.menubar;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.CANCEL;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ERROR_MESSAGE_PASSWORDS_NOT_MATCH;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.FINISH;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_PASSWORD;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_REPEAT_PASSWORD;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_USER_NAME;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_XMPP_JABBER_SERVER;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_CREATE_ACCOUNT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_CREATE_XMPP_JABBER_ACCOUNT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.shared.Constants.CANCEL;
+import static saros.stf.shared.Constants.ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS;
+import static saros.stf.shared.Constants.ERROR_MESSAGE_PASSWORDS_NOT_MATCH;
+import static saros.stf.shared.Constants.FINISH;
+import static saros.stf.shared.Constants.LABEL_PASSWORD;
+import static saros.stf.shared.Constants.LABEL_REPEAT_PASSWORD;
+import static saros.stf.shared.Constants.LABEL_USER_NAME;
+import static saros.stf.shared.Constants.LABEL_XMPP_JABBER_SERVER;
+import static saros.stf.shared.Constants.MENU_CREATE_ACCOUNT;
+import static saros.stf.shared.Constants.MENU_SAROS;
+import static saros.stf.shared.Constants.SHELL_CREATE_XMPP_JABBER_ACCOUNT;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 import java.rmi.RemoteException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
+import saros.stf.test.Constants;
 
 public class SarosPreferencesTest extends StfTestCase {
 

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

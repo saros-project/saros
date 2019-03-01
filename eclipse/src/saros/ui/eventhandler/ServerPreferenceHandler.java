@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
+import saros.SarosConstants;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.preferences.EclipsePreferenceConstants;
 
 public class ServerPreferenceHandler {
 
@@ -23,7 +23,7 @@ public class ServerPreferenceHandler {
           // better, yet it's not possible since the ServiceDiscoveryManager
           // is not available at that point
           if (ConnectionState.CONNECTED.equals(newState)) {
-            if (Boolean.getBoolean("de.fu_berlin.inf.dpp.server.SUPPORTED")) {
+            if (Boolean.getBoolean("saros.server.SUPPORTED")) {
               if (preferenceStore.getBoolean(EclipsePreferenceConstants.SERVER_ACTIVATED)) {
                 addServerFeature(connection);
               } else {

@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
+package saros.whiteboard.gef.commands;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.AttributeRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.NodeRecord;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.ui.actions.Clipboard;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.gef.util.LayoutUtils;
+import saros.whiteboard.sxe.records.AttributeRecord;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.records.IRecord;
+import saros.whiteboard.sxe.records.NodeRecord;
 
 /**
  * Achieves a list of LayoutElementRecord from the Clipboard. The list should be obtained by the

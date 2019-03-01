@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.server.preferences;
+package saros.server.preferences;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
+import saros.annotations.Component;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.Preferences;
 
 /** Server implementation of the abstract {@link Preferences} class. */
 @Component(module = "server")

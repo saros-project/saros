@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.menuContributions;
+package saros.ui.menuContributions;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
-import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,6 +14,16 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.picocontainer.annotations.Inject;
+import saros.SarosConstants;
+import saros.SarosPluginContext;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.ui.Messages;
+import saros.ui.model.roster.RosterEntryElement;
+import saros.ui.util.CollaborationUtils;
+import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
 
 /**
  * This class fills a {@link Menu} with {@link MenuItem}s. Each entry represents a contact with

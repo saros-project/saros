@@ -1,18 +1,6 @@
 /** */
-package de.fu_berlin.inf.dpp.ui.preferencePages;
+package saros.ui.preferencePages;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.FeedbackInterval;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.Messages;
-import de.fu_berlin.inf.dpp.feedback.StatisticManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.util.LinkListener;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -34,6 +22,18 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.annotations.Component;
+import saros.feedback.AbstractFeedbackManager;
+import saros.feedback.ErrorLogManager;
+import saros.feedback.FeedbackInterval;
+import saros.feedback.FeedbackManager;
+import saros.feedback.Messages;
+import saros.feedback.StatisticManager;
+import saros.feedback.StatisticManagerConfiguration;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.ui.util.LinkListener;
+import saros.ui.util.SWTUtils;
 
 /**
  * The preferences page for the settings concerning the user feedback. The user can enable or

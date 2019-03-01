@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.net;
+package saros.net;
 
-import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import saros.net.internal.BinaryXMPPExtension;
+import saros.net.internal.DataTransferManager;
+import saros.net.internal.TransferDescription;
 
 /**
  * An interface for intercepting packages that are about to send or dispatched via the {@link

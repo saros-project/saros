@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package de.fu_berlin.inf.dpp.concurrent.jupiter;
+package saros.concurrent.jupiter;
 
 /**
  * This interface represents the concept of a timestamp. Timestamps is a general concept, so this

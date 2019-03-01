@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.editor.colorstorage;
+package saros.editor.colorstorage;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -16,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import saros.annotations.Component;
+import saros.preferences.IPreferenceStore;
 
 /**
  * This class stores {@link ColorIDSet}s when ever a ColorIdSet is added it gets saved to a
@@ -28,7 +28,7 @@ public final class ColorIDSetStorage {
 
   private static final Charset CHARSET = Charset.forName("ISO-8859-1");
 
-  private static final String PREFERENCE_STORE_KEY = "de.fu_berlin.inf.dpp.coloridsets";
+  private static final String PREFERENCE_STORE_KEY = "saros.coloridsets";
 
   private static final long REMOVE_THRESHOLD = 1000L * 60L * 60L * 24L * 30L;
 

@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editor;
+package saros.whiteboard.gef.editor;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.SarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.session.ISarosSession;
+import saros.session.ISessionLifecycleListener;
+import saros.session.ISessionListener;
+import saros.session.SarosSessionManager;
+import saros.session.SessionEndReason;
+import saros.session.User;
+import saros.ui.util.SWTUtils;
 
 /**
  * The editor is enabled/disabled respective the Saros user permissions, read-only or write-access.

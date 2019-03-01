@@ -1,33 +1,5 @@
-package de.fu_berlin.inf.dpp.server;
+package saros.server;
 
-import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
-import de.fu_berlin.inf.dpp.communication.connection.NullProxyResolver;
-import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
-import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.filesystem.NullChecksumCache;
-import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.server.console.InviteCommand;
-import de.fu_berlin.inf.dpp.server.console.ServerConsole;
-import de.fu_berlin.inf.dpp.server.console.ShareCommand;
-import de.fu_berlin.inf.dpp.server.dummies.NullRemoteProgressIndicatorFactory;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerPathFactoryImpl;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerPathImpl;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerWorkspaceImpl;
-import de.fu_berlin.inf.dpp.server.net.SubscriptionAuthorizer;
-import de.fu_berlin.inf.dpp.server.preferences.PersistencePreferenceStore;
-import de.fu_berlin.inf.dpp.server.preferences.ServerPreferences;
-import de.fu_berlin.inf.dpp.server.session.JoinSessionRequestHandler;
-import de.fu_berlin.inf.dpp.server.session.NegotiationHandler;
-import de.fu_berlin.inf.dpp.server.session.ServerSessionContextFactory;
-import de.fu_berlin.inf.dpp.server.synchronize.ServerUISynchronizerImpl;
-import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,11 +7,39 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
+import saros.communication.connection.IProxyResolver;
+import saros.communication.connection.NullProxyResolver;
+import saros.context.AbstractContextFactory;
+import saros.context.IContextKeyBindings;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IPath;
+import saros.filesystem.IPathFactory;
+import saros.filesystem.IWorkspace;
+import saros.filesystem.NullChecksumCache;
+import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.Preferences;
+import saros.server.console.InviteCommand;
+import saros.server.console.ServerConsole;
+import saros.server.console.ShareCommand;
+import saros.server.dummies.NullRemoteProgressIndicatorFactory;
+import saros.server.filesystem.ServerPathFactoryImpl;
+import saros.server.filesystem.ServerPathImpl;
+import saros.server.filesystem.ServerWorkspaceImpl;
+import saros.server.net.SubscriptionAuthorizer;
+import saros.server.preferences.PersistencePreferenceStore;
+import saros.server.preferences.ServerPreferences;
+import saros.server.session.JoinSessionRequestHandler;
+import saros.server.session.NegotiationHandler;
+import saros.server.session.ServerSessionContextFactory;
+import saros.server.synchronize.ServerUISynchronizerImpl;
+import saros.session.ISarosSessionContextFactory;
+import saros.synchronize.UISynchronizer;
 
 /**
- * Server implementation of {@link de.fu_berlin.inf.dpp.context.IContextFactory}. In addition to the
- * core components configured in {@link de.fu_berlin.inf.dpp.context.CoreContextFactory}, this class
- * adds the server-specific components such as implementations of unimplemented core interfaces.
+ * Server implementation of {@link saros.context.IContextFactory}. In addition to the core
+ * components configured in {@link saros.context.CoreContextFactory}, this class adds the
+ * server-specific components such as implementations of unimplemented core interfaces.
  */
 public class ServerContextFactory extends AbstractContextFactory {
 

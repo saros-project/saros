@@ -1,30 +1,30 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  de.fu_berlin.inf.dpp.account.TestSuite.class,
-  de.fu_berlin.inf.dpp.activities.TestSuite.class,
-  de.fu_berlin.inf.dpp.communication.extensions.TestSuite.class,
-  de.fu_berlin.inf.dpp.concurrent.TestSuite.class,
-  de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles.TestSuite.class,
-  de.fu_berlin.inf.dpp.editor.colorstorage.TestSuite.class,
-  de.fu_berlin.inf.dpp.editor.remote.TestSuite.class,
-  de.fu_berlin.inf.dpp.filesystem.TestSuite.class,
-  de.fu_berlin.inf.dpp.misc.xstream.TestSuite.class,
-  de.fu_berlin.inf.dpp.monitoring.TestSuite.class,
-  de.fu_berlin.inf.dpp.negotiation.TestSuite.class,
-  de.fu_berlin.inf.dpp.net.TestSuite.class,
-  de.fu_berlin.inf.dpp.net.internal.TestSuite.class,
-  de.fu_berlin.inf.dpp.preferences.TestSuite.class,
-  de.fu_berlin.inf.dpp.session.TestSuite.class,
-  de.fu_berlin.inf.dpp.session.internal.TestSuite.class,
-  de.fu_berlin.inf.dpp.synchronize.TestSuite.class,
-  de.fu_berlin.inf.dpp.util.TestSuite.class,
-  de.fu_berlin.inf.dpp.versioning.TestSuite.class,
-  de.fu_berlin.inf.dpp.SarosCoreContextFactoryTest.class
+  saros.account.TestSuite.class,
+  saros.activities.TestSuite.class,
+  saros.communication.extensions.TestSuite.class,
+  saros.concurrent.TestSuite.class,
+  saros.concurrent.jupiter.test.puzzles.TestSuite.class,
+  saros.editor.colorstorage.TestSuite.class,
+  saros.editor.remote.TestSuite.class,
+  saros.filesystem.TestSuite.class,
+  saros.misc.xstream.TestSuite.class,
+  saros.monitoring.TestSuite.class,
+  saros.negotiation.TestSuite.class,
+  saros.net.TestSuite.class,
+  saros.net.internal.TestSuite.class,
+  saros.preferences.TestSuite.class,
+  saros.session.TestSuite.class,
+  saros.session.internal.TestSuite.class,
+  saros.synchronize.TestSuite.class,
+  saros.util.TestSuite.class,
+  saros.versioning.TestSuite.class,
+  saros.SarosCoreContextFactoryTest.class
 })
 public class SarosCoreTestSuite {
   // the class remains completely empty,

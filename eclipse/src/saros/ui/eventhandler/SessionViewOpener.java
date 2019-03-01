@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
-import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewUtils;
+import saros.concurrent.watchdog.IsInconsistentObservable;
+import saros.observables.ValueChangeListener;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.ViewUtils;
 
 /**
  * This handler is responsible for opening the SessionView if an inconsistency has been detected.

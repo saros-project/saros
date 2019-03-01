@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets;
+package saros.ui.widgets;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
-import de.fu_berlin.inf.dpp.context.IContextKeyBindings.SarosVersion;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.FontUtils;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -21,6 +10,17 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.account.XMPPAccountStore;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
+import saros.context.IContextKeyBindings.SarosVersion;
+import saros.net.ConnectionState;
+import saros.ui.Messages;
+import saros.ui.util.FontUtils;
+import saros.ui.util.LayoutUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.views.SarosView;
 
 public class ConnectionStateComposite extends Composite {
 

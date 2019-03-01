@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.monitoring;
+package saros.monitoring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

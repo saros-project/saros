@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,6 +10,9 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
+import saros.activities.SPath;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.ui.util.SWTUtils;
 
 /**
  * Listener registered on Editors to be informed about their dirty state.

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -7,8 +7,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +14,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
 
 public class SharedProjectMapperTest {
 

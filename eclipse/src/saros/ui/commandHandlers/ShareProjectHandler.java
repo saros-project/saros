@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.ui.commandHandlers;
+package saros.ui.commandHandlers;
 
-import de.fu_berlin.inf.dpp.ui.menuContributions.StartSessionWithContacts;
-import de.fu_berlin.inf.dpp.ui.menuContributions.StartSessionWithProjects;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
+import saros.ui.menuContributions.StartSessionWithContacts;
+import saros.ui.menuContributions.StartSessionWithProjects;
+import saros.ui.util.WizardUtils;
+import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
 
 /**
  * @JTourBusStop 1, Invitation Process:

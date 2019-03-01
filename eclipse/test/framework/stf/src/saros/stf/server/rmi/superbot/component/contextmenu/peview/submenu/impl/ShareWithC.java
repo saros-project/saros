@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl;
+package saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import saros.net.xmpp.JID;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.widget.ContextMenuHelper;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
+import saros.stf.server.rmi.superbot.impl.SuperBot;
 
 public final class ShareWithC extends StfRemoteObject implements IShareWithC {
 

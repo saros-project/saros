@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.communication;
+package saros.communication;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.extensions.SarosPacketExtension;
-import de.fu_berlin.inf.dpp.misc.xstream.XStreamExtensionProvider;
-import de.fu_berlin.inf.dpp.misc.xstream.XStreamExtensionProvider.XStreamIQPacket;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,6 +16,16 @@ import org.jivesoftware.smack.filter.PacketIDFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import saros.annotations.Component;
+import saros.communication.extensions.SarosPacketExtension;
+import saros.misc.xstream.XStreamExtensionProvider;
+import saros.misc.xstream.XStreamExtensionProvider.XStreamIQPacket;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.preferences.PreferenceConstants;
+import saros.util.ThreadUtils;
 
 /**
  * A manager class that allows to discover if a given XMPP entity supports Skype and that allows to

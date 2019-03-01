@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.stf.client.tester;
+package saros.stf.client.tester;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.IControlBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 import java.rmi.RemoteException;
+import saros.net.xmpp.JID;
+import saros.stf.server.rmi.controlbot.IControlBot;
+import saros.stf.server.rmi.htmlbot.IHTMLBot;
+import saros.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
+import saros.stf.server.rmi.remotebot.IRemoteBot;
+import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
+import saros.stf.server.rmi.superbot.ISuperBot;
 
 /**
  * Interface of {@link InvalidTester} and {@link RealTester}. It define all methods supported by

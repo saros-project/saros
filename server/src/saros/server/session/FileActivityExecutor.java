@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.server.session;
+package saros.server.session;
 
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.server.editor.ServerEditorManager;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.FileActivity;
+import saros.activities.SPath;
+import saros.filesystem.IFile;
+import saros.filesystem.IResource;
+import saros.server.editor.ServerEditorManager;
+import saros.session.AbstractActivityConsumer;
+import saros.session.ISarosSession;
 
 /** Executes FileActivities and performs actual filesystem operations. */
 public class FileActivityExecutor extends AbstractActivityConsumer implements Startable {

@@ -3,4 +3,4 @@
  * extend the ViewPart. To display new views it is mandatory to add a View Extension to the
  * plugin.xml file.
  */
-package de.fu_berlin.inf.dpp.ui.views;
+package saros.ui.views;

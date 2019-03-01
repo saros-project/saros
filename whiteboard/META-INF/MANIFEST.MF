@@ -1,17 +1,17 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Whiteboard Plug-in
-Bundle-SymbolicName: de.fu_berlin.inf.dpp.whiteboard; singleton:=true
+Bundle-SymbolicName: saros.whiteboard; singleton:=true
 Bundle-Version: 14.11.28.DEVEL
-Bundle-Activator: de.fu_berlin.inf.dpp.whiteboard.Activator
+Bundle-Activator: saros.whiteboard.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.gef;bundle-version="3.6.0",
  org.eclipse.ui.views,
  org.eclipse.ui.editors,
  org.eclipse.jface.text,
- de.fu_berlin.inf.dpp.core,
- de.fu_berlin.inf.dpp
+ saros.core,
+ saros.eclipse
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/log4j-1.2.15.jar,

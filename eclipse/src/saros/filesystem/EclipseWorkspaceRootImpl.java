@@ -1,5 +1,5 @@
 /** */
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 import java.util.ArrayList;
 import java.util.List;

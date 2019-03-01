@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.server.progress;
+package saros.server.progress;
 
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import java.io.PrintStream;
+import saros.monitoring.IProgressMonitor;
 
 /**
  * Progress indicator supposed to be use for terminal output.
@@ -12,8 +12,7 @@ import java.io.PrintStream;
  * <p>Redraws in the next line if stdout is used in the meantime (e.g. by a logger). Avoid excessive
  * logging while this is in use.
  *
- * <p>Alternatively use {@link de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor} to disable
- * progress reporting.
+ * <p>Alternatively use {@link saros.monitoring.NullProgressMonitor} to disable progress reporting.
  */
 public class ConsoleProgressIndicator implements IProgressMonitor {
   private PrintStream out;

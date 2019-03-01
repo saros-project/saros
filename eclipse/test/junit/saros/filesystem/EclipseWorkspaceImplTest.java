@@ -1,9 +1,7 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import java.io.IOException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.easymock.EasyMock;
@@ -11,6 +9,8 @@ import org.easymock.IAnswer;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.Test;
+import saros.exceptions.OperationCanceledException;
+import saros.monitoring.IProgressMonitor;
 
 public class EclipseWorkspaceImplTest {
 

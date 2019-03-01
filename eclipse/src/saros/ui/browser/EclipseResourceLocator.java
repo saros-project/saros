@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.browser;
+package saros.ui.browser;
 
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -14,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
+import saros.ui.ide_embedding.IUIResourceLocator;
 
 /**
  * This class implements the locating of HTML UI resources for Eclipse. It extracts bundle resources
@@ -24,7 +24,7 @@ public class EclipseResourceLocator implements IUIResourceLocator {
   private static final Logger LOG = Logger.getLogger(EclipseResourceLocator.class);
 
   // TODO central place
-  private static final String UI_BUNDLE_ID = "de.fu_berlin.inf.dpp.ui.frontend";
+  private static final String UI_BUNDLE_ID = "saros.ui.frontend";
 
   private static final String HTML_ROOT_PATH = "html/dist";
 

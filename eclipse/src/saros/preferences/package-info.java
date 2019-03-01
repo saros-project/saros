@@ -10,4 +10,4 @@
  * @see <a href="http://www.vogella.de/articles/EclipsePreferences/article.html">Eclipse Preferences
  *     - Tutorial</a>
  */
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;

@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package saros.ui.browser_functions;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.pages.SessionWizardPage;
+import saros.HTMLUIContextFactory;
+import saros.ui.ide_embedding.DialogManager;
+import saros.ui.pages.SessionWizardPage;
 
 /** Open and display the {@link SessionWizardPage} dialog. */
 public class ShowSessionWizard extends TypedJavascriptFunction {

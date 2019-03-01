@@ -1,21 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
+package saros.intellij.ui.views.buttons;
 
 import com.intellij.openapi.application.ApplicationManager;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.actions.ConsistencyAction;
-import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -23,6 +8,21 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.activities.SPath;
+import saros.concurrent.watchdog.ConsistencyWatchdogClient;
+import saros.concurrent.watchdog.IsInconsistentObservable;
+import saros.filesystem.IResource;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.actions.ConsistencyAction;
+import saros.intellij.ui.util.DialogUtils;
+import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.util.NotificationPanel;
+import saros.observables.ValueChangeListener;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.SessionEndReason;
 
 /**
  * Button for triggering a {@link ConsistencyAction}. Displays a different symbol when state is

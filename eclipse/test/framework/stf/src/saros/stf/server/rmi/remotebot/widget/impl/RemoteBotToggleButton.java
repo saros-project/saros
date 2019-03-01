@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToggleButton;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToggleButton;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotToggleButton;
 
 public final class RemoteBotToggleButton extends StfRemoteObject implements IRemoteBotToggleButton {
 

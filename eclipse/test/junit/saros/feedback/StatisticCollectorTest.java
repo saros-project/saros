@@ -1,19 +1,8 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.replay;
 
-import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.test.mocks.EclipseMocker;
-import de.fu_berlin.inf.dpp.test.mocks.EditorManagerMock;
 import java.util.LinkedList;
 import java.util.List;
 import org.easymock.EasyMock;
@@ -29,6 +18,17 @@ import org.picocontainer.PicoBuilder;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
+import saros.context.IContextKeyBindings;
+import saros.editor.EditorManager;
+import saros.editor.FollowModeManager;
+import saros.net.IConnectionManager;
+import saros.net.internal.DataTransferManager;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
+import saros.test.mocks.EclipseMocker;
+import saros.test.mocks.EditorManagerMock;
 
 public class StatisticCollectorTest {
 

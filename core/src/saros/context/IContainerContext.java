@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.context;
+package saros.context;
 
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoCompositionException;

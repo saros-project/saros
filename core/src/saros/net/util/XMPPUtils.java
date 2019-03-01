@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.net.util;
+package saros.net.util;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import gnu.inet.encoding.Stringprep;
 import gnu.inet.encoding.StringprepException;
 import java.util.Iterator;
@@ -29,6 +27,8 @@ import org.jivesoftware.smackx.packet.DiscoverInfo;
 import org.jivesoftware.smackx.packet.DiscoverInfo.Identity;
 import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.jivesoftware.smackx.search.UserSearch;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
 
 /** Utility class for classic XMPP operations */
 public class XMPPUtils {

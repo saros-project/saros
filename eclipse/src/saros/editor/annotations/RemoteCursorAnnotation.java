@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.editor.annotations;
+package saros.editor.annotations;
 
-import de.fu_berlin.inf.dpp.session.User;
+import saros.session.User;
 
 /**
  * {@link SarosAnnotation} to use in combination with the {@link RemoteCursorStrategy}. This is only
@@ -8,8 +8,7 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 public class RemoteCursorAnnotation extends SarosAnnotation {
 
-  public static final String TYPE =
-      "de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorAnnotation";
+  public static final String TYPE = "saros.editor.annotations.RemoteCursorAnnotation";
 
   public RemoteCursorAnnotation(User source) {
     super(TYPE, false, "RemoteCursorAnnotation", source);

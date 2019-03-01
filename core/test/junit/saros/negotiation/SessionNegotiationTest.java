@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
@@ -10,24 +10,6 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.fail;
 
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
-import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.Negotiation.Status;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
-import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
-import de.fu_berlin.inf.dpp.test.fakes.net.ThreadedReceiver;
-import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -36,6 +18,24 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import saros.communication.extensions.InvitationAcknowledgedExtension;
+import saros.communication.extensions.InvitationOfferingExtension;
+import saros.monitoring.NullProgressMonitor;
+import saros.negotiation.Negotiation.Status;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.IConnectionManager;
+import saros.net.ITransmitter;
+import saros.net.PacketCollector;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.preferences.IPreferenceStore;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.User;
+import saros.test.fakes.net.FakeConnectionFactory;
+import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
+import saros.test.fakes.net.ThreadedReceiver;
+import saros.versioning.VersionManager;
 
 public class SessionNegotiationTest {
 

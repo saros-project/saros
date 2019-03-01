@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.ui.expressions;
+package saros.ui.expressions;
 
-import de.fu_berlin.inf.dpp.session.User;
 import org.eclipse.core.expressions.PropertyTester;
+import saros.session.User;
 
 /** Adds test to {@link User} instances. */
 public class UserPropertyTester extends PropertyTester {

@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
-import de.fu_berlin.inf.dpp.context.IContainerContext;
 import org.picocontainer.PicoCompositionException;
 import org.picocontainer.annotations.Inject;
+import saros.context.IContainerContext;
 
 /**
  * Provides the possibility to initialize a component with the components hold in the given {@link
- * de.fu_berlin.inf.dpp.context.IContainerContext}.
+ * saros.context.IContainerContext}.
  *
  * <p>Typically this is the context created by Saros while it's initialization.
  */

@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.intellij.filesystem;
+package saros.intellij.filesystem;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.activities.SPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
 
 /**
  * Provides static methods to convert VirtualFiles to Saros resource objects or Saros resources

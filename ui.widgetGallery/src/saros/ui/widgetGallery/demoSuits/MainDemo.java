@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits;
+package saros.ui.widgetGallery.demoSuits;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.ImageManager;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.basic.BasicDemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.chat.ChatDemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.decoration.DecorationDemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.InstructionDemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.preferences.PreferencesDemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.roster.RosterDemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.rosterSession.RosterSessionDemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.wizard.WizardDemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite.ListExplanation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.widgetGallery.ImageManager;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoExplorer.DemoSuite;
+import saros.ui.widgetGallery.demoSuits.basic.BasicDemoSuite;
+import saros.ui.widgetGallery.demoSuits.chat.ChatDemoSuite;
+import saros.ui.widgetGallery.demoSuits.decoration.DecorationDemoSuite;
+import saros.ui.widgetGallery.demoSuits.instruction.InstructionDemoSuite;
+import saros.ui.widgetGallery.demoSuits.preferences.PreferencesDemoSuite;
+import saros.ui.widgetGallery.demoSuits.roster.RosterDemoSuite;
+import saros.ui.widgetGallery.demoSuits.rosterSession.RosterSessionDemoSuite;
+import saros.ui.widgetGallery.demoSuits.wizard.WizardDemoSuite;
+import saros.ui.widgets.ListExplanationComposite;
+import saros.ui.widgets.ListExplanationComposite.ListExplanation;
 
 @DemoSuite({
   DecorationDemoSuite.class,

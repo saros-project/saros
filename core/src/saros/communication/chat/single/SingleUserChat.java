@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.communication.chat.single;
+package saros.communication.chat.single;
 
-import de.fu_berlin.inf.dpp.communication.chat.AbstractChat;
-import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
-import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
-import de.fu_berlin.inf.dpp.communication.chat.ChatHistory;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -16,6 +11,11 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.ChatStateListener;
 import org.jivesoftware.smackx.ChatStateManager;
+import saros.communication.chat.AbstractChat;
+import saros.communication.chat.ChatElement;
+import saros.communication.chat.ChatElement.ChatElementType;
+import saros.communication.chat.ChatHistory;
+import saros.net.xmpp.JID;
 
 /** This object represents a chat with a single user. */
 public class SingleUserChat extends AbstractChat {

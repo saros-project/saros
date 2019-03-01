@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
+package saros.ui.widgets.viewer.project;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
-import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +29,16 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.picocontainer.annotations.Inject;
+import saros.Saros;
+import saros.SarosPluginContext;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.ui.util.LayoutUtils;
+import saros.ui.widgets.viewer.ViewerComposite;
+import saros.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
+import saros.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
+import saros.util.ArrayUtils;
 
 /**
  * This {@link Composite} allows to check (via check boxes) {@link IProject}s, {@link IFolder}s and

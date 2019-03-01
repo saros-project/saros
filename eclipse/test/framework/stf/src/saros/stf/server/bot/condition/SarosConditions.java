@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.stf.server.bot.condition;
+package saros.stf.server.bot.condition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.Chatroom;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotTable;
+import saros.stf.server.rmi.superbot.component.view.saros.impl.Chatroom;
 
 /** This is a factory class to create some conditions provided with STF. */
 public class SarosConditions extends Conditions {

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package saros.intellij.editor;
 
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
@@ -9,9 +9,9 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.intellij.filesystem.Filesystem;
 
 /** IntellIJ API for project-level operations on editors and documents. */
 public class ProjectAPI {

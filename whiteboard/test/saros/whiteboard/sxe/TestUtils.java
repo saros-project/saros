@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe;
+package saros.whiteboard.sxe;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.records.ISXERecordFactory;
 
 public class TestUtils {
 

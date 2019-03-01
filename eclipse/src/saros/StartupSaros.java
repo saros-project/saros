@@ -1,17 +1,5 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.stf.server.STFController;
-import de.fu_berlin.inf.dpp.ui.commandHandlers.GettingStartedHandler;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewUtils;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -21,6 +9,18 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
 import org.picocontainer.annotations.Inject;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.annotations.Component;
+import saros.communication.connection.ConnectionHandler;
+import saros.context.IContainerContext;
+import saros.feedback.FeedbackPreferences;
+import saros.preferences.Preferences;
+import saros.stf.server.STFController;
+import saros.ui.commandHandlers.GettingStartedHandler;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.ViewUtils;
+import saros.util.ThreadUtils;
 
 /**
  * An instance of this class is instantiated when Eclipse starts, after the Saros plugin has been
@@ -67,7 +67,7 @@ public class StartupSaros implements IStartup {
 
     if (xmppAccountStore.isEmpty()) showSarosView();
 
-    Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
+    Integer port = Integer.getInteger("saros.testmode");
 
     if (port != null && port > 0 && port <= 65535) {
       LOG.info("starting STF controller on port " + port);

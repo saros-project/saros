@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
 import com.google.gson.annotations.Expose;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.CommittedRecordException;
+import saros.whiteboard.sxe.constants.NodeType;
+import saros.whiteboard.sxe.exceptions.CommittedRecordException;
 
 /**
  * Implementation of a DOM attribute in context of Shared XML Editing XEP-0284 (SXE).

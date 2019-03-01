@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.util;
+package saros.whiteboard.sxe.util;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.AttributeRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +15,10 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import saros.whiteboard.sxe.records.AttributeRecord;
+import saros.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.records.IRecord;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
 
 public class SXEUtils {
 

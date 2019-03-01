@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package saros.project.internal;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.project.Messages;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User.Permission;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -18,6 +10,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.project.Messages;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.SessionEndReason;
+import saros.session.User.Permission;
 
 /**
  * This model provider is responsible for warning a session participant when trying to modify the
@@ -43,11 +43,10 @@ public class ResourceChangeValidator extends ModelProvider {
   private static final int ERROR_CODE = 0;
 
   private static final IStatus ERROR_STATUS =
-      new Status(IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE, ERROR_TEXT, null);
+      new Status(IStatus.ERROR, "saros", ERROR_CODE, ERROR_TEXT, null);
 
   private static final IStatus DELETE_PROJECT_ERROR_STATUS =
-      new Status(
-          IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE, DELETE_PROJECT_ERROR_TEXT, null);
+      new Status(IStatus.ERROR, "saros", ERROR_CODE, DELETE_PROJECT_ERROR_TEXT, null);
 
   @Inject private ISarosSessionManager sessionManager;
 

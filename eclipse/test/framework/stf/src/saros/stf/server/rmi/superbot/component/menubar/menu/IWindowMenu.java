@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu;
+package saros.stf.server.rmi.superbot.component.menubar.menu;
 
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Perspective;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import saros.stf.client.tester.AbstractTester;
+import saros.stf.server.rmi.superbot.component.Perspective;
 
 /**
  * This interface contains convenience API to perform a action using main menu widgets. You can

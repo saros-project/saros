@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.Set;
+import saros.activities.SPath;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
+import saros.filesystem.IProject;
+import saros.session.User;
 
 /**
  * Tracks and provides access to editors for the set of files shared in the currently running
@@ -19,8 +19,8 @@ import java.util.Set;
  *
  * <p>{@link IEditorManager} tracks locally open editors. Changes to local editors (such as editors
  * getting opened, closed, or their content changed) are reported to remote sites as {@link
- * de.fu_berlin.inf.dpp.activities.IActivity activities}. Objects can react to both local and remote
- * editor events by installing an {@link ISharedEditorListener}.
+ * saros.activities.IActivity activities}. Objects can react to both local and remote editor events
+ * by installing an {@link ISharedEditorListener}.
  *
  * <p>All methods of {@link IEditorManager} automatically take care of any required synchronization
  * with the UI thread and can be safely called from any thread.

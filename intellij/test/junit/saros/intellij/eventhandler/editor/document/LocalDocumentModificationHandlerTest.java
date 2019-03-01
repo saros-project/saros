@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document;
+package saros.intellij.eventhandler.editor.document;
 
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.Assertions.assertThat;
@@ -10,13 +10,13 @@ import com.intellij.mock.MockEditorFactory;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorEventMulticaster;
-import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import saros.intellij.editor.EditorManager;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({EditorFactory.class})

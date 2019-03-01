@@ -1,17 +1,5 @@
-package de.fu_berlin.inf.dpp.synchronize;
+package saros.synchronize;
 
-import de.fu_berlin.inf.dpp.activities.StopActivity;
-import de.fu_berlin.inf.dpp.activities.StopActivity.State;
-import de.fu_berlin.inf.dpp.activities.StopActivity.Type;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.observables.ObservableValue;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +16,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.StopActivity;
+import saros.activities.StopActivity.State;
+import saros.activities.StopActivity.Type;
+import saros.annotations.Component;
+import saros.observables.ObservableValue;
+import saros.session.AbstractActivityConsumer;
+import saros.session.AbstractActivityProducer;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityConsumer.Priority;
+import saros.session.ISarosSession;
+import saros.session.User;
+import saros.util.ThreadUtils;
 
 /**
  * The @StopManager class is used to coordinate blocking of user input between different Saros

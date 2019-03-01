@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp.versioning;
+package saros.versioning;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.extensions.VersionExchangeExtension;
-import de.fu_berlin.inf.dpp.context.IContextKeyBindings.SarosVersion;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,6 +14,13 @@ import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
+import saros.annotations.Component;
+import saros.communication.extensions.VersionExchangeExtension;
+import saros.context.IContextKeyBindings.SarosVersion;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.PacketCollector;
+import saros.net.xmpp.JID;
 
 /**
  * Component for figuring out whether two Saros plug-in instances with known Version are compatible.

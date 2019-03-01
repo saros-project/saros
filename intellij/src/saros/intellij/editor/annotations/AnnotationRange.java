@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.editor.annotations;
+package saros.intellij.editor.annotations;
 
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import org.jetbrains.annotations.NotNull;

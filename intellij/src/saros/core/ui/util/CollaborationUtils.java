@@ -1,28 +1,7 @@
-package de.fu_berlin.inf.dpp.core.ui.util;
+package saros.core.ui.util;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
-import de.fu_berlin.inf.dpp.core.monitoring.Status;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.SarosComponent;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
-import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.internal.SarosSession;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +16,27 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.core.monitoring.IStatus;
+import saros.core.monitoring.Status;
+import saros.filesystem.IContainer;
+import saros.filesystem.IFile;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.intellij.SarosComponent;
+import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.runtime.UIMonitoredJob;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.DialogUtils;
+import saros.intellij.ui.util.NotificationPanel;
+import saros.monitoring.IProgressMonitor;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.SessionEndReason;
+import saros.session.User;
+import saros.session.internal.SarosSession;
+import saros.util.ThreadUtils;
 
 /**
  * Offers convenient methods for collaboration actions like sharing a project resources.

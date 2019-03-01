@@ -15,4 +15,4 @@
  *
  * In subpackages, you will also find classes for managing discovery and subscription.
  */
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;

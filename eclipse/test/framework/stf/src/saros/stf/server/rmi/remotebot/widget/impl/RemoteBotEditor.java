@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,6 +24,13 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+import saros.editor.annotations.SelectionAnnotation;
+import saros.editor.internal.EditorAPI;
+import saros.editor.text.LineRange;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
+import saros.stf.server.util.WidgetUtil;
 
 public class RemoteBotEditor extends StfRemoteObject implements IRemoteBotEditor {
 

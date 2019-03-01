@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import org.junit.Test;
+import saros.whiteboard.sxe.SXEController;
 
 public class ApplyRecordsTest {
 

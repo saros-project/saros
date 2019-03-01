@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.util;
+package saros.util;
 
 import java.io.IOException;
 import java.io.InputStream;

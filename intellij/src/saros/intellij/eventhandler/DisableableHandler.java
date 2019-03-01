@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.eventhandler;
+package saros.intellij.eventhandler;
 
 /** Provides a method to disable the listener held in the handler, thereby disabling the handler. */
 public interface DisableableHandler {

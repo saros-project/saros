@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
+package saros.intellij.ui.swt_browser;
 
 import com.intellij.ui.AncestorListenerAdapter;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.event.AncestorEvent;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.ui.pages.MainPage;
 
 /**
  * Saros main panel view. This is a JPanel and encapsulates the browser canvas. This class is

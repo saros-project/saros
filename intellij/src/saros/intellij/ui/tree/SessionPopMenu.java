@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.intellij.ui.tree;
+package saros.intellij.ui.tree;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.editor.FollowModeManager;
+import saros.session.ISarosSessionManager;
+import saros.session.User;
 
 /** Session pop-up menu that displays the option to follow a participant. */
 class SessionPopMenu extends JPopupMenu {

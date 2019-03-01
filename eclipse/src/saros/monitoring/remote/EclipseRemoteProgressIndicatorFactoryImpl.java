@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.monitoring.remote;
+package saros.monitoring.remote;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.annotations.Component;
+import saros.session.User;
 
 /** Eclipse-specific implementation of the {@link IRemoteProgressIndicatorFactory} interface. */
 @Component(module = "core")

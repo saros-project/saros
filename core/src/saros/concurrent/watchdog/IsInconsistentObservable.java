@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.concurrent.watchdog;
+package saros.concurrent.watchdog;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.observables.ObservableValue;
+import saros.annotations.Component;
+import saros.observables.ObservableValue;
 
 /**
  * This observable contains whether the ConsistencyWatchdogClient has detected that there are files

@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.editor.internal;
+package saros.editor.internal;
 
-import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorAnnotation;
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
-import de.fu_berlin.inf.dpp.editor.annotations.SelectionFillUpAnnotation;
-import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.Predicate;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +17,17 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+import saros.editor.annotations.RemoteCursorAnnotation;
+import saros.editor.annotations.SarosAnnotation;
+import saros.editor.annotations.SelectionAnnotation;
+import saros.editor.annotations.SelectionFillUpAnnotation;
+import saros.editor.annotations.ViewportAnnotation;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.User;
+import saros.ui.util.SWTUtils;
+import saros.util.Predicate;
 
 /**
  * This class is responsible for managing annotations related with other users' locations, i.e.

@@ -1,11 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.tree;
+package saros.intellij.ui.tree;
 
 import com.intellij.util.ui.UIUtil;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +11,11 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.intellij.ui.util.IconManager;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.roster.IRosterListener;
+import saros.net.xmpp.roster.RosterTracker;
 
 /**
  * Root node for the tree of contacts, that a user has in their contact list.

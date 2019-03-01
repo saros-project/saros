@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf;
+package saros.stf;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.jar.JarFile;
 /** @author Stefan Rossbach */
 public class TestLinkFinder {
 
-  private static final String STF_TEST_CASE_PACKAGE = "de.fu_berlin.inf.dpp.stf.test";
+  private static final String STF_TEST_CASE_PACKAGE = "saros.stf.test";
   private static ClassLoader classLoader;
   private static File baseDirectory;
   private static Class<?> testLinkAnnotation;
@@ -24,7 +24,7 @@ public class TestLinkFinder {
 
     classLoader = ClassLoader.getSystemClassLoader();
 
-    testLinkAnnotation = Class.forName("de.fu_berlin.inf.dpp.stf.annotation.TestLink");
+    testLinkAnnotation = Class.forName("saros.stf.annotation.TestLink");
 
     String className = TestLinkFinder.class.getName().replace(".", "/").concat(".class");
 

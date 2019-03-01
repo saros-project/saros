@@ -22,4 +22,4 @@
  *     href="http://help.eclipse.org/indigo/topic/org.eclipse.platform.doc.isv/guide/workbench_cmd_handlers.htm">plugin.xml
  *     - org.eclipse.ui.handlers extension point</a>
  */
-package de.fu_berlin.inf.dpp.ui.commandHandlers;
+package saros.ui.commandHandlers;

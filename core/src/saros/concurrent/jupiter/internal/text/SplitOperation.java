@@ -18,15 +18,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
+package saros.concurrent.jupiter.internal.text;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.List;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.concurrent.jupiter.Operation;
+import saros.session.User;
 
 /**
  * The SplitOperation contains two operations to be performed after each other. It is used when an

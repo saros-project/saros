@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.communication.chat;
+package saros.communication.chat;
 
 import org.jivesoftware.smack.XMPPException;
 

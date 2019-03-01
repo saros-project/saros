@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.test.fakes.synchonize;
+package saros.test.fakes.synchonize;
 
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -9,6 +8,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import org.picocontainer.Disposable;
 import org.picocontainer.Startable;
+import saros.synchronize.UISynchronizer;
 
 public class NonUISynchronizer implements UISynchronizer, Startable, Disposable {
 

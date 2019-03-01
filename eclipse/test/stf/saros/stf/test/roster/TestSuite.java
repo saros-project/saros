@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.roster;
+package saros.stf.test.roster;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

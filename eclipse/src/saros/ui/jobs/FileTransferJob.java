@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.jobs;
+package saros.ui.jobs;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
-import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -12,6 +7,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Error;
+import saros.Saros;
+import saros.monitoring.MonitorableFileTransfer;
+import saros.monitoring.MonitorableFileTransfer.TransferStatus;
+import saros.monitoring.ProgressMonitorAdapterFactory;
+import saros.net.xmpp.JID;
 
 abstract class FileTransferJob extends Job {
 

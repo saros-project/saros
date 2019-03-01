@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.wizard.composite;
+package saros.ui.widgetGallery.demoSuits.wizard.composite;
 
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.util.LayoutUtils;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgets.wizard.EnterXMPPAccountComposite;
 
 @Demo
 public class EnterXMPPAccountCompositeDemo extends AbstractDemo {

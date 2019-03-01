@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 /** Wraps an object to make it replaceable. */
 abstract class Replaceable<T> {

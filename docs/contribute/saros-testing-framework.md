@@ -14,7 +14,7 @@ You need a [development environment](development-environment.md) with **Eclipse 
 ### Configuration
 
 * Before you can run the stf tests you need four XMPP accounts. If you want to use our XMPP server you can create accounts as described in the [user documentation](../../documentation/getting-started.html).
-* Then you have to create the file `configuration.properties` in directory `de.fu_berlin.inf.dpp/test/framework/stf/src/de/fu_berlin/inf/dpp/stf/client`.
+* Then you have to create the file `configuration.properties` in directory `saros/test/framework/stf/src/saros/stf/client`.
 * Add the following lines to the config and **replace the placeholders with your credentials** (make sure **every tester has an unique JID**)
 
 ```properties
@@ -53,7 +53,7 @@ Therefore the current workaround is to execute the gradle task `generateLibAll` 
     configuration.
     You only need to run the appropriate launch file(s). E.g. the
     test `AccountPreferenceTest.java` in the package
-    `de.fu_berlin.inf.dpp.stf.test.account` only needs the tester
+    `saros.stf.test.account` only needs the tester
     *ALICE*. In this case you only need to start *Saros\_STF\_Alice*.
 2.  **Right click** on the test you want to run and select **Run As > JUnit test**
 
@@ -63,7 +63,7 @@ However Intellij/Gradle supports to run multiple intellij instances from within 
 
 ### Run multiple Intellij instances for testing
 * Open the `Gradle` tool window
-* Open the task directory `de.fu_berlin.inf.dpp.intellij > Tasks > intellij`
+* Open the task directory `saros.intellij > Tasks > intellij`
 * Execute task `runIde` for each IntelliJ IDEA instance you need.
 
 Each simultaneously execution of `runIde` creates a sandbox directory in the `build` directory of the intellij project.

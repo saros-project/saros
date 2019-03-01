@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.server.session;
+package saros.server.session;
 
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.server.editor.ServerEditorManager;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import org.picocontainer.Startable;
+import saros.activities.TextEditActivity;
+import saros.server.editor.ServerEditorManager;
+import saros.session.AbstractActivityConsumer;
+import saros.session.ISarosSession;
 
 /** Executes TextEditActivities through the {@link ServerEditorManager}. */
 public class TextEditActivityExecutor extends AbstractActivityConsumer implements Startable {

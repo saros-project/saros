@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
+import saros.preferences.EclipsePreferenceConstants;
 
 public class FeedbackPreferences {
 

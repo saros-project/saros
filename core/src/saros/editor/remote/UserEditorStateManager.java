@@ -1,21 +1,21 @@
-package de.fu_berlin.inf.dpp.editor.remote;
+package saros.editor.remote;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.picocontainer.Startable;
+import saros.activities.IActivity;
+import saros.activities.SPath;
+import saros.annotations.Component;
+import saros.session.IActivityConsumer;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
 
 /**
  * This class contains the state of the editors, viewports and selections of all remote users as we
  * believe it to be by listening to the Activities we receive. This class is a {@linkplain
- * de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority#PASSIVE passive consumer}.
+ * saros.session.IActivityConsumer.Priority#PASSIVE passive consumer}.
  */
 @Component
 public class UserEditorStateManager implements IActivityConsumer, Startable {

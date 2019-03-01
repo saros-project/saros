@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.editor.remote;
+package saros.editor.remote;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
+import saros.activities.SPath;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
 
 /** Represents the current status of an editor. */
 public class EditorState {

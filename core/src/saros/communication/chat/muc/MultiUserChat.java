@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.communication.chat.muc;
+package saros.communication.chat.muc;
 
-import de.fu_berlin.inf.dpp.communication.chat.AbstractChat;
-import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
-import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
-import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +17,11 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
+import saros.communication.chat.AbstractChat;
+import saros.communication.chat.ChatElement;
+import saros.communication.chat.ChatElement.ChatElementType;
+import saros.communication.chat.IChatListener;
+import saros.net.xmpp.JID;
 
 /**
  * This class encapsulates Smacks {@link MultiUserChat} and offers {@link ChatState}s that are

@@ -17,10 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net.xmpp;
+package saros.net.xmpp;
 
-import de.fu_berlin.inf.dpp.net.ConnectionState;
 import org.jivesoftware.smack.Connection;
+import saros.net.ConnectionState;
 
 /**
  * A listener for changes to the current connection state. Use {@link

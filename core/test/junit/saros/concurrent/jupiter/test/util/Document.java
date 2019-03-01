@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
+package saros.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.concurrent.jupiter.Operation;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.session.User;
 
 /**
  * this class represent a document object for testing.

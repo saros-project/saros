@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.stf.test.whiteboard;
+package saros.stf.test.whiteboard;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView.Tool;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.IWhiteboardFigure;
-import de.fu_berlin.inf.dpp.stf.shared.Constants;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.tester.AbstractTester;
+import saros.stf.client.util.Util;
+import saros.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView.Tool;
+import saros.stf.server.rmi.superbot.component.view.whiteboard.IWhiteboardFigure;
+import saros.stf.shared.Constants;
 
 public class ObjectCreationTest extends StfTestCase {
   private static final String fileContent =

@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits;
+package saros.ui.widgetGallery.demoSuits;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.util.CompositeUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -10,6 +8,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import saros.ui.widgetGallery.util.CompositeUtils;
+import saros.ui.widgets.decoration.EmptyText;
 
 public abstract class AbstractDemo {
 

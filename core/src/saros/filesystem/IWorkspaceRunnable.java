@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
-import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import java.io.IOException;
+import saros.exceptions.OperationCanceledException;
+import saros.monitoring.IProgressMonitor;
 
 /**
  * This interface is under development. It currently equals its Eclipse counterpart. If not

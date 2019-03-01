@@ -1,36 +1,36 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
-import static de.fu_berlin.inf.dpp.context.AbstractContextFactory.Component.create;
+import static saros.context.AbstractContextFactory.Component.create;
 
-import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
-import de.fu_berlin.inf.dpp.ui.browser_functions.AddContact;
-import de.fu_berlin.inf.dpp.ui.browser_functions.CloseAccountWizard;
-import de.fu_berlin.inf.dpp.ui.browser_functions.CloseSessionInvitationWizard;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ConnectAccount;
-import de.fu_berlin.inf.dpp.ui.browser_functions.DeleteAccount;
-import de.fu_berlin.inf.dpp.ui.browser_functions.DeleteContact;
-import de.fu_berlin.inf.dpp.ui.browser_functions.DisconnectAccount;
-import de.fu_berlin.inf.dpp.ui.browser_functions.EditAccount;
-import de.fu_berlin.inf.dpp.ui.browser_functions.GetValidJID;
-import de.fu_berlin.inf.dpp.ui.browser_functions.RenameContact;
-import de.fu_berlin.inf.dpp.ui.browser_functions.SaveAccount;
-import de.fu_berlin.inf.dpp.ui.browser_functions.SendInvitation;
-import de.fu_berlin.inf.dpp.ui.browser_functions.SetActiveAccount;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ShowAccountPage;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ShowSessionWizard;
-import de.fu_berlin.inf.dpp.ui.core_facades.ConnectionFacade;
-import de.fu_berlin.inf.dpp.ui.core_facades.RosterFacade;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
-import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
-import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
-import de.fu_berlin.inf.dpp.ui.pages.AccountPage;
-import de.fu_berlin.inf.dpp.ui.pages.ConfigurationPage;
-import de.fu_berlin.inf.dpp.ui.pages.MainPage;
-import de.fu_berlin.inf.dpp.ui.pages.SessionWizardPage;
-import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
-import de.fu_berlin.inf.dpp.ui.renderer.ProjectListRenderer;
-import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
 import org.picocontainer.MutablePicoContainer;
+import saros.context.AbstractContextFactory;
+import saros.ui.browser_functions.AddContact;
+import saros.ui.browser_functions.CloseAccountWizard;
+import saros.ui.browser_functions.CloseSessionInvitationWizard;
+import saros.ui.browser_functions.ConnectAccount;
+import saros.ui.browser_functions.DeleteAccount;
+import saros.ui.browser_functions.DeleteContact;
+import saros.ui.browser_functions.DisconnectAccount;
+import saros.ui.browser_functions.EditAccount;
+import saros.ui.browser_functions.GetValidJID;
+import saros.ui.browser_functions.RenameContact;
+import saros.ui.browser_functions.SaveAccount;
+import saros.ui.browser_functions.SendInvitation;
+import saros.ui.browser_functions.SetActiveAccount;
+import saros.ui.browser_functions.ShowAccountPage;
+import saros.ui.browser_functions.ShowSessionWizard;
+import saros.ui.core_facades.ConnectionFacade;
+import saros.ui.core_facades.RosterFacade;
+import saros.ui.ide_embedding.BrowserCreator;
+import saros.ui.manager.BrowserManager;
+import saros.ui.manager.ProjectListManager;
+import saros.ui.pages.AccountPage;
+import saros.ui.pages.ConfigurationPage;
+import saros.ui.pages.MainPage;
+import saros.ui.pages.SessionWizardPage;
+import saros.ui.renderer.AccountRenderer;
+import saros.ui.renderer.ProjectListRenderer;
+import saros.ui.renderer.StateRenderer;
 
 /**
  * This is the HTML UI core factory for Saros. All components that are created by this factory

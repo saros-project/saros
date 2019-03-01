@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.ui.pages;
+package saros.ui.pages;
 
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
-import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 import java.util.List;
+import saros.ui.ide_embedding.IUIResourceLocator;
+import saros.ui.renderer.Renderer;
 
 /**
  * A browser page encapsulates the location of the HTML page as well as the needed browsers

@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.intellij.filesystem;
+package saros.intellij.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.filesystem.IResource;
 
 public abstract class IntelliJResourceImpl implements IResource {
 

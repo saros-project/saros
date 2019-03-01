@@ -1,11 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl;
+package saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.INewC;
 import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -13,6 +7,12 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.SarosSWTBotPreferences;
+import saros.stf.server.bot.widget.ContextMenuHelper;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.INewC;
 
 public final class NewC extends StfRemoteObject implements INewC {
 

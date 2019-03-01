@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net;
+package saros.net;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -10,10 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +21,10 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.junit.Before;
 import org.junit.Test;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.roster.RosterTracker;
 
 public class RosterTrackerTest {
 

@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.stf;
+package saros.stf;
 
-import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.SwtBrowserPanel;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
 import java.rmi.RemoteException;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -13,6 +11,8 @@ import org.fest.swing.core.TypeMatcher;
 import org.fest.swing.edt.FailOnThreadViolationRepaintManager;
 import org.fest.swing.exception.ComponentLookupException;
 import org.fest.swing.fixture.JPopupMenuFixture;
+import saros.intellij.ui.swt_browser.SwtBrowserPanel;
+import saros.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
 
 /**
  * The IntelliJ implementation of the {@link IHTMLWorkbenchBot}. It is used for opening and closing

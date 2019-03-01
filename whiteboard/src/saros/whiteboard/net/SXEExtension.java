@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.whiteboard.net;
+package saros.whiteboard.net;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessageWriter;
 import org.jivesoftware.smack.packet.PacketExtension;
+import saros.whiteboard.sxe.net.SXEMessage;
+import saros.whiteboard.sxe.net.SXEMessageWriter;
 
 /**
  * Very simple extension embedding an SXEMessage using the SXEMessageFactory to convert it to a

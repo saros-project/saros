@@ -17,20 +17,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import saros.annotations.Component;
+import saros.net.ConnectionState;
+import saros.net.ITransmitter;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
 
 /**
  * ITransmitter implementation using XMPP, IBB streams and Socks5 streams for sending packet
@@ -43,8 +43,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
   /** size in bytes that a packet extension must exceed to be compressed */
   private static final int PACKET_EXTENSION_COMPRESS_THRESHOLD =
-      Integer.getInteger(
-          "de.fu_berlin.inf.dpp.net.transmitter.PACKET_EXTENSION_COMPRESS_THRESHOLD", 32);
+      Integer.getInteger("saros.net.transmitter.PACKET_EXTENSION_COMPRESS_THRESHOLD", 32);
 
   private final DataTransferManager dataManager;
 

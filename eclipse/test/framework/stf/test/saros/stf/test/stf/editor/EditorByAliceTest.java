@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.editor;
+package saros.stf.test.stf.editor;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static org.eclipse.swtbot.swt.finder.SWTBotAssert.assertContains;
 import static org.eclipse.swtbot.swt.finder.SWTBotAssert.assertDoesNotContain;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 import java.rmi.RemoteException;
 import java.util.List;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.test.Constants;
 
 public class EditorByAliceTest extends StfTestCase {
 

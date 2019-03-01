@@ -1,5 +1,5 @@
 dependencies {
-  compile project(':de.fu_berlin.inf.dpp.core')
+  compile project(':saros.core')
   compile 'org.apache.commons:commons-collections4:4.2'
   testCompile configurations.testConfig
 }

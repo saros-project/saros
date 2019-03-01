@@ -1,17 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.tree;
+package saros.intellij.ui.tree;
 
 import com.intellij.util.ui.UIUtil;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +8,17 @@ import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.intellij.ui.util.IconManager;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.ISessionListener;
+import saros.session.SessionEndReason;
+import saros.session.User;
+import saros.ui.util.ModelFormatUtils;
 
 /** Session tree root node. */
 public class SessionTreeRootNode extends DefaultMutableTreeNode {

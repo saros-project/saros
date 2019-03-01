@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package saros.project.internal;
 
 public interface IFollowModeChangesListener {
   public void followModeChanged();

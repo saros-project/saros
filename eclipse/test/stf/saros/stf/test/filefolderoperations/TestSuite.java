@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.filefolderoperations;
+package saros.stf.test.filefolderoperations;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

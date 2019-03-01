@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.mocks;
+package saros.test.mocks;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;

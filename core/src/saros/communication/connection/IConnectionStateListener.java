@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.communication.connection;
+package saros.communication.connection;
 
-import de.fu_berlin.inf.dpp.net.ConnectionState;
+import saros.net.ConnectionState;
 
 /** A listener for changes to the current connection state. */
 public interface IConnectionStateListener {

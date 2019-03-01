@@ -1,25 +1,25 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
-import de.fu_berlin.inf.dpp.editor.FollowModeBroadcaster;
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
-import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
-import de.fu_berlin.inf.dpp.misc.xstream.UserConverter;
-import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
-import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
-import de.fu_berlin.inf.dpp.session.internal.ChangeColorManager;
-import de.fu_berlin.inf.dpp.session.internal.LeaveAndKickHandler;
-import de.fu_berlin.inf.dpp.session.internal.PermissionManager;
-import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
-import de.fu_berlin.inf.dpp.session.internal.timeout.ClientSessionTimeoutHandler;
-import de.fu_berlin.inf.dpp.session.internal.timeout.ServerSessionTimeoutHandler;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import org.picocontainer.MutablePicoContainer;
+import saros.concurrent.management.ConcurrentDocumentClient;
+import saros.concurrent.management.ConcurrentDocumentServer;
+import saros.concurrent.watchdog.ConsistencyWatchdogClient;
+import saros.concurrent.watchdog.ConsistencyWatchdogHandler;
+import saros.concurrent.watchdog.ConsistencyWatchdogServer;
+import saros.editor.FollowModeBroadcaster;
+import saros.editor.FollowModeManager;
+import saros.editor.remote.UserEditorStateManager;
+import saros.misc.xstream.SPathConverter;
+import saros.misc.xstream.UserConverter;
+import saros.session.internal.ActivityHandler;
+import saros.session.internal.ActivitySequencer;
+import saros.session.internal.ChangeColorManager;
+import saros.session.internal.LeaveAndKickHandler;
+import saros.session.internal.PermissionManager;
+import saros.session.internal.UserInformationHandler;
+import saros.session.internal.timeout.ClientSessionTimeoutHandler;
+import saros.session.internal.timeout.ServerSessionTimeoutHandler;
+import saros.synchronize.StopManager;
 
 /**
  * Basic {@link ISarosSessionContextFactory} implementation which creates the {@link ISarosSession

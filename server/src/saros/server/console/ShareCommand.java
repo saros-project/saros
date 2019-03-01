@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.server.console;
+package saros.server.console;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.server.filesystem.ServerProjectImpl;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
+import saros.server.filesystem.ServerProjectImpl;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
 
 public class ShareCommand extends ConsoleCommand {
   private static final Logger log = Logger.getLogger(ShareCommand.class);

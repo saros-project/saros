@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
+package saros.intellij.ui.swt_browser;
 
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.PluginId;
@@ -6,8 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
-import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import java.util.concurrent.CountDownLatch;
+import saros.intellij.SarosComponent;
 
 /**
  * This class is an implementation of a tool window factory and creates a tool window containing a

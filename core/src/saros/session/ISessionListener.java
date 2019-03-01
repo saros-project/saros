@@ -17,10 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.User.Permission;
+import saros.filesystem.IProject;
+import saros.session.User.Permission;
 
 /**
  * Listens for events that can happen during a {@link ISarosSession session}. For life-cycle events

@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster;
+package saros.ui.widgets.viewer.roster;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterGroupElement;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
 import java.util.List;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -20,6 +12,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import saros.net.xmpp.JID;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.model.roster.RosterEntryElement;
+import saros.ui.model.roster.RosterGroupElement;
+import saros.ui.util.LayoutUtils;
+import saros.ui.util.WizardUtils;
+import saros.ui.wizards.AddContactWizard;
 
 /**
  * This {@link Composite} extends {@link ContactSelectionComposite} and displays additional

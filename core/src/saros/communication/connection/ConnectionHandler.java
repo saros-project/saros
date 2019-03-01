@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.communication.connection;
+package saros.communication.connection;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.internal.TCPServer;
-import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,6 +10,16 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.picocontainer.annotations.Nullable;
+import saros.SarosConstants;
+import saros.account.XMPPAccount;
+import saros.net.ConnectionState;
+import saros.net.IConnectionManager;
+import saros.net.internal.TCPServer;
+import saros.net.mdns.MDNSService;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.preferences.Preferences;
 
 /**
  * Facade for handling connection establishment and connection events. This facade should be
@@ -31,8 +31,7 @@ public class ConnectionHandler {
 
   private static final Logger LOG = Logger.getLogger(ConnectionHandler.class);
 
-  private static final boolean MDNS_MODE =
-      Boolean.getBoolean("de.fu_berlin.inf.dpp.net.ENABLE_MDNS");
+  private static final boolean MDNS_MODE = Boolean.getBoolean("saros.net.ENABLE_MDNS");
 
   private final XMPPConnectionService connectionService;
   private final MDNSService mDNSService;

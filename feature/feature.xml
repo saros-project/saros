@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="de.fu_berlin.inf.dpp.feature"
+      id="saros.feature"
       label="Saros"
       version="14.10.31">
 
@@ -368,21 +368,21 @@ Public License instead of this License.
    </requires>
 
    <plugin
-         id="de.fu_berlin.inf.dpp"
+         id="saros"
          download-size="0"
          install-size="0"
          version="14.10.31"
          unpack="false"/>
 
    <plugin
-         id="de.fu_berlin.inf.dpp.whiteboard"
+         id="saros.whiteboard"
          download-size="0"
          install-size="0"
          version="14.10.31"
          unpack="false"/>
 
    <plugin
-         id="de.fu_berlin.inf.dpp.core"
+         id="saros.core"
          download-size="0"
          install-size="0"
          version="0.1.0"

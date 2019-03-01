@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate;
+package saros.intellij.eventhandler.editor.editorstate;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
-import de.fu_berlin.inf.dpp.intellij.eventhandler.DisableableHandler;
 import org.jetbrains.annotations.NotNull;
+import saros.intellij.eventhandler.DisableableHandler;
 
 /**
  * Abstract class defining the base functionality needed to create and register/unregister a

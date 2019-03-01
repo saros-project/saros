@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.stf.test.followmode;
+package saros.stf.test.followmode;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class FollowModeDisabledInNewSessionTest extends StfTestCase {
 

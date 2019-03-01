@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;

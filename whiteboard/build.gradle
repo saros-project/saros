@@ -29,8 +29,8 @@ manifestDependencies {
 }
 
 dependencies {
-  compile project(':de.fu_berlin.inf.dpp.core')
-  compile project(':de.fu_berlin.inf.dpp')
+  compile project(':saros.core')
+  compile project(':saros.eclipse')
   releaseDep (log4jVersion) {
       exclude group: 'com.sun.jmx', module: 'jmxri'
       exclude group: 'com.sun.jdmk', module: 'jmxtools'

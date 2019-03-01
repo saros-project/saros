@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu;
+package saros.stf.server.rmi.superbot.component.menubar.menu.submenu;
 
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import saros.feedback.FeedbackManager;
+import saros.net.xmpp.JID;
 
 public interface ISarosPreferences extends Remote {
 

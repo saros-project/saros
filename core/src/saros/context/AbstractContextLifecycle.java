@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.context;
+package saros.context;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import saros.SarosPluginContext;
 
 /**
  * Abstract superclass which specifies and allows customization of the Saros startup and shutdown

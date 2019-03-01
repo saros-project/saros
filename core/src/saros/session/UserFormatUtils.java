@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
 
 /** Utility class for retrieving Format information on a User. */
 public class UserFormatUtils {

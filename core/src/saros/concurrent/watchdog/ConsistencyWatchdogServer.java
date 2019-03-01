@@ -1,19 +1,5 @@
-package de.fu_berlin.inf.dpp.concurrent.watchdog;
+package saros.concurrent.watchdog;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.synchronize.Blockable;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,6 +11,20 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.ChecksumActivity;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.annotations.Component;
+import saros.editor.IEditorManager;
+import saros.editor.ISharedEditorListener;
+import saros.editor.remote.UserEditorStateManager;
+import saros.session.AbstractActivityProducer;
+import saros.session.ISarosSession;
+import saros.synchronize.Blockable;
+import saros.synchronize.StopManager;
+import saros.synchronize.UISynchronizer;
+import saros.util.NamedThreadFactory;
+import saros.util.ThreadUtils;
 
 /**
  * The server side of the <i>consistency watchdog</i> infrastructure. It periodically checksums the

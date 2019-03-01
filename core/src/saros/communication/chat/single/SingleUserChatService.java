@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp.communication.chat.single;
+package saros.communication.chat.single;
 
-import de.fu_berlin.inf.dpp.communication.chat.AbstractChatService;
-import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
-import de.fu_berlin.inf.dpp.communication.chat.IChat;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +13,13 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.ChatStateManager;
+import saros.communication.chat.AbstractChatService;
+import saros.communication.chat.ChatElement;
+import saros.communication.chat.IChat;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
 
 public class SingleUserChatService extends AbstractChatService {
 

@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards.dialogs;
+package saros.ui.wizards.dialogs;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterXMPPAccountWizardPage;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -14,6 +9,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import saros.SarosPluginContext;
+import saros.ui.util.WizardUtils;
+import saros.ui.wizards.ConfigurationWizard;
+import saros.ui.wizards.CreateXMPPAccountWizard;
+import saros.ui.wizards.pages.EnterXMPPAccountWizardPage;
 
 public class ConfigurationWizardDialog extends WizardDialog {
 

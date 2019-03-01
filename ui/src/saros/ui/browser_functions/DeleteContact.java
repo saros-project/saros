@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package saros.ui.browser_functions;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.HTMLUIStrings;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.core_facades.RosterFacade;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
+import saros.HTMLUIContextFactory;
+import saros.HTMLUIStrings;
+import saros.net.xmpp.JID;
+import saros.ui.JavaScriptAPI;
+import saros.ui.core_facades.RosterFacade;
 
 /** Delete a contact (given by its JID) from the roster of the active account. */
 public class DeleteContact extends TypedJavascriptFunction {

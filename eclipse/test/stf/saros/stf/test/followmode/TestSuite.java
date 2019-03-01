@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.followmode;
+package saros.stf.test.followmode;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

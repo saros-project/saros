@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.util;
+package saros.whiteboard.sxe.util;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.AttributeRecord;
 import java.util.Collection;
 import java.util.HashMap;
+import saros.whiteboard.sxe.records.AttributeRecord;
 
 /**
  * A list of AttributeRecords that wraps a HashMap to accelerate the access of an AttributeRecord by

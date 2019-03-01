@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.actions;
+package saros.intellij.ui.actions;
 
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
+import saros.intellij.ui.util.NotificationPanel;
 
 /** Class used to report that an action is not implemented yet. */
 public class NotImplementedAction extends AbstractSarosAction {

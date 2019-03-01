@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy;
+package saros.whiteboard.gef.editpolicy;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateLineRequest;
-import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
-import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateTextBoxRequest;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.draw2d.AbstractPointListShape;
 import org.eclipse.draw2d.IFigure;
@@ -18,6 +14,10 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.XYLayoutEditPolicy;
 import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.swt.graphics.Color;
+import saros.whiteboard.gef.request.CreateLineRequest;
+import saros.whiteboard.gef.request.CreatePointlistRequest;
+import saros.whiteboard.gef.request.CreateTextBoxRequest;
+import saros.whiteboard.gef.util.ColorUtils;
 
 /**
  * This edit policy extends the XYLayout by the freehand drawing feature

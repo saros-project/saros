@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.util;
+package saros.ui.widgetGallery.util;
 
 import java.util.UUID;
 

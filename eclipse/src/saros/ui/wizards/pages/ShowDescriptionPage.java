@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import saros.negotiation.IncomingSessionNegotiation;
+import saros.net.util.XMPPUtils;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
 
 /**
  * A wizard page that displays the name of the inviter and the description provided with the

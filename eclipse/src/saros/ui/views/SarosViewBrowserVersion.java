@@ -1,9 +1,6 @@
-package de.fu_berlin.inf.dpp.ui.views;
+package saros.ui.views;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
-import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -11,6 +8,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.part.ViewPart;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.ui.ide_embedding.BrowserCreator;
+import saros.ui.pages.MainPage;
 
 /**
  * This view displays an SWTBrowser. The Browser loads an HTML Page which contains the actual UI
@@ -18,7 +18,7 @@ import org.picocontainer.annotations.Inject;
  * UI is heavily under construction, and is missing a lot of functionality yet.
  *
  * <p>To use this view, alter the 'plugin.xml' by comment out the SarosView 'view'tag and uncomment
- * the the 'view' tag below which quote to 'de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion'
+ * the the 'view' tag below which quote to 'saros.ui.views.SarosViewBrowserVersion'
  *
  * <p>TODO: Find a way to switch between the different UI versions in runtime. This is not a
  * required feature, but for debugging and comparing useful.
@@ -26,7 +26,7 @@ import org.picocontainer.annotations.Inject;
 public class SarosViewBrowserVersion extends ViewPart {
 
   /** The ID of the view as specified in the plugin manifest. */
-  public static final String ID = "de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion";
+  public static final String ID = "saros.ui.views.SarosViewBrowserVersion";
 
   private static final String TROUBLESHOOTING_URL = "http://www.saros-project.org/troubleshooting";
   private static final Logger LOG = Logger.getLogger(SarosViewBrowserVersion.class);

@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
 import java.util.HashMap;
 import java.util.Map;
+import saros.negotiation.hooks.ISessionNegotiationHook;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.Preferences;
 
 /** NegotiationHook to exchange initial and favorite color values and preferences */
 public class ColorNegotiationHook implements ISessionNegotiationHook {

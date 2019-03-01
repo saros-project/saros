@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editor;
+package saros.whiteboard.gef.editor;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.SXECommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.SXECompoundCommand;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.commands.CompoundCommand;
+import saros.whiteboard.gef.commands.SXECommand;
+import saros.whiteboard.gef.commands.SXECompoundCommand;
 
 /**
  * An adaption of the GEF CommandStack that will convert a {@link
@@ -12,7 +12,7 @@ import org.eclipse.gef.commands.CompoundCommand;
  * of <code>IRecord</code>s to the controller.
  *
  * @author jurke
- * @see de.fu_berlin.inf.dpp.whiteboard.gef.commands.SXECompoundCommand
+ * @see saros.whiteboard.gef.commands.SXECompoundCommand
  */
 public class SXECommandStack extends CommandStack {
 

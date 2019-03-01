@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp.editor.internal;
+package saros.editor.internal;
 
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,6 +17,13 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import saros.editor.EditorManager;
+import saros.editor.annotations.ContributionAnnotation;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
+import saros.ui.util.SWTUtils;
 
 /**
  * Throughout a session, the user should be made aware of the textual changes made by the other

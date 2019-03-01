@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.intellij.editor.annotations;
+package saros.intellij.editor.annotations;
 
 import com.intellij.openapi.editor.Editor;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.filesystem.IFile;
+import saros.session.User;
 
 /**
  * Base class for Saros annotations. An annotation is a highlighted section of text. Annotations are

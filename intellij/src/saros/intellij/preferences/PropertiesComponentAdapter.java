@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.intellij.preferences;
+package saros.intellij.preferences;
 
 import com.intellij.ide.util.PropertiesComponent;
-import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
 import java.nio.charset.Charset;
 import org.apache.commons.codec.binary.Base64;
+import saros.preferences.PreferenceStore;
 
 /**
  * This class adapts the {@link PropertiesComponent} to the IPreferenceStore interface.
@@ -13,7 +13,7 @@ import org.apache.commons.codec.binary.Base64;
  */
 public class PropertiesComponentAdapter extends PreferenceStore {
 
-  private static final String PROPERTY_PREFIX = "de.fu_berlin.inf.dpp.config.";
+  private static final String PROPERTY_PREFIX = "saros.config.";
 
   private static final Charset PROPERTY_CHARSET = Charset.forName("UTF-8");
   private static final Charset BASE64_CHARSET = Charset.forName("ISO-8859-1");

@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.basic.rounded;
+package saros.ui.widgetGallery.demoSuits.basic.rounded;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.RoundedComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -15,6 +12,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgets.RoundedComposite;
 
 @Demo
 public class RoundedCompositeDemo extends AbstractDemo {

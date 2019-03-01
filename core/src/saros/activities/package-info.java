@@ -5,7 +5,6 @@
  * transmitted to other participants. Thus, in a Saros session, peers are continually exchanging
  * activities invisibly.
  *
- * <p>Each activity should implement the {@link de.fu_berlin.inf.dpp.activities.IActivity}
- * interface.
+ * <p>Each activity should implement the {@link saros.activities.IActivity} interface.
  */
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;

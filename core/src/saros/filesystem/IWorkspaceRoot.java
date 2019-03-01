@@ -19,7 +19,7 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 /**
  * This interface is under development. It currently equals its Eclipse counterpart. If not

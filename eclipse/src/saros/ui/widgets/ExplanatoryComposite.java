@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets;
+package saros.ui.widgets;
 
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.PaintEvent;

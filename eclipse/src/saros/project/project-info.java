@@ -7,4 +7,4 @@
  * resources are monitored within this package and the framework for processing activities is laid
  * out here.
  */
-package de.fu_berlin.inf.dpp.project;
+package saros.project;

@@ -1,18 +1,10 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
 
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.stream.IStreamService;
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,6 +17,14 @@ import org.easymock.EasyMock;
 import org.jivesoftware.smack.Connection;
 import org.junit.Before;
 import org.junit.Test;
+import saros.net.ConnectionState;
+import saros.net.IConnectionManager;
+import saros.net.stream.IStreamService;
+import saros.net.stream.StreamMode;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.test.util.TestThread;
 
 public class DataTransferManagerTest {
 

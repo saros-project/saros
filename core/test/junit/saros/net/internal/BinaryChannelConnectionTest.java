@@ -1,13 +1,9 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.net.internal.BinaryChannelConnection.IDPool;
-import de.fu_berlin.inf.dpp.net.stream.ByteStream;
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,6 +16,10 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import saros.net.internal.BinaryChannelConnection.IDPool;
+import saros.net.stream.ByteStream;
+import saros.net.stream.StreamMode;
+import saros.net.xmpp.JID;
 
 public class BinaryChannelConnectionTest {
 

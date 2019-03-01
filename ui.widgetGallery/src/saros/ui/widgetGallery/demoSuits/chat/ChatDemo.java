@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.chat;
+package saros.ui.widgetGallery.demoSuits.chat;
 
-import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.chat.chatRoom.ChatRoomParticipant;
 import java.util.Date;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -20,6 +15,11 @@ import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import saros.communication.chat.ChatElement;
+import saros.net.xmpp.JID;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgetGallery.demoSuits.chat.chatRoom.ChatRoomParticipant;
 
 @Demo("This demo shows a multi user chat using 3x3 chats.")
 public class ChatDemo extends AbstractDemo {

@@ -1,15 +1,8 @@
-package de.fu_berlin.inf.dpp.stf.server.bot;
+package saros.stf.server.bot;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatInput;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLine;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLine;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -21,6 +14,13 @@ import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.hamcrest.Matcher;
+import saros.stf.server.bot.widget.SarosSWTBotChatInput;
+import saros.stf.server.bot.widget.SarosSWTBotChatLine;
+import saros.stf.server.bot.widget.SarosSWTBotChatLinePartnerChangeSeparator;
+import saros.ui.widgets.chat.items.ChatLine;
+import saros.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
+import saros.ui.widgets.chat.parts.ChatInput;
+import saros.ui.widgets.chat.parts.SkypeStyleChatDisplay;
 
 /**
  * SarosSWTBot is a {@link SWTBot} with capabilities for testing specific GUI items only defined for

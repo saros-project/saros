@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
+import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.IncomingSessionNegotiation;
+import saros.negotiation.OutgoingSessionNegotiation;
 
 /**
  * Interface for handling incoming and outgoing session and project negotiations. @Note

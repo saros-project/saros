@@ -1,8 +1,7 @@
-package de.fu_berlin.inf.dpp.ui.model.roster;
+package saros.ui.model.roster;
 
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,6 +11,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 import org.junit.Before;
 import org.junit.Test;
+import saros.net.xmpp.JID;
 
 public class RosterComparatorTest {
 

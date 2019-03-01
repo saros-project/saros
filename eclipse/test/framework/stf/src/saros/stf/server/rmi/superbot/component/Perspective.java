@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component;
+package saros.stf.server.rmi.superbot.component;
 
 public class Perspective {
 

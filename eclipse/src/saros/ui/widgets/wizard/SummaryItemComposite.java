@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.ui.widgets.wizard;
+package saros.ui.widgets.wizard;
 
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.widgets.SimpleIllustratedComposite;
 
 public class SummaryItemComposite extends SimpleIllustratedComposite {
   protected IllustratedText defaultContent;

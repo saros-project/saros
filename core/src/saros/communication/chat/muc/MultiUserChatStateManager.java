@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.communication.chat.muc;
+package saros.communication.chat.muc;
 
-import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +16,8 @@ import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
+import saros.communication.chat.IChatListener;
+import saros.net.xmpp.JID;
 
 /**
  * Handles the {@link ChatState} of a particular {@link MultiUserChat} and the propagation of

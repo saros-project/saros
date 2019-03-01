@@ -17,12 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net.xmpp;
+package saros.net.xmpp;
 
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import java.io.Serializable;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import saros.net.util.XMPPUtils;
 
 /**
  * A JID which is used to identify the users of the XMPP network.

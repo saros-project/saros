@@ -1,9 +1,8 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package saros.ui.browser_functions;
 
 import static org.junit.Assert.assertEquals;
 
 import de.fu_berlin.inf.ag_se.browser.IBrowser;
-import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import java.lang.reflect.Method;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -13,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import saros.ui.JavaScriptAPI;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(JavaScriptAPI.class)

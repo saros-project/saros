@@ -17,13 +17,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.communication.extensions;
+package saros.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.HashMap;
 import java.util.Map;
+import saros.negotiation.hooks.ISessionNegotiationHook;
+import saros.net.xmpp.JID;
 
 /** Packet used for exchanging data during session negotiation. Can be used on both sides. */
 @XStreamAlias(/* SessionNegotiationParameterExchange */ "SNPE")

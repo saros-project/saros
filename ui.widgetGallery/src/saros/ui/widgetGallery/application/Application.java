@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.application;
+package saros.ui.widgetGallery.application;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;

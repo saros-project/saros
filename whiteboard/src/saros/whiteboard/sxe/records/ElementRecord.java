@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
 import com.google.gson.annotations.Expose;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.XMLNotWellFormedException;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ChildRecordChangeCache.ChildRecordChangeListener;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.util.AttributeSet;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.util.NodeSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.constants.NodeType;
+import saros.whiteboard.sxe.exceptions.XMLNotWellFormedException;
+import saros.whiteboard.sxe.records.ChildRecordChangeCache.ChildRecordChangeListener;
+import saros.whiteboard.sxe.util.AttributeSet;
+import saros.whiteboard.sxe.util.NodeSet;
 
 /**
  * Implementation of a DOM element in context of Shared XML Editing XEP-0284 (SXE).
@@ -29,7 +29,7 @@ public class ElementRecord extends NodeRecord {
   /**
    * Used to notify listeners only after a whole SXECommand/SXEMessage was executed.
    *
-   * @see de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController#notifyLocalListeners()
+   * @see saros.whiteboard.sxe.SXEController#notifyLocalListeners()
    */
   protected ChildRecordChangeCache changeSupport;
 
@@ -130,8 +130,7 @@ public class ElementRecord extends NodeRecord {
   /**
    * Returns the ElementRecord created by DocumentRecord with this as parent.
    *
-   * @see de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord#createElementRecord(String,
-   *     String)
+   * @see saros.whiteboard.sxe.records.DocumentRecord#createElementRecord(String, String)
    */
   public ElementRecord createNewElementRecord(String ns, String name) {
     ElementRecord record = getDocumentRecord().createElementRecord(ns, name);
@@ -165,8 +164,7 @@ public class ElementRecord extends NodeRecord {
   /**
    * Returns the AttributeRecord created by DocumentRecord with this as parent.
    *
-   * @see de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord#createAttributeRecord(String,
-   *     String)
+   * @see saros.whiteboard.sxe.records.DocumentRecord#createAttributeRecord(String, String)
    */
   public AttributeRecord createNewAttributeRecord(String ns, String name, String chdata) {
     AttributeRecord record = getDocumentRecord().createAttributeRecord(ns, name, chdata);

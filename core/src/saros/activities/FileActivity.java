@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.Arrays;
 import org.apache.commons.lang3.ObjectUtils;
+import saros.session.User;
 
 @XStreamAlias("fileActivity")
 public class FileActivity extends AbstractResourceActivity

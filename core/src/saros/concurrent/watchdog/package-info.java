@@ -37,4 +37,4 @@
  *       recoveries from clients to the host.
  * </ul>
  */
-package de.fu_berlin.inf.dpp.concurrent.watchdog;
+package saros.concurrent.watchdog;

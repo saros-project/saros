@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;
 
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
+import saros.net.util.XMPPUtils;
 
 /**
  * Represent an entry in a contact list.

@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.monitoring;
+package saros.monitoring;
 
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 
 public class EclipseToCoreMonitorAdapter extends ProgressMonitorWrapper
-    implements de.fu_berlin.inf.dpp.monitoring.IProgressMonitor {
+    implements saros.monitoring.IProgressMonitor {
 
   EclipseToCoreMonitorAdapter(org.eclipse.core.runtime.IProgressMonitor monitor) {
     super(monitor);

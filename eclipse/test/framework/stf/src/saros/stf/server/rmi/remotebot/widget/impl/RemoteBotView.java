@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarDropDownButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarPushButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarRadioButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarToggleButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotViewMenu;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +11,16 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarPushButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarRadioButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.IRemoteBot;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotToolbarButton;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotToolbarDropDownButton;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotToolbarPushButton;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotToolbarRadioButton;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotToolbarToggleButton;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotView;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotViewMenu;
 
 public final class RemoteBotView extends StfRemoteObject implements IRemoteBotView {
 

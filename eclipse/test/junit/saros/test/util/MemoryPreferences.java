@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.util;
+package saros.test.util;
 
 import java.util.HashMap;
 import org.osgi.service.prefs.BackingStoreException;

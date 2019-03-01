@@ -1,14 +1,5 @@
-package de.fu_berlin.inf.dpp.communication.chat.muc.negotiation;
+package saros.communication.chat.muc.negotiation;
 
-import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
-import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -16,6 +7,15 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Nullable;
+import saros.communication.chat.muc.MultiUserChatPreferences;
+import saros.negotiation.hooks.ISessionNegotiationHook;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
 
 /**
  * The MUCNegotiationManager is responsible for transmitting the Communication config of the host to
@@ -62,8 +62,7 @@ public class MUCNegotiationManager {
         }
 
         @Override
-        public void setInitialHostPreferences(
-            de.fu_berlin.inf.dpp.preferences.IPreferenceStore hostPreferences) {
+        public void setInitialHostPreferences(saros.preferences.IPreferenceStore hostPreferences) {
           // NOP
         }
 
@@ -85,8 +84,8 @@ public class MUCNegotiationManager {
         @Override
         public void applyActualParameters(
             Map<String, String> input,
-            de.fu_berlin.inf.dpp.preferences.IPreferenceStore hostPreferences,
-            de.fu_berlin.inf.dpp.preferences.IPreferenceStore clientPreferences) {
+            saros.preferences.IPreferenceStore hostPreferences,
+            saros.preferences.IPreferenceStore clientPreferences) {
 
           if (input == null) return;
 

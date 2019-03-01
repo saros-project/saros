@@ -1,14 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.views;
+package saros.ui.widgetGallery.views;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.ImageManager;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoElement;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoExplorer;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.util.CompositeUtils;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.widgets.BannerComposite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.widgets.DemoBannerComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite.IllustratedText;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -19,9 +10,18 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
+import saros.ui.widgetGallery.ImageManager;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoExplorer.DemoElement;
+import saros.ui.widgetGallery.demoExplorer.DemoExplorer;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgetGallery.util.CompositeUtils;
+import saros.ui.widgetGallery.widgets.BannerComposite;
+import saros.ui.widgetGallery.widgets.DemoBannerComposite;
+import saros.ui.widgets.SimpleIllustratedComposite.IllustratedText;
 
 public class WidgetGalleryView extends ViewPart {
-  public static final String ID = "de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView";
+  public static final String ID = "saros.ui.widgetGallery.views.WidgetGalleryView";
   public static SelectionProviderIntermediate selectionProviderIntermediate =
       new SelectionProviderIntermediate();
 

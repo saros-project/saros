@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
+package saros.whiteboard.gef.commands;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import java.util.List;
 import org.eclipse.draw2d.geometry.Rectangle;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.sxe.records.IRecord;
 
 /**
  * Default command to create arbitrary <code>ElementRecord</code> instances with a certain position

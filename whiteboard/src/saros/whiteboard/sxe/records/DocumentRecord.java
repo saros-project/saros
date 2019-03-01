@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.MissingRecordException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.exceptions.MissingRecordException;
 
 /**
  * Implementation of a DOM document in context of Shared XML Editing XEP-0284 (SXE).
@@ -41,7 +41,7 @@ public class DocumentRecord {
   /**
    * Creates an ElementRecord using the factory of the controller.
    *
-   * @see de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory
+   * @see saros.whiteboard.sxe.records.ISXERecordFactory
    */
   public ElementRecord createElementRecord(String ns, String name) {
     ElementRecord e = controller.getRecordFactory().createElementRecord(this, ns, name);
@@ -53,7 +53,7 @@ public class DocumentRecord {
   /**
    * Creates an AttributeRecord using the factory of the controller.
    *
-   * @see de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory
+   * @see saros.whiteboard.sxe.records.ISXERecordFactory
    */
   public AttributeRecord createAttributeRecord(String ns, String name, String chdata) {
     AttributeRecord a = controller.getRecordFactory().createAttributeRecord(this, ns, name, chdata);

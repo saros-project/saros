@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.contextmenu;
+package saros.stf.test.stf.contextmenu;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.ALICE;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRunAsContextMenu;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRunAsContextMenu;
 
 public class ContextMenuRunAsTest extends StfTestCase {
 

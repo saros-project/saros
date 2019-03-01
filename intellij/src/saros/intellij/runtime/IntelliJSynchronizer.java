@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.intellij.runtime;
+package saros.intellij.runtime;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
+import saros.synchronize.UISynchronizer;
 
 /**
  * Class implements the {@link UISynchronizer} with {@link Application#invokeLater(Runnable)} and

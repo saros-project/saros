@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.ui.expressions;
+package saros.ui.expressions;
 
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import org.eclipse.core.expressions.PropertyTester;
+import saros.session.ISarosSession;
 
 /** Adds tests to a running {@link ISarosSession session}. */
 public class SarosSessionPropertyTester extends PropertyTester {

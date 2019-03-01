@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.ui.ide_embedding;
+package saros.ui.ide_embedding;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
-import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.util.StringUtils;
+import saros.HTMLUIContextFactory;
+import saros.ui.manager.BrowserManager;
+import saros.ui.pages.IBrowserPage;
 
 /**
  * This class represents the IDE-independent part of the browser creation. It resorts to

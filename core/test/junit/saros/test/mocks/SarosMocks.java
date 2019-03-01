@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.test.mocks;
+package saros.test.mocks;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import org.easymock.EasyMock;
 import org.powermock.api.easymock.PowerMock;
+import saros.activities.SPath;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.User;
 
 /**
  * This class provides several mock-creating methods for various purposes. It makes use of EasyMock

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.fakes.synchonize;
+package saros.test.fakes.synchonize;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

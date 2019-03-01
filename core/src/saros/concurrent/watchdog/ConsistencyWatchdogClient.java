@@ -1,20 +1,5 @@
-package de.fu_berlin.inf.dpp.concurrent.watchdog;
+package saros.concurrent.watchdog;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.UserFormatUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +13,21 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.ChecksumActivity;
+import saros.activities.ChecksumErrorActivity;
+import saros.activities.FileActivity;
+import saros.activities.SPath;
+import saros.annotations.Component;
+import saros.editor.IEditorManager;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.NullProgressMonitor;
+import saros.monitoring.remote.RemoteProgressManager;
+import saros.session.AbstractActivityConsumer;
+import saros.session.AbstractActivityProducer;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityConsumer.Priority;
+import saros.session.ISarosSession;
+import saros.session.UserFormatUtils;
 
 /**
  * This class is responsible for two things:

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 /**
  * Abstract implementation of IActivityReceiver, which does nothing.

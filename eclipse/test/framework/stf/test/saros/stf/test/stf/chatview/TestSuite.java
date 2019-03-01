@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.chatview;
+package saros.stf.test.stf.chatview;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

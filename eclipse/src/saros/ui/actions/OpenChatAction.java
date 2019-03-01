@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.actions;
+package saros.ui.actions;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.model.session.UserElement;
-import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
 import java.util.List;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
@@ -18,6 +7,17 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.communication.chat.single.SingleUserChatService;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.session.User;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.model.session.UserElement;
+import saros.ui.util.selection.SelectionUtils;
+import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.ui.widgets.chat.ChatRoomsComposite;
 
 public class OpenChatAction extends Action implements Disposable {
 

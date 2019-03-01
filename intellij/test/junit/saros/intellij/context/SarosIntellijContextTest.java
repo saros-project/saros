@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.intellij.context;
+package saros.intellij.context;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
-import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import saros.HTMLUIContextFactory;
+import saros.context.CoreContextFactory;
+import saros.context.IContainerContext;
+import saros.context.IContextFactory;
+import saros.test.mocks.ContextMocker;
 
 /** Checks the Saros/I context for integrity. */
 public class SarosIntellijContextTest extends AbstractContextTest {

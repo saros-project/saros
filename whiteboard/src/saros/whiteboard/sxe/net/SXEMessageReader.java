@@ -1,11 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
+package saros.whiteboard.sxe.net;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.NewRecordDataObject;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.SetRecordDataObject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -14,6 +8,12 @@ import org.apache.log4j.Logger;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import saros.whiteboard.sxe.constants.RecordEntry;
+import saros.whiteboard.sxe.constants.RecordType;
+import saros.whiteboard.sxe.constants.SXEMessageType;
+import saros.whiteboard.sxe.records.serializable.NewRecordDataObject;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
+import saros.whiteboard.sxe.records.serializable.SetRecordDataObject;
 
 /**
  * Reader class for the SXE protocol. Reads SXEMessages from strings or pull parsers.

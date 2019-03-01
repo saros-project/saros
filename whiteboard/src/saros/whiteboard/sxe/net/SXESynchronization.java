@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
+package saros.whiteboard.sxe.net;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import org.apache.log4j.Logger;
+import saros.whiteboard.sxe.SXEController;
 
 /**
  * Base class for synchronization processes

@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.ui.browser;
+package saros.ui.browser;
 
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
-import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
+import saros.synchronize.UISynchronizer;
+import saros.ui.ide_embedding.BrowserCreator;
+import saros.ui.ide_embedding.DialogManager;
+import saros.ui.ide_embedding.IBrowserDialog;
+import saros.ui.pages.IBrowserPage;
+import saros.ui.util.SWTUtils;
 
 /** Eclipse side implementation of the IDialogManager interface */
 public class EclipseDialogManager extends DialogManager {

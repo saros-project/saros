@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
-import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
-import de.fu_berlin.inf.dpp.test.mocks.PrepareCoreComponents;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
-import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,6 +8,14 @@ import org.junit.runner.RunWith;
 import org.picocontainer.MutablePicoContainer;
 import org.powermock.core.classloader.annotations.MockPolicy;
 import org.powermock.modules.junit4.PowerMockRunner;
+import saros.context.CoreContextFactory;
+import saros.context.IContextFactory;
+import saros.filesystem.IWorkspaceRoot;
+import saros.test.mocks.ContextMocker;
+import saros.test.mocks.PrepareCoreComponents;
+import saros.ui.ide_embedding.DialogManager;
+import saros.ui.ide_embedding.IUIResourceLocator;
+import saros.ui.util.ICollaborationUtils;
 
 /** Checks the {@link HTMLUIContextFactory} for internal integrity. */
 @RunWith(PowerMockRunner.class)

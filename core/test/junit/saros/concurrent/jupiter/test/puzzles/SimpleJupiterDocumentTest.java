@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
+package saros.concurrent.jupiter.test.puzzles;
 
 /**
  * This test class represent local execution of document changes and appropriate jupiter operations.
@@ -8,18 +8,18 @@ import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.PathFake;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.User;
 import org.junit.Test;
+import saros.activities.JupiterActivity;
+import saros.concurrent.jupiter.Algorithm;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.internal.Jupiter;
+import saros.concurrent.jupiter.internal.text.InsertOperation;
+import saros.concurrent.jupiter.test.util.Document;
+import saros.concurrent.jupiter.test.util.JupiterTestCase;
+import saros.concurrent.jupiter.test.util.PathFake;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.session.User;
 
 public class SimpleJupiterDocumentTest extends JupiterTestCase {
 

@@ -3,11 +3,11 @@
    <description url="http://dpp.sf.net/update">
       Site to install the Saros Feature for Distributed Party Programming
    </description>
-   <feature url="http://dpp.sourceforge.net/update/de.fu_berlin.inf.dpp.feature_14.10.31.jar" id="de.fu_berlin.inf.dpp.feature" version="14.10.31">
+   <feature url="http://dpp.sourceforge.net/update/saros.feature_14.10.31.jar" id="saros.feature" version="14.10.31">
       <category name="DPP"/>
    </feature>
-   <archive path="plugins/de.fu_berlin.inf.dpp_14.10.31.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp_14.10.31.jar?use_mirror=dfn"/>
-   <archive path="plugins/de.fu_berlin.inf.dpp.whiteboard_14.10.31.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.whiteboard_14.10.31.jar?use_mirror=dfn"/>
-   <archive path="plugins/de.fu_berlin.inf.dpp.core_0.1.0.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.core_0.1.0.jar?use_mirror=dfn"/>
+   <archive path="plugins/saros_14.10.31.jar" url="http://downloads.sourceforge.net/dpp/saros_14.10.31.jar?use_mirror=dfn"/>
+   <archive path="plugins/saros.whiteboard_14.10.31.jar" url="http://downloads.sourceforge.net/dpp/saros.whiteboard_14.10.31.jar?use_mirror=dfn"/>
+   <archive path="plugins/saros.core_0.1.0.jar" url="http://downloads.sourceforge.net/dpp/saros.core_0.1.0.jar?use_mirror=dfn"/>
    <category-def name="DPP" label="DPP"/>
 </site>

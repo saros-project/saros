@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events;
+package saros.ui.widgets.viewer.project.events;
 
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.ResourceSelectionComposite;
+import saros.ui.widgets.viewer.project.ResourceSelectionComposite;
 
 /** Listener for {@link ResourceSelectionComposite} events. */
 public interface ResourceSelectionListener extends BaseResourceSelectionListener {

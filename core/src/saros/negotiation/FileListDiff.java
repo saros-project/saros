@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import saros.negotiation.FileList.MetaData;
 
 /**
  * A diff between two {@link FileList file lists}.

@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
+import saros.editor.colorstorage.UserColorID;
 
 /**
  * The <code>PreferenceInitializer</code> is responsible for initializing preference values needed

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
+package saros.intellij.ui.views.buttons;
 
 import com.intellij.util.ui.UIUtil;
 import javax.swing.ImageIcon;

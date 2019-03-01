@@ -12,7 +12,7 @@ buildscript {
 }
 
 dependencies {
-  compile project(':de.fu_berlin.inf.dpp.core')
+  compile project(':saros.core')
 
   releaseDep files('libs/swt-browser-improved.jar')
   releaseDep 'com.google.code.gson:gson:2.3'
@@ -21,7 +21,7 @@ dependencies {
   compile configurations.releaseDep
 
   testCompile configurations.testConfig
-  testCompile project(path: ':de.fu_berlin.inf.dpp.core', configuration: 'testing')
+  testCompile project(path: ':saros.core', configuration: 'testing')
 }
 
 sourceSets.main.java.srcDir 'src'

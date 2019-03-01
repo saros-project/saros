@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.renderer;
+package saros.ui.renderer;
 
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.ui.model.Contact;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
+import saros.net.util.XMPPUtils;
+import saros.ui.model.Contact;
 
 public class ContactRenderer {
   /**

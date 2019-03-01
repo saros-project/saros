@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui;
+package saros.intellij.ui;
 
-import de.fu_berlin.inf.dpp.intellij.util.MessageUtils;
+import saros.intellij.util.MessageUtils;
 
 /** UI message bundle. */
 public class Messages {

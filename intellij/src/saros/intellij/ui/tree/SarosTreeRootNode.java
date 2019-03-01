@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.tree;
+package saros.intellij.ui.tree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 

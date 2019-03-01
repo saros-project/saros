@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.wizard.wizards;
+package saros.ui.widgetGallery.demoSuits.wizard.wizards;
 
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.eclipse.swt.SWT;
@@ -11,6 +8,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.util.WizardUtils;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
 
 @Demo("All available wizards.")
 public class AllWizardsDemo extends AbstractDemo {

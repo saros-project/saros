@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.stf.test.partialsharing;
+package saros.stf.test.partialsharing;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.FINISH;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.RADIO_USING_EXISTING_PROJECT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_PROJECTS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.FINISH;
+import static saros.stf.shared.Constants.RADIO_USING_EXISTING_PROJECT;
+import static saros.stf.shared.Constants.SHELL_ADD_PROJECTS;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
+import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class ShareFilesFromOneProjectToMultipleRemoteProjectsTest extends StfTestCase {
 

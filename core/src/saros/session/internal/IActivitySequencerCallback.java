@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.net.xmpp.JID;
+import saros.session.User;
 
 /**
  * Simple callback interface for monitoring events that occur in the {@link ActivitySequencer}

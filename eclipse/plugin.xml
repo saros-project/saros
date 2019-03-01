@@ -5,24 +5,24 @@
     <extension
          point="org.eclipse.ui.views">
       <category
-            id="de.fu_berlin.inf.dpp.Saros"
+            id="saros.Saros"
             name="Saros"/>
       <category
-            id="de.fu_berlin.inf.dpp.Developer"
+            id="saros.Developer"
             name="Saros Development">
       </category>
      <view
-           category="de.fu_berlin.inf.dpp.Saros"
-           class="de.fu_berlin.inf.dpp.ui.views.SarosView"
+           category="saros.Saros"
+           class="saros.ui.views.SarosView"
            icon="icons/view16/saros_misc.png"
-           id="de.fu_berlin.inf.dpp.ui.views.SarosView"
+           id="saros.ui.views.SarosView"
            name="Saros">
      </view>
      <!-- <view
-			category="de.fu_berlin.inf.dpp.Saros"
-			class="de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion"
+			category="saros.Saros"
+			class="saros.ui.views.SarosViewBrowserVersion"
 			icon="icons/view16/saros_misc.png"
-			id="de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion"
+			id="saros.ui.views.SarosViewBrowserVersion"
 			name="Saros HTML GUI">
 			</view> -->
    </extension>
@@ -30,7 +30,7 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="*">
          <view
-               id="de.fu_berlin.inf.dpp.ui.views.SarosView"
+               id="saros.ui.views.SarosView"
                ratio="0.5"
                relationship="right"
                relative="org.eclipse.ui.views.TaskList">
@@ -41,8 +41,8 @@
          point="org.eclipse.ui.decorators">
       <decorator
             adaptable="true"
-            class="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator"
-            id="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator"
+            class="saros.ui.decorators.SharedProjectDecorator"
+            id="saros.ui.decorators.SharedProjectDecorator"
             label="Shared Project Decorator"
             lightweight="true"
             state="true">
@@ -52,8 +52,8 @@
       </decorator>
       <decorator
             adaptable="true"
-            class="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
-            id="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
+            class="saros.ui.decorators.SharedProjectFileDecorator"
+            id="saros.ui.decorators.SharedProjectFileDecorator"
             label="Shared Project File Decorator"
             lightweight="true"
             state="true">
@@ -65,182 +65,182 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage"
-            id="de.fu_berlin.inf.dpp.preferences"
+            class="saros.ui.preferencePages.GeneralPreferencePage"
+            id="saros.preferences"
             name="Saros"/>
       <page
-            category="de.fu_berlin.inf.dpp.preferences"
-            class="de.fu_berlin.inf.dpp.ui.preferencePages.AdvancedPreferencePage"
-            id="de.fu_berlin.inf.dpp.preferences.advanced"
+            category="saros.preferences"
+            class="saros.ui.preferencePages.AdvancedPreferencePage"
+            id="saros.preferences.advanced"
             name="Advanced"/>
       <page
-            category="de.fu_berlin.inf.dpp.preferences"
-            class="de.fu_berlin.inf.dpp.ui.preferencePages.NetworkPreferencePage"
-            id="de.fu_berlin.inf.dpp.preferences.network"
+            category="saros.preferences"
+            class="saros.ui.preferencePages.NetworkPreferencePage"
+            id="saros.preferences.network"
             name="Network"/>
       <page
-            category="de.fu_berlin.inf.dpp.preferences"
-            class="de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage"
+            category="saros.preferences"
+            class="saros.ui.preferencePages.FeedbackPreferencePage"
             id="de.fu_berlin.dpp.preferences.feedback"
             name="Feedback"/>
       <page
-            category="de.fu_berlin.inf.dpp.preferences"
-            class="de.fu_berlin.inf.dpp.ui.preferencePages.CommunicationPreferencePage"
+            category="saros.preferences"
+            class="saros.ui.preferencePages.CommunicationPreferencePage"
             id="de.fu_berlin.dpp.preferences.communication"
             name="Communication">
       </page>
       <page
-              category="de.fu_berlin.inf.dpp.preferences"
-              class="de.fu_berlin.inf.dpp.ui.preferencePages.PersonalizationPreferencePage"
-              id="de.fu_berlin.inf.dpp.preferences.personalization"
+              category="saros.preferences"
+              class="saros.ui.preferencePages.PersonalizationPreferencePage"
+              id="saros.preferences.personalization"
               name="Personalization">
       </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer"/>
+      <initializer class="saros.preferences.EclipsePreferenceInitializer"/>
    </extension>
    <extension
          point="org.eclipse.ui.editors.documentProviders">
       <provider
-            class="de.fu_berlin.inf.dpp.editor.internal.SharedDocumentProvider"
+            class="saros.editor.internal.SharedDocumentProvider"
             id="Saros.shared_document_provider"
             inputTypes="org.eclipse.ui.IFileEditorInput"/>
    </extension>
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
-      <type name="de.fu_berlin.inf.dpp.annotations.viewport.default"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.viewport.1"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.viewport.2"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.viewport.3"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.viewport.4"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.viewport.5"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.contribution.default"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.contribution.1"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.contribution.2"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.contribution.3"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.contribution.4"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.contribution.5"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.selection.default"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.selection.1"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.selection.2"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.selection.3"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.selection.4"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.selection.5"/>
+      <type name="saros.annotations.viewport.default"/>
+      <type name="saros.annotations.viewport.1"/>
+      <type name="saros.annotations.viewport.2"/>
+      <type name="saros.annotations.viewport.3"/>
+      <type name="saros.annotations.viewport.4"/>
+      <type name="saros.annotations.viewport.5"/>
+      <type name="saros.annotations.contribution.default"/>
+      <type name="saros.annotations.contribution.1"/>
+      <type name="saros.annotations.contribution.2"/>
+      <type name="saros.annotations.contribution.3"/>
+      <type name="saros.annotations.contribution.4"/>
+      <type name="saros.annotations.contribution.5"/>
+      <type name="saros.annotations.selection.default"/>
+      <type name="saros.annotations.selection.1"/>
+      <type name="saros.annotations.selection.2"/>
+      <type name="saros.annotations.selection.3"/>
+      <type name="saros.annotations.selection.4"/>
+      <type name="saros.annotations.selection.5"/>
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.default"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.default"
+            annotationType="saros.annotations.viewport.default"
+            colorPreferenceKey="saros.annotations.viewport.color.default"
             colorPreferenceValue="128,128,128"
             contributesToHeader="true"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.default"
+            highlightPreferenceKey="saros.annotations.viewport.highlight.default"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
             label="DPP Default Viewport"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.default"
+            overviewRulerPreferenceKey="saros.annotations.viewport.overview.default"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.default"
+            textPreferenceKey="saros.annotations.viewport.text.default"
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.default"
+            verticalRulerPreferenceKey="saros.annotations.viewport.ruler.default"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.1"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.1"
+            annotationType="saros.annotations.viewport.1"
+            colorPreferenceKey="saros.annotations.viewport.color.1"
             colorPreferenceValue="141,206,231"
             contributesToHeader="true"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.1"
+            highlightPreferenceKey="saros.annotations.viewport.highlight.1"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
             label="DPP Viewport User 1"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.1"
+            overviewRulerPreferenceKey="saros.annotations.viewport.overview.1"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.1"
+            textPreferenceKey="saros.annotations.viewport.text.1"
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.1"
+            verticalRulerPreferenceKey="saros.annotations.viewport.ruler.1"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.2"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.2"
+            annotationType="saros.annotations.viewport.2"
+            colorPreferenceKey="saros.annotations.viewport.color.2"
             colorPreferenceValue="191,187,130"
             contributesToHeader="true"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.2"
+            highlightPreferenceKey="saros.annotations.viewport.highlight.2"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
             label="DPP Viewport User 2"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.2"
+            overviewRulerPreferenceKey="saros.annotations.viewport.overview.2"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.2"
+            textPreferenceKey="saros.annotations.viewport.text.2"
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.2"
+            verticalRulerPreferenceKey="saros.annotations.viewport.ruler.2"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.3"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.3"
+            annotationType="saros.annotations.viewport.3"
+            colorPreferenceKey="saros.annotations.viewport.color.3"
             colorPreferenceValue="186,220,81"
             contributesToHeader="true"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.3"
+            highlightPreferenceKey="saros.annotations.viewport.highlight.3"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
             label="DPP Viewport User 3"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.3"
+            overviewRulerPreferenceKey="saros.annotations.viewport.overview.3"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.3"
+            textPreferenceKey="saros.annotations.viewport.text.3"
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.3"
+            verticalRulerPreferenceKey="saros.annotations.viewport.ruler.3"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.4"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.4"
+            annotationType="saros.annotations.viewport.4"
+            colorPreferenceKey="saros.annotations.viewport.color.4"
             colorPreferenceValue="237,237,169"
             contributesToHeader="true"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.4"
+            highlightPreferenceKey="saros.annotations.viewport.highlight.4"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
             label="DPP Viewport User 4"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.4"
+            overviewRulerPreferenceKey="saros.annotations.viewport.overview.4"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.4"
+            textPreferenceKey="saros.annotations.viewport.text.4"
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.4"
+            verticalRulerPreferenceKey="saros.annotations.viewport.ruler.4"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.5"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.5"
+            annotationType="saros.annotations.viewport.5"
+            colorPreferenceKey="saros.annotations.viewport.color.5"
             colorPreferenceValue="137,180,178"
             contributesToHeader="true"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.5"
+            highlightPreferenceKey="saros.annotations.viewport.highlight.5"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
             label="DPP Viewport User 5"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.5"
+            overviewRulerPreferenceKey="saros.annotations.viewport.overview.5"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.5"
+            textPreferenceKey="saros.annotations.viewport.text.5"
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.5"
+            verticalRulerPreferenceKey="saros.annotations.viewport.ruler.5"
             verticalRulerPreferenceValue="false"/>
 
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.contribution.default"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color.default"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.highlight.default"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.overview.default"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.default"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.default"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.default"
+            annotationType="saros.annotations.contribution.default"
+            colorPreferenceKey="saros.annotations.contribution.color.default"
+            highlightPreferenceKey="saros.annotations.contribution.highlight.default"
+            overviewRulerPreferenceKey="saros.annotations.contribution.overview.default"
+            textPreferenceKey="saros.annotations.contribution.text.default"
+            textStylePreferenceKey="saros.annotations.contribution.textstyle.default"
+            verticalRulerPreferenceKey="saros.annotations.contribution.ruler.default"
             colorPreferenceValue="128,128,128"
             contributesToHeader="false"
             highlightPreferenceValue="true"
@@ -252,13 +252,13 @@
             textStylePreferenceValue="UNDERLINE"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.contribution.1"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color.1"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.highlight.1"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.overview.1"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.1"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.1"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.1"
+            annotationType="saros.annotations.contribution.1"
+            colorPreferenceKey="saros.annotations.contribution.color.1"
+            highlightPreferenceKey="saros.annotations.contribution.highlight.1"
+            overviewRulerPreferenceKey="saros.annotations.contribution.overview.1"
+            textPreferenceKey="saros.annotations.contribution.text.1"
+            textStylePreferenceKey="saros.annotations.contribution.textstyle.1"
+            verticalRulerPreferenceKey="saros.annotations.contribution.ruler.1"
             colorPreferenceValue="141,206,231"
             contributesToHeader="false"
             highlightPreferenceValue="true"
@@ -270,13 +270,13 @@
             textStylePreferenceValue="UNDERLINE"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.contribution.2"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color.2"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.highlight.2"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.overview.2"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.2"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.2"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.2"
+            annotationType="saros.annotations.contribution.2"
+            colorPreferenceKey="saros.annotations.contribution.color.2"
+            highlightPreferenceKey="saros.annotations.contribution.highlight.2"
+            overviewRulerPreferenceKey="saros.annotations.contribution.overview.2"
+            textPreferenceKey="saros.annotations.contribution.text.2"
+            textStylePreferenceKey="saros.annotations.contribution.textstyle.2"
+            verticalRulerPreferenceKey="saros.annotations.contribution.ruler.2"
             colorPreferenceValue="191,187,130"
             contributesToHeader="false"
             highlightPreferenceValue="true"
@@ -288,13 +288,13 @@
             textStylePreferenceValue="UNDERLINE"
             verticalRulerPreferenceValue="false"/>
        <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.contribution.3"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color.3"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.highlight.3"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.overview.3"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.3"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.3"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.3"
+            annotationType="saros.annotations.contribution.3"
+            colorPreferenceKey="saros.annotations.contribution.color.3"
+            highlightPreferenceKey="saros.annotations.contribution.highlight.3"
+            overviewRulerPreferenceKey="saros.annotations.contribution.overview.3"
+            textPreferenceKey="saros.annotations.contribution.text.3"
+            textStylePreferenceKey="saros.annotations.contribution.textstyle.3"
+            verticalRulerPreferenceKey="saros.annotations.contribution.ruler.3"
             colorPreferenceValue="186,220,81"
             contributesToHeader="false"
             highlightPreferenceValue="true"
@@ -306,13 +306,13 @@
             textStylePreferenceValue="UNDERLINE"
             verticalRulerPreferenceValue="false"/>
        <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.contribution.4"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color.4"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.highlight.4"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.overview.4"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.4"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.4"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.4"
+            annotationType="saros.annotations.contribution.4"
+            colorPreferenceKey="saros.annotations.contribution.color.4"
+            highlightPreferenceKey="saros.annotations.contribution.highlight.4"
+            overviewRulerPreferenceKey="saros.annotations.contribution.overview.4"
+            textPreferenceKey="saros.annotations.contribution.text.4"
+            textStylePreferenceKey="saros.annotations.contribution.textstyle.4"
+            verticalRulerPreferenceKey="saros.annotations.contribution.ruler.4"
             colorPreferenceValue="237,237,169"
             contributesToHeader="false"
             highlightPreferenceValue="true"
@@ -324,13 +324,13 @@
             textStylePreferenceValue="UNDERLINE"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.contribution.5"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color.5"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.highlight.5"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.overview.5"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.5"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.5"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.5"
+            annotationType="saros.annotations.contribution.5"
+            colorPreferenceKey="saros.annotations.contribution.color.5"
+            highlightPreferenceKey="saros.annotations.contribution.highlight.5"
+            overviewRulerPreferenceKey="saros.annotations.contribution.overview.5"
+            textPreferenceKey="saros.annotations.contribution.text.5"
+            textStylePreferenceKey="saros.annotations.contribution.textstyle.5"
+            verticalRulerPreferenceKey="saros.annotations.contribution.ruler.5"
             colorPreferenceValue="137,180,178"
             contributesToHeader="false"
             highlightPreferenceValue="true"
@@ -343,336 +343,336 @@
             verticalRulerPreferenceValue="false"/>
 
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.selection.default"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.default"
+            annotationType="saros.annotations.selection.default"
+            colorPreferenceKey="saros.annotations.selection.color.default"
             colorPreferenceValue="128,128,128"
             contributesToHeader="false"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.default"
+            highlightPreferenceKey="saros.annotations.selection.highlight.default"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
             label="DPP Default Selection"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.default"
+            overviewRulerPreferenceKey="saros.annotations.selection.overview.default"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.default"
+            textPreferenceKey="saros.annotations.selection.text.default"
             textPreferenceValue="true"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.default"
+            textStylePreferenceKey="saros.annotations.selection.textstyle.default"
             textStylePreferenceValue="BOX"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.default"
+            verticalRulerPreferenceKey="saros.annotations.selection.ruler.default"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.selection.1"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.1"
+            annotationType="saros.annotations.selection.1"
+            colorPreferenceKey="saros.annotations.selection.color.1"
             colorPreferenceValue="183,224,240"
             contributesToHeader="false"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.1"
+            highlightPreferenceKey="saros.annotations.selection.highlight.1"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
             label="DPP Selection User 1"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.1"
+            overviewRulerPreferenceKey="saros.annotations.selection.overview.1"
             overviewRulerPreferenceValue="true"
             presentationLayer="9"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.1"
+            textPreferenceKey="saros.annotations.selection.text.1"
             textPreferenceValue="true"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.1"
+            textStylePreferenceKey="saros.annotations.selection.textstyle.1"
             textStylePreferenceValue="BOX"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.1"
+            verticalRulerPreferenceKey="saros.annotations.selection.ruler.1"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.selection.2"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.2"
+            annotationType="saros.annotations.selection.2"
+            colorPreferenceKey="saros.annotations.selection.color.2"
             colorPreferenceValue="208,205,164"
             contributesToHeader="false"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.2"
+            highlightPreferenceKey="saros.annotations.selection.highlight.2"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
             label="DPP Selection User 2"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.2"
+            overviewRulerPreferenceKey="saros.annotations.selection.overview.2"
             overviewRulerPreferenceValue="true"
             presentationLayer="10"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.2"
+            textPreferenceKey="saros.annotations.selection.text.2"
             textPreferenceValue="true"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.2"
+            textStylePreferenceKey="saros.annotations.selection.textstyle.2"
             textStylePreferenceValue="BOX"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.2"
+            verticalRulerPreferenceKey="saros.annotations.selection.ruler.2"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.selection.3"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.3"
+            annotationType="saros.annotations.selection.3"
+            colorPreferenceKey="saros.annotations.selection.color.3"
             colorPreferenceValue="220,237,166"
             contributesToHeader="false"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.3"
+            highlightPreferenceKey="saros.annotations.selection.highlight.3"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
             label="DPP Selection User 3"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.3"
+            overviewRulerPreferenceKey="saros.annotations.selection.overview.3"
             overviewRulerPreferenceValue="true"
             presentationLayer="11"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.3"
+            textPreferenceKey="saros.annotations.selection.text.3"
             textPreferenceValue="true"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.3"
+            textStylePreferenceKey="saros.annotations.selection.textstyle.3"
             textStylePreferenceValue="BOX"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.3"
+            verticalRulerPreferenceKey="saros.annotations.selection.ruler.3"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.selection.4"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.4"
+            annotationType="saros.annotations.selection.4"
+            colorPreferenceKey="saros.annotations.selection.color.4"
             colorPreferenceValue="246,246,211"
             contributesToHeader="false"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.4"
+            highlightPreferenceKey="saros.annotations.selection.highlight.4"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
             label="DPP Selection User 4"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.4"
+            overviewRulerPreferenceKey="saros.annotations.selection.overview.4"
             overviewRulerPreferenceValue="true"
             presentationLayer="12"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.4"
+            textPreferenceKey="saros.annotations.selection.text.4"
             textPreferenceValue="true"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.4"
+            textStylePreferenceKey="saros.annotations.selection.textstyle.4"
             textStylePreferenceValue="BOX"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.4"
+            verticalRulerPreferenceKey="saros.annotations.selection.ruler.4"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.selection.5"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.5"
+            annotationType="saros.annotations.selection.5"
+            colorPreferenceKey="saros.annotations.selection.color.5"
             colorPreferenceValue="184,210,209"
             contributesToHeader="false"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.5"
+            highlightPreferenceKey="saros.annotations.selection.highlight.5"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
             label="DPP Selection User 5"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.5"
+            overviewRulerPreferenceKey="saros.annotations.selection.overview.5"
             overviewRulerPreferenceValue="true"
             presentationLayer="13"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.5"
+            textPreferenceKey="saros.annotations.selection.text.5"
             textPreferenceValue="true"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.5"
+            textStylePreferenceKey="saros.annotations.selection.textstyle.5"
             textStylePreferenceValue="BOX"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.5"
+            verticalRulerPreferenceKey="saros.annotations.selection.ruler.5"
             verticalRulerPreferenceValue="false"/>
 
    </extension>
    <extension
-         id="de.fu_berlin.inf.dpp.modelProvider"
+         id="saros.modelProvider"
          point="org.eclipse.core.resources.modelProviders">
-      <modelProvider class="de.fu_berlin.inf.dpp.project.internal.ResourceChangeValidator"/>
+      <modelProvider class="saros.project.internal.ResourceChangeValidator"/>
       <enablement>
          <instanceof value="org.eclipse.core.resources.IResource"/>
       </enablement>
    </extension>
    <extension
-         id="de.fu_berlin.inf.dpp.startup"
+         id="saros.startup"
          point="org.eclipse.ui.startup">
       <startup
-            class="de.fu_berlin.inf.dpp.StartupSaros">
+            class="saros.StartupSaros">
       </startup>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
-            id="de.fu_berlin.inf.dpp.ui.commands.Empty"
+            id="saros.ui.commands.Empty"
             name="EMPTY COMMAND">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.GettingStarted"
+            id="saros.ui.commands.GettingStarted"
             name="Getting Started...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.StartSarosConfiguration"
+            id="saros.ui.commands.StartSarosConfiguration"
             name="Start Saros Configuration...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount"
+            id="saros.ui.commands.CreateXMPPAccount"
             name="Create Account...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.AddContact"
+            id="saros.ui.commands.AddContact"
             name="Add Contact...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences"
+            id="saros.ui.commands.OpenSarosPreferences"
             name="Preferences...">
       </command>
             <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.AddXMPPAccount"
+            id="saros.ui.commands.AddXMPPAccount"
             name="Add Account...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
+            id="saros.ui.commands.ShareResource"
             name="Share Project(s)...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SessionLeave"
+            id="saros.ui.commands.SessionLeave"
             name="Leave Session...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddResources"
+            id="saros.ui.commands.SessionAddResources"
             name="Add Projects...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddContacts"
+            id="saros.ui.commands.SessionAddContacts"
             name="Add Contacts...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedResources"
+            id="saros.ui.commands.SessionAddSelectedResources"
             name="Add to Saros Session">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedContacts"
+            id="saros.ui.commands.SessionAddSelectedContacts"
             name="Add to Saros Session">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.GettingStartedHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.GettingStarted">
+            class="saros.ui.commandHandlers.GettingStartedHandler"
+            commandId="saros.ui.commands.GettingStarted">
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.StartSarosConfigurationHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.StartSarosConfiguration">
+            class="saros.ui.commandHandlers.StartSarosConfigurationHandler"
+            commandId="saros.ui.commands.StartSarosConfiguration">
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.CreateXMPPAccountHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount">
+            class="saros.ui.commandHandlers.CreateXMPPAccountHandler"
+            commandId="saros.ui.commands.CreateXMPPAccount">
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.AddXMPPAccountHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.AddXMPPAccount">
+            class="saros.ui.commandHandlers.AddXMPPAccountHandler"
+            commandId="saros.ui.commands.AddXMPPAccount">
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.AddContactHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.AddContact">
+            class="saros.ui.commandHandlers.AddContactHandler"
+            commandId="saros.ui.commands.AddContact">
          <activeWhen>
-                <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
+                <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
          </activeWhen>
          <enabledWhen>
-             <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected" />
+             <reference definitionId="saros.ui.definitions.isConnected" />
          </enabledWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.OpenSarosPreferencesHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences">
+            class="saros.ui.commandHandlers.OpenSarosPreferencesHandler"
+            commandId="saros.ui.commands.OpenSarosPreferences">
       </handler>
       <handler
-      class="de.fu_berlin.inf.dpp.ui.commandHandlers.ShareProjectHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource">
+      class="saros.ui.commandHandlers.ShareProjectHandler"
+            commandId="saros.ui.commands.ShareResource">
          <enabledWhen>
             <and>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                     definitionId="saros.ui.definitions.isConnected">
                </reference>
                <not>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                        definitionId="saros.ui.definitions.isSarosSessionRunning">
                   </reference>
                </not>
             </and>
          </enabledWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionLeaveHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionLeave">
+            class="saros.ui.commandHandlers.SessionLeaveHandler"
+            commandId="saros.ui.commands.SessionLeave">
          <activeWhen>
             <and>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                     definitionId="saros.ui.definitions.isConnected">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                     definitionId="saros.ui.definitions.isSarosSessionRunning">
                </reference>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddProjectsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddResources">
+            class="saros.ui.commandHandlers.SessionAddProjectsHandler"
+            commandId="saros.ui.commands.SessionAddResources">
          <activeWhen>
             <and>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                     definitionId="saros.ui.definitions.isConnected">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                     definitionId="saros.ui.definitions.isSarosSessionRunning">
                </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="de.fu_berlin.inf.dpp.ui.definitions.hasWriteAccess">
+                  definitionId="saros.ui.definitions.hasWriteAccess">
             </reference>
          </enabledWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddContactsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddContacts">
+            class="saros.ui.commandHandlers.SessionAddContactsHandler"
+            commandId="saros.ui.commands.SessionAddContacts">
          <activeWhen>
             <and>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                     definitionId="saros.ui.definitions.isConnected">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                     definitionId="saros.ui.definitions.isSarosSessionRunning">
                </reference>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddSelectedProjectsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedResources">
+            class="saros.ui.commandHandlers.SessionAddSelectedProjectsHandler"
+            commandId="saros.ui.commands.SessionAddSelectedResources">
          <activeWhen>
             <and>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                     definitionId="saros.ui.definitions.isConnected">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                     definitionId="saros.ui.definitions.isSarosSessionRunning">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.resourcesSelected">
+                     definitionId="saros.ui.definitions.resourcesSelected">
                </reference>
                <not>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectsSelectedInSarosSession">
+                        definitionId="saros.ui.definitions.projectsSelectedInSarosSession">
                   </reference>
                </not>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="de.fu_berlin.inf.dpp.ui.definitions.hasWriteAccess">
+                  definitionId="saros.ui.definitions.hasWriteAccess">
             </reference>
          </enabledWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddSelectedContactsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedContacts">
+            class="saros.ui.commandHandlers.SessionAddSelectedContactsHandler"
+            commandId="saros.ui.commands.SessionAddSelectedContacts">
          <activeWhen>
             <and>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                     definitionId="saros.ui.definitions.isConnected">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                     definitionId="saros.ui.definitions.isSarosSessionRunning">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
+                     definitionId="saros.ui.definitions.contactsSelected">
                </reference>
                <not>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelectedInSarosSession">
+                        definitionId="saros.ui.definitions.contactsSelectedInSarosSession">
                   </reference>
                </not>
             </and>
@@ -685,7 +685,7 @@
             allPopups="false"
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
-               id="de.fu_berlin.inf.dpp.ui.main.menu"
+               id="saros.ui.main.menu"
                label="Saros">
             <visibleWhen
                   checkEnabled="false">
@@ -699,12 +699,12 @@
                   visible="true">
             </separator>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.GettingStarted"
+                  commandId="saros.ui.commands.GettingStarted"
                   icon="icons/view16/saros_misc.png"
                   style="push">
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.StartSarosConfiguration"
+                  commandId="saros.ui.commands.StartSarosConfiguration"
                   icon="icons/view16/saros_misc.png"
                   style="push">
             </command>
@@ -713,28 +713,28 @@
                   visible="true">
             </separator>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount"
+                  commandId="saros.ui.commands.CreateXMPPAccount"
                   icon="icons/elcl16/xmpp_create_account_tsk.png"
                   style="push">
                 <visibleWhen>
-                    <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
+                    <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
                 </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.AddXMPPAccount"
+                  commandId="saros.ui.commands.AddXMPPAccount"
                   icon="icons/elcl16/xmpp_create_account_tsk.png"
                   style="push">
                 <visibleWhen>
-                    <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
+                    <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
                 </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.AddContact"
+                  commandId="saros.ui.commands.AddContact"
                   disabledIcon="icons/dlcl16/contact_add_tsk.png"
                   icon="icons/elcl16/contact_add_tsk.png"
                   style="push">
                <visibleWhen>
-                  <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
+                  <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
                </visibleWhen>
             </command>
             <separator
@@ -746,7 +746,7 @@
                   visible="true">
             </separator>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
+                  commandId="saros.ui.commands.ShareResource"
                   disabledIcon="icons/dlcl16/spacer.png"
                   icon="icons/elcl16/session_tsk.png"
                   style="push">
@@ -754,13 +754,13 @@
                      checkEnabled="false">
                       <not>
                         <reference
-                              definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                              definitionId="saros.ui.definitions.isSarosSessionRunning">
                         </reference>
                      </not>
                </visibleWhen>
             </command>
            <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddResources"
+                  commandId="saros.ui.commands.SessionAddResources"
                   disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
                   icon="icons/elcl16/session_add_projects_tsk.png"
                   style="push">
@@ -768,16 +768,16 @@
                      checkEnabled="false">
                   <and>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                           definitionId="saros.ui.definitions.isConnected">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                           definitionId="saros.ui.definitions.isSarosSessionRunning">
                      </reference>
                   </and>
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddContacts"
+                  commandId="saros.ui.commands.SessionAddContacts"
                   disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
                   icon="icons/elcl16/session_add_contacts_tsk.png"
                   style="push">
@@ -785,19 +785,19 @@
                      checkEnabled="false">
                   <and>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                           definitionId="saros.ui.definitions.isConnected">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                           definitionId="saros.ui.definitions.isSarosSessionRunning">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
+                           definitionId="saros.ui.definitions.isSarosSessionHost">
                      </reference>
                   </and>
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionLeave"
+                  commandId="saros.ui.commands.SessionLeave"
                   disabledIcon="icons/dlcl16/session_leave_tsk.png"
                   icon="icons/elcl16/session_leave_tsk.png"
                   label="Leave Session..."
@@ -806,21 +806,21 @@
                      checkEnabled="false">
                   <and>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                           definitionId="saros.ui.definitions.isConnected">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                           definitionId="saros.ui.definitions.isSarosSessionRunning">
                      </reference>
                      <not>
                         <reference
-                              definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
+                              definitionId="saros.ui.definitions.isSarosSessionHost">
                         </reference>
                      </not>
                   </and>
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionLeave"
+                  commandId="saros.ui.commands.SessionLeave"
                   disabledIcon="icons/dlcl16/session_terminate_tsk.png"
                   icon="icons/elcl16/session_terminate_tsk.png"
                   label="Stop Session..."
@@ -829,13 +829,13 @@
                      checkEnabled="false">
                   <and>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                           definitionId="saros.ui.definitions.isConnected">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                           definitionId="saros.ui.definitions.isSarosSessionRunning">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
+                           definitionId="saros.ui.definitions.isSarosSessionHost">
                      </reference>
                   </and>
                </visibleWhen>
@@ -856,7 +856,7 @@
                   name="additions">
             </separator>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences"
+                  commandId="saros.ui.commands.OpenSarosPreferences"
                   icon="icons/elcl16/preferences_open_tsk.png"
                   style="push">
             </command>
@@ -864,9 +864,9 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:de.fu_berlin.inf.dpp.ui.views.SarosView?before=menustart">
+            locationURI="popup:saros.ui.views.SarosView?before=menustart">
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
+               commandId="saros.ui.commands.ShareResource"
                disabledIcon="icons/dlcl16/spacer.png"
                icon="icons/elcl16/session_tsk.png"
                style="push">
@@ -874,21 +874,21 @@
                   checkEnabled="false">
                <and>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                        definitionId="saros.ui.definitions.isConnected">
                   </reference>
                   <not>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                           definitionId="saros.ui.definitions.isSarosSessionRunning">
                      </reference>
                   </not>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+                        definitionId="saros.ui.definitions.sessionHeadlineSelected">
                   </reference>
                </and>
             </visibleWhen>
          </command>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddResources"
+               commandId="saros.ui.commands.SessionAddResources"
                disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
                icon="icons/elcl16/session_add_projects_tsk.png"
                style="push">
@@ -896,39 +896,39 @@
                   checkEnabled="false">
                <and>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                        definitionId="saros.ui.definitions.isConnected">
                   </reference>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                        definitionId="saros.ui.definitions.isSarosSessionRunning">
                   </reference>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+                        definitionId="saros.ui.definitions.sessionHeadlineSelected">
                   </reference>
                </and>
             </visibleWhen>
          </command>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.AddContact"
+               commandId="saros.ui.commands.AddContact"
                disabledIcon="icons/dlcl16/contact_add_tsk.png"
                icon="icons/elcl16/contact_add_tsk.png"
                style="push">
             <visibleWhen checkEnabled="false">
                <and>
-                  <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
+                  <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
                   <not>
-                     <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected" />
+                     <reference definitionId="saros.ui.definitions.contactsSelected" />
                   </not>
                   <not>
-                     <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected" />
+                     <reference definitionId="saros.ui.definitions.participantsSelected" />
                   </not>
                   <not>
-                     <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected" />
+                     <reference definitionId="saros.ui.definitions.sessionHeadlineSelected" />
                   </not>
                </and>
             </visibleWhen>
          </command>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddContacts"
+               commandId="saros.ui.commands.SessionAddContacts"
                disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
                icon="icons/elcl16/session_add_contacts_tsk.png"
                style="push">
@@ -936,16 +936,16 @@
                   checkEnabled="false">
                <and>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                        definitionId="saros.ui.definitions.isConnected">
                   </reference>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                        definitionId="saros.ui.definitions.isSarosSessionRunning">
                   </reference>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+                        definitionId="saros.ui.definitions.sessionHeadlineSelected">
                   </reference>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
+                        definitionId="saros.ui.definitions.isSarosSessionHost">
                   </reference>
                </and>
             </visibleWhen>
@@ -978,11 +978,11 @@
                      <and>
                         <not>
                            <reference
-                                 definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                                 definitionId="saros.ui.definitions.isSarosSessionRunning">
                            </reference>
                         </not>
                         <reference
-                              definitionId="de.fu_berlin.inf.dpp.ui.definitions.resourcesSelected">
+                              definitionId="saros.ui.definitions.resourcesSelected">
                         </reference>
                      </and>
             </visibleWhen>
@@ -991,25 +991,25 @@
                      visible="true">
                </separator>
                <command
-                     commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
+                     commandId="saros.ui.commands.Empty"
                      label="Not Connected"
                      style="push">
                   <visibleWhen
                         checkEnabled="false">
                      <not>
                         <reference
-                              definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                              definitionId="saros.ui.definitions.isConnected">
                         </reference>
                      </not>
                   </visibleWhen>
                </command>
                <dynamic
-                     class="de.fu_berlin.inf.dpp.ui.menuContributions.StartSessionWithContacts"
-                     id="de.fu_berlin.inf.dpp.ui.menus.ProjectShareContacts">
+                     class="saros.ui.menuContributions.StartSessionWithContacts"
+                     id="saros.ui.menus.ProjectShareContacts">
                   <visibleWhen
                         checkEnabled="false">
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                           definitionId="saros.ui.definitions.isConnected">
                      </reference>
                   </visibleWhen>
                </dynamic>
@@ -1018,7 +1018,7 @@
                      visible="true">
                </separator>
                <command
-                     commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
+                     commandId="saros.ui.commands.ShareResource"
                      label="Multiple Contacts..."
                      style="push">
                </command>
@@ -1035,7 +1035,7 @@
                </separator>
             </menu>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedResources"
+                  commandId="saros.ui.commands.SessionAddSelectedResources"
                   disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
                   icon="icons/elcl16/session_add_projects_tsk.png"
                   style="push">
@@ -1043,13 +1043,13 @@
                      checkEnabled="false">
                   <and>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                           definitionId="saros.ui.definitions.isConnected">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                           definitionId="saros.ui.definitions.isSarosSessionRunning">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.resourcesSelected">
+                           definitionId="saros.ui.definitions.resourcesSelected">
                      </reference>
                   </and>
                </visibleWhen>
@@ -1068,11 +1068,11 @@
                <and>
                   <not>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                           definitionId="saros.ui.definitions.isSarosSessionRunning">
                      </reference>
                   </not>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
+                        definitionId="saros.ui.definitions.contactsSelected">
                   </reference>
                </and>
             </visibleWhen>
@@ -1081,25 +1081,25 @@
                   visible="true">
             </separator>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
+                  commandId="saros.ui.commands.Empty"
                   label="Not Connected"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
                   <not>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                           definitionId="saros.ui.definitions.isConnected">
                      </reference>
                   </not>
                </visibleWhen>
             </command>
             <dynamic
-                  class="de.fu_berlin.inf.dpp.ui.menuContributions.StartSessionWithProjects"
-                  id="de.fu_berlin.inf.dpp.ui.menus.ProjectShareResources">
+                  class="saros.ui.menuContributions.StartSessionWithProjects"
+                  id="saros.ui.menus.ProjectShareResources">
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                        definitionId="saros.ui.definitions.isConnected">
                   </reference>
                </visibleWhen>
             </dynamic>
@@ -1112,7 +1112,7 @@
             </separator>
          </menu>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedContacts"
+               commandId="saros.ui.commands.SessionAddSelectedContacts"
                disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
                icon="icons/elcl16/session_add_contacts_tsk.png"
                style="push">
@@ -1120,16 +1120,16 @@
                   checkEnabled="false">
                <and>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                        definitionId="saros.ui.definitions.isConnected">
                   </reference>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                        definitionId="saros.ui.definitions.isSarosSessionRunning">
                   </reference>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
+                        definitionId="saros.ui.definitions.contactsSelected">
                   </reference>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
+                        definitionId="saros.ui.definitions.isSarosSessionHost">
                   </reference>
                </and>
             </visibleWhen>
@@ -1137,81 +1137,81 @@
       </menuContribution>
    </extension>
    <extension
-         id="de.fu_berlin.inf.dpp.ui.definitions.isResource"
+         id="saros.ui.definitions.isResource"
          point="org.eclipse.core.expressions.definitions">
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+            id="saros.ui.definitions.isConnected">
          <with
-               variable="de.fu_berlin.inf.dpp.Saros">
+               variable="saros.Saros">
             <test
-                  property="de.fu_berlin.inf.dpp.isConnected">
+                  property="saros.isConnected">
             </test>
          </with>
       </definition>
-      <definition id="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled">
-         <with variable="de.fu_berlin.inf.dpp.Saros">
-            <test property="de.fu_berlin.inf.dpp.isXMPPEnabled" />
+      <definition id="saros.ui.definitions.isXMPPEnabled">
+         <with variable="saros.Saros">
+            <test property="saros.isXMPPEnabled" />
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+            id="saros.ui.definitions.isSarosSessionRunning">
          <with
-               variable="de.fu_berlin.inf.dpp.SarosSession">
+               variable="saros.SarosSession">
             <instanceof
-                  value="de.fu_berlin.inf.dpp.session.internal.SarosSession">
+                  value="saros.session.internal.SarosSession">
             </instanceof>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
+            id="saros.ui.definitions.isSarosSessionHost">
          <with
-               variable="de.fu_berlin.inf.dpp.SarosSession">
+               variable="saros.SarosSession">
             <test
-                  property="de.fu_berlin.inf.dpp.isHost">
+                  property="saros.isHost">
             </test>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.isInSarosSession">
+            id="saros.ui.definitions.isInSarosSession">
          <or>
             <adapt
                   type="org.eclipse.core.resources.IResource">
                <test
-                     property="de.fu_berlin.inf.dpp.isInSarosSession">
+                     property="saros.isInSarosSession">
                </test>
             </adapt>
             <adapt
-                  type="de.fu_berlin.inf.dpp.net.xmpp.JID">
+                  type="saros.net.xmpp.JID">
                <test
-                     property="de.fu_berlin.inf.dpp.isInSarosSession">
+                     property="saros.isInSarosSession">
                </test>
             </adapt>
          </or>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.isProject">
+            id="saros.ui.definitions.isProject">
          <adapt
                type="org.eclipse.core.resources.IProject">
          </adapt>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.projectsSelected">
+            id="saros.ui.definitions.projectsSelected">
          <with
                variable="selection">
             <iterate
                   ifEmpty="false"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isProject">
+                     definitionId="saros.ui.definitions.isProject">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.singleProjectsSelected">
+            id="saros.ui.definitions.singleProjectsSelected">
          <and>
             <reference
-                  definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectsSelected">
+                  definitionId="saros.ui.definitions.projectsSelected">
             </reference>
             <with
                   variable="selection">
@@ -1222,10 +1222,10 @@
          </and>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.multipleProjectsSelected">
+            id="saros.ui.definitions.multipleProjectsSelected">
          <and>
             <reference
-                  definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectsSelected">
+                  definitionId="saros.ui.definitions.projectsSelected">
             </reference>
             <with
                   variable="selection">
@@ -1245,80 +1245,80 @@
          </and>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.projectsSelectedInSarosSession">
+            id="saros.ui.definitions.projectsSelectedInSarosSession">
          <with
                variable="selection">
             <iterate
                   ifEmpty="true"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isResource">
+                     definitionId="saros.ui.definitions.isResource">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isInSarosSession">
+                     definitionId="saros.ui.definitions.isInSarosSession">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
+            id="saros.ui.definitions.contactsSelected">
          <with
                variable="selection">
             <iterate
                   ifEmpty="false"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isContact">
+                     definitionId="saros.ui.definitions.isContact">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.isContact">
+            id="saros.ui.definitions.isContact">
          <adapt
-               type="de.fu_berlin.inf.dpp.net.xmpp.JID">
+               type="saros.net.xmpp.JID">
          </adapt>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
+            id="saros.ui.definitions.contactsSelected">
          <with
                variable="selection">
             <iterate
                   ifEmpty="false"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isContact">
+                     definitionId="saros.ui.definitions.isContact">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.contactsSelectedInSarosSession">
+            id="saros.ui.definitions.contactsSelectedInSarosSession">
          <with
                variable="selection">
             <iterate
                   ifEmpty="true"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isContact">
+                     definitionId="saros.ui.definitions.isContact">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isInSarosSession">
+                     definitionId="saros.ui.definitions.isInSarosSession">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.isParticipant">
+            id="saros.ui.definitions.isParticipant">
          <adapt
-               type="de.fu_berlin.inf.dpp.session.User">
+               type="saros.session.User">
          </adapt>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.singleParticipantSelected">
+            id="saros.ui.definitions.singleParticipantSelected">
          <and>
             <reference
-                  definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected">
+                  definitionId="saros.ui.definitions.participantsSelected">
             </reference>
             <with
                   variable="selection">
@@ -1329,83 +1329,83 @@
          </and>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected">
+            id="saros.ui.definitions.participantsSelected">
          <with
                variable="selection">
             <iterate
                   ifEmpty="false"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isParticipant">
+                     definitionId="saros.ui.definitions.isParticipant">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.participantIsRemote">
+            id="saros.ui.definitions.participantIsRemote">
          <adapt
-               type="de.fu_berlin.inf.dpp.session.User">
+               type="saros.session.User">
             <test
-                  property="de.fu_berlin.inf.dpp.isRemote">
+                  property="saros.isRemote">
             </test>
          </adapt>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.participantsHasWriteAccess">
+            id="saros.ui.definitions.participantsHasWriteAccess">
          <adapt
-               type="de.fu_berlin.inf.dpp.session.User">
+               type="saros.session.User">
             <test
-                  property="de.fu_berlin.inf.dpp.hasWriteAccess">
+                  property="saros.hasWriteAccess">
             </test>
          </adapt>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.containsParticipantsWithoutWriteAccess">
+            id="saros.ui.definitions.containsParticipantsWithoutWriteAccess">
          <with
                variable="selection">
             <iterate
                   ifEmpty="false"
                   operator="or">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsHasWriteAccess">
+                     definitionId="saros.ui.definitions.participantsHasWriteAccess">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.containsRemoteParticipants">
+            id="saros.ui.definitions.containsRemoteParticipants">
          <with
                variable="selection">
             <iterate
                   ifEmpty="false"
                   operator="or">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantIsRemote">
+                     definitionId="saros.ui.definitions.participantIsRemote">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.isResource">
+            id="saros.ui.definitions.isResource">
          <adapt
                type="org.eclipse.core.resources.IResource">
          </adapt>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.resourcesSelected">
+            id="saros.ui.definitions.resourcesSelected">
          <with
                variable="selection">
             <iterate
                   ifEmpty="false"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isResource">
+                     definitionId="saros.ui.definitions.isResource">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+            id="saros.ui.definitions.sessionHeadlineSelected">
          <with
                variable="selection">
             <count
@@ -1415,17 +1415,17 @@
                   ifEmpty="false"
                   operator="or">
                <instanceof
-                     value="de.fu_berlin.inf.dpp.ui.model.session.SessionHeaderElement">
+                     value="saros.ui.model.session.SessionHeaderElement">
                </instanceof>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.hasWriteAccess">
+            id="saros.ui.definitions.hasWriteAccess">
          <with
-               variable="de.fu_berlin.inf.dpp.SarosSession">
+               variable="saros.SarosSession">
             <test
-                  property="de.fu_berlin.inf.dpp.hasWriteAccess">
+                  property="saros.hasWriteAccess">
             </test>
          </with>
       </definition>
@@ -1433,13 +1433,13 @@
    <extension
          point="org.eclipse.ui.services">
       <sourceProvider
-            provider="de.fu_berlin.inf.dpp.serviceProviders.SarosSourceProvider">
+            provider="saros.serviceProviders.SarosSourceProvider">
          <variable
-               name="de.fu_berlin.inf.dpp.Saros"
+               name="saros.Saros"
                priorityLevel="workbench">
          </variable>
          <variable
-               name="de.fu_berlin.inf.dpp.SarosSession"
+               name="saros.SarosSession"
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
@@ -1447,79 +1447,79 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="de.fu_berlin.inf.dpp.ui.expressions.SarosPropertyTester"
-            id="de.fu_berlin.inf.dpp.propertyTesters.SarosPropertyTester"
-            namespace="de.fu_berlin.inf.dpp"
+            class="saros.ui.expressions.SarosPropertyTester"
+            id="saros.propertyTesters.SarosPropertyTester"
+            namespace="saros"
             properties="isConnected,isXMPPEnabled"
-            type="de.fu_berlin.inf.dpp.Saros">
+            type="saros.Saros">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.ui.expressions.SarosSessionPropertyTester"
-            id="de.fu_berlin.inf.dpp.propertyTesters.SarosSessionPropertyTester"
-            namespace="de.fu_berlin.inf.dpp"
+            class="saros.ui.expressions.SarosSessionPropertyTester"
+            id="saros.propertyTesters.SarosSessionPropertyTester"
+            namespace="saros"
             properties="isHost,hasWriteAccess"
-            type="de.fu_berlin.inf.dpp.session.ISarosSession">
+            type="saros.session.ISarosSession">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.ui.expressions.ProjectPropertyTester"
-            id="de.fu_berlin.inf.dpp.propertyTesters.ProjectPropertyTester"
-            namespace="de.fu_berlin.inf.dpp"
+            class="saros.ui.expressions.ProjectPropertyTester"
+            id="saros.propertyTesters.ProjectPropertyTester"
+            namespace="saros"
             properties="isInSarosSession"
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.ui.expressions.ContactPropertyTester"
-            id="de.fu_berlin.inf.dpp.ui.expressions.ContactPropertyTester"
-            namespace="de.fu_berlin.inf.dpp"
+            class="saros.ui.expressions.ContactPropertyTester"
+            id="saros.ui.expressions.ContactPropertyTester"
+            namespace="saros"
             properties="isInSarosSession"
-            type="de.fu_berlin.inf.dpp.net.xmpp.JID">
+            type="saros.net.xmpp.JID">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.ui.expressions.UserPropertyTester"
-            id="de.fu_berlin.inf.dpp.ui.expressions.UserPropertyTester"
-            namespace="de.fu_berlin.inf.dpp"
+            class="saros.ui.expressions.UserPropertyTester"
+            id="saros.ui.expressions.UserPropertyTester"
+            namespace="saros"
             properties="hasWriteAccess,isRemote"
-            type="de.fu_berlin.inf.dpp.session.User">
+            type="saros.session.User">
       </propertyTester>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="de.fu_berlin.inf.dpp.ui.model.roster.RosterGroupElement"
-            class="de.fu_berlin.inf.dpp.ui.model.roster.RosterAdapterFactory">
+            adaptableType="saros.ui.model.roster.RosterGroupElement"
+            class="saros.ui.model.roster.RosterAdapterFactory">
          <adapter
                type="org.jivesoftware.smack.RosterGroup">
          </adapter>
       </factory>
       <factory
-            adaptableType="de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement"
-            class="de.fu_berlin.inf.dpp.ui.model.roster.RosterAdapterFactory">
+            adaptableType="saros.ui.model.roster.RosterEntryElement"
+            class="saros.ui.model.roster.RosterAdapterFactory">
          <adapter
                type="org.jivesoftware.smack.RosterEntry">
          </adapter>
          <adapter
-               type="de.fu_berlin.inf.dpp.net.xmpp.JID">
+               type="saros.net.xmpp.JID">
          </adapter>
       </factory>
       <factory
-            adaptableType="de.fu_berlin.inf.dpp.ui.model.session.UserElement"
-            class="de.fu_berlin.inf.dpp.ui.model.session.SessionContentAdapterFactory">
+            adaptableType="saros.ui.model.session.UserElement"
+            class="saros.ui.model.session.SessionContentAdapterFactory">
          <adapter
-               type="de.fu_berlin.inf.dpp.session.User">
+               type="saros.session.User">
          </adapter>
       </factory>
       <factory
-            adaptableType="de.fu_berlin.inf.dpp.ui.model.session.AwarenessInformationTreeElement"
-            class="de.fu_berlin.inf.dpp.ui.model.session.SessionContentAdapterFactory">
+            adaptableType="saros.ui.model.session.AwarenessInformationTreeElement"
+            class="saros.ui.model.session.SessionContentAdapterFactory">
          <adapter
-               type="de.fu_berlin.inf.dpp.session.User">
+               type="saros.session.User">
          </adapter>
       </factory>
       <factory
-            adaptableType="de.fu_berlin.inf.dpp.ui.model.session.FollowModeInformationTreeElement"
-            class="de.fu_berlin.inf.dpp.ui.model.session.SessionContentAdapterFactory">
+            adaptableType="saros.ui.model.session.FollowModeInformationTreeElement"
+            class="saros.ui.model.session.SessionContentAdapterFactory">
          <adapter
-               type="de.fu_berlin.inf.dpp.session.User">
+               type="saros.session.User">
          </adapter>
       </factory>
    </extension>

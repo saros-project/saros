@@ -46,9 +46,9 @@ sonarqube {
   }
 }
 
-ext.projectsToConfigure = subprojects - project(':de.fu_berlin.inf.dpp.ui.frontend')
+ext.projectsToConfigure = subprojects - project(':saros.ui.frontend')
 // Configurations that are specific to all subprojects
-// de.fu_berlin.inf.dpp.ui.frontend is not a real subproject and contains
+// saros.ui.frontend is not a real subproject and contains
 // only a build.gradle in order to allow to scan the sources of this subproject
 configure(projectsToConfigure) { project ->
 
@@ -133,57 +133,57 @@ task prepareIntellij(dependsOn: ['mavenizeP2Repository'])
 
 task cleanGenerateLibAll {
   doLast {
-    project(':de.fu_berlin.inf.dpp').file('lib').deleteDir()
-    project(':de.fu_berlin.inf.dpp.core').file('lib').deleteDir()
-    project(':de.fu_berlin.inf.dpp.whiteboard').file('lib').deleteDir()
-    project(':de.fu_berlin.inf.dpp.ui').file('lib').deleteDir()
+    project(':saros.eclipse').file('lib').deleteDir()
+    project(':saros.core').file('lib').deleteDir()
+    project(':saros.whiteboard').file('lib').deleteDir()
+    project(':saros.ui').file('lib').deleteDir()
   }
 }
 
 // generate all lib dirs in order to run stf tests
 task generateLibAll(dependsOn:['cleanGenerateLibAll',
-                               ':de.fu_berlin.inf.dpp.core:generateLib',
-                               ':de.fu_berlin.inf.dpp.ui:generateLib',
-                               ':de.fu_berlin.inf.dpp:generateLib',
-                               ':de.fu_berlin.inf.dpp.whiteboard:generateLib'])
+                               ':saros.core:generateLib',
+                               ':saros.ui:generateLib',
+                               ':saros.eclipse:generateLib',
+                               ':saros.whiteboard:generateLib'])
 
 task sarosEclipse(type: Copy, dependsOn: [
   'mavenizeP2Repository',
-  ':de.fu_berlin.inf.dpp.core:test',
-  ':de.fu_berlin.inf.dpp.ui:test',
-  ':de.fu_berlin.inf.dpp:test',
-  ':de.fu_berlin.inf.dpp:jar',
-  ':de.fu_berlin.inf.dpp.whiteboard:test',
-  ':de.fu_berlin.inf.dpp.whiteboard:jar'
+  ':saros.core:test',
+  ':saros.ui:test',
+  ':saros.eclipse:test',
+  ':saros.eclipse:jar',
+  ':saros.whiteboard:test',
+  ':saros.whiteboard:jar'
   ]) {
   group 'Delivery'
   description 'Builds and tests all modules required by Saros for Eclipse'
 
-  from project(':de.fu_berlin.inf.dpp.core').jar
-  from project(':de.fu_berlin.inf.dpp.ui').jar
-  from project(':de.fu_berlin.inf.dpp').jar
-  from project(':de.fu_berlin.inf.dpp.whiteboard').jar
+  from project(':saros.core').jar
+  from project(':saros.ui').jar
+  from project(':saros.eclipse').jar
+  from project(':saros.whiteboard').jar
   into 'build/distribution/eclipse'
 }
 
 task sarosServer(type: Copy, dependsOn: [
-  ':de.fu_berlin.inf.dpp.core:test',
-  ':de.fu_berlin.inf.dpp.server:test'
+  ':saros.core:test',
+  ':saros.server:test'
   ]) {
   group 'Delivery'
   description 'Builds and tests all modules required by the Saros Server'
 }
 
 task sarosIntellij(type: Copy, dependsOn: [
-  ':de.fu_berlin.inf.dpp.core:test',
-  ':de.fu_berlin.inf.dpp.ui:test',
-  ':de.fu_berlin.inf.dpp.intellij:test',
-  ':de.fu_berlin.inf.dpp.intellij:buildPlugin'
+  ':saros.core:test',
+  ':saros.ui:test',
+  ':saros.intellij:test',
+  ':saros.intellij:buildPlugin'
   ]) {
   group 'Delivery'
   description 'Builds and tests all modules required by Saros for Intellij'
 
-  from project(':de.fu_berlin.inf.dpp.intellij').configurations.archives.artifacts.files
+  from project(':saros.intellij').configurations.archives.artifacts.files
   include '*.zip'
   into 'build/distribution/intellij'
 }

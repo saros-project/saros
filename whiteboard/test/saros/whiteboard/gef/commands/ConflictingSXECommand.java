@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
+package saros.whiteboard.gef.commands;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SetRecord;
 import java.util.List;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.IRecord;
+import saros.whiteboard.sxe.records.SetRecord;
 
 public class ConflictingSXECommand extends SXECommand {
 

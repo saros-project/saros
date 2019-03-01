@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.project.filesystem;
+package saros.intellij.project.filesystem;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -6,12 +6,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.Ignore;
 import org.junit.Test;
+import saros.filesystem.IPath;
 
 public class IntelliJPathImplTest {
 

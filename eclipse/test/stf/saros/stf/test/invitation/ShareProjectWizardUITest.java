@@ -1,23 +1,23 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package saros.stf.test.invitation;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ResourceSelectionComposite_delete_dialog_title;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ResourceSelectionComposite_overwrite_dialog_title;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHARE_PROJECTS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SHARE_PROJECT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.YES;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.shared.Constants.MENU_SAROS;
+import static saros.stf.shared.Constants.ResourceSelectionComposite_delete_dialog_title;
+import static saros.stf.shared.Constants.ResourceSelectionComposite_overwrite_dialog_title;
+import static saros.stf.shared.Constants.SHARE_PROJECTS;
+import static saros.stf.shared.Constants.SHELL_SHARE_PROJECT;
+import static saros.stf.shared.Constants.YES;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 import java.rmi.RemoteException;
 import java.util.Random;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
+import saros.stf.test.Constants;
 
 /*
  * 1. open the invitation wizard

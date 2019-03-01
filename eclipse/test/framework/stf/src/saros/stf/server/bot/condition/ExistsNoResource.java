@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.bot.condition;
+package saros.stf.server.bot.condition;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;

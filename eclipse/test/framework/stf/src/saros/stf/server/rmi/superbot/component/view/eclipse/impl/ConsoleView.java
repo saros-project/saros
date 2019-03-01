@@ -1,12 +1,8 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl;
+package saros.stf.server.rmi.superbot.component.view.eclipse.impl;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
 import java.rmi.RemoteException;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -18,6 +14,10 @@ import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.SarosSWTBotPreferences;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
 
 public final class ConsoleView extends StfRemoteObject implements IConsoleView {
 

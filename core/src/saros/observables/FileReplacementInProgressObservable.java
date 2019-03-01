@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.observables;
+package saros.observables;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
+import saros.annotations.Component;
 
 /**
  * This observable can be used to check whether there is currently a file replacement activity in

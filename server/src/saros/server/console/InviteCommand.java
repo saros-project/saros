@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.server.console;
+package saros.server.console;
 
 import static java.util.stream.Collectors.partitioningBy;
 
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSessionManager;
 
 public class InviteCommand extends ConsoleCommand {
   private static final Logger log = Logger.getLogger(InviteCommand.class);

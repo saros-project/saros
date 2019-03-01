@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.stun;
+package saros.net.stun;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;

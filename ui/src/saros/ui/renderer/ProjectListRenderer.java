@@ -1,15 +1,15 @@
 /** */
-package de.fu_berlin.inf.dpp.ui.renderer;
+package saros.ui.renderer;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.HTMLUIStrings;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
-import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree;
 import java.io.IOException;
 import org.apache.log4j.Logger;
+import saros.HTMLUIContextFactory;
+import saros.HTMLUIStrings;
+import saros.filesystem.IWorkspaceRoot;
+import saros.ui.JavaScriptAPI;
+import saros.ui.manager.ProjectListManager;
+import saros.ui.model.ProjectTree;
 
 /**
  * This class is responsible for sending the Project list to the HTML UI.

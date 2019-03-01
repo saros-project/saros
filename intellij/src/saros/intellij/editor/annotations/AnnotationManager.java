@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.editor.annotations;
+package saros.intellij.editor.annotations;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
@@ -8,9 +8,6 @@ import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
-import de.fu_berlin.inf.dpp.session.User;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +16,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.filesystem.IFile;
+import saros.intellij.editor.colorstorage.ColorManager;
+import saros.session.User;
 
 /** Annotation manager used to create, delete and manage annotations for a Saros session. */
 // TODO save local selection before editor is closed

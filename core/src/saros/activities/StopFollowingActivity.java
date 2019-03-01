@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.session.User;
 
 /**
  * This activity notifies the recipient that the local user is following someone in the running

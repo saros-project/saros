@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
 import org.picocontainer.MutablePicoContainer;
 

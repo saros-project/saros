@@ -29,7 +29,7 @@ If you develop on Eclipse you should have already installed the Eclipse version 
 * Right-click the "Saros" project in the project explorer and navigate to<br/>
   `Properties > Java Code Style > Clean up`
 * Under the box `Active profile:`, click `Import...`
-* Select the profile [`de.fu_berlin.inf.dpp/clean-up-profile.xml`](https://github.com/saros-project/saros/blob/master/de.fu_berlin.inf.dpp/clean-up-profile.xml)
+* Select the profile [`saros/clean-up-profile.xml`](https://github.com/saros-project/saros/blob/master/saros/clean-up-profile.xml)
 
 #### Install and Enable Google Java Formatter
 * Install the [eclipse Google Java Formatter](https://github.com/google/google-java-format#eclipse) which is available as Drop-In in [GitHub Releases](https://github.com/google/google-java-format/releases).

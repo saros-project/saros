@@ -6,4 +6,4 @@
  * than one core component. This way, browser functions have a single class to talk to and renderers
  * can install simple listeners.
  */
-package de.fu_berlin.inf.dpp.ui.core_facades;
+package saros.ui.core_facades;

@@ -8,16 +8,16 @@
       <application
             icon="icons/view16/widget_gallery_misc.png">
          <run
-               class="de.fu_berlin.inf.dpp.ui.widgetGallery.application.Application">
+               class="saros.ui.widgetGallery.application.Application">
          </run>
       </application>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="de.fu_berlin.inf.dpp.ui.widgetGallery.application.Perspective"
+            class="saros.ui.widgetGallery.application.Perspective"
             icon="icons/view16/widget_gallery_misc.png"
-            id="de.fu_berlin.inf.dpp.ui.widgetGallery.perspective"
+            id="saros.ui.widgetGallery.perspective"
             name="Widget Gallery">
       </perspective>
    </extension>
@@ -25,10 +25,10 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="false"
-            category="de.fu_berlin.inf.dpp.Developer"
-            class="de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView"
+            category="saros.Developer"
+            class="saros.ui.widgetGallery.views.WidgetGalleryView"
             icon="icons/view16/widget_gallery_misc.png"
-            id="de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView"
+            id="saros.ui.widgetGallery.views.WidgetGalleryView"
             name="Saros Widget Gallery"
             restorable="true">
       </view>
@@ -38,10 +38,10 @@
       <perspectiveExtension
             targetID="*">
          <view
-               id="de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView"
+               id="saros.ui.widgetGallery.views.WidgetGalleryView"
                minimized="false"
                relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.views.SarosView">
+               relative="saros.ui.views.SarosView">
          </view>
       </perspectiveExtension>
    </extension>
@@ -49,18 +49,18 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.widgetGallery.commands.ShowWidgetGalleryView"
+            id="saros.ui.widgetGallery.commands.ShowWidgetGalleryView"
             name="Show Saros Widget Gallery">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="de.fu_berlin.inf.dpp.ui.widgetGallery.commandHandlers.ShowWidgetGalleryView"
-            commandId="de.fu_berlin.inf.dpp.ui.widgetGallery.commands.ShowWidgetGalleryView">
+            class="saros.ui.widgetGallery.commandHandlers.ShowWidgetGalleryView"
+            commandId="saros.ui.widgetGallery.commands.ShowWidgetGalleryView">
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.widgetGallery.commandHandlers.RefreshDemo"
+            class="saros.ui.widgetGallery.commandHandlers.RefreshDemo"
             commandId="org.eclipse.ui.file.refresh">
       </handler>
    </extension>
@@ -68,25 +68,25 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
-            locationURI="menu:de.fu_berlin.inf.dpp.ui.main.menu?after=DeveloperStart">
+            locationURI="menu:saros.ui.main.menu?after=DeveloperStart">
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.widgetGallery.commands.ShowWidgetGalleryView"
+               commandId="saros.ui.widgetGallery.commands.ShowWidgetGalleryView"
                icon="icons/view16/widget_gallery_misc.png"
                style="push">
          </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="toolbar:de.fu_berlin.inf.dpp.ui.views.SarosView?after=additions">
+            locationURI="toolbar:saros.ui.views.SarosView?after=additions">
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.widgetGallery.commands.ShowWidgetGalleryView"
+               commandId="saros.ui.widgetGallery.commands.ShowWidgetGalleryView"
                icon="icons/view16/widget_gallery_misc.png"
                style="push">
          </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="toolbar:de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView?after=additions">
+            locationURI="toolbar:saros.ui.widgetGallery.views.WidgetGalleryView?after=additions">
          <command
                commandId="org.eclipse.ui.file.refresh"
                icon="icons/elcl16/reload.png"

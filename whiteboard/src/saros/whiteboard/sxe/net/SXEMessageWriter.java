@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
+package saros.whiteboard.sxe.net;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -19,6 +17,8 @@ import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import saros.whiteboard.sxe.constants.RecordEntry;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
 
 /**
  * Writer class for the SXE protocol (Shared XML Editing XEP-0284). Creates well-formed XML-Strings

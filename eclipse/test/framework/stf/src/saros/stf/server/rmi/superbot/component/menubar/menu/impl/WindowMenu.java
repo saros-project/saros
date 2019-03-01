@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl;
+package saros.stf.server.rmi.superbot.component.menubar.menu.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Perspective;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.IWindowMenu;
-import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotTree;
+import saros.stf.server.rmi.superbot.component.Perspective;
+import saros.stf.server.rmi.superbot.component.menubar.menu.IWindowMenu;
+import saros.stf.server.util.WidgetUtil;
 
 public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
 

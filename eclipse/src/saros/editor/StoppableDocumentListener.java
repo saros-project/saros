@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocumentListener;

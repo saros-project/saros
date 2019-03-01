@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.CommittedRecordException;
+import saros.whiteboard.sxe.exceptions.CommittedRecordException;
 
 public abstract class AbstractRecord implements IRecord {
 

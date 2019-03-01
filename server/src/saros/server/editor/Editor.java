@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.server.editor;
+package saros.server.editor;
 
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
+import saros.activities.TextEditActivity;
+import saros.filesystem.IFile;
 
 /** Representation of an open file on the server. Used by {@link ServerEditorManager}. */
 public class Editor {

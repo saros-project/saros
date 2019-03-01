@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.stf.client;
+package saros.stf.client;
 
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.tester.SarosTester;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import saros.stf.client.tester.AbstractTester;
+import saros.stf.client.tester.SarosTester;
 
 public class ShutdownRemoteEclipse {
 

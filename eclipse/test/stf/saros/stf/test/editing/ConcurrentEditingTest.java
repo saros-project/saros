@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.stf.test.editing;
+package saros.stf.test.editing;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 import java.rmi.RemoteException;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.test.Constants;
 
 public class ConcurrentEditingTest extends StfTestCase {
 

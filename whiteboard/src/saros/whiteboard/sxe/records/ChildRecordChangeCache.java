@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -9,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import saros.whiteboard.sxe.SXEController;
 
 /**
  * This class offers convenient methods to notify clients (like GUI) about applied changes and
@@ -22,8 +22,8 @@ import org.apache.log4j.Logger;
  *
  * <p>The listeners are notified after a whole operation or message is applied.
  *
- * @see de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController#notifyLocalListeners()
- * @see de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord#apply(DocumentRecord)
+ * @see saros.whiteboard.sxe.SXEController#notifyLocalListeners()
+ * @see saros.whiteboard.sxe.records.IRecord#apply(DocumentRecord)
  * @author jurke
  */
 public class ChildRecordChangeCache {

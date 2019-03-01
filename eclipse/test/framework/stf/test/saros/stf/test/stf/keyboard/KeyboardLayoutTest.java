@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.keyboard;
+package saros.stf.test.stf.keyboard;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static org.junit.Assert.assertEquals;
+import static saros.stf.client.tester.SarosTester.ALICE;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
 
 public class KeyboardLayoutTest extends StfTestCase {
 

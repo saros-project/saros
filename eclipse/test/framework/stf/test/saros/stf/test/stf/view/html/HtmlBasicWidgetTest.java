@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.view.html;
+package saros.stf.test.stf.view.html;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.ui.View.BASIC_WIDGET_TEST;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.ui.View.BASIC_WIDGET_TEST;
 
-import de.fu_berlin.inf.dpp.stf.client.StfHtmlTestCase;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
 import java.util.Arrays;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfHtmlTestCase;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
 
 public class HtmlBasicWidgetTest extends StfHtmlTestCase {
 

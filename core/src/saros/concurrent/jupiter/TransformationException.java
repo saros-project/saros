@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter;
+package saros.concurrent.jupiter;
 
 /** Exception thrown by algorithm instances whenever transforming operations fails. */
 public class TransformationException extends Exception {

@@ -1,33 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package saros.ui.wizards;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.CancelListener;
-import de.fu_berlin.inf.dpp.negotiation.FileList;
-import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
-import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
@@ -66,6 +38,34 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.picocontainer.annotations.Inject;
+import saros.Saros;
+import saros.SarosPluginContext;
+import saros.editor.internal.EditorAPI;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.monitoring.ProgressMonitorAdapterFactory;
+import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.CancelListener;
+import saros.negotiation.FileList;
+import saros.negotiation.FileListDiff;
+import saros.negotiation.FileListFactory;
+import saros.negotiation.NegotiationTools;
+import saros.negotiation.NegotiationTools.CancelLocation;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.negotiation.ProjectNegotiation;
+import saros.negotiation.ProjectNegotiationData;
+import saros.net.IConnectionManager;
+import saros.net.xmpp.JID;
+import saros.preferences.Preferences;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.ui.Messages;
+import saros.ui.util.DialogUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.views.SarosView;
+import saros.ui.wizards.dialogs.WizardDialogAccessable;
+import saros.ui.wizards.pages.EnterProjectNamePage;
+import saros.util.ThreadUtils;
 
 public class AddProjectToSessionWizard extends Wizard {
 
@@ -307,8 +307,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
               }
 
-              final Map<String, de.fu_berlin.inf.dpp.filesystem.IProject> convertedMapping =
-                  new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IProject>();
+              final Map<String, saros.filesystem.IProject> convertedMapping =
+                  new HashMap<String, saros.filesystem.IProject>();
 
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
                 convertedMapping.put(
@@ -542,7 +542,7 @@ public class AddProjectToSessionWizard extends Wizard {
       final String projectID = entry.getKey();
       final IProject project = entry.getValue();
 
-      final de.fu_berlin.inf.dpp.filesystem.IProject adaptedProject =
+      final saros.filesystem.IProject adaptedProject =
           ResourceAdapterFactory.create(entry.getValue());
 
       /*

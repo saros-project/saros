@@ -1,29 +1,29 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
-import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
-import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
-import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.session.User;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import saros.activities.FileActivity;
+import saros.activities.SPath;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.internal.text.DeleteOperation;
+import saros.concurrent.jupiter.internal.text.ITextOperation;
+import saros.editor.IEditorManager;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
+import saros.intellij.editor.annotations.AnnotationManager;
+import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.project.SharedResourcesManager;
+import saros.intellij.session.SessionUtils;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.NotificationPanel;
+import saros.session.User;
 
 /** This class applies the logic for activities that were received from remote. */
 public class LocalEditorManipulator {

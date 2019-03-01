@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
+package saros.whiteboard.gef.commands;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.draw2d.geometry.Rectangle;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.IRecord;
 
 /**
  * A command to change the position and size of an <code>ElementRecord</code> by setting its

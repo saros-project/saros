@@ -1,23 +1,23 @@
-package de.fu_berlin.inf.dpp.stf.test.session;
+package saros.stf.test.session;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ADD_PROJECTS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.CANCEL;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_PROJECTS_TO_SESSION;
 import static org.junit.Assert.assertFalse;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.client.tester.SarosTester.CARL;
+import static saros.stf.shared.Constants.ADD_PROJECTS;
+import static saros.stf.shared.Constants.CANCEL;
+import static saros.stf.shared.Constants.MENU_SAROS;
+import static saros.stf.shared.Constants.SHELL_ADD_PROJECTS_TO_SESSION;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
+import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class ShareMultipleProjectsTest extends StfTestCase {
 

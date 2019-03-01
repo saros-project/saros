@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.core.util;
+package saros.core.util;
 
-import de.fu_berlin.inf.dpp.util.Function;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import saros.util.Function;
 
 /**
  * Map which will automatically insert a value for a given key if the Map does not already contain

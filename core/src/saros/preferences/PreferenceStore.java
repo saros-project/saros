@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;

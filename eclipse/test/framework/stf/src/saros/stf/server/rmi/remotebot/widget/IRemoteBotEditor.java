@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget;
+package saros.stf.server.rmi.remotebot.widget;
 
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -9,6 +8,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
+import saros.stf.client.tester.AbstractTester;
 
 /**
  * This interface contains convenience API to perform actions in the editor area, then you can start

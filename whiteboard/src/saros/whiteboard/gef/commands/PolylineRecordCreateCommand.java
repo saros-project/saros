@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
+package saros.whiteboard.gef.commands;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGPolylineRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.draw2d.geometry.PointList;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.gef.model.SVGPolylineRecord;
+import saros.whiteboard.sxe.records.IRecord;
 
 /**
  * A specialized version of a create command for point lists as location and size wouldn't suffice.

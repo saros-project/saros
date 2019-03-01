@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Factory to create adapters from Eclipse {@link org.eclipse.core.resources.IResource resources} to
- * Saros Core {@linkplain de.fu_berlin.inf.dpp.filesystem.IResource resources}.
+ * Saros Core {@linkplain saros.filesystem.IResource resources}.
  */
 public class ResourceAdapterFactory {
 

@@ -8,10 +8,10 @@
       <sourceFolder url="file://$MODULE_DIR$/test/junit" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/resources" isTestSource="false" />
     </content>
-    <orderEntry type="module" module-name="de.fu_berlin.inf.dpp.core" exported="" />
+    <orderEntry type="module" module-name="saros.core" exported="" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="de.fu_berlin.inf.dpp.ui" />
+    <orderEntry type="module" module-name="saros.ui" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
 public interface SarosConstants {
 
@@ -7,7 +7,7 @@ public interface SarosConstants {
    *
    * <p>See also: XEP-0030: Service Discovery (http://xmpp.org/extensions/xep-0030.html)
    */
-  public static final String XMPP_FEATURE_NAMESPACE = "de.fu_berlin.inf.dpp";
+  public static final String XMPP_FEATURE_NAMESPACE = "saros";
   /** Sub-namespace for the server. It is used advertise when a server is active. */
   public static final String NAMESPACE_SERVER = XMPP_FEATURE_NAMESPACE + ".server";
   /**

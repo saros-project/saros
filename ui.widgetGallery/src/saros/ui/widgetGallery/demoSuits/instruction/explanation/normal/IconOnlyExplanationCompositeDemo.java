@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.explanation.normal;
+package saros.ui.widgetGallery.demoSuits.instruction.explanation.normal;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.ExplanationComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgets.ExplanationComposite;
 
 @Demo
 public class IconOnlyExplanationCompositeDemo extends AbstractDemo {

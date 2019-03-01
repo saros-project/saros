@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 public interface IFileContentChangedNotifier {
 

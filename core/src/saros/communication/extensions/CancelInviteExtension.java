@@ -1,5 +1,5 @@
 /** */
-package de.fu_berlin.inf.dpp.communication.extensions;
+package saros.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

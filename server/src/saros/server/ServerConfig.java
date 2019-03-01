@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.server;
+package saros.server;
 
 /**
  * A facade for accessing the configuration properties that were passed to the Saros server on
@@ -6,10 +6,10 @@ package de.fu_berlin.inf.dpp.server;
  */
 public class ServerConfig {
 
-  private static final String JID_KEY = "de.fu_berlin.inf.dpp.server.jid";
-  private static final String PASSWORD_KEY = "de.fu_berlin.inf.dpp.server.password";
-  private static final String WORKSPACE_PATH_KEY = "de.fu_berlin.inf.dpp.server.workspace";
-  private static final String INTERACTIVE_KEY = "de.fu_berlin.inf.dpp.server.interactive";
+  private static final String JID_KEY = "saros.server.jid";
+  private static final String PASSWORD_KEY = "saros.server.password";
+  private static final String WORKSPACE_PATH_KEY = "saros.server.workspace";
+  private static final String INTERACTIVE_KEY = "saros.server.interactive";
 
   /**
    * Returns the JID that the Saros server should use to connect to the XMPP network.

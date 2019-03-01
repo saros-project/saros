@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;

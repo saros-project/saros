@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
 
 /**
  * Defines which projects and *which of their resources) to share during a particular {@link

@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
-import de.fu_berlin.inf.dpp.activities.ChangeColorActivity;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSet;
-import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +12,17 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.ChangeColorActivity;
+import saros.annotations.Component;
+import saros.editor.colorstorage.ColorIDSet;
+import saros.editor.colorstorage.ColorIDSetStorage;
+import saros.editor.colorstorage.UserColorID;
+import saros.session.AbstractActivityConsumer;
+import saros.session.AbstractActivityProducer;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityConsumer.Priority;
+import saros.session.ISessionListener;
+import saros.session.User;
 
 /**
  * This manager is responsible for handling color changes and managing the currently available

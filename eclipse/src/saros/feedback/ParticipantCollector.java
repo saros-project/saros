@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import saros.annotations.Component;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
 
 /**
  * A Collector class that collects for each number of users the time they were present in the same

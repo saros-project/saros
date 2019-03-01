@@ -1,49 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.views;
+package saros.ui.views;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.BalloonNotification;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
-import de.fu_berlin.inf.dpp.ui.actions.ChangeWriteAccessAction;
-import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
-import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
-import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
-import de.fu_berlin.inf.dpp.ui.actions.Disposable;
-import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
-import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
-import de.fu_berlin.inf.dpp.ui.actions.JumpToUserWithWriteAccessPositionAction;
-import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
-import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
-import de.fu_berlin.inf.dpp.ui.actions.OpenChatAction;
-import de.fu_berlin.inf.dpp.ui.actions.OpenPreferencesAction;
-import de.fu_berlin.inf.dpp.ui.actions.RemoveUserAction;
-import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
-import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
-import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
-import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
-import de.fu_berlin.inf.dpp.ui.sounds.Sounds;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.MDNSSessionDisplayComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +38,50 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.annotations.Component;
+import saros.editor.EditorManager;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.roster.IRosterListener;
+import saros.net.xmpp.roster.RosterTracker;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.SessionEndReason;
+import saros.session.User;
+import saros.ui.BalloonNotification;
+import saros.ui.Messages;
+import saros.ui.actions.ChangeColorAction;
+import saros.ui.actions.ChangeWriteAccessAction;
+import saros.ui.actions.ChangeXMPPAccountAction;
+import saros.ui.actions.ConsistencyAction;
+import saros.ui.actions.DeleteContactAction;
+import saros.ui.actions.Disposable;
+import saros.ui.actions.FollowModeAction;
+import saros.ui.actions.FollowThisPersonAction;
+import saros.ui.actions.JumpToUserWithWriteAccessPositionAction;
+import saros.ui.actions.LeaveSessionAction;
+import saros.ui.actions.NewContactAction;
+import saros.ui.actions.OpenChatAction;
+import saros.ui.actions.OpenPreferencesAction;
+import saros.ui.actions.RemoveUserAction;
+import saros.ui.actions.RenameContactAction;
+import saros.ui.actions.SendFileAction;
+import saros.ui.actions.SkypeAction;
+import saros.ui.model.roster.RosterEntryElement;
+import saros.ui.sounds.SoundPlayer;
+import saros.ui.sounds.Sounds;
+import saros.ui.util.LayoutUtils;
+import saros.ui.util.ModelFormatUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.ui.widgets.ConnectionStateComposite;
+import saros.ui.widgets.chat.ChatRoomsComposite;
+import saros.ui.widgets.viewer.ViewerComposite;
+import saros.ui.widgets.viewer.session.MDNSSessionDisplayComposite;
+import saros.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
 
 /**
  * @JTourBusStop 1, The Interface Tour:
@@ -105,10 +105,9 @@ public class SarosView extends ViewPart {
 
   private static final Logger LOG = Logger.getLogger(SarosView.class);
 
-  public static final String ID = "de.fu_berlin.inf.dpp.ui.views.SarosView";
+  public static final String ID = "saros.ui.views.SarosView";
 
-  private static final boolean MDNS_MODE =
-      Boolean.getBoolean("de.fu_berlin.inf.dpp.net.ENABLE_MDNS");
+  private static final boolean MDNS_MODE = Boolean.getBoolean("saros.net.ENABLE_MDNS");
 
   private final IRosterListener rosterListener =
       new IRosterListener() {

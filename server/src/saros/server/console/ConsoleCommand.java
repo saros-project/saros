@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.server.console;
+package saros.server.console;
 
 import java.io.PrintStream;
 import java.util.List;

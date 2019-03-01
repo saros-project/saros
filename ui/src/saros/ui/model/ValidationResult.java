@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;
 
 /**
  * This class is used to report the result of a parameter validation back to Javascript. It is

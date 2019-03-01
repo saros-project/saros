@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.standalone;
+package saros.whiteboard.standalone;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -6,7 +6,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 public class Perspective implements IPerspectiveFactory {
 
   // private static final String ID_TABS_FOLDER =
-  // "de.fu_berlin.inf.dpp.whiteboard.tabs";
+  // "saros.whiteboard.tabs";
 
   @Override
   public void createInitialLayout(IPageLayout layout) {

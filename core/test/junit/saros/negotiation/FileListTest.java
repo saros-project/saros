@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -8,11 +8,6 @@ import static org.junit.Assert.assertTrue;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +22,11 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
 
 /*
  *Project Layout for test

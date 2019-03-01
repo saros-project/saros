@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.ui.model.session;
+package saros.ui.model.session;
 
-import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
+import saros.awareness.AwarenessInformationCollector;
+import saros.editor.EditorManager;
+import saros.session.User;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.ModelFormatUtils;
 
 /**
  * This is a tree element that can be displayed as a child element of the user entry in the Saros

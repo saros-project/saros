@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse;
+package saros.stf.server.rmi.superbot.component.view.eclipse;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
 import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
 
 /**
  * This interface contains methods to select treeItems in the package explorer view

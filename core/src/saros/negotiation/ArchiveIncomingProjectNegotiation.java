@@ -1,22 +1,5 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.util.CoreUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,6 +9,23 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
+import saros.exceptions.LocalCancellationException;
+import saros.exceptions.SarosCancellationException;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.SubProgressMonitor;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.observables.FileReplacementInProgressObservable;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.util.CoreUtils;
 
 /**
  * Implementation of {@link AbstractIncomingProjectNegotiation} utilizing a transferred zip archive
@@ -133,7 +133,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
     try {
       workspace.run(decompressTask, projectMapping.values().toArray(new IResource[0]));
-    } catch (de.fu_berlin.inf.dpp.exceptions.OperationCanceledException e) {
+    } catch (saros.exceptions.OperationCanceledException e) {
       LocalCancellationException canceled =
           new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
       canceled.initCause(e);

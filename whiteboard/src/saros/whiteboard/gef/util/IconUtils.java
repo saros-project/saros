@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.util;
+package saros.whiteboard.gef.util;
 
 import java.util.HashMap;
 import org.apache.log4j.Logger;

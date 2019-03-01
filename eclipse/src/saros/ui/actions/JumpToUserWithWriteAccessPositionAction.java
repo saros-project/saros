@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.actions;
+package saros.ui.actions;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
@@ -18,6 +8,16 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.annotations.Component;
+import saros.editor.EditorManager;
+import saros.session.ISarosSessionManager;
+import saros.session.User;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.selection.SelectionUtils;
+import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.util.ThreadUtils;
 
 /** Action which triggers the viewport of the local user to be changed to a local user's one. */
 @Component(module = "action")

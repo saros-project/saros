@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net;
+package saros.net;
 
 import java.util.EnumSet;
 

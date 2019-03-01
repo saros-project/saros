@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy;
+package saros.whiteboard.gef.editpolicy;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;

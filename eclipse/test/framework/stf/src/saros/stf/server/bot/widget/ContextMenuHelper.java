@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.bot.widget;
+package saros.stf.server.bot.widget;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WithMnemonicRegex.withMnemonicRegex;
 import static org.hamcrest.Matchers.allOf;

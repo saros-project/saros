@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.editor.remote;
+package saros.editor.remote;
 
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import saros.activities.EditorActivity;
+import saros.activities.SPath;
+import saros.activities.TextSelectionActivity;
+import saros.activities.ViewportActivity;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
+import saros.session.AbstractActivityConsumer;
+import saros.session.IActivityConsumer;
 
 /**
  * Instances of this class represent the state of the editors of one user, including the viewports

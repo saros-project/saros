@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.actions;
+package saros.whiteboard.gef.actions;
 
-import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.IconUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.ColorDialog;
+import saros.ui.actions.ChangeColorAction;
+import saros.ui.util.SWTUtils;
+import saros.whiteboard.gef.util.ColorUtils;
+import saros.whiteboard.gef.util.IconUtils;
 
 /**
  * Handles the action of changing background color. They are added in the WhiteboardEditor,

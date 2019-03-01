@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editor;
+package saros.whiteboard.gef.editor;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PanningTool;
 import java.util.Iterator;
 import org.eclipse.gef.Disposable;
 import org.eclipse.gef.EditDomain;
@@ -16,6 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.widgets.Event;
+import saros.whiteboard.gef.tools.PanningTool;
 
 /**
  * An extension of the GEF graphical editor with a locking feature using the setEnabled() method.

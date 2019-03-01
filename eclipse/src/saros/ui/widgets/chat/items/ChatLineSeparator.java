@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chat.items;
+package saros.ui.widgets.chat.items;
 
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleRoundedComposite;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.Messages;
+import saros.ui.widgets.SimpleRoundedComposite;
 
 /**
  * This composite is used to display a separator between messages of the same chat partner.

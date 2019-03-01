@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import org.picocontainer.Startable;
+import saros.annotations.Component;
+import saros.communication.extensions.ActivitiesExtension;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.User;
 
 /**
  * Converts session-dependent User objects to session-independent XML representations, and vice

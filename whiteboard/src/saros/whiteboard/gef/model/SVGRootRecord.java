@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.model;
+package saros.whiteboard.gef.model;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import org.apache.batik.util.SVGConstants;
+import saros.whiteboard.sxe.records.DocumentRecord;
 
 /*
  * Note: As I take SVG Tiny as a reference, svg:svg elements cannot be nested

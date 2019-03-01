@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.ui;
+package saros.ui;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import de.fu_berlin.inf.ag_se.browser.IBrowser;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree;
-import de.fu_berlin.inf.dpp.ui.model.State;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.account.XMPPAccount;
+import saros.ui.model.ProjectTree;
+import saros.ui.model.State;
 
 /**
  * Since the callable JS functions inside the UI.Frontend are hidden for Java developers, this class

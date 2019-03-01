@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.server.dummies;
+package saros.server.dummies;
 
-import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicator;
-import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
-import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.monitoring.remote.IRemoteProgressIndicator;
+import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
+import saros.monitoring.remote.RemoteProgressManager;
+import saros.session.User;
 
 /**
  * An implementation of {@link IRemoteProgressIndicatorFactory} which returns {@link

@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.widgets;
+package saros.ui.widgets;
 
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanationComposite.SimpleExplanation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import saros.ui.widgets.SimpleExplanationComposite.SimpleExplanation;
 
 /**
  * Instances of this class are controls which are capable of containing exactly <strong>one</strong>

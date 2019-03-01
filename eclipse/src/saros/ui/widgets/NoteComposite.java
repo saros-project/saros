@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets;
+package saros.ui.widgets;
 
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import java.util.ResourceBundle.Control;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -8,6 +7,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
+import saros.ui.util.LayoutUtils;
 
 /**
  * A {@link RoundedComposite} that contains an easily extendible {@link IllustratedComposite}.

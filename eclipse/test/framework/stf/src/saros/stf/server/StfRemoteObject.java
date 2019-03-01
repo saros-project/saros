@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.stf.server;
+package saros.stf.server;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.stf.shared.Constants;
-import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
+import saros.Saros;
+import saros.account.XMPPAccountStore;
+import saros.context.IContainerContext;
+import saros.editor.EditorManager;
+import saros.editor.FollowModeManager;
+import saros.net.IConnectionManager;
+import saros.net.internal.DataTransferManager;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.stf.shared.Constants;
+import saros.versioning.VersionManager;
 
 public abstract class StfRemoteObject implements Constants {
 

@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets;
+package saros.ui.widgets;
 
-import de.fu_berlin.inf.dpp.ui.util.FontUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
@@ -9,6 +8,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
+import saros.ui.util.FontUtils;
 
 /**
  * This composite displays a simple {@link IllustratedComposite} that can only display text.

@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.activities.TextSelectionActivity;
+import saros.annotations.Component;
+import saros.editor.IEditorManager;
+import saros.editor.ISharedEditorListener;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.User;
+import saros.session.User.Permission;
 
 /**
  * This collector collects information about selections made by users with {@link

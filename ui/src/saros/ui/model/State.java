@@ -1,15 +1,14 @@
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;
 
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import saros.account.XMPPAccount;
+import saros.net.ConnectionState;
 
 /**
  * Represents the state of the browser application. It consists of an {@link XMPPAccount}, a list of
- * {@link de.fu_berlin.inf.dpp.ui.model.Contact}s and the {@link
- * de.fu_berlin.inf.dpp.net.ConnectionState}.
+ * {@link saros.ui.model.Contact}s and the {@link saros.net.ConnectionState}.
  */
 public class State {
 
@@ -24,10 +23,7 @@ public class State {
    * ConnectionState#NOT_CONNECTED}.
    */
   public State() {
-    this(
-        null,
-        Collections.<Contact>emptyList(),
-        de.fu_berlin.inf.dpp.net.ConnectionState.NOT_CONNECTED);
+    this(null, Collections.<Contact>emptyList(), saros.net.ConnectionState.NOT_CONNECTED);
   }
 
   /**

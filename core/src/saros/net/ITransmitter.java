@@ -16,13 +16,13 @@
  * Ave, Cambridge, MA 02139, USA.
  */
 
-package de.fu_berlin.inf.dpp.net;
+package saros.net;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.IOException;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import saros.annotations.Component;
+import saros.net.xmpp.JID;
 
 /**
  * A humble interface that is responsible for network functionality. The idea behind this interface

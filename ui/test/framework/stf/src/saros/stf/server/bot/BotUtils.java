@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.bot;
+package saros.stf.server.bot;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;

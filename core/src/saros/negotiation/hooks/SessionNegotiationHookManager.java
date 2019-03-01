@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.negotiation.hooks;
+package saros.negotiation.hooks;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
+import saros.net.stream.StreamMode;
 
 public final class BinaryXMPPExtension {
 

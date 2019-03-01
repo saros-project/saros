@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.ui.renderer;
+package saros.ui.renderer;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.account.IAccountStoreListener;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import java.util.ArrayList;
 import java.util.List;
+import saros.HTMLUIContextFactory;
+import saros.account.IAccountStoreListener;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.ui.JavaScriptAPI;
 
 /** This class is responsible for sending the account list to the HTML UI. */
 public class AccountRenderer extends Renderer {

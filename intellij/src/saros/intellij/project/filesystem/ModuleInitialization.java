@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.project.filesystem;
+package saros.intellij.project.filesystem;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.ModifiableModuleModel;
@@ -8,15 +8,15 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.exceptions.ModuleNotFoundException;
+import saros.filesystem.IProject;
+import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.ui.wizards.AddProjectToSessionWizard;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
 
 /**
  * This class is instantiated by the PicoContainer as part of the session context.

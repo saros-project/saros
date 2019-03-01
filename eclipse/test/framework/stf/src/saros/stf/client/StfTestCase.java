@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.client;
+package saros.stf.client;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -24,6 +19,11 @@ import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.MethodRule;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
+import saros.net.xmpp.JID;
+import saros.stf.client.tester.AbstractTester;
+import saros.stf.client.util.Util;
+import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
+import saros.test.util.EclipseTestThread;
 
 public abstract class StfTestCase {
 

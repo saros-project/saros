@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.intellij.preferences;
+package saros.intellij.preferences;
 
-import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
+import saros.preferences.PreferenceInitializer;
+import saros.preferences.Preferences;
 
 /**
  * IntelliJ implementation of the {@link Preferences} abstract class, that uses an {@link

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 public class EclipseResourceImpl implements IResource {
 
   private static final Map<
-          Class<? extends de.fu_berlin.inf.dpp.filesystem.IResource>,
+          Class<? extends saros.filesystem.IResource>,
           Class<? extends org.eclipse.core.resources.IResource>>
       classMapping;
 

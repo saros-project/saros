@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import java.util.concurrent.CopyOnWriteArrayList;
+import saros.activities.IActivity;
 
 /**
  * Standard implementation of {@link IActivityProducer}, which, in addition to the interface

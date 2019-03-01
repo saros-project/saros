@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.stf.test.roster;
+package saros.stf.test.roster;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.client.tester.SarosTester.CARL;
 
-import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.annotation.TestLink;
+import saros.stf.client.StfTestCase;
 
 @TestLink(id = "Saros-117_sort_online_contacts_over_offline")
 public class SortContactsOnlineOverOfflineTest extends StfTestCase {

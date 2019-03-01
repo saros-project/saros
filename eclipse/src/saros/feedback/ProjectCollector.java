@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import saros.annotations.Component;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
 
 /**
  * A Collector class that collects information for each shared project during a session.

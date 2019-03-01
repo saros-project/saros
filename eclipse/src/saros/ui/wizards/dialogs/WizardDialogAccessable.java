@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards.dialogs;
+package saros.ui.wizards.dialogs;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.wizard.IWizard;

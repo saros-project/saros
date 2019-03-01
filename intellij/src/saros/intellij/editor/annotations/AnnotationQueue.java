@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.intellij.editor.annotations;
+package saros.intellij.editor.annotations;
 
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.filesystem.IFile;
+import saros.session.User;
 
 /**
  * A class to store a limited number of annotations of a certain type. The store operates like a

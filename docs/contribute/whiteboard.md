@@ -9,7 +9,7 @@ The Saros Whiteboard was designed to enable Saros users to communicate ideas gra
 ## Developing the Whiteboard
 
 ### Setup
-First of all, The view has to be un-commented from `de.fu_berlin.inf.dpp.whiteboard/plugin.xml`, the view has the following id: `de.fu_berlin.inf.dpp.whiteboard.ui.HTMLWhiteboardView`.
+First of all, The view has to be un-commented from `saros.whiteboard/plugin.xml`, the view has the following id: `saros.whiteboard.ui.HTMLWhiteboardView`.
 
 Then install the dependencies using the command `npm run setup`, note that `npm install` does not suffice.
 

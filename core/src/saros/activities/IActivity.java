@@ -17,9 +17,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
-import de.fu_berlin.inf.dpp.session.User;
+import saros.session.User;
 
 /**
  * An interface for all things that occur in a shared project session such as editing a file,

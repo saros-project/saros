@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.preferences;
+package saros.ui.widgetGallery.demoSuits.preferences;
 
-import de.fu_berlin.inf.dpp.ui.preferencePages.AdvancedPreferencePage;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.PreferencePageDemo;
 import org.eclipse.jface.preference.IPreferencePage;
+import saros.ui.preferencePages.AdvancedPreferencePage;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoExplorer.PreferencePageDemo;
 
 @Demo
 public class AdvancedPageDemo extends PreferencePageDemo {

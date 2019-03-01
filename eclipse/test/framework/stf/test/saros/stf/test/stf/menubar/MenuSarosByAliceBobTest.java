@@ -1,26 +1,26 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.menubar;
+package saros.stf.test.stf.menubar;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.FINISH;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_ADD_CONTACT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.NEXT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHARE_PROJECTS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SHARE_PROJECT;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.ACCEPT;
+import static saros.stf.shared.Constants.FINISH;
+import static saros.stf.shared.Constants.MENU_ADD_CONTACT;
+import static saros.stf.shared.Constants.MENU_SAROS;
+import static saros.stf.shared.Constants.NEXT;
+import static saros.stf.shared.Constants.SHARE_PROJECTS;
+import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
+import static saros.stf.shared.Constants.SHELL_SHARE_PROJECT;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 import java.rmi.RemoteException;
 import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
+import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.test.Constants;
 
 public class MenuSarosByAliceBobTest extends StfTestCase {
 

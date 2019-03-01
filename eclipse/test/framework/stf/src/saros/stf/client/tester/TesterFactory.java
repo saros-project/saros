@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.client.tester;
+package saros.stf.client.tester;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.client.Configuration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import saros.net.xmpp.JID;
+import saros.stf.client.Configuration;
 
 final class TesterFactory {
 

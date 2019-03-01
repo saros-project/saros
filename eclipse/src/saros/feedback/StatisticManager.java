@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -18,6 +13,11 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.picocontainer.Startable;
+import saros.Saros;
+import saros.annotations.Component;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.ui.preferencePages.FeedbackPreferencePage;
+import saros.util.StackTrace;
 
 /**
  * The StatisticManager is supposed to gather statistic data and submit it at the end of a session
@@ -31,7 +31,7 @@ public class StatisticManager extends AbstractFeedbackManager implements Startab
   private static final Logger log = Logger.getLogger(StatisticManager.class.getName());
 
   private static final String STATISTIC_UPLOAD_URL =
-      System.getProperty("de.fu_berlin.inf.dpp.feedback.STATISTIC_UPLOAD_URL");
+      System.getProperty("saros.feedback.STATISTIC_UPLOAD_URL");
 
   private static final Random RANDOM = new Random();
 

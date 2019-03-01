@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project;
+package saros.project;
 
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
@@ -9,14 +9,6 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
-import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import org.eclipse.core.resources.IFile;
@@ -25,6 +17,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import saros.activities.FileActivity;
+import saros.activities.FileActivity.Purpose;
+import saros.activities.FileActivity.Type;
+import saros.activities.SPath;
+import saros.filesystem.IResource;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.net.xmpp.JID;
+import saros.session.User;
 
 public class FileActivityConsumerTest {
 

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.monitoring;
+package saros.monitoring;
 
 /**
  * This interface is under development. It currently equals its Eclipse counterpart. If not

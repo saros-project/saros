@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery;
+package saros.ui.widgetGallery;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.application.Activator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import saros.ui.widgetGallery.application.Activator;
 
 /** Handles references to all used images throughout this plug-in. */
 public class ImageManager {

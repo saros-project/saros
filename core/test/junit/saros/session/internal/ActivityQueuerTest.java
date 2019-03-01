@@ -1,24 +1,10 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
-import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.NOPActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +13,20 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.activities.EditorActivity;
+import saros.activities.FolderCreatedActivity;
+import saros.activities.FolderDeletedActivity;
+import saros.activities.IActivity;
+import saros.activities.JupiterActivity;
+import saros.activities.NOPActivity;
+import saros.activities.SPath;
+import saros.activities.StartFollowingActivity;
+import saros.concurrent.jupiter.internal.JupiterVectorTime;
+import saros.concurrent.jupiter.internal.text.NoOperation;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.net.xmpp.JID;
+import saros.session.User;
 
 public class ActivityQueuerTest {
 

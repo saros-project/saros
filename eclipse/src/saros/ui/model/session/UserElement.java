@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.ui.model.session;
+package saros.ui.model.session;
 
-import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.TreeElement;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTBoldStyler;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
+import saros.awareness.AwarenessInformationCollector;
+import saros.editor.EditorManager;
+import saros.session.User;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.model.TreeContentProvider;
+import saros.ui.model.TreeElement;
+import saros.ui.util.ModelFormatUtils;
+import saros.ui.util.SWTBoldStyler;
 
 /**
  * Model element for a session {@link User user}. This element can only be used in conjunction with
@@ -71,7 +71,7 @@ public final class UserElement extends TreeElement {
 
     /*
      * Blank space in the front for the highlighting color square, see
-     * de.fu_berlin.inf.dpp.ui.widgets.viewer.session.UserElementDecorator
+     * saros.ui.widgets.viewer.session.UserElementDecorator
      *
      * ColorSquare [HOST] Alice [following]
      */

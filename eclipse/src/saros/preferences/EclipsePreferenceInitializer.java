@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.FeedbackInterval;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
+import saros.Saros;
+import saros.feedback.AbstractFeedbackManager;
+import saros.feedback.FeedbackInterval;
+import saros.feedback.FeedbackManager;
 
 /**
  * Class used to initialize default preference values.
@@ -165,7 +165,7 @@ public class EclipsePreferenceInitializer extends AbstractPreferenceInitializer 
   }
 
   private static class CorePreferenceStoreAccessAdapter
-      implements de.fu_berlin.inf.dpp.preferences.IPreferenceStore {
+      implements saros.preferences.IPreferenceStore {
 
     private final PreferenceAccessAdapter adapter;
 

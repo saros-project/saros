@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.model.roster;
+package saros.ui.model.roster;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
+import saros.net.xmpp.JID;
 
 /**
  * Provides adapters for {@link Roster} entities which are provided by {@link

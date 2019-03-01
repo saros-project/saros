@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.communication.chat.muc;
+package saros.communication.chat.muc;
 
 /** Preferences for a {@link MultiUserChat} session. */
 public final class MultiUserChatPreferences {

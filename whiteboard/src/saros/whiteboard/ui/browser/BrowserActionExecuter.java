@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.whiteboard.ui.browser;
+package saros.whiteboard.ui.browser;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.MissingRecordException;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.AttributeRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.constants.RecordType;
+import saros.whiteboard.sxe.exceptions.MissingRecordException;
+import saros.whiteboard.sxe.records.AttributeRecord;
+import saros.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.records.IRecord;
 
 public class BrowserActionExecuter {
 

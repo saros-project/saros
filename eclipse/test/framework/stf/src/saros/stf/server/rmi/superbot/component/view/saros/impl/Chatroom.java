@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl;
+package saros.stf.server.rmi.superbot.component.view.saros.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatInput;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IChatroom;
 import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCTabItem;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.SarosSWTBot;
+import saros.stf.server.bot.condition.SarosConditions;
+import saros.stf.server.bot.widget.SarosSWTBotChatInput;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.superbot.component.view.saros.IChatroom;
 
 public final class Chatroom extends StfRemoteObject implements IChatroom {
 

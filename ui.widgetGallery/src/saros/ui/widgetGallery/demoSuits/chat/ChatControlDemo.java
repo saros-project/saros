@@ -1,20 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.chat;
+package saros.ui.widgetGallery.demoSuits.chat;
 
-import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
-import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
-import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
-import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanationComposite.SimpleExplanation;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanatoryComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatControl;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.CharacterEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatControlListener;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
 import java.util.Date;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,6 +11,21 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.picocontainer.annotations.Inject;
+import saros.communication.chat.ChatElement;
+import saros.communication.chat.muc.MultiUserChat;
+import saros.communication.chat.muc.MultiUserChatPreferences;
+import saros.communication.chat.muc.MultiUserChatService;
+import saros.net.xmpp.JID;
+import saros.ui.util.LayoutUtils;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgets.SimpleExplanationComposite.SimpleExplanation;
+import saros.ui.widgets.SimpleExplanatoryComposite;
+import saros.ui.widgets.chat.ChatControl;
+import saros.ui.widgets.chat.events.CharacterEnteredEvent;
+import saros.ui.widgets.chat.events.ChatClearedEvent;
+import saros.ui.widgets.chat.events.IChatControlListener;
+import saros.ui.widgets.chat.events.MessageEnteredEvent;
 
 @Demo
 public class ChatControlDemo extends AbstractDemo {

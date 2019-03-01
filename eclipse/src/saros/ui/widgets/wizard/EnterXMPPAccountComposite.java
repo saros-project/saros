@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.wizard;
+package saros.ui.widgets.wizard;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.swt.SWT;
@@ -25,6 +20,11 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.net.xmpp.JID;
+import saros.preferences.Preferences;
+import saros.ui.Messages;
+import saros.ui.widgets.decoration.JIDCombo;
 
 /**
  * Gives the user the possibility to enter a {@link JID}, the corresponding password and optionally

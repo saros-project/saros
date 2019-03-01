@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.filesystem;
+package saros.intellij.filesystem;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -7,14 +7,6 @@ import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.exceptions.ModuleNotFoundException;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,6 +16,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.exceptions.ModuleNotFoundException;
+import saros.filesystem.IContainer;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.intellij.project.filesystem.IntelliJPathImpl;
 
 public final class IntelliJProjectImpl extends IntelliJResourceImpl implements IProject {
 

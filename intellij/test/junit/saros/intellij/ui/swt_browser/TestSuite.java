@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
+package saros.intellij.ui.swt_browser;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.constants;
+package saros.whiteboard.sxe.constants;
 
 /**
  * Enumeration for SXE messages used during session negotiation.

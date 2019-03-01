@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
 import com.imagingbook.color.ColorSpaceConversion;
 import org.eclipse.swt.graphics.Color;

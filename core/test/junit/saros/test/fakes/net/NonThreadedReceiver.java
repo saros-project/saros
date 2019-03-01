@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.test.fakes.net;
+package saros.test.fakes.net;
 
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.PacketCollector.CancelHook;
-import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
+import saros.net.IReceiver;
+import saros.net.PacketCollector;
+import saros.net.PacketCollector.CancelHook;
+import saros.net.internal.BinaryXMPPExtension;
 
 class NonThreadedReceiver implements IReceiver {
 

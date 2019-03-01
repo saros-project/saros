@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  de.fu_berlin.inf.dpp.ui.browser_functions.TestSuite.class,
-  de.fu_berlin.inf.dpp.ui.manager.TestSuite.class,
-  de.fu_berlin.inf.dpp.ui.model.TestSuite.class,
-  de.fu_berlin.inf.dpp.HTMLUIContextFactoryTest.class
+  saros.ui.browser_functions.TestSuite.class,
+  saros.ui.manager.TestSuite.class,
+  saros.ui.model.TestSuite.class,
+  saros.HTMLUIContextFactoryTest.class
 })
 public class HTMLUITestSuite {
   // the class remains completely empty,

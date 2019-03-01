@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter;
+package saros.concurrent.jupiter;
 
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.activities.JupiterActivity;
+import saros.activities.SPath;
+import saros.session.User;
 
 public interface Algorithm {
 

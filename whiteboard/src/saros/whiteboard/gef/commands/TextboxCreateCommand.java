@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
+package saros.whiteboard.gef.commands;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGTextBoxRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.apache.log4j.Logger;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.gef.model.SVGTextBoxRecord;
+import saros.whiteboard.sxe.records.IRecord;
 
 public class TextboxCreateCommand extends ElementRecordCreateCommand {
 

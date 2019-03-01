@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
-import de.fu_berlin.inf.dpp.net.stream.ByteStream;
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,6 +13,9 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.net.stream.ByteStream;
+import saros.net.stream.StreamMode;
+import saros.net.xmpp.JID;
 
 /**
  * BinaryChannelConnection is a class that encapsulates a bidirectional communication channel

@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview;
+package saros.stf.server.rmi.superbot.component.contextmenu.sarosview;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.IWorkTogetherOnContextMenu;
 import java.rmi.RemoteException;
+import saros.net.xmpp.JID;
+import saros.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.IWorkTogetherOnContextMenu;
 
 public interface IContextMenusInContactListArea extends IContextMenusInSarosView {
 

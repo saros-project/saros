@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets;
+package saros.ui.widgets;
 
-import de.fu_berlin.inf.dpp.ui.util.ColorUtils;
-import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -13,6 +11,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.util.ColorUtils;
+import saros.ui.util.PaintUtils;
 
 /**
  * Instances of this class are controls which are capable of containing other controls.

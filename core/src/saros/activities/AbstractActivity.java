@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import de.fu_berlin.inf.dpp.session.User;
 import org.apache.commons.lang3.ObjectUtils;
+import saros.session.User;
 
 public abstract class AbstractActivity implements IActivity {
 

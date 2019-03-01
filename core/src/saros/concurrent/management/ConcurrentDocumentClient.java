@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.concurrent.management;
+package saros.concurrent.management;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.activities.AbstractActivityReceiver;
+import saros.activities.ChecksumActivity;
+import saros.activities.FileActivity;
+import saros.activities.IActivity;
+import saros.activities.IActivityReceiver;
+import saros.activities.JupiterActivity;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.TransformationException;
+import saros.session.ISarosSession;
 
 /**
  * ConcurrentDocumentClient is responsible for managing the Jupiter interaction on the local side of
@@ -167,8 +167,8 @@ public class ConcurrentDocumentClient {
    * Resets the JupiterClient for the given path.
    *
    * <p>When this is called on the client (or on the host for one of his JupiterClient), a call to
-   * {@link ConcurrentDocumentServer#reset(de.fu_berlin.inf.dpp.session.User, SPath)} should be
-   * executed at the same time on the side of the given user.
+   * {@link ConcurrentDocumentServer#reset(saros.session.User, SPath)} should be executed at the
+   * same time on the side of the given user.
    *
    * @client and @host This can be called on the host as well, if the host wants to reset his client
    *     document (which at the moment never happens, because the version of the host is the

@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 import static org.junit.Assert.assertEquals;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.User;
 
 public class UserConverterTest {
 

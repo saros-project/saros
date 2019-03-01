@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.communication.extensions.JoinSessionRejectedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.JoinSessionRequestExtension;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +8,16 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
+import saros.communication.extensions.JoinSessionRejectedExtension;
+import saros.communication.extensions.JoinSessionRequestExtension;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.ui.util.CollaborationUtils;
+import saros.ui.util.SWTUtils;
 
 public final class JoinSessionRequestHandler {
 
@@ -60,7 +60,7 @@ public final class JoinSessionRequestHandler {
     this.receiver = receiver;
     this.preferenceStore = preferenceStore;
 
-    if (Boolean.getBoolean("de.fu_berlin.inf.dpp.server.SUPPORTED")) {
+    if (Boolean.getBoolean("saros.server.SUPPORTED")) {
       this.receiver.addPacketListener(
           joinSessionRequestListener, JoinSessionRequestExtension.PROVIDER.getPacketFilter());
     }

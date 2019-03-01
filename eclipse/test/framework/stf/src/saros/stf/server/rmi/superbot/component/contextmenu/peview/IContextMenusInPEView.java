@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview;
+package saros.stf.server.rmi.superbot.component.contextmenu.peview;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.INewC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRunAsContextMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.INewC;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRunAsContextMenu;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
 
 public interface IContextMenusInPEView extends Remote {
   public IShareWithC shareWith() throws RemoteException;

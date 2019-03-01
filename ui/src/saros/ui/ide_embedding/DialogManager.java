@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.ide_embedding;
+package saros.ui.ide_embedding;
 
 import de.fu_berlin.inf.ag_se.browser.IBrowser;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.ui.pages.AbstractBrowserPage;
-import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.synchronize.UISynchronizer;
+import saros.ui.pages.AbstractBrowserPage;
+import saros.ui.pages.IBrowserPage;
 
 /**
  * IDE-independent base class for managing HTML dialogs.

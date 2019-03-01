@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
-import de.fu_berlin.inf.dpp.activities.PermissionActivity;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
-import de.fu_berlin.inf.dpp.synchronize.StartHandle;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.PermissionActivity;
+import saros.annotations.Component;
+import saros.session.AbstractActivityConsumer;
+import saros.session.AbstractActivityProducer;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityConsumer.Priority;
+import saros.session.User;
+import saros.session.User.Permission;
+import saros.synchronize.StartHandle;
+import saros.synchronize.UISynchronizer;
+import saros.util.ThreadUtils;
 
 /**
  * This manager is responsible for handling {@link Permission} changes. It both produces and
