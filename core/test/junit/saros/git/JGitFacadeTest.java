@@ -25,54 +25,58 @@ public class JGitFacadeTest {
   @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
   // the local user is creating the bundle
-  private File localworkDirTree;
+  private File localWorkDirTree;
   private JGitFacade localJGitFacade;
+
+  private byte[] bundle;
+
+  // the remote user is receiving the bundle
+  private File remoteWorkDirTree;
+  private JGitFacade remoteJGitFacade;
 
   @Before
   public void setUp() throws IOException, IllegalStateException, GitAPIException {
-    localworkDirTree = tempFolder.newFolder("TempDir1");
+    localWorkDirTree = tempFolder.newFolder("TempDir1");
+    localJGitFacade = new JGitFacade(localWorkDirTree);
 
-    localJGitFacade = new JGitFacade(localworkDirTree);
+    initNewRepo(localWorkDirTree);
+    writeCommitToRepo(localWorkDirTree, 2);
 
-    initNewRepo(localworkDirTree);
-    writeCommitToRepo(localworkDirTree, 2);
+    remoteWorkDirTree = tempFolder.newFolder("TempDir2");
+    remoteJGitFacade = new JGitFacade(remoteWorkDirTree);
+
+    cloneFromRepo(localWorkDirTree, remoteWorkDirTree);
+
+    writeCommitToRepo(localWorkDirTree, 3);
   }
   // lucky paths
   @Test
   public void testCreateBundleHEAD() throws IllegalArgumentException, IOException {
-    byte[] bundle = localJGitFacade.createBundle("HEAD", "");
+    bundle = localJGitFacade.createBundle("HEAD", "");
     assertNotNull(bundle);
   }
 
   @Test
   public void testCreateBundleRef() throws IllegalArgumentException, IOException {
-    byte[] bundle = localJGitFacade.createBundle("refs/heads/master", "");
+    bundle = localJGitFacade.createBundle("refs/heads/master", "");
     assertNotNull(bundle);
   }
 
   @Test
   public void testFetchFromBundle() throws IllegalArgumentException, Exception {
-    File remoteworkDirTree = tempFolder.newFolder("TempDir2");
-
-    JGitFacade remoteJGitFacade = new JGitFacade(remoteworkDirTree);
-
-    cloneFromRepo(localworkDirTree, remoteworkDirTree);
-
-    writeCommitToRepo(localworkDirTree, 3);
-
     String basis = remoteJGitFacade.getSHA1HashByRevisionString("HEAD");
 
-    byte[] bundle = localJGitFacade.createBundle("HEAD", basis);
+    bundle = localJGitFacade.createBundle("HEAD", basis);
 
     assertNotEquals(
-        getObjectIdByRevisionString(localworkDirTree, "HEAD"),
-        getObjectIdByRevisionString(remoteworkDirTree, "FETCH_HEAD"));
+        getObjectIdByRevisionString(localWorkDirTree, "HEAD"),
+        getObjectIdByRevisionString(remoteWorkDirTree, "FETCH_HEAD"));
 
     remoteJGitFacade.fetchFromBundle(bundle);
 
     assertEquals(
-        getObjectIdByRevisionString(localworkDirTree, "HEAD"),
-        getObjectIdByRevisionString(remoteworkDirTree, "FETCH_HEAD"));
+        getObjectIdByRevisionString(localWorkDirTree, "HEAD"),
+        getObjectIdByRevisionString(remoteWorkDirTree, "FETCH_HEAD"));
   }
 
   // handling exceptions
@@ -102,25 +106,18 @@ public class JGitFacadeTest {
 
     JGitFacade emptyDirJGitFacade = new JGitFacade(emptyDir);
 
-    writeCommitToRepo(localworkDirTree, 3);
+    writeCommitToRepo(localWorkDirTree, 3);
 
-    byte[] bundle = localJGitFacade.createBundle("HEAD", "CheckoutAtCommit2");
+    bundle = localJGitFacade.createBundle("HEAD", "CheckoutAtCommit2");
 
     emptyDirJGitFacade.fetchFromBundle(bundle);
   }
 
   @Test(expected = IOException.class)
   public void testFetchFromBundleBasisMissing() throws IllegalArgumentException, Exception {
-    File remoteworkDirTree = tempFolder.newFolder("TempDir2");
+    writeCommitToRepo(localWorkDirTree, 4);
 
-    JGitFacade remoteJGitFacade = new JGitFacade(remoteworkDirTree);
-
-    cloneFromRepo(localworkDirTree, remoteworkDirTree);
-
-    writeCommitToRepo(localworkDirTree, 3);
-    writeCommitToRepo(localworkDirTree, 4);
-
-    byte[] bundle = localJGitFacade.createBundle("HEAD", "CheckoutAtCommit3");
+    bundle = localJGitFacade.createBundle("HEAD", "CheckoutAtCommit3");
 
     remoteJGitFacade.fetchFromBundle(bundle);
   }

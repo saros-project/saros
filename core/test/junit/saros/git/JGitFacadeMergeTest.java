@@ -18,30 +18,29 @@ public class JGitFacadeMergeTest {
   @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
   // the local user is creating the bundle
-  private File localWorkDir;
+  private File localWorkDirTree;
   private JGitFacade localJGitFacade;
 
   private byte[] bundle;
 
-  private File remoteWorkDir;
+  // the remote user is receiving the bundle
+  private File remoteWorkDirTree;
   private JGitFacade remoteJGitFacade;
 
   @Before
   public void setUp() throws IOException, IllegalStateException, GitAPIException {
-    localWorkDir = tempFolder.newFolder("TempDir1");
+    localWorkDirTree = tempFolder.newFolder("TempDir1");
+    localJGitFacade = new JGitFacade(localWorkDirTree);
 
-    localJGitFacade = new JGitFacade(localWorkDir);
+    JGitFacadeTest.initNewRepo(localWorkDirTree);
+    JGitFacadeTest.writeCommitToRepo(localWorkDirTree, 2);
 
-    JGitFacadeTest.initNewRepo(localWorkDir);
-    JGitFacadeTest.writeCommitToRepo(localWorkDir, 2);
+    remoteWorkDirTree = tempFolder.newFolder("TempDir2");
+    remoteJGitFacade = new JGitFacade(remoteWorkDirTree);
 
-    remoteWorkDir = tempFolder.newFolder("TempDir2");
+    JGitFacadeTest.cloneFromRepo(localWorkDirTree, remoteWorkDirTree);
 
-    remoteJGitFacade = new JGitFacade(remoteWorkDir);
-
-    JGitFacadeTest.cloneFromRepo(localWorkDir, remoteWorkDir);
-
-    JGitFacadeTest.writeCommitToRepo(localWorkDir, 3);
+    JGitFacadeTest.writeCommitToRepo(localWorkDirTree, 3);
 
     String basis = remoteJGitFacade.getSHA1HashByRevisionString("HEAD");
 
@@ -54,18 +53,18 @@ public class JGitFacadeMergeTest {
           URISyntaxException {
 
     assertNotEquals(
-        JGitFacadeTest.getObjectIdByRevisionString(localWorkDir, "HEAD"),
-        JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDir, "HEAD"));
+        JGitFacadeTest.getObjectIdByRevisionString(localWorkDirTree, "HEAD"),
+        JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDirTree, "HEAD"));
 
     remoteJGitFacade.fetchFromBundle(bundle);
     remoteJGitFacade.ffMerge("refs/heads/bundle");
 
     assertEquals(
-        JGitFacadeTest.getObjectIdByRevisionString(localWorkDir, "HEAD"),
-        JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDir, "refs/heads/bundle"));
+        JGitFacadeTest.getObjectIdByRevisionString(localWorkDirTree, "HEAD"),
+        JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDirTree, "refs/heads/bundle"));
 
     assertEquals(
-        JGitFacadeTest.getObjectIdByRevisionString(localWorkDir, "HEAD"),
-        JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDir, "HEAD"));
+        JGitFacadeTest.getObjectIdByRevisionString(localWorkDirTree, "HEAD"),
+        JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDirTree, "HEAD"));
   }
 }
