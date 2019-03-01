@@ -162,7 +162,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
       final StringBuilder aliasBuilder = new StringBuilder();
 
-      aliasBuilder.append(referencePoint).append(PATH_DELIMITER);
+      aliasBuilder.append(referencePointID).append(PATH_DELIMITER);
 
       final int prefixLength = aliasBuilder.length();
 
