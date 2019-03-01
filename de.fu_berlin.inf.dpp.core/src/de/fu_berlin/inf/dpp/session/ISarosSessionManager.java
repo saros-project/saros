@@ -23,6 +23,7 @@ public interface ISarosSessionManager {
    *
    * @param projectResources the local project resources which should be shared.
    */
+  @Deprecated
   public void startSession(Map<IProject, List<IResource>> projectResources);
 
   // FIXME this method is error prone and only used by the IPN, find a better
@@ -89,6 +90,7 @@ public interface ISarosSessionManager {
    *
    * @param projectResourcesMapping
    */
+  @Deprecated
   public void addResourcesToSession(Map<IProject, List<IResource>> projectResourcesMapping);
 
   /**
