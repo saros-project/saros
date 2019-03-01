@@ -1,0 +1,69 @@
+<idea-plugin>
+
+    <name>Saros</name>
+
+    <id>saros</id>
+
+    <description>
+        Saros is an Open Source IDE plugin for distributed collaborative software development.
+    </description>
+
+    <change-notes>
+        This is the first alpha version of Saros for IntelliJ. Use at your own risk.
+    </change-notes>
+
+    <version>0.1.0</version>
+
+    <vendor url="http://www.saros-project.org" email="saros-devel@googlegroups.com">
+        Saros Project
+    </vendor>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="182.5107.16"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <component>
+            <implementation-class>saros.intellij.SarosComponent
+            </implementation-class>
+        </component>
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+        <group id="saros.MainMenu" text="S_aros" description="Saros menu">
+            <add-to-group group-id="MainMenu" relative-to-action="HelpMenu" anchor="before"/>
+            <action id="saros.about"
+                    class="saros.intellij.ui.menu.AboutSarosHandler"
+                    text="_About Saros"/>
+        </group>
+
+        <group keep-content="true" compact="false" popup="true"
+               id="saros.ShareWith"
+               icon="/icons/famfamfam/session_tsk.png" text="_Share With..."
+               description="Share this module using Saros"
+               class="saros.intellij.ui.menu.SarosFileShareGroup">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </group>
+
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Saros" icon="/icons/saros/saros_misc.png"
+                    anchor="bottom" secondary="true"
+                    factoryClass="saros.intellij.ui.SarosToolWindowFactory"/>
+
+        <toolWindow id="Swt Browser" icon="/icons/saros/saros_misc.png"
+                    anchor="bottom" secondary="true"
+                    factoryClass="saros.intellij.ui.swt_browser.SwtToolWindowFactory"
+                    conditionClass="saros.intellij.ui.swt_browser.BrowserCondition"/>
+    </extensions>
+</idea-plugin>

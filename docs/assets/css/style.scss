@@ -32,6 +32,25 @@ ol {
   padding-left: 20px;
 }
 
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  border: 1px solid #dfe2e5;
+  margin-bottom: 20px;
+}
+
+th {
+   padding: 10px;
+   border: 1px solid #dfe2e5;
+}
+
+td {
+   padding: 10px;
+   border: 1px solid #dfe2e5;
+}
+
+
 h1, h2, h3, h4, h5, h6 {
   margin: 10px 0;
   font-weight: 700;

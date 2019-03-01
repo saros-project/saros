@@ -6,13 +6,13 @@
 npm cache verify
 
 echo "Building the HTML GUI"
-cd /home/ci/saros_src/de.fu_berlin.inf.dpp.ui.frontend/html
+cd /home/ci/saros_src/ui.frontend/html
 npm install
 npm run build
 npm run test:log
 
 
 echo "Building the HTML Whiteboard"
-cd /home/ci/saros_src/de.fu_berlin.inf.dpp.whiteboard/frontend
+cd /home/ci/saros_src/whiteboard/frontend
 npm run setup
 npm run build

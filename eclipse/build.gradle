@@ -1,0 +1,196 @@
+eclipse{
+  project {
+    natures 'org.eclipse.pde.PluginNature'
+  }
+  classpath {
+    file {
+      whenMerged { classpath ->
+        classpath.entries.removeAll {it.path == 'test/junit' && it.output == 'bin/test'  ||
+                                     it.path == 'test/stf' && it.output == 'bin/stfTest' ||
+                                     it.path == 'test/resources' && it.output == 'bin/test'}
+      }
+    }
+  }
+}
+
+
+buildscript {
+  repositories {
+    maven {
+      url  "http://dl.bintray.com/monkey-works/BuildMonkey"
+    }
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+ dependencies {
+    classpath "de.monkeyworks.buildmonkey:gradle.dependency:0.4.13"
+  }
+}
+
+apply plugin: 'de.monkeyworks.buildmonkey.ManifestDependencyPlugin'
+
+repositories {
+  maven { url rootProject.file('build/maven') }
+}
+
+configurations {
+  stfTest
+}
+
+sourceSets {
+  main.java.srcDirs = ['src',
+                       'ext-src',
+                       'test/framework/stf/src',
+                       'test/framework/stf/test',
+                       'test/junit',
+                       'test/stf']
+
+  main {
+    resources {
+      srcDir 'src'
+      exclude '**/*.java'
+    }
+    resources {
+      srcDir 'test/framework/stf/src'
+      exclude '**/*.java'
+    }
+  }
+
+  test {
+    java.srcDir 'test/junit'
+    resources.srcDir 'test/resources'
+  }
+
+  stfTest {
+    java.srcDir 'test/stf'
+    resources.srcDir 'test/resources'
+  }
+}
+
+manifestDependencies {
+    eclipseGroup = 'eclipse-deps'
+
+    dependencyHandling {
+      def ids = [:]
+      if (it.matches('org.junit'))
+      {
+        ids['groupId'] = 'junit'
+        ids['artifactId'] = 'junit'
+        ids['version'] = '4.11'
+      }
+      return ids
+    }
+}
+
+dependencies {
+  compile project(':saros.core')
+  compile project(':saros.ui')
+
+  compile project(path: ':saros.core', configuration: 'testing')
+  compile project(path: ':saros.ui', configuration: 'testing')
+
+  releaseDep fileTree(dir: 'libs', include: '*.jar', exclude: '*source*.jar')
+
+  // This is very ugly but necessary in order to build stf together with saros eclipse
+  compile configurations.testConfig
+  compile configurations.releaseDep
+
+  stfTestCompile junitVersion
+  stfTestCompile sourceSets.main.output
+  stfTestCompile project(':saros.core')
+  stfTestCompile project(':saros.ui')
+  stfTestCompile project(path: ':saros.ui', configuration: 'testing')
+  stfTestCompile fileTree(dir: 'libs', include: '*.jar', exclude: '*source*.jar')
+  stfTestCompile fileTree(dir: eclipseHome + '/plugins').matching {
+    include '*.jar'
+    exclude '*commons.lang*'
+    exclude 'de.fu_berlin.*'
+  }
+}
+
+task stfTest (type: Test, dependsOn: [':saros.eclipse:build']) {
+  group 'Verification'
+  description 'Runs the stf tests. Requires a corresponding test environment'
+
+  testClassesDirs = sourceSets.stfTest.output.classesDirs
+
+  systemProperty 'saros.stf.client.configuration.files', System.getProperty('stf.client.configuration.files', '') 
+
+  classpath = sourceSets.stfTest.runtimeClasspath
+
+  testLogging {
+    showStandardStreams = true
+    events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+  }
+  // Print summary of failed tests
+  ext.failedStfTests = []
+  afterTest { descriptor, result ->
+    if(result.resultType == org.gradle.api.tasks.testing.TestResult.ResultType.FAILURE){
+      ext.failedStfTests << "${descriptor.className}.${descriptor.name}"
+    }
+  }
+  afterSuite { suite, result ->
+    if (!suite.parent && !ext.failedStfTests.isEmpty()) {
+      logger.lifecycle("Failed tests:")
+      ext.failedStfTests.each { logger.lifecycle(it) }
+    }
+  }
+
+  include '**/stf/test/**/*Test.*'
+  exclude '**/stf/test/stf/**'
+  exclude '**/whiteboard/**'
+}
+
+tasks.withType(Test) {
+  enableAssertions = false
+}
+
+compileJava.dependsOn rootProject.mavenizeP2Repository
+
+jar {
+  manifest {
+      // benutze das im Projekt vorliegende File, falls vorhanden:
+      def manif = "${projectDir}/META-INF/MANIFEST.MF"
+      if (new File(manif).exists()) {
+         from (manif)
+      }
+  }
+
+  from sourceSets.main.output
+
+  into('lib') {
+    from configurations.getByName('releaseDep')
+  }
+  into('assets') {
+    from 'assets'
+  }
+  into('icons') {
+    from 'icons'
+  }
+  into('test/resources') {
+    from('test/resources')
+  }
+  from('.') {
+    include '*.properties'
+    include 'readme.html'
+    include 'plugin.xml'
+    include 'version.comp'
+    include 'LICENSE'
+    include 'CHANGELOG'
+  }
+}
+
+compileJava.dependsOn rootProject.mavenizeP2Repository
+
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/Eclipse'
+    property 'sonar.projectDescription', 'Saros plugin for the Eclipse IDE'
+    property 'sonar.projectVersion', '14.11.28.DEVEL'
+    property 'sonar.exclusion', '**/Messages.java'
+    // necessary to avoid the scanning of stf
+    property 'sonar.sources', 'src'
+    property 'sonar.tests', 'test/junit, test/stf'
+  }
+}

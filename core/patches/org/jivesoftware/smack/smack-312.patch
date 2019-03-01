@@ -1,0 +1,53 @@
+diff --git a/saros.core/patches/org/jivesoftware/smack/Roster.java b/saros.core/patches/org/jivesoftware/smack/Roster.java
+index f6be4e2..c2e0b03 100644
+--- a/saros.core/patches/org/jivesoftware/smack/Roster.java
++++ b/saros.core/patches/org/jivesoftware/smack/Roster.java
+@@ -914,19 +914,17 @@
+                         // Keep note that an entry has been added
+                         addedEntries.add(item.getUser());
+                     } else {
+-                        // If the entry was in then list then update its state
+-                        // with the new values
+-                        RosterEntry oldEntry = entries.put(item.getUser(),
+-                            entry);
+-
+-                        RosterPacket.Item oldItem = RosterEntry
+-                            .toRosterItem(oldEntry);
++                        // If new item is different then update it and keep note
+                         // We have also to check if only the group names have
+                         // changed from the item
+-                        if (oldEntry == null
+-                            || !oldEntry.equalsDeep(entry)
++                        RosterEntry currentEntry = entries.get(item.getUser());
++                        RosterPacket.Item currentItem = RosterEntry
++                            .toRosterItem(currentEntry);
++                        if (currentEntry == null
++                            || !currentEntry.equalsDeep(entry)
+                             || !item.getGroupNames().equals(
+-                                oldItem.getGroupNames())) {
++                                currentItem.getGroupNames())) {
++                            entries.put(item.getUser(), entry);
+                             updatedEntries.add(item.getUser());
+                         }
+                     }
+diff --git a/saros/ext-src/org/jivesoftware/smack/RosterEntry.java b/saros/ext-src/org/jivesoftware/smack/RosterEntry.java
+index 8146055..9e5d7fd 100644
+--- a/saros/ext-src/org/jivesoftware/smack/RosterEntry.java
++++ b/saros/ext-src/org/jivesoftware/smack/RosterEntry.java
+@@ -98,10 +98,14 @@
+         if (name != null && name.equals(this.name)) {
+             return;
+         }
+-        this.name = name;
++
++        // Create a RosterEntry-copy with the new name to create an
++        // update-RosterPacket
++        RosterEntry updatedRosterEntry = new RosterEntry(this.user, name,
++            this.type, this.status, this.roster, this.connection);
+         RosterPacket packet = new RosterPacket();
+         packet.setType(IQ.Type.SET);
+-        packet.addRosterItem(toRosterItem(this));
++        packet.addRosterItem(toRosterItem(updatedRosterEntry));
+         connection.sendPacket(packet);
+     }
+ 

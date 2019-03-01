@@ -32,11 +32,10 @@ You need an **XMPP account** to use Saros.
 1.  You can **create a new account** within Saros by using the
     FU-Berlin servers.
 2.  You can **use an existing account.**
-    For example your Google, GMX, or web.de mail address. **They are
+    For example your Google mail address. **This is a
     valid XMPP accounts**.
     To use your Google account you have to allow less secure apps access
-    your account, see
-    <https://support.google.com/accounts/answer/6010255?hl=en>
+    your account, see [here](https://support.google.com/accounts/answer/6010255?hl=en).
     Unfortunately, gmx and web.de accounts do not work currently.
      
 

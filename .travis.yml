@@ -30,9 +30,9 @@ _stf_setup_config: &stf_before_script
   env: J_TYPE=STF_TEST
   before_script:
     # Pull required images
-    - docker pull saros/ci_build:0.3
-    - docker pull saros/stf_test_slave:0.3
-    - docker pull saros/stf_xmpp_server:0.3
+    - docker pull saros/ci_build:0.4
+    - docker pull saros/stf_test_slave:0.4
+    - docker pull saros/stf_xmpp_server:0.4
     # Create shared workspace dir which is mounted by the build, master and slave containers
     - mkdir stf_ws
     # Start required containers and services
@@ -51,9 +51,9 @@ jobs:
 
     - stage: build
       if: type in (push, pull_request)
-      before_script: docker pull saros/ci_build:0.3
+      before_script: docker pull saros/ci_build:0.4
       script:
-        - docker run -td --name build -v $PWD:/home/ci/saros_src saros/ci_build:0.3 bash
+        - docker run -td --name build -v $PWD:/home/ci/saros_src saros/ci_build:0.4 bash
         - docker exec -t build /home/ci/saros_src/travis/script/build/build_all.sh
       after_success:
         - docker exec -t build /home/ci/saros_src/travis/script/scan/scan_all.sh $SONAR_TOKEN $TRAVIS_PULL_REQUEST

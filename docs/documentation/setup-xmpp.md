@@ -19,35 +19,29 @@ In order to use Saros you need to configure an XMPP/Jabber account.
 -   If you want to **use Saros in a company** or with more than one
     peer, we recommend using your own XMPP server. From our own testing
     we can
-    recommend [OpenFire](http://www.igniterealtime.org/projects/openfire/index.jsp) (others
-    such as [ejabberd](http://www.process-one.net/en/ejabberd/) should
+    recommend [OpenFire](https://www.igniterealtime.org/projects/openfire/index.jsp) (others
+    such as [ejabberd](https://www.process-one.net/en/ejabberd/) should
     be suitable as well)
 
 ### Suitable Jabber servers
 
 *   The following public Jabber servers have been tested to **work
     reliably with no known problems**:
-    *   [jabber.org](http://www.jabber.org/) - [In-Band
-        Registration](http://xmpp.org/extensions/xep-0077.md) disabled,
+    *   [jabber.org](https://www.jabber.org/) - [In-Band
+        Registration](https://xmpp.org/extensions/xep-0077.html) disabled,
         thus you need to
-        visit [register.jabber.org](http://register.jabber.org/) to
+        visit [register.jabber.org](https://register.jabber.org/) to
         create an account.
 *   The following public Jabber servers **have known minor issues**, but
     should work in general:
-    *   [jabber.ccc.de](http://web.jabber.ccc.de/) - No support
-        for [In-Band
-        Bytestream](http://xmpp.org/extensions/xep-0047.md), thus not
-        suitable for firewalled users.
-    *   [jabber.se](http://www.jabber.se/) - Outdated certificates, thus
-        communication between federated servers will likely fail.
-    *   [jabber.no](http://www.jabber.no/) - [In-Band Bytestream file
-        transfers](http://xmpp.org/extensions/xep-0047.md) are
+    *   [jabber.no](https://www.jabber.no/) - [In-Band Bytestream file
+        transfers](https://xmpp.org/extensions/xep-0047.html) are
         incompatible with our [XMPP API
-        Smack](http://www.igniterealtime.org/projects/smack/), thus if
+        Smack](https://www.igniterealtime.org/projects/smack/), thus if
         you do not have a P2P connection Saros will not work.
-    *   [jabber.cc](http://www.jabber.cc/) - Outdated certificates and
+    *   [jabber.cc](https://www.jabber.cc/) - Outdated certificates and
         frequent out-takes
-*   [List of other public servers](http://xmpp.org/services/)
+*   [List of other public servers](https://xmpp.org/services/)
 
 ## eJabberD (Linux)
 

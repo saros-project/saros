@@ -1,7 +1,6 @@
-include 'de.fu_berlin.inf.dpp.core'
-include 'de.fu_berlin.inf.dpp.ui'
-include 'de.fu_berlin.inf.dpp.ui.frontend'
-include 'de.fu_berlin.inf.dpp'
-include 'de.fu_berlin.inf.dpp.whiteboard'
-include 'de.fu_berlin.inf.dpp.intellij'
-include 'de.fu_berlin.inf.dpp.server'
+String prefix = 'saros.'
+List projectDirs = ['core', 'ui', 'ui.frontend', 'eclipse', 'whiteboard', 'intellij', 'server'].each { dir ->
+  String projectName = prefix + dir
+  include projectName
+  project(":$projectName").projectDir = file(dir)
+}

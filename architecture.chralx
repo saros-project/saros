@@ -2,7 +2,7 @@
 //refer to the primer.chralx file located in 
 //the same folder as this file.
 
--- root saros: de.fu_berlin.inf.dpp
+-- root saros: saros
 
 Two Saros peers collaborate on some task by
 entering a session. At the core of Saros is the
@@ -11,8 +11,8 @@ for the handling of activities and the delegation
 of tasks to other components.
 
 -- component session_management
-	+= de.fu_berlin.inf.dpp.session
-	+= de.fu_berlin.inf.dpp.project
+	+= saros.session
+	+= saros.project
 
 -- session_management => invitation
 
@@ -24,7 +24,7 @@ consistent state. The algorithm used to maintain consistency
 is the Jupiter algorithm.
 
 -- component operational_transformation
-	+= de.fu_berlin.inf.dpp.concurrent
+	+= saros.concurrent
 
 -- session_management => operational_transformation
 
@@ -37,7 +37,7 @@ component, later to be converted to activities
 by calls the session_management's activity producers.
 
 -- component ui 
-	+= de.fu_berlin.inf.dpp.ui
+	+= saros.ui
 	+= org.eclipse.jface
 
 -- ui => session_management
@@ -49,8 +49,8 @@ session metadata are exchanged before the actual
 session begins.
 
 -- component invitation 
-	+= de.fu_berlin.inf.dpp.negotiation
-	+= de.fu_berlin.inf.dpp.invitation
+	+= saros.negotiation
+	+= saros.invitation
 
 This data exchange is done via the network layer.
 
@@ -61,7 +61,7 @@ of activities via the wire. The protocol used
 is XMPP.
 
 -- component network
-	+= de.fu_berlin.inf.dpp.net 
+	+= saros.net 
 
 Session_management uses the network layer to 
 exchange activities between peers.

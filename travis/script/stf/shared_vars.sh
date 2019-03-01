@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
-stf_master_image="saros/ci_build:0.3"
-stf_slave_image="saros/stf_test_slave:0.3"
-stf_xmpp_image="saros/stf_xmpp_server:0.3"
+stf_master_image="saros/ci_build:0.4"
+stf_slave_image="saros/stf_test_slave:0.4"
+stf_xmpp_image="saros/stf_xmpp_server:0.4"
 
 stf_master_name="stf_master"
 stf_network_name="stf_test_network"

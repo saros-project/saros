@@ -1,0 +1,69 @@
+eclipse.project {
+  natures 'org.eclipse.pde.PluginNature'
+}
+
+buildscript {
+  repositories {
+    maven {
+      url  "http://dl.bintray.com/monkey-works/BuildMonkey"
+    }
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "de.monkeyworks.buildmonkey:gradle.dependency:0.4.13"
+  }
+}
+
+apply plugin: 'de.monkeyworks.buildmonkey.ManifestDependencyPlugin'
+
+repositories {
+  maven { url rootProject.file('build/maven') }
+}
+
+manifestDependencies {
+    eclipseGroup = 'eclipse-deps'
+
+    dependencyHandling { [:] }
+}
+
+dependencies {
+  compile project(':saros.core')
+  compile project(':saros.eclipse')
+  releaseDep (log4jVersion) {
+      exclude group: 'com.sun.jmx', module: 'jmxri'
+      exclude group: 'com.sun.jdmk', module: 'jmxtools'
+      exclude group: 'javax.jms', module: 'jms'
+    }
+  releaseDep 'com.google.code.gson:gson:2.8.5'
+  testCompile configurations.testConfig
+}
+
+jar {
+  manifest {
+      def manif = "${projectDir}/META-INF/MANIFEST.MF"
+      if (new File(manif).exists()) {
+          from (manif)
+      }
+  }
+
+  from sourceSets.main.output
+
+  into('lib') {
+    from configurations.getByName('releaseDep')
+  }
+}
+
+sourceSets {
+  main.java.srcDirs =  ['src', 'ext-src']
+  test.java.srcDir 'test'
+}
+
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/Whiteboard'
+    property 'sonar.projectDescription', 'Saros Whiteboard plugin for Eclipse IDE'
+    property 'sonar.projectVersion', '14.11.28.DEVEL'
+  }
+}
