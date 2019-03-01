@@ -80,7 +80,7 @@ Export-Package: saros;
  saros.editor.internal,
  saros.monitoring,
  saros.project;
-  uses:="de.fu_berlin.inf.dpp.activities,
+  uses:="saros.activities,
    saros,
    org.jivesoftware.smack,
    org.eclipse.core.resources,
