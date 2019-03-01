@@ -125,6 +125,30 @@ public class JGitFacadeTest {
     remoteJGitFacade.fetchFromBundle(bundle);
   }
 
+  @Test
+  public void testFetchFromBundleWithMerge()
+      throws IOException, NoFilepatternException, GitAPIException, IllegalArgumentException,
+          URISyntaxException {
+    String basis = remoteJGitFacade.getSHA1HashByRevisionString("HEAD");
+
+    bundle = localJGitFacade.createBundle("HEAD", basis);
+
+    assertNotEquals(
+        JGitFacadeTest.getObjectIdByRevisionString(localWorkDirTree, "HEAD"),
+        JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDirTree, "HEAD"));
+
+    remoteJGitFacade.fetchFromBundle(bundle);
+    remoteJGitFacade.fastForwardMerge("refs/heads/bundle");
+
+    assertEquals(
+        JGitFacadeTest.getObjectIdByRevisionString(localWorkDirTree, "HEAD"),
+        JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDirTree, "refs/heads/bundle"));
+
+    assertEquals(
+        JGitFacadeTest.getObjectIdByRevisionString(localWorkDirTree, "HEAD"),
+        JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDirTree, "HEAD"));
+  }
+
   /**
    * Creating a new Git directory,create a file and git add the file,create the first commit and
    * create the Tag "CheckoutAtInit" that is pointing to the commit
