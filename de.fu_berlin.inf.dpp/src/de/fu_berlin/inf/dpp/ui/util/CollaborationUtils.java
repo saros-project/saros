@@ -84,7 +84,7 @@ public class CollaborationUtils {
 
             try {
               refreshProjects(newResources.keySet(), null);
-              sessionManager.startSession(convert(newResources));
+              sessionManager.startSessionWithReferencePoints(convert(newResources));
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
               ISarosSession session = sessionManager.getSession();
@@ -212,7 +212,7 @@ public class CollaborationUtils {
                */
             }
 
-            sessionManager.addResourcesToSession(convert(projectResources));
+            sessionManager.addReferencePointResourcesToSession(convert(projectResources));
           }
         });
   }
@@ -443,18 +443,21 @@ public class CollaborationUtils {
   }
 
   private static Map<
-          de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>>
+          de.fu_berlin.inf.dpp.filesystem.IReferencePoint,
+          List<de.fu_berlin.inf.dpp.filesystem.IResource>>
       convert(Map<IProject, List<IResource>> data) {
 
-    Map<de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>>
+    Map<
+            de.fu_berlin.inf.dpp.filesystem.IReferencePoint,
+            List<de.fu_berlin.inf.dpp.filesystem.IResource>>
         result =
             new HashMap<
-                de.fu_berlin.inf.dpp.filesystem.IProject,
+                de.fu_berlin.inf.dpp.filesystem.IReferencePoint,
                 List<de.fu_berlin.inf.dpp.filesystem.IResource>>();
 
     for (Entry<IProject, List<IResource>> entry : data.entrySet())
       result.put(
-          ResourceAdapterFactory.create(entry.getKey()),
+          ResourceAdapterFactory.create(entry.getKey()).getReferencePoint(),
           ResourceAdapterFactory.convertTo(entry.getValue()));
 
     return result;

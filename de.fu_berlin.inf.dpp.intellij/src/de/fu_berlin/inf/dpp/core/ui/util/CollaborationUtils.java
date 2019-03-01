@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
@@ -67,7 +68,7 @@ public class CollaborationUtils {
    */
   public static void startSession(List<IResource> resources, final List<JID> contacts) {
 
-    final Map<IProject, List<IResource>> newResources = acquireResources(resources, null);
+    final Map<IReferencePoint, List<IResource>> newResources = acquireResources(resources, null);
 
     UIMonitoredJob sessionStartupJob =
         new UIMonitoredJob("Session Startup") {
@@ -76,7 +77,7 @@ public class CollaborationUtils {
           protected IStatus run(IProgressMonitor monitor) {
             monitor.beginTask("Starting session...", IProgressMonitor.UNKNOWN);
             try {
-              sessionManager.startSession(newResources);
+              sessionManager.startSessionWithReferencePoints(newResources);
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
               monitor.worked(50);
@@ -169,11 +170,11 @@ public class CollaborationUtils {
       return;
     }
 
-    final Map<IProject, List<IResource>> projectResources;
+    final Map<IReferencePoint, List<IResource>> referencePointResources;
 
-    projectResources = acquireResources(resourcesToAdd, sarosSession);
+    referencePointResources = acquireResources(resourcesToAdd, sarosSession);
 
-    if (projectResources.isEmpty()) {
+    if (referencePointResources.isEmpty()) {
       return;
     }
 
@@ -185,7 +186,7 @@ public class CollaborationUtils {
           public void run() {
 
             if (sarosSession.hasWriteAccess()) {
-              sessionManager.addResourcesToSession(projectResources);
+              sessionManager.addReferencePointResourcesToSession(referencePointResources);
               return;
             }
 
@@ -301,7 +302,7 @@ public class CollaborationUtils {
    * @param sarosSession
    * @return
    */
-  private static Map<IProject, List<IResource>> acquireResources(
+  private static Map<IReferencePoint, List<IResource>> acquireResources(
       List<IResource> selectedResources, ISarosSession sarosSession) {
 
     Map<IProject, Set<IResource>> projectsResources = new HashMap<IProject, Set<IResource>>();
@@ -406,11 +407,11 @@ public class CollaborationUtils {
       resources.addAll(additionalFilesForPartialSharing);
     }
 
-    HashMap<IProject, List<IResource>> resources = new HashMap<IProject, List<IResource>>();
+    HashMap<IReferencePoint, List<IResource>> resources = new HashMap<IReferencePoint, List<IResource>>();
 
     for (Entry<IProject, Set<IResource>> entry : projectsResources.entrySet()) {
       resources.put(
-          entry.getKey(),
+          entry.getKey().getReferencePoint(),
           entry.getValue() == null ? null : new ArrayList<IResource>(entry.getValue()));
     }
 

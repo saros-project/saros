@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.server.console;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.server.filesystem.ServerProjectImpl;
@@ -44,16 +45,16 @@ public class ShareCommand extends ConsoleCommand {
     }
 
     try {
-      Map<IProject, List<IResource>> projects = new HashMap<>();
+      Map<IReferencePoint, List<IResource>> referencePointResources = new HashMap<>();
       for (String path : args) {
         try {
           IProject project = new ServerProjectImpl(this.workspace, path);
-          projects.put(project, null);
+          referencePointResources.put(project.getReferencePoint(), null);
         } catch (Exception e) {
           log.error(path + " could not be added to the session", e);
         }
       }
-      sessionManager.addResourcesToSession(projects);
+      sessionManager.addReferencePointResourcesToSession(referencePointResources);
     } catch (Exception e) {
       log.error("Error sharing resources", e);
     }

@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.context.AbstractContextLifecycle;
 import de.fu_berlin.inf.dpp.context.ContainerContext;
 import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -33,7 +33,7 @@ public class ServerLifecycle extends AbstractContextLifecycle {
     connectToXMPPServer(context);
     context
         .getComponent(ISarosSessionManager.class)
-        .startSession(new HashMap<IProject, List<IResource>>());
+        .startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
   }
 
   @Override
