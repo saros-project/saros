@@ -142,4 +142,5 @@ Bundle-ClassPath: .,
  lib/picocontainer-2.11.2.jar,
  lib/weupnp.jar,
  lib/jmdns-3.4.1.jar,
- lib/libidn-1.15.jar
+ lib/libidn-1.15.jar,
+ lib/org.eclipse.jgit-5.2.1.201812262042-r.jar
