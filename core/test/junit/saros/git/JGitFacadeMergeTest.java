@@ -19,25 +19,33 @@ public class JGitFacadeMergeTest {
 
   // the local user is creating the bundle
   private File localWorkDir;
-  private File remoteWorkDir;
+  private JGitFacade localJGitFacade;
+
   private byte[] bundle;
+
+  private File remoteWorkDir;
+  private JGitFacade remoteJGitFacade;
 
   @Before
   public void setUp() throws IOException, IllegalStateException, GitAPIException {
     localWorkDir = tempFolder.newFolder("TempDir1");
+
+    localJGitFacade = new JGitFacade(localWorkDir);
 
     JGitFacadeTest.initNewRepo(localWorkDir);
     JGitFacadeTest.writeCommitToRepo(localWorkDir, 2);
 
     remoteWorkDir = tempFolder.newFolder("TempDir2");
 
+    remoteJGitFacade = new JGitFacade(remoteWorkDir);
+
     JGitFacadeTest.cloneFromRepo(localWorkDir, remoteWorkDir);
 
     JGitFacadeTest.writeCommitToRepo(localWorkDir, 3);
 
-    String basis = JGitFacade.getSHA1HashByRevisionString(remoteWorkDir, "HEAD");
+    String basis = remoteJGitFacade.getSHA1HashByRevisionString("HEAD");
 
-    bundle = JGitFacade.createBundle(localWorkDir, "HEAD", basis);
+    bundle = localJGitFacade.createBundle("HEAD", basis);
   }
 
   @Test
@@ -49,8 +57,8 @@ public class JGitFacadeMergeTest {
         JGitFacadeTest.getObjectIdByRevisionString(localWorkDir, "HEAD"),
         JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDir, "HEAD"));
 
-    JGitFacade.fetchFromBundle(remoteWorkDir, bundle);
-    JGitFacade.ffMerge(remoteWorkDir, "refs/heads/bundle");
+    remoteJGitFacade.fetchFromBundle(bundle);
+    remoteJGitFacade.ffMerge("refs/heads/bundle");
 
     assertEquals(
         JGitFacadeTest.getObjectIdByRevisionString(localWorkDir, "HEAD"),

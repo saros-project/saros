@@ -26,10 +26,13 @@ public class JGitFacadeTest {
 
   // the local user is creating the bundle
   private File localworkDirTree;
+  private JGitFacade localJGitFacade;
 
   @Before
   public void setUp() throws IOException, IllegalStateException, GitAPIException {
     localworkDirTree = tempFolder.newFolder("TempDir1");
+
+    localJGitFacade = new JGitFacade(localworkDirTree);
 
     initNewRepo(localworkDirTree);
     writeCommitToRepo(localworkDirTree, 2);
@@ -37,13 +40,13 @@ public class JGitFacadeTest {
   // lucky paths
   @Test
   public void testCreateBundleHEAD() throws IllegalArgumentException, IOException {
-    byte[] bundle = JGitFacade.createBundle(localworkDirTree, "HEAD", "");
+    byte[] bundle = localJGitFacade.createBundle("HEAD", "");
     assertNotNull(bundle);
   }
 
   @Test
   public void testCreateBundleRef() throws IllegalArgumentException, IOException {
-    byte[] bundle = JGitFacade.createBundle(localworkDirTree, "refs/heads/master", "");
+    byte[] bundle = localJGitFacade.createBundle("refs/heads/master", "");
     assertNotNull(bundle);
   }
 
@@ -51,19 +54,21 @@ public class JGitFacadeTest {
   public void testFetchFromBundle() throws IllegalArgumentException, Exception {
     File remoteworkDirTree = tempFolder.newFolder("TempDir2");
 
+    JGitFacade remoteJGitFacade = new JGitFacade(remoteworkDirTree);
+
     cloneFromRepo(localworkDirTree, remoteworkDirTree);
 
     writeCommitToRepo(localworkDirTree, 3);
 
-    String basis = JGitFacade.getSHA1HashByRevisionString(remoteworkDirTree, "HEAD");
+    String basis = remoteJGitFacade.getSHA1HashByRevisionString("HEAD");
 
-    byte[] bundle = JGitFacade.createBundle(localworkDirTree, "HEAD", basis);
+    byte[] bundle = localJGitFacade.createBundle("HEAD", basis);
 
     assertNotEquals(
         getObjectIdByRevisionString(localworkDirTree, "HEAD"),
         getObjectIdByRevisionString(remoteworkDirTree, "FETCH_HEAD"));
 
-    JGitFacade.fetchFromBundle(remoteworkDirTree, bundle);
+    remoteJGitFacade.fetchFromBundle(bundle);
 
     assertEquals(
         getObjectIdByRevisionString(localworkDirTree, "HEAD"),
@@ -75,17 +80,19 @@ public class JGitFacadeTest {
   public void testCreateBundleEmptyworkDirTree() throws IllegalArgumentException, IOException {
     File emptyDir = tempFolder.newFolder("TempDir3");
 
-    JGitFacade.createBundle(emptyDir, "HEAD", "CheckoutAtInit");
+    JGitFacade emptyDirJGitFacade = new JGitFacade(emptyDir);
+
+    emptyDirJGitFacade.createBundle("HEAD", "CheckoutAtInit");
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateBundleWrongRef() throws IllegalArgumentException, IOException {
-    JGitFacade.createBundle(localworkDirTree, "refs/heads/wrongRef", "CheckoutAtInit");
+    localJGitFacade.createBundle("refs/heads/wrongRef", "CheckoutAtInit");
   }
 
   @Test(expected = IOException.class)
   public void testCreateBundleWrongBasis() throws IllegalArgumentException, IOException {
-    JGitFacade.createBundle(localworkDirTree, "HEAD", "WrongBasis");
+    localJGitFacade.createBundle("HEAD", "WrongBasis");
   }
 
   @Test(expected = IOException.class)
@@ -93,25 +100,29 @@ public class JGitFacadeTest {
       throws IllegalArgumentException, IOException, GitAPIException, URISyntaxException {
     File emptyDir = tempFolder.newFolder("TempDir3");
 
+    JGitFacade emptyDirJGitFacade = new JGitFacade(emptyDir);
+
     writeCommitToRepo(localworkDirTree, 3);
 
-    byte[] bundle = JGitFacade.createBundle(localworkDirTree, "HEAD", "CheckoutAtCommit2");
+    byte[] bundle = localJGitFacade.createBundle("HEAD", "CheckoutAtCommit2");
 
-    JGitFacade.fetchFromBundle(emptyDir, bundle);
+    emptyDirJGitFacade.fetchFromBundle(bundle);
   }
 
   @Test(expected = IOException.class)
   public void testFetchFromBundleBasisMissing() throws IllegalArgumentException, Exception {
     File remoteworkDirTree = tempFolder.newFolder("TempDir2");
 
+    JGitFacade remoteJGitFacade = new JGitFacade(remoteworkDirTree);
+
     cloneFromRepo(localworkDirTree, remoteworkDirTree);
 
     writeCommitToRepo(localworkDirTree, 3);
     writeCommitToRepo(localworkDirTree, 4);
 
-    byte[] bundle = JGitFacade.createBundle(localworkDirTree, "HEAD", "CheckoutAtCommit3");
+    byte[] bundle = localJGitFacade.createBundle("HEAD", "CheckoutAtCommit3");
 
-    JGitFacade.fetchFromBundle(remoteworkDirTree, bundle);
+    remoteJGitFacade.fetchFromBundle(bundle);
   }
 
   /**
@@ -191,7 +202,8 @@ public class JGitFacadeTest {
       throw new IllegalArgumentException(
           "workDirTree of where should be cloned to is null and can't be resolved");
     try {
-      Git.cloneRepository().setURI(JGitFacade.getUrlByworkDirTree(from)).setDirectory(to).call();
+      JGitFacade fromJGitFacade = new JGitFacade(from);
+      Git.cloneRepository().setURI(fromJGitFacade.getUrl()).setDirectory(to).call();
     } catch (InvalidRemoteException e) {
       throw new IllegalArgumentException(
           "workDirTree of where should be cloned to is null and can't be resolved", e);

@@ -25,11 +25,15 @@ import org.eclipse.jgit.transport.URIish;
 
 public class JGitFacade {
   private static final Logger log = Logger.getLogger(JGitFacade.class);
+  private File workDirTree;
+
+  public JGitFacade(File workDirTree) {
+    setWorkDirTree(workDirTree);
+  }
 
   /**
    * Create a {@code bundle} with all commits from {@code basis} to {@code actual} of the Git repo.
    *
-   * @param workDirTree The directory that contains the .git directory
    * @param actual The name of the ref to lookup. For example: "HEAD" or "refs/heads/master". Must
    *     not be a short-handform; e.g., "master" is not automatically expanded
    *     to"refs/heads/master". Include the object the ref is point at in the {@code bundle} and (if
@@ -42,10 +46,10 @@ public class JGitFacade {
    * @throws IOException failed while read/resolved parameters or while written to the {@code
    *     bundle}
    */
-  public static byte[] createBundle(File workDirTree, String actual, String basis)
+  public byte[] createBundle(String actual, String basis)
       throws IllegalArgumentException, IOException {
 
-    Git git = getGitByworkDirTree(workDirTree);
+    Git git = getGit();
     Repository repo = git.getRepository();
     // In order to create the bundle object we need to initialize the Bundlewriter and set it up
     // with the commit, it should end with and the start commit.
@@ -91,7 +95,6 @@ public class JGitFacade {
   /**
    * Fetching from a bundle to a Git repo
    *
-   * @param workDirTree The directory that contains the .git directory
    * @param bundle See <a href="https://git-scm.com/docs/git-bundle">git bundle</a>
    * @throws IllegalArgumentException {@code workDirTree} or {@code bundle} is null and can't be
    *     resolved
@@ -99,10 +102,10 @@ public class JGitFacade {
    *     while fetch
    * @throws URISyntaxException
    */
-  public static void fetchFromBundle(File workDirTree, byte[] bundle)
+  public void fetchFromBundle(byte[] bundle)
       throws IllegalArgumentException, IOException, URISyntaxException {
 
-    Git git = getGitByworkDirTree(workDirTree);
+    Git git = getGit();
 
     if (bundle == null) throw new IllegalArgumentException("bundle is null and can't be resolved");
 
@@ -128,29 +131,27 @@ public class JGitFacade {
   }
 
   /**
-   * @param workDirTree The directory that contains the .git directory
    * @return The URL to access/address directly the .git directory
    * @throws IllegalArgumentException {@code workDirTree} is null can't be resolved
    * @throws IOException failed while read
    */
-  static String getUrlByworkDirTree(File workDirTree) throws IllegalArgumentException, IOException {
-    Git git = getGitByworkDirTree(workDirTree);
+  String getUrl() throws IllegalArgumentException, IOException {
+    Git git = getGit();
     return git.getRepository().getDirectory().getCanonicalPath();
   }
 
   /**
-   * @param workDirTree The directory that contains the .git directory
    * @param revString See <a href="https://www.git-scm.com/docs/gitrevisions">gitrevisions</a>
    * @throws IllegalArgumentException {@code workDirTree} is null can't be resolved
    * @throws IOException failed while read
    */
-  public static String getSHA1HashByRevisionString(File workDirTree, String revString)
+  public String getSHA1HashByRevisionString(String revString)
       throws IllegalArgumentException, IOException {
-    Git git = getGitByworkDirTree(workDirTree);
+    Git git = getGit();
     return git.getRepository().resolve(revString).name();
   }
-  /** @param workDirTree The directory that contains the .git directory */
-  private static Git getGitByworkDirTree(File workDirTree) throws IOException {
+
+  private Git getGit() throws IOException {
     try {
       if (workDirTree == null)
         throw new IllegalArgumentException("workDirTree is null and can't be resolved");
@@ -164,13 +165,12 @@ public class JGitFacade {
    * Allowing to merge commits if fast forward merge is possible. The current commit has to be a
    * ancestor of the named commit (which is accessed by resolving the given Revision String).
    *
-   * @param workDirTree The directory that contains the .git directory
    * @param revString See <a href="https://www.git-scm.com/docs/gitrevisions">gitrevisions</a>
    * @throws IOException failed while merge
    */
-  public static void ffMerge(File workDirTree, String revString) throws IOException {
+  public void ffMerge(String revString) throws IOException {
     try {
-      Git git = getGitByworkDirTree(workDirTree);
+      Git git = getGit();
       git.merge()
           .include(git.getRepository().resolve(revString))
           .setFastForward(FastForwardMode.FF_ONLY)
@@ -178,5 +178,13 @@ public class JGitFacade {
     } catch (IOException | RevisionSyntaxException | GitAPIException e) {
       throw new IOException("merge failed", e);
     }
+  }
+  /** @param workDirTree The directory that contains the .git directory */
+  public void setWorkDirTree(File workDirTree) {
+    this.workDirTree = workDirTree;
+  }
+  /** @return workDirTree The directory that contains the .git directory */
+  public File getWorkDirTree() {
+    return workDirTree;
   }
 }
