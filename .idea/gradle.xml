@@ -9,13 +9,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/saros" />
-            <option value="$PROJECT_DIR$/saros.core" />
-            <option value="$PROJECT_DIR$/saros.intellij" />
-            <option value="$PROJECT_DIR$/saros.server" />
-            <option value="$PROJECT_DIR$/saros.ui" />
-            <option value="$PROJECT_DIR$/saros.ui.frontend" />
-            <option value="$PROJECT_DIR$/saros.whiteboard" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/eclipse" />
+            <option value="$PROJECT_DIR$/intellij" />
+            <option value="$PROJECT_DIR$/server" />
+            <option value="$PROJECT_DIR$/ui" />
+            <option value="$PROJECT_DIR$/ui.frontend" />
+            <option value="$PROJECT_DIR$/whiteboard" />
           </set>
         </option>
         <option name="useAutoImport" value="true" />

@@ -81,12 +81,12 @@
       <page
             category="saros.preferences"
             class="saros.ui.preferencePages.FeedbackPreferencePage"
-            id="de.fu_berlin.dpp.preferences.feedback"
+            id="saros.preferences.feedback"
             name="Feedback"/>
       <page
             category="saros.preferences"
             class="saros.ui.preferencePages.CommunicationPreferencePage"
-            id="de.fu_berlin.dpp.preferences.communication"
+            id="saros.preferences.communication"
             name="Communication">
       </page>
       <page
