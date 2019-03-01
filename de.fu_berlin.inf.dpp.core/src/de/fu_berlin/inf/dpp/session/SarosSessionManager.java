@@ -168,18 +168,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     negotiationHandler = handler;
   }
 
-  @Override
-  public void startSession(final Map<IProject, List<IResource>> projectResourcesMapping) {
-
-    Map<IReferencePoint, List<IResource>> list = new HashMap<>();
-
-    for (Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
-      list.put(entry.getKey().getReferencePoint(), entry.getValue());
-    }
-
-    startSessionWithReferencePoints(list);
-  }
-
   /**
    * @JTourBusStop 3, Invitation Process:
    *
@@ -543,24 +531,6 @@ public class SarosSessionManager implements ISarosSessionManager {
           }
         };
     nextProjectNegotiationWorker = ThreadUtils.runSafeAsync(log, worker);
-  }
-
-  /**
-   * Adds project resources to an existing session.
-   *
-   * @param projectResourcesMapping
-   */
-  @Override
-  public synchronized void addResourcesToSession(
-      Map<IProject, List<IResource>> projectResourcesMapping) {
-
-    Map<IReferencePoint, List<IResource>> list = new HashMap<>();
-
-    for (Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
-      list.put(entry.getKey().getReferencePoint(), entry.getValue());
-    }
-
-    addReferencePointResourcesToSession(list);
   }
 
   /**

@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.session;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IReferencePoint;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -19,13 +18,6 @@ public interface ISarosSessionManager {
   /** @return the active session or <code>null</code> if there is no active session. */
   public ISarosSession getSession();
 
-  /**
-   * Starts a new DPP session with the local user as only participant.
-   *
-   * @param projectResources the local project resources which should be shared.
-   */
-  @Deprecated
-  public void startSession(Map<IProject, List<IResource>> projectResources);
 
   /**
    * Starts a new DPP session with the local user as only participant.
@@ -92,14 +84,6 @@ public interface ISarosSessionManager {
    * @param jidsToInvite the JIDs of the users that should be invited.
    */
   public void invite(Collection<JID> jidsToInvite, String description);
-
-  /**
-   * Adds project resources to an existing session.
-   *
-   * @param projectResourcesMapping
-   */
-  @Deprecated
-  public void addResourcesToSession(Map<IProject, List<IResource>> projectResourcesMapping);
 
   /**
    * Adds reference point resources to an existing session.
