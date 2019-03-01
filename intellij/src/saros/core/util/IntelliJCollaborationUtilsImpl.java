@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.core.util;
+package saros.core.util;
 
-import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
 import java.util.List;
+import saros.core.ui.util.CollaborationUtils;
+import saros.filesystem.IResource;
+import saros.net.xmpp.JID;
+import saros.ui.util.ICollaborationUtils;
 
 /**
  * This delegates the {@link ICollaborationUtils} methods to the actual implementation in IntelliJ.

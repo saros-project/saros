@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.client;
+package saros.stf.client;
 
 import static org.junit.Assume.assumeTrue;
 
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import org.junit.Before;
+import saros.stf.client.tester.AbstractTester;
 
 /**
  * Special type of {@link StfTestCase} which makes sure that all {@linkplain #select(AbstractTester,

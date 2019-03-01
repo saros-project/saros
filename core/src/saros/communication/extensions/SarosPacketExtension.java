@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.communication.extensions;
+package saros.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import de.fu_berlin.inf.dpp.misc.xstream.XStreamExtensionProvider;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
+import saros.misc.xstream.XStreamExtensionProvider;
 
 /**
  * @JTourBusStop 1, Creating custom network messages, Packet Extensions:
@@ -25,7 +25,7 @@ public abstract class SarosPacketExtension {
   // keep this short as it is included in every packet extension !
   public static final String VERSION = "SPXV1";
 
-  public static final String EXTENSION_NAMESPACE = "de.fu_berlin.inf.dpp";
+  public static final String EXTENSION_NAMESPACE = "saros";
 
   @XStreamAlias("v")
   @XStreamAsAttribute

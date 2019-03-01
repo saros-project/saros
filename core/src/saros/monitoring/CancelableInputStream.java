@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.monitoring;
+package saros.monitoring;
 
 import java.io.IOException;
 import java.io.InputStream;

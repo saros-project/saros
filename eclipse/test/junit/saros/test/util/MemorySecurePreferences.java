@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.util;
+package saros.test.util;
 
 import java.io.IOException;
 import java.util.HashMap;

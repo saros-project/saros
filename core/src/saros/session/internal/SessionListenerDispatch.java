@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.concurrent.CopyOnWriteArrayList;
+import saros.filesystem.IProject;
+import saros.session.ISessionListener;
+import saros.session.User;
 
 /** {@link ISessionListener} implementation which can dispatch events to multiple listeners. */
 public class SessionListenerDispatch implements ISessionListener {

@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import saros.net.xmpp.JID;
 
 /** @deprecated Use {@link UserConverter} instead. */
 @Deprecated

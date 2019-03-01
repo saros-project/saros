@@ -1,9 +1,6 @@
 /** */
-package de.fu_berlin.inf.dpp.ui.dialogs;
+package saros.ui.dialogs;
 
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.Messages;
-import de.fu_berlin.inf.dpp.ui.util.LinkListener;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -17,6 +14,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
+import saros.feedback.FeedbackManager;
+import saros.feedback.Messages;
+import saros.ui.util.LinkListener;
 
 /**
  * Implements a dialog that asks the user to participate in our Saros feedback survey.

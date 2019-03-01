@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.part;
+package saros.whiteboard.gef.part;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGPolylineRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Polyline;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.swt.graphics.Color;
+import saros.whiteboard.gef.model.SVGPolylineRecord;
+import saros.whiteboard.gef.util.ColorUtils;
 
 public class SVGPolylinePart extends ElementRecordPart {
 

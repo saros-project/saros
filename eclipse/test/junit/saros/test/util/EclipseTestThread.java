@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.util;
+package saros.test.util;
 
 /**
  * A Thread which runs the give Runnable. After the thread finished, you might call verify to ensure

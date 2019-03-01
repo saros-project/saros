@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 /**
  * An interface that can be used to access checksums. So they do not need to be recalculated as long

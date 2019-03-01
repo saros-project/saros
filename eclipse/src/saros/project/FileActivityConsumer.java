@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp.project;
+package saros.project;
 
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -16,6 +8,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.picocontainer.Startable;
+import saros.activities.FileActivity;
+import saros.activities.IActivity;
+import saros.activities.SPath;
+import saros.editor.EditorManager;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.session.AbstractActivityConsumer;
+import saros.session.ISarosSession;
+import saros.util.FileUtils;
 
 public class FileActivityConsumer extends AbstractActivityConsumer implements Startable {
 
@@ -225,7 +225,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     file.setCharset(encoding, new NullProgressMonitor());
   }
 
-  private static IFile toEclipseIFile(de.fu_berlin.inf.dpp.filesystem.IFile file) {
+  private static IFile toEclipseIFile(saros.filesystem.IFile file) {
     return (IFile) ResourceAdapterFactory.convertBack(file);
   }
 }

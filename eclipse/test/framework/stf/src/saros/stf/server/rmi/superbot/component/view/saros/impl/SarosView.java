@@ -1,26 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl;
+package saros.stf.server.rmi.superbot.component.view.saros.impl;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withRegex;
 
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInContactListArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInContactListArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInSessionArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IChatroom;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
-import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +27,23 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
+import saros.editor.FollowModeManager;
+import saros.net.xmpp.JID;
+import saros.session.User;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.SarosSWTBotPreferences;
+import saros.stf.server.rmi.controlbot.impl.ControlBotImpl;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotView;
+import saros.stf.server.rmi.superbot.ISuperBot;
+import saros.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInContactListArea;
+import saros.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
+import saros.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInContactListArea;
+import saros.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInSessionArea;
+import saros.stf.server.rmi.superbot.component.view.saros.IChatroom;
+import saros.stf.server.rmi.superbot.component.view.saros.ISarosView;
+import saros.stf.server.rmi.superbot.impl.SuperBot;
+import saros.stf.server.util.WidgetUtil;
 
 /**
  * This implementation of {@link ISarosView}

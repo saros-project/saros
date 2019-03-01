@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl;
+package saros.stf.server.rmi.superbot.component.view.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPackageExplorerView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IProgressView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ConsoleView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorerView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.superbot.component.view.IViews;
+import saros.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
+import saros.stf.server.rmi.superbot.component.view.eclipse.IPackageExplorerView;
+import saros.stf.server.rmi.superbot.component.view.eclipse.IProgressView;
+import saros.stf.server.rmi.superbot.component.view.eclipse.impl.ConsoleView;
+import saros.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorerView;
+import saros.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
+import saros.stf.server.rmi.superbot.component.view.saros.ISarosView;
+import saros.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
+import saros.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
+import saros.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
 
 public final class Views extends StfRemoteObject implements IViews {
 

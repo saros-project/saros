@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
+import saros.negotiation.FileList.MetaData;
 
 public class FileListDiffTest {
 

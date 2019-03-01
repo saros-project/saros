@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.mdns;
+package saros.net.mdns;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.concurrent.undo;
+package saros.concurrent.undo;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import saros.activities.SPath;
+import saros.concurrent.jupiter.Operation;
 
 /**
  * The Operation History is the data structure for saving operations to calculate undo and redo

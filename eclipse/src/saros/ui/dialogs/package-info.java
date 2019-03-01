@@ -14,4 +14,4 @@
  *       view with specified title and message
  * </ul>
  */
-package de.fu_berlin.inf.dpp.ui.dialogs;
+package saros.ui.dialogs;

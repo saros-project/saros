@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.ui.Messages;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,6 +21,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.account.XMPPAccountStore;
+import saros.preferences.Preferences;
+import saros.ui.Messages;
 
 /**
  * Allows the user to create an XMPP account.

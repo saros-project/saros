@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui;
+package saros.ui;
 
-import de.fu_berlin.inf.dpp.Saros;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import saros.Saros;
 
 /** Handles references to all used images throughout this plug-in. */
 public class ImageManager {

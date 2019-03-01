@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.renderer;
+package saros.ui.renderer;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.dpp.ui.model.State;
 import java.util.ArrayList;
 import java.util.List;
+import saros.ui.model.State;
 
 /**
  * Implementations of this interface can transfer their current state to a list of browsers by

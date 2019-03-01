@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import java.util.ArrayList;
 import java.util.Collection;

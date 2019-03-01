@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.editor.annotations;
+package saros.editor.annotations;
 
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.AnnotationPainter.IDrawingStrategy;

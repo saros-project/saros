@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.part;
+package saros.whiteboard.gef.part;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGTextBoxRecord;
 import org.apache.batik.util.SVGConstants;
 import org.apache.log4j.Logger;
 import org.eclipse.draw2d.ColorConstants;
@@ -10,6 +9,7 @@ import org.eclipse.draw2d.XYLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import saros.whiteboard.gef.model.SVGTextBoxRecord;
 
 /**
  * this class acts as Listener on changes in the records, it calls different methods on creation and

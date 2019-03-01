@@ -1,16 +1,10 @@
-package de.fu_berlin.inf.dpp.intellij.filesystem;
+package saros.intellij.filesystem;
 
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -18,6 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.filesystem.IContainer;
+import saros.filesystem.IFolder;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.intellij.project.filesystem.IntelliJPathImpl;
 
 public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder {
 

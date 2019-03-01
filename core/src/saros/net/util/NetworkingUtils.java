@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.util;
+package saros.net.util;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;

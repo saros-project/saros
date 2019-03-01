@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.model.session;
+package saros.ui.model.session;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.remote.EditorState;
-import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jface.viewers.StyledString;
@@ -14,6 +7,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import saros.activities.SPath;
+import saros.awareness.AwarenessInformationCollector;
+import saros.editor.EditorManager;
+import saros.editor.remote.EditorState;
+import saros.editor.remote.UserEditorStateManager;
+import saros.session.User;
+import saros.ui.model.TreeElement;
 
 /**
  * This is a tree element that can be displayed as a child element of the user entry in the Saros

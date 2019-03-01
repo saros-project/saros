@@ -1,14 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl;
+package saros.stf.server.rmi.remotebot.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotPerspective;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotChatLine;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotPerspective;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotView;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +22,15 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import saros.stf.server.bot.SarosSWTBot;
+import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotPerspective;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotView;
+import saros.stf.server.rmi.remotebot.widget.impl.RemoteBotChatLine;
+import saros.stf.server.rmi.remotebot.widget.impl.RemoteBotEditor;
+import saros.stf.server.rmi.remotebot.widget.impl.RemoteBotPerspective;
+import saros.stf.server.rmi.remotebot.widget.impl.RemoteBotView;
 
 public final class RemoteWorkbenchBot extends RemoteBot implements IRemoteWorkbenchBot {
 

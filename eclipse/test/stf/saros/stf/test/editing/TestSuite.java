@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.editing;
+package saros.stf.test.editing;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

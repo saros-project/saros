@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl;
+package saros.stf.server.rmi.htmlbot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.BotUtils;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLSelect;
 import java.rmi.RemoteException;
 import java.util.List;
+import saros.stf.server.HTMLSTFRemoteObject;
+import saros.stf.server.bot.BotUtils;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLSelect;
 
 public final class RemoteHTMLSelect extends HTMLSTFRemoteObject implements IRemoteHTMLSelect {
 

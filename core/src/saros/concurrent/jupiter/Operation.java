@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter;
+package saros.concurrent.jupiter;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.List;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.concurrent.jupiter.internal.text.ITextOperation;
+import saros.session.User;
 
 /**
  * An Operation is a representation of a user Activity for the use by an algorithm like Jupiter.

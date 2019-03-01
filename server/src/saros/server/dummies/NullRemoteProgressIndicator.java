@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.server.dummies;
+package saros.server.dummies;
 
-import de.fu_berlin.inf.dpp.activities.ProgressActivity;
-import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicator;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.activities.ProgressActivity;
+import saros.monitoring.remote.IRemoteProgressIndicator;
+import saros.session.User;
 
 /** A dummy implementation of {@link IRemoteProgressIndicator} which just does nothing. */
 public class NullRemoteProgressIndicator implements IRemoteProgressIndicator {

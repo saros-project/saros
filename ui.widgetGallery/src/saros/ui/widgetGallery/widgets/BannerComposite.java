@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.widgets;
+package saros.ui.widgetGallery.widgets;
 
-import de.fu_berlin.inf.dpp.ui.util.FontUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.util.FontUtils;
+import saros.ui.widgets.SimpleIllustratedComposite;
 
 public class BannerComposite extends SimpleIllustratedComposite {
 

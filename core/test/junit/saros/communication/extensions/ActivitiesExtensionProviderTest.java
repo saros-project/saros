@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.communication.extensions;
+package saros.communication.extensions;
 
 import static org.junit.Assert.assertFalse;
 
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.List;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.junit.Test;
+import saros.activities.EditorActivity;
+import saros.activities.IActivity;
+import saros.net.xmpp.JID;
+import saros.session.User;
 
 public class ActivitiesExtensionProviderTest {
 

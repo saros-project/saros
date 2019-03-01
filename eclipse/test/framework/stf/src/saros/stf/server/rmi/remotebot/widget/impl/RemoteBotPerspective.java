@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotPerspective;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotPerspective;
 
 public final class RemoteBotPerspective extends StfRemoteObject implements IRemoteBotPerspective {
 

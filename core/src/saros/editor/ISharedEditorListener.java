@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.activities.TextSelectionActivity;
+import saros.session.User;
 
 /**
  * Listener type for events related to local and remote {@link IEditorManager editors} which belong

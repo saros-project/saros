@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.stf.test.consistency;
+package saros.stf.test.consistency;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertEquals;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.client.tester.SarosTester.CARL;
+import static saros.stf.shared.Constants.ACCEPT;
+import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
-import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
-import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.annotation.TestLink;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.test.Constants;
+import saros.test.util.EclipseTestThread;
 
 @TestLink(id = "Saros-36_edit_during_invitation")
 public class EditDuringInvitationTest extends StfTestCase {

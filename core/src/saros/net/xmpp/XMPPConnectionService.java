@@ -1,11 +1,5 @@
-package de.fu_berlin.inf.dpp.net.xmpp;
+package saros.net.xmpp;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.stun.IStunService;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
-import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -24,6 +18,12 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
+import saros.annotations.Component;
+import saros.net.ConnectionState;
+import saros.net.stun.IStunService;
+import saros.net.upnp.IUPnPService;
+import saros.net.util.NetworkingUtils;
+import saros.util.ThreadUtils;
 
 /**
  * This class is responsible for establishing XMPP connections and notifying registered listeners
@@ -123,8 +123,7 @@ public class XMPPConnectionService {
     this.upnpService = upnpService;
     this.stunService = stunService;
 
-    packetReplyTimeout =
-        Integer.getInteger("de.fu_berlin.inf.dpp.net.smack.PACKET_REPLAY_TIMEOUT", 30000);
+    packetReplyTimeout = Integer.getInteger("saros.net.smack.PACKET_REPLAY_TIMEOUT", 30000);
   }
 
   /**

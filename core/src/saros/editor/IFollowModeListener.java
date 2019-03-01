@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
-import de.fu_berlin.inf.dpp.session.User;
+import saros.session.User;
 
 public interface IFollowModeListener {
   /** Reasons why the FollowMode stopped */

@@ -1,8 +1,6 @@
 /** */
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.ITextSelection;
@@ -20,6 +18,8 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.ui.IEditorPart;
+import saros.editor.internal.EditorAPI;
+import saros.editor.text.LineRange;
 
 /**
  * Listener for tracking the selection and viewport of an IEditorPart and reporting any changes to
@@ -202,9 +202,7 @@ public class EditorListener {
       lastSelection = selection;
 
       manager.generateSelection(
-          part,
-          new de.fu_berlin.inf.dpp.editor.text.TextSelection(
-              selection.getOffset(), selection.getLength()));
+          part, new saros.editor.text.TextSelection(selection.getOffset(), selection.getLength()));
     }
   }
 

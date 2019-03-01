@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -8,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import org.apache.log4j.Logger;
+import saros.util.ThreadUtils;
 
 // TODO JavaDoc
 

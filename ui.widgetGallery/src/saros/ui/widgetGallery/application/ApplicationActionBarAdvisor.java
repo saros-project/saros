@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.application;
+package saros.ui.widgetGallery.application;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IWorkbenchWindow;

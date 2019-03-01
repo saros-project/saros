@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.communication.connection;
+package saros.communication.connection;
 
-import de.fu_berlin.inf.dpp.Saros;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.eclipse.core.net.proxy.IProxyData;
@@ -8,6 +7,7 @@ import org.eclipse.core.net.proxy.IProxyService;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import saros.Saros;
 
 /**
  * Component for resolving Eclipse proxy settings.

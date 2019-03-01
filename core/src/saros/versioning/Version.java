@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.versioning;
+package saros.versioning;
 
 import java.util.StringTokenizer;
 

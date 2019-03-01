@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
+package saros.intellij.ui.wizards.pages;
 
 /** Interface defines wizard page action listener structure */
 public interface PageActionListener {

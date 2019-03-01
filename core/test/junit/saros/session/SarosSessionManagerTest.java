@@ -1,16 +1,8 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,6 +13,14 @@ import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import saros.context.IContainerContext;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.preferences.IPreferenceStore;
+import saros.session.internal.SarosSession;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SarosSession.class, SarosSessionManager.class})

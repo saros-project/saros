@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.model.mdns;
+package saros.ui.model.mdns;
 
-import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import saros.net.mdns.MDNSService;
+import saros.ui.ImageManager;
+import saros.ui.model.HeaderElement;
 
 public class MDNSHeaderElement extends HeaderElement {
 

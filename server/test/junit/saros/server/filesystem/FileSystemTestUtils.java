@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
+import saros.filesystem.IPath;
+import saros.filesystem.IWorkspace;
 
 /**
  * Provides utility methods for the server file system implementation tests. These methods are meant

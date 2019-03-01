@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.editor.annotations;
+package saros.editor.annotations;
 
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.ColorUtils;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.eclipse.jface.text.source.IAnnotationPresentation;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -13,6 +8,11 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
+import saros.session.User;
+import saros.session.User.Permission;
+import saros.ui.Messages;
+import saros.ui.util.ColorUtils;
+import saros.ui.util.ModelFormatUtils;
 
 /**
  * The annotation that shows the viewports of users with {@link Permission#WRITE_ACCESS}.
@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ViewportAnnotation extends SarosAnnotation implements IAnnotationPresentation {
 
-  protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.viewport";
+  protected static final String TYPE = "saros.annotations.viewport";
 
   private static final int INSET = 2;
 

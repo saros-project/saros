@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.account;
+package saros.account;
 
 import java.util.List;
 

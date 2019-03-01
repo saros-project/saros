@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl;
+package saros.stf.server.rmi.superbot.component.menubar.menu.impl;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.ISarosMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.ISarosPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.impl.SarosPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import saros.net.xmpp.JID;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.superbot.component.menubar.menu.ISarosMenu;
+import saros.stf.server.rmi.superbot.component.menubar.menu.submenu.ISarosPreferences;
+import saros.stf.server.rmi.superbot.component.menubar.menu.submenu.impl.SarosPreferences;
+import saros.stf.server.rmi.superbot.impl.SuperBot;
 
 public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
 

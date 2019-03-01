@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.net.stream;
+package saros.net.stream;
 
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.IOException;
 import org.jivesoftware.smack.Connection;
+import saros.net.internal.IByteStreamConnection;
+import saros.net.internal.IByteStreamConnectionListener;
+import saros.net.xmpp.JID;
 
 /**
  * This interface is used to define various services (probably only XEP 65 SOCKS5, XEP 47 in-band

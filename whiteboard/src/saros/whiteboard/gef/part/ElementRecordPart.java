@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.part;
+package saros.whiteboard.gef.part;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.ElementModelDeletePolicy;
-import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.ElementModelLayoutEditPolicy;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ChildRecordChangeCache.ChildRecordChangeListener;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.NodeRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SetRecord;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +11,14 @@ import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
+import saros.whiteboard.gef.editpolicy.ElementModelDeletePolicy;
+import saros.whiteboard.gef.editpolicy.ElementModelLayoutEditPolicy;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.sxe.records.ChildRecordChangeCache.ChildRecordChangeListener;
+import saros.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.records.IRecord;
+import saros.whiteboard.sxe.records.NodeRecord;
+import saros.whiteboard.sxe.records.SetRecord;
 
 /**
  * Base edit part for SXE that installs the edit policies, registers itself on activation and

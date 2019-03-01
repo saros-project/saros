@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.communication.extensions.JoinSessionRejectedExtension;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
+import saros.communication.extensions.JoinSessionRejectedExtension;
+import saros.net.IReceiver;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.ui.util.DialogUtils;
+import saros.ui.util.SWTUtils;
 
 public final class JoinSessionRejectedHandler {
 

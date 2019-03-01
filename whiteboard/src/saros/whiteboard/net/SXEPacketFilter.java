@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.whiteboard.net;
+package saros.whiteboard.net;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
+import saros.whiteboard.sxe.constants.SXEMessageType;
+import saros.whiteboard.sxe.net.SXEMessage;
+import saros.whiteboard.sxe.net.SXESession;
 
 /**
  * A customizable filter for SXE that allows to filter for a certain peer within a certain session

@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.model.roster;
+package saros.ui.model.roster;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManagerListener;
-import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +14,13 @@ import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
+import saros.SarosConstants;
+import saros.SarosPluginContext;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.net.xmpp.discovery.DiscoveryManagerListener;
+import saros.ui.model.TreeContentProvider;
+import saros.ui.util.ViewerUtils;
 
 /**
  * {@link IContentProvider} for use in conjunction with a {@link Roster} input.

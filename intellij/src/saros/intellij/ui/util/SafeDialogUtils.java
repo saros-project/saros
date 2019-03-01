@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.intellij.ui.util;
+package saros.intellij.ui.util;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.exceptions.IllegalAWTContextException;
 import java.awt.Component;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.exceptions.IllegalAWTContextException;
 
 /**
  * Dialog helper used to show messages in safe manner by starting it on the AWT event dispatcher
@@ -20,7 +20,7 @@ import org.picocontainer.annotations.Inject;
  * applies to all input dialogs as they need to be executed synchronously to return the input value.
  * Such dialogs should check whether they are executed in a write safe context with {@link
  * Application#isWriteAccessAllowed()} and then throw an {@link
- * de.fu_berlin.inf.dpp.exceptions.IllegalAWTContextException}.
+ * saros.exceptions.IllegalAWTContextException}.
  *
  * <p>Asynchronous dialogs can still be safely executed from any context with {@link
  * Application#invokeLater(Runnable,ModalityState)}.

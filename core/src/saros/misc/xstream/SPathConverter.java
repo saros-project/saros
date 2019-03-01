@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.SPath;
+import saros.annotations.Component;
+import saros.communication.extensions.ActivitiesExtension;
+import saros.filesystem.IPath;
+import saros.filesystem.IPathFactory;
+import saros.filesystem.IProject;
+import saros.session.ISarosSession;
 
 /**
  * Converts session- and IDE-dependent SPath to session- and IDE-independent XML representations,

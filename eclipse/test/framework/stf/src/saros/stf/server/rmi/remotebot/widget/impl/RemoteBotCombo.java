@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
 public final class RemoteBotCombo extends StfRemoteObject implements IRemoteBotCombo {
 

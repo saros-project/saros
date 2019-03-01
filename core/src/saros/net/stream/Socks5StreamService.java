@@ -1,11 +1,5 @@
-package de.fu_berlin.inf.dpp.net.stream;
+package saros.net.stream;
 
-import de.fu_berlin.inf.dpp.net.internal.BinaryChannelConnection;
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnectionListener;
-import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,6 +29,12 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
+import saros.net.internal.BinaryChannelConnection;
+import saros.net.internal.IByteStreamConnection;
+import saros.net.internal.IByteStreamConnectionListener;
+import saros.net.util.NetworkingUtils;
+import saros.net.xmpp.JID;
+import saros.util.NamedThreadFactory;
 
 /**
  * Transport class for SOCKS5 bytestreams. When a Request is received always it is tried to
@@ -78,7 +78,7 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
   private static final int MEDIATED_BIDIRECTIONAL_TEST_TIMEOUT = 5000;
 
   private static final boolean TCP_NODELAY =
-      Boolean.valueOf(System.getProperty("de.fu_berlin.inf.dpp.net.socks5.TCP_NODELAY", "true"));
+      Boolean.valueOf(System.getProperty("saros.net.socks5.TCP_NODELAY", "true"));
 
   /**
    * Timeout for the local side on how long it should wait for the remote side to report which
@@ -88,7 +88,7 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
    * connect timeout} !
    */
   private static final int TARGET_RESPONSE_TIMEOUT =
-      Integer.getInteger("de.fu_berlin.inf.dpp.net.socks5.TARGET_RESPONSE_TIMEOUT", 30000);
+      Integer.getInteger("saros.net.socks5.TARGET_RESPONSE_TIMEOUT", 30000);
 
   /**
    * Timeout for the remote side on how long it should try to connect to all offered stream hosts.
@@ -97,7 +97,7 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
    * !
    */
   private static final int TOTAL_CONNECT_TIMEOUT =
-      Integer.getInteger("de.fu_berlin.inf.dpp.net.socks5.TOTAL_CONNECT_TIMEOUT", 20000);
+      Integer.getInteger("saros.net.socks5.TOTAL_CONNECT_TIMEOUT", 20000);
 
   private HashMap<String, Exchanger<Socks5BytestreamSession>> runningRemoteConnects =
       new HashMap<String, Exchanger<Socks5BytestreamSession>>();

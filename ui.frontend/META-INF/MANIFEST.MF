@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ui.frontend
-Bundle-SymbolicName: de.fu_berlin.inf.dpp.ui.frontend
+Bundle-SymbolicName: saros.ui.frontend
 Bundle-Version: 0.1.0.DEVEL
 Bundle-Vendor: FU-Berlin
-Fragment-Host: de.fu_berlin.inf.dpp.ui
+Fragment-Host: saros.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

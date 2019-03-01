@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.project;
+package saros.project;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.synchronize.Blockable;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +17,17 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.picocontainer.Startable;
 import org.picocontainer.annotations.Inject;
+import saros.activities.IActivity;
+import saros.activities.IResourceActivity;
+import saros.annotations.Component;
+import saros.editor.EditorManager;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.observables.FileReplacementInProgressObservable;
+import saros.session.AbstractActivityProducer;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.synchronize.Blockable;
+import saros.synchronize.StopManager;
 
 /**
  * This manager is responsible for handling all resource changes that aren't handled by the
@@ -90,7 +90,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
       new ISessionListener() {
 
         @Override
-        public void projectAdded(de.fu_berlin.inf.dpp.filesystem.IProject project) {
+        public void projectAdded(saros.filesystem.IProject project) {
           synchronized (projectStates) {
             IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(project);
             projectStates.put(eclipseProject, eclipseProject.isOpen());
@@ -98,7 +98,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         }
 
         @Override
-        public void projectRemoved(de.fu_berlin.inf.dpp.filesystem.IProject project) {
+        public void projectRemoved(saros.filesystem.IProject project) {
           synchronized (projectStates) {
             IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(project);
             projectStates.remove(eclipseProject);

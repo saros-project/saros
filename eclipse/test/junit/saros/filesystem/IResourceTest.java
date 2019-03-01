@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;

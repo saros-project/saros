@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.upnp;
+package saros.net.upnp;
 
 import java.net.InetAddress;
 import java.util.List;

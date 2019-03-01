@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

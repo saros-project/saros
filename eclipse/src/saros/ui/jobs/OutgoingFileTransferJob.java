@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.jobs;
+package saros.ui.jobs;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.File;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -12,6 +9,9 @@ import org.eclipse.ui.progress.IProgressConstants;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import saros.Saros;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
 
 /**
  * This job is intended to be used with a pending outgoing {@linkplain FileTransferRequest XMPP file

@@ -1,12 +1,12 @@
 /** */
-package de.fu_berlin.inf.dpp.concurrent.management;
+package saros.concurrent.management;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.QueueItem;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.ObjectUtils;
+import saros.activities.IActivity;
+import saros.activities.QueueItem;
+import saros.session.User;
 
 public class TransformationResult {
 

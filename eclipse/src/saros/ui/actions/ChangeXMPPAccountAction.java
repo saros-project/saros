@@ -1,18 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.actions;
+package saros.ui.actions;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
@@ -25,6 +12,19 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
+import saros.net.ConnectionState;
+import saros.session.ISarosSessionManager;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.DialogUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.WizardUtils;
+import saros.util.ThreadUtils;
 
 /**
  * In addition to the connect/disconnect action, this allows the user to switch between accounts. At
@@ -129,7 +129,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
                         .getSite()
                         .getService(IHandlerService.class);
             try {
-              service.executeCommand("de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences", null);
+              service.executeCommand("saros.ui.commands.OpenSarosPreferences", null);
             } catch (Exception e) {
               LOG.debug("Could execute command", e);
             }

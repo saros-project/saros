@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
+package saros.whiteboard.sxe.net;
 
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SXEUtils;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import saros.ui.util.SWTUtils;
+import saros.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.constants.SXEMessageType;
+import saros.whiteboard.sxe.records.IRecord;
+import saros.whiteboard.sxe.util.SXEUtils;
 
 /**
  * Base class for the inviter for the synchronization process during invitation.

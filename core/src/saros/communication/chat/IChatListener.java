@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.communication.chat;
+package saros.communication.chat;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.jivesoftware.smackx.ChatState;
+import saros.net.xmpp.JID;
 
 /** A listener for {@link IChat} chat-related events. */
 public interface IChatListener {

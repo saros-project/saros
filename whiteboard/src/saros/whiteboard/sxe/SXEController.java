@@ -1,23 +1,23 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe;
+package saros.whiteboard.sxe;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.MissingRecordException;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.XMLNotWellFormedException;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.ISXETransmitter;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SetRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SXEUtils;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.whiteboard.sxe.constants.RecordType;
+import saros.whiteboard.sxe.constants.SXEMessageType;
+import saros.whiteboard.sxe.exceptions.MissingRecordException;
+import saros.whiteboard.sxe.exceptions.XMLNotWellFormedException;
+import saros.whiteboard.sxe.net.ISXETransmitter;
+import saros.whiteboard.sxe.net.SXEMessage;
+import saros.whiteboard.sxe.net.SXESession;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.IRecord;
+import saros.whiteboard.sxe.records.ISXERecordFactory;
+import saros.whiteboard.sxe.records.SetRecord;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
+import saros.whiteboard.sxe.util.SXEUtils;
 
 /**
  * Central part of an SXE session that maintains the document.

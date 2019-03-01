@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.stf.server.bot.condition;
+package saros.stf.server.bot.condition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTable;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotTable;
 
 public class ExistsTableItem extends DefaultCondition {
 

@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.editor.annotations;
+package saros.editor.annotations;
 
-import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.Annotation;
@@ -9,6 +8,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
+import saros.session.User;
 
 /**
  * Abstract base class for {@link Annotation}s.

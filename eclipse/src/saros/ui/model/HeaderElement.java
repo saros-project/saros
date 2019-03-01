@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;
 
-import de.fu_berlin.inf.dpp.ui.util.FontUtils;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
+import saros.ui.util.FontUtils;
 
 /**
  * Abstract headline for use with {@link IContentProvider}s that use {@link ITreeElement}s.

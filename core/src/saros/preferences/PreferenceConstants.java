@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
 /**
  * This class provide constants for the preferences. This ensure the correct usage, when they are

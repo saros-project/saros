@@ -1,14 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl;
+package saros.stf.server.rmi.superbot.component.view.eclipse.impl;
 
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPackageExplorerView;
-import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,6 +22,15 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.session.ISarosSession;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.condition.SarosConditions;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
+import saros.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
+import saros.stf.server.rmi.superbot.component.view.eclipse.IPackageExplorerView;
+import saros.stf.server.util.WidgetUtil;
 
 public final class PackageExplorerView extends StfRemoteObject implements IPackageExplorerView {
 

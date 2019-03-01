@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.List;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.net.xmpp.JID;
+import saros.session.User;
 
 public class ActivityOptimizerTest {
 

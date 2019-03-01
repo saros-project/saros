@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.communication.extensions;
+package saros.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
-import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import saros.misc.xstream.JIDConverter;
+import saros.net.xmpp.JID;
 
 @XStreamAlias(/* ProjectNegotiationCompleted */ "PNCMP")
 public class UserFinishedProjectNegotiationExtension extends SarosSessionPacketExtension {

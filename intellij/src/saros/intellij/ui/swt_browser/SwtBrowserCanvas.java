@@ -1,9 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
+package saros.intellij.ui.swt_browser;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
-import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 import java.awt.Canvas;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -12,6 +9,9 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.ui.ide_embedding.BrowserCreator;
+import saros.ui.pages.IBrowserPage;
 
 /**
  * This class is an AWT canvas and is responsible for launching the browser. It represents the AWT

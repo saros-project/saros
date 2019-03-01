@@ -1,28 +1,28 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl;
+package saros.stf.server.rmi.htmlbot.widget.impl;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.IdSelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.Selector;
-import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.BotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLCheckbox;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLInputField;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLMultiSelect;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLProgressBar;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLRadioGroup;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLSelect;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLTextElement;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLTree;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
-import de.fu_berlin.inf.dpp.ui.View;
 import java.rmi.RemoteException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
+import saros.stf.server.HTMLSTFRemoteObject;
+import saros.stf.server.bot.BotPreferences;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLButton;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLCheckbox;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLInputField;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLMultiSelect;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLProgressBar;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLRadioGroup;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLSelect;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLTextElement;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLTree;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
+import saros.ui.View;
 
 public class RemoteHTMLView extends HTMLSTFRemoteObject implements IRemoteHTMLView {
 

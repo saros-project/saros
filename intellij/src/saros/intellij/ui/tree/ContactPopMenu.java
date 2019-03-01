@@ -1,17 +1,8 @@
-package de.fu_berlin.inf.dpp.intellij.ui.tree;
+package saros.intellij.ui.tree;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -24,6 +15,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.core.ui.util.CollaborationUtils;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.util.NotificationPanel;
+import saros.net.xmpp.JID;
 
 /**
  * Contact pop-up menu for selecting a project to share. Opened when right-clicking on a contact.

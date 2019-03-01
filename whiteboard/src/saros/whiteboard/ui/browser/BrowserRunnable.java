@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.ui.browser;
+package saros.whiteboard.ui.browser;
 
 /**
  * Contains the code that will be run when a browser function is called.

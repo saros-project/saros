@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.note;
+package saros.ui.widgetGallery.demoSuits.instruction.note;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.NoteComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleNoteComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgets.NoteComposite;
+import saros.ui.widgets.SimpleNoteComposite;
 
 @Demo("Different NoteComposites with various system icons and colors")
 public class SimpleNoteCompositeDemo extends AbstractDemo {

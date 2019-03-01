@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.editor.remote;
+package saros.editor.remote;
 
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
@@ -7,21 +7,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.User;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.activities.EditorActivity;
+import saros.activities.EditorActivity.Type;
+import saros.activities.SPath;
+import saros.activities.TextSelectionActivity;
+import saros.activities.ViewportActivity;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
+import saros.filesystem.IPath;
+import saros.filesystem.IPathFactory;
+import saros.filesystem.IProject;
+import saros.session.User;
 
 public class UserEditorStateTest {
 

@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.ui.pages;
+package saros.ui.pages;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.HTMLUIStrings;
+import saros.HTMLUIContextFactory;
+import saros.HTMLUIStrings;
 
 /** Represents the wizard to manage accounts. */
 public class AccountPage extends AbstractBrowserPage {

@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.absolutePath;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.path;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static saros.server.filesystem.FileSystemTestUtils.absolutePath;
+import static saros.server.filesystem.FileSystemTestUtils.path;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import java.io.File;
 import org.junit.Ignore;
 import org.junit.Test;
+import saros.filesystem.IPath;
 
 public class ServerPathImplTest {
 

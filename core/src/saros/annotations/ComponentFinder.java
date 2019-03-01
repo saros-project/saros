@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.annotations;
+package saros.annotations;
 
 import java.io.File;
 import java.lang.annotation.Annotation;

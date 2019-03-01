@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.model;
+package saros.whiteboard.gef.model;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SetRecord;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import saros.whiteboard.sxe.constants.RecordType;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.records.IRecord;
+import saros.whiteboard.sxe.records.SetRecord;
 
 /**
  * Base class for records that understand GEF's layout mechanic. Thus it allows to convert a {@link

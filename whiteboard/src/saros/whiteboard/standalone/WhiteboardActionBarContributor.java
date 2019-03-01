@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.standalone;
+package saros.whiteboard.standalone;
 
-import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeBackgroundColorAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
 import org.apache.log4j.Logger;
 import org.eclipse.gef.ui.actions.ActionBarContributor;
 import org.eclipse.gef.ui.actions.DeleteRetargetAction;
@@ -18,6 +15,9 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.RetargetAction;
+import saros.ui.actions.ChangeColorAction;
+import saros.whiteboard.gef.actions.ChangeBackgroundColorAction;
+import saros.whiteboard.gef.actions.ChangeForegroundColorAction;
 
 public class WhiteboardActionBarContributor extends ActionBarContributor {
 

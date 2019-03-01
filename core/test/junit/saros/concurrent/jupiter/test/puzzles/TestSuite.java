@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
+package saros.concurrent.jupiter.test.puzzles;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

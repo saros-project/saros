@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.intellij.runtime;
+package saros.intellij.runtime;
 
-import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
-import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgressFrame;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import saros.core.monitoring.IStatus;
+import saros.intellij.ui.widgets.progress.ProgressFrame;
+import saros.monitoring.IProgressMonitor;
 
 /** Class designed to start long lasting job with progress indicator */
 public abstract class UIMonitoredJob extends Thread {

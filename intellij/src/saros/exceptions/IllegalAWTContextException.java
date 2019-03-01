@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.exceptions;
+package saros.exceptions;
 
 /**
  * Signals that the current AWT action was triggered from an illegal context.
@@ -6,7 +6,7 @@ package de.fu_berlin.inf.dpp.exceptions;
  * <p>This exception will be thrown if an AWT action is triggered (synchronously) inside a write
  * safe context.
  *
- * @see de.fu_berlin.inf.dpp.intellij.ui.util.SafeDialogUtils
+ * @see saros.intellij.ui.util.SafeDialogUtils
  */
 public class IllegalAWTContextException extends Exception {
 

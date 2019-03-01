@@ -5,7 +5,7 @@
          default="build"
          xmlns:ant4eclipse="antlib:org.ant4eclipse">
 
-    <property name="plugin.name" value="de.fu_berlin.inf.dpp.stf" />
+    <property name="plugin.name" value="saros.stf" />
 
     <!-- define ant-contrib macros -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
@@ -133,18 +133,18 @@
                 <!-- ant4eclipse's buildPlugin-task finds the core jar file automatically
                      in the workspace. However, this does not work for testing, so we amend the
                      classpath accordingly. -->
-                <fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/build/plugins">
+                <fileset dir="${workspaceDirectory}/saros.core/build/plugins">
                     <include name="*.jar" />
                 </fileset>
 
                 <!-- HACK: as the normal class loader cannot find jars inside a jar file -->
-                <fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/lib">
+                <fileset dir="${workspaceDirectory}/saros.core/lib">
                     <include name="*.jar" />
                 </fileset>
 
                 <!-- as the class files from the junit core folder are not included include
                      them -->
-                <dirset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/bin_test" />
+                <dirset dir="${workspaceDirectory}/saros.core/bin_test" />
 
                 <pathelement path="${java.class.path}" />
             </classpath>

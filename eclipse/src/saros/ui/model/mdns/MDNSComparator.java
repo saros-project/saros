@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model.mdns;
+package saros.ui.model.mdns;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;

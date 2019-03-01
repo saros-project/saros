@@ -1,9 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package saros.intellij.editor;
 
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +8,9 @@ import java.util.ListIterator;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.filesystem.IFile;
+import saros.intellij.filesystem.VirtualFileConverter;
 
 /** Class used to capture and re-apply which editors are currently selected by the user. */
 // TODO consider duplicated open editors during screen splitting

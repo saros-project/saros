@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.intellij;
+package saros.intellij;
 
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.context.AbstractContextLifecycle;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
-import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.SwtLibLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import saros.HTMLUIContextFactory;
+import saros.context.AbstractContextLifecycle;
+import saros.context.IContextFactory;
+import saros.intellij.context.SarosIntellijContextFactory;
+import saros.intellij.ui.swt_browser.SwtLibLoader;
 
 /**
  * Extends the {@link AbstractContextLifecycle} for an IntelliJ plug-in. It contains additional

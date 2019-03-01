@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
+import saros.whiteboard.sxe.constants.RecordType;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
 
 /**
  * The most generalized version of an SXE record.
@@ -57,7 +57,7 @@ public interface IRecord {
    * Sets the sender of this record
    *
    * @param sender
-   * @throws de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.CommittedRecordException
+   * @throws saros.whiteboard.sxe.exceptions.CommittedRecordException
    */
   public void setSender(String sender);
 }

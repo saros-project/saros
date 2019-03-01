@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.intellij.session;
+package saros.intellij.session;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import org.jetbrains.annotations.NotNull;
+import saros.activities.SPath;
+import saros.filesystem.IResource;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.SessionEndReason;
 
 /**
  * A utility class to provide easy access to functionality needing a session object.

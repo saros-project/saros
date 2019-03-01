@@ -1,5 +1,5 @@
 /** */
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Event;

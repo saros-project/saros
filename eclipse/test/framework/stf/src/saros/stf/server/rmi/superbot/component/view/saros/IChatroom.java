@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros;
+package saros.stf.server.rmi.superbot.component.view.saros;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

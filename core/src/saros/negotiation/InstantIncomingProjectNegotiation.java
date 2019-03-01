@@ -1,20 +1,5 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.stream.IncomingStreamProtocol;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -23,6 +8,21 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
+import saros.exceptions.LocalCancellationException;
+import saros.exceptions.SarosCancellationException;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IProject;
+import saros.filesystem.IWorkspace;
+import saros.monitoring.IProgressMonitor;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.negotiation.stream.IncomingStreamProtocol;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.observables.FileReplacementInProgressObservable;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
 
 /** Receive shared Projects and display them instant using a stream based solution. */
 public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNegotiation {

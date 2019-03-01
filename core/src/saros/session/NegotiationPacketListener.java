@@ -1,21 +1,21 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.CancelProjectNegotiationExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
-import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import saros.communication.extensions.CancelInviteExtension;
+import saros.communication.extensions.CancelProjectNegotiationExtension;
+import saros.communication.extensions.InvitationAcknowledgedExtension;
+import saros.communication.extensions.InvitationOfferingExtension;
+import saros.communication.extensions.ProjectNegotiationOfferingExtension;
+import saros.negotiation.ProjectNegotiation;
+import saros.negotiation.ProjectNegotiationData;
+import saros.negotiation.SessionNegotiation;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
 
 /**
  * This class is responsible for receiving, handling, and/or forwarding specific network messages

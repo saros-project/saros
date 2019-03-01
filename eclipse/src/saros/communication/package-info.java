@@ -15,4 +15,4 @@
  *       direct one-to-one chat (single) which is session-independent.
  * </ul>
  */
-package de.fu_berlin.inf.dpp.communication;
+package saros.communication;

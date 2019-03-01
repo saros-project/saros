@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.editor.annotations;
+package saros.editor.annotations;
 
-import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
+import saros.editor.internal.LocationAnnotationManager;
+import saros.session.User;
+import saros.ui.Messages;
+import saros.ui.util.ModelFormatUtils;
 
 /**
  * Mimics the text cursor and selection of other session participants.
@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
  */
 public class SelectionAnnotation extends SarosAnnotation {
 
-  protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
+  protected static final String TYPE = "saros.annotations.selection";
 
   public SelectionAnnotation(User source, boolean isCursor) {
     super(

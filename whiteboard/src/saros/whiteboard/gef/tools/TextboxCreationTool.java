@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.tools;
+package saros.whiteboard.gef.tools;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.TextboxCreateCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
-import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateTextBoxRequest;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.jface.dialogs.InputDialog;
+import saros.whiteboard.gef.commands.TextboxCreateCommand;
+import saros.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
+import saros.whiteboard.gef.request.CreateTextBoxRequest;
 
 public class TextboxCreationTool extends CreationToolWithoutSelection {
 

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.editor.colorstorage;
+package saros.intellij.editor.colorstorage;
 
 import java.awt.Color;
 

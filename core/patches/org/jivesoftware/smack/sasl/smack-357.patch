@@ -1,7 +1,7 @@
-diff --git a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/sasl/SASLGSSAPIMechanism.java b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/sasl/SASLGSSAPIMechanism.java
+diff --git a/saros/ext-src/org/jivesoftware/smack/sasl/SASLGSSAPIMechanism.java b/saros/ext-src/org/jivesoftware/smack/sasl/SASLGSSAPIMechanism.java
 index fb2ee89..c9a32bd 100644
---- a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/sasl/SASLGSSAPIMechanism.java
-+++ b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/sasl/SASLGSSAPIMechanism.java
+--- a/saros/ext-src/org/jivesoftware/smack/sasl/SASLGSSAPIMechanism.java
++++ b/saros/ext-src/org/jivesoftware/smack/sasl/SASLGSSAPIMechanism.java
 @@ -70,8 +70,7 @@
          String[] mechanisms = { getName() };
          Map<String, String> props = new HashMap<String, String>();
@@ -22,10 +22,10 @@ index fb2ee89..c9a32bd 100644
          authenticate();
      }
  
-diff --git a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/sasl/SASLMechanism.java b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/sasl/SASLMechanism.java
+diff --git a/saros/ext-src/org/jivesoftware/smack/sasl/SASLMechanism.java b/saros/ext-src/org/jivesoftware/smack/sasl/SASLMechanism.java
 index 4ea801f..2681b09 100644
---- a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/sasl/SASLMechanism.java
-+++ b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/sasl/SASLMechanism.java
+--- a/saros/ext-src/org/jivesoftware/smack/sasl/SASLMechanism.java
++++ b/saros/ext-src/org/jivesoftware/smack/sasl/SASLMechanism.java
 @@ -154,7 +154,7 @@
  
          String[] mechanisms = { getName() };

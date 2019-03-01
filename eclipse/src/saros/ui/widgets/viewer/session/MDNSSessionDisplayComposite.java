@@ -1,24 +1,24 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
+package saros.ui.widgets.viewer.session;
 
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
-import de.fu_berlin.inf.dpp.session.internal.SarosSession;
-import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
-import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSComparator;
-import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.session.SessionComparator;
-import de.fu_berlin.inf.dpp.ui.model.session.SessionContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.session.SessionInput;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.picocontainer.annotations.Inject;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
+import saros.net.ConnectionState;
+import saros.net.mdns.MDNSService;
+import saros.session.internal.SarosSession;
+import saros.ui.model.TreeLabelProvider;
+import saros.ui.model.mdns.MDNSComparator;
+import saros.ui.model.mdns.MDNSContentProvider;
+import saros.ui.model.session.SessionComparator;
+import saros.ui.model.session.SessionContentProvider;
+import saros.ui.model.session.SessionInput;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.ViewerUtils;
 
 /**
  * This {@link Composite} displays the {@link SarosSession} and the Local Area Network via MDNS in

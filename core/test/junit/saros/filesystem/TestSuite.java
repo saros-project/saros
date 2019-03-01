@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

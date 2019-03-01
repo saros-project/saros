@@ -9,13 +9,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/de.fu_berlin.inf.dpp" />
-            <option value="$PROJECT_DIR$/de.fu_berlin.inf.dpp.core" />
-            <option value="$PROJECT_DIR$/de.fu_berlin.inf.dpp.intellij" />
-            <option value="$PROJECT_DIR$/de.fu_berlin.inf.dpp.server" />
-            <option value="$PROJECT_DIR$/de.fu_berlin.inf.dpp.ui" />
-            <option value="$PROJECT_DIR$/de.fu_berlin.inf.dpp.ui.frontend" />
-            <option value="$PROJECT_DIR$/de.fu_berlin.inf.dpp.whiteboard" />
+            <option value="$PROJECT_DIR$/saros" />
+            <option value="$PROJECT_DIR$/saros.core" />
+            <option value="$PROJECT_DIR$/saros.intellij" />
+            <option value="$PROJECT_DIR$/saros.server" />
+            <option value="$PROJECT_DIR$/saros.ui" />
+            <option value="$PROJECT_DIR$/saros.ui.frontend" />
+            <option value="$PROJECT_DIR$/saros.whiteboard" />
           </set>
         </option>
         <option name="useAutoImport" value="true" />

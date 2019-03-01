@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.synchronize.internal;
+package saros.synchronize.internal;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import saros.annotations.Component;
+import saros.synchronize.UISynchronizer;
+import saros.util.StackTrace;
 
 @Component(module = "eclipse")
 // TODO rename to EclipseSWTSynchronizer

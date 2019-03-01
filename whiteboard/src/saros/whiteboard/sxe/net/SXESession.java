@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
+package saros.whiteboard.sxe.net;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import java.util.Random;
+import saros.whiteboard.sxe.constants.SXEMessageType;
 
 /**
  * Simple session object to store IDs and manage a message counter

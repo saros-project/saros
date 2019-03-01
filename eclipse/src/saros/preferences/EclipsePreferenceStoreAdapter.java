@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -10,8 +10,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  * Adapts Eclipse's preference storing and change notification mechanism to Saros's IPreferences
  * interface.
  */
-public class EclipsePreferenceStoreAdapter
-    implements de.fu_berlin.inf.dpp.preferences.IPreferenceStore {
+public class EclipsePreferenceStoreAdapter implements saros.preferences.IPreferenceStore {
 
   private final IPreferenceStore delegate;
   private final List<IPreferenceChangeListener> listeners =

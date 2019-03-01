@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import java.io.IOException;
 import org.eclipse.core.runtime.CoreException;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.ProgressMonitorAdapterFactory;
 
 /**
  * Takes an {@link org.eclipse.core.resources.IWorkspaceRunnable Eclipse WorkspaceRunnable} and

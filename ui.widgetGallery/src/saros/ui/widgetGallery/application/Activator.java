@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.application;
+package saros.ui.widgetGallery.application;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -8,7 +8,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
   // The plug-in ID
-  public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp.ui.widgetGallery"; // $NON-NLS-1$
+  public static final String PLUGIN_ID = "saros.ui.widgetGallery"; // $NON-NLS-1$
 
   // The shared instance
   private static Activator plugin;

@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.ui.dialogs;
+package saros.ui.dialogs;
 
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import org.apache.log4j.Logger;
+import saros.ui.util.DialogUtils;
+import saros.ui.util.SWTUtils;
 
 public class WarningMessageDialog {
 

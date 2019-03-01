@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.tools;
+package saros.whiteboard.gef.tools;
 
-import de.fu_berlin.inf.dpp.whiteboard.Activator;
 import org.eclipse.draw2d.Cursors;
 import org.eclipse.gef.palette.ToolEntry;
 import org.eclipse.gef.tools.PanningSelectionTool;
 import org.eclipse.swt.graphics.Cursor;
+import saros.whiteboard.Activator;
 
 /**
  * An adaption of the PanningSelectionTool for panning only

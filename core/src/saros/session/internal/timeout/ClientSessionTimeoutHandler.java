@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.session.internal.timeout;
+package saros.session.internal.timeout;
 
-import de.fu_berlin.inf.dpp.communication.extensions.PingExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.PongExtension;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
+import saros.communication.extensions.PingExtension;
+import saros.communication.extensions.PongExtension;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.internal.ActivitySequencer;
+import saros.util.ThreadUtils;
 
 /**
  * Component for detecting network errors on the client side of a session.

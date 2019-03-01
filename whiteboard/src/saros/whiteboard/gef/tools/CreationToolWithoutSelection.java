@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.tools;
+package saros.whiteboard.gef.tools;
 
 import org.apache.log4j.Logger;
 import org.eclipse.gef.EditPart;

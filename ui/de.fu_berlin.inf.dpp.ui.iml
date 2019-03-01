@@ -14,10 +14,10 @@
       <sourceFolder url="file://$MODULE_DIR$/test/junit" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/test/framework/stf/src" isTestSource="false" />
     </content>
-    <orderEntry type="module" module-name="de.fu_berlin.inf.dpp.core" />
+    <orderEntry type="module" module-name="saros.core" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="de.fu_berlin.inf.dpp.ui.frontend" />
+    <orderEntry type="module" module-name="saros.ui.frontend" />
     <orderEntry type="library" exported="" scope="PROVIDED" name="gson-2.3" level="project" />
     <orderEntry type="library" exported="" scope="PROVIDED" name="swt-debug" level="project" />
     <orderEntry type="module-library" exported="">

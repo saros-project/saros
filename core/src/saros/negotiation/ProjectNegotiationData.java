@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;

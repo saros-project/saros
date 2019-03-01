@@ -1,19 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package saros.ui.wizards;
 
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.CancelListener;
-import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.ShowDescriptionPage;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
@@ -24,6 +10,20 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import saros.monitoring.ProgressMonitorAdapterFactory;
+import saros.negotiation.CancelListener;
+import saros.negotiation.IncomingSessionNegotiation;
+import saros.negotiation.NegotiationTools.CancelLocation;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.negotiation.SessionNegotiation;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.ui.Messages;
+import saros.ui.util.DialogUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.wizards.dialogs.WizardDialogAccessable;
+import saros.ui.wizards.pages.ShowDescriptionPage;
+import saros.util.ThreadUtils;
 
 /**
  * A wizard that guides the user through an incoming invitation process.

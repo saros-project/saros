@@ -1,33 +1,33 @@
-package de.fu_berlin.inf.dpp.intellij.project;
+package saros.intellij.project;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
-import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
-import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
-import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
-import de.fu_berlin.inf.dpp.intellij.editor.SelectedEditorState;
-import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
-import de.fu_berlin.inf.dpp.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
-import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.Startable;
+import saros.activities.FileActivity;
+import saros.activities.FolderCreatedActivity;
+import saros.activities.FolderDeletedActivity;
+import saros.activities.IActivity;
+import saros.activities.IFileSystemModificationActivity;
+import saros.activities.SPath;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
+import saros.intellij.editor.EditorManager;
+import saros.intellij.editor.LocalEditorHandler;
+import saros.intellij.editor.LocalEditorManipulator;
+import saros.intellij.editor.SelectedEditorState;
+import saros.intellij.editor.annotations.AnnotationManager;
+import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
+import saros.observables.FileReplacementInProgressObservable;
+import saros.session.AbstractActivityConsumer;
+import saros.session.AbstractActivityProducer;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityConsumer.Priority;
+import saros.session.ISarosSession;
 
 /** The SharedResourcesManager creates and handles file and folder activities. */
 public class SharedResourcesManager extends AbstractActivityProducer implements Startable {

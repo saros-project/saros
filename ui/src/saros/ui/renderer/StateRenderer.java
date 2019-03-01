@@ -1,33 +1,32 @@
-package de.fu_berlin.inf.dpp.ui.renderer;
+package saros.ui.renderer;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.account.IAccountStoreListener;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.core_facades.RosterFacade;
-import de.fu_berlin.inf.dpp.ui.core_facades.RosterFacade.RosterChangeListener;
-import de.fu_berlin.inf.dpp.ui.model.Contact;
-import de.fu_berlin.inf.dpp.ui.model.State;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
+import saros.HTMLUIContextFactory;
+import saros.account.IAccountStoreListener;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.ui.JavaScriptAPI;
+import saros.ui.core_facades.RosterFacade;
+import saros.ui.core_facades.RosterFacade.RosterChangeListener;
+import saros.ui.model.Contact;
+import saros.ui.model.State;
 
 /**
  * This class is responsible for transferring information about the state of Saros to the browser so
- * they can be displayed. This information are encapsulated in {@link
- * de.fu_berlin.inf.dpp.ui.model.State}.
+ * they can be displayed. This information are encapsulated in {@link saros.ui.model.State}.
  *
- * <p>This class also manages the {@link de.fu_berlin.inf.dpp.ui.model.State} via listeners for the
- * {@link de.fu_berlin.inf.dpp.net.ConnectionState} and the {@link org.jivesoftware.smack.Roster},
- * from which the list of {@link de.fu_berlin.inf.dpp.ui.model.Contact}s is created.
+ * <p>This class also manages the {@link saros.ui.model.State} via listeners for the {@link
+ * saros.net.ConnectionState} and the {@link org.jivesoftware.smack.Roster}, from which the list of
+ * {@link saros.ui.model.Contact}s is created.
  */
 public class StateRenderer extends Renderer {
 

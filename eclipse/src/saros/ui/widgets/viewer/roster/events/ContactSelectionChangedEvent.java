@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events;
+package saros.ui.widgets.viewer.roster.events;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import saros.net.xmpp.JID;
 
 public class ContactSelectionChangedEvent {
   private JID jid;

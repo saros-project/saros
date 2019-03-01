@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import saros.filesystem.IPath;
 
 public class ServerPathImpl implements IPath {
 

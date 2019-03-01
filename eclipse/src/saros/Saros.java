@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -17,6 +13,10 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
+import saros.annotations.Component;
+import saros.editor.annotations.SarosAnnotation;
+import saros.util.ThreadUtils;
+import saros.versioning.VersionManager;
 
 /**
  * The main plug-in of Saros.
@@ -37,7 +37,7 @@ public class Saros extends AbstractUIPlugin {
    */
 
   /** This is the Bundle-SymbolicName (a.k.a the pluginID) */
-  public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp"; // $NON-NLS-1$
+  public static final String PLUGIN_ID = "saros.eclipse"; // $NON-NLS-1$
 
   private static final String VERSION_COMPATIBILITY_PROPERTY_FILE = "version.comp"; // $NON-NLS-1$
 
@@ -197,8 +197,7 @@ public class Saros extends AbstractUIPlugin {
    */
   public static boolean useHtmlGui() {
     // TODO store constant string elsewhere
-    return Platform.getBundle("de.fu_berlin.inf.dpp.ui") != null
-        && Boolean.getBoolean("saros.swtbrowser");
+    return Platform.getBundle("saros.ui") != null && Boolean.getBoolean("saros.swtbrowser");
   }
 
   private void setupLoggers() {
@@ -208,8 +207,7 @@ public class Saros extends AbstractUIPlugin {
      */
     final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-    final boolean isDebugMode =
-        Boolean.getBoolean("de.fu_berlin.inf.dpp.debug") || isDebugging(); // $NON-NLS-1$
+    final boolean isDebugMode = Boolean.getBoolean("saros.debug") || isDebugging(); // $NON-NLS-1$
 
     final String log4jPropertyFile =
         isDebugMode

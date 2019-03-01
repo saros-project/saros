@@ -2,7 +2,7 @@
  * Created on 20.01.2005
  *
  */
-package de.fu_berlin.inf.dpp.observables;
+package saros.observables;
 
 /**
  * Listener interface for listening to changes of a {@link ObservableValue}.

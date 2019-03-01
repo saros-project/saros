@@ -1,25 +1,5 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.stream.OutgoingStreamProtocol;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
@@ -37,6 +17,26 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import saros.activities.SPath;
+import saros.editor.IEditorManager;
+import saros.editor.ISharedEditorListener;
+import saros.editor.remote.UserEditorStateManager;
+import saros.exceptions.LocalCancellationException;
+import saros.exceptions.SarosCancellationException;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IProject;
+import saros.filesystem.IWorkspace;
+import saros.monitoring.IProgressMonitor;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.negotiation.stream.OutgoingStreamProtocol;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.User;
+import saros.synchronize.StartHandle;
 
 /** Share Projects to display them instant on client side using a stream based solution. */
 public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNegotiation {

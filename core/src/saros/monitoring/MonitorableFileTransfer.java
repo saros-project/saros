@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.monitoring;
+package saros.monitoring;
 
-import de.fu_berlin.inf.dpp.util.CoreUtils;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import saros.util.CoreUtils;
 
 public class MonitorableFileTransfer {
   private static final int INTERVAL = 200;

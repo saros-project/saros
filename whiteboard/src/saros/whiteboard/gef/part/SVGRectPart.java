@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.part;
+package saros.whiteboard.gef.part;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGRectRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.draw2d.Border;
 import org.eclipse.draw2d.IFigure;
@@ -9,6 +7,8 @@ import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.swt.graphics.Color;
+import saros.whiteboard.gef.model.SVGRectRecord;
+import saros.whiteboard.gef.util.ColorUtils;
 
 public class SVGRectPart extends ElementRecordPart {
 

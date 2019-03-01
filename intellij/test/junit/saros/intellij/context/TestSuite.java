@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.context;
+package saros.intellij.context;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

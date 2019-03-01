@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot;
+package saros.stf.server.rmi.htmlbot;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion;
 import java.rmi.RemoteException;
+import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.ui.views.SarosViewBrowserVersion;
 
 public class EclipseHTMLWorkbenchBot implements IHTMLWorkbenchBot {
 

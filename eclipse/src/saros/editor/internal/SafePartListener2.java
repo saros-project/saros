@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.editor.internal;
+package saros.editor.internal;
 
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
+import saros.util.ThreadUtils;
 
 /**
  * A listener which forwards calls to a another IPartListener2, but catches all exception which

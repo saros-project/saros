@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij;
+package saros.intellij;
 
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.Keymap;

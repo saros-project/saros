@@ -1,17 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
+package saros.ui.widgets.viewer.session;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -25,6 +13,18 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.editor.EditorManager;
+import saros.filesystem.IProject;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.ISessionListener;
+import saros.session.SessionEndReason;
+import saros.ui.util.LayoutUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.ViewerUtils;
+import saros.ui.widgets.viewer.ViewerComposite;
 
 /**
  * Base composite to extend for creating composites that will display the current {@link

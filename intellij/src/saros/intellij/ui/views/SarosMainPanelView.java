@@ -1,7 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.views;
+package saros.intellij.ui.views;
 
 import com.intellij.ui.components.JBScrollPane;
-import de.fu_berlin.inf.dpp.intellij.ui.tree.SessionAndContactsTreeView;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -10,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ScrollPaneConstants;
+import saros.intellij.ui.tree.SessionAndContactsTreeView;
 
 /**
  * Saros main panel view containing the {@link SessionAndContactsTreeView}, the {@link SarosToolbar}

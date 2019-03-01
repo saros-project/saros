@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.roster;
+package saros.ui.widgetGallery.demoSuits.roster;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoExplorer.DemoSuite;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
 
 @DemoSuite({
   BuddyDisplayCompositeDemo.class,

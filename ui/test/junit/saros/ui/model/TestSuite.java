@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

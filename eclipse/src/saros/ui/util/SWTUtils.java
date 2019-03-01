@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
-import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Callable;
@@ -16,6 +14,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import saros.util.StackTrace;
+import saros.util.ThreadUtils;
 
 public class SWTUtils {
 

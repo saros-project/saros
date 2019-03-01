@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.util;
+package saros.whiteboard.sxe.util;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
+import saros.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.records.IRecord;
 
 /**
  * Use this class to divide a bunch of records in root records and records that are descendants of

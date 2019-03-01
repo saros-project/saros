@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.test.mocks;
+package saros.test.mocks;
 
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
 import org.powermock.core.spi.PowerMockPolicy;
 import org.powermock.mockpolicies.MockPolicyClassLoadingSettings;
 import org.powermock.mockpolicies.MockPolicyInterceptionSettings;
+import saros.account.XMPPAccountStore;
+import saros.editor.colorstorage.ColorIDSetStorage;
+import saros.negotiation.NegotiationFactory;
 
 /**
  * This policy can be used to avoid reiterating which core components need to be prepared by

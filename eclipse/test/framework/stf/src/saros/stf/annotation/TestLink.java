@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.annotation;
+package saros.stf.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

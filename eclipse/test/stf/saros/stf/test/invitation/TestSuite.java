@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package saros.stf.test.invitation;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot;
+package saros.stf.server.rmi.htmlbot;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

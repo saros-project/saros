@@ -1,21 +1,21 @@
-package de.fu_berlin.inf.dpp.server;
+package saros.server;
 
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.context.AbstractContextLifecycle;
-import de.fu_berlin.inf.dpp.context.ContainerContext;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.communication.connection.ConnectionHandler;
+import saros.context.AbstractContextLifecycle;
+import saros.context.ContainerContext;
+import saros.context.IContextFactory;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSessionManager;
+import saros.session.SessionEndReason;
 
 public class ServerLifecycle extends AbstractContextLifecycle {
 
@@ -54,7 +54,7 @@ public class ServerLifecycle extends AbstractContextLifecycle {
     if (jidString == null || password == null) {
       log.fatal(
           "XMPP credentials are missing! Pass the "
-              + "system properties de.fu_berlin.inf.dpp.server.jid and"
+              + "system properties saros.server.jid and"
               + "de.fu_berln.inf.dpp.server.password to the server");
       stop();
       System.exit(1);

@@ -1,16 +1,15 @@
-package de.fu_berlin.inf.dpp.monitoring;
+package saros.monitoring;
 
 /**
  * Adapter class which turns a Saros core progress monitor into an Eclipse one.
  *
- * @see de.fu_berlin.inf.dpp.monitoring.IProgressMonitor
+ * @see saros.monitoring.IProgressMonitor
  * @see org.eclipse.core.runtime.IProgressMonitor
  */
 public class CoreToEclipseMonitorAdapter
-    implements org.eclipse.core.runtime.IProgressMonitor,
-        de.fu_berlin.inf.dpp.monitoring.IProgressMonitor {
+    implements org.eclipse.core.runtime.IProgressMonitor, saros.monitoring.IProgressMonitor {
 
-  private final de.fu_berlin.inf.dpp.monitoring.IProgressMonitor monitor;
+  private final saros.monitoring.IProgressMonitor monitor;
   private double collectedWork;
 
   /**
@@ -18,7 +17,7 @@ public class CoreToEclipseMonitorAdapter
    *
    * @param monitor Saros core progress monitor to wrap
    */
-  public CoreToEclipseMonitorAdapter(de.fu_berlin.inf.dpp.monitoring.IProgressMonitor monitor) {
+  public CoreToEclipseMonitorAdapter(saros.monitoring.IProgressMonitor monitor) {
     this.monitor = monitor;
   }
 

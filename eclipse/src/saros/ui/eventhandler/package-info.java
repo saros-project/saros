@@ -7,4 +7,4 @@
  * is for hybrid classes that contain a small amount of "business logic" and much ui code.
  * </ul>
  */
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;

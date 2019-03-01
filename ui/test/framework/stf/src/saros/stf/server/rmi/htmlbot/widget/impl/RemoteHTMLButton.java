@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl;
+package saros.stf.server.rmi.htmlbot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLButton;
 import java.rmi.RemoteException;
+import saros.stf.server.HTMLSTFRemoteObject;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLButton;
 
 public final class RemoteHTMLButton extends HTMLSTFRemoteObject implements IRemoteHTMLButton {
 

@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLine;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotChatLine;
 import java.rmi.RemoteException;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.widget.SarosSWTBotChatLine;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotChatLine;
 
 public final class RemoteBotChatLine extends StfRemoteObject implements IRemoteBotChatLine {
 

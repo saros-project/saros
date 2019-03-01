@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.filesystem.FileSystem;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.filesystem.FileSystem;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.NullProgressMonitor;
+import saros.negotiation.FileList.MetaData;
 
 /**
  * Offers two ways to create {@link FileList file lists}.

@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.test.util;
+package saros.test.util;
 
-import de.fu_berlin.inf.dpp.preferences.IPreferenceChangeListener;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import java.util.HashMap;
+import saros.preferences.IPreferenceChangeListener;
+import saros.preferences.IPreferenceStore;
 
 /**
  * A simple in-memory implementation of the {@link IPreferenceStore} interface. It currently doesn't

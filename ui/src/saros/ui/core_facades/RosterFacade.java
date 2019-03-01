@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.core_facades;
+package saros.ui.core_facades;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
-import de.fu_berlin.inf.dpp.observables.ObservableValue;
-import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +8,14 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
+import saros.HTMLUIContextFactory;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.roster.IRosterListener;
+import saros.net.xmpp.roster.RosterTracker;
+import saros.observables.ObservableValue;
+import saros.observables.ValueChangeListener;
 
 /**
  * Bundles all backend calls to alter the currently active account's contact list. Provides a

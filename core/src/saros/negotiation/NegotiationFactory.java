@@ -1,23 +1,23 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ProjectNegotiationTypeHook;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import java.util.List;
+import saros.context.IContainerContext;
+import saros.editor.IEditorManager;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IWorkspace;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.IConnectionManager;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.observables.FileReplacementInProgressObservable;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ProjectNegotiationTypeHook;
+import saros.session.User;
+import saros.versioning.VersionManager;
 
 public final class NegotiationFactory {
 

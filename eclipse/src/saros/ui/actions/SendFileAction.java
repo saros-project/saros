@@ -1,20 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.actions;
+package saros.ui.actions;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.jobs.IncomingFileTransferJob;
-import de.fu_berlin.inf.dpp.ui.jobs.OutgoingFileTransferJob;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.CoreUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -39,6 +24,21 @@ import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.negotiation.ProjectNegotiation;
+import saros.net.ConnectionState;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.session.User;
+import saros.ui.Messages;
+import saros.ui.jobs.IncomingFileTransferJob;
+import saros.ui.jobs.OutgoingFileTransferJob;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.selection.SelectionUtils;
+import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.util.CoreUtils;
 
 /**
  * Action for sending and receiving a file over XMPP.

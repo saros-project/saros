@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
-import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
-import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import org.picocontainer.Startable;
+import saros.activities.StartFollowingActivity;
+import saros.activities.StopFollowingActivity;
+import saros.session.AbstractActivityProducer;
+import saros.session.ISarosSession;
+import saros.session.User;
 
 /**
  * The FollowModeBroadcaster is responsible for distributing the current follow mode state of the

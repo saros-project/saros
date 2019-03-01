@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.intellij.project.filesystem;
+package saros.intellij.project.filesystem;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
-import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
-import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
-import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import java.io.IOException;
 import org.apache.log4j.Logger;
+import saros.exceptions.OperationCanceledException;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
+import saros.filesystem.IWorkspaceRunnable;
+import saros.intellij.filesystem.Filesystem;
+import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.monitoring.NullProgressMonitor;
 
 public class IntelliJWorkspaceImpl implements IWorkspace {
   public static final Logger LOG = Logger.getLogger(IntelliJWorkspaceImpl.class);

@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.feedback.Messages;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.util.FontUtils;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite.IllustratedText;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleNoteComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.SummaryItemComposite;
-import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardPage;
@@ -20,6 +9,17 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import saros.SarosPluginContext;
+import saros.feedback.Messages;
+import saros.net.xmpp.JID;
+import saros.ui.ImageManager;
+import saros.ui.util.FontUtils;
+import saros.ui.util.LayoutUtils;
+import saros.ui.widgets.SimpleIllustratedComposite;
+import saros.ui.widgets.SimpleIllustratedComposite.IllustratedText;
+import saros.ui.widgets.SimpleNoteComposite;
+import saros.ui.widgets.wizard.SummaryItemComposite;
+import saros.ui.wizards.ConfigurationWizard;
 
 /**
  * Final {@link WizardPage} for the {@link ConfigurationWizard} that summarizes the made
@@ -31,10 +31,9 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
 
   private static final Logger LOG = Logger.getLogger(ConfigurationSummaryWizardPage.class);
 
-  public static final String TITLE =
-      de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_title;
+  public static final String TITLE = saros.ui.Messages.ConfigurationSummaryWizardPage_title;
   public static final String DESCRIPTION =
-      de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_description;
+      saros.ui.Messages.ConfigurationSummaryWizardPage_description;
 
   private Composite composite;
   private SimpleIllustratedComposite jid;
@@ -87,8 +86,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
 
     Label successLabel = new Label(autoConnectComposite, SWT.WRAP);
     successLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    successLabel.setText(
-        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_label_success);
+    successLabel.setText(saros.ui.Messages.ConfigurationSummaryWizardPage_label_success);
     FontUtils.makeBold(successLabel);
 
     SimpleNoteComposite check =
@@ -96,7 +94,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
             autoConnectComposite,
             SWT.BORDER,
             ImageManager.ELCL_PREFERENCES_OPEN,
-            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_check_settings);
+            saros.ui.Messages.ConfigurationSummaryWizardPage_check_settings);
     check.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     check.setSpacing(5);
 
@@ -105,7 +103,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
             autoConnectComposite,
             SWT.BORDER,
             ImageManager.ELCL_CONTACT_ADD,
-            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_addContacts);
+            saros.ui.Messages.ConfigurationSummaryWizardPage_addContacts);
 
     addContacts.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     addContacts.setSpacing(5);
@@ -115,7 +113,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
             autoConnectComposite,
             SWT.BORDER,
             ImageManager.ELCL_SESSION,
-            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_share_project);
+            saros.ui.Messages.ConfigurationSummaryWizardPage_share_project);
     shareProjects.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     shareProjects.setSpacing(5);
 
@@ -126,8 +124,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
     Group rightColumn = new Group(composite, SWT.NONE);
     rightColumn.setLayout(LayoutUtils.createGridLayout(5, 0));
     rightColumn.setText(
-        de.fu_berlin.inf.dpp.ui.Messages
-            .ConfigurationSummaryWizardPage_right_column_your_configuration);
+        saros.ui.Messages.ConfigurationSummaryWizardPage_right_column_your_configuration);
 
     /*
      * jid settings
@@ -215,19 +212,18 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
       autoConnection.setContent(
           new IllustratedText(
               ImageManager.ELCL_XMPP_CONNECTED,
-              de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_connect_auto));
+              saros.ui.Messages.ConfigurationSummaryWizardPage_connect_auto));
     } else {
       autoConnection.setContent(
           new IllustratedText(
               ImageManager.DLCL_XMPP_CONNECTED,
-              de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_connect_auto_not));
+              saros.ui.Messages.ConfigurationSummaryWizardPage_connect_auto_not));
     }
 
     if (uPnPEnabled) {
       uPnPOption.setContent(
           new IllustratedText(
-              ImageManager.ICON_UPNP,
-              de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_use_upnp));
+              ImageManager.ICON_UPNP, saros.ui.Messages.ConfigurationSummaryWizardPage_use_upnp));
     } else {
 
       Image disabledUPnP = null;
@@ -239,8 +235,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
 
       uPnPOption.setContent(
           new IllustratedText(
-              disabledUPnP,
-              de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_use_upnp_not));
+              disabledUPnP, saros.ui.Messages.ConfigurationSummaryWizardPage_use_upnp_not));
     }
 
     if (!currentSkypeUsername.isEmpty()) {
@@ -248,15 +243,13 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
           new IllustratedText(
               ImageManager.ELCL_CONTACT_SKYPE_CALL,
               MessageFormat.format(
-                  de.fu_berlin.inf.dpp.ui.Messages
-                      .ConfigurationSummaryWizardPage_skype_show_username,
+                  saros.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username,
                   currentSkypeUsername)));
     } else {
       this.skypeUsername.setContent(
           new IllustratedText(
               ImageManager.DLCL_CONTACT_SKYPE_CALL,
-              de.fu_berlin.inf.dpp.ui.Messages
-                  .ConfigurationSummaryWizardPage_skype_show_username_not));
+              saros.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username_not));
     }
 
     if (statisticSubmissionAllowed) {

@@ -1,18 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.internal.SarosSession;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.util.FileUtils;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,6 +26,19 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
+import saros.Saros;
+import saros.SarosPluginContext;
+import saros.filesystem.EclipseProjectImpl;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.SessionEndReason;
+import saros.session.User;
+import saros.session.internal.SarosSession;
+import saros.ui.Messages;
+import saros.util.FileUtils;
+import saros.util.ThreadUtils;
 
 /**
  * Offers convenient methods for collaboration actions like sharing a project resources.
@@ -256,11 +256,11 @@ public class CollaborationUtils {
    */
   private static String getSessionDescription(ISarosSession sarosSession) {
 
-    final Set<de.fu_berlin.inf.dpp.filesystem.IProject> projects = sarosSession.getProjects();
+    final Set<saros.filesystem.IProject> projects = sarosSession.getProjects();
 
     final StringBuilder result = new StringBuilder();
 
-    for (de.fu_berlin.inf.dpp.filesystem.IProject project : projects) {
+    for (saros.filesystem.IProject project : projects) {
 
       final Pair<Long, Long> fileCountAndSize;
 
@@ -432,15 +432,11 @@ public class CollaborationUtils {
     return String.format(Locale.US, "%.2f GB", size / (1000F * 1000F * 1000F));
   }
 
-  private static Map<
-          de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>>
-      convert(Map<IProject, List<IResource>> data) {
+  private static Map<saros.filesystem.IProject, List<saros.filesystem.IResource>> convert(
+      Map<IProject, List<IResource>> data) {
 
-    Map<de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>>
-        result =
-            new HashMap<
-                de.fu_berlin.inf.dpp.filesystem.IProject,
-                List<de.fu_berlin.inf.dpp.filesystem.IResource>>();
+    Map<saros.filesystem.IProject, List<saros.filesystem.IResource>> result =
+        new HashMap<saros.filesystem.IProject, List<saros.filesystem.IResource>>();
 
     for (Entry<IProject, List<IResource>> entry : data.entrySet())
       result.put(

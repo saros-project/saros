@@ -1,7 +1,6 @@
-package de.fu_berlin.inf.dpp.ui;
+package saros.ui;
 
 import com.novocode.naf.swt.custom.BalloonWindow;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -14,6 +13,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import saros.util.ThreadUtils;
 
 public class BalloonNotification {
 

@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package saros.stf.test.invitation;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.CANCEL;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.client.tester.SarosTester.CARL;
+import static saros.stf.shared.Constants.CANCEL;
+import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
-import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.annotation.TestLink;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
 @TestLink(id = "Saros-133_user_declines_invitation_to_an_already_established_session")
 public class UserDeclinesInvitationToCurrentSessionTest extends StfTestCase {

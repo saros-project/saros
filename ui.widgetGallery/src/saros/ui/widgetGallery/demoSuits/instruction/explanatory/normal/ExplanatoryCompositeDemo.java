@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.explanatory.normal;
+package saros.ui.widgetGallery.demoSuits.instruction.explanatory.normal;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.ExplanationComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.ExplanatoryComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -12,6 +8,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgets.ExplanationComposite;
+import saros.ui.widgets.ExplanatoryComposite;
 
 @Demo
 public class ExplanatoryCompositeDemo extends AbstractDemo {

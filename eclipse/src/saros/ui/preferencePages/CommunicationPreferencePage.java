@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.preferencePages;
+package saros.ui.preferencePages;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -18,6 +14,10 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.annotations.Component;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.preferences.PreferenceConstants;
 
 @Component(module = "prefs")
 public class CommunicationPreferencePage extends FieldEditorPreferencePage

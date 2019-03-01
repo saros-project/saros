@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.net.xmpp.subscription;
+package saros.net.xmpp.subscription;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import java.text.MessageFormat;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
@@ -16,6 +11,11 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Type;
+import saros.annotations.Component;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
 
 /**
  * This is class is responsible for handling XMPP subscriptions requests.

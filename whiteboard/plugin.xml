@@ -4,9 +4,9 @@
 	<extension
          point="org.eclipse.ui.views">
 		<view
-			id="de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView"
-            category="de.fu_berlin.inf.dpp.Saros"
-            class="de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView"
+			id="saros.whiteboard.view.SarosWhiteboardView"
+            category="saros.Saros"
+            class="saros.whiteboard.view.SarosWhiteboardView"
             icon="icons/view16/whiteboard_misc.png"
             name="Saros Whiteboard"/>
 	</extension>
@@ -14,27 +14,27 @@
 	<extension 
 		point="org.eclipse.ui.views">
 		<view
-			id="de.fu_berlin.inf.dpp.whiteboard.ui.HTMLWhiteboardView"
-			category="de.fu_berlin.inf.dpp.Saros"
-			class="de.fu_berlin.inf.dpp.whiteboard.ui.HTMLWhiteboardView"
+			id="saros.whiteboard.ui.HTMLWhiteboardView"
+			category="saros.Saros"
+			class="saros.whiteboard.ui.HTMLWhiteboardView"
 			icon="icons/view16/whiteboard_misc.png"
 			name="Saros HTML Whiteboard"/>
 	</extension>
 	end HTML Whiteboard -->
 	<extension
-         	id="de.fu_berlin.inf.dpp.startup"
+         	id="saros.startup"
          	point="org.eclipse.ui.startup">
       	<startup
-            class="de.fu_berlin.inf.dpp.whiteboard.StartupWhiteboard"/>
+            class="saros.whiteboard.StartupWhiteboard"/>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="*">
          <view
-               id="de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView"
+               id="saros.whiteboard.view.SarosWhiteboardView"
                ratio="0.5"
                relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.views.SarosView"/>
+               relative="saros.ui.views.SarosView"/>
       </perspectiveExtension>
    </extension>
    
@@ -46,27 +46,27 @@
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
-               class="de.fu_berlin.inf.dpp.whiteboard.standalone.Application">
+               class="saros.whiteboard.standalone.Application">
          </run>
       </application>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="de.fu_berlin.inf.dpp.whiteboard.standalone.Perspective"
+            class="saros.whiteboard.standalone.Perspective"
             icon="icons/view16/whiteboard_misc.png"
-            id="de.fu_berlin.inf.dpp.whiteboard.standalone.perspective"
+            id="saros.whiteboard.standalone.perspective"
             name="Saros Whiteboard">
       </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor"
-            contributorClass="de.fu_berlin.inf.dpp.whiteboard.standalone.WhiteboardActionBarContributor"
+            class="saros.whiteboard.gef.editor.WhiteboardEditor"
+            contributorClass="saros.whiteboard.standalone.WhiteboardActionBarContributor"
             default="true"
             icon="icons/view16/whiteboard_misc.png"
-            id="de.fu_berlin.inf.dpp.whiteboard.whiteboardeditor"
+            id="saros.whiteboard.whiteboardeditor"
             name="Whiteboard">
       </editor>
    </extension>

@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.editor.internal;
+package saros.editor.internal;
 
-import de.fu_berlin.inf.dpp.util.Predicate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -15,6 +14,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import saros.util.Predicate;
 
 /** This class holds convenience methods for managing annotations. */
 public class AnnotationModelHelper {

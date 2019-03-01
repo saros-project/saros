@@ -1,11 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.model.roster;
+package saros.ui.model.roster;
 
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
-import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
@@ -15,6 +9,12 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.RosterPacket.ItemType;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.model.ITreeElement;
+import saros.ui.model.TreeElement;
 
 /**
  * Wrapper for {@link RosterEntryElement RosterEntryElements} in use with {@link Viewer Viewers}

@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.communication.chat;
+package saros.communication.chat;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.List;
 import java.util.Set;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.ChatState;
+import saros.net.xmpp.JID;
 
 /** This interface is used to provide unified access to multiple chat types. */
 public interface IChat {

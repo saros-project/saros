@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.util;
+package saros.ui.util;
 
 import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;

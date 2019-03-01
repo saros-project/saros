@@ -1,13 +1,10 @@
-package de.fu_berlin.inf.dpp.stf.client.util;
+package saros.stf.client.util;
 
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
+import static saros.stf.shared.Constants.ACCEPT;
+import static saros.stf.shared.Constants.NODE_SAROS;
+import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
+import static saros.stf.shared.Constants.VIEW_SAROS;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +15,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import saros.net.xmpp.JID;
+import saros.stf.client.tester.AbstractTester;
+import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class Util {
   /**

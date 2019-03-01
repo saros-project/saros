@@ -1,30 +1,30 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.communication.extensions.ConnectionEstablishedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
+import saros.communication.extensions.ConnectionEstablishedExtension;
+import saros.communication.extensions.InvitationAcceptedExtension;
+import saros.communication.extensions.InvitationAcknowledgedExtension;
+import saros.communication.extensions.InvitationCompletedExtension;
+import saros.communication.extensions.InvitationParameterExchangeExtension;
+import saros.exceptions.LocalCancellationException;
+import saros.exceptions.SarosCancellationException;
+import saros.monitoring.IProgressMonitor;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.negotiation.hooks.ISessionNegotiationHook;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.IConnectionManager;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.PacketCollector;
+import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.PreferenceStore;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.SessionEndReason;
 
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !

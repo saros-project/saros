@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
-import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser;
-import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser.ColorSelectionListener;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import saros.editor.annotations.SarosAnnotation;
+import saros.editor.colorstorage.UserColorID;
+import saros.ui.widgets.ColorChooser;
+import saros.ui.widgets.ColorChooser.ColorSelectionListener;
 
 public class ColorChooserWizardPage extends WizardPage {
 

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events;
+package saros.ui.widgets.viewer.roster.events;
 
 /** Listener for {@link ContactSelectionChangedEvent} events. */
 public interface ContactSelectionListener {

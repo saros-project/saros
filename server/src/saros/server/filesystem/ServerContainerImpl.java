@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
+import saros.filesystem.IContainer;
+import saros.filesystem.IPath;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
 
 /**
  * Server implementation of the {@link IContainer} interface. Every type of container is implemented

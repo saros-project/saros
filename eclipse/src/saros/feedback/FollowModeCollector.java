@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.annotations.Component;
+import saros.editor.FollowModeManager;
+import saros.editor.IFollowModeListener;
+import saros.session.ISarosSession;
+import saros.session.User;
 
 /**
  * A Collector class that collects the number of local follow-mode toggles executed by a user and

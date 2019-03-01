@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 import java.nio.charset.Charset;
 import org.apache.commons.codec.DecoderException;

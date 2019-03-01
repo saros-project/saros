@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
+package saros.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.Logger;
+import saros.activities.JupiterActivity;
+import saros.concurrent.jupiter.Algorithm;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.TransformationException;
+import saros.concurrent.jupiter.internal.Jupiter;
+import saros.session.User;
 
 /**
  * This proxy class on server represent the server side of the two-way jupiter protocol.

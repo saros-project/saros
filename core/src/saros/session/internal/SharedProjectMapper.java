@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.session.User;
 
 /**
  * This class is responsible for mapping global project IDs to local {@linkplain IProject projects},

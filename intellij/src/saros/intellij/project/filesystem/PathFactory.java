@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.intellij.project.filesystem;
+package saros.intellij.project.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
+import saros.filesystem.IPath;
+import saros.filesystem.IPathFactory;
 
 public class PathFactory implements IPathFactory {
   @Override

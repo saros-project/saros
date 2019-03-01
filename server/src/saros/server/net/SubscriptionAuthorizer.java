@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.server.net;
+package saros.server.net;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
-import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionListener;
 import org.apache.log4j.Logger;
+import saros.annotations.Component;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.subscription.SubscriptionHandler;
+import saros.net.xmpp.subscription.SubscriptionListener;
 
 /**
  * A component which automatically authorizes all incoming presence subscription requests from

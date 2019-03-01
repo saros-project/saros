@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.actions;
+package saros.whiteboard.gef.actions;
 
-import de.fu_berlin.inf.dpp.whiteboard.messages.WhiteboardMessages;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.Graphics;
@@ -23,6 +22,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import saros.whiteboard.messages.WhiteboardMessages;
 
 public class ExportToImageAction extends WorkbenchPartAction {
 

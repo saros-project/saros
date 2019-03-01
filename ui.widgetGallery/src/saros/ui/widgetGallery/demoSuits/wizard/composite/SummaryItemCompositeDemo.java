@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.wizard.composite;
+package saros.ui.widgetGallery.demoSuits.wizard.composite;
 
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.util.StringUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite.IllustratedText;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.SummaryItemComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.ImageManager;
+import saros.ui.util.LayoutUtils;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgetGallery.util.StringUtils;
+import saros.ui.widgets.SimpleIllustratedComposite.IllustratedText;
+import saros.ui.widgets.wizard.SummaryItemComposite;
 
 @Demo
 public class SummaryItemCompositeDemo extends AbstractDemo {

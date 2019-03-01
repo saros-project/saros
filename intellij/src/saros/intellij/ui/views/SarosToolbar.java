@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.intellij.ui.views;
+package saros.intellij.ui.views;
 
-import de.fu_berlin.inf.dpp.intellij.ui.actions.NotImplementedAction;
-import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.intellij.ui.views.buttons.ConnectButton;
-import de.fu_berlin.inf.dpp.intellij.ui.views.buttons.ConsistencyButton;
-import de.fu_berlin.inf.dpp.intellij.ui.views.buttons.FollowButton;
-import de.fu_berlin.inf.dpp.intellij.ui.views.buttons.LeaveSessionButton;
-import de.fu_berlin.inf.dpp.intellij.ui.views.buttons.SimpleButton;
 import java.awt.FlowLayout;
 import javax.swing.JToolBar;
+import saros.intellij.ui.actions.NotImplementedAction;
+import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.views.buttons.ConnectButton;
+import saros.intellij.ui.views.buttons.ConsistencyButton;
+import saros.intellij.ui.views.buttons.FollowButton;
+import saros.intellij.ui.views.buttons.LeaveSessionButton;
+import saros.intellij.ui.views.buttons.SimpleButton;
 
 /**
  * Saros toolbar. Displays several buttons for interacting with Saros.

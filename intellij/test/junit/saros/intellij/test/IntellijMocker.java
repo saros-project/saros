@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.test;
+package saros.intellij.test;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;

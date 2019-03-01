@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.editor;
+package saros.intellij.editor;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
@@ -11,11 +11,11 @@ import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.intellij.filesystem.Filesystem;
 import java.awt.Point;
 import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
+import saros.editor.text.LineRange;
+import saros.intellij.filesystem.Filesystem;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.

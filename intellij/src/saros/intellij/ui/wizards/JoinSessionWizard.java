@@ -1,22 +1,22 @@
-package de.fu_berlin.inf.dpp.intellij.ui.wizards;
+package saros.intellij.ui.wizards;
 
-import static de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
+import static saros.negotiation.NegotiationTools.CancelOption;
 
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.JobWithStatus;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.HeaderPanel;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.InfoPage;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.PageActionListener;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.awt.Window;
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.JobWithStatus;
+import saros.intellij.ui.util.NotificationPanel;
+import saros.intellij.ui.wizards.pages.HeaderPanel;
+import saros.intellij.ui.wizards.pages.InfoPage;
+import saros.intellij.ui.wizards.pages.PageActionListener;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.NullProgressMonitor;
+import saros.negotiation.IncomingSessionNegotiation;
+import saros.negotiation.NegotiationTools.CancelLocation;
+import saros.net.xmpp.JID;
+import saros.util.ThreadUtils;
 
 /**
  * A wizard that guides the user through an incoming invitation process.

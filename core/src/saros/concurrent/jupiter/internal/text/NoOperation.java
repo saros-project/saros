@@ -19,15 +19,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
+package saros.concurrent.jupiter.internal.text;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.Collections;
 import java.util.List;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.concurrent.jupiter.Operation;
+import saros.session.User;
 
 /** The NoOperation is used to hold a empty text together with the position zero. */
 @XStreamAlias("noOp")

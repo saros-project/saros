@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
 /** Parent class for FeedbackManager and StatisticManager */
 public abstract class AbstractFeedbackManager {

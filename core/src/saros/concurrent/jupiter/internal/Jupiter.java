@@ -18,26 +18,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
+package saros.concurrent.jupiter.internal;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import org.apache.log4j.Logger;
+import saros.activities.ChecksumActivity;
+import saros.activities.JupiterActivity;
+import saros.activities.SPath;
+import saros.concurrent.jupiter.Algorithm;
+import saros.concurrent.jupiter.InclusionTransformation;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.Timestamp;
+import saros.concurrent.jupiter.TransformationException;
+import saros.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
+import saros.concurrent.jupiter.internal.text.NoOperation;
+import saros.concurrent.jupiter.internal.text.TimestampOperation;
+import saros.session.User;
 
 /** This class implements the client-side core of the Jupiter control algorithm. */
 public class Jupiter implements Algorithm {

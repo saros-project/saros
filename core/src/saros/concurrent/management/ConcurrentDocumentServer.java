@@ -1,23 +1,23 @@
-package de.fu_berlin.inf.dpp.concurrent.management;
+package saros.concurrent.management;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.QueueItem;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.AbstractActivityReceiver;
+import saros.activities.ChecksumActivity;
+import saros.activities.FileActivity;
+import saros.activities.IActivity;
+import saros.activities.IActivityReceiver;
+import saros.activities.JupiterActivity;
+import saros.activities.QueueItem;
+import saros.activities.SPath;
+import saros.concurrent.jupiter.TransformationException;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
 
 /**
  * The ConcurrentDocumentServer is responsible for coordinating all JupiterActivities.

@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.session.User;
 
 /** Subclass of FileActivity that allows the specification of targets. */
 @XStreamAlias("targetedFileActivity")

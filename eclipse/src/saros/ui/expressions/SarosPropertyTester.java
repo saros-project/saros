@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.expressions;
+package saros.ui.expressions;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import org.eclipse.core.expressions.PropertyTester;
 import org.picocontainer.annotations.Inject;
+import saros.Saros;
+import saros.SarosPluginContext;
+import saros.communication.connection.ConnectionHandler;
 
 /**
  * Adds tests to a running Saros plugin. Currently only supports several network connection and
@@ -12,8 +12,7 @@ import org.picocontainer.annotations.Inject;
  */
 public class SarosPropertyTester extends PropertyTester {
 
-  private static final boolean MDNS_MODE =
-      Boolean.getBoolean("de.fu_berlin.inf.dpp.net.ENABLE_MDNS");
+  private static final boolean MDNS_MODE = Boolean.getBoolean("saros.net.ENABLE_MDNS");
 
   @Inject private ConnectionHandler connectionHandler;
 

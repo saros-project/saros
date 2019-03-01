@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
+package saros.ui.widgets.viewer.session;
 
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.model.session.AwarenessInformationTreeElement;
-import de.fu_berlin.inf.dpp.ui.model.session.UserElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import saros.editor.EditorManager;
+import saros.session.User;
+import saros.ui.model.session.AwarenessInformationTreeElement;
+import saros.ui.model.session.UserElement;
 
 public class UserInteractionListener extends MouseAdapter {
 

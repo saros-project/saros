@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate;
+package saros.intellij.eventhandler.editor.editorstate;
 
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
@@ -6,8 +6,8 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
-import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import org.jetbrains.annotations.NotNull;
+import saros.intellij.editor.LocalEditorHandler;
 
 /**
  * Dispatches matching editor activities when an editor for a shared file is opened/selected or

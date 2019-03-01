@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp.net.xmpp.discovery;
+package saros.net.xmpp.discovery;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +19,14 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo;
 import org.picocontainer.Disposable;
+import saros.annotations.Component;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.roster.IRosterListener;
+import saros.net.xmpp.roster.RosterTracker;
+import saros.util.NamedThreadFactory;
+import saros.util.StackTrace;
+import saros.util.ThreadUtils;
 
 /**
  * This class is responsible for performing ServiceDiscovery for features such as Jingle and Saros.

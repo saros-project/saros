@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.chat.chatRoom;
+package saros.ui.widgetGallery.demoSuits.chat.chatRoom;
 
-import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
-import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatControl;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.CharacterEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatControlListener;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -16,6 +9,13 @@ import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import saros.communication.chat.muc.MultiUserChat;
+import saros.communication.chat.muc.MultiUserChatPreferences;
+import saros.ui.widgets.chat.ChatControl;
+import saros.ui.widgets.chat.events.CharacterEnteredEvent;
+import saros.ui.widgets.chat.events.ChatClearedEvent;
+import saros.ui.widgets.chat.events.IChatControlListener;
+import saros.ui.widgets.chat.events.MessageEnteredEvent;
 
 public class ChatRoomParticipant {
   protected static String server = "jabber.ccc.de";

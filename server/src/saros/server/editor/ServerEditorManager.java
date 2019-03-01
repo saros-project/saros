@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.server.editor;
+package saros.server.editor;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.session.User;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.Collections;
@@ -20,6 +10,16 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.log4j.Logger;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.editor.IEditorManager;
+import saros.editor.ISharedEditorListener;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.session.User;
 
 /** Server implementation of the {@link IEditorManager} interface */
 public class ServerEditorManager implements IEditorManager {

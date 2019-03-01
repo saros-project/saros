@@ -1,27 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.model.session;
+package saros.ui.model.session;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
-import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
-import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
-import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSHeaderElement;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterHeaderElement;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,6 +10,28 @@ import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.activities.SPath;
+import saros.awareness.AwarenessInformationCollector;
+import saros.editor.EditorManager;
+import saros.editor.FollowModeManager;
+import saros.editor.IFollowModeListener;
+import saros.editor.ISharedEditorListener;
+import saros.net.mdns.MDNSService;
+import saros.net.xmpp.roster.IRosterListener;
+import saros.project.internal.FollowingActivitiesManager;
+import saros.project.internal.IFollowModeChangesListener;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
+import saros.ui.model.HeaderElement;
+import saros.ui.model.TreeContentProvider;
+import saros.ui.model.mdns.MDNSContentProvider;
+import saros.ui.model.mdns.MDNSHeaderElement;
+import saros.ui.model.roster.RosterContentProvider;
+import saros.ui.model.roster.RosterHeaderElement;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.ViewerUtils;
 
 public class SessionContentProvider extends TreeContentProvider {
 

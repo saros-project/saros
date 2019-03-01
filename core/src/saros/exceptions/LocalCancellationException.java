@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.exceptions;
+package saros.exceptions;
 
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
+import saros.negotiation.NegotiationTools.CancelOption;
 
 /** Exception used for signaling that the local user canceled an operation */
 public class LocalCancellationException extends SarosCancellationException {

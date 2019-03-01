@@ -1,11 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.preferencePages;
+package saros.ui.preferencePages;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.Messages;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -13,6 +7,12 @@ import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
+import saros.Saros;
+import saros.SarosPluginContext;
+import saros.annotations.Component;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.preferences.PreferenceConstants;
+import saros.ui.Messages;
 
 /**
  * Contains the advanced preferences - consisting of preferences that are geared towards developers
@@ -69,7 +69,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage
               getFieldEditorParent()));
     }
 
-    if (Boolean.getBoolean("de.fu_berlin.inf.dpp.server.SUPPORTED")) {
+    if (Boolean.getBoolean("saros.server.SUPPORTED")) {
       addField(
           new BooleanFieldEditor(
               EclipsePreferenceConstants.SERVER_ACTIVATED,

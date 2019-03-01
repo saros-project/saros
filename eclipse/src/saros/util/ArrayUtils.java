@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.util;
+package saros.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;

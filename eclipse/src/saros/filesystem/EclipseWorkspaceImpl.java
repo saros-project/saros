@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +8,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.MultiRule;
+import saros.Saros;
+import saros.exceptions.OperationCanceledException;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.ProgressMonitorAdapterFactory;
 
 /**
  * Eclipse implementation of {@link IWorkspace}. Lets you execute {@link IWorkspaceRunnable}s via

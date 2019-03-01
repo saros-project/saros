@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package saros.ui.wizards;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
-import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.ColorChooserWizardPage;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSettingsWizardPage;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.editor.colorstorage.UserColorID;
+import saros.feedback.ErrorLogManager;
+import saros.feedback.StatisticManagerConfiguration;
+import saros.preferences.PreferenceConstants;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.wizards.pages.ColorChooserWizardPage;
+import saros.ui.wizards.pages.ConfigurationSettingsWizardPage;
+import saros.ui.wizards.pages.ConfigurationSummaryWizardPage;
 
 /**
  * A wizard to configure Saros (XMPP account, network settings, statistic submission).

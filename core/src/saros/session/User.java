@@ -17,9 +17,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import saros.net.xmpp.JID;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse instance for the use in one

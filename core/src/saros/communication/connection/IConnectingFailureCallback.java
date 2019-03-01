@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.communication.connection;
+package saros.communication.connection;
 
 /** Simple callback interface which is being notified in case of connecting error. */
 public interface IConnectingFailureCallback {

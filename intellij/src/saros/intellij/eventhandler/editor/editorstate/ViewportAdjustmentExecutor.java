@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate;
+package saros.intellij.eventhandler.editor.editorstate;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
@@ -7,14 +7,14 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
-import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
+import saros.intellij.editor.LocalEditorManipulator;
+import saros.intellij.editor.ProjectAPI;
 
 /**
  * Queues viewport adjustments for editors that are not currently visible and executes the queued

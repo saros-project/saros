@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,6 +18,11 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.picocontainer.Startable;
+import saros.Saros;
+import saros.annotations.Component;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.session.ISarosSession;
+import saros.ui.preferencePages.FeedbackPreferencePage;
 
 /**
  * The ErrorLogManager is supposed to upload an error log file to our server at the end of a
@@ -39,7 +39,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements Startabl
   private static final Logger log = Logger.getLogger(ErrorLogManager.class.getName());
 
   private static final String ERROR_LOG_UPLOAD_URL =
-      System.getProperty("de.fu_berlin.inf.dpp.feedback.ERROR_LOG_UPLOAD_URL");
+      System.getProperty("saros.feedback.ERROR_LOG_UPLOAD_URL");
 
   protected final String sessionID;
   private static String mostRecentSessionID;

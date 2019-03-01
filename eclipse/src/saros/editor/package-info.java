@@ -25,4 +25,4 @@
  *       they occur in a document (using documentAboutToBeChanged)
  * </ul>
  */
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;

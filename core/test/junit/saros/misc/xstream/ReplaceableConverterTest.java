@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;

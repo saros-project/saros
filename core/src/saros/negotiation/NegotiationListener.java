@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
 /**
  * Listener interface for signaling termination of {@link SessionNegotiation} and {@link

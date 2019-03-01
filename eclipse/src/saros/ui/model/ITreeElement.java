@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;

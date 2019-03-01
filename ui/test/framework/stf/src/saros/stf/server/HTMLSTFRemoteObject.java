@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server;
+package saros.stf.server;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
-import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
+import saros.context.IContainerContext;
+import saros.ui.manager.BrowserManager;
 
 /**
  * This is the base class for all remote object of the HTML GUI test framework. It contains methods

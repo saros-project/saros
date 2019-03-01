@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.actions;
+package saros.ui.actions;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.SkypeManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
@@ -25,6 +14,17 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.annotations.Component;
+import saros.communication.SkypeManager;
+import saros.net.xmpp.JID;
+import saros.preferences.PreferenceConstants;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.selection.SelectionUtils;
+import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.util.ThreadUtils;
 
 /**
  * A action for skyping other JIDs.

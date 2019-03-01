@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.wizard;
+package saros.ui.widgets.wizard;
 
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.ProjectNameChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.ProjectOptionListener;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -23,6 +20,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
+import saros.ui.Messages;
+import saros.ui.widgets.wizard.events.ProjectNameChangedEvent;
+import saros.ui.widgets.wizard.events.ProjectOptionListener;
 
 public class ProjectOptionComposite extends Composite {
 

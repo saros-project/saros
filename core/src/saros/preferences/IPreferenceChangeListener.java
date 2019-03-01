@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
 /**
  * Preference changes will be handled by implementations of this listener.

@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.net.stream;
+package saros.net.stream;
 
-import de.fu_berlin.inf.dpp.net.internal.BinaryChannelConnection;
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -13,6 +9,10 @@ import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.ibb.InBandBytestreamManager;
+import saros.net.internal.BinaryChannelConnection;
+import saros.net.internal.IByteStreamConnection;
+import saros.net.internal.IByteStreamConnectionListener;
+import saros.net.xmpp.JID;
 
 /**
  * This stream service establishes IBB sessions.

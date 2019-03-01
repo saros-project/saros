@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.context;
+package saros.intellij.context;
 
-import static de.fu_berlin.inf.dpp.intellij.test.IntellijMocker.mockStaticGetInstance;
+import static saros.intellij.test.IntellijMocker.mockStaticGetInstance;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.command.CommandProcessor;
@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
-import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -19,6 +18,7 @@ import org.picocontainer.MutablePicoContainer;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import saros.test.mocks.ContextMocker;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({

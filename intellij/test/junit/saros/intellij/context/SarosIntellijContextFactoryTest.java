@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.intellij.context;
+package saros.intellij.context;
 
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
-import de.fu_berlin.inf.dpp.test.mocks.PrepareCoreComponents;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.MockPolicy;
+import saros.context.CoreContextFactory;
+import saros.context.IContextFactory;
+import saros.test.mocks.ContextMocker;
+import saros.test.mocks.PrepareCoreComponents;
 
 /** Checks the {@link SarosIntellijContextFactory} for internal integrity. */
 @MockPolicy(PrepareCoreComponents.class)

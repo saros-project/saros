@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.actions;
+package saros.whiteboard.gef.actions;
 
 import org.eclipse.swt.graphics.RGB;
 

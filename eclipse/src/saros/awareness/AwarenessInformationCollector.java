@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.awareness;
+package saros.awareness;
 
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import saros.editor.EditorManager;
+import saros.editor.remote.UserEditorStateManager;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.User;
 
 /**
  * Singleton that provides methods to collect and retrieve awareness information for session

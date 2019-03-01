@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package saros.ui.wizards;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,6 +9,16 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.communication.connection.ConnectionHandler;
+import saros.net.util.XMPPUtils;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.DialogUtils;
+import saros.ui.wizards.pages.CreateXMPPAccountWizardPage;
+import saros.util.ThreadUtils;
 
 /**
  * @JTourBusStop 4, The Interface Tour:

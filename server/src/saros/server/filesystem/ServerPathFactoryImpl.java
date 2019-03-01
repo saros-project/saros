@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
+import saros.filesystem.IPath;
+import saros.filesystem.IPathFactory;
 
 public class ServerPathFactoryImpl implements IPathFactory {
 

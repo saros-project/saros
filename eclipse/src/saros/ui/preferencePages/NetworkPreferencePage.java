@@ -1,15 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.preferencePages;
+package saros.ui.preferencePages;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
-import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +26,16 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
+import saros.Saros;
+import saros.SarosPluginContext;
+import saros.annotations.Component;
+import saros.net.upnp.IUPnPService;
+import saros.net.util.NetworkingUtils;
+import saros.preferences.PreferenceConstants;
+import saros.ui.Messages;
+import saros.ui.util.SWTUtils;
+import saros.ui.views.SarosView;
+import saros.util.ThreadUtils;
 
 /** @author Stefan Rossbach */
 @Component(module = "prefs")

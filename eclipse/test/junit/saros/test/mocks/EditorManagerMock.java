@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.test.mocks;
+package saros.test.mocks;
 
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import java.util.List;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import saros.editor.EditorManager;
+import saros.editor.ISharedEditorListener;
 
 public class EditorManagerMock {
   public static EditorManager createMock(final List<Object> editorListeners) {

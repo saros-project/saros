@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.intellij.project.filesystem;
+package saros.intellij.project.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import saros.filesystem.IPath;
 
 /**
  * TODO: This is a copy of the server implementation of the path interface. As soon as the core is

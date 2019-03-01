@@ -6,10 +6,10 @@
 		<mkdir dir="${src.dir}" />
 
 		<junit reloading="false" haltonfailure="on">
-			<sysproperty key="de.fu_berlin.inf.dpp.stf.client.configuration.files" value="${stf.client.config.files}" />
+			<sysproperty key="saros.stf.client.configuration.files" value="${stf.client.config.files}" />
 			<classpath>
 				<fileset dir="${saros.plugin.dir}">
-					<include name="de.fu_berlin.inf.dpp*.jar" />
+					<include name="saros*.jar" />
 				</fileset>
 				<fileset dir="${eclipse.plugin.dir}">
 					<include name="*.jar" />

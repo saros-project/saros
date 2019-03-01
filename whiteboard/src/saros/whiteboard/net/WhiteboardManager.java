@@ -1,32 +1,32 @@
-package de.fu_berlin.inf.dpp.whiteboard.net;
+package saros.whiteboard.net;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.GEFRecordFactory;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController.State;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEOutgoingSynchronizationProcess;
-import de.fu_berlin.inf.dpp.whiteboard.ui.browser.BrowserSXEBridge;
-import de.fu_berlin.inf.dpp.whiteboard.ui.browser.IWhiteboardBrowser;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.editor.annotations.SarosAnnotation;
+import saros.monitoring.IProgressMonitor;
+import saros.monitoring.ProgressMonitorAdapterFactory;
+import saros.negotiation.hooks.ISessionNegotiationHook;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.session.ISarosSession;
+import saros.session.ISessionLifecycleListener;
+import saros.session.SarosSessionManager;
+import saros.session.SessionEndReason;
+import saros.session.User;
+import saros.ui.util.SWTUtils;
+import saros.whiteboard.gef.model.GEFRecordFactory;
+import saros.whiteboard.gef.util.ColorUtils;
+import saros.whiteboard.sxe.ISXEMessageHandler;
+import saros.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.SXEController.State;
+import saros.whiteboard.sxe.net.SXEOutgoingSynchronizationProcess;
+import saros.whiteboard.ui.browser.BrowserSXEBridge;
+import saros.whiteboard.ui.browser.IWhiteboardBrowser;
 
 /**
  * This class makes the interconnection between Saros and SXE.

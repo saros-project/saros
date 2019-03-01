@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.server.session;
+package saros.server.session;
 
-import de.fu_berlin.inf.dpp.server.editor.ServerEditorManager;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
-import de.fu_berlin.inf.dpp.session.SarosCoreSessionContextFactory;
 import org.picocontainer.MutablePicoContainer;
+import saros.server.editor.ServerEditorManager;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionContextFactory;
+import saros.session.SarosCoreSessionContextFactory;
 
 /** Server implementation of the {@link ISarosSessionContextFactory} interface. */
 public class ServerSessionContextFactory extends SarosCoreSessionContextFactory {

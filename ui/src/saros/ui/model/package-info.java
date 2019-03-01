@@ -4,4 +4,4 @@
  * Models should not contain non-trivial logic, nor should they rely on other data types than
  * primitive types and other model classes.
  */
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;

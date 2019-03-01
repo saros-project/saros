@@ -1,22 +1,22 @@
-package de.fu_berlin.inf.dpp.stf.test;
+package saros.stf.test;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  de.fu_berlin.inf.dpp.stf.test.account.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.chatview.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.consistency.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.editing.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.filefolderoperations.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.followmode.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.html.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.invitation.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.partialsharing.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.permissions.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.roster.TestSuite.class,
-  de.fu_berlin.inf.dpp.stf.test.session.TestSuite.class
+  saros.stf.test.account.TestSuite.class,
+  saros.stf.test.chatview.TestSuite.class,
+  saros.stf.test.consistency.TestSuite.class,
+  saros.stf.test.editing.TestSuite.class,
+  saros.stf.test.filefolderoperations.TestSuite.class,
+  saros.stf.test.followmode.TestSuite.class,
+  saros.stf.test.html.TestSuite.class,
+  saros.stf.test.invitation.TestSuite.class,
+  saros.stf.test.partialsharing.TestSuite.class,
+  saros.stf.test.permissions.TestSuite.class,
+  saros.stf.test.roster.TestSuite.class,
+  saros.stf.test.session.TestSuite.class
 })
 public class StfTestSuite {
   // the class remains completely empty,

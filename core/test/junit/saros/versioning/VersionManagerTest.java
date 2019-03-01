@@ -19,18 +19,18 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package de.fu_berlin.inf.dpp.versioning;
+package saros.versioning;
 
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
-import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
 import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.test.fakes.net.FakeConnectionFactory;
+import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
 
 public class VersionManagerTest {
 

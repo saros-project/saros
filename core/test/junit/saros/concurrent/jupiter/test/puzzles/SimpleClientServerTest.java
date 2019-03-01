@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
+package saros.concurrent.jupiter.test.puzzles;
 
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.TwoWayJupiterClientDocument;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.TwoWayJupiterServerDocument;
 import org.junit.Test;
+import saros.concurrent.jupiter.internal.text.DeleteOperation;
+import saros.concurrent.jupiter.internal.text.InsertOperation;
+import saros.concurrent.jupiter.test.util.ClientSynchronizedDocument;
+import saros.concurrent.jupiter.test.util.JupiterTestCase;
+import saros.concurrent.jupiter.test.util.TwoWayJupiterClientDocument;
+import saros.concurrent.jupiter.test.util.TwoWayJupiterServerDocument;
 
 public class SimpleClientServerTest extends JupiterTestCase {
 

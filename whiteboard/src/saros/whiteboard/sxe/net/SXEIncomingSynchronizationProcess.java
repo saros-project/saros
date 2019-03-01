@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
+package saros.whiteboard.sxe.net;
 
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import saros.ui.util.SWTUtils;
+import saros.util.ThreadUtils;
+import saros.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.constants.SXEMessageType;
 
 /**
  * Base class for the invitee for the synchronization process during invitation *
@@ -37,7 +37,7 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
    * (non-Javadoc)
    *
    * @see
-   * de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESynchronization#start(org.
+   * saros.whiteboard.sxe.net.SXESynchronization#start(org.
    * eclipse.core.runtime.IProgressMonitor)
    */
   public void start() {

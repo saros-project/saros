@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

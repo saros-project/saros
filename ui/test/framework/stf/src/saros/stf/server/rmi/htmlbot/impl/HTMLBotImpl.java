@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.impl;
+package saros.stf.server.rmi.htmlbot.impl;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.CssClassSelector;
-import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.BotUtils;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLView;
-import de.fu_berlin.inf.dpp.ui.View;
-import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
-import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 import java.rmi.RemoteException;
 import java.util.List;
+import saros.stf.server.HTMLSTFRemoteObject;
+import saros.stf.server.bot.BotUtils;
+import saros.stf.server.rmi.htmlbot.IHTMLBot;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
+import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLView;
+import saros.ui.View;
+import saros.ui.pages.IBrowserPage;
+import saros.ui.pages.MainPage;
 
 public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 

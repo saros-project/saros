@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.test.mocks;
+package saros.test.mocks;
 
-import de.fu_berlin.inf.dpp.context.IContextFactory;
 import java.util.ArrayList;
 import java.util.List;
 import org.easymock.EasyMock;
@@ -13,6 +12,7 @@ import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
 import org.powermock.api.easymock.PowerMock;
+import saros.context.IContextFactory;
 
 /**
  * Facilitates integration tests by offering multiple ways to create a PicoContainer full of mocked

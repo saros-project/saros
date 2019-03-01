@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.misc.sound;
+package saros.misc.sound;
 
 import java.io.File;
 import java.io.IOException;

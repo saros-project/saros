@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.manager;
+package saros.ui.manager;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

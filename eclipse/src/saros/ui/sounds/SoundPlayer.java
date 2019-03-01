@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.sounds;
+package saros.ui.sounds;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -12,6 +8,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
+import saros.Saros;
+import saros.SarosPluginContext;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.util.ThreadUtils;
 
 public class SoundPlayer {
 
@@ -37,7 +37,7 @@ public class SoundPlayer {
         new Runnable() {
           @Override
           public void run() {
-            de.fu_berlin.inf.dpp.misc.sound.SoundPlayer.playSound(getSoundFile(filename));
+            saros.misc.sound.SoundPlayer.playSound(getSoundFile(filename));
           }
         });
   }

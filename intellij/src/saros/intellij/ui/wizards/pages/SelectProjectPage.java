@@ -1,10 +1,8 @@
-package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
+package saros.intellij.ui.wizards.pages;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -24,6 +22,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.intellij.ui.Messages;
 
 /** Selects local project. FIXME: Add tabs for multiple projects. */
 public class SelectProjectPage extends AbstractWizardPage {

@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.model.session;
+package saros.ui.model.session;
 
-import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
-import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import saros.ui.model.HeaderElement;
+import saros.ui.model.ITreeElement;
 
 /**
  * Comparator for {@link ITreeElement} for {@link SessionInput}.

@@ -1,24 +1,24 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package saros.project.internal;
 
-import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
-import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.FollowModeCollector;
-import de.fu_berlin.inf.dpp.feedback.JumpFeatureUsageCollector;
-import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
-import de.fu_berlin.inf.dpp.feedback.PermissionChangeCollector;
-import de.fu_berlin.inf.dpp.feedback.ProjectCollector;
-import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
-import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
-import de.fu_berlin.inf.dpp.feedback.StatisticManager;
-import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
-import de.fu_berlin.inf.dpp.project.FileActivityConsumer;
-import de.fu_berlin.inf.dpp.project.FolderActivityConsumer;
-import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
-import de.fu_berlin.inf.dpp.session.SarosCoreSessionContextFactory;
 import org.picocontainer.MutablePicoContainer;
+import saros.feedback.DataTransferCollector;
+import saros.feedback.ErrorLogManager;
+import saros.feedback.FeedbackManager;
+import saros.feedback.FollowModeCollector;
+import saros.feedback.JumpFeatureUsageCollector;
+import saros.feedback.ParticipantCollector;
+import saros.feedback.PermissionChangeCollector;
+import saros.feedback.ProjectCollector;
+import saros.feedback.SelectionCollector;
+import saros.feedback.SessionDataCollector;
+import saros.feedback.StatisticManager;
+import saros.feedback.TextEditCollector;
+import saros.project.FileActivityConsumer;
+import saros.project.FolderActivityConsumer;
+import saros.project.SharedResourcesManager;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionContextFactory;
+import saros.session.SarosCoreSessionContextFactory;
 
 /** Eclipse implementation of the {@link ISarosSessionContextFactory} interface. */
 public class SarosEclipseSessionContextFactory extends SarosCoreSessionContextFactory {

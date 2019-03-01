@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.decoration;
+package saros.ui.widgets.decoration;
 
-import de.fu_berlin.inf.dpp.ui.util.ColorUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
@@ -9,6 +7,8 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import saros.ui.util.ColorUtils;
+import saros.ui.util.SWTUtils;
 
 /** Class which displays a default text if the user has not entered own input. */
 public class EmptyText {

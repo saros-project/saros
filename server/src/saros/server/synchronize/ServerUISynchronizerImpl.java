@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.server.synchronize;
+package saros.server.synchronize;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import org.apache.log4j.Logger;
+import saros.annotations.Component;
+import saros.synchronize.UISynchronizer;
 
 /**
  * Server implementation of the {@link UISynchronizer} interface. As the server has no actual "UI

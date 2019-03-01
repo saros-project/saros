@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.Collections;
 import java.util.List;
+import saros.session.User;
 
 public class QueueItem {
   /*

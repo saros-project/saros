@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.communication.chat.muc.negotiation;
+package saros.communication.chat.muc.negotiation;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
 /**
  * Eclipse implementation of the {@link Preferences}, that wraps a {@link

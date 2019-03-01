@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.whiteboard.ui.browser;
+package saros.whiteboard.ui.browser;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler.MessageListener;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 import org.apache.log4j.Logger;
+import saros.whiteboard.net.WhiteboardManager;
+import saros.whiteboard.sxe.ISXEMessageHandler.MessageListener;
+import saros.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.net.SXEMessage;
+import saros.whiteboard.sxe.records.ElementRecord;
 
 /**
  * BrowserSXEBridge is the java interface between the SXEController which contains all model data

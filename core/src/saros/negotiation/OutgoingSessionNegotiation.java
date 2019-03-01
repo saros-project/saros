@@ -1,37 +1,37 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
-import de.fu_berlin.inf.dpp.communication.extensions.ConnectionEstablishedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
-import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.versioning.Compatibility;
-import de.fu_berlin.inf.dpp.versioning.VersionCompatibilityResult;
-import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
+import saros.SarosConstants;
+import saros.communication.extensions.ConnectionEstablishedExtension;
+import saros.communication.extensions.InvitationAcceptedExtension;
+import saros.communication.extensions.InvitationAcknowledgedExtension;
+import saros.communication.extensions.InvitationCompletedExtension;
+import saros.communication.extensions.InvitationOfferingExtension;
+import saros.communication.extensions.InvitationParameterExchangeExtension;
+import saros.exceptions.LocalCancellationException;
+import saros.exceptions.SarosCancellationException;
+import saros.monitoring.IProgressMonitor;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.negotiation.hooks.ISessionNegotiationHook;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.PacketCollector;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.PreferenceStore;
+import saros.session.ColorNegotiationHook;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.User;
+import saros.versioning.Compatibility;
+import saros.versioning.VersionCompatibilityResult;
+import saros.versioning.VersionManager;
 
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !
@@ -41,7 +41,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
   private static final Logger log = Logger.getLogger(OutgoingSessionNegotiation.class);
 
   private static final boolean IGNORE_VERSION_COMPATIBILITY =
-      Boolean.getBoolean("de.fu_berlin.inf.dpp.negotiation.session.IGNORE_VERSION_COMPATIBILITY");
+      Boolean.getBoolean("saros.negotiation.session.IGNORE_VERSION_COMPATIBILITY");
 
   private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 

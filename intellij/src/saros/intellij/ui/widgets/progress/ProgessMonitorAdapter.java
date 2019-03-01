@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.intellij.ui.widgets.progress;
+package saros.intellij.ui.widgets.progress;
 
 import com.intellij.openapi.progress.ProgressIndicator;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import saros.monitoring.IProgressMonitor;
 
 /**
  * Adapter class for {@link ProgressIndicator} objects to be used as an {@link IProgressMonitor}.

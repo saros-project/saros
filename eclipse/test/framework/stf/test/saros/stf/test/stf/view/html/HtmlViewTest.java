@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.view.html;
+package saros.stf.test.stf.view.html;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import java.rmi.RemoteException;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
 
 public class HtmlViewTest extends StfTestCase {
 

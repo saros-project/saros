@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.stf.client.tester;
+package saros.stf.client.tester;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.IControlBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import org.apache.log4j.Logger;
+import saros.net.xmpp.JID;
+import saros.stf.server.rmi.controlbot.IControlBot;
+import saros.stf.server.rmi.htmlbot.IHTMLBot;
+import saros.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
+import saros.stf.server.rmi.remotebot.IRemoteBot;
+import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
+import saros.stf.server.rmi.superbot.ISuperBot;
 
 /**
  * Tester simulate a real Saros-tester. He/She can takes use of all RMI interfaces to help test

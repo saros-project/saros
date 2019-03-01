@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
+package saros.ui.widgets.viewer.session;
 
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.internal.SarosSession;
-import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterComparator;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.session.SessionComparator;
-import de.fu_berlin.inf.dpp.ui.model.session.SessionContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.session.SessionInput;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.events.DisposeEvent;
@@ -19,6 +8,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.session.internal.SarosSession;
+import saros.ui.model.TreeLabelProvider;
+import saros.ui.model.roster.RosterComparator;
+import saros.ui.model.roster.RosterContentProvider;
+import saros.ui.model.session.SessionComparator;
+import saros.ui.model.session.SessionContentProvider;
+import saros.ui.model.session.SessionInput;
+import saros.ui.util.SWTUtils;
 
 /**
  * This {@link Composite} displays the {@link SarosSession} and the {@link Roster} in parallel.

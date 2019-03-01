@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.preferences;
+package saros.preferences;
 
 /**
  * This {@link PreferenceChangeEvent} is describing a changed preference.

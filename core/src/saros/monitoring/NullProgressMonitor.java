@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.monitoring;
+package saros.monitoring;
 
 public class NullProgressMonitor implements IProgressMonitor {
 

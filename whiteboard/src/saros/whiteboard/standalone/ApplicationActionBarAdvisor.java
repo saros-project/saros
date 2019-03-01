@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.standalone;
+package saros.whiteboard.standalone;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IWorkbenchWindow;

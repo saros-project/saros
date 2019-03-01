@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.view.sarosview;
+package saros.stf.test.stf.view.sarosview;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.VIEW_SAROS;
+import static saros.stf.shared.Constants.VIEW_SAROS_ID;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import java.rmi.RemoteException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
 
 public class SarosViewTest extends StfTestCase {
 

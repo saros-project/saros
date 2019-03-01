@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot;
+package saros.stf.server.rmi.superbot;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.IMenuBar;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
-import de.fu_berlin.inf.dpp.stf.shared.Constants;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import saros.net.xmpp.JID;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.superbot.component.menubar.IMenuBar;
+import saros.stf.server.rmi.superbot.component.view.IViews;
+import saros.stf.server.rmi.superbot.internal.IInternal;
+import saros.stf.shared.Constants;
+import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public interface ISuperBot extends Remote {
 

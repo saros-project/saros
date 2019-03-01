@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import saros.activities.EditorActivity;
+import saros.activities.EditorActivity.Type;
+import saros.activities.IActivity;
+import saros.activities.IResourceActivity;
+import saros.activities.JupiterActivity;
+import saros.activities.SPath;
+import saros.filesystem.IProject;
+import saros.session.User;
 
 /** This class enables the queuing of {@linkplain IActivity activities} for given projects. */
 public class ActivityQueuer {

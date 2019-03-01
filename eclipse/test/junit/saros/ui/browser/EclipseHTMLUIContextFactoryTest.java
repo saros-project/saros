@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.ui.browser;
+package saros.ui.browser;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.picocontainer.MutablePicoContainer;
+import saros.HTMLUIContextFactory;
+import saros.context.IContextFactory;
+import saros.synchronize.UISynchronizer;
+import saros.test.mocks.ContextMocker;
 
 /** Check {@link EclipseHTMLUIContextFactory} for internal integrity. */
 public class EclipseHTMLUIContextFactoryTest {

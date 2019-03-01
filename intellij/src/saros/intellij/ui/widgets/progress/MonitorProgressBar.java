@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.intellij.ui.widgets.progress;
+package saros.intellij.ui.widgets.progress;
 
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
+import saros.monitoring.IProgressMonitor;
 
 /** Progress bar with autoincrement to use as COMPONENT in UI */
 public class MonitorProgressBar implements IProgressMonitor {

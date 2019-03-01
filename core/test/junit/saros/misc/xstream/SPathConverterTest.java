@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.misc.xstream;
+package saros.misc.xstream;
 
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.activities.SPath;
+import saros.filesystem.IPath;
+import saros.filesystem.IPathFactory;
+import saros.filesystem.IProject;
+import saros.session.ISarosSession;
 
 public class SPathConverterTest {
 

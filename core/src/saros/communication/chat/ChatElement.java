@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.communication.chat;
+package saros.communication.chat;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.Date;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.ChatState;
+import saros.net.xmpp.JID;
 
 /** Chat element class representing entries in the {@link ChatHistory}. */
 public class ChatElement {

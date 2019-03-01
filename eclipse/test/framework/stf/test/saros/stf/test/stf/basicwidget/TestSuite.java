@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.basicwidget;
+package saros.stf.test.stf.basicwidget;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

@@ -1,30 +1,30 @@
-package de.fu_berlin.inf.dpp.stf.test.session;
+package saros.stf.test.session;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_PREFERENCES;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_SAROS_NETWORK;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.OK;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_GROUP;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_IBB_CHECKBOX;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_SOCKS5_MEDIATED_CHECKBOX;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.RESTORE_DEFAULTS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_PREFERNCES;
 import static org.junit.Assert.assertEquals;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.MENU_PREFERENCES;
+import static saros.stf.shared.Constants.MENU_SAROS;
+import static saros.stf.shared.Constants.NODE_SAROS;
+import static saros.stf.shared.Constants.NODE_SAROS_NETWORK;
+import static saros.stf.shared.Constants.OK;
+import static saros.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_GROUP;
+import static saros.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_IBB_CHECKBOX;
+import static saros.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_SOCKS5_MEDIATED_CHECKBOX;
+import static saros.stf.shared.Constants.RESTORE_DEFAULTS;
+import static saros.stf.shared.Constants.SHELL_PREFERNCES;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.tester.AbstractTester;
+import saros.stf.client.util.Util;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
+import saros.stf.shared.Constants.TypeOfCreateProject;
 
 /**
  * This test class ensures that it is possible to establish and running sessions with different

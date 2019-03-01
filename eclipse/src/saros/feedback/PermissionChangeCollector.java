@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.log4j.Logger;
+import saros.annotations.Component;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
+import saros.session.User.Permission;
 
 /**
  * Collects the {@link Permission} changes of the local user. It is measured how long the user

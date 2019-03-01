@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/de.fu_berlin.inf.dpp.ui.frontend.iml" filepath="$PROJECT_DIR$/de.fu_berlin.inf.dpp.ui.frontend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/saros.ui.frontend.iml" filepath="$PROJECT_DIR$/saros.ui.frontend.iml" />
     </modules>
   </component>
 </project>

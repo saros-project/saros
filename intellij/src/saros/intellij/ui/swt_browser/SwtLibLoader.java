@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
+package saros.intellij.ui.swt_browser;
 
 import com.intellij.ide.plugins.cl.PluginClassLoader;
 import com.intellij.openapi.application.PathManager;
@@ -54,7 +54,7 @@ public class SwtLibLoader {
 
     String jarFilename = getJarFilename(osName, osArch);
     String pluginsPath = PathManager.getPluginsPath();
-    String swtJarPath = pluginsPath + "/de.fu_berlin.inf.dpp.swt_plugin/resources/" + jarFilename;
+    String swtJarPath = pluginsPath + "/saros.swt_plugin/resources/" + jarFilename;
     File jarFile = new File(swtJarPath);
     if (!jarFile.exists()) {
       throw new IllegalStateException(

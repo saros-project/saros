@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.ui.commandHandlers;
+package saros.ui.commandHandlers;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.pages.ConfigurationPage;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.ui.ide_embedding.DialogManager;
+import saros.ui.pages.ConfigurationPage;
+import saros.ui.util.WizardUtils;
 
 public class StartSarosConfigurationHandler extends AbstractHandler {
 

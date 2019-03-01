@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.FontUtils;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
-import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -21,6 +13,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
+import saros.ui.Messages;
+import saros.ui.util.FontUtils;
+import saros.ui.util.LayoutUtils;
+import saros.ui.widgets.decoration.EmptyText;
+import saros.ui.widgets.decoration.JIDCombo;
 
 /**
  * Allows the user to enter a {@link JID}.

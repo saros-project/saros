@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
-import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
-import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import java.io.IOException;
+import saros.exceptions.OperationCanceledException;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
+import saros.filesystem.IWorkspaceRunnable;
+import saros.monitoring.NullProgressMonitor;
 
 /** Server implementation of the {@link IWorkspace} interface. */
 public class ServerWorkspaceImpl implements IWorkspace {

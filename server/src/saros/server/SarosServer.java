@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.server;
+package saros.server;
 
-import de.fu_berlin.inf.dpp.server.console.ServerConsole;
 import java.net.URL;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import saros.server.console.ServerConsole;
 
 /** The entry point for the Saros server. */
 public class SarosServer {

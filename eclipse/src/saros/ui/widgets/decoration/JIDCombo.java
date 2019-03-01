@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.decoration;
+package saros.ui.widgets.decoration;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -13,6 +8,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.account.XMPPAccountStore;
+import saros.net.xmpp.JID;
+import saros.preferences.Preferences;
+import saros.ui.util.SWTUtils;
 
 /**
  * Extends a {@link JID} displaying {@link Combo}.<br>

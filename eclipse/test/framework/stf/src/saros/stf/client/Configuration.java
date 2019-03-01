@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client;
+package saros.stf.client;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +15,9 @@ public final class Configuration {
   private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
 
   private static final String DEFAULT_CONFIGURATION_FILE =
-      "de/fu_berlin/inf/dpp/stf/client/configuration.properties";
+      "saros/stf/client/configuration.properties";
   private static final String OPTIONAL_CONFIGURATION_FILES_PROPERTY =
-      "de.fu_berlin.inf.dpp.stf.client.configuration.files";
+      "saros.stf.client.configuration.files";
 
   private static final Configuration INSTANCE = new Configuration();
 

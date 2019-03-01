@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer;
+package saros.ui.widgetGallery.demoExplorer;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
 
 public abstract class WizardPageDemo extends AbstractDemo {
 

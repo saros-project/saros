@@ -18,7 +18,7 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.filesystem;
+package saros.filesystem;
 
 /**
  * A checksum cache that always makes callers recalculate checksums.

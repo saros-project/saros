@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net;
+package saros.net;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -101,7 +101,7 @@ public class PacketCollector implements PacketListener {
    *
    * @param packet the packet to process
    * @singleThreaded should only be accessed by the single threaded executer of {@link
-   *     de.fu_berlin.inf.dpp.net.DispatchThreadContext}
+   *     saros.net.DispatchThreadContext}
    */
   @Override
   public void processPacket(Packet packet) {

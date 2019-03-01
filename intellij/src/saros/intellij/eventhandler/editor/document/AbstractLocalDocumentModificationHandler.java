@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.document;
+package saros.intellij.eventhandler.editor.document;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
-import de.fu_berlin.inf.dpp.intellij.eventhandler.DisableableHandler;
-import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
-import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import saros.activities.SPath;
+import saros.intellij.editor.EditorManager;
+import saros.intellij.eventhandler.DisableableHandler;
+import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.session.SessionUtils;
 
 /** Parent class containing utility methods when working with document listeners. */
 public abstract class AbstractLocalDocumentModificationHandler implements DisableableHandler {

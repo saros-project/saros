@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
 import com.google.gson.annotations.Expose;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.CommittedRecordException;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.NewRecordDataObject;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SetRecordList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Random;
 import org.apache.log4j.Logger;
+import saros.whiteboard.sxe.constants.NodeType;
+import saros.whiteboard.sxe.constants.RecordEntry;
+import saros.whiteboard.sxe.constants.RecordType;
+import saros.whiteboard.sxe.exceptions.CommittedRecordException;
+import saros.whiteboard.sxe.records.serializable.NewRecordDataObject;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
+import saros.whiteboard.sxe.util.SetRecordList;
 
 /**
  * Abstract implementation of a DOM node in context of Shared XML Editing XEP-0284 (SXE).

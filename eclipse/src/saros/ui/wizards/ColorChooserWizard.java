@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package saros.ui.wizards;
 
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.ColorChooserWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.wizards.pages.ColorChooserWizardPage;
 
 public class ColorChooserWizard extends Wizard {
 

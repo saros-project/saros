@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
+package saros.ui.widgets.viewer.session;
 
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.model.session.UserElement;
-import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TreeItem;
+import saros.editor.annotations.SarosAnnotation;
+import saros.session.User;
+import saros.ui.model.session.UserElement;
+import saros.ui.util.PaintUtils;
 
 /**
  * Draws a rounded rectangle indicating the highlighting color that is used for this user in the

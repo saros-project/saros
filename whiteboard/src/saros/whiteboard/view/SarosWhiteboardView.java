@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.view;
+package saros.whiteboard.view;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeBackgroundColorAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor;
 import org.apache.log4j.Logger;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.editparts.ZoomManager;
@@ -24,6 +21,9 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.ViewPart;
+import saros.whiteboard.gef.actions.ChangeBackgroundColorAction;
+import saros.whiteboard.gef.actions.ChangeForegroundColorAction;
+import saros.whiteboard.gef.editor.WhiteboardEditor;
 
 public class SarosWhiteboardView extends ViewPart {
 

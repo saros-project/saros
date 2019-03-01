@@ -17,14 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.List;
 import org.apache.commons.lang3.ObjectUtils;
+import saros.session.User;
 
 /**
  * A Checksum Error is a notification sent to the host by a user who wants inconsistencies to be

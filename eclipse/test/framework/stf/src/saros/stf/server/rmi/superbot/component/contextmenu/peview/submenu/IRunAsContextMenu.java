@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu;
+package saros.stf.server.rmi.superbot.component.contextmenu.peview.submenu;
 
-import de.fu_berlin.inf.dpp.stf.shared.Constants;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import saros.stf.shared.Constants;
 
 /**
  * This interface contains convenience API to perform actions activated by clicking subMenus of

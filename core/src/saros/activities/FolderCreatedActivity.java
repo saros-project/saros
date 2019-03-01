@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.session.User;
 
 /** An activity that represents the creation of a folder made by a user during a session. */
 @XStreamAlias("folderCreated")

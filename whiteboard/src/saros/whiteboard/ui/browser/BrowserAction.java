@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.ui.browser;
+package saros.whiteboard.ui.browser;
 
 import java.util.ArrayList;
 import java.util.List;

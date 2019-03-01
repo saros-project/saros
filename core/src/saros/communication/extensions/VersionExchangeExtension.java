@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.communication.extensions;
+package saros.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.misc.xstream.XStreamExtensionProvider;
 import java.util.HashMap;
 import java.util.Map;
+import saros.misc.xstream.XStreamExtensionProvider;
 
 /**
  * Packet containing data for exchanging version details. This packet extension is <b>NOT</b>

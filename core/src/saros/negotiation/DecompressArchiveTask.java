@@ -1,14 +1,5 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.filesystem.FileSystem;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
-import de.fu_berlin.inf.dpp.monitoring.CancelableInputStream;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +8,15 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.log4j.Logger;
+import saros.exceptions.OperationCanceledException;
+import saros.filesystem.FileSystem;
+import saros.filesystem.IFile;
+import saros.filesystem.IProject;
+import saros.filesystem.IWorkspace;
+import saros.filesystem.IWorkspaceRunnable;
+import saros.monitoring.CancelableInputStream;
+import saros.monitoring.IProgressMonitor;
+import saros.session.ISarosSession;
 
 public class DecompressArchiveTask implements IWorkspaceRunnable {
 
@@ -34,7 +34,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
    *
    * @param file Zip file containing the compressed data
    * @param idToProjectMapping map containing the id to project mapping (see also {@link
-   *     ISarosSession#getProjectID(de.fu_berlin.inf.dpp.filesystem.IProject)}
+   *     ISarosSession#getProjectID(saros.filesystem.IProject)}
    * @param monitor monitor that is used for progress report and cancellation or <code>null</code>
    *     to use the monitor provided by the {@link #run(IProgressMonitor)} method
    */

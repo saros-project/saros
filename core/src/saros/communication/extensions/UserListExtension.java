@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.communication.extensions;
+package saros.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
 import java.util.ArrayList;
 import java.util.List;
+import saros.net.xmpp.JID;
+import saros.session.User;
+import saros.session.User.Permission;
 
 @XStreamAlias(/* UserListStatusUpdate */ "ULSUP")
 public class UserListExtension extends SarosSessionPacketExtension {

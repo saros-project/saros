@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.model;
+package saros.whiteboard.gef.model;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SXEDefaultRecordFactory;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SXEUtils;
 import java.util.List;
 import org.apache.batik.util.SVGConstants;
 import org.apache.log4j.Logger;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.records.IRecord;
+import saros.whiteboard.sxe.records.SXEDefaultRecordFactory;
+import saros.whiteboard.sxe.records.serializable.RecordDataObject;
+import saros.whiteboard.sxe.util.SXEUtils;
 
 /**
  * Custom implementation of the ISXERecordFactory to achieve specialized ElementRecord subclass

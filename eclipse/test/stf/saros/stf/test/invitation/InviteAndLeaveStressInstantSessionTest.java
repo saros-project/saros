@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package saros.stf.test.invitation;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.client.tester.SarosTester.CARL;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy;
+package saros.whiteboard.gef.editpolicy;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.DeleteRecordsCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGRootRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.ComponentEditPolicy;
 import org.eclipse.gef.requests.GroupRequest;
+import saros.whiteboard.gef.commands.DeleteRecordsCommand;
+import saros.whiteboard.gef.model.SVGRootRecord;
+import saros.whiteboard.sxe.records.ElementRecord;
 
 /**
  * Simple edit policy to enable record deletion

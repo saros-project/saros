@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -11,6 +8,9 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
+import saros.filesystem.IFile;
+import saros.filesystem.IPath;
+import saros.filesystem.IWorkspace;
 
 /** Server implementation of the {@link IFile} interface. */
 public class ServerFileImpl extends ServerResourceImpl implements IFile {

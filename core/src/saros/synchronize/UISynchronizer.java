@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.synchronize;
+package saros.synchronize;
 
 /**
  * Abstraction layer to the underlying UI event loop in terms of the platform event model. Should

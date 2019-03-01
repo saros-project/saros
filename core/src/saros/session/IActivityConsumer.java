@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
+import saros.activities.IActivity;
 
 /**
  * Implementations of this class can be {@linkplain

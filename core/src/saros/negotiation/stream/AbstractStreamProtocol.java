@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.negotiation.stream;
+package saros.negotiation.stream;
 
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import saros.filesystem.IFile;
+import saros.monitoring.IProgressMonitor;
 
 /**
  * Stream consists of infinite Stream entries. Stream end is signaled by empty <em>projectID</em>.

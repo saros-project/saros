@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.communication.extensions;
+package saros.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.fu_berlin.inf.dpp.negotiation.FileList;
 import java.util.List;
+import saros.negotiation.FileList;
 
 @XStreamAlias(/* ProjectNegotiationMissingFiles */ "PNMF")
 public class ProjectNegotiationMissingFilesExtension extends ProjectNegotiationExtension {

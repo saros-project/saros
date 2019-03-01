@@ -1,18 +1,18 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.controlbot.manipulation;
+package saros.stf.test.stf.controlbot.manipulation;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static saros.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.BOB;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.net.xmpp.JID;
+import saros.stf.client.StfTestCase;
+import saros.stf.client.util.Util;
 
 public class NetworkManipulatorTest extends StfTestCase {
 

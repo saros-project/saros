@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.commandHandlers;
+package saros.ui.commandHandlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -11,8 +11,7 @@ public class OpenSarosPreferencesHandler extends AbstractHandler {
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
     PreferenceDialog pref =
-        PreferencesUtil.createPreferenceDialogOn(
-            null, "de.fu_berlin.inf.dpp.preferences", null, null);
+        PreferencesUtil.createPreferenceDialogOn(null, "saros.preferences", null, null);
     if (pref != null) pref.open();
 
     return null;

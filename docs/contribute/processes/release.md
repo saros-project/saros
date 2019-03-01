@@ -313,7 +313,7 @@ development for the next release, `14.1.31`.
         ` 13.12.6.TESTING`)
     *   make sure that in project Saros the file saros.properties
         contains the line:
-        `de.fu_berlin.inf.dpp.debug=true`
+        `saros.debug=true`
     *   The commit message should be something like
         "`[BUILD] Open release branch 13.12.6`"
 
@@ -356,12 +356,12 @@ some important preconditions:
     for building the test files.
 *   Up-to-date working copy and the following projects in your Eclipse
     workspace
-    *   Saros Eclipse plugin: `de.fu_berlin.inf.dpp`
-    *   Saros core project: `de.fu_berlin.inf.dpp.core`
-    *   Whiteboard plugin: `de.fu_berlin.inf.dpp.whiteboard`
-    *   Saros Eclipse Feature: `de.fu_berlin.inf.dpp.feature`
+    *   Saros Eclipse plugin: `saros`
+    *   Saros core project: `saros.core`
+    *   Whiteboard plugin: `saros.whiteboard`
+    *   Saros Eclipse Feature: `saros.feature`
     *   Saros Eclipse Update Site for Beta tests:
-        `de.fu_berlin.inf.dpp.update_beta`
+        `saros.update_beta`
 
 #### Step-by-Step
 
@@ -376,9 +376,9 @@ Note: This section needs an update to include the Core project.
         to ` 13.12.6``.TESTING`
     *   Update plugin version of feature
         a.  Go to tab *Plug-ins*
-        b.  Make sure `de.fu_berlin.inf.dpp` and
-            `de.fu_berlin.inf.dpp.whiteboard` and
-            `de.fu_berlin.inf.dpp.core `are included
+        b.  Make sure `saros` and
+            `saros.whiteboard` and
+            `saros.core `are included
         c.  For all projects, click on *Versions...*
         d.  Select *Copy versions from plugin and fragment manifests*
         e.  Press *Finish*
@@ -388,7 +388,7 @@ Note: This section needs an update to include the Core project.
     a.  Go to tab *Site Map*
     b.  Remove the previous feature (right-click &gt; "Remove")
     c.  Add current feature ("Add Feature" &gt; select
-        "`de.fu_berlin.inf.dpp.feature (``13.12.6``.TESTING)`")
+        "`saros.feature (``13.12.6``.TESTING)`")
     d.  Go to tab *Archives*
     e.  In the section "Archive Mapping" adjust the version numbers in
         the three entries
@@ -420,10 +420,10 @@ Note: This section needs an update to include the Core project.
     to the release branch. Make sure your commit
     does not contain changes that go beyond these files (if it does,
     unstage them):
-    *   `de.fu_berlin.inf.dpp.feature/feature.xml`
-    *   `de.fu_berlin.inf.dpp.update_beta/artifacts.jar`
-    *   `de.fu_berlin.inf.dpp.update_beta/content.jar`
-    *   `de.fu_berlin.inf.dpp.update_beta/site.xml`
+    *   `saros.feature/feature.xml`
+    *   `saros.update_beta/artifacts.jar`
+    *   `saros.update_beta/content.jar`
+    *   `saros.update_beta/site.xml`
 
 ### How to create a new release
 
@@ -438,11 +438,11 @@ Note: This section needs an update to include the Core project.
         using Eclipse 3.7 it will not work on earlier versions.
 *   Up-to-date working copy and the following projects in your Eclipse
     workspace
-    *   Saros Eclipse plugin: `de.fu_berlin.inf.dpp`
-    *   Saros core project: `de.fu_berlin.inf.dpp.core`
-    *   Whiteboard plugin: `de.fu_berlin.inf.dpp.whiteboard`
-    *   Saros Eclipse Feature: `de.fu_berlin.inf.dpp.feature`
-    *   Saros Eclipse Update Site: `de.fu_berlin.inf.dpp.update`
+    *   Saros Eclipse plugin: `saros`
+    *   Saros core project: `saros.core`
+    *   Whiteboard plugin: `saros.whiteboard`
+    *   Saros Eclipse Feature: `saros.feature`
+    *   Saros Eclipse Update Site: `saros.update`
 *   A change log of all relevant changes (fixes, features and
     important GUI-changes) since the last release (the test manager can
     be asked for a compiled list of changes up until the release)
@@ -477,7 +477,7 @@ Note: This section needs an update to include the Core project.
     *   Go to the version compatibility configuration (file
         `version.comp`) and add a compatibility information
     *   Make sure the `saros.properties` file sets the
-        `de.fu_berlin.inf.dpp.debug` property to `false`
+        `saros.debug` property to `false`
 
 4.  In each of the projects **Saros** and **Whiteboard**:
     *   Go to `plugin.xml.` Set plugin version number (for instance
@@ -489,8 +489,8 @@ Note: This section needs an update to include the Core project.
     b.  Update plugin version of feature
         1.  Go to tab *Plug-ins*
         2.  Make sure
-            `de.fu_berlin.inf.dpp.core`, `de.fu_berlin.inf.dpp`, and
-            `de.fu_berlin.inf.dpp.whiteboard` are included
+            `saros.core`, `saros`, and
+            `saros.whiteboard` are included
         3.  For all projects, click on *Versions...*
         4.  Select *Copy versions from plugin and fragment manifests*
         5.  Press *Finish*
@@ -526,7 +526,7 @@ Note: This section needs an update to include the Core project.
     a.  login with ssh as `[username],dpp` to
         `web.sourceforge.net` (e.g. using WinSCP)
     b.  copy `index.md`, `site.xm`l, and the
-        `de.fu_berlin.inf.dpp.feature_13.12.6.jar` from the
+        `saros.feature_13.12.6.jar` from the
         `features/ `folder into `htdocs/update/`
         *   copy `web/` directory to `htdocs/update/` in the unlikely
             case the style files changed
@@ -571,16 +571,16 @@ Note: This section needs an update to include the Core project.
     commit to Gerrit (on `refs/for/release/13.12.6`). Make sure your
     commit does not contain changes that go beyond these files (unstage
     them otherwise):
-    *   `de.fu_berlin.inf.dpp.feature/feature.xml`
-    *   `de.fu_berlin.inf.dpp.update/artifacts.jar`
-    *   `de.fu_berlin.inf.dpp.update/``content.jar`
-    *   `de.fu_berlin.inf.dpp.update/``site.xml`
-    *   `de.fu_berlin.inf.dpp.whiteboard/META-INF/MANIFEST.MF`
-    *   `de.fu_berlin.inf.dpp/CHANGELOG`
-    *   `de.fu_berlin.inf.dpp/``META-INF/MANIFEST.MF`
-    *   `de.fu_berlin.inf.dpp/``credits.txt`
-    *   `de.fu_berlin.inf.dpp/``saros.properties`
-    *   `de.fu_berlin.inf.dpp/``version.comp`
+    *   `saros.feature/feature.xml`
+    *   `saros.update/artifacts.jar`
+    *   `saros.update/``content.jar`
+    *   `saros.update/``site.xml`
+    *   `saros.whiteboard/META-INF/MANIFEST.MF`
+    *   `saros/CHANGELOG`
+    *   `saros/``META-INF/MANIFEST.MF`
+    *   `saros/``credits.txt`
+    *   `saros/``saros.properties`
+    *   `saros/``version.comp`
 
 ### How to announce a new release
 

@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.ui.browser;
+package saros.ui.browser;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
-import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
-import de.fu_berlin.inf.dpp.util.EclipseCollaborationUtilsImpl;
 import org.picocontainer.MutablePicoContainer;
+import saros.HTMLUIContextFactory;
+import saros.context.AbstractContextFactory;
+import saros.ui.ide_embedding.DialogManager;
+import saros.ui.ide_embedding.IUIResourceLocator;
+import saros.ui.util.ICollaborationUtils;
+import saros.util.EclipseCollaborationUtilsImpl;
 
 /**
  * Context factory that provides the necessary components that are required for the {@link

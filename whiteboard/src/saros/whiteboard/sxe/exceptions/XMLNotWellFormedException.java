@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions;
+package saros.whiteboard.sxe.exceptions;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SetRecord;
+import saros.whiteboard.sxe.records.SetRecord;
 
 public class XMLNotWellFormedException extends RuntimeException {
 

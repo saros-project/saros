@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
+package saros.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCTabItem;
 import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCTabItem;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.remotebot.widget.IRemoteBotCTabItem;
 
 public final class RemoteBotCTabItem extends StfRemoteObject implements IRemoteBotCTabItem {
 

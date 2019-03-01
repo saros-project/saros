@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.activities;
+package saros.activities;
 
-import de.fu_berlin.inf.dpp.session.User;
+import saros.session.User;
 
 /**
  * This is an interface for activities that are only sent to a specific set of users.

@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.net;
+package saros.net;
 
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
+import saros.net.stream.StreamMode;
 
 /**
  * Listener for tracking network traffic. <b>Note:</b> It is up to the implementation to do

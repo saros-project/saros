@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.util.selection.retriever.impl;
+package saros.ui.util.selection.retriever.impl;
 
-import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.ISelectionRetriever;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ISelection;
+import saros.ui.util.selection.SelectionUtils;
+import saros.ui.util.selection.retriever.ISelectionRetriever;
 
 /**
  * This class implements a generic {@link ISelectionRetriever} which retrieves selections which are

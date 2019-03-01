@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.core.monitoring.remote;
+package saros.core.monitoring.remote;
 
-import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicator;
-import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
-import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.monitoring.remote.IRemoteProgressIndicator;
+import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
+import saros.monitoring.remote.RemoteProgressManager;
+import saros.session.User;
 
 /** IntelliJ implementation of the {@link IRemoteProgressIndicatorFactory} interface. */
 public class IntelliJRemoteProgressIndicatorFactoryImpl implements IRemoteProgressIndicatorFactory {

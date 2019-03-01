@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.standalone;
+package saros.whiteboard.standalone;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -10,12 +9,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import saros.whiteboard.gef.editor.WhiteboardEditor;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
   protected static Logger log = Logger.getLogger(ApplicationWorkbenchAdvisor.class);
-  private static final String PERSPECTIVE_ID =
-      "de.fu_berlin.inf.dpp.whiteboard.standalone.perspective";
+  private static final String PERSPECTIVE_ID = "saros.whiteboard.standalone.perspective";
 
   @Override
   public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(

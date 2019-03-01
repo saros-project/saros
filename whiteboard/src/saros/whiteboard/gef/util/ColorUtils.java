@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.util;
+package saros.whiteboard.gef.util;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ColorListener;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
+import saros.whiteboard.gef.actions.ColorListener;
 
 public class ColorUtils {
   private static final Logger log = Logger.getLogger(ColorUtils.class);

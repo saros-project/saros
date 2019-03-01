@@ -1,11 +1,9 @@
-package de.fu_berlin.inf.dpp.editor.colorstorage;
+package saros.editor.colorstorage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import saros.net.xmpp.JID;
+import saros.session.User;
 
 public class ColorIDSetTest {
 

@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.tools;
+package saros.whiteboard.gef.tools;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
+import saros.whiteboard.gef.request.CreatePointlistRequest;
 
 /**
  * A tool to create a point list by dragging.
@@ -8,8 +8,8 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
  * <p>Instead of creating a rectangle out of start and current location, on every handle drag the
  * current point is added to the point list of the create request.
  *
- * @see de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest
- * @see de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy
+ * @see saros.whiteboard.gef.request.CreatePointlistRequest
+ * @see saros.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy
  * @author markusb
  */
 public class ArrowCreationTool extends LineCreationTool {

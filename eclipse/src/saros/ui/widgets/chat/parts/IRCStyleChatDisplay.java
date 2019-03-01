@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chat.parts;
+package saros.ui.widgets.chat.parts;
 
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -17,6 +15,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import saros.ui.util.SWTUtils;
+import saros.ui.widgets.chat.events.IChatDisplayListener;
 
 /** This composite displays a chat conversation between users. */
 public class IRCStyleChatDisplay extends Composite implements IChatDisplay {

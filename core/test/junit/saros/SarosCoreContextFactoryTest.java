@@ -1,24 +1,24 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
-import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
-import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
-import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
+import saros.communication.connection.IProxyResolver;
+import saros.context.CoreContextFactory;
+import saros.context.IContainerContext;
+import saros.context.IContextFactory;
+import saros.context.IContextKeyBindings;
+import saros.editor.IEditorManager;
+import saros.filesystem.IChecksumCache;
+import saros.filesystem.IWorkspace;
+import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.Preferences;
+import saros.test.mocks.ContextMocker;
+import saros.test.util.MemoryPreferenceStore;
 
 /** Check the {@link CoreContextFactory} for internal integrity. */
 public class SarosCoreContextFactoryTest {

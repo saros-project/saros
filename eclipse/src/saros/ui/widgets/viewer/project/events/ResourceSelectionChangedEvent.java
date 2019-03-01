@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events;
+package saros.ui.widgets.viewer.project.events;
 
 import org.eclipse.core.resources.IResource;
 

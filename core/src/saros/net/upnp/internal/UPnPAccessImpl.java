@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.net.upnp.internal;
+package saros.net.upnp.internal;
 
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -10,6 +9,7 @@ import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
 import org.bitlet.weupnp.PortMappingEntry;
 import org.xml.sax.SAXException;
+import saros.net.upnp.IUPnPAccess;
 
 /** UPnP access proxy for Saros to access the UPnP library weupnp. */
 public class UPnPAccessImpl implements IUPnPAccess {

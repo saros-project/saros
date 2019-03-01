@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import java.util.List;
+import saros.activities.IActivity;
+import saros.session.internal.ActivityHandler;
 
 /**
  * Callback interface used by the {@link ActivityHandler} to notify the logic that an activity can

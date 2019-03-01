@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
+import saros.activities.IActivity;
 
 /**
  * Used to listen to what an {@link IActivityProducer} does, i.e. to react on <em>locally</em>

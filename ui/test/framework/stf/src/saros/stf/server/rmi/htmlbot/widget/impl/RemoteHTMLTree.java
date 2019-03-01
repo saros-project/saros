@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.impl;
+package saros.stf.server.rmi.htmlbot.widget.impl;
 
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.Selector;
-import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLTree;
 import java.rmi.RemoteException;
+import saros.stf.server.HTMLSTFRemoteObject;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLTree;
 
 public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements IRemoteHTMLTree {
 

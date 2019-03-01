@@ -1,13 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.ResourceSelectionComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +13,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import saros.preferences.EclipsePreferenceConstants;
+import saros.ui.Messages;
+import saros.ui.util.SWTUtils;
+import saros.ui.views.SarosView;
+import saros.ui.widgets.viewer.project.ResourceSelectionComposite;
+import saros.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
+import saros.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
+import saros.ui.widgets.viewer.project.events.ResourceSelectionListener;
 
 public class ResourceSelectionWizardPage extends WizardPage {
   private static final Logger LOG = Logger.getLogger(ResourceSelectionWizardPage.class);

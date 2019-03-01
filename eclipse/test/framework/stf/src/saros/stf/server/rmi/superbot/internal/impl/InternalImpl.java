@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl;
+package saros.stf.server.rmi.superbot.internal.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
-import de.fu_berlin.inf.dpp.versioning.Version;
-import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -31,6 +27,10 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.LibraryLocation;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.rmi.superbot.internal.IInternal;
+import saros.versioning.Version;
+import saros.versioning.VersionManager;
 
 public final class InternalImpl extends StfRemoteObject implements IInternal {
 

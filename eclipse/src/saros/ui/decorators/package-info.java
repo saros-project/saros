@@ -3,4 +3,4 @@
  * Eclipse Project Explorer. Decorators are helpful to display the status of Saros handled project
  * resources.
  */
-package de.fu_berlin.inf.dpp.ui.decorators;
+package saros.ui.decorators;

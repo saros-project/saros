@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chat.items;
+package saros.ui.widgets.chat.items;
 
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,6 +13,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import saros.ui.util.SWTUtils;
 
 /**
  * This composite is used to display a chat message.

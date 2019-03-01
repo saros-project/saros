@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package saros.ui.browser_functions;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunction.Policy;
-import de.fu_berlin.inf.dpp.ui.core_facades.ConnectionFacade;
+import saros.HTMLUIContextFactory;
+import saros.ui.browser_functions.BrowserFunction.Policy;
+import saros.ui.core_facades.ConnectionFacade;
 
 /** Disconnect the active account. */
 public class DisconnectAccount extends TypedJavascriptFunction {

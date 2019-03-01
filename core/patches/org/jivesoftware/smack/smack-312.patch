@@ -1,7 +1,7 @@
-diff --git a/de.fu_berlin.inf.dpp.core/patches/org/jivesoftware/smack/Roster.java b/de.fu_berlin.inf.dpp.core/patches/org/jivesoftware/smack/Roster.java
+diff --git a/saros.core/patches/org/jivesoftware/smack/Roster.java b/saros.core/patches/org/jivesoftware/smack/Roster.java
 index f6be4e2..c2e0b03 100644
---- a/de.fu_berlin.inf.dpp.core/patches/org/jivesoftware/smack/Roster.java
-+++ b/de.fu_berlin.inf.dpp.core/patches/org/jivesoftware/smack/Roster.java
+--- a/saros.core/patches/org/jivesoftware/smack/Roster.java
++++ b/saros.core/patches/org/jivesoftware/smack/Roster.java
 @@ -914,19 +914,17 @@
                          // Keep note that an entry has been added
                          addedEntries.add(item.getUser());
@@ -30,10 +30,10 @@ index f6be4e2..c2e0b03 100644
                              updatedEntries.add(item.getUser());
                          }
                      }
-diff --git a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/RosterEntry.java b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/RosterEntry.java
+diff --git a/saros/ext-src/org/jivesoftware/smack/RosterEntry.java b/saros/ext-src/org/jivesoftware/smack/RosterEntry.java
 index 8146055..9e5d7fd 100644
---- a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/RosterEntry.java
-+++ b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/RosterEntry.java
+--- a/saros/ext-src/org/jivesoftware/smack/RosterEntry.java
++++ b/saros/ext-src/org/jivesoftware/smack/RosterEntry.java
 @@ -98,10 +98,14 @@
          if (name != null && name.equals(this.name)) {
              return;

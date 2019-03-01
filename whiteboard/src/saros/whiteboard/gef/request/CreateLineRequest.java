@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.request;
+package saros.whiteboard.gef.request;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
+import saros.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
 
 /**
  * class to track points of a line

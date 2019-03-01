@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model.roster;
+package saros.ui.model.roster;
 
 import java.util.HashMap;
 import java.util.Map;

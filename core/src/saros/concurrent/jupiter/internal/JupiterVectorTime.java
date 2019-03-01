@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
+package saros.concurrent.jupiter.internal;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.VectorTime;
+import saros.concurrent.jupiter.Timestamp;
+import saros.concurrent.jupiter.VectorTime;
 
 /** This class models the vector time for the Jupiter control algorithm. */
 @XStreamAlias("vectorTime")

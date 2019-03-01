@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions;
+package saros.whiteboard.sxe.exceptions;
 
 /**
  * Used if a received RecordDataObject contains a reference to a local record that does not exist.

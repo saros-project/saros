@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.editor.internal;
+package saros.editor.internal;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

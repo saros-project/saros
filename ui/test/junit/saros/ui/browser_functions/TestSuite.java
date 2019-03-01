@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package saros.ui.browser_functions;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

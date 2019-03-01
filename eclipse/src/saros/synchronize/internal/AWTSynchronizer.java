@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.synchronize.internal;
+package saros.synchronize.internal;
 
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import java.awt.EventQueue;
 import org.apache.log4j.Logger;
+import saros.synchronize.UISynchronizer;
 
 public class AWTSynchronizer implements UISynchronizer {
 

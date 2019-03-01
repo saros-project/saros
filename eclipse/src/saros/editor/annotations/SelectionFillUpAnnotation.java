@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.editor.annotations;
+package saros.editor.annotations;
 
-import de.fu_berlin.inf.dpp.session.User;
+import saros.session.User;
 
 /**
  * This Annotation amends the {@link SelectionAnnotation}. It fills up highlighted lines to the
@@ -9,8 +9,7 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 public class SelectionFillUpAnnotation extends SarosAnnotation {
 
-  public static final String TYPE =
-      "de.fu_berlin.inf.dpp.editor.annotations.SelectionFillUpAnnotation";
+  public static final String TYPE = "saros.editor.annotations.SelectionFillUpAnnotation";
 
   private int length;
   private int offset;

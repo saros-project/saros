@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.basic.illustrated;
+package saros.ui.widgetGallery.demoSuits.basic.illustrated;
 
-import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.IllustratedComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite.IllustratedText;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import saros.ui.widgetGallery.annotations.Demo;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
+import saros.ui.widgets.IllustratedComposite;
+import saros.ui.widgets.SimpleIllustratedComposite;
+import saros.ui.widgets.SimpleIllustratedComposite.IllustratedText;
 
 @Demo
 public class SimpleIllustratedCompositeDemo extends AbstractDemo {

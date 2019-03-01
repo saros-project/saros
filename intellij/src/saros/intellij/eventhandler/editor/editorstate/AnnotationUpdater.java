@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.eventhandler.editor.editorstate;
+package saros.intellij.eventhandler.editor.editorstate;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -6,13 +6,13 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
-import de.fu_berlin.inf.dpp.intellij.editor.annotations.AnnotationManager;
-import de.fu_berlin.inf.dpp.intellij.filesystem.VirtualFileConverter;
-import de.fu_berlin.inf.dpp.intellij.session.SessionUtils;
 import org.jetbrains.annotations.NotNull;
+import saros.activities.SPath;
+import saros.filesystem.IFile;
+import saros.intellij.editor.LocalEditorHandler;
+import saros.intellij.editor.annotations.AnnotationManager;
+import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.session.SessionUtils;
 
 /**
  * Loads all stored annotations when an editor is opened for a shared file and updates the stored

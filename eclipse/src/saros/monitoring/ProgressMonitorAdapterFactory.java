@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.monitoring;
+package saros.monitoring;
 
 /**
  * Factory to create adapters from Eclipse {@link org.eclipse.core.runtime.IProgressMonitor} to
- * Saros Core {@link de.fu_berlin.inf.dpp.monitoring.IProgressMonitor} and vice versa.
+ * Saros Core {@link saros.monitoring.IProgressMonitor} and vice versa.
  */
 public class ProgressMonitorAdapterFactory {
 
@@ -12,13 +12,13 @@ public class ProgressMonitorAdapterFactory {
    * @param monitor an Eclipse ProgressMonitor
    * @return converted ProgressMonitor
    */
-  public static de.fu_berlin.inf.dpp.monitoring.IProgressMonitor convert(
+  public static saros.monitoring.IProgressMonitor convert(
       org.eclipse.core.runtime.IProgressMonitor monitor) {
 
     if (monitor == null) return null;
 
-    if (monitor instanceof de.fu_berlin.inf.dpp.monitoring.IProgressMonitor)
-      return (de.fu_berlin.inf.dpp.monitoring.IProgressMonitor) monitor;
+    if (monitor instanceof saros.monitoring.IProgressMonitor)
+      return (saros.monitoring.IProgressMonitor) monitor;
 
     return new EclipseToCoreMonitorAdapter(monitor);
   }
@@ -30,7 +30,7 @@ public class ProgressMonitorAdapterFactory {
    * @return the corresponding Eclipse {@linkplain org.eclipse.core.runtime.IProgressMonitor}
    */
   public static org.eclipse.core.runtime.IProgressMonitor convert(
-      de.fu_berlin.inf.dpp.monitoring.IProgressMonitor monitor) {
+      saros.monitoring.IProgressMonitor monitor) {
 
     if (monitor == null) return null;
 

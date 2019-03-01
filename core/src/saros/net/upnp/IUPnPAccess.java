@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.net.upnp;
+package saros.net.upnp;
 
-import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -9,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
 import org.xml.sax.SAXException;
+import saros.net.upnp.internal.UPnPServiceImpl;
 
 /**
  * An interface responsible for UPnP accessing functionality. Implementing classes can be used for

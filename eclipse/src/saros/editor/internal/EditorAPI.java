@@ -1,14 +1,5 @@
-package de.fu_berlin.inf.dpp.editor.internal;
+package saros.editor.internal;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.log4j.Logger;
@@ -43,6 +34,15 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import saros.activities.SPath;
+import saros.editor.text.LineRange;
+import saros.editor.text.TextSelection;
+import saros.filesystem.EclipseFileImpl;
+import saros.filesystem.ResourceAdapterFactory;
+import saros.ui.dialogs.WarningMessageDialog;
+import saros.ui.util.SWTUtils;
+import saros.ui.views.SarosView;
+import saros.util.StackTrace;
 
 /**
  * Collection of helper methods to interact with the Eclipse IDE and its editors.

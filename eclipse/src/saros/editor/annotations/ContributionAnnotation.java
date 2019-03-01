@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.editor.annotations;
+package saros.editor.annotations;
 
-import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import saros.editor.internal.ContributionAnnotationManager;
+import saros.session.User;
+import saros.ui.Messages;
+import saros.ui.util.ModelFormatUtils;
 
 /**
  * Marks textual additions and changes of other users. They are meant to inform the user of recent
@@ -15,7 +15,7 @@ import org.eclipse.jface.text.source.IAnnotationModel;
  */
 public class ContributionAnnotation extends SarosAnnotation {
 
-  protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.contribution";
+  protected static final String TYPE = "saros.annotations.contribution";
 
   /** The model this annotation belongs to. */
   protected IAnnotationModel model;

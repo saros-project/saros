@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.standalone;
+package saros.whiteboard.standalone;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeBackgroundColorAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
 import org.apache.log4j.Logger;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.EditPartViewer;
@@ -10,6 +8,8 @@ import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.actions.ActionFactory;
+import saros.whiteboard.gef.actions.ChangeBackgroundColorAction;
+import saros.whiteboard.gef.actions.ChangeForegroundColorAction;
 
 public class WhiteboardContextMenuProvider extends ContextMenuProvider {
 

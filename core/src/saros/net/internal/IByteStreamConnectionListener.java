@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
 /**
  * Listener interface used by IStreamService and IBytestreamConnection to notify about established

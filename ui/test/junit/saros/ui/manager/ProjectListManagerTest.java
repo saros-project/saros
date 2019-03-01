@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.manager;
+package saros.ui.manager;
 
 import static java.text.MessageFormat.format;
 import static org.easymock.EasyMock.createMock;
@@ -11,21 +11,21 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.google.gson.Gson;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree.Node;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree.Node.Type;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspaceRoot;
+import saros.ui.model.ProjectTree;
+import saros.ui.model.ProjectTree.Node;
+import saros.ui.model.ProjectTree.Node.Type;
 
 public class ProjectListManagerTest {
 

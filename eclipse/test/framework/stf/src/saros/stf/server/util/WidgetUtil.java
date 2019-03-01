@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.util;
+package saros.stf.server.util;
 
 import java.util.Arrays;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;

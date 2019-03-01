@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;
 
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree.Node.Type;
 import java.util.ArrayList;
 import java.util.List;
+import saros.ui.model.ProjectTree.Node.Type;
 
 /**
  * Represents a project. This is an abstraction of the different concepts of what an "project" is in

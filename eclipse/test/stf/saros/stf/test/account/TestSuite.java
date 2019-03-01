@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.account;
+package saros.stf.test.account;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

@@ -1,25 +1,25 @@
-package de.fu_berlin.inf.dpp.server.filesystem;
+package saros.server.filesystem;
 
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.assertResourceNotExists;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createFolder;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static saros.server.filesystem.FileSystemTestUtils.assertResourceNotExists;
+import static saros.server.filesystem.FileSystemTestUtils.createFolder;
+import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 
-import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import saros.exceptions.OperationCanceledException;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
+import saros.filesystem.IWorkspaceRunnable;
+import saros.monitoring.IProgressMonitor;
 
 public class ServerWorkspaceImplTest extends EasyMockSupport {
 

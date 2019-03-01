@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.net.upnp.internal;
+package saros.net.upnp.internal;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -20,6 +17,9 @@ import org.apache.log4j.Logger;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
 import org.picocontainer.Disposable;
+import saros.annotations.Component;
+import saros.net.upnp.IUPnPAccess;
+import saros.net.upnp.IUPnPService;
 
 /*
  *  Class for performing UPnP functions (using the weupnp library) and managing the mapping state.

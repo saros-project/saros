@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManagerListener;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.FilteredContactSelectionComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionListener;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -21,6 +10,17 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
+import saros.SarosConstants;
+import saros.SarosPluginContext;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.net.xmpp.discovery.DiscoveryManagerListener;
+import saros.ui.Messages;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.ui.widgets.viewer.roster.FilteredContactSelectionComposite;
+import saros.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
+import saros.ui.widgets.viewer.roster.events.ContactSelectionListener;
 
 /**
  * Allows the user to select a {@link JID} from the {@link Roster}.

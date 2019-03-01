@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.util;
+package saros.util;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

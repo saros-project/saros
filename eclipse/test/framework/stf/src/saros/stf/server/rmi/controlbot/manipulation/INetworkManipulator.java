@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation;
+package saros.stf.server.rmi.controlbot.manipulation;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import saros.net.xmpp.JID;
 
 /**
  * This interface gives you control to manipulate the Saros and XMPP network access. All methods

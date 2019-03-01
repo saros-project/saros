@@ -1,17 +1,17 @@
-package de.fu_berlin.inf.dpp.negotiation.stream;
+package saros.negotiation.stream;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.filesystem.FileSystem;
-import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.log4j.Logger;
+import saros.exceptions.LocalCancellationException;
+import saros.filesystem.FileSystem;
+import saros.filesystem.IFile;
+import saros.monitoring.IProgressMonitor;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.session.ISarosSession;
 
 /** Implements Stream processing in {@link AbstractStreamProtocol} format. */
 public class IncomingStreamProtocol extends AbstractStreamProtocol {

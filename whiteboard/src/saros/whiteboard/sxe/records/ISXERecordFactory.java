@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.SXEController;
 
 /**
  * Use this factory to customize the IRecord implementations respective namespace, name and maybe

@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.ui.model;
+package saros.ui.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree.Node;
-import de.fu_berlin.inf.dpp.ui.model.ProjectTree.Node.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import org.junit.Test;
+import saros.ui.model.ProjectTree.Node;
+import saros.ui.model.ProjectTree.Node.Type;
 
 public class ProjectTreeTest {
 

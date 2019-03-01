@@ -1,13 +1,9 @@
-package de.fu_berlin.inf.dpp.intellij.ui.wizards;
+package saros.intellij.ui.wizards;
 
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.AbstractWizardPage;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.HeaderPanel;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.NavigationPanel;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -24,6 +20,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.intellij.ui.wizards.pages.AbstractWizardPage;
+import saros.intellij.ui.wizards.pages.HeaderPanel;
+import saros.intellij.ui.wizards.pages.NavigationPanel;
 
 /**
  * Class represents a wizard. Usage:

@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
+package saros.intellij.ui.swt_browser;
 
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
+import saros.ui.ide_embedding.IUIResourceLocator;
 
 /**
  * This is the IntelliJ implementation of the resource locator for pages. Those resources are

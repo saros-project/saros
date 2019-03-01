@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.actions;
+package saros.whiteboard.gef.actions;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.PasteRecordCommand;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.ui.actions.Clipboard;
 import org.eclipse.gef.ui.actions.SelectionAction;
@@ -8,6 +7,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import saros.whiteboard.gef.commands.PasteRecordCommand;
 
 /**
  * Action used to create and executed paste commands that past content of the clipboard to the

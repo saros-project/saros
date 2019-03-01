@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.intellij.ui.actions;
+package saros.intellij.ui.actions;
 
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import org.picocontainer.annotations.Inject;
+import saros.communication.connection.ConnectionHandler;
 
 /** Disconnects from XMPP/Jabber server */
 public class DisconnectServerAction extends AbstractSarosAction {

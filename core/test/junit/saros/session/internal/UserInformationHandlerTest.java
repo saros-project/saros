@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.Collections;
 import java.util.List;
 import org.easymock.EasyMock;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.junit.Before;
 import org.junit.Test;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.PacketCollector;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.User;
 
 public class UserInformationHandlerTest {
 

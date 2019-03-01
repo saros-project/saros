@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package saros.ui.wizards;
 
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.ResourceSelectionWizardPage;
 import java.util.Collection;
 import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.util.CollaborationUtils;
+import saros.ui.views.SarosView;
+import saros.ui.wizards.pages.ResourceSelectionWizardPage;
 
 /**
  * Wizard for adding resources to a running session.

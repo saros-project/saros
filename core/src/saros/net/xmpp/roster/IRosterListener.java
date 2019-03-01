@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.xmpp.roster;
+package saros.net.xmpp.roster;
 
 import java.util.Collection;
 import org.jivesoftware.smack.Roster;

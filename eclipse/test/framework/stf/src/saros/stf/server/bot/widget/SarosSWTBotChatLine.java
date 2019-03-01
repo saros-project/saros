@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.stf.server.bot.widget;
+package saros.stf.server.bot.widget;
 
-import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLine;
 import org.eclipse.swtbot.swt.finder.ReferenceBy;
 import org.eclipse.swtbot.swt.finder.SWTBotWidget;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.hamcrest.SelfDescribing;
+import saros.ui.widgets.chat.items.ChatLine;
 
 /**
  * This represents a {@link ChatLine} widget in chat view. GUI peoples have changed the chat view's

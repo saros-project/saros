@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import saros.monitoring.IProgressMonitor;
 
 /**
  * A listener for {@link ISarosSession} life-cycle related events.

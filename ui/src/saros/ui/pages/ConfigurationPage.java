@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.ui.pages;
+package saros.ui.pages;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.HTMLUIStrings;
+import saros.HTMLUIContextFactory;
+import saros.HTMLUIStrings;
 
 /** Represents the Saros Configuration Wizard. This wizard is used to configure Saros */
 public class ConfigurationPage extends AbstractBrowserPage {

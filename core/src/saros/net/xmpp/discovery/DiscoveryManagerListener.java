@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.net.xmpp.discovery;
+package saros.net.xmpp.discovery;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import saros.net.xmpp.JID;
 
 /** Listener for {@link DiscoveryManager} events */
 public interface DiscoveryManagerListener {

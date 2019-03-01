@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.request;
+package saros.whiteboard.gef.request;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.gef.requests.CreateRequest;
+import saros.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
 
 /**
  * Simple request class to create a line

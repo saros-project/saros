@@ -1,19 +1,19 @@
-package de.fu_berlin.inf.dpp.ui.model.session;
+package saros.ui.model.session;
 
-import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.internal.SarosSession;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
-import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.ObjectUtils;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import saros.awareness.AwarenessInformationCollector;
+import saros.editor.EditorManager;
+import saros.session.User;
+import saros.session.internal.SarosSession;
+import saros.ui.ImageManager;
+import saros.ui.Messages;
+import saros.ui.model.HeaderElement;
+import saros.ui.model.TreeElement;
 
 /**
  * Container {@link TreeElement} for a {@link SarosSession}

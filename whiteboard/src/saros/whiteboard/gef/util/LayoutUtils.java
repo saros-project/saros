@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.util;
+package saros.whiteboard.gef.util;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGRootRecord;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Translatable;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.gef.model.SVGRootRecord;
 
 public class LayoutUtils {
 

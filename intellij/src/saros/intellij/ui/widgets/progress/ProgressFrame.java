@@ -1,9 +1,7 @@
-package de.fu_berlin.inf.dpp.intellij.ui.widgets.progress;
+package saros.intellij.ui.widgets.progress;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,9 +10,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import org.picocontainer.annotations.Inject;
+import saros.SarosPluginContext;
+import saros.monitoring.IProgressMonitor;
 
 /** Creates independent progress monitor window */
-// todo: use de.fu_berlin.inf.dpp.monitoring.IProgressMonitor in all IntelliJ classes
+// todo: use saros.monitoring.IProgressMonitor in all IntelliJ classes
 public class ProgressFrame implements IProgressMonitor {
 
   public static final String TITLE = "Progress monitor";

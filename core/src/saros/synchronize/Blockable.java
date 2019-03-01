@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.synchronize;
+package saros.synchronize;
 
 /**
  * Implementers of this interface can be blocked by the StopManager. Being blocked means that they

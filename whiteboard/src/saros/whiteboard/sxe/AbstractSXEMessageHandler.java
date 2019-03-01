@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe;
+package saros.whiteboard.sxe;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ChildRecordChangeCache;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import saros.whiteboard.sxe.net.SXEMessage;
+import saros.whiteboard.sxe.records.ChildRecordChangeCache;
+import saros.whiteboard.sxe.records.ElementRecord;
 
 /**
  * Apart from maintaining the lists of listeners this class caches ChildRecordChangeCache during

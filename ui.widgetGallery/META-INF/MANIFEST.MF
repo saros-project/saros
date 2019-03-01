@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Saros Plug-in Widget Gallery
-Bundle-SymbolicName: de.fu_berlin.inf.dpp.ui.widgetGallery;singleton:=true
+Bundle-SymbolicName: saros.ui.widgetGallery;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: de.fu_berlin.inf.dpp.ui.widgetGallery.application.Activator
+Bundle-Activator: saros.ui.widgetGallery.application.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.workbench.texteditor,
@@ -20,8 +20,8 @@ Require-Bundle: org.eclipse.ui,
  org.tigris.subversion.subclipse.ui;resolution:=optional,
  org.eclipse.ui.console,
  org.eclipse.core.expressions,
- de.fu_berlin.inf.dpp.core,
- de.fu_berlin.inf.dpp
+ saros.core,
+ saros
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: FU-Berlin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

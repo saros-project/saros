@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.editor.text;
+package saros.editor.text;
 
 /** Container to hold text selection values. */
 public class TextSelection {

@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.bot.widget;
+package saros.stf.server.bot.widget;
 
-import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatControl;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import org.eclipse.swt.custom.StyledText;
@@ -13,6 +11,8 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.hamcrest.SelfDescribing;
+import saros.ui.widgets.chat.ChatControl;
+import saros.ui.widgets.chat.parts.ChatInput;
 
 /**
  * Represents a {@link ChatInput}widget in chat view. GUI peoples have changed the chat view's looks

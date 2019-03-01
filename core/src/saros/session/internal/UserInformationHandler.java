@@ -1,18 +1,5 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
-import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.extensions.UserFinishedProjectNegotiationExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension.UserListEntry;
-import de.fu_berlin.inf.dpp.communication.extensions.UserListReceivedExtension;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceStore;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +11,19 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.Startable;
+import saros.activities.IResourceActivity;
+import saros.annotations.Component;
+import saros.communication.extensions.UserFinishedProjectNegotiationExtension;
+import saros.communication.extensions.UserListExtension;
+import saros.communication.extensions.UserListExtension.UserListEntry;
+import saros.communication.extensions.UserListReceivedExtension;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.PacketCollector;
+import saros.net.xmpp.JID;
+import saros.preferences.PreferenceStore;
+import saros.session.ISarosSession;
+import saros.session.User;
 
 /**
  * Business Logic for receiving and sending updates of the invitation state of users. Also handles

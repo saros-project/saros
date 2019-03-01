@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.net;
+package saros.net;
 
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.io.IOException;
+import saros.net.internal.IByteStreamConnection;
+import saros.net.stream.StreamMode;
+import saros.net.xmpp.JID;
 
 // TODO Javadoc
 

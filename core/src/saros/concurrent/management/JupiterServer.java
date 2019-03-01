@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.concurrent.management;
+package saros.concurrent.management;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import saros.activities.ChecksumActivity;
+import saros.activities.JupiterActivity;
+import saros.activities.SPath;
+import saros.concurrent.jupiter.TransformationException;
+import saros.concurrent.jupiter.internal.JupiterDocumentServer;
+import saros.session.ISarosSession;
+import saros.session.User;
 
 /**
  * A JupiterServer manages Jupiter server instances for a number of users AND number of paths.

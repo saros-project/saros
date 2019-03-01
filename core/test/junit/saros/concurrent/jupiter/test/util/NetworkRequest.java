@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
+package saros.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.activities.JupiterActivity;
+import saros.session.User;
 
 public class NetworkRequest implements Comparable<NetworkRequest> {
 

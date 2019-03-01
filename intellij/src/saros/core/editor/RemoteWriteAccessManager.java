@@ -1,20 +1,20 @@
-package de.fu_berlin.inf.dpp.core.editor;
+package saros.core.editor;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.core.util.AutoHashMap;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import saros.activities.AbstractActivityReceiver;
+import saros.activities.EditorActivity;
+import saros.activities.IActivity;
+import saros.activities.IActivityReceiver;
+import saros.activities.SPath;
+import saros.core.util.AutoHashMap;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
+import saros.session.User.Permission;
 
 /**
  * This class manages state of open editors of all users with {@link Permission#WRITE_ACCESS} and

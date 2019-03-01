@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.whiteboard.net;
+package saros.whiteboard.net;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessageReader;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.xmlpull.v1.XmlPullParser;
+import saros.whiteboard.sxe.constants.SXEMessageType;
+import saros.whiteboard.sxe.net.SXEMessage;
+import saros.whiteboard.sxe.net.SXEMessageReader;
+import saros.whiteboard.sxe.net.SXESession;
 
 /**
  * The Smack extension provider that will parse the SXE messages if initialized.

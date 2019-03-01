@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.monitoring;
+package saros.monitoring;
 
 /**
  * A progress monitor that uses a given amount of work ticks from a parent monitor. It can be used

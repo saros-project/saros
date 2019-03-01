@@ -16,4 +16,4 @@
  *   <li>undo (not in core yet) --- package for undo/redo operations within a Saros session
  * </ul>
  */
-package de.fu_berlin.inf.dpp.concurrent;
+package saros.concurrent;

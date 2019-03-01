@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chat.parts;
+package saros.ui.widgets.chat.parts;
 
-import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
 import java.util.Date;
 import org.eclipse.swt.graphics.Color;
+import saros.ui.widgets.chat.events.IChatDisplayListener;
 
 /** Interface for adding, removing, and modifying chat content. */
 public interface IChatDisplay {

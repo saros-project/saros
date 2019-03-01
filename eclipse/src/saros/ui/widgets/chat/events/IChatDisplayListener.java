@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chat.events;
+package saros.ui.widgets.chat.events;
 
 import java.util.EventListener;
 

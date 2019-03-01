@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chat.parts;
+package saros.ui.widgets.chat.parts;
 
-import de.fu_berlin.inf.dpp.ui.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusEvent;
@@ -10,6 +9,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import saros.ui.Messages;
 
 /**
  * This control displays an input field for text input

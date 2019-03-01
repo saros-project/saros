@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="de.fu_berlin.inf.dpp" module="server"/>
+    <info organisation="saros" module="server"/>
     <configurations>
         <conf name="build"/>
         <conf name="test"/>

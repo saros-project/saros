@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.contextmenu;
+package saros.stf.test.stf.contextmenu;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

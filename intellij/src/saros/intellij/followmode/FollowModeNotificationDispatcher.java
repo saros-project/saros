@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.intellij.followmode;
+package saros.intellij.followmode;
 
-import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.session.User;
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
+import saros.editor.FollowModeManager;
+import saros.editor.IFollowModeListener;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.NotificationPanel;
+import saros.session.User;
 
 /** Displays user notifications about follow mode status changes. */
 public class FollowModeNotificationDispatcher implements IFollowModeListener {

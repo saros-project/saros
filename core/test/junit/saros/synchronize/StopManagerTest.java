@@ -1,17 +1,10 @@
-package de.fu_berlin.inf.dpp.synchronize;
+package saros.synchronize;
 
 import static org.easymock.EasyMock.isA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.StopActivity;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityListener;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +14,13 @@ import org.easymock.IAnswer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import saros.activities.IActivity;
+import saros.activities.StopActivity;
+import saros.net.xmpp.JID;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityListener;
+import saros.session.ISarosSession;
+import saros.session.User;
 
 public class StopManagerTest {
 

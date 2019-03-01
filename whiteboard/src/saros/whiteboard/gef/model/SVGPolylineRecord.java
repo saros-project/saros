@@ -1,8 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.model;
+package saros.whiteboard.gef.model;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +8,9 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.draw2d.geometry.Rectangle;
+import saros.whiteboard.gef.util.ColorUtils;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.IRecord;
 
 /**
  * This class maintains a cache of the SVG points attribute. Parsing the String on every access

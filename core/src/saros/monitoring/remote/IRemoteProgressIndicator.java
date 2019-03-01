@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.monitoring.remote;
+package saros.monitoring.remote;
 
-import de.fu_berlin.inf.dpp.activities.ProgressActivity;
-import de.fu_berlin.inf.dpp.session.User;
+import saros.activities.ProgressActivity;
+import saros.session.User;
 
 /**
  * Interface for displaying the progress of a {@link RemoteProgressMonitor} on the

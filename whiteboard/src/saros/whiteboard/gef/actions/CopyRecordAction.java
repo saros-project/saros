@@ -1,9 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.actions;
+package saros.whiteboard.gef.actions;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.CopyRecordCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor;
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
-import de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView;
 import java.util.Iterator;
 import java.util.List;
 import org.eclipse.gef.EditPart;
@@ -13,6 +9,10 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import saros.whiteboard.gef.commands.CopyRecordCommand;
+import saros.whiteboard.gef.editor.WhiteboardEditor;
+import saros.whiteboard.gef.model.LayoutElementRecord;
+import saros.whiteboard.view.SarosWhiteboardView;
 
 /**
  * Creates and executes a copy command that stores deep copies of the current selection to the

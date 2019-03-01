@@ -1,17 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl;
+package saros.stf.server.rmi.superbot.impl;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.IMenuBar;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl.MenuBar;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl.InternalImpl;
-import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +15,18 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import saros.net.xmpp.JID;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.SarosSWTBotPreferences;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.superbot.ISuperBot;
+import saros.stf.server.rmi.superbot.component.menubar.IMenuBar;
+import saros.stf.server.rmi.superbot.component.menubar.impl.MenuBar;
+import saros.stf.server.rmi.superbot.component.view.IViews;
+import saros.stf.server.rmi.superbot.component.view.impl.Views;
+import saros.stf.server.rmi.superbot.internal.IInternal;
+import saros.stf.server.rmi.superbot.internal.impl.InternalImpl;
+import saros.stf.server.util.WidgetUtil;
 
 public final class SuperBot extends StfRemoteObject implements ISuperBot {
 

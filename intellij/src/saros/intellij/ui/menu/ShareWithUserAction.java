@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.menu;
+package saros.intellij.ui.menu;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -7,16 +7,16 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
-import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.filesystem.IntelliJProjectImpl;
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
+import saros.core.ui.util.CollaborationUtils;
+import saros.filesystem.IResource;
+import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.IconManager;
+import saros.net.xmpp.JID;
 
 /**
  * An Action that starts a session when triggered.

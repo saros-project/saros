@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer;
+package saros.ui.widgetGallery.demoExplorer;
 
-import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import saros.ui.model.TreeContentProvider;
+import saros.ui.widgetGallery.demoSuits.AbstractDemo;
 
 /**
  * {@link IContentProvider} for use in conjunction with a {@link AbstractDemo} input.

@@ -1,10 +1,9 @@
-package de.fu_berlin.inf.dpp.server.synchronize;
+package saros.server.synchronize;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -12,6 +11,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.Test;
+import saros.synchronize.UISynchronizer;
 
 public class ServerUISynchronizerImplTest {
 

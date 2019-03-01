@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe;
+package saros.whiteboard.sxe;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
+import saros.whiteboard.sxe.net.SXEMessage;
+import saros.whiteboard.sxe.records.DocumentRecord;
+import saros.whiteboard.sxe.records.ElementRecord;
 
 /**
  * Interface for message handling notification especially for a client like the GUI.
@@ -14,8 +14,8 @@ public interface ISXEMessageHandler {
   /**
    * Informs about sent and applied messages. </br>
    *
-   * <p>Note: only notifies about {@link
-   * de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType#RECORDS} messages
+   * <p>Note: only notifies about {@link saros.whiteboard.sxe.constants.SXEMessageType#RECORDS}
+   * messages
    *
    * @author jurke
    */
@@ -53,9 +53,8 @@ public interface ISXEMessageHandler {
    * handles.
    *
    * @author jurke
-   * @see de.fu_berlin.inf.dpp.whiteboard.sxe.records.ChildRecordChangeCache
-   * @see
-   *     de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor#createGraphicalViewer(Composite)
+   * @see saros.whiteboard.sxe.records.ChildRecordChangeCache
+   * @see saros.whiteboard.gef.editor.WhiteboardEditor#createGraphicalViewer(Composite)
    */
   public interface NotificationListener {
 

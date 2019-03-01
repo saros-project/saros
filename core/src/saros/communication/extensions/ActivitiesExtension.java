@@ -17,41 +17,41 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.communication.extensions;
+package saros.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import de.fu_berlin.inf.dpp.activities.ChangeColorActivity;
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
-import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
-import de.fu_berlin.inf.dpp.activities.FolderMovedActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.NOPActivity;
-import de.fu_berlin.inf.dpp.activities.PermissionActivity;
-import de.fu_berlin.inf.dpp.activities.ProgressActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
-import de.fu_berlin.inf.dpp.activities.StopActivity;
-import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
-import de.fu_berlin.inf.dpp.activities.TargetedFileActivity;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.List;
 import org.jivesoftware.smack.packet.PacketExtension;
+import saros.activities.ChangeColorActivity;
+import saros.activities.ChecksumActivity;
+import saros.activities.ChecksumErrorActivity;
+import saros.activities.EditorActivity;
+import saros.activities.FileActivity;
+import saros.activities.FolderCreatedActivity;
+import saros.activities.FolderDeletedActivity;
+import saros.activities.FolderMovedActivity;
+import saros.activities.IActivity;
+import saros.activities.JupiterActivity;
+import saros.activities.NOPActivity;
+import saros.activities.PermissionActivity;
+import saros.activities.ProgressActivity;
+import saros.activities.SPath;
+import saros.activities.StartFollowingActivity;
+import saros.activities.StopActivity;
+import saros.activities.StopFollowingActivity;
+import saros.activities.TargetedFileActivity;
+import saros.activities.TextSelectionActivity;
+import saros.activities.ViewportActivity;
+import saros.concurrent.jupiter.internal.JupiterVectorTime;
+import saros.concurrent.jupiter.internal.text.DeleteOperation;
+import saros.concurrent.jupiter.internal.text.InsertOperation;
+import saros.concurrent.jupiter.internal.text.NoOperation;
+import saros.concurrent.jupiter.internal.text.SplitOperation;
+import saros.concurrent.jupiter.internal.text.TimestampOperation;
+import saros.net.xmpp.JID;
+import saros.session.User;
 
 @XStreamAlias("ADOS")
 public class ActivitiesExtension extends SarosSessionPacketExtension {

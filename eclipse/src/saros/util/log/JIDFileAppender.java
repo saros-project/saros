@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp.util.log;
+package saros.util.log;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +9,13 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.spi.LoggingEvent;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
+import saros.Saros;
+import saros.SarosPluginContext;
+import saros.annotations.Component;
+import saros.net.ConnectionState;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
 
 /**
  * FileAppender which can replace date patterns in the file name but also can replace a %s with the

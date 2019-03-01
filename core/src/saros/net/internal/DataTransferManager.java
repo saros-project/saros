@@ -1,18 +1,5 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package saros.net.internal;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.context.IContextKeyBindings.IBBStreamService;
-import de.fu_berlin.inf.dpp.context.IContextKeyBindings.Socks5StreamService;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransferListener;
-import de.fu_berlin.inf.dpp.net.stream.IStreamService;
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -31,6 +18,19 @@ import java.util.zip.Inflater;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Nullable;
+import saros.annotations.Component;
+import saros.context.IContextKeyBindings.IBBStreamService;
+import saros.context.IContextKeyBindings.Socks5StreamService;
+import saros.net.ConnectionState;
+import saros.net.IConnectionManager;
+import saros.net.IPacketInterceptor;
+import saros.net.IReceiver;
+import saros.net.ITransferListener;
+import saros.net.stream.IStreamService;
+import saros.net.stream.StreamMode;
+import saros.net.xmpp.IConnectionListener;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.XMPPConnectionService;
 
 /**
  * This class is responsible for handling all transfers of binary data. It maintains a map of

@@ -1,28 +1,5 @@
-package de.fu_berlin.inf.dpp.whiteboard.gef.editor;
+package saros.whiteboard.gef.editor;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeBackgroundColorAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.CopyRecordAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ExportToImageAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.PasteRecordAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.actions.SXEDeleteAction;
-import de.fu_berlin.inf.dpp.whiteboard.gef.commands.ElementRecordCreateCommand;
-import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.ElementModelLayoutEditPolicy;
-import de.fu_berlin.inf.dpp.whiteboard.gef.part.RecordPartFactory;
-import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateTextBoxRequest;
-import de.fu_berlin.inf.dpp.whiteboard.gef.tools.ArrowCreationTool;
-import de.fu_berlin.inf.dpp.whiteboard.gef.tools.CreationToolWithoutSelection;
-import de.fu_berlin.inf.dpp.whiteboard.gef.tools.LineCreationTool;
-import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PanningTool.PanningToolEntry;
-import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PointlistCreationTool;
-import de.fu_berlin.inf.dpp.whiteboard.gef.tools.TextboxCreationTool;
-import de.fu_berlin.inf.dpp.whiteboard.gef.util.IconUtils;
-import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
-import de.fu_berlin.inf.dpp.whiteboard.standalone.WhiteboardContextMenuProvider;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler.MessageAdapter;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler.NotificationListener;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -66,6 +43,29 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.widgets.Composite;
+import saros.whiteboard.gef.actions.ChangeBackgroundColorAction;
+import saros.whiteboard.gef.actions.ChangeForegroundColorAction;
+import saros.whiteboard.gef.actions.CopyRecordAction;
+import saros.whiteboard.gef.actions.ExportToImageAction;
+import saros.whiteboard.gef.actions.PasteRecordAction;
+import saros.whiteboard.gef.actions.SXEDeleteAction;
+import saros.whiteboard.gef.commands.ElementRecordCreateCommand;
+import saros.whiteboard.gef.editpolicy.ElementModelLayoutEditPolicy;
+import saros.whiteboard.gef.part.RecordPartFactory;
+import saros.whiteboard.gef.request.CreateTextBoxRequest;
+import saros.whiteboard.gef.tools.ArrowCreationTool;
+import saros.whiteboard.gef.tools.CreationToolWithoutSelection;
+import saros.whiteboard.gef.tools.LineCreationTool;
+import saros.whiteboard.gef.tools.PanningTool.PanningToolEntry;
+import saros.whiteboard.gef.tools.PointlistCreationTool;
+import saros.whiteboard.gef.tools.TextboxCreationTool;
+import saros.whiteboard.gef.util.IconUtils;
+import saros.whiteboard.net.WhiteboardManager;
+import saros.whiteboard.standalone.WhiteboardContextMenuProvider;
+import saros.whiteboard.sxe.ISXEMessageHandler.MessageAdapter;
+import saros.whiteboard.sxe.ISXEMessageHandler.NotificationListener;
+import saros.whiteboard.sxe.net.SXEMessage;
+import saros.whiteboard.sxe.records.ElementRecord;
 
 /**
  * The editor creates the GUI using the GEF API and initializes to listen to the WhiteboardManager.
@@ -74,7 +74,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 
-  public static final String ID = "de.fu_berlin.inf.dpp.whiteboard.whiteboardeditor";
+  public static final String ID = "saros.whiteboard.whiteboardeditor";
 
   private KeyHandler keyHandler;
 

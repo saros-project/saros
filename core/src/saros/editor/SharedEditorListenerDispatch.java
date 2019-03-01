@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.concurrent.CopyOnWriteArrayList;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.activities.TextSelectionActivity;
+import saros.session.User;
 
 /** {@link ISharedEditorListener} which can dispatch events to multiple listeners. */
 public class SharedEditorListenerDispatch implements ISharedEditorListener {

@@ -1,12 +1,5 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
-import de.fu_berlin.inf.dpp.context.IContainerContext;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
-import de.fu_berlin.inf.dpp.test.mocks.EclipseMocker;
-import de.fu_berlin.inf.dpp.test.mocks.PrepareEclipseComponents;
-import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
@@ -17,6 +10,13 @@ import org.picocontainer.MutablePicoContainer;
 import org.powermock.core.classloader.annotations.MockPolicy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import saros.context.CoreContextFactory;
+import saros.context.IContainerContext;
+import saros.context.IContextFactory;
+import saros.test.mocks.ContextMocker;
+import saros.test.mocks.EclipseMocker;
+import saros.test.mocks.PrepareEclipseComponents;
+import saros.ui.browser.EclipseHTMLUIContextFactory;
 
 /** Checks the Saros/E context for integrity. */
 @RunWith(PowerMockRunner.class)

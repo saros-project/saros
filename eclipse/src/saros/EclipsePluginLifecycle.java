@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp;
+package saros;
 
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.context.AbstractContextLifecycle;
-import de.fu_berlin.inf.dpp.context.ContainerContext;
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
-import de.fu_berlin.inf.dpp.session.SarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import saros.communication.connection.ConnectionHandler;
+import saros.context.AbstractContextLifecycle;
+import saros.context.ContainerContext;
+import saros.context.IContextFactory;
+import saros.feedback.FeedbackPreferences;
+import saros.session.SarosSessionManager;
+import saros.session.SessionEndReason;
+import saros.ui.browser.EclipseHTMLUIContextFactory;
 
 /**
  * Extends the {@link AbstractContextLifecycle} for an Eclipse plug-in. It contains additional

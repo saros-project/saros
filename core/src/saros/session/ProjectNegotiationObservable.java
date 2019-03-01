@@ -1,7 +1,5 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.negotiation.ProjectNegotiation;
+import saros.net.xmpp.JID;
 
 /**
  * Observable which keeps track of all {@link ProjectNegotiation project negotiations} currently

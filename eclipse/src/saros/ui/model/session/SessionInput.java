@@ -1,7 +1,7 @@
-package de.fu_berlin.inf.dpp.ui.model.session;
+package saros.ui.model.session;
 
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
+import saros.session.ISarosSession;
+import saros.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
 
 /**
  * Instances of this class bundle a custom content and an {@link ISarosSession} instance for use

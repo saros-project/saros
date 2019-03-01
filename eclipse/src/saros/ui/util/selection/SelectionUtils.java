@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.util.selection;
+package saros.ui.util.selection;
 
-import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.runtime.Platform;
@@ -12,6 +11,7 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import saros.util.ArrayUtils;
 
 /**
  * Utility class for a convenient work with the {@link ISelectionService}.

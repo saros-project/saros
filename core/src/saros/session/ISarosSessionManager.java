@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.monitoring.IProgressMonitor;
+import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
 
 /**
  * Interface for starting and stopping a DPP session. It also offers support for monitoring the

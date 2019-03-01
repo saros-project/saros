@@ -19,19 +19,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
+package saros.concurrent.jupiter.internal.text;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.misc.xstream.UrlEncodingStringConverter;
-import de.fu_berlin.inf.dpp.session.User;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import saros.activities.SPath;
+import saros.activities.TextEditActivity;
+import saros.misc.xstream.UrlEncodingStringConverter;
+import saros.session.User;
 
 /**
  * The DeleteOperation is used to hold a text together with its position that is to be deleted in

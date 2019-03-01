@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.intellij.ui.eventhandler;
+package saros.intellij.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.intellij.ui.Messages;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
 import java.text.MessageFormat;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.NotificationPanel;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
+import saros.session.SessionEndReason;
+import saros.session.User;
 
 /** Notifies the local user when a session is started or the current session ended. */
 public class SessionStatusChangeHandler {

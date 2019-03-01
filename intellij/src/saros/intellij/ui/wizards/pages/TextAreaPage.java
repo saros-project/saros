@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
+package saros.intellij.ui.wizards.pages;
 
 import com.intellij.ui.components.JBScrollPane;
 import java.awt.BorderLayout;

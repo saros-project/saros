@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.feedback;
+package saros.feedback;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.context.IContextKeyBindings.PlatformVersion;
-import de.fu_berlin.inf.dpp.context.IContextKeyBindings.SarosVersion;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import java.util.Date;
+import saros.annotations.Component;
+import saros.context.IContextKeyBindings.PlatformVersion;
+import saros.context.IContextKeyBindings.SarosVersion;
+import saros.session.ISarosSession;
 
 /**
  * Collects some general session data (session time, session ID, session count), platform

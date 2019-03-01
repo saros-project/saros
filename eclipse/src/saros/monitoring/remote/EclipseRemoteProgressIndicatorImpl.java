@@ -1,10 +1,5 @@
-package de.fu_berlin.inf.dpp.monitoring.remote;
+package saros.monitoring.remote;
 
-import de.fu_berlin.inf.dpp.activities.ProgressActivity;
-import de.fu_berlin.inf.dpp.activities.ProgressActivity.ProgressAction;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.ObjectUtils;
@@ -13,6 +8,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import saros.activities.ProgressActivity;
+import saros.activities.ProgressActivity.ProgressAction;
+import saros.session.User;
+import saros.ui.Messages;
+import saros.ui.util.ModelFormatUtils;
 
 /** Eclipse-specific implementation of the {@link IRemoteProgressIndicator} interface. */
 final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicator {

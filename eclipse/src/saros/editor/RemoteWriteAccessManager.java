@@ -1,16 +1,5 @@
-package de.fu_berlin.inf.dpp.editor;
+package saros.editor;
 
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,6 +8,17 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.part.FileEditorInput;
+import saros.activities.EditorActivity;
+import saros.activities.SPath;
+import saros.editor.internal.EditorAPI;
+import saros.filesystem.EclipseFileImpl;
+import saros.session.AbstractActivityConsumer;
+import saros.session.IActivityConsumer;
+import saros.session.ISarosSession;
+import saros.session.ISessionListener;
+import saros.session.User;
+import saros.session.User.Permission;
+import saros.util.StackTrace;
 
 /**
  * This class manages state of open editors of all users with {@link Permission#WRITE_ACCESS} and
@@ -29,8 +29,8 @@ import org.eclipse.ui.part.FileEditorInput;
  * happens, when last user with {@link Permission#WRITE_ACCESS} closes the editor.
  *
  * <p>This class is an {@link IActivityConsumer} and it expects it's {@link
- * #exec(de.fu_berlin.inf.dpp.activities.IActivity) exec()} method to be called -- it won't register
- * itself as an {@link IActivityConsumer}.
+ * #exec(saros.activities.IActivity) exec()} method to be called -- it won't register itself as an
+ * {@link IActivityConsumer}.
  */
 public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 

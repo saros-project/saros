@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
+import saros.activities.AbstractActivityReceiver;
+import saros.activities.IActivity;
+import saros.activities.IActivityReceiver;
+import saros.activities.TextSelectionActivity;
 
 /**
  * Use this class if you are just interested in some (e.g. just one) Activity type. Just subclass it

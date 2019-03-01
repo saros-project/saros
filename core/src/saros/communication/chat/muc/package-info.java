@@ -5,4 +5,4 @@
  *
  * The MUC package contains classes for realizing XMPP MUC sessions.
  */
-package de.fu_berlin.inf.dpp.communication.chat.muc;
+package saros.communication.chat.muc;

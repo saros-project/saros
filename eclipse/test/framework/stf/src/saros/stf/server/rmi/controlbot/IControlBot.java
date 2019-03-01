@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.controlbot;
+package saros.stf.server.rmi.controlbot;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.IAccountManipulator;
-import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import saros.stf.server.rmi.controlbot.manipulation.IAccountManipulator;
+import saros.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
 
 /**
  * The Saros Control robot allows you to change the behavior of Saros during runtime and accessing

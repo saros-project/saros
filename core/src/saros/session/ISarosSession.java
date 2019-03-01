@@ -17,23 +17,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.session;
+package saros.session;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.User.Permission;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
+import saros.activities.IActivity;
+import saros.activities.IResourceActivity;
+import saros.concurrent.management.ConcurrentDocumentClient;
+import saros.concurrent.management.ConcurrentDocumentServer;
+import saros.filesystem.IProject;
+import saros.filesystem.IResource;
+import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.session.IActivityConsumer.Priority;
+import saros.session.User.Permission;
+import saros.synchronize.StopManager;
 
 /**
  * A Saros session consists of one or more shared projects, which are the central concept of the

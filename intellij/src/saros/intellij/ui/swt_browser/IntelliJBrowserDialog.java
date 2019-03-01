@@ -1,8 +1,8 @@
-package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
+package saros.intellij.ui.swt_browser;
 
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
 import java.awt.Rectangle;
 import javax.swing.JDialog;
+import saros.ui.ide_embedding.IBrowserDialog;
 
 /** IntelliJ wrapper of the Swing-specific dialog class. */
 public class IntelliJBrowserDialog implements IBrowserDialog {

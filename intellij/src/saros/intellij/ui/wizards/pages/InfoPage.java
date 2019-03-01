@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
+package saros.intellij.ui.wizards.pages;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;

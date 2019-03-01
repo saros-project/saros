@@ -17,20 +17,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.PacketExtension;
+import saros.communication.extensions.CancelInviteExtension;
+import saros.exceptions.LocalCancellationException;
+import saros.exceptions.SarosCancellationException;
+import saros.negotiation.NegotiationTools.CancelOption;
+import saros.negotiation.hooks.SessionNegotiationHookManager;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
+import saros.session.ISarosSessionManager;
 
 /**
  * @author rdjemili
@@ -42,22 +42,21 @@ public abstract class SessionNegotiation extends Negotiation {
 
   /** Timeout for all packet exchanges during the session negotiation */
   protected static final long PACKET_TIMEOUT =
-      Long.getLong("de.fu_berlin.inf.dpp.negotiation.session.PACKET_TIMEOUT", 30000L);
+      Long.getLong("saros.negotiation.session.PACKET_TIMEOUT", 30000L);
 
   /**
    * Timeout on how long the session negotiation should wait for the remote user to accept the
    * invitation
    */
   protected static final long INVITATION_ACCEPTED_TIMEOUT =
-      Long.getLong("de.fu_berlin.inf.dpp.negotiation.session.INVITATION_ACCEPTED_TIMEOUT", 600000L);
+      Long.getLong("saros.negotiation.session.INVITATION_ACCEPTED_TIMEOUT", 600000L);
 
   /**
    * Timeout on how long the session negotiation should wait for the remote user to connect to the
    * host side.
    */
   protected static final long CONNECTION_ESTABLISHED_TIMEOUT =
-      Long.getLong(
-          "de.fu_berlin.inf.dpp.negotiation.session.CONNECTION_ESTABLISHED_TIMEOUT", 120000L);
+      Long.getLong("saros.negotiation.session.CONNECTION_ESTABLISHED_TIMEOUT", 120000L);
 
   protected final SessionNegotiationHookManager hookManager;
 

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.bot.condition;
+package saros.stf.server.bot.condition;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;

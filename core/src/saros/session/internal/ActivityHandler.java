@@ -1,26 +1,26 @@
-package de.fu_berlin.inf.dpp.session.internal;
+package saros.session.internal;
 
-import de.fu_berlin.inf.dpp.activities.ActivityOptimizer;
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.ITargetedActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.QueueItem;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
-import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
+import saros.activities.ActivityOptimizer;
+import saros.activities.ChecksumActivity;
+import saros.activities.IActivity;
+import saros.activities.IResourceActivity;
+import saros.activities.ITargetedActivity;
+import saros.activities.JupiterActivity;
+import saros.activities.QueueItem;
+import saros.concurrent.management.ConcurrentDocumentClient;
+import saros.concurrent.management.ConcurrentDocumentServer;
+import saros.concurrent.management.TransformationResult;
+import saros.session.IActivityHandlerCallback;
+import saros.session.ISarosSession;
+import saros.session.User;
+import saros.synchronize.UISynchronizer;
+import saros.util.ThreadUtils;
 
 /**
  * This handler is responsible for handling the correct thread access when transforming activities
@@ -45,8 +45,7 @@ public final class ActivityHandler implements Startable {
 
   static {
     int dispatchModeToUse =
-        Integer.getInteger(
-            "de.fu_berlin.inf.dpp.session.ACTIVITY_DISPATCH_MODE", DISPATCH_MODE_SYNC);
+        Integer.getInteger("saros.session.ACTIVITY_DISPATCH_MODE", DISPATCH_MODE_SYNC);
 
     if (dispatchModeToUse != DISPATCH_MODE_ASYNC) dispatchModeToUse = DISPATCH_MODE_SYNC;
 

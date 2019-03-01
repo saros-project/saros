@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.synchronize;
+package saros.synchronize;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

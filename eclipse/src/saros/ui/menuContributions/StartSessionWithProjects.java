@@ -1,11 +1,5 @@
-package de.fu_berlin.inf.dpp.ui.menuContributions;
+package saros.ui.menuContributions;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.ui.wizards.StartSessionWizard;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,6 +16,12 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.jivesoftware.smack.RosterEntry;
+import saros.net.xmpp.JID;
+import saros.ui.Messages;
+import saros.ui.util.CollaborationUtils;
+import saros.ui.util.WizardUtils;
+import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.ui.wizards.StartSessionWizard;
 
 /**
  * Creates a context menu filled with entries, each of which represents a project that currently

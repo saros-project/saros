@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards.pages;
+package saros.ui.wizards.pages;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -1,14 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.impl;
+package saros.stf.server.rmi.superbot.component.menubar.menu.submenu.impl;
 
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.Messages;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.ISarosPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -16,6 +7,15 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import saros.account.XMPPAccount;
+import saros.feedback.FeedbackManager;
+import saros.feedback.Messages;
+import saros.net.xmpp.JID;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.condition.SarosConditions;
+import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import saros.stf.server.rmi.superbot.component.menubar.menu.submenu.ISarosPreferences;
+import saros.stf.server.rmi.superbot.impl.SuperBot;
 
 public final class SarosPreferences extends StfRemoteObject implements ISarosPreferences {
 

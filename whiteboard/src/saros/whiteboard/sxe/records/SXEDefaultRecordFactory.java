@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
+package saros.whiteboard.sxe.records;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
+import saros.whiteboard.sxe.SXEController;
 
 /**
  * Default factory implementation that returns standard SXE instances.
@@ -12,9 +12,9 @@ public class SXEDefaultRecordFactory implements ISXERecordFactory {
   /*
    * (non-Javadoc)
    *
-   * @see de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory#
+   * @see saros.whiteboard.sxe.records.ISXERecordFactory#
    * createElementRecord
-   * (de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord,
+   * (saros.whiteboard.sxe.records.DocumentRecord,
    * java.lang.String, java.lang.String)
    */
   @Override
@@ -25,9 +25,9 @@ public class SXEDefaultRecordFactory implements ISXERecordFactory {
   /*
    * (non-Javadoc)
    *
-   * @see de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory#
+   * @see saros.whiteboard.sxe.records.ISXERecordFactory#
    * createAttributeRecord
-   * (de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord,
+   * (saros.whiteboard.sxe.records.DocumentRecord,
    * java.lang.String, java.lang.String, java.lang.String)
    */
   @Override
@@ -40,8 +40,8 @@ public class SXEDefaultRecordFactory implements ISXERecordFactory {
    * (non-Javadoc)
    *
    * @see
-   * de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory#createRoot
-   * (de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord)
+   * saros.whiteboard.sxe.records.ISXERecordFactory#createRoot
+   * (saros.whiteboard.sxe.records.DocumentRecord)
    */
   @Override
   public ElementRecord createRoot(DocumentRecord document) {
@@ -52,8 +52,8 @@ public class SXEDefaultRecordFactory implements ISXERecordFactory {
    * (non-Javadoc)
    *
    * @see
-   * de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory#createDocument
-   * (de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEController)
+   * saros.whiteboard.sxe.records.ISXERecordFactory#createDocument
+   * (saros.whiteboard.sxe.ISXEController)
    */
   @Override
   public DocumentRecord createDocument(SXEController controller) {

@@ -13,4 +13,4 @@
  *   <li>the {@link UndoManager} only works during a running Saros session
  * </ul>
  */
-package de.fu_berlin.inf.dpp.concurrent.undo;
+package saros.concurrent.undo;

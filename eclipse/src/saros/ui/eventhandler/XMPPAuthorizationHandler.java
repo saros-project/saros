@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.ui.eventhandler;
+package saros.ui.eventhandler;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
-import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionListener;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
+import saros.net.xmpp.JID;
+import saros.net.xmpp.subscription.SubscriptionHandler;
+import saros.net.xmpp.subscription.SubscriptionListener;
+import saros.ui.Messages;
+import saros.ui.util.SWTUtils;
 
 /** Handler for accepting or rejecting incoming XMPP subscription requests */
 public class XMPPAuthorizationHandler {

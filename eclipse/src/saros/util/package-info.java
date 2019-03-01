@@ -10,4 +10,4 @@
  *       ActivityUtils}, {@link FileUtils}, {@ArrayUtils}.
  *   <li>{@link Utils}, a class full of useful functions, including ones for thread-management.
  */
-package de.fu_berlin.inf.dpp.util;
+package saros.util;

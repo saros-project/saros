@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.exceptions;
+package saros.exceptions;
 
 /** Exception used for signaling that a user (local or remote) canceled an operation */
 public class SarosCancellationException extends Exception {

@@ -1,15 +1,15 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
+package saros.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document.JupiterDocumentListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.Logger;
+import saros.activities.JupiterActivity;
+import saros.concurrent.jupiter.Algorithm;
+import saros.concurrent.jupiter.Operation;
+import saros.concurrent.jupiter.Timestamp;
+import saros.concurrent.jupiter.TransformationException;
+import saros.concurrent.jupiter.internal.Jupiter;
+import saros.concurrent.jupiter.test.util.Document.JupiterDocumentListener;
+import saros.net.xmpp.JID;
+import saros.session.User;
 
 public class TwoWayJupiterServerDocument implements NetworkEventHandler, DocumentTestChecker {
 

@@ -1,24 +1,24 @@
-package de.fu_berlin.inf.dpp.server.session;
+package saros.server.session;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.AbstractIncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.AbstractOutgoingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
-import de.fu_berlin.inf.dpp.server.ServerConfig;
-import de.fu_berlin.inf.dpp.server.progress.ConsoleProgressIndicator;
-import de.fu_berlin.inf.dpp.session.INegotiationHandler;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
+import saros.filesystem.IProject;
+import saros.monitoring.NullProgressMonitor;
+import saros.negotiation.AbstractIncomingProjectNegotiation;
+import saros.negotiation.AbstractOutgoingProjectNegotiation;
+import saros.negotiation.IncomingSessionNegotiation;
+import saros.negotiation.NegotiationTools;
+import saros.negotiation.OutgoingSessionNegotiation;
+import saros.negotiation.ProjectNegotiation;
+import saros.negotiation.SessionNegotiation;
+import saros.server.ServerConfig;
+import saros.server.progress.ConsoleProgressIndicator;
+import saros.session.INegotiationHandler;
+import saros.session.ISarosSessionManager;
+import saros.util.NamedThreadFactory;
 
 public class NegotiationHandler implements INegotiationHandler {
 

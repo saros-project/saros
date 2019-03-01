@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.menubar;
+package saros.stf.test.stf.menubar;
 
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
+import static saros.stf.client.tester.SarosTester.ALICE;
 
-import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 import java.rmi.RemoteException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import saros.stf.client.StfTestCase;
+import saros.stf.test.Constants;
 
 public class MenuRefactorTest extends StfTestCase {
 

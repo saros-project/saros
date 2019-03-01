@@ -1,22 +1,5 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl;
+package saros.stf.server.rmi.controlbot.manipulation.impl;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.NOPActivity;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
-import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityListener;
-import de.fu_berlin.inf.dpp.session.IActivityProducer;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
 import java.rmi.RemoteException;
 import java.util.Queue;
 import java.util.Random;
@@ -28,6 +11,23 @@ import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import saros.activities.IActivity;
+import saros.activities.NOPActivity;
+import saros.monitoring.IProgressMonitor;
+import saros.net.IPacketInterceptor;
+import saros.net.internal.BinaryXMPPExtension;
+import saros.net.internal.TransferDescription;
+import saros.net.xmpp.JID;
+import saros.session.IActivityConsumer;
+import saros.session.IActivityListener;
+import saros.session.IActivityProducer;
+import saros.session.ISarosSession;
+import saros.session.ISessionLifecycleListener;
+import saros.session.SessionEndReason;
+import saros.session.User;
+import saros.stf.server.StfRemoteObject;
+import saros.stf.server.bot.SarosSWTBotPreferences;
+import saros.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
 
 /** @author Stefan Rossbach */
 public final class NetworkManipulatorImpl extends StfRemoteObject

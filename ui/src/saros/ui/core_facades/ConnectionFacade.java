@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.core_facades;
+package saros.ui.core_facades;
 
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import saros.HTMLUIContextFactory;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
+import saros.communication.connection.ConnectionHandler;
 
 /** Bundles backend calls for connecting to and disconnecting from a server. */
 public class ConnectionFacade {

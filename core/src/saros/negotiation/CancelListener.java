@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.negotiation;
+package saros.negotiation;
 
-import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
+import saros.negotiation.NegotiationTools.CancelLocation;
 
 /** Listener for monitoring {@link Negotiation negotiations}. */
 public interface CancelListener {

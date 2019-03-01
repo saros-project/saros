@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot;
+package saros.stf.server.rmi.htmlbot;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
-import de.fu_berlin.inf.dpp.ui.View;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
+import saros.ui.View;
 
 /**
  * This interface is part of the HTML GUI test framework. It provides methods to remotely emulate
