@@ -3,17 +3,20 @@ package saros.intellij.ui.tree;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.Pair;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import saros.SarosPluginContext;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
@@ -26,7 +29,8 @@ import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
- * Contact pop-up menu for selecting a project to share. Opened when right-clicking on a contact.
+ * Contact pop-up menu for selecting a project and module to share. Opened when right-clicking on a
+ * contact.
  */
 class ContactPopMenu extends JPopupMenu {
 
@@ -34,25 +38,58 @@ class ContactPopMenu extends JPopupMenu {
 
   @Inject private IWorkspace workspace;
 
-  @Inject private Project project;
-
   private final ContactTreeRootNode.ContactInfo contactInfo;
 
   ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
     this.contactInfo = contactInfo;
 
-    if (workspace == null || project == null) {
-      SarosPluginContext.initComponent(this);
-
-      if (workspace == null || project == null) {
-        LOG.error("PicoContainer injection failed. Objects still not present after injection.");
-
-        return;
-      }
-    }
+    SarosPluginContext.initComponent(this);
 
     JMenu menuShareProject = new JMenu("Work together on...");
     menuShareProject.setIcon(IconManager.SESSIONS_ICON);
+
+    List<String> nonCompliantModules = new ArrayList<>();
+
+    for (Project project : ProjectManager.getInstance().getOpenProjects()) {
+      Pair<JMenu, List<String>> results = prepareProjectMenu(project);
+
+      if (results == null) {
+        return;
+      }
+
+      JMenu projectMenu = results.first;
+      List<String> projectNonCompliantModules = results.second;
+
+      menuShareProject.add(projectMenu);
+
+      if (!projectNonCompliantModules.isEmpty()) {
+        nonCompliantModules.addAll(projectNonCompliantModules);
+      }
+    }
+
+    if (!nonCompliantModules.isEmpty()) {
+      NotificationPanel.showWarning(
+          MessageFormat.format(
+              Messages.Contact_saros_message_conditional,
+              MessageFormat.format(
+                  Messages.ContactPopMenu_invalid_module_message_condition, nonCompliantModules)),
+          Messages.ContactPopMenu_invalid_module_title);
+    }
+
+    add(menuShareProject);
+  }
+
+  /**
+   * Prepares the JMenu for the given project. The menu contains all sharable modules contained in
+   * the project.
+   *
+   * @param project the project whose menu to prepare
+   * @return a <code>Pair</code> containing the prepared JMenu (first value) and a list of
+   *     incompatible modules (second value) or <code>null</code> if the ModuleManager could not be
+   *     instantiated
+   */
+  private Pair<JMenu, List<String>> prepareProjectMenu(@NotNull Project project) {
+    JMenu projectMenu = new JMenu(project.getName());
 
     ModuleManager moduleManager = ModuleManager.getInstance(project);
 
@@ -64,14 +101,15 @@ class ContactPopMenu extends JPopupMenu {
               Messages.ContactPopMenu_unsupported_ide_message_condition),
           Messages.ContactPopMenu_unsupported_ide_title);
 
-      return;
+      return null;
     }
 
-    List<JMenuItem> shownModules = new LinkedList<>();
-    List<String> nonCompliantModules = new LinkedList<>();
+    List<JMenuItem> shownModules = new ArrayList<>();
+    List<String> nonCompliantModules = new ArrayList<>();
 
     for (Module module : moduleManager.getModules()) {
       String moduleName = module.getName();
+      String fullModuleName = project.getName() + File.separator + moduleName;
 
       if (project.getName().equalsIgnoreCase(moduleName)) {
         continue;
@@ -85,17 +123,17 @@ class ContactPopMenu extends JPopupMenu {
       } catch (IllegalArgumentException exception) {
         LOG.debug(
             "Ignoring module "
-                + moduleName
+                + fullModuleName
                 + " as it does not meet the current release restrictions.");
 
-        nonCompliantModules.add(moduleName);
+        nonCompliantModules.add(fullModuleName);
 
         continue;
 
       } catch (IllegalStateException exception) {
         LOG.warn(
             "Ignoring module "
-                + moduleName
+                + fullModuleName
                 + " as an error "
                 + "occurred while trying to create an IProject object.",
             exception);
@@ -103,10 +141,10 @@ class ContactPopMenu extends JPopupMenu {
         NotificationPanel.showWarning(
             MessageFormat.format(
                 Messages.ContactPopMenu_error_creating_module_object_message,
-                moduleName,
+                fullModuleName,
                 exception),
             MessageFormat.format(
-                Messages.ContactPopMenu_error_creating_module_object_title, moduleName));
+                Messages.ContactPopMenu_error_creating_module_object_title, fullModuleName));
 
         continue;
       }
@@ -117,20 +155,11 @@ class ContactPopMenu extends JPopupMenu {
       shownModules.add(moduleItem);
     }
 
-    if (!nonCompliantModules.isEmpty()) {
-      NotificationPanel.showWarning(
-          MessageFormat.format(
-              Messages.Contact_saros_message_conditional,
-              MessageFormat.format(
-                  Messages.ContactPopMenu_invalid_module_message_condition, nonCompliantModules)),
-          Messages.ContactPopMenu_invalid_module_title);
-    }
-
     if (!shownModules.isEmpty()) {
       shownModules.sort(Comparator.comparing(JMenuItem::getText));
 
       for (JMenuItem moduleItem : shownModules) {
-        menuShareProject.add(moduleItem);
+        projectMenu.add(moduleItem);
       }
     } else {
       LOG.debug(
@@ -140,7 +169,7 @@ class ContactPopMenu extends JPopupMenu {
                   : "complying with our current release restrictions ")
               + "were found");
 
-      menuShareProject.add(
+      projectMenu.add(
           new JMenuItem(
               "No modules "
                   + (nonCompliantModules.isEmpty()
@@ -149,7 +178,7 @@ class ContactPopMenu extends JPopupMenu {
                   + " found!"));
     }
 
-    add(menuShareProject);
+    return new Pair<>(projectMenu, nonCompliantModules);
   }
 
   /** Action that is executed, when a project is selected for sharing. */
@@ -168,7 +197,7 @@ class ContactPopMenu extends JPopupMenu {
         LOG.error(
             "The IProject object for the module "
                 + moduleName
-                + " could not be created. This most likely means that the local IntelliJ instance "
+                + " could not be created. This most likely means that the local Intellij instance "
                 + "does not know any module with the given name.");
 
         NotificationPanel.showError(
@@ -188,6 +217,7 @@ class ContactPopMenu extends JPopupMenu {
       List<JID> contacts = new ArrayList<>();
       contacts.add(user);
 
+      // TODO set the correct project for the session context
       CollaborationUtils.startSession(resources, contacts);
     }
   }
