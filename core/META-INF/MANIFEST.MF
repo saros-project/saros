@@ -139,4 +139,5 @@ Bundle-ClassPath: .,
  lib/xpp3-1.1.4c.jar,
  lib/picocontainer-2.11.2.jar,
  lib/weupnp.jar,
- lib/libidn-1.15.jar
+ lib/libidn-1.15.jar,
+ lib/org.eclipse.jgit-5.3.0.201903130848-r.jar
