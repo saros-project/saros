@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import saros.exceptions.LocalCancellationException;
 import saros.filesystem.FileSystem;
 import saros.filesystem.IFile;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.session.ISarosSession;
@@ -36,13 +38,17 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol implements Au
    */
   public void receiveStream() throws IOException, LocalCancellationException {
     while (true) {
-      String projectID = in.readUTF();
+      String referencePointID = in.readUTF();
 
       /* check stream end */
-      if (projectID.isEmpty()) break;
+      if (referencePointID.isEmpty()) break;
 
       String fileName = in.readUTF();
-      IFile file = session.getProject(projectID).getFile(fileName);
+      IReferencePointManager referencePointManager =
+          session.getComponent(IReferencePointManager.class);
+
+      IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
+      IFile file = referencePointManager.getFile(referencePoint, fileName);
 
       String message = "receiving " + displayName(file);
       log.debug(message);
