@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.negotiation.hooks.ISessionNegotiationHook;
@@ -103,7 +105,12 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
     StringBuilder stringBuilder = new StringBuilder();
 
-    for (final IProject project : sessionManager.getSession().getProjects()) {
+    IReferencePointManager referencePointManager =
+        sessionManager.getSession().getComponent(IReferencePointManager.class);
+
+    for (final IReferencePoint referencePoint : sessionManager.getSession().getReferencePoints()) {
+
+      IProject project = referencePointManager.get(referencePoint);
 
       IntelliJProjectImpl intelliJProject = project.adaptTo(IntelliJProjectImpl.class);
 
