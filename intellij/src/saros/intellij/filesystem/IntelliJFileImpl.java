@@ -30,6 +30,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   public IntelliJFileImpl(@NotNull final IntelliJProjectImpl project, @NotNull final IPath path) {
     this.project = project;
     this.path = path;
+    this.referencePoint = project.getReferencePoint();
   }
 
   /**
