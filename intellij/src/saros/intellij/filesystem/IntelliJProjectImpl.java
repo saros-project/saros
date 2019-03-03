@@ -21,6 +21,7 @@ import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.filesystem.ReferencePointImpl;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 
 /** A <code>IntelliJProjectImpl</code> represents a specific module loaded in a specific project. */
@@ -56,6 +57,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     this.moduleName = module.getName();
 
     moduleRoot = getModuleContentRoot(module);
+
+    this.referencePoint = new ReferencePointImpl(getFullPath());
   }
 
   /**
