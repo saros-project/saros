@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import saros.filesystem.IReferencePointManager;
 import saros.negotiation.ProjectNegotiationData;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
@@ -376,33 +377,34 @@ public class EnterProjectNamePage extends WizardPage {
     final Set<String> reservedProjectNames = new HashSet<String>();
 
     // force pre-selection of already shared projects
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
-      String projectID = entry.getKey();
+      String referencePointID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      saros.filesystem.IProject project = session.getProject(projectID);
+      saros.filesystem.IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
-      // not shared yet
-      if (project == null) continue;
+      if (referencePoint == null) continue;
 
-      projectOptionComposite.setProjectName(project.getName(), true);
+      projectOptionComposite.setProjectName(referencePointManager.getName(referencePoint), true);
       projectOptionComposite.setEnabled(false);
-      reservedProjectNames.add(project.getName());
+      reservedProjectNames.add(referencePointManager.getName(referencePoint));
     }
 
     // try to assign local names for the remaining remote projects
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
-      String projectID = entry.getKey();
+      String referencePointID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      saros.filesystem.IProject project = session.getProject(projectID);
+      saros.filesystem.IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
       // already shared
-      if (project != null) continue;
+      if (referencePoint != null) continue;
 
-      final String remoteProjectName = remoteProjectIdToNameMapping.get(projectID);
+      final String remoteProjectName = remoteProjectIdToNameMapping.get(referencePointID);
 
       final String desiredLocalProjectName =
           desiredRemoteToLocalProjectNameMapping.get(remoteProjectName);

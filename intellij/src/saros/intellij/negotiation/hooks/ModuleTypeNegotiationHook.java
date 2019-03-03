@@ -110,7 +110,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
     for (final IReferencePoint referencePoint : sessionManager.getSession().getReferencePoints()) {
 
-      IProject project = referencePointManager.get(referencePoint);
+      IProject project = referencePointManager.getProject(referencePoint);
 
       IntelliJProjectImpl intelliJProject = project.adaptTo(IntelliJProjectImpl.class);
 

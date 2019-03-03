@@ -149,7 +149,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             ProjectSharingData projectSharingData = new ProjectSharingData();
             for (ProjectNegotiationData projectNegotiationData : ipn.getProjectNegotiationData()) {
               String projectID = projectNegotiationData.getProjectID();
-              IProject project = referencePointManager.get(session.getReferencePoint(projectID));
+              IProject project =
+                  referencePointManager.getProject(session.getReferencePoint(projectID));
               List<IResource> resourcesToShare =
                   session.getSharedResources(project.getReferencePoint());
 
@@ -712,7 +713,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     ProjectSharingData currentSharedProjects = new ProjectSharingData();
     for (IReferencePoint referencePoint : currentSession.getReferencePoints()) {
       currentSharedProjects.addProject(
-          referencePointManager.get(referencePoint),
+          referencePointManager.getProject(referencePoint),
           session.getReferencePointID(referencePoint),
           session.getSharedResources(referencePoint));
     }
