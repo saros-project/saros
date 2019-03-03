@@ -12,6 +12,7 @@ import saros.exceptions.OperationCanceledException;
 import saros.filesystem.FileSystem;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.CancelableInputStream;
@@ -34,7 +35,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
    *
    * @param file Zip file containing the compressed data
    * @param idToProjectMapping map containing the id to project mapping (see also {@link
-   *     ISarosSession#getProjectID(saros.filesystem.IProject)}
+   *     ISarosSession#getReferencePointID(IReferencePoint)} (saros.filesystem.IReferencePoint)}
    * @param monitor monitor that is used for progress report and cancellation or <code>null</code>
    *     to use the monitor provided by the {@link #run(IProgressMonitor)} method
    */
