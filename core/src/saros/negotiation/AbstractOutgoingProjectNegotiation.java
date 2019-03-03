@@ -112,7 +112,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         for (IProject project : projects) {
           String projectID = projects.getProjectID(project);
           List<IResource> resources = projects.getResourcesToShare(project);
-          session.addSharedResources(project, projectID, resources);
+          session.addSharedResources(project.getReferencePoint(), projectID, resources);
         }
       }
 

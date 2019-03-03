@@ -60,7 +60,7 @@ public class ProjectClosedHandler implements Disposable {
          * to prevent it from trying to run any activities on disposed resources.
          *
          * @param project the project whose modules to disable the activity execution for
-         * @see ISarosSession#setActivityExecution(IProject,boolean)
+         * @see ISarosSession#setActivityExecution(saros.filesystem.IReferencePoint,boolean)
          */
         private void disableActivityExecutionForProjectModules(@NotNull Project project) {
           for (Module module : ModuleManager.getInstance(project).getModules()) {
@@ -74,7 +74,7 @@ public class ProjectClosedHandler implements Disposable {
             }
 
             if (sarosSession.isShared(wrappedModule)) {
-              sarosSession.setActivityExecution(wrappedModule, false);
+              sarosSession.setActivityExecution(wrappedModule.getReferencePoint(), false);
             }
           }
         }
