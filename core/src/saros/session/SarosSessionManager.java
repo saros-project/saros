@@ -34,6 +34,8 @@ import org.jivesoftware.smack.Connection;
 import saros.annotations.Component;
 import saros.context.IContainerContext;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
@@ -141,11 +143,15 @@ public class SarosSessionManager implements ISarosSessionManager {
             AbstractIncomingProjectNegotiation ipn =
                 (AbstractIncomingProjectNegotiation) negotiation;
 
+            IReferencePointManager referencePointManager =
+                session.getComponent(IReferencePointManager.class);
+
             ProjectSharingData projectSharingData = new ProjectSharingData();
             for (ProjectNegotiationData projectNegotiationData : ipn.getProjectNegotiationData()) {
               String projectID = projectNegotiationData.getProjectID();
-              IProject project = session.getProject(projectID);
-              List<IResource> resourcesToShare = session.getSharedResources(project);
+              IProject project = referencePointManager.get(session.getReferencePoint(projectID));
+              List<IResource> resourcesToShare =
+                  session.getSharedResources(project.getReferencePoint());
 
               projectSharingData.addProject(project, projectID, resourcesToShare);
             }
@@ -279,7 +285,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
-        session.addSharedResources(project, projectID, resourcesList);
+        session.addSharedResources(project.getReferencePoint(), projectID, resourcesList);
       }
 
       log.info("session started");
@@ -599,7 +605,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       final List<IResource> resourcesList = mapEntry.getValue();
 
       // side effect: non shared projects are always partial -.-
-      String projectID = currentSession.getProjectID(project);
+      String projectID = currentSession.getReferencePointID(project.getReferencePoint());
 
       if (projectID == null) {
         projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
@@ -616,8 +622,9 @@ public class SarosSessionManager implements ISarosSessionManager {
        * registered as being part of the session. This is because their
        * lists of shared resources may have changed.
        */
-      if (currentSession.isHost() && !currentSession.isCompletelyShared(project)) {
-        currentSession.addSharedResources(project, projectID, resourcesList);
+      if (currentSession.isHost()
+          && !currentSession.isCompletelyShared(project.getReferencePoint())) {
+        currentSession.addSharedResources(project.getReferencePoint(), projectID, resourcesList);
       }
     }
 
@@ -699,10 +706,15 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
+    IReferencePointManager referencePointManager =
+        currentSession.getComponent(IReferencePointManager.class);
+
     ProjectSharingData currentSharedProjects = new ProjectSharingData();
-    for (IProject project : currentSession.getProjects()) {
+    for (IReferencePoint referencePoint : currentSession.getReferencePoints()) {
       currentSharedProjects.addProject(
-          project, session.getProjectID(project), session.getSharedResources(project));
+          referencePointManager.get(referencePoint),
+          session.getReferencePointID(referencePoint),
+          session.getSharedResources(referencePoint));
     }
 
     if (currentSharedProjects.isEmpty()) return;

@@ -20,6 +20,7 @@ import saros.filesystem.FileSystem;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
@@ -141,17 +142,17 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
        * resources of the contained projects
        */
       for (Entry<String, IProject> entry : projectMapping.entrySet()) {
-        final String projectID = entry.getKey();
-        final IProject project = entry.getValue();
+        final String referencePointID = entry.getKey();
+        final IReferencePoint referencePoint = entry.getValue().getReferencePoint();
         /*
          * TODO Queuing responsibility should be moved to Project
          * Negotiation, since its the only consumer of queuing
          * functionality. This will enable a specific Queuing mechanism per
          * TransferType (see github issue #137).
          */
-        session.addProjectMapping(projectID, project);
+        session.addReferencePointMapping(referencePointID, referencePoint);
         /* TODO change queuing to resource based queuing */
-        session.enableQueuing(project);
+        session.enableQueuing(referencePoint);
       }
 
       /*
@@ -186,12 +187,13 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
        */
       for (Entry<String, IProject> entry : projectMapping.entrySet()) {
 
-        final String projectID = entry.getKey();
-        final IProject project = entry.getValue();
+        final String referencePointID = entry.getKey();
+        final IReferencePoint referencePoint = entry.getValue().getReferencePoint();
 
-        final boolean isPartialRemoteProject = getProjectNegotiationData(projectID).isPartial();
+        final boolean isPartialRemoteProject =
+            getProjectNegotiationData(referencePointID).isPartial();
 
-        final FileList remoteFileList = getProjectNegotiationData(projectID).getFileList();
+        final FileList remoteFileList = getProjectNegotiationData(referencePointID).getFileList();
 
         List<IResource> resources = null;
 
@@ -201,10 +203,11 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
           resources = new ArrayList<IResource>(paths.size());
 
-          for (final String path : paths) resources.add(getResource(project, path));
+          for (final String path : paths)
+            resources.add(getResource(referencePointManager.get(referencePoint), path));
         }
 
-        session.addSharedResources(project, projectID, resources);
+        session.addSharedResources(referencePoint, referencePointID, resources);
       }
     } catch (Exception e) {
       exception = e;
@@ -260,7 +263,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
      * functionality. This will enable a specific Queuing mechanism per
      * TransferType (see github issue #137).
      */
-    for (IProject project : projectMapping.values()) session.disableQueuing(project);
+    for (IProject project : projectMapping.values())
+      session.disableQueuing(project.getReferencePoint());
 
     if (fileTransferManager != null)
       fileTransferManager.removeFileTransferListener(transferListener);
