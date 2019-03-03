@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import saros.annotations.Component;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.session.ISarosSession;
 import saros.session.ISessionListener;
@@ -36,17 +36,17 @@ public class ProjectCollector extends AbstractStatisticCollector {
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
-        public void resourcesAdded(IProject project) {
-          String projectID = sarosSession.getProjectID(project);
+        public void resourcesAdded(IReferencePoint referencePoint) {
+          String referencePointID = sarosSession.getReferencePointID(referencePoint);
 
-          ProjectInformation info = sharedProjects.get(projectID);
+          ProjectInformation info = sharedProjects.get(referencePointID);
 
           if (info == null) {
             info = new ProjectInformation();
-            sharedProjects.put(projectID, info);
+            sharedProjects.put(referencePointID, info);
           }
 
-          boolean isPartial = !sarosSession.isCompletelyShared(project);
+          boolean isPartial = !sarosSession.isCompletelyShared(referencePoint);
 
           /*
            * ignore partial shared projects that were upgraded to full shared
@@ -54,7 +54,7 @@ public class ProjectCollector extends AbstractStatisticCollector {
            */
           if (!info.isPartial && isPartial) info.isPartial = true;
 
-          List<IResource> sharedResources = sarosSession.getSharedResources(project);
+          List<IResource> sharedResources = sarosSession.getSharedResources(referencePoint);
 
           if (sharedResources != null) {
             for (Iterator<IResource> it = sharedResources.iterator(); it.hasNext(); ) {
