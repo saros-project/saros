@@ -204,7 +204,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
           resources = new ArrayList<IResource>(paths.size());
 
           for (final String path : paths)
-            resources.add(getResource(referencePointManager.get(referencePoint), path));
+            resources.add(getResource(referencePointManager.getProject(referencePoint), path));
         }
 
         session.addSharedResources(referencePoint, referencePointID, resources);
