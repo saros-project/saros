@@ -19,6 +19,7 @@ import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.Startable;
@@ -90,17 +91,27 @@ public class SharedResourcesManager extends AbstractActivityProducer
       new ISessionListener() {
 
         @Override
-        public void projectAdded(saros.filesystem.IProject project) {
+        public void projectAdded(saros.filesystem.IReferencePoint referencePoint) {
           synchronized (projectStates) {
-            IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(project);
+            IReferencePointManager referencePointManager =
+                sarosSession.getComponent(IReferencePointManager.class);
+            IProject eclipseProject =
+                (IProject)
+                    ResourceAdapterFactory.convertBack(
+                        referencePointManager.getProject(referencePoint));
             projectStates.put(eclipseProject, eclipseProject.isOpen());
           }
         }
 
         @Override
-        public void projectRemoved(saros.filesystem.IProject project) {
+        public void projectRemoved(saros.filesystem.IReferencePoint referencePoint) {
           synchronized (projectStates) {
-            IProject eclipseProject = (IProject) ResourceAdapterFactory.convertBack(project);
+            IReferencePointManager referencePointManager =
+                sarosSession.getComponent(IReferencePointManager.class);
+            IProject eclipseProject =
+                (IProject)
+                    ResourceAdapterFactory.convertBack(
+                        referencePointManager.getProject(referencePoint));
             projectStates.remove(eclipseProject);
           }
         }

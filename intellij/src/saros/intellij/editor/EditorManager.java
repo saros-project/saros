@@ -31,6 +31,8 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.editor.document.AbstractLocalDocumentModificationHandler;
 import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
@@ -238,8 +240,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         @Override
-        public void resourcesAdded(final IProject project) {
-          executeInUIThreadSynchronous(() -> addProjectResources(project));
+        public void resourcesAdded(final IReferencePoint referencePoint) {
+          IReferencePointManager referencePointManager =
+              session.getComponent(IReferencePointManager.class);
+          executeInUIThreadSynchronous(
+              () -> addProjectResources(referencePointManager.getProject(referencePoint)));
         }
 
         /**

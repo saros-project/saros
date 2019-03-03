@@ -258,7 +258,7 @@ public final class SarosSession implements ISarosSession {
         sharedReferencePointMapper.addResources(referencePoint, allResources);
       }
 
-      listenerDispatch.projectAdded(referencePointManager.get(referencePoint));
+      listenerDispatch.projectAdded(referencePoint);
     } else {
       // existing project
       if (allResources == null) {
@@ -270,7 +270,7 @@ public final class SarosSession implements ISarosSession {
       }
     }
 
-    listenerDispatch.resourcesAdded(referencePointManager.get(referencePoint));
+    listenerDispatch.resourcesAdded(referencePoint);
   }
 
   /**
@@ -1007,7 +1007,7 @@ public final class SarosSession implements ISarosSession {
   public void addReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
     if (sharedReferencePointMapper.getReferencePoint(referencePointID) == null) {
       sharedReferencePointMapper.addReferencePoint(referencePointID, referencePoint, true);
-      listenerDispatch.projectAdded(referencePointManager.get(referencePoint));
+      listenerDispatch.projectAdded(referencePoint);
     }
   }
 
@@ -1015,7 +1015,7 @@ public final class SarosSession implements ISarosSession {
   public void removeReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
     if (sharedReferencePointMapper.getReferencePoint(referencePointID) != null) {
       sharedReferencePointMapper.removeReferencePoint(referencePointID);
-      listenerDispatch.projectRemoved(referencePointManager.get(referencePoint));
+      listenerDispatch.projectRemoved(referencePoint);
     }
   }
 
@@ -1052,12 +1052,12 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public void enableQueuing(IReferencePoint referencePoint) {
-    activityQueuer.enableQueuing(referencePointManager.get(referencePoint));
+    activityQueuer.enableQueuing(referencePointManager.getProject(referencePoint));
   }
 
   @Override
   public void disableQueuing(IReferencePoint referencePoint) {
-    activityQueuer.disableQueuing(referencePointManager.get(referencePoint));
+    activityQueuer.disableQueuing(referencePointManager.getProject(referencePoint));
     // send us a dummy activity to ensure the queues get flushed
     sendActivity(Collections.singletonList(localUser), new NOPActivity(localUser, localUser, 0));
   }
