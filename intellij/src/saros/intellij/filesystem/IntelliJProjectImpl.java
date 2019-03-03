@@ -23,6 +23,7 @@ import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.filesystem.ReferencePointImpl;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 
 public final class IntelliJProjectImpl extends IntelliJResourceImpl implements IProject {
@@ -69,6 +70,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     this.moduleName = module.getName();
 
     moduleRoot = getModuleContentRoot(module);
+
+    this.referencePoint = new ReferencePointImpl(getFullPath());
 
     checkIfContentRootLocatedBelowProjectRoot(module, moduleRoot);
     checkIfModuleFileLocatedInContentRoot(module, moduleRoot);
