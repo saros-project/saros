@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Shell;
 import saros.Saros;
 import saros.SarosPluginContext;
 import saros.filesystem.EclipseProjectImpl;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -87,6 +88,8 @@ public class CollaborationUtils {
               ISarosSession session = sessionManager.getSession();
 
               if (session == null) return Status.CANCEL_STATUS;
+
+              fillReferencePointManager(session, convert(newResources).keySet());
 
               sessionManager.invite(participantsToAdd, getSessionDescription(session));
 
@@ -206,6 +209,8 @@ public class CollaborationUtils {
                * execption handling !
                */
             }
+
+            fillReferencePointManager(session, convert(projectResources).keySet());
 
             sessionManager.addResourcesToSession(convert(projectResources));
           }
@@ -459,5 +464,13 @@ public class CollaborationUtils {
     }
 
     progress.done();
+  }
+
+  private static void fillReferencePointManager(
+      ISarosSession session, Set<saros.filesystem.IProject> projects) {
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    referencePointManager.putSetOfProjects(projects);
   }
 }

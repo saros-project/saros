@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,6 +42,7 @@ import saros.Saros;
 import saros.SarosPluginContext;
 import saros.editor.internal.EditorAPI;
 import saros.filesystem.IChecksumCache;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.monitoring.ProgressMonitorAdapterFactory;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
@@ -315,6 +317,9 @@ public class AddProjectToSessionWizard extends Wizard {
                     entry.getKey(), ResourceAdapterFactory.create(entry.getValue()));
               }
 
+              fillReferencePointManager(
+                  sessionManager.getSession(), new HashSet<>(convertedMapping.values()));
+
               final ProjectNegotiation.Status status =
                   negotiation.run(convertedMapping, ProgressMonitorAdapterFactory.convert(monitor));
 
@@ -545,6 +550,8 @@ public class AddProjectToSessionWizard extends Wizard {
       final saros.filesystem.IProject adaptedProject =
           ResourceAdapterFactory.create(entry.getValue());
 
+      fillReferencePointManager(session, adaptedProject);
+
       /*
        * do not refresh already partially shared projects as this may
        * trigger resource change events
@@ -665,5 +672,20 @@ public class AddProjectToSessionWizard extends Wizard {
     if (proceed) {
       for (IEditorPart editor : dirtyEditors) editor.doSave(new NullProgressMonitor());
     }
+  }
+
+  private void fillReferencePointManager(
+      ISarosSession session, Set<saros.filesystem.IProject> projects) {
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    referencePointManager.putSetOfProjects(projects);
+  }
+
+  private void fillReferencePointManager(ISarosSession session, saros.filesystem.IProject project) {
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    referencePointManager.put(project.getReferencePoint(), project);
   }
 }
