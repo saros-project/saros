@@ -19,7 +19,7 @@
  */
 package saros.session;
 
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.session.User.Permission;
 
 /**
@@ -84,7 +84,8 @@ public interface ISessionListener {
   }
 
   /**
-   * Is fired when an user leaves the shared project.
+   * Is fired when an user leaves the shared {@link saros.filesystem.IReferencePoint} reference
+   * point.
    *
    * <p>This method is called on the UI thread.
    *
@@ -95,29 +96,30 @@ public interface ISessionListener {
   }
 
   /**
-   * Is fired then a project has been made part of the session, either because the local user began
-   * sharing it or because it is being shared by a remote user.
+   * Is fired when a reference point has been made part of the session, either because the local
+   * user began sharing it or because it is being shared by a remote user.
    *
-   * <p>Note that this event is also fired if a project is re-shared with a different set of shared
-   * resources (e.g. by sharing a previously unshared folder of a partially shared project).
+   * <p>Note that this event is also fired if a reference point is re-shared with a different set of
+   * shared resources (e.g. by sharing a previously unshared folder of a partially shared reference
+   * point).
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    *
-   * @param project the project that was added
+   * @param referencePoint the reference point that was added
    */
-  public default void projectAdded(IProject project) {
+  public default void projectAdded(IReferencePoint referencePoint) {
     // NOP
   }
 
   /**
-   * Is fired then a project has been removed from the session, meaning it is not shared between the
-   * session's users anymore.
+   * Is fired when a reference point has been removed from the session, meaning it is not shared
+   * between the session's users anymore.
    *
    * <p>This method might <i>not</i> be called on the UI thread.
    *
-   * @param project the project that was removed
+   * @param referencePoint the reference point that was removed
    */
-  public default void projectRemoved(IProject project) {
+  public default void projectRemoved(IReferencePoint referencePoint) {
     // NOP
   }
 
@@ -125,8 +127,10 @@ public interface ISessionListener {
    * Is fired when resources are added to the current session.
    *
    * <p>This method might <i>not</i> be called on the UI thread.
+   *
+   * @param referencePoint
    */
-  public default void resourcesAdded(IProject project) {
+  public default void resourcesAdded(IReferencePoint referencePoint) {
     // NOP
   }
 }

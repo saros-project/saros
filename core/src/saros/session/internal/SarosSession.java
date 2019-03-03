@@ -267,7 +267,7 @@ public final class SarosSession implements ISarosSession {
         sharedReferencePointMapper.addResources(referencePoint, allResources);
       }
 
-      listenerDispatch.projectAdded(referencePointManager.getProject(referencePoint));
+      listenerDispatch.projectAdded(referencePoint);
     } else {
       // existing project
       if (allResources == null) {
@@ -279,7 +279,7 @@ public final class SarosSession implements ISarosSession {
       }
     }
 
-    listenerDispatch.resourcesAdded(referencePointManager.getProject(referencePoint));
+    listenerDispatch.resourcesAdded(referencePoint);
   }
 
   /**
@@ -1008,7 +1008,7 @@ public final class SarosSession implements ISarosSession {
   public void addReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
     if (sharedReferencePointMapper.getReferencePoint(referencePointID) == null) {
       sharedReferencePointMapper.addReferencePoint(referencePointID, referencePoint, true);
-      listenerDispatch.projectAdded(referencePointManager.getProject(referencePoint));
+      listenerDispatch.projectAdded(referencePoint);
     }
   }
 
@@ -1016,7 +1016,7 @@ public final class SarosSession implements ISarosSession {
   public void removeReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
     if (sharedReferencePointMapper.getReferencePoint(referencePointID) != null) {
       sharedReferencePointMapper.removeReferencePoint(referencePointID);
-      listenerDispatch.projectRemoved(referencePointManager.getProject(referencePoint));
+      listenerDispatch.projectRemoved(referencePoint);
     }
   }
 

@@ -55,6 +55,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -325,7 +326,7 @@ public class EditorManager implements IEditorManager {
         }
 
         @Override
-        public void resourcesAdded(IProject project) {
+        public void resourcesAdded(IReferencePoint referencePoint) {
           SWTUtils.runSafeSWTSync(
               LOG,
               new Runnable() {

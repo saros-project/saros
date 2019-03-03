@@ -7,7 +7,8 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import saros.communication.extensions.SessionStatusRequestExtension;
 import saros.communication.extensions.SessionStatusResponseExtension;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
@@ -82,21 +83,24 @@ public final class SessionStatusRequestHandler {
   private String getSessionDescription(ISarosSession session) {
     String description = "Projects: ";
 
-    Set<IProject> projects = session.getProjects();
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    Set<IReferencePoint> referencePoints = session.getReferencePoints();
     int i = 0;
-    int numOfProjects = projects.size();
+    int numOfReferencePoints = referencePoints.size();
 
-    for (IProject project : projects) {
-      description += project.getName();
+    for (IReferencePoint referencePoint : referencePoints) {
+      description += referencePointManager.getName(referencePoint);
 
-      if (!session.isCompletelyShared(project)) description += " (partial)";
+      if (!session.isCompletelyShared(referencePoint)) description += " (partial)";
 
-      if (i < numOfProjects - 1) description += ", ";
+      if (i < numOfReferencePoints - 1) description += ", ";
 
       i++;
     }
 
-    if (numOfProjects == 0) {
+    if (numOfReferencePoints == 0) {
       description += "none";
     }
 

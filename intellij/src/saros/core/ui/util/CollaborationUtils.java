@@ -258,7 +258,7 @@ public class CollaborationUtils {
     try {
       for (IReferencePoint referencePoint : referencePoints) {
 
-        IProject project = referencePointManager.get(referencePoint);
+        IProject project = referencePointManager.getProject(referencePoint);
 
         Pair<Long, Long> fileCountAndSize;
 
