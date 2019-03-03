@@ -30,6 +30,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import saros.filesystem.IReferencePointManager;
 import saros.negotiation.ProjectNegotiationData;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
@@ -348,32 +349,36 @@ public class EnterProjectNamePage extends WizardPage {
 
     final Set<String> reservedProjectNames = new HashSet<String>();
 
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
-      String projectID = entry.getKey();
+      String referencePointID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      saros.filesystem.IProject project = session.getProject(projectID);
+      saros.filesystem.IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
-      if (project == null) continue;
+      if (referencePoint == null) continue;
 
-      projectOptionComposite.setProjectName(true, project.getName());
+      projectOptionComposite.setProjectName(true, referencePointManager.getName(referencePoint));
       projectOptionComposite.setEnabled(false);
-      reservedProjectNames.add(project.getName());
+      reservedProjectNames.add(referencePointManager.getName(referencePoint));
     }
 
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
-      String projectID = entry.getKey();
+      String referencePointID = entry.getKey();
       ProjectOptionComposite projectOptionComposite = entry.getValue();
 
-      saros.filesystem.IProject project = session.getProject(projectID);
+      saros.filesystem.IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
-      if (project != null) continue;
+      if (referencePoint != null) continue;
 
       String projectNameProposal =
           findProjectNameProposal(
-              remoteProjectMapping.get(projectID), reservedProjectNames.toArray(new String[0]));
+              remoteProjectMapping.get(referencePointID),
+              reservedProjectNames.toArray(new String[0]));
 
       projectOptionComposite.setProjectName(false, projectNameProposal);
       reservedProjectNames.add(projectNameProposal);

@@ -12,6 +12,8 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import saros.exceptions.ModuleNotFoundException;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.wizards.AddProjectToSessionWizard;
 import saros.repackaged.picocontainer.Startable;
@@ -44,8 +46,11 @@ public class ModuleInitialization implements Startable {
       new ISessionListener() {
 
         @Override
-        public void resourcesAdded(IProject module) {
-          final ModuleReloader moduleReloader = new ModuleReloader(module);
+        public void resourcesAdded(IReferencePoint referencePoint) {
+          IReferencePointManager referencePointManager =
+              session.getComponent(IReferencePointManager.class);
+          final ModuleReloader moduleReloader =
+              new ModuleReloader(referencePointManager.getProject(referencePoint));
 
           // Registers a ModuleLoader with the AWT event dispatching thread to be executed
           // asynchronously.

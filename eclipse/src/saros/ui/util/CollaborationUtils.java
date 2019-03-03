@@ -261,21 +261,29 @@ public class CollaborationUtils {
    */
   private static String getSessionDescription(ISarosSession sarosSession) {
 
-    final Set<saros.filesystem.IProject> projects = sarosSession.getProjects();
+    final Set<saros.filesystem.IReferencePoint> referencePoints = sarosSession.getReferencePoints();
+
+    IReferencePointManager referencePointManager =
+        sarosSession.getComponent(IReferencePointManager.class);
 
     final StringBuilder result = new StringBuilder();
 
-    for (saros.filesystem.IProject project : projects) {
+    for (saros.filesystem.IReferencePoint referencePoint : referencePoints) {
 
       final Pair<Long, Long> fileCountAndSize;
 
-      final boolean isCompletelyShared = sarosSession.isCompletelyShared(project);
+      final boolean isCompletelyShared = sarosSession.isCompletelyShared(referencePoint);
 
       final List<IResource> resources;
 
       if (isCompletelyShared)
-        resources = Collections.singletonList(((EclipseProjectImpl) project).getDelegate());
-      else resources = ResourceAdapterFactory.convertBack(sarosSession.getSharedResources(project));
+        resources =
+            Collections.singletonList(
+                ((EclipseProjectImpl) referencePointManager.getProject(referencePoint))
+                    .getDelegate());
+      else
+        resources =
+            ResourceAdapterFactory.convertBack(sarosSession.getSharedResources(referencePoint));
 
       fileCountAndSize =
           FileUtils.getFileCountAndSize(
@@ -286,7 +294,7 @@ public class CollaborationUtils {
       result.append(
           String.format(
               "\nProject: %s (%s), Files: %d, Size: %s",
-              project.getName(),
+              referencePointManager.getName(referencePoint),
               isCompletelyShared ? "complete" : "partial",
               fileCountAndSize.getRight(),
               format(fileCountAndSize.getLeft())));

@@ -9,6 +9,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import saros.SarosPluginContext;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.intellij.ui.util.IconManager;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -59,12 +61,16 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         }
 
         @Override
-        public void resourcesAdded(final IProject project) {
+        public void resourcesAdded(final IReferencePoint referencePoint) {
+
+          IReferencePointManager referencePointManager =
+              sessionManager.getSession().getComponent(IReferencePointManager.class);
+
           UIUtil.invokeLaterIfNeeded(
               new Runnable() {
                 @Override
                 public void run() {
-                  addProjectNode(project);
+                  addProjectNode(referencePointManager.getProject(referencePoint));
                 }
               });
         }
