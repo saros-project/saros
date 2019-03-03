@@ -22,6 +22,7 @@ import saros.core.monitoring.Status;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.intellij.SarosComponent;
@@ -247,16 +248,21 @@ public class CollaborationUtils {
    */
   private static String getShareProjectDescription(ISarosSession sarosSession) {
 
-    Set<IProject> projects = sarosSession.getProjects();
+    Set<IReferencePoint> referencePoints = sarosSession.getReferencePoints();
 
     StringBuilder result = new StringBuilder();
 
+    IReferencePointManager referencePointManager =
+        sarosSession.getComponent(IReferencePointManager.class);
+
     try {
-      for (IProject project : projects) {
+      for (IReferencePoint referencePoint : referencePoints) {
+
+        IProject project = referencePointManager.get(referencePoint);
 
         Pair<Long, Long> fileCountAndSize;
 
-        if (sarosSession.isCompletelyShared(project)) {
+        if (sarosSession.isCompletelyShared(referencePoint)) {
           fileCountAndSize =
               getFileCountAndSize(Arrays.asList(project.members()), true, IResource.FILE);
 
@@ -267,7 +273,7 @@ public class CollaborationUtils {
                   fileCountAndSize.getRight(),
                   format(fileCountAndSize.getLeft())));
         } else {
-          List<IResource> resources = sarosSession.getSharedResources(project);
+          List<IResource> resources = sarosSession.getSharedResources(referencePoint);
 
           fileCountAndSize = getFileCountAndSize(resources, false, IResource.NONE);
 

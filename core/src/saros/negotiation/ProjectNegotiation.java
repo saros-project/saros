@@ -11,6 +11,7 @@ import saros.exceptions.LocalCancellationException;
 import saros.exceptions.RemoteCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.MonitorableFileTransfer;
@@ -55,6 +56,8 @@ public abstract class ProjectNegotiation extends Negotiation {
 
   protected final IChecksumCache checksumCache;
 
+  protected final IReferencePointManager referencePointManager;
+
   /**
    * The file transfer manager can be <code>null</code> if no connection was established or was lost
    * when the class was instantiated.
@@ -82,6 +85,8 @@ public abstract class ProjectNegotiation extends Negotiation {
     Connection connection = connectionService.getConnection();
 
     if (connection != null) fileTransferManager = new FileTransferManager(connection);
+
+    this.referencePointManager = this.session.getComponent(IReferencePointManager.class);
   }
 
   /**

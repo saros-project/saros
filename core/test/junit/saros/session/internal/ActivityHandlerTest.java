@@ -40,6 +40,7 @@ import saros.activities.ViewportActivity;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.session.IActivityHandlerCallback;
 import saros.session.ISarosSession;
 import saros.session.User;
@@ -336,11 +337,14 @@ public class ActivityHandlerTest {
             })
         .anyTimes();
 
+    IReferencePoint referencePoint = EasyMock.createMock(IReferencePoint.class);
     IProject project = EasyMock.createMock(IProject.class);
+    EasyMock.expect(project.getReferencePoint()).andStubReturn(referencePoint);
+    EasyMock.replay(project);
 
-    EasyMock.expect(sessionMock.userHasProject(dave, project)).andStubReturn(false);
+    EasyMock.expect(sessionMock.userHasReferencePoint(dave, referencePoint)).andStubReturn(false);
     for (User user : remoteUsersWithProjects) {
-      EasyMock.expect(sessionMock.userHasProject(user, project)).andStubReturn(true);
+      EasyMock.expect(sessionMock.userHasReferencePoint(user, referencePoint)).andStubReturn(true);
     }
 
     EasyMock.expect(sessionMock.getUsers()).andStubReturn(participants);

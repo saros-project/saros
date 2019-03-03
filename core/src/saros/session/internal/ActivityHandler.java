@@ -181,7 +181,8 @@ public final class ActivityHandler implements Startable {
         recipients = item.recipients;
       } else {
         for (User user : item.recipients) {
-          if (session.userHasProject(user, activity.getPath().getProject())) {
+          if (session.userHasReferencePoint(
+              user, activity.getPath().getProject().getReferencePoint())) {
             recipients.add(user);
           }
         }
