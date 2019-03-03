@@ -17,13 +17,13 @@ import org.junit.Test;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 
-public class SharedProjectMapperTest {
+public class SharedReferencePointMapperTest {
 
-  private SharedProjectMapper mapper;
+  private SharedReferencePointMapper mapper;
 
   @Before
   public void setUp() {
-    mapper = new SharedProjectMapper();
+    mapper = new SharedReferencePointMapper();
   }
 
   @Test(expected = NullPointerException.class)
