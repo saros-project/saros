@@ -5,8 +5,10 @@ import java.nio.file.Path;
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
+import saros.filesystem.ReferencePointImpl;
 
 /**
  * Server implementation of the {@link IResource} interface. It represents each resource directly as
@@ -16,7 +18,7 @@ public abstract class ServerResourceImpl implements IResource {
 
   private IWorkspace workspace;
   private IPath path;
-
+  private IReferencePoint referencePoint;
   /**
    * Creates a ServerResourceImpl.
    *
@@ -26,6 +28,8 @@ public abstract class ServerResourceImpl implements IResource {
   public ServerResourceImpl(IWorkspace workspace, IPath path) {
     this.path = path;
     this.workspace = workspace;
+    if (path.segmentCount() > 0)
+      this.referencePoint = new ReferencePointImpl(ServerPathImpl.fromString(path.segment(0)));
   }
 
   /**
@@ -117,5 +121,10 @@ public abstract class ServerResourceImpl implements IResource {
    */
   Path toNioPath() {
     return ((ServerPathImpl) getLocation()).getDelegate();
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint() {
+    return referencePoint;
   }
 }

@@ -8,10 +8,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.intellij.editor.ProjectAPI;
 
 public abstract class IntelliJResourceImpl implements IResource {
+
+  protected IReferencePoint referencePoint;
 
   @Override
   public boolean isIgnored() {
@@ -99,5 +102,10 @@ public abstract class IntelliJResourceImpl implements IResource {
   @Override
   public <T extends IResource> T adaptTo(@NotNull Class<T> clazz) {
     return clazz.isInstance(this) ? clazz.cast(this) : null;
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint() {
+    return referencePoint;
   }
 }
