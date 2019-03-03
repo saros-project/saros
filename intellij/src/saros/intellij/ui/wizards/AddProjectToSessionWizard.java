@@ -24,14 +24,17 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.SarosPluginContext;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePointManager;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.filesystem.Filesystem;
@@ -671,6 +674,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
     subMonitor.setTaskName("\"Searching for files that will be modified...\",");
 
+    fillReferencePointManager(session, new HashSet<>(projectMapping.values()));
+
     for (Map.Entry<String, IProject> entry : projectMapping.entrySet()) {
 
       String projectID = entry.getKey();
@@ -705,5 +710,12 @@ public class AddProjectToSessionWizard extends Wizard {
       }
     }
     return modifiedResources;
+  }
+
+  private void fillReferencePointManager(ISarosSession session, Set<IProject> projects) {
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    referencePointManager.putSetOfProjects(projects);
   }
 }
