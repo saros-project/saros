@@ -45,6 +45,7 @@ import saros.Saros;
 import saros.SarosPluginContext;
 import saros.editor.internal.EditorAPI;
 import saros.filesystem.IChecksumCache;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.monitoring.ProgressMonitorAdapterFactory;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
@@ -336,6 +337,9 @@ public class AddProjectToSessionWizard extends Wizard {
                     entry.getKey(), ResourceAdapterFactory.create(entry.getValue()));
               }
 
+              fillReferencePointManager(
+                  sessionManager.getSession(), new HashSet<>(convertedMapping.values()));
+
               final ProjectNegotiation.Status status =
                   negotiation.run(convertedMapping, ProgressMonitorAdapterFactory.convert(monitor));
 
@@ -566,6 +570,8 @@ public class AddProjectToSessionWizard extends Wizard {
       final saros.filesystem.IProject adaptedProject =
           ResourceAdapterFactory.create(entry.getValue());
 
+      fillReferencePointManager(session, adaptedProject);
+
       /*
        * do not refresh already partially shared projects as this may
        * trigger resource change events
@@ -698,6 +704,21 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     mappingStorage.updateMapping(jid, currentProjectNameMapping);
+  }
+
+  private void fillReferencePointManager(
+      ISarosSession session, Set<saros.filesystem.IProject> projects) {
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    referencePointManager.putSetOfProjects(projects);
+  }
+
+  private void fillReferencePointManager(ISarosSession session, saros.filesystem.IProject project) {
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    referencePointManager.put(project.getReferencePoint(), project);
   }
 
   private static final class ResourceMappingStorage {

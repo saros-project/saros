@@ -22,9 +22,11 @@ package saros.session.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,9 +47,12 @@ import saros.communication.extensions.LeaveSessionExtension;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.context.IContainerContext;
+import saros.filesystem.CoreReferencePointManager;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.net.IConnectionManager;
 import saros.net.ITransmitter;
@@ -132,6 +137,8 @@ public final class SarosSession implements ISarosSession {
   private final UserInformationHandler userListHandler;
 
   private final String sessionID;
+
+  private final IReferencePointManager referencePointManager;
 
   private boolean started = false;
   private boolean stopped = false;
@@ -256,22 +263,22 @@ public final class SarosSession implements ISarosSession {
       // new project
       if (allResources == null) {
         // new fully shared project
-        projectMapper.addProject(id, project, false);
+        projectMapper.addReferencePoint(id, project.getReferencePoint(), false);
       } else {
         // new partially shared project
-        projectMapper.addProject(id, project, true);
-        projectMapper.addResources(project, allResources);
+        projectMapper.addReferencePoint(id, project.getReferencePoint(), true);
+        projectMapper.addResources(project.getReferencePoint(), allResources);
       }
 
       listenerDispatch.projectAdded(project);
     } else {
       // existing project
       if (allResources == null) {
-        // upgrade partially shared to fully shared project
-        projectMapper.addProject(id, project, false);
+        // upgrade partially shared to fully shared project / reference point
+        projectMapper.addReferencePoint(id, project.getReferencePoint(), false);
       } else {
-        // increase scope of partially shared project
-        projectMapper.addResources(project, allResources);
+        // increase scope of partially shared project / reference point
+        projectMapper.addResources(project.getReferencePoint(), allResources);
       }
     }
 
@@ -319,7 +326,7 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public boolean userHasProject(User user, IProject project) {
-    return projectMapper.userHasProject(user, project);
+    return projectMapper.userHasReferencePoint(user, project.getReferencePoint());
   }
 
   @Override
@@ -441,7 +448,7 @@ public final class SarosSession implements ISarosSession {
        * to decide whom to send activities to - they just send them to the
        * host, who decides for them.
        */
-      projectMapper.addMissingProjectsToUser(user);
+      projectMapper.addMissingReferencePointsToUser(user);
     }
 
     synchronizer.syncExec(
@@ -587,7 +594,12 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public Set<IProject> getProjects() {
-    return projectMapper.getProjects();
+    Set<IReferencePoint> referencePoints = projectMapper.getReferencePoints();
+    Set<IProject> projects = new HashSet<>();
+    for (IReferencePoint referencePoint : referencePoints) {
+      projects.add(referencePointManager.get(referencePoint));
+    }
+    return projects;
   }
 
   // FIXME synchronization
@@ -795,14 +807,14 @@ public final class SarosSession implements ISarosSession {
   private boolean updatePartialSharedResources(final IFileSystemModificationActivity activity) {
 
     final IProject project = activity.getPath().getProject();
-
+    final IReferencePoint referencePoint = project.getReferencePoint();
     /*
      * The follow 'if check' assumes that move operations where at least one
      * project is not part of the sharing is announced as create and delete
      * activities.
      */
 
-    if (!projectMapper.isPartiallyShared(project)) return true;
+    if (!projectMapper.isPartiallyShared(referencePoint)) return true;
 
     if (activity instanceof FileActivity) {
       FileActivity fileActivity = ((FileActivity) activity);
@@ -829,7 +841,7 @@ public final class SarosSession implements ISarosSession {
             return false;
           }
 
-          projectMapper.addResources(project, Collections.singletonList(file));
+          projectMapper.addResources(referencePoint, Collections.singletonList(file));
 
           break;
 
@@ -848,7 +860,7 @@ public final class SarosSession implements ISarosSession {
             return false;
           }
 
-          projectMapper.removeResources(project, Collections.singletonList(file));
+          projectMapper.removeResources(referencePoint, Collections.singletonList(file));
 
           break;
 
@@ -894,7 +906,7 @@ public final class SarosSession implements ISarosSession {
           }
 
           projectMapper.removeAndAddResources(
-              project, Collections.singletonList(oldFile), Collections.singletonList(file));
+              referencePoint, Collections.singletonList(oldFile), Collections.singletonList(file));
 
           break;
       }
@@ -914,7 +926,7 @@ public final class SarosSession implements ISarosSession {
         return false;
       }
 
-      projectMapper.addResources(project, Collections.singletonList(folder));
+      projectMapper.addResources(referencePoint, Collections.singletonList(folder));
 
     } else if (activity instanceof FolderDeletedActivity) {
       IFolder folder = activity.getPath().getFolder();
@@ -933,7 +945,7 @@ public final class SarosSession implements ISarosSession {
         return false;
       }
 
-      projectMapper.removeResources(project, Collections.singletonList(folder));
+      projectMapper.removeResources(referencePoint, Collections.singletonList(folder));
     }
 
     return true;
@@ -982,41 +994,50 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public String getProjectID(IProject project) {
-    return projectMapper.getID(project);
+    return projectMapper.getID(project.getReferencePoint());
   }
 
   @Override
   public IProject getProject(String projectID) {
-    return projectMapper.getProject(projectID);
+    IReferencePoint referencePoint = projectMapper.getReferencePoint(projectID);
+    return referencePoint == null ? null : referencePointManager.get(referencePoint);
   }
 
   @Override
   public Map<IProject, List<IResource>> getProjectResourcesMapping() {
-    return projectMapper.getProjectResourceMapping();
+    Map<IReferencePoint, List<IResource>> referencePointResourceMapping =
+        projectMapper.getReferencePointResourceMapping();
+    Map<IProject, List<IResource>> projectResourceMapping = new HashMap<>();
+
+    for (Entry<IReferencePoint, List<IResource>> entry : referencePointResourceMapping.entrySet()) {
+      projectResourceMapping.put(referencePointManager.get(entry.getKey()), entry.getValue());
+    }
+
+    return projectResourceMapping;
   }
 
   @Override
   public List<IResource> getSharedResources(IProject project) {
-    return projectMapper.getProjectResourceMapping().get(project);
+    return projectMapper.getReferencePointResourceMapping().get(project.getReferencePoint());
   }
 
   @Override
   public boolean isCompletelyShared(IProject project) {
-    return projectMapper.isCompletelyShared(project);
+    return projectMapper.isCompletelyShared(project.getReferencePoint());
   }
 
   @Override
   public void addProjectMapping(String projectID, IProject project) {
-    if (projectMapper.getProject(projectID) == null) {
-      projectMapper.addProject(projectID, project, true);
+    if (projectMapper.getReferencePoint(projectID) == null) {
+      projectMapper.addReferencePoint(projectID, project.getReferencePoint(), true);
       listenerDispatch.projectAdded(project);
     }
   }
 
   @Override
   public void removeProjectMapping(String projectID, IProject project) {
-    if (projectMapper.getProject(projectID) != null) {
-      projectMapper.removeProject(projectID);
+    if (projectMapper.getReferencePoint(projectID) != null) {
+      projectMapper.removeReferencePoint(projectID);
       listenerDispatch.projectRemoved(project);
     }
   }
@@ -1099,6 +1120,7 @@ public final class SarosSession implements ISarosSession {
     sessionContainer = context.createChildContainer();
     sessionContainer.addComponent(ISarosSession.class, this);
     sessionContainer.addComponent(IActivityHandlerCallback.class, activityCallback);
+    sessionContainer.addComponent(IReferencePointManager.class, new CoreReferencePointManager());
 
     ISarosSessionContextFactory factory = context.getComponent(ISarosSessionContextFactory.class);
     factory.createComponents(this, sessionContainer);
@@ -1121,6 +1143,8 @@ public final class SarosSession implements ISarosSession {
     activitySequencer = sessionContainer.getComponent(ActivitySequencer.class);
 
     userListHandler = sessionContainer.getComponent(UserInformationHandler.class);
+
+    referencePointManager = sessionContainer.getComponent(IReferencePointManager.class);
 
     // ensure that the container uses caching
     assert sessionContainer.getComponent(ActivityHandler.class)
