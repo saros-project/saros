@@ -40,6 +40,15 @@ public class CoreReferencePointManager implements IReferencePointManager {
   }
 
   @Override
+  public void putSetOfProjects(Set<IProject> projects) {
+    if (projects == null) throw new IllegalArgumentException("Set of projects is null");
+
+    for (IProject project : projects) {
+      put(project.getReferencePoint(), project);
+    }
+  }
+
+  @Override
   public Set<IProject> getProjects(Set<IReferencePoint> referencePoints) {
     if (referencePoints == null)
       throw new IllegalArgumentException("Set of reference points is null");
