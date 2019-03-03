@@ -191,10 +191,11 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
       ISarosSession session = ((SessionInfo) nSession.getUserObject()).getSession();
 
       ProjectInfo projInfo;
-      if (session.isCompletelyShared(project)) {
+      if (session.isCompletelyShared(project.getReferencePoint())) {
         projInfo = new ProjectInfo(project);
       } else {
-        projInfo = new ProjectInfo(project, session.getSharedResources(project));
+        projInfo =
+            new ProjectInfo(project, session.getSharedResources(project.getReferencePoint()));
       }
 
       DefaultMutableTreeNode nProject = new DefaultMutableTreeNode(projInfo);

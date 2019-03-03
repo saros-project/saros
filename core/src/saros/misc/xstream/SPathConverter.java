@@ -12,6 +12,8 @@ import saros.communication.extensions.ActivitiesExtension;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 
@@ -63,7 +65,7 @@ public class SPathConverter implements Converter, Startable {
 
     SPath spath = (SPath) value;
 
-    String i = session.getProjectID(spath.getProject());
+    String i = session.getReferencePointID(spath.getProject().getReferencePoint());
     if (i == null) {
       LOG.error(
           "Could not retrieve project id for project '"
@@ -84,14 +86,18 @@ public class SPathConverter implements Converter, Startable {
     String i = reader.getAttribute(PROJECT_ID);
     String p = URLCodec.decode(reader.getAttribute(PATH));
 
-    IProject project = session.getProject(i);
-    if (project == null) {
-      LOG.error("Could not create SPath because there is no shared project for id '" + i + "'");
+    IReferencePoint referencePoint = session.getReferencePoint(i);
+    if (referencePoint == null) {
+      LOG.error(
+          "Could not create SPath because there is no shared reference point for id '" + i + "'");
       return null;
     }
 
     IPath path = pathFactory.fromString(p);
 
-    return new SPath(project, path);
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    return referencePointManager.createSPath(referencePoint, path);
   }
 }
