@@ -4,6 +4,7 @@ import java.io.IOException;
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspaceRoot;
 
@@ -104,5 +105,10 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   @Override
   public <T extends IResource> T adaptTo(Class<T> clazz) {
     return null;
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint() {
+    throw new UnsupportedOperationException();
   }
 }

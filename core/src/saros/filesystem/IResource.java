@@ -67,4 +67,13 @@ public interface IResource {
   public IPath getLocation();
 
   public <T extends IResource> T adaptTo(Class<T> clazz);
+
+  /**
+   * Returns the {@link IReferencePoint} on which the resource is referenced to
+   *
+   * @return the reference point on which the resource is referenced to
+   * @deprecated this method is used as long as the Saros completely based on reference points
+   */
+  @Deprecated
+  public IReferencePoint getReferencePoint();
 }
