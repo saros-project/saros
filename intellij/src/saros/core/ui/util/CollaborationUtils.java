@@ -21,6 +21,7 @@ import saros.core.monitoring.Status;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.intellij.SarosComponent;
 import saros.intellij.filesystem.IntelliJProjectImpl;
@@ -81,10 +82,12 @@ public class CollaborationUtils {
               monitor.worked(50);
 
               ISarosSession session = sessionManager.getSession();
-
               if (session == null) {
                 return Status.CANCEL_STATUS;
               }
+
+              fillReferencePointManager(session, newResources.keySet());
+
               monitor.setTaskName("Inviting participants...");
               sessionManager.invite(participantsToAdd, getShareProjectDescription(session));
 
@@ -175,6 +178,8 @@ public class CollaborationUtils {
     if (projectResources.isEmpty()) {
       return;
     }
+
+    fillReferencePointManager(sarosSession, projectResources.keySet());
 
     ThreadUtils.runSafeAsync(
         "AddResourceToSession",
@@ -484,5 +489,12 @@ public class CollaborationUtils {
     }
 
     return Pair.of(totalFileSize, totalFileCount);
+  }
+
+  private static void fillReferencePointManager(ISarosSession session, Set<IProject> projects) {
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+
+    referencePointManager.putSetOfProjects(projects);
   }
 }
