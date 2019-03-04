@@ -11,7 +11,7 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.NegotiationTools.CancelOption;
@@ -58,7 +58,9 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
   @Override
   protected void transfer(
-      IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
+      IProgressMonitor monitor,
+      Map<String, IReferencePoint> referencePointMapping,
+      List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
 
     /* only get files, if something is missing */
