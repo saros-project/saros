@@ -4,6 +4,7 @@ import java.io.IOException;
 import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
@@ -31,6 +32,11 @@ public class ServerWorkspaceImpl implements IWorkspace {
   @Override
   public IProject getProject(String name) {
     return new ServerProjectImpl(this, name);
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint(String name) {
+    return getProject(name).getReferencePoint();
   }
 
   @Override
