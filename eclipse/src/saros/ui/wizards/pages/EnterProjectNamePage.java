@@ -97,7 +97,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     for (final ProjectNegotiationData data : projectNegotiationData) {
 
-      remoteProjectIdToNameMapping.put(data.getProjectID(), data.getProjectName());
+      remoteProjectIdToNameMapping.put(data.getReferencePointID(), data.getProjectName());
 
       unsupportedCharsets.addAll(getUnsupportedCharsets(data.getFileList().getEncodings()));
     }
