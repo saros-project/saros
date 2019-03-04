@@ -13,6 +13,7 @@ import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
@@ -64,7 +65,9 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
   @Override
   protected void transfer(
-      IProgressMonitor monitor, Map<String, IProject> projectMapping, List<FileList> missingFiles)
+      IProgressMonitor monitor,
+      Map<String, IReferencePoint> referencePointMapping,
+      List<FileList> missingFiles)
       throws IOException, SarosCancellationException {
 
     boolean filesMissing = false;
@@ -73,13 +76,13 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
     // the host do not send an archive if we do not need any files
     if (filesMissing) {
-      receiveAndUnpackArchive(projectMapping, transferListener, monitor);
+      receiveAndUnpackArchive(referencePointMapping, transferListener, monitor);
     }
   }
 
   /** Receives the archive with all missing files and unpacks it. */
   private void receiveAndUnpackArchive(
-      final Map<String, IProject> localProjectMapping,
+      final Map<String, IReferencePoint> localReferencePointMapping,
       final TransferListener archiveTransferListener,
       final IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
@@ -96,7 +99,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
      */
 
     try {
-      unpackArchive(localProjectMapping, archiveFile, new SubProgressMonitor(monitor, 50));
+      unpackArchive(localReferencePointMapping, archiveFile, new SubProgressMonitor(monitor, 50));
       monitor.done();
     } finally {
       if (archiveFile != null && !archiveFile.delete()) {
@@ -106,15 +109,15 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
   }
 
   private void unpackArchive(
-      final Map<String, IProject> localProjectMapping,
+      final Map<String, IReferencePoint> localReferencePointMapping,
       final File archiveFile,
       final IProgressMonitor monitor)
       throws LocalCancellationException, IOException {
 
     final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
 
-    for (Entry<String, IProject> entry : localProjectMapping.entrySet())
-      projectMapping.put(entry.getKey(), entry.getValue());
+    for (Entry<String, IReferencePoint> entry : localReferencePointMapping.entrySet())
+      projectMapping.put(entry.getKey(), referencePointManager.get(entry.getValue()));
 
     final DecompressArchiveTask decompressTask =
         new DecompressArchiveTask(archiveFile, projectMapping, PATH_DELIMITER, monitor);
