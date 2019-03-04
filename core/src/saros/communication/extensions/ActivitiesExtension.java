@@ -32,6 +32,9 @@ import saros.activities.FileActivity;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.FolderMovedActivity;
+import saros.activities.GitCollectActivity;
+import saros.activities.GitRequestActivity;
+import saros.activities.GitSendBundleActivity;
 import saros.activities.IActivity;
 import saros.activities.JupiterActivity;
 import saros.activities.NOPActivity;
@@ -148,6 +151,9 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
           FolderCreatedActivity.class,
           FolderDeletedActivity.class,
           FolderMovedActivity.class,
+          GitCollectActivity.class,
+          GitRequestActivity.class,
+          GitSendBundleActivity.class,
           JupiterActivity.class,
           NOPActivity.class,
           PermissionActivity.class,

@@ -35,6 +35,12 @@ public interface IActivityReceiver {
 
   void receive(FolderMovedActivity folderMovedActivity);
 
+  void receive(GitCollectActivity gitCollectActivity);
+
+  void receive(GitRequestActivity gitRequestActivity);
+
+  void receive(GitSendBundleActivity gitSendBundleActivity);
+
   void receive(JupiterActivity jupiterActivity);
 
   void receive(NOPActivity nopActivity);
