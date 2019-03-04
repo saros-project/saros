@@ -628,7 +628,7 @@ public class AddProjectToSessionWizard extends Wizard {
     final Map<String, IProject> result = new HashMap<String, IProject>();
 
     for (final ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
-      final String projectID = data.getProjectID();
+      final String projectID = data.getReferencePointID();
 
       result.put(
           projectID,
