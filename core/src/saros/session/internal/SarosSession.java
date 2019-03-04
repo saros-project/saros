@@ -1063,12 +1063,12 @@ public final class SarosSession implements ISarosSession {
 
   @Override
   public void enableQueuing(IReferencePoint referencePoint) {
-    activityQueuer.enableQueuing(referencePointManager.getProject(referencePoint));
+    activityQueuer.enableQueuing(referencePoint);
   }
 
   @Override
   public void disableQueuing(IReferencePoint referencePoint) {
-    activityQueuer.disableQueuing(referencePointManager.getProject(referencePoint));
+    activityQueuer.disableQueuing(referencePoint);
     // send us a dummy activity to ensure the queues get flushed
     sendActivity(Collections.singletonList(localUser), new NOPActivity(localUser, localUser, 0));
   }
