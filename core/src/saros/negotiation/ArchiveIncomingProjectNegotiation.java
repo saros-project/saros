@@ -14,7 +14,6 @@ import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.SubProgressMonitor;
@@ -135,7 +134,10 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
      */
 
     try {
-      workspace.run(decompressTask, projectMapping.values().toArray(new IResource[0]));
+      workspace.run(
+          decompressTask,
+          localReferencePointMapping.values().toArray(new IReferencePoint[0]),
+          referencePointManager);
     } catch (saros.exceptions.OperationCanceledException e) {
       LocalCancellationException canceled =
           new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
