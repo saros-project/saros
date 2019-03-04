@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
@@ -48,6 +49,11 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
             });
 
     return module != null ? new IntelliJProjectImpl(module) : null;
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint(String name) {
+    return getProject(name).getReferencePoint();
   }
 
   @Override
