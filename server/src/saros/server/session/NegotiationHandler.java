@@ -5,7 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.monitoring.NullProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
 import saros.negotiation.AbstractOutgoingProjectNegotiation;
@@ -153,7 +153,7 @@ public class NegotiationHandler implements INegotiationHandler {
             negotiation.localCancel(
                 "Server does not accept incoming projects",
                 NegotiationTools.CancelOption.NOTIFY_PEER);
-            negotiation.run(new HashMap<String, IProject>(), new NullProgressMonitor());
+            negotiation.run(new HashMap<String, IReferencePoint>(), new NullProgressMonitor());
           }
         });
   }
