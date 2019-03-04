@@ -63,7 +63,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
   public InstantOutgoingProjectNegotiation(
       final JID peer, //
-      final ProjectSharingData projects, //
+      final ProjectSharingData referencePoints, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -76,7 +76,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       ) {
     super(
         peer,
-        projects,
+        referencePoints,
         sessionManager,
         session,
         editorManager,
@@ -117,12 +117,12 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     for (final FileList list : fileLists) {
       fileCount += list.getPaths().size();
 
-      final String projectID = list.getProjectID();
-      final IReferencePoint referencePoint = referencePoints.getReferencePoint(projectID);
+      final String referencePointID = list.getProjectID();
+      final IReferencePoint referencePoint = referencePoints.getReferencePoint(referencePointID);
 
       if (referencePoint == null)
         throw new LocalCancellationException(
-            "project with id " + projectID + " was unshared during synchronization",
+            "reference point with id " + referencePointID + " was unshared during synchronization",
             CancelOption.NOTIFY_PEER);
     }
 
