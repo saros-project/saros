@@ -37,17 +37,19 @@ public class JGitFacadeTest {
   @Before
   public void setUp() throws IOException, IllegalStateException, GitAPIException {
     localWorkDirTree = tempFolder.newFolder("TempDir1");
-    localJGitFacade = new JGitFacade(localWorkDirTree);
 
     initNewRepo(localWorkDirTree);
     writeCommitToRepo(localWorkDirTree, 2);
 
     remoteWorkDirTree = tempFolder.newFolder("TempDir2");
-    remoteJGitFacade = new JGitFacade(remoteWorkDirTree);
 
     cloneFromRepo(localWorkDirTree, remoteWorkDirTree);
 
     writeCommitToRepo(localWorkDirTree, 3);
+
+    // All the set up before can't be done by the user with Saros.
+    localJGitFacade = new JGitFacade(localWorkDirTree);
+    remoteJGitFacade = new JGitFacade(remoteWorkDirTree);
   }
   // lucky paths
   @Test
@@ -199,13 +201,22 @@ public class JGitFacadeTest {
       throw new IllegalArgumentException(
           "workDirTree of where should be cloned to is null and can't be resolved");
     try {
-      JGitFacade fromJGitFacade = new JGitFacade(from);
-      Git.cloneRepository().setURI(fromJGitFacade.getUrl()).setDirectory(to).call();
+      Git.cloneRepository().setURI(getUrl(from)).setDirectory(to).call();
     } catch (InvalidRemoteException e) {
       throw new IllegalArgumentException(
           "workDirTree of where should be cloned to is null and can't be resolved", e);
     } catch (GitAPIException | IOException e) {
       throw new IOException("clone failed", e);
     }
+  }
+
+  /**
+   * @param workDirTree The directory that contains the .git directory
+   * @return The URL to access/address directly the .git directory
+   * @throws IllegalArgumentException {@code workDirTree} is null can't be resolved
+   * @throws IOException failed while read
+   */
+  private static String getUrl(File workDirTree) throws IllegalArgumentException, IOException {
+    return Git.open(workDirTree).getRepository().getDirectory().getCanonicalPath();
   }
 }

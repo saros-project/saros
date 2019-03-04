@@ -26,9 +26,26 @@ import org.eclipse.jgit.transport.URIish;
 public class JGitFacade {
   private static final Logger log = Logger.getLogger(JGitFacade.class);
   private File workDirTree;
+  private Git git;
 
-  public JGitFacade(File workDirTree) {
+  public JGitFacade(File workDirTree) throws IOException {
     setWorkDirTree(workDirTree);
+    setGit();
+  }
+  /**
+   * Set the {@code git} object which offer the functionality of the library. See {@link Git}
+   *
+   * @throws IllegalArgumentException {@code workDirTree} is null or can't be resolved
+   * @throws IOException failed while read from workDirTree
+   */
+  private void setGit() throws IllegalArgumentException, IOException {
+    try {
+      if (workDirTree == null)
+        throw new IllegalArgumentException("workDirTree is null and can't be resolved");
+      git = Git.open(workDirTree);
+    } catch (IOException e) {
+      throw new IOException("failed while read from workDirTree", e);
+    }
   }
 
   /**
@@ -48,8 +65,6 @@ public class JGitFacade {
    */
   public byte[] createBundle(String actual, String basis)
       throws IllegalArgumentException, IOException {
-
-    Git git = getGit();
     Repository repo = git.getRepository();
     // In order to create the bundle object we need to initialize the Bundlewriter and set it up
     // with the commit, it should end with and the start commit.
@@ -104,9 +119,6 @@ public class JGitFacade {
    */
   public void fetchFromBundle(byte[] bundle)
       throws IllegalArgumentException, IOException, URISyntaxException {
-
-    Git git = getGit();
-
     if (bundle == null) throw new IllegalArgumentException("bundle is null and can't be resolved");
 
     try {
@@ -131,34 +143,13 @@ public class JGitFacade {
   }
 
   /**
-   * @return The URL to access/address directly the .git directory
-   * @throws IllegalArgumentException {@code workDirTree} is null can't be resolved
-   * @throws IOException failed while read
-   */
-  String getUrl() throws IllegalArgumentException, IOException {
-    Git git = getGit();
-    return git.getRepository().getDirectory().getCanonicalPath();
-  }
-
-  /**
    * @param revString See <a href="https://www.git-scm.com/docs/gitrevisions">gitrevisions</a>
    * @throws IllegalArgumentException {@code workDirTree} is null can't be resolved
    * @throws IOException failed while read
    */
   public String getSHA1HashByRevisionString(String revString)
       throws IllegalArgumentException, IOException {
-    Git git = getGit();
     return git.getRepository().resolve(revString).name();
-  }
-
-  private Git getGit() throws IOException {
-    try {
-      if (workDirTree == null)
-        throw new IllegalArgumentException("workDirTree is null and can't be resolved");
-      return Git.open(workDirTree);
-    } catch (IOException e) {
-      throw new IOException("failed while read from workDirTree", e);
-    }
   }
 
   /**
@@ -170,7 +161,6 @@ public class JGitFacade {
    */
   public void ffMerge(String revString) throws IOException {
     try {
-      Git git = getGit();
       git.merge()
           .include(git.getRepository().resolve(revString))
           .setFastForward(FastForwardMode.FF_ONLY)
@@ -179,10 +169,12 @@ public class JGitFacade {
       throw new IOException("merge failed", e);
     }
   }
+
   /** @param workDirTree The directory that contains the .git directory */
   public void setWorkDirTree(File workDirTree) {
     this.workDirTree = workDirTree;
   }
+
   /** @return workDirTree The directory that contains the .git directory */
   public File getWorkDirTree() {
     return workDirTree;

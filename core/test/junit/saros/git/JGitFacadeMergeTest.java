@@ -30,17 +30,19 @@ public class JGitFacadeMergeTest {
   @Before
   public void setUp() throws IOException, IllegalStateException, GitAPIException {
     localWorkDirTree = tempFolder.newFolder("TempDir1");
-    localJGitFacade = new JGitFacade(localWorkDirTree);
 
     JGitFacadeTest.initNewRepo(localWorkDirTree);
     JGitFacadeTest.writeCommitToRepo(localWorkDirTree, 2);
 
     remoteWorkDirTree = tempFolder.newFolder("TempDir2");
-    remoteJGitFacade = new JGitFacade(remoteWorkDirTree);
 
     JGitFacadeTest.cloneFromRepo(localWorkDirTree, remoteWorkDirTree);
 
     JGitFacadeTest.writeCommitToRepo(localWorkDirTree, 3);
+
+    // All the set up before can't be done by the user with Saros.
+    localJGitFacade = new JGitFacade(localWorkDirTree);
+    remoteJGitFacade = new JGitFacade(remoteWorkDirTree);
 
     String basis = remoteJGitFacade.getSHA1HashByRevisionString("HEAD");
 
