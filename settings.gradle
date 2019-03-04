@@ -4,3 +4,7 @@ List projectDirs = ['core', 'ui', 'ui.frontend', 'eclipse', 'whiteboard', 'intel
   include projectName
   project(":$projectName").projectDir = file(dir)
 }
+
+String projectName = prefix + 'picocontainer'
+include projectName
+project(":$projectName").projectDir = file('core/picocontainer')

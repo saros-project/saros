@@ -137,7 +137,7 @@ Bundle-ClassPath: .,
  lib/commons-lang3-3.8.1.jar,
  lib/xstream-1.4.10.jar,
  lib/xpp3-1.1.4c.jar,
- lib/picocontainer-2.11.2.jar,
+ lib/picocontainer-2.11.2-patched_relocated.jar,
  lib/weupnp.jar,
  lib/libidn-1.15.jar
 Bundle-Vendor: Saros Project

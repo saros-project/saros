@@ -46,7 +46,7 @@ sonarqube {
   }
 }
 
-ext.projectsToConfigure = subprojects - project(':saros.ui.frontend')
+ext.projectsToConfigure = subprojects - project(':saros.ui.frontend') - project(':saros.picocontainer')
 // Configurations that are specific to all subprojects
 // saros.ui.frontend is not a real subproject and contains
 // only a build.gradle in order to allow to scan the sources of this subproject
@@ -131,8 +131,9 @@ configure(projectsToConfigure) { project ->
 // remove all build dirs. The frontend package has no build directory
 task cleanAll(dependsOn: projectsToConfigure.collect{":${it.name}:clean"} << 'clean')
 
-task prepareEclipse(dependsOn: projectsToConfigure.collect { [":${it.name}:cleanEclipseProject", ":${it.name}:cleanEclipseClasspath"] }.flatten() +
-                               projectsToConfigure.collect { [":${it.name}:eclipseProject", ":${it.name}:eclipseClasspath"]}.flatten() +
+ext.projectsToPrepare = projectsToConfigure + project(':saros.picocontainer') 
+task prepareEclipse(dependsOn: projectsToPrepare.collect { [":${it.name}:cleanEclipseProject", ":${it.name}:cleanEclipseClasspath"] }.flatten() +
+                               projectsToPrepare.collect { [":${it.name}:eclipseProject", ":${it.name}:eclipseClasspath"]}.flatten() +
                                ['mavenizeP2Repository', 'generateLibAll'])
 
 task prepareIntellij(dependsOn: ['mavenizeP2Repository'])
@@ -159,6 +160,7 @@ task generateLibAll(dependsOn:['cleanGenerateLibAll',
 
 task sarosEclipse(type: Copy, dependsOn: [
   'mavenizeP2Repository',
+  ':saros.picocontainer:test',
   ':saros.core:test',
   ':saros.ui:test',
   ':saros.eclipse:test',
@@ -190,6 +192,7 @@ task sarosServer(type: Copy, dependsOn: [
 }
 
 task sarosIntellij(type: Copy, dependsOn: [
+  ':saros.picocontainer:test',
   ':saros.core:test',
   ':saros.ui:test',
   ':saros.intellij:test',
