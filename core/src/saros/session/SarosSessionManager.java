@@ -155,7 +155,8 @@ public class SarosSessionManager implements ISarosSessionManager {
               List<IResource> resourcesToShare =
                   session.getSharedResources(project.getReferencePoint());
 
-              projectSharingData.addProject(project, projectID, resourcesToShare);
+              projectSharingData.addReferencePoint(
+                  project.getReferencePoint(), projectID, resourcesToShare);
             }
 
             User originUser = session.getUser(negotiation.getPeer());
@@ -612,7 +613,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       if (projectID == null) {
         projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
       }
-      projectsToShare.addProject(project, projectID, resourcesList);
+      projectsToShare.addReferencePoint(project.getReferencePoint(), projectID, resourcesList);
 
       /*
        * If this is the host, add the project directly to the session
@@ -713,8 +714,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     ProjectSharingData currentSharedProjects = new ProjectSharingData();
     for (IReferencePoint referencePoint : currentSession.getReferencePoints()) {
-      currentSharedProjects.addProject(
-          referencePointManager.getProject(referencePoint),
+      currentSharedProjects.addReferencePoint(
+          referencePoint,
           session.getReferencePointID(referencePoint),
           session.getSharedResources(referencePoint));
     }

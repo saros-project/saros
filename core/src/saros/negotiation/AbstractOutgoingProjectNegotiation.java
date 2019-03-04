@@ -16,7 +16,7 @@ import saros.editor.IEditorManager;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
@@ -43,7 +43,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
   private static final Logger LOG = Logger.getLogger(AbstractOutgoingProjectNegotiation.class);
 
-  protected ProjectSharingData projects;
+  protected ProjectSharingData referencePoints;
 
   private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 
@@ -79,7 +79,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         transmitter,
         receiver);
 
-    this.projects = projects;
+    this.referencePoints = projects;
 
     this.editorManager = editorManager;
     this.additionalProjectDataFactory = additionalProjectDataFactory;
@@ -96,7 +96,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
     try {
       setup(monitor);
 
-      sendFileList(createProjectNegotiationDataList(projects, monitor), monitor);
+      sendFileList(createProjectNegotiationDataList(referencePoints, monitor), monitor);
 
       monitor.subTask("");
 
@@ -109,10 +109,10 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
        * can thus safely assume these projects to be shared now.
        */
       if (!session.isHost()) {
-        for (IProject project : projects) {
-          String projectID = projects.getProjectID(project);
-          List<IResource> resources = projects.getResourcesToShare(project);
-          session.addSharedResources(project.getReferencePoint(), projectID, resources);
+        for (IReferencePoint referencePoint : referencePoints) {
+          String referencePointID = referencePoints.getReferencePointID(referencePoint);
+          List<IResource> resources = referencePoints.getResourcesToShare(referencePoint);
+          session.addSharedResources(referencePoint, referencePointID, resources);
         }
       }
 
@@ -322,39 +322,47 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
     List<ProjectNegotiationData> negData =
         new ArrayList<ProjectNegotiationData>(projectSharingData.size());
 
-    for (IProject project : projectSharingData) {
+    for (IReferencePoint referencePoint : projectSharingData) {
 
       if (monitor.isCanceled())
         throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
       try {
-        String projectID = projectSharingData.getProjectID(project);
-        List<IResource> resources = projectSharingData.getResourcesToShare(project);
+        String referencePointID = projectSharingData.getReferencePointID(referencePoint);
+        List<IResource> resources = projectSharingData.getResourcesToShare(referencePoint);
 
         /*
          * force editor buffer flush because we read the files from the
          * underlying storage
          */
-        if (editorManager != null) editorManager.saveEditors(project);
+        if (editorManager != null)
+          editorManager.saveEditors(referencePointManager.getProject(referencePoint));
 
         FileList projectFileList =
-            FileListFactory.createFileList(referencePointManager,
-                project.getReferencePoint(),
+            FileListFactory.createFileList(
+                referencePointManager,
+                referencePoint,
                 resources,
-                checksumCache, new SubProgressMonitor(
+                checksumCache,
+                new SubProgressMonitor(
                     monitor,
                     1 * scale,
                     SubProgressMonitor.SUPPRESS_BEGINTASK
                         | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-        boolean partial = projectSharingData.shouldBeSharedPartially(project);
+        boolean partial = projectSharingData.shouldBeSharedPartially(referencePoint);
 
-        projectFileList.setProjectID(projectID);
+        projectFileList.setProjectID(referencePointID);
 
-        Map<String, String> additionalProjectData = additionalProjectDataFactory.build(project);
+        Map<String, String> additionalProjectData =
+            additionalProjectDataFactory.build(referencePointManager.getProject(referencePoint));
 
         ProjectNegotiationData data =
             new ProjectNegotiationData(
-                projectID, project.getName(), partial, projectFileList, additionalProjectData);
+                referencePointID,
+                referencePointManager.getName(referencePoint),
+                partial,
+                projectFileList,
+                additionalProjectData);
 
         negData.add(data);
 
