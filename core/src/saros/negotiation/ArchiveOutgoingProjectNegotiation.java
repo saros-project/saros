@@ -159,8 +159,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
        * force editor buffer flush because we read the files from the
        * underlying storage
        */
-      if (editorManager != null)
-        editorManager.saveEditors(referencePointManager.get(referencePoint));
+      if (editorManager != null) editorManager.saveEditors(referencePoint);
 
       final StringBuilder aliasBuilder = new StringBuilder();
 

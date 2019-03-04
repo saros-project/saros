@@ -54,7 +54,6 @@ import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.EclipseFileImpl;
-import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
@@ -1405,7 +1404,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   @Override
-  public void saveEditors(final IProject project) {
+  public void saveEditors(final IReferencePoint referencePoint) {
     SWTUtils.runSafeSWTSync(
         LOG,
         new Runnable() {
@@ -1424,7 +1423,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             editorPaths.addAll(openEditorPaths);
 
             for (final SPath path : editorPaths) {
-              if (project == null || project.equals(path.getProject())) saveLazy(path);
+              if (referencePoint == null
+                  || referencePoint.equals(path.getProject().getReferencePoint())) saveLazy(path);
             }
           }
         });
