@@ -1,8 +1,9 @@
 package saros.filesystem;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -70,11 +71,33 @@ public class EclipseWorkspaceImpl implements IWorkspace {
   @Override
   public void run(final IWorkspaceRunnable runnable)
       throws IOException, OperationCanceledException {
-    run(runnable, null);
+    run(runnable, null, null);
+  }
+
+  /** @deprecated See {@link IWorkspace}. */
+  @Override
+  @Deprecated
+  public IProject getProject(String project) {
+    return ResourceAdapterFactory.create(delegate.getRoot().getProject(project));
+  }
+
+  /** @deprecated See {@link IWorkspace}. */
+  @Override
+  @Deprecated
+  public IPath getLocation() {
+    return ResourceAdapterFactory.create(delegate.getRoot().getLocation());
+  }
+
+  @Deprecated
+  public IReferencePoint getReferencePoint(String name) {
+    return getProject(name).getReferencePoint();
   }
 
   @Override
-  public void run(IWorkspaceRunnable runnable, IResource[] resources)
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
       throws IOException, OperationCanceledException {
 
     final org.eclipse.core.resources.IWorkspaceRunnable eclipseRunnable;
@@ -89,8 +112,14 @@ public class EclipseWorkspaceImpl implements IWorkspace {
       eclipseRunnable = new EclipseRunnableAdapter(runnable);
     }
 
-    final List<org.eclipse.core.resources.IResource> eclipseResources =
-        ResourceAdapterFactory.convertBack(resources != null ? Arrays.asList(resources) : null);
+    List<IResource> eclipseResources = null;
+
+    if (referencePoints != null) {
+      eclipseResources = new ArrayList<>();
+      for (IReferencePoint referencePoint : referencePoints)
+        eclipseResources.add(
+            ResourceAdapterFactory.convertBack(referencePointManager.getProject(referencePoint)));
+    }
 
     final ISchedulingRule schedulingRule;
 
@@ -116,41 +145,5 @@ public class EclipseWorkspaceImpl implements IWorkspace {
 
       throw new OperationCanceledException(e);
     }
-  }
-
-  /** @deprecated See {@link IWorkspace}. */
-  @Override
-  @Deprecated
-  public IProject getProject(String project) {
-    return ResourceAdapterFactory.create(delegate.getRoot().getProject(project));
-  }
-
-  /** @deprecated See {@link IWorkspace}. */
-  @Override
-  @Deprecated
-  public IPath getLocation() {
-    return ResourceAdapterFactory.create(delegate.getRoot().getLocation());
-  }
-
-  public IReferencePoint getReferencePoint(String name) {
-    return getProject(name).getReferencePoint();
-  }
-
-  @Override
-  public void run(
-      IWorkspaceRunnable runnable,
-      IReferencePoint[] referencePoints,
-      IReferencePointManager referencePointManager)
-      throws IOException, OperationCanceledException {
-
-    IResource[] resources = null;
-
-    if (referencePoints != null) {
-      resources = new IResource[referencePoints.length];
-      for (int i = 0; i < referencePoints.length; i++) {
-        resources[i] = referencePointManager.getProject(referencePoints[i]);
-      }
-    }
-    run(runnable, resources);
   }
 }
