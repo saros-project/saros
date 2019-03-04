@@ -21,6 +21,7 @@ package saros.session;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -537,7 +538,13 @@ public class SarosSessionManager implements ISarosSessionManager {
      * negotiation with all collected resources.
      */
 
-    nextProjectNegotiation.add(projectResourcesMapping);
+    Map<IReferencePoint, List<IResource>> referencePointResourcesMapping = new HashMap<>();
+
+    for (Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
+      referencePointResourcesMapping.put(entry.getKey().getReferencePoint(), entry.getValue());
+    }
+
+    nextProjectNegotiation.add(referencePointResourcesMapping);
 
     if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
       return;
@@ -593,7 +600,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     ProjectSharingData projectsToShare = new ProjectSharingData();
-    Map<IProject, List<IResource>> mapping = nextProjectNegotiation.get();
+    Map<IReferencePoint, List<IResource>> mapping = nextProjectNegotiation.get();
 
     /*
      * Put all information about which projects and resources to share into
@@ -603,17 +610,18 @@ public class SarosSessionManager implements ISarosSessionManager {
      * have an ID if it is a already-partially-shared project that is now
      * being re-added, e.g. to share additional resources from it.)
      */
-    for (Entry<IProject, List<IResource>> mapEntry : mapping.entrySet()) {
-      final IProject project = mapEntry.getKey();
+    for (Entry<IReferencePoint, List<IResource>> mapEntry : mapping.entrySet()) {
+      final IReferencePoint referencePoint = mapEntry.getKey();
       final List<IResource> resourcesList = mapEntry.getValue();
 
       // side effect: non shared projects are always partial -.-
-      String projectID = currentSession.getReferencePointID(project.getReferencePoint());
+      String projectID = currentSession.getReferencePointID(referencePoint);
 
       if (projectID == null) {
         projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
       }
-      projectsToShare.addReferencePoint(project.getReferencePoint(), projectID, resourcesList);
+
+      projectsToShare.addReferencePoint(referencePoint, projectID, resourcesList);
 
       /*
        * If this is the host, add the project directly to the session
@@ -625,9 +633,8 @@ public class SarosSessionManager implements ISarosSessionManager {
        * registered as being part of the session. This is because their
        * lists of shared resources may have changed.
        */
-      if (currentSession.isHost()
-          && !currentSession.isCompletelyShared(project.getReferencePoint())) {
-        currentSession.addSharedResources(project.getReferencePoint(), projectID, resourcesList);
+      if (currentSession.isHost() && !currentSession.isCompletelyShared(referencePoint)) {
+        currentSession.addSharedResources(referencePoint, projectID, resourcesList);
       }
     }
 
