@@ -111,7 +111,7 @@ runIde.finalizedBy(unlockIntellijSandbox)
 
 afterEvaluate {
   dependencies {
-    compile intellij {exclude 'picocontainer*.jar', 'junit*.jar'}
+    compile intellij {exclude 'junit*.jar'}
   }
 }
 
