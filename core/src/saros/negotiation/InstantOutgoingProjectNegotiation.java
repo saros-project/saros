@@ -23,7 +23,7 @@ import saros.editor.remote.UserEditorStateManager;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.NegotiationTools.CancelOption;
@@ -117,9 +117,9 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       fileCount += list.getPaths().size();
 
       final String projectID = list.getProjectID();
-      final IProject project = projects.getProject(projectID);
+      final IReferencePoint referencePoint = referencePoints.getReferencePoint(projectID);
 
-      if (project == null)
+      if (referencePoint == null)
         throw new LocalCancellationException(
             "project with id " + projectID + " was unshared during synchronization",
             CancelOption.NOTIFY_PEER);
@@ -145,14 +145,14 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
     long writtenBytes = 0;
     try (PipedInputStream in = new PipedInputStream();
-        CountingOutputStream out = new CountingOutputStream(new PipedOutputStream(in)); ) {
+        CountingOutputStream out = new CountingOutputStream(new PipedOutputStream(in))) {
       /* id in description needed to bypass SendFileAction handler */
       String streamName = TRANSFER_ID_PREFIX + getID();
       transfer.sendStream(in, streamName, 0, streamName);
 
       awaitNegotation(transfer, monitor);
 
-      OutgoingStreamProtocol osp = new OutgoingStreamProtocol(out, projects, monitor);
+      OutgoingStreamProtocol osp = new OutgoingStreamProtocol(out, referencePoints, monitor);
       sendProjectConfigFiles(osp);
       sendRemainingPreferOpenedFirst(osp);
       osp.close();
@@ -191,9 +191,9 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   private void createTransferList(List<FileList> fileLists, int fileCount) {
     List<SPath> files = new ArrayList<SPath>(fileCount);
     for (final FileList list : fileLists) {
-      IProject project = projects.getProject(list.getProjectID());
+      IReferencePoint referencePoint = referencePoints.getReferencePoint(list.getProjectID());
       for (String file : list.getPaths()) {
-        files.add(new SPath(project.getFile(file)));
+        files.add(new SPath(referencePointManager.getFile(referencePoint, file)));
       }
     }
 
@@ -233,8 +233,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     };
 
     for (String string : eclipseProjFiles) {
-      for (IProject project : projects) {
-        SPath file = new SPath(project.getFile(string));
+      for (IReferencePoint referencePoint : referencePoints) {
+        SPath file = new SPath(referencePointManager.getFile(referencePoint, string));
         sendIfRequired(osp, file);
       }
     }
