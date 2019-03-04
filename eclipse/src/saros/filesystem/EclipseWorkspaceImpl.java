@@ -133,4 +133,22 @@ public class EclipseWorkspaceImpl implements IWorkspace {
   public IPath getLocation() {
     return ResourceAdapterFactory.create(delegate.getRoot().getLocation());
   }
+
+  @Override
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
+      throws IOException, OperationCanceledException {
+
+    IResource[] resources = null;
+
+    if (referencePoints != null) {
+      resources = new IResource[referencePoints.length];
+      for (int i = 0; i < referencePoints.length; i++) {
+        resources[i] = referencePointManager.get(referencePoints[i]);
+      }
+    }
+    run(runnable, resources);
+  }
 }
