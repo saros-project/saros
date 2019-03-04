@@ -88,6 +88,17 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           generateRenamingResourceMoveActivity(event);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * <p>Works for all files in the application scope, including meta-files like Intellij
+         * configuration files.
+         *
+         * <p>File changes done though an Intellij editor are processed in the {@link
+         * LocalDocumentModificationHandler} instead.
+         *
+         * @param event
+         */
         @Override
         public void beforeContentsChange(@NotNull VirtualFileEvent event) {
           generateEditorSavedActivity(event);
@@ -98,9 +109,30 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           generateResourceDeletionActivity(event);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * <p>Intellij offers multiple ways of moving resources through the UI that are handled in
+         * different ways internally:
+         * <li><i>Move file to other package:</i>
+         *
+         *     <p>Triggers the move listener for the file.
+         * <li><i>Move package to other package</i> and <i>Move package to other source root:</i>
+         *
+         *     <p>Just triggers the move listener for the package directory, does not trigger a
+         *     listener event for the contained files or folders. This means the listener has to
+         *     iterate the contained resources and create matching actions in the right order.
+         * <li><i>Move package to other directory:</i>
+         *
+         *     <p>Triggers the create listener for the new path of the contained directories in
+         *     right order. Then triggers the move listener for the contained files. Then triggers
+         *     the delete listener for the old path of the contained directories.
+         *
+         * @param event
+         */
         @Override
         public void beforeFileMovement(@NotNull VirtualFileMoveEvent event) {
-          generateResourceMoveActivitiy(event);
+          generateResourceMoveActivity(event);
         }
       };
 
@@ -156,11 +188,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   }
 
   /**
-   * Works for all files in the application scope, including meta-files like Intellij configuration
-   * files.
-   *
-   * <p>File changes done though an Intellij editor are processed in the {@link
-   * LocalDocumentModificationHandler} instead.
+   * Notifies the other session participants of the local save of the given file.
    *
    * @param virtualFileEvent the event to react to
    * @see LocalDocumentModificationHandler
@@ -263,7 +291,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     dispatchActivity(activity);
 
-    if (!createdVirtualFile.isDirectory()){
+    if (!createdVirtualFile.isDirectory()) {
       editorManager.openEditor(path, false);
     }
   }
@@ -371,29 +399,13 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   /**
    * Generates and dispatches activities handling resources moves.
    *
-   * <p>Intellij offers multiple ways of moving resources through the UI that are handled in
-   * different ways internally:
-   * <li><i>Move file to other package:</i>
-   *
-   *     <p>Triggers the move listener for the file.
-   * <li><i>Move package to other package</i> and <i>Move package to other source root:</i>
-   *
-   *     <p>Just triggers the move listener for the package directory, does not trigger a listener
-   *     event for the contained files or folders. This means the listener has to iterate the
-   *     contained resources and create matching actions in the right order.
-   * <li><i>Move package to other directory:</i>
-   *
-   *     <p>Triggers the create listener for the new path of the contained directories in right
-   *     order. Then triggers the move listener for the contained files. Then triggers the delete
-   *     listener for the old path of the contained directories.
-   *
    * @param virtualFileMoveEvent the event to react to
    * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
    * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
    * @see #generateResourceCreationActivity(VirtualFileEvent) (VirtualFileEvent)
    * @see #generateResourceDeletionActivity(VirtualFileEvent) (VirtualFileEvent)
    */
-  private void generateResourceMoveActivitiy(@NotNull VirtualFileMoveEvent virtualFileMoveEvent) {
+  private void generateResourceMoveActivity(@NotNull VirtualFileMoveEvent virtualFileMoveEvent) {
 
     assert enabled : "the before file move listener was triggered while it was disabled";
 
@@ -744,6 +756,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     Object oldValue = filePropertyEvent.getOldValue();
     Object newValue = filePropertyEvent.getNewValue();
 
+    //noinspection SwitchStatementWithTooFewBranches
     switch (propertyName) {
       case (VirtualFile.PROP_NAME):
         String oldName = (String) oldValue;
