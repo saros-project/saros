@@ -13,7 +13,7 @@ import saros.exceptions.OperationCanceledException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
@@ -145,20 +145,21 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     for (final FileList list : fileLists) {
       final String projectID = list.getProjectID();
 
-      final IProject project = projects.getProject(projectID);
+      final IReferencePoint referencePoint = referencePoints.getReferencePoint(projectID);
 
-      if (project == null)
+      if (referencePoint == null)
         throw new LocalCancellationException(
-            "project with id " + projectID + " was unshared during synchronization",
+            "reference point with id " + projectID + " was unshared during synchronization",
             CancelOption.NOTIFY_PEER);
 
-      projectsToLock.add(project);
+      projectsToLock.add(referencePointManager.get(referencePoint));
 
       /*
        * force editor buffer flush because we read the files from the
        * underlying storage
        */
-      if (editorManager != null) editorManager.saveEditors(project);
+      if (editorManager != null)
+        editorManager.saveEditors(referencePointManager.get(referencePoint));
 
       final StringBuilder aliasBuilder = new StringBuilder();
 
@@ -169,7 +170,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       for (final String path : list.getPaths()) {
 
         // assert path is relative !
-        filesToCompress.add(project.getFile(path));
+        filesToCompress.add(referencePointManager.getFile(referencePoint, path));
         aliasBuilder.append(path);
         fileAlias.add(aliasBuilder.toString());
         aliasBuilder.setLength(prefixLength);
