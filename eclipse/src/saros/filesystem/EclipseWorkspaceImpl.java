@@ -124,6 +124,12 @@ public class EclipseWorkspaceImpl implements IWorkspace {
   }
 
   @Override
+  public IReferencePoint getReferencePoint(String name)
+  {
+    return getProject(name).getReferencePoint();
+  }
+
+  @Override
   public IPath getLocation() {
     return ResourceAdapterFactory.create(delegate.getRoot().getLocation());
   }

@@ -35,7 +35,24 @@ public interface IWorkspace {
   public void run(IWorkspaceRunnable runnable, IResource[] resources)
       throws IOException, OperationCanceledException;
 
+  /**
+   * Returns a handle to the project resource with the given name
+   *
+   * @param project the name of the project
+   * @return a project resource handle
+   * @deprecated Don't use this in Saros Core anymore because of adjusting the Core to reference
+   *     point. Use {@linkplain #getReferencePoint(String)} instead.
+   */
+  @Deprecated
   public IProject getProject(String project);
+
+  /**
+   * Returns the reference point with the given name which is a child of this workspace
+   *
+   * @param name the name of the reference point
+   * @return a reference point with the given name
+   */
+  public IReferencePoint getReferencePoint(String name);
 
   public IPath getLocation();
 }
