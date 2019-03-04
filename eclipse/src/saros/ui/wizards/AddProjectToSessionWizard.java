@@ -565,10 +565,14 @@ public class AddProjectToSessionWizard extends Wizard {
        * files
        */
 
+      IReferencePointManager referencePointManager =
+          session.getComponent(IReferencePointManager.class);
+
       try {
         localFileList =
             FileListFactory.createFileList(
-                adaptedProject,
+                referencePointManager,
+                adaptedProject.getReferencePoint(),
                 null,
                 checksumCache,
                 ProgressMonitorAdapterFactory.convert(
