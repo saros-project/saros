@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/bin/bash -e
 
 project_root_dir=$1
+linting_script=$project_root_dir/travis/script/lint/lint.js
 
 echo "Linting the HTML GUI"
-node ./lint.js project_root_dir/ui.frontend/html
+node $linting_script $project_root_dir/ui.frontend/html
 
 echo "Linting the HTML Whiteboard"
-node ./lint.js project_root_dir/whiteboard/frontend
-
+node $linting_script $project_root_dir/whiteboard/frontend
