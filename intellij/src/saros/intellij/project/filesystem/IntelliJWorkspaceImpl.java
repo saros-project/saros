@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
@@ -57,6 +58,11 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
    * @deprecated does not make sense in the context of Intellij IDEA
    */
   @Deprecated
+  @Override
+  public IReferencePoint getReferencePoint(String name) {
+    return getProject(name).getReferencePoint();
+  }
+
   @Override
   public IPath getLocation() {
     throw new UnsupportedOperationException(
