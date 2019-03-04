@@ -6,7 +6,6 @@ import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.NullProgressMonitor;
@@ -47,19 +46,7 @@ public class ServerWorkspaceImpl implements IWorkspace {
   @Override
   public void run(IWorkspaceRunnable runnable) throws IOException, OperationCanceledException {
 
-    run(runnable, null);
-  }
-
-  @Override
-  public void run(IWorkspaceRunnable runnable, IResource[] resources)
-      throws IOException, OperationCanceledException {
-
-    /*
-     * TODO Implement a watchdog to interrupt runnables that run too long
-     */
-    synchronized (this) {
-      runnable.run(new NullProgressMonitor());
-    }
+    run(runnable, null, null);
   }
 
   @Override
@@ -68,6 +55,11 @@ public class ServerWorkspaceImpl implements IWorkspace {
       IReferencePoint[] referencePoints,
       IReferencePointManager referencePointManager)
       throws IOException, OperationCanceledException {
-    run(runnable, null);
+    /*
+     * TODO Implement a watchdog to interrupt runnables that run too long
+     */
+    synchronized (this) {
+      runnable.run(new NullProgressMonitor());
+    }
   }
 }

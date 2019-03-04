@@ -7,7 +7,6 @@ import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.NullProgressMonitor;
@@ -18,12 +17,6 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
   @Override
   public void run(IWorkspaceRunnable procedure) throws IOException, OperationCanceledException {
     procedure.run(new NullProgressMonitor());
-  }
-
-  @Override
-  public void run(IWorkspaceRunnable runnable, IResource[] resources)
-      throws IOException, OperationCanceledException {
-    run(runnable);
   }
 
   /**
@@ -38,8 +31,6 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
    * @throws UnsupportedOperationException always
    * @deprecated does not make sense in the context of Intellij IDEA
    */
-  @Deprecated
-  @Override
   public IProject getProject(final String moduleName) {
     throw new UnsupportedOperationException(
         "Modules names can not be used to uniquely identify modules in Intellij in an application context.");
@@ -60,11 +51,6 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
    */
   @Deprecated
   @Override
-  public IReferencePoint getReferencePoint(String name) {
-    return getProject(name).getReferencePoint();
-  }
-
-  @Override
   public IPath getLocation() {
     throw new UnsupportedOperationException(
         "There is no such concept as a centralized workspace directory for Intellij.");
@@ -77,5 +63,10 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
       IReferencePointManager referencePointManager)
       throws IOException, OperationCanceledException {
     run(runnable);
+  }
+
+  @Override
+  public IReferencePoint getReferencePoint(String name) {
+    return getProject(name).getReferencePoint();
   }
 }
