@@ -26,6 +26,8 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 
 /*
@@ -49,16 +51,21 @@ public class FileListTest {
   }
 
   private IProject project;
+  private IReferencePoint referencePoint;
+  private IReferencePointManager referencePointManager;
 
   @Before
   public void setUp() throws Exception {
-    project = createProjectLayout();
+    referencePoint = createReferencePointMock();
+    project = createProjectLayout(referencePoint);
+    referencePointManager = createReferencePointManagerMock(referencePoint, project);
   }
 
   @Test
   public void testCreateFileListForProject() throws IOException {
 
-    final FileList fileList = FileListFactory.createFileList(project, null, null, null);
+    final FileList fileList =
+        FileListFactory.createFileList(referencePointManager, referencePoint, null, null, null);
 
     final List<String> paths = fileList.getPaths();
 
@@ -106,32 +113,12 @@ public class FileListTest {
     assertEquals(list, listFromXml);
   }
 
-  private static IProject createProjectLayout() {
+  private static IProject createProjectLayout(IReferencePoint referencePoint) {
 
     final IProject project = EasyMock.createMock(IProject.class);
 
-    final IFolder barFolder = createFolderMock(project, "bar", new IResource[0]);
-
-    final IFolder foobarfooFolder = createFolderMock(project, "foobar/foo", new IResource[0]);
-
-    final IFile infoTxtFile = createFileMock(project, "info.txt", "1234", "UTF-8");
-
-    final IFile foobarInfoTxtFile =
-        createFileMock(project, "foobar/info.txt", "12345", "ISO-8859-1");
-
-    final IFolder foobarFolder =
-        createFolderMock(project, "foobar", new IResource[] {foobarfooFolder, foobarInfoTxtFile});
-
     EasyMock.expect(project.getName()).andStubReturn("foo");
-
-    try {
-      EasyMock.expect(project.getDefaultCharset()).andStubReturn("UTF-16");
-
-      EasyMock.expect(project.members())
-          .andStubReturn(new IResource[] {barFolder, infoTxtFile, foobarFolder});
-    } catch (IOException e) {
-      // cannot happen
-    }
+    EasyMock.expect(project.getReferencePoint()).andStubReturn(referencePoint);
 
     EasyMock.replay(project);
 
@@ -207,6 +194,47 @@ public class FileListTest {
 
     EasyMock.replay(folderMock);
     return folderMock;
+  }
+
+  private static IReferencePoint createReferencePointMock() {
+    IReferencePoint referencePoint = EasyMock.createMock(IReferencePoint.class);
+    EasyMock.replay(referencePoint);
+    return referencePoint;
+  }
+
+  private static IReferencePointManager createReferencePointManagerMock(
+      IReferencePoint referencePoint, IProject project) {
+
+    final IFolder barFolder = createFolderMock(project, "bar", new IResource[0]);
+
+    final IFolder foobarfooFolder = createFolderMock(project, "foobar/foo", new IResource[0]);
+
+    final IFile infoTxtFile = createFileMock(project, "info.txt", "1234", "UTF-8");
+
+    final IFile foobarInfoTxtFile =
+        createFileMock(project, "foobar/info.txt", "12345", "ISO-8859-1");
+
+    final IFolder foobarFolder =
+        createFolderMock(project, "foobar", new IResource[] {foobarfooFolder, foobarInfoTxtFile});
+
+    IReferencePointManager referencePointManager =
+        EasyMock.createMock(IReferencePointManager.class);
+    EasyMock.expect(referencePointManager.getProject(referencePoint)).andStubReturn(project);
+
+    EasyMock.expect(referencePointManager.getName(referencePoint)).andStubReturn("foo");
+
+    try {
+      EasyMock.expect(referencePointManager.getDefaultCharSet(referencePoint))
+          .andStubReturn("UTF-16");
+
+      EasyMock.expect(referencePointManager.members(referencePoint))
+          .andStubReturn(new IResource[] {barFolder, infoTxtFile, foobarFolder});
+    } catch (Exception e) {
+      // cannot happen
+    }
+
+    EasyMock.replay(referencePointManager);
+    return referencePointManager;
   }
 
   private static String toXML(FileList list) {

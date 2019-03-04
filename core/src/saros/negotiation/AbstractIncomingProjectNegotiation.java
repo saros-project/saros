@@ -367,11 +367,10 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       // TODO optimize for partial shared projects
 
       final FileList localProjectFileList =
-          FileListFactory.createFileList(
-              project,
+          FileListFactory.createFileList(referencePointManager,
+              project.getReferencePoint(),
               null,
-              checksumCache,
-              new SubProgressMonitor(
+              checksumCache, new SubProgressMonitor(
                   monitor, 1 * MONITOR_WORK_SCALE, SubProgressMonitor.SUPPRESS_BEGINTASK));
 
       final ProjectNegotiationData data = getProjectNegotiationData(id);

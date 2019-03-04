@@ -10,7 +10,8 @@ import saros.filesystem.FileSystem;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
@@ -21,7 +22,8 @@ import saros.negotiation.FileList.MetaData;
  *
  * <p>
  * <li>Either an inexpensive one that rescans the whole project to gather meta data:<br>
- *     {@link #createFileList(IProject, List, IChecksumCache, IProgressMonitor)}
+ *     {@link #createFileList(IReferencePointManager, IReferencePoint, List, IChecksumCache,
+ *     IProgressMonitor)}
  * <li>Or a cheap one which requires the caller to take care of the validity of input data:<br>
  *     {@link #createFileList(List)}
  */
@@ -31,23 +33,29 @@ public class FileListFactory {
 
   private IChecksumCache checksumCache;
   private IProgressMonitor monitor;
+  private IReferencePointManager referencePointManager;
 
-  private FileListFactory(IChecksumCache checksumCache, IProgressMonitor monitor) {
+  private FileListFactory(
+      IChecksumCache checksumCache,
+      IProgressMonitor monitor,
+      IReferencePointManager referencePointManager) {
     this.checksumCache = checksumCache;
     this.monitor = monitor;
+    this.referencePointManager = referencePointManager;
 
     if (this.monitor == null) this.monitor = new NullProgressMonitor();
   }
 
   public static FileList createFileList(
-      IProject project,
+      IReferencePointManager referencePointManager,
+      IReferencePoint referencePoint,
       List<IResource> resources,
       IChecksumCache checksumCache,
       IProgressMonitor monitor)
       throws IOException {
 
-    FileListFactory fact = new FileListFactory(checksumCache, monitor);
-    return fact.build(project, resources);
+    FileListFactory fact = new FileListFactory(checksumCache, monitor, referencePointManager);
+    return fact.build(referencePoint, resources);
   }
 
   /**
@@ -72,13 +80,14 @@ public class FileListFactory {
     return new FileList();
   }
 
-  private FileList build(IProject project, List<IResource> resources) throws IOException {
+  private FileList build(IReferencePoint referencePoint, List<IResource> resources)
+      throws IOException {
 
     FileList list = new FileList();
 
     if (resources == null) {
-      list.addEncoding(project.getDefaultCharset());
-      resources = Arrays.asList(project.members());
+      list.addEncoding(referencePointManager.getDefaultCharSet(referencePoint));
+      resources = Arrays.asList(referencePointManager.members(referencePoint));
     }
 
     addMembersToList(list, resources);
