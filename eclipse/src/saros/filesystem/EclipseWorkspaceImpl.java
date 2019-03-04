@@ -135,4 +135,22 @@ public class EclipseWorkspaceImpl implements IWorkspace {
   public IReferencePoint getReferencePoint(String name) {
     return getProject(name).getReferencePoint();
   }
+
+  @Override
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
+      throws IOException, OperationCanceledException {
+
+    IResource[] resources = null;
+
+    if (referencePoints != null) {
+      resources = new IResource[referencePoints.length];
+      for (int i = 0; i < referencePoints.length; i++) {
+        resources[i] = referencePointManager.getProject(referencePoints[i]);
+      }
+    }
+    run(runnable, resources);
+  }
 }
