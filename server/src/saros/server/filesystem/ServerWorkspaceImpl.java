@@ -5,6 +5,7 @@ import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
@@ -55,5 +56,14 @@ public class ServerWorkspaceImpl implements IWorkspace {
     synchronized (this) {
       runnable.run(new NullProgressMonitor());
     }
+  }
+
+  @Override
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
+      throws IOException, OperationCanceledException {
+    run(runnable, null);
   }
 }

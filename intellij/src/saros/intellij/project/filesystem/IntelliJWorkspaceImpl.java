@@ -10,6 +10,7 @@ import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
@@ -59,5 +60,14 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
   @Override
   public IPath getLocation() {
     return IntelliJPathImpl.fromString(project.getBasePath());
+  }
+
+  @Override
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
+      throws IOException, OperationCanceledException {
+    run(runnable);
   }
 }
