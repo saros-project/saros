@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.NullProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
@@ -136,7 +137,7 @@ public class NegotiationHandler implements INegotiationHandler {
   public void handleIncomingProjectNegotiation(
       final AbstractIncomingProjectNegotiation negotiation) {
 
-    Map<String, IProject> projectMapping = new HashMap<>();
+    Map<String, IReferencePoint> referencePointMapping = new HashMap<>();
 
     for (ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
       String projectName = data.getProjectName();
@@ -153,7 +154,7 @@ public class NegotiationHandler implements INegotiationHandler {
         }
       }
 
-      projectMapping.put(data.getProjectID(), project);
+      referencePointMapping.put(data.getReferencePointID(), project.getReferencePoint());
     }
 
     projectExecutor.execute(
@@ -162,9 +163,10 @@ public class NegotiationHandler implements INegotiationHandler {
           public void run() {
             ProjectNegotiation.Status status;
             if (ServerConfig.isInteractive()) {
-              status = negotiation.run(projectMapping, new ConsoleProgressIndicator(System.out));
+              status =
+                  negotiation.run(referencePointMapping, new ConsoleProgressIndicator(System.out));
             } else {
-              status = negotiation.run(projectMapping, new NullProgressMonitor());
+              status = negotiation.run(referencePointMapping, new NullProgressMonitor());
             }
 
             if (status != ProjectNegotiation.Status.OK)

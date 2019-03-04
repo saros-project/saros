@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,6 +41,7 @@ import saros.Saros;
 import saros.SarosPluginContext;
 import saros.editor.internal.EditorAPI;
 import saros.filesystem.IChecksumCache;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.monitoring.ProgressMonitorAdapterFactory;
@@ -309,16 +309,17 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
               }
 
-              final Map<String, saros.filesystem.IProject> convertedMapping =
-                  new HashMap<String, saros.filesystem.IProject>();
+              final Map<String, saros.filesystem.IReferencePoint> convertedMapping =
+                  new HashMap<String, IReferencePoint>();
 
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
-                convertedMapping.put(
-                    entry.getKey(), ResourceAdapterFactory.create(entry.getValue()));
-              }
+                saros.filesystem.IProject sarosProject =
+                    ResourceAdapterFactory.create(entry.getValue());
 
-              fillReferencePointManager(
-                  sessionManager.getSession(), new HashSet<>(convertedMapping.values()));
+                convertedMapping.put(entry.getKey(), sarosProject.getReferencePoint());
+
+                fillReferencePointManager(sessionManager.getSession(), sarosProject);
+              }
 
               final ProjectNegotiation.Status status =
                   negotiation.run(convertedMapping, ProgressMonitorAdapterFactory.convert(monitor));
