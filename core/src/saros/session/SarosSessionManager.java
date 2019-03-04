@@ -126,6 +126,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   private volatile INegotiationHandler negotiationHandler;
 
+  private IReferencePointManager referencePointManager;
+
   private final NegotiationListener negotiationListener =
       new NegotiationListener() {
         @Override
@@ -215,17 +217,17 @@ public class SarosSessionManager implements ISarosSessionManager {
    *
    * <p>This class manages the current Saros session.
    *
-   * <p>Saros makes a distinction between a session and a shared project. A session is an on-line
-   * collaboration between users which allows users to carry out activities. The main activity is to
-   * share projects. Hence, before you share a project, a session has to be started and all users
-   * added to it.
+   * <p>Saros makes a distinction between a session and a shared reference point. A session is an
+   * on-line collaboration between users which allows users to carry out activities. The main
+   * activity is to share reference points. Hence, before you share a reference point, a session has
+   * to be started and all users added to it.
    *
-   * <p>(At the moment, this separation is invisible to the user. He/she must share a project in
-   * order to start a session.)
+   * <p>(At the moment, this separation is invisible to the user. He/she must share a reference
+   * point in order to start a session.)
    */
   @Override
-  public void startSession(final Map<IProject, List<IResource>> projectResourcesMapping) {
-
+  public void startSessionWithReferencePoints(
+      final Map<IReferencePoint, List<IResource>> referencePointResourcesMapping) {
     /*
      * FIXME split the logic, start a session without anything and then add
      * resources !
@@ -282,14 +284,17 @@ public class SarosSessionManager implements ISarosSessionManager {
       session.start();
       sessionStarted(session);
 
-      for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping.entrySet()) {
+      referencePointManager = session.getComponent(IReferencePointManager.class);
 
-        final IProject project = mapEntry.getKey();
+      for (Entry<IReferencePoint, List<IResource>> mapEntry :
+          referencePointResourcesMapping.entrySet()) {
+
+        final IReferencePoint referencePoint = mapEntry.getKey();
         final List<IResource> resourcesList = mapEntry.getValue();
 
-        String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+        String referencePointID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
-        session.addSharedResources(project.getReferencePoint(), projectID, resourcesList);
+        session.addSharedResources(referencePoint, referencePointID, resourcesList);
       }
 
       log.info("session started");
@@ -297,6 +302,18 @@ public class SarosSessionManager implements ISarosSessionManager {
       sessionStartup = false;
       startStopSessionLock.unlock();
     }
+  }
+
+  @Override
+  public void startSession(final Map<IProject, List<IResource>> projectResourcesMapping) {
+
+    Map<IReferencePoint, List<IResource>> list = new HashMap<>();
+
+    for (Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
+      list.put(entry.getKey().getReferencePoint(), entry.getValue());
+    }
+
+    startSessionWithReferencePoints(list);
   }
 
   // FIXME offer a startSession method for the client and host !
@@ -519,15 +536,10 @@ public class SarosSessionManager implements ISarosSessionManager {
     for (JID jid : jidsToInvite) invite(jid, description);
   }
 
-  /**
-   * Adds project resources to an existing session.
-   *
-   * @param projectResourcesMapping
-   */
   @Override
-  public synchronized void addResourcesToSession(
-      Map<IProject, List<IResource>> projectResourcesMapping) {
-    if (projectResourcesMapping == null) {
+  public synchronized void addReferencePointResourcesToSession(
+      Map<IReferencePoint, List<IResource>> referencePointResourcesMapping) {
+    if (referencePointResourcesMapping == null) {
       return;
     }
 
@@ -538,13 +550,12 @@ public class SarosSessionManager implements ISarosSessionManager {
      * negotiation with all collected resources.
      */
 
-    Map<IReferencePoint, List<IResource>> referencePointResourcesMapping = new HashMap<>();
-
-    for (Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
-      referencePointResourcesMapping.put(entry.getKey().getReferencePoint(), entry.getValue());
+    Map<IReferencePoint, List<IResource>> referencePointMapping = new HashMap<>();
+    for (Map.Entry<IReferencePoint, List<IResource>> entry :
+        referencePointResourcesMapping.entrySet()) {
+      referencePointMapping.put(entry.getKey(), entry.getValue());
     }
-
-    nextProjectNegotiation.add(referencePointResourcesMapping);
+    nextProjectNegotiation.add(referencePointMapping);
 
     if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
       return;
@@ -574,6 +585,24 @@ public class SarosSessionManager implements ISarosSessionManager {
           }
         };
     nextProjectNegotiationWorker = ThreadUtils.runSafeAsync(log, worker);
+  }
+
+  /**
+   * Adds project resources to an existing session.
+   *
+   * @param projectResourcesMapping
+   */
+  @Override
+  public synchronized void addResourcesToSession(
+      Map<IProject, List<IResource>> projectResourcesMapping) {
+
+    Map<IReferencePoint, List<IResource>> list = new HashMap<>();
+
+    for (Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
+      list.put(entry.getKey().getReferencePoint(), entry.getValue());
+    }
+
+    addReferencePointResourcesToSession(list);
   }
 
   /**
