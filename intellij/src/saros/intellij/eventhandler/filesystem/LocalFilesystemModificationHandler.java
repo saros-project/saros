@@ -259,11 +259,13 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       activity =
           new FileActivity(
               user, Type.CREATED, FileActivity.Purpose.ACTIVITY, path, null, content, charset);
-
-      editorManager.openEditor(path, false);
     }
 
     dispatchActivity(activity);
+
+    if (!createdVirtualFile.isDirectory()){
+      editorManager.openEditor(path, false);
+    }
   }
 
   /**
