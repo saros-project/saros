@@ -11,7 +11,6 @@ import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.intellij.filesystem.Filesystem;
@@ -30,12 +29,6 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
   @Override
   public void run(IWorkspaceRunnable procedure) throws IOException, OperationCanceledException {
     procedure.run(new NullProgressMonitor());
-  }
-
-  @Override
-  public void run(IWorkspaceRunnable runnable, IResource[] resources)
-      throws IOException, OperationCanceledException {
-    run(runnable);
   }
 
   @Override
