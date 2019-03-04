@@ -2,17 +2,14 @@ package saros.negotiation;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
-import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
@@ -113,13 +110,13 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
       final IProgressMonitor monitor)
       throws LocalCancellationException, IOException {
 
-    final Map<String, IProject> projectMapping = new HashMap<String, IProject>();
-
-    for (Entry<String, IReferencePoint> entry : localReferencePointMapping.entrySet())
-      projectMapping.put(entry.getKey(), referencePointManager.get(entry.getValue()));
-
     final DecompressArchiveTask decompressTask =
-        new DecompressArchiveTask(archiveFile, projectMapping, PATH_DELIMITER, monitor);
+        new DecompressArchiveTask(
+            referencePointManager,
+            archiveFile,
+            localReferencePointMapping,
+            PATH_DELIMITER,
+            monitor);
 
     long startTime = System.currentTimeMillis();
 
