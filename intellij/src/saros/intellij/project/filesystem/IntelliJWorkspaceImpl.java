@@ -6,6 +6,7 @@ import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
@@ -67,5 +68,14 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
   public IPath getLocation() {
     throw new UnsupportedOperationException(
         "There is no such concept as a centralized workspace directory for Intellij.");
+  }
+
+  @Override
+  public void run(
+      IWorkspaceRunnable runnable,
+      IReferencePoint[] referencePoints,
+      IReferencePointManager referencePointManager)
+      throws IOException, OperationCanceledException {
+    run(runnable);
   }
 }
