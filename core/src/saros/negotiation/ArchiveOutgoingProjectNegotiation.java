@@ -38,7 +38,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
   public ArchiveOutgoingProjectNegotiation( //
       final JID peer, //
-      final ProjectSharingData projects, //
+      final ProjectSharingData referencePoints, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -51,7 +51,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       ) {
     super(
         peer,
-        projects,
+        referencePoints,
         sessionManager,
         session,
         editorManager,
@@ -145,13 +145,13 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     final List<IResource> projectsToLock = new ArrayList<IResource>();
 
     for (final FileList list : fileLists) {
-      final String projectID = list.getProjectID();
+      final String referencePointID = list.getProjectID();
 
-      final IReferencePoint referencePoint = referencePoints.getReferencePoint(projectID);
+      final IReferencePoint referencePoint = referencePoints.getReferencePoint(referencePointID);
 
       if (referencePoint == null)
         throw new LocalCancellationException(
-            "reference point with id " + projectID + " was unshared during synchronization",
+            "reference point with id " + referencePointID + " was unshared during synchronization",
             CancelOption.NOTIFY_PEER);
 
       projectsToLock.add(referencePointManager.get(referencePoint));
@@ -165,7 +165,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
       final StringBuilder aliasBuilder = new StringBuilder();
 
-      aliasBuilder.append(projectID).append(PATH_DELIMITER);
+      aliasBuilder.append(referencePointID).append(PATH_DELIMITER);
 
       final int prefixLength = aliasBuilder.length();
 

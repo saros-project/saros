@@ -57,7 +57,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
   protected AbstractOutgoingProjectNegotiation( //
       final JID peer, //
-      final ProjectSharingData projects, //
+      final ProjectSharingData referencePoints, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
       final IEditorManager editorManager, //
@@ -79,7 +79,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         transmitter,
         receiver);
 
-    this.referencePoints = projects;
+    this.referencePoints = referencePoints;
 
     this.editorManager = editorManager;
     this.additionalProjectDataFactory = additionalProjectDataFactory;
@@ -104,9 +104,9 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
       monitor.subTask("");
 
       /*
-       * If we are a non-host sharing projects with the host, now is the
-       * time where we know that the host has accepted our projects. We
-       * can thus safely assume these projects to be shared now.
+       * If we are a non-host sharing reference points with the host, now is the
+       * time where we know that the host has accepted our reference points. We
+       * can thus safely assume these reference points to be shared now.
        */
       if (!session.isHost()) {
         for (IReferencePoint referencePoint : referencePoints) {
@@ -170,14 +170,15 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
    * Cleanup acquired resources during {@link #setup}, {@link #prepareTransfer} and {@link
    * #transfer}.
    *
-   * @param monitor mapping from remote project ids to the target local projects
+   * @param monitor mapping from remote reference point ids to the target local reference points
    */
   protected void cleanup(IProgressMonitor monitor) {
     deleteCollectors();
     monitor.done();
   }
 
-  protected void sendFileList(List<ProjectNegotiationData> projectInfos, IProgressMonitor monitor)
+  protected void sendFileList(
+      List<ProjectNegotiationData> referencePointInfos, IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     /*
@@ -203,7 +204,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
      * current implementation opens a wizard on the remote side)
      */
     ProjectNegotiationOfferingExtension offering =
-        new ProjectNegotiationOfferingExtension(getSessionID(), getID(), projectInfos);
+        new ProjectNegotiationOfferingExtension(getSessionID(), getID(), referencePointInfos);
 
     transmitter.send(
         ISarosSession.SESSION_CONNECTION_ID,

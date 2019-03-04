@@ -98,9 +98,10 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
    * caller to ensure that appropriate actions are performed to avoid unintended data loss, i.e this
    * method will do a best effort to backup altered data but no guarantee can be made in doing so!
    *
-   * @param referencePointMapping mapping from remote project ids to the target local projects
-   * @throws IllegalArgumentException if either a project id is not valid or the referenced project
-   *     for that id does not exist
+   * @param referencePointMapping mapping from remote reference point ids to the target local
+   *     reference points
+   * @throws IllegalArgumentException if either a reference point id is not valid or the referenced
+   *     reference point for that id does not exist
    */
   public Status run(
       Map<String, IReferencePoint> referencePointMapping, final IProgressMonitor monitor) {
@@ -156,11 +157,11 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       }
 
       /*
-       * If we are the session's host and are receiving projects from a
+       * If we are the session's host and are receiving reference points from a
        * non-host user, we need to notify all components that the user
-       * already has these projects and can process (and send) activities
+       * already has these reference points and can process (and send) activities
        * targeting them. Otherwise, activities generated while we are
-       * still receiving the project archive will get lost.
+       * still receiving the reference point archive will get lost.
        *
        * FIXME: userStartedQueuing() needs a better name which is less
        * bound to its use in OutgoingProjectNegotiation.
@@ -190,14 +191,14 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
         final String referencePointID = entry.getKey();
         final IReferencePoint referencePoint = entry.getValue();
 
-        final boolean isPartialRemoteProject =
+        final boolean isPartialRemoteReferencePoint =
             getProjectNegotiationData(referencePointID).isPartial();
 
         final FileList remoteFileList = getProjectNegotiationData(referencePointID).getFileList();
 
         List<IResource> resources = null;
 
-        if (isPartialRemoteProject) {
+        if (isPartialRemoteReferencePoint) {
 
           final List<String> paths = remoteFileList.getPaths();
 
@@ -250,10 +251,10 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       throws IOException, SarosCancellationException;
 
   /**
-   * Cleanup ends the negotiation process, by disabling the project based queue and removes acquired
-   * handlers during {@link #setup} and {@link #transfer}.
+   * Cleanup ends the negotiation process, by disabling the reference point based queue and removes
+   * acquired handlers during {@link #setup} and {@link #transfer}.
    *
-   * @param monitor mapping from remote project ids to the target local projects
+   * @param monitor mapping from remote project ids to the target local reference points
    * @param referencePointMapping mapping of reference points
    */
   protected void cleanup(
@@ -277,20 +278,20 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
   }
 
   /**
-   * Returns the {@link ProjectNegotiationData negotiation data} for all projects which are part of
-   * this negotiation.
+   * Returns the {@link ProjectNegotiationData negotiation data} for all reference points which are
+   * part of this negotiation.
    *
-   * @return negotiation data for all projects which are part of this negotiation.
+   * @return negotiation data for all reference points which are part of this negotiation.
    */
   public List<ProjectNegotiationData> getProjectNegotiationData() {
     return new ArrayList<ProjectNegotiationData>(projectNegotiationData.values());
   }
 
   /**
-   * Returns the {@link ProjectNegotiationData negotiation data} for the given project id.
+   * Returns the {@link ProjectNegotiationData negotiation data} for the given reference point id.
    *
-   * @return negotiation data for the given project id or <code>null</code> if no negotiation data
-   *     exists for the given project id.
+   * @return negotiation data for the given reference point id or <code>null</code> if no
+   *     negotiation data exists for the given reference point id.
    */
   public ProjectNegotiationData getProjectNegotiationData(final String id) {
     return projectNegotiationData.get(id);
@@ -347,7 +348,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
    *
    * @param localReferencePointMapping the local reference point mapping to use
    * @param monitor
-   * @return list of differences (one for each project) between the local and the remote side.
+   * @return list of differences (one for each project/reference point) between the local and the
+   *     remote side.
    * @throws SarosCancellationException
    * @throws IOException
    */
@@ -368,7 +370,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       final String id = entry.getKey();
       final IReferencePoint referencePoint = entry.getValue();
 
-      // TODO optimize for partial shared projects
+      // TODO optimize for partial shared projects / reference points
 
       final FileList localProjectFileList =
           FileListFactory.createFileList(
@@ -404,8 +406,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
    *
    * @param localReferencePointMapping
    * @param diffs
-   * @return list of file lists (each for every project) containing the missing files that are not
-   *     present on the local side.
+   * @return list of file lists (each for every project / reference point) containing the missing
+   *     files that are not present on the local side.
    * @throws IOException
    */
   protected List<FileList> synchronizeProjectStructures(
@@ -463,7 +465,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
       /*
        * We send an empty file list to the host as a notification that we
-       * do not need any files for the given project.
+       * do not need any files for the given reference point.
        */
       final FileList fileList =
           missingFiles.isEmpty()
@@ -521,7 +523,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
       final ProjectNegotiationData data = getProjectNegotiationData(id);
 
-      if (data == null) throw new IllegalArgumentException("invalid project id: " + id);
+      if (data == null) throw new IllegalArgumentException("invalid reference point id: " + id);
 
       if (!referencePointManager.projectExists(referencePoint))
         throw new IllegalArgumentException(
