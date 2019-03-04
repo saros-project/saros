@@ -4,7 +4,7 @@ import java.util.Set;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.session.User;
 
 /**
@@ -54,13 +54,14 @@ public interface IEditorManager {
   String getContent(SPath path);
 
   /**
-   * Saves the local editors of all shared files belonging to the given project. If <code>null
+   * Saves the local editors of all shared files belonging to the given reference point. If <code>
+   * null
    * </code> is passed, the shared files of all projects will be saved.
    *
-   * @param project the project whose editors should be saved, or <code>null</code> to save all
-   *     editors
+   * @param referencePoint the reference point whose editors should be saved, or <code>null</code>
+   *     to save all editors
    */
-  void saveEditors(IProject project);
+  void saveEditors(IReferencePoint referencePoint);
 
   /**
    * Close the editor of given {@link SPath}.
