@@ -332,11 +332,10 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         if (editorManager != null) editorManager.saveEditors(project);
 
         FileList projectFileList =
-            FileListFactory.createFileList(
-                project,
+            FileListFactory.createFileList(referencePointManager,
+                project.getReferencePoint(),
                 resources,
-                checksumCache,
-                new SubProgressMonitor(
+                checksumCache, new SubProgressMonitor(
                     monitor,
                     1 * scale,
                     SubProgressMonitor.SUPPRESS_BEGINTASK
