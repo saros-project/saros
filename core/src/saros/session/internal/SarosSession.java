@@ -19,6 +19,7 @@
  */
 package saros.session.internal;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +50,7 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.git.GitManager;
 import saros.net.IConnectionManager;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
@@ -124,6 +126,8 @@ public final class SarosSession implements ISarosSession {
   private final StopManager stopManager;
 
   private final ChangeColorManager changeColorManager;
+  
+  private final GitManager gitManager;
 
   private final PermissionManager permissionManager;
 
@@ -1038,6 +1042,18 @@ public final class SarosSession implements ISarosSession {
     changeColorManager.changeColorID(colorID);
   }
 
+  public void gitSendCommitRequest() {
+    gitManager.sendCommitRequest();
+  }
+
+  public void gitChangeWorkDirTree(File workDirTree) throws IOException {
+    gitManager.changeWorkDirTree(workDirTree);
+  }
+
+  public GitManager getGitManager() {
+    return gitManager;
+  }
+
   @Override
   public Set<Integer> getUnavailableColors() {
     return changeColorManager.getUsedColorIDs();
@@ -1114,6 +1130,8 @@ public final class SarosSession implements ISarosSession {
     stopManager = sessionContainer.getComponent(StopManager.class);
 
     changeColorManager = sessionContainer.getComponent(ChangeColorManager.class);
+    
+    gitManager = sessionContainer.getComponent(GitManager.class);
 
     permissionManager = sessionContainer.getComponent(PermissionManager.class);
 

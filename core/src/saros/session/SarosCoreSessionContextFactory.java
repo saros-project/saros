@@ -9,6 +9,7 @@ import saros.concurrent.watchdog.ConsistencyWatchdogServer;
 import saros.editor.FollowModeBroadcaster;
 import saros.editor.FollowModeManager;
 import saros.editor.remote.UserEditorStateManager;
+import saros.git.GitManager;
 import saros.misc.xstream.SPathConverter;
 import saros.misc.xstream.UserConverter;
 import saros.session.internal.ActivityHandler;
@@ -62,6 +63,7 @@ public class SarosCoreSessionContextFactory implements ISarosSessionContextFacto
     container.addComponent(ChangeColorManager.class);
     container.addComponent(FollowModeManager.class);
     container.addComponent(FollowModeBroadcaster.class);
+    container.addComponent(GitManager.class);
     container.addComponent(LeaveAndKickHandler.class);
     container.addComponent(PermissionManager.class);
     container.addComponent(StopManager.class);
