@@ -14,6 +14,7 @@ import org.eclipse.jgit.api.RemoteRemoveCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.NullProgressMonitor;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -23,28 +24,35 @@ import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.TransportBundleStream;
 import org.eclipse.jgit.transport.URIish;
 
+/**
+ * This class offers methods from the JGit library in a handy way. Another goal is to keep the JGit
+ * dependencies in a single place.
+ */
 public class JGitFacade {
   private static final Logger log = Logger.getLogger(JGitFacade.class);
   private File workDirTree;
   private Git git;
 
+  /** @param workDirTree The directory that contains the .git directory */
   public JGitFacade(File workDirTree) throws IOException {
     setWorkDirTree(workDirTree);
     setGit();
   }
+
   /**
    * Set the {@code git} object which offer the functionality of the library. See {@link Git}
    *
    * @throws IllegalArgumentException {@code workDirTree} is null or can't be resolved
    * @throws IOException failed while read from workDirTree
    */
-  private void setGit() throws IllegalArgumentException, IOException {
+  private void setGit() throws IOException {
     try {
       if (workDirTree == null)
         throw new IllegalArgumentException("workDirTree is null and can't be resolved");
       git = Git.open(workDirTree);
     } catch (IOException e) {
-      throw new IOException("failed while read from workDirTree", e);
+      throw new IOException(
+          "failed while read from workDirTree with name " + workDirTree.getName(), e);
     }
   }
 
@@ -58,13 +66,13 @@ public class JGitFacade {
    * @param basis Assume that the recipient have at least the commit the {@code basis} is pointing
    *     to. In order to fetch from a {@code bundle} the recipient must have the commit the {@code
    *     basis} is pointing to.
+   * @return an byte[] that hold all the commits. It can be sent with the Saros protocols.
    * @throws IllegalArgumentException {@code workDirTree} is null or if resolving {@code actual}
    *     leads to a not existing ref
    * @throws IOException failed while read/resolved parameters or while written to the {@code
    *     bundle}
    */
-  public byte[] createBundle(String actual, String basis)
-      throws IllegalArgumentException, IOException {
+  public byte[] createBundle(String actual, String basis) throws IOException {
     Repository repo = git.getRepository();
     // In order to create the bundle object we need to initialize the Bundlewriter and set it up
     // with the commit, it should end with and the start commit.
@@ -85,15 +93,19 @@ public class JGitFacade {
 
     // The second information is the commit to start with
     if (basis != null && !basis.trim().isEmpty()) {
+      ObjectId basisID = git.getRepository().resolve(basis);
+
+      if (basisID == null) throw new IOException("failed while resolved basis");
+
       try {
         RevWalk walk = new RevWalk(repo);
 
-        RevCommit basisCommit = walk.parseCommit(repo.resolve(basis));
+        RevCommit basisCommit = walk.parseCommit(basisID);
 
         walk.close();
 
         bundlewriter.assume(basisCommit);
-      } catch (NullPointerException | IOException e) {
+      } catch (IOException e) {
         throw new IOException("failed while resolved basis", e);
       }
     }
@@ -117,8 +129,7 @@ public class JGitFacade {
    *     while fetch
    * @throws URISyntaxException
    */
-  public void fetchFromBundle(byte[] bundle)
-      throws IllegalArgumentException, IOException, URISyntaxException {
+  public void fetchFromBundle(byte[] bundle) throws IOException, URISyntaxException {
     if (bundle == null) throw new IllegalArgumentException("bundle is null and can't be resolved");
 
     try {
@@ -147,8 +158,7 @@ public class JGitFacade {
    * @throws IllegalArgumentException {@code workDirTree} is null can't be resolved
    * @throws IOException failed while read
    */
-  public String getSHA1HashByRevisionString(String revString)
-      throws IllegalArgumentException, IOException {
+  public String getSHA1HashByRevisionString(String revString) throws IOException {
     return git.getRepository().resolve(revString).name();
   }
 
@@ -159,7 +169,7 @@ public class JGitFacade {
    * @param revString See <a href="https://www.git-scm.com/docs/gitrevisions">gitrevisions</a>
    * @throws IOException failed while merge
    */
-  public void ffMerge(String revString) throws IOException {
+  public void fastForwardMerge(String revString) throws IOException {
     try {
       git.merge()
           .include(git.getRepository().resolve(revString))

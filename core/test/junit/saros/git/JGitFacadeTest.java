@@ -51,7 +51,7 @@ public class JGitFacadeTest {
     localJGitFacade = new JGitFacade(localWorkDirTree);
     remoteJGitFacade = new JGitFacade(remoteWorkDirTree);
   }
-  // lucky paths
+  // happy paths
   @Test
   public void testCreateBundleHEAD() throws IllegalArgumentException, IOException {
     bundle = localJGitFacade.createBundle("HEAD", "");

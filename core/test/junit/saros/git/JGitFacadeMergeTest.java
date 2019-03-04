@@ -59,7 +59,7 @@ public class JGitFacadeMergeTest {
         JGitFacadeTest.getObjectIdByRevisionString(remoteWorkDirTree, "HEAD"));
 
     remoteJGitFacade.fetchFromBundle(bundle);
-    remoteJGitFacade.ffMerge("refs/heads/bundle");
+    remoteJGitFacade.fastForwardMerge("refs/heads/bundle");
 
     assertEquals(
         JGitFacadeTest.getObjectIdByRevisionString(localWorkDirTree, "HEAD"),
