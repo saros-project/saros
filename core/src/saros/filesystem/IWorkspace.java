@@ -50,4 +50,12 @@ public interface IWorkspace {
    */
   @Deprecated
   public IPath getLocation();
+
+  /**
+   * Returns the reference point with the given name which is a child of this workspace
+   *
+   * @param name the name of the reference point
+   * @return a reference point with the given name
+   */
+  public IReferencePoint getReferencePoint(String name);
 }
