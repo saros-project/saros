@@ -54,7 +54,7 @@ public class ShareCommand extends ConsoleCommand {
           log.error(path + " could not be added to the session", e);
         }
       }
-      sessionManager.addReferencePointResourcesToSession(referencePoints);
+      sessionManager.addReferencePointResources(referencePoints);
     } catch (Exception e) {
       log.error("Error sharing resources", e);
     }
