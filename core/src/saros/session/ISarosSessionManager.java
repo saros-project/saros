@@ -23,8 +23,7 @@ public interface ISarosSessionManager {
    *
    * @param referencePointResources the local reference point resources which should be shared.
    */
-  public void startSessionWithReferencePoints(
-      Map<IReferencePoint, List<IResource>> referencePointResources);
+  public void startSession(Map<IReferencePoint, List<IResource>> referencePointResources);
 
   // FIXME this method is error prone and only used by the IPN, find a better
   // abstraction
@@ -90,7 +89,7 @@ public interface ISarosSessionManager {
    *
    * @param referencePointResourcesMapping
    */
-  public void addReferencePointResourcesToSession(
+  public void addReferencePointResources(
       Map<IReferencePoint, List<IResource>> referencePointResourcesMapping);
 
   /**

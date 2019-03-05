@@ -33,7 +33,7 @@ public class ServerLifecycle extends AbstractContextLifecycle {
     connectToXMPPServer(context);
     context
         .getComponent(ISarosSessionManager.class)
-        .startSessionWithReferencePoints(new HashMap<IReferencePoint, List<IResource>>());
+        .startSession(new HashMap<IReferencePoint, List<IResource>>());
   }
 
   @Override
