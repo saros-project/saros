@@ -126,7 +126,7 @@ public final class SarosSession implements ISarosSession {
   private final StopManager stopManager;
 
   private final ChangeColorManager changeColorManager;
-  
+
   private final GitManager gitManager;
 
   private final PermissionManager permissionManager;
@@ -1130,7 +1130,7 @@ public final class SarosSession implements ISarosSession {
     stopManager = sessionContainer.getComponent(StopManager.class);
 
     changeColorManager = sessionContainer.getComponent(ChangeColorManager.class);
-    
+
     gitManager = sessionContainer.getComponent(GitManager.class);
 
     permissionManager = sessionContainer.getComponent(PermissionManager.class);

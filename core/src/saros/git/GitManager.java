@@ -7,7 +7,6 @@ import org.picocontainer.Startable;
 import saros.activities.GitCollectActivity;
 import saros.activities.GitRequestActivity;
 import saros.activities.GitSendBundleActivity;
-import saros.annotations.Component;
 import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
 import saros.session.IActivityConsumer;
@@ -15,17 +14,16 @@ import saros.session.IActivityConsumer.Priority;
 import saros.session.internal.SarosSession;
 
 /**
- * This Class is responsible for the negotiation between user that want to sent,receive and fetch
+ * This Class is responsible for the negotiation between a user that want to send,receive and fetch
  * commits.
  *
- * <p>In order to start the negotiation the user needs to call the procedure {@code
+ * <p>In order to start the negotiation the user needs to call the method {@code
  * sendCommitRequest()}.
  *
  * <p>Before starting negotiation the user need to set up his working directory tree by calling the
- * procedure {@code changeWorkDirTree(File workDirTree)}. After calling it the first time the
- * Manager hold a {@link JGitFacade} object.
+ * method {@code changeWorkDirTree(File workDirTree)}. After calling it the first time the Manager
+ * hold a {@link JGitFacade} object.
  */
-@Component(module = "core")
 public class GitManager extends AbstractActivityProducer implements Startable {
 
   private static final Logger log = Logger.getLogger(GitManager.class.getName());
@@ -55,7 +53,6 @@ public class GitManager extends AbstractActivityProducer implements Startable {
   }
 
   public void changeWorkDirTree(File workDirTree) throws IOException {
-    log.info("You changed your working directory tree");
     if (jGitFacade == null) {
       this.jGitFacade = new JGitFacade(workDirTree);
     } else {
@@ -67,54 +64,44 @@ public class GitManager extends AbstractActivityProducer implements Startable {
       new AbstractActivityConsumer() {
         @Override
         public void receive(GitRequestActivity activity) {
-          if (jGitFacade != null) {
-            log.info("You recieved a request to fetch commits");
-            try {
+          if (jGitFacade == null) return;
 
-              String basis = jGitFacade.getSHA1HashByRevisionString("HEAD");
-              fireActivity(new GitCollectActivity(session.getLocalUser(), basis));
+          try {
+            String basis = jGitFacade.getSHA1HashByRevisionString("HEAD");
+            fireActivity(new GitCollectActivity(session.getLocalUser(), basis));
 
-            } catch (IOException e) {
-              log.debug(session.getLocalUser().toString() + " can't access the Git Directory");
-            }
-          } else {
-            log.info("Your workDirTree is not selected.");
+          } catch (IOException e) {
+            log.debug(e);
           }
         }
 
         @Override
         public void receive(GitCollectActivity activity) {
-          if (jGitFacade != null) {
-            log.info("Your request to send your commits was accepted.");
-            String basis = activity.getBasis();
-            try {
-              byte[] bundle = jGitFacade.createBundle("HEAD", basis);
-              fireActivity(new GitSendBundleActivity(session.getLocalUser(), bundle));
+          if (jGitFacade == null) return;
 
-            } catch (IOException e) {
-              log.info("Please check that the recievers HEAD is ancestor of your HEAD.");
-              log.debug("failed at create bundle");
-            } catch (IllegalArgumentException e) {
-              log.debug(e);
-            }
-          } else {
-            log.info("Your workDirTree is not selected.");
+          String basis = activity.getBasis();
+
+          try {
+            byte[] bundle = jGitFacade.createBundle("HEAD", basis);
+            fireActivity(new GitSendBundleActivity(session.getLocalUser(), bundle));
+
+          } catch (IOException e) {
+            log.debug(e);
+          } catch (IllegalArgumentException e) {
+            log.debug(e);
           }
         }
 
         @Override
         public void receive(GitSendBundleActivity activity) {
-          if (jGitFacade != null) {
-            log.info("You recieving the commits between your HEAD and the senders HEAD");
-            byte[] bundle = activity.getBundle();
-            try {
-              jGitFacade.fetchFromBundle(bundle);
-              log.info("Fetched the commits");
-            } catch (Exception e) {
-              log.debug(e);
-            }
-          } else {
-            log.info("Your workDirTree is not selected.");
+          if (jGitFacade == null) return;
+
+          byte[] bundle = activity.getBundle();
+
+          try {
+            jGitFacade.fetchFromBundle(bundle);
+          } catch (Exception e) {
+            log.debug(e);
           }
         }
       };

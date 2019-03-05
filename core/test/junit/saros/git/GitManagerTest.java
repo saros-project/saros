@@ -211,8 +211,6 @@ public class GitManagerTest {
           target.exec(rewriteGitCollectActivity((GitCollectActivity) activity));
         } else if (activity instanceof GitSendBundleActivity) {
           target.exec(rewriteGitSendBundleActivity((GitSendBundleActivity) activity));
-        } else {
-          return;
         }
       }
     };
