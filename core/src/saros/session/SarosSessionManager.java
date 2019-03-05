@@ -21,7 +21,6 @@ package saros.session;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import saros.annotations.Component;
 import saros.context.IContainerContext;
-import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
@@ -78,12 +76,13 @@ public class SarosSessionManager implements ISarosSessionManager {
    * @JTourBusStop 6, Architecture Overview, Invitation Management:
    *
    * <p>While Activities are used to keep a running session consistent, we use MESSAGES whenever the
-   * Session itself is modified. This means adding users or projects to the session.
+   * Session itself is modified. This means adding users or projects / reference points to the
+   * session.
    *
    * <p>The Invitation Process is managed by the "Invitation Management"-Component. This class is
    * the main entrance point of this Component. During the invitation Process, the Network Layer is
    * used to send MESSAGES between the host and the invitees and the Session Management is informed
-   * about joined users and added projects.
+   * about joined users and added projects / reference points.
    *
    * <p>For more information about the Invitation Process see the "Invitation Process"-Tour.
    */
@@ -126,8 +125,6 @@ public class SarosSessionManager implements ISarosSessionManager {
 
   private volatile INegotiationHandler negotiationHandler;
 
-  private IReferencePointManager referencePointManager;
-
   private final NegotiationListener negotiationListener =
       new NegotiationListener() {
         @Override
@@ -150,16 +147,13 @@ public class SarosSessionManager implements ISarosSessionManager {
                 session.getComponent(IReferencePointManager.class);
 
             ProjectSharingData projectSharingData = new ProjectSharingData();
+
             for (ProjectNegotiationData projectNegotiationData : ipn.getProjectNegotiationData()) {
-
-              String projectID = projectNegotiationData.getReferencePointID();
-              IProject project =
-                  referencePointManager.getProject(session.getReferencePoint(projectID));
-              List<IResource> resourcesToShare =
-                  session.getSharedResources(project.getReferencePoint());
-
+              String referencePointID = projectNegotiationData.getReferencePointID();
+              IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
+              List<IResource> resourcesToShare = session.getSharedResources(referencePoint);
               projectSharingData.addReferencePoint(
-                  project.getReferencePoint(), projectID, resourcesToShare);
+                  referencePoint, referencePointID, resourcesToShare);
             }
 
             User originUser = session.getUser(negotiation.getPeer());
@@ -283,8 +277,6 @@ public class SarosSessionManager implements ISarosSessionManager {
       sessionStarting(session);
       session.start();
       sessionStarted(session);
-
-      referencePointManager = session.getComponent(IReferencePointManager.class);
 
       for (Entry<IReferencePoint, List<IResource>> mapEntry :
           referencePointResourcesMapping.entrySet()) {
@@ -538,12 +530,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * negotiation with all collected resources.
      */
 
-    Map<IReferencePoint, List<IResource>> referencePointMapping = new HashMap<>();
-    for (Map.Entry<IReferencePoint, List<IResource>> entry :
-        referencePointResourcesMapping.entrySet()) {
-      referencePointMapping.put(entry.getKey(), entry.getValue());
-    }
-    nextProjectNegotiation.add(referencePointMapping);
+    nextProjectNegotiation.add(referencePointResourcesMapping);
 
     if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
       return;
@@ -598,52 +585,52 @@ public class SarosSessionManager implements ISarosSessionManager {
       return;
     }
 
-    ProjectSharingData projectsToShare = new ProjectSharingData();
+    ProjectSharingData referencePointsToShare = new ProjectSharingData();
     Map<IReferencePoint, List<IResource>> mapping = nextProjectNegotiation.get();
 
     /*
-     * Put all information about which projects and resources to share into
+     * Put all information about which reference points and resources to share into
      * a ProjectsToShare instance, for passing to
      * OutgoingProjectNegotiation. On the way, generate session-wide ID's
-     * for the projects that don't have them yet. (A project might already
-     * have an ID if it is a already-partially-shared project that is now
+     * for the reference points that don't have them yet. (A reference point might already
+     * have an ID if it is a already-partially-shared reference point that is now
      * being re-added, e.g. to share additional resources from it.)
      */
     for (Entry<IReferencePoint, List<IResource>> mapEntry : mapping.entrySet()) {
       final IReferencePoint referencePoint = mapEntry.getKey();
       final List<IResource> resourcesList = mapEntry.getValue();
 
-      // side effect: non shared projects are always partial -.-
-      String projectID = currentSession.getReferencePointID(referencePoint);
+      // side effect: non shared reference point are always partial -.-
+      String referencePointID = currentSession.getReferencePointID(referencePoint);
 
-      if (projectID == null) {
-        projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
+      if (referencePointID == null) {
+        referencePointID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
       }
 
-      projectsToShare.addReferencePoint(referencePoint, projectID, resourcesList);
+      referencePointsToShare.addReferencePoint(referencePoint, referencePointID, resourcesList);
 
       /*
-       * If this is the host, add the project directly to the session
+       * If this is the host, add the reference point directly to the session
        * before sending it to the other clients. (Non-hosts, on the other
-       * hand, wait until the host has accepted the project and offers it
+       * hand, wait until the host has accepted the reference point and offers it
        * back with a second project negotiation.)
        *
-       * Note that partial projects are re-added even if they were already
+       * Note that partial reference points are re-added even if they were already
        * registered as being part of the session. This is because their
        * lists of shared resources may have changed.
        */
       if (currentSession.isHost() && !currentSession.isCompletelyShared(referencePoint)) {
-        currentSession.addSharedResources(referencePoint, projectID, resourcesList);
+        currentSession.addSharedResources(referencePoint, referencePointID, resourcesList);
       }
     }
 
-    if (projectsToShare.isEmpty()) {
+    if (referencePointsToShare.isEmpty()) {
       log.warn(
           "skipping project negotiation because no new projects were added to the current session");
       return;
     }
 
-    executeOutgoingProjectNegotiation(projectsToShare, session.getLocalUser());
+    executeOutgoingProjectNegotiation(referencePointsToShare, session.getLocalUser());
   }
 
   private void executeOutgoingProjectNegotiation(
@@ -666,8 +653,8 @@ public class SarosSessionManager implements ISarosSessionManager {
     List<User> recipients = new ArrayList<>();
     if (session.isHost()) {
       /*
-       * If we received these project from a non-host user previously,
-       * that user already has the project.
+       * If we received these reference point from a non-host user previously,
+       * that user already has the reference point.
        */
       for (User user : session.getRemoteUsers()) {
         if (!user.equals(originUser)) {
