@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Whiteboard Plug-in
 Bundle-SymbolicName: saros.whiteboard; singleton:=true
-Bundle-Version: 14.11.28.DEVEL
+Bundle-Version: 0.1.0
 Bundle-Activator: saros.whiteboard.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
