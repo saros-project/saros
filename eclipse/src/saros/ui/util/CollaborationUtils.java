@@ -82,14 +82,16 @@ public class CollaborationUtils {
 
             try {
               refreshProjects(newResources.keySet(), null);
-              sessionManager.startSession(convert(newResources));
+              sessionManager.startSessionWithReferencePoints(
+                  convertToReferencePointResourceMapping(newResources));
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
               ISarosSession session = sessionManager.getSession();
 
               if (session == null) return Status.CANCEL_STATUS;
 
-              fillReferencePointManager(session, convert(newResources).keySet());
+              fillReferencePointManager(
+                  session, convertToProjectResourceMapping(newResources).keySet());
 
               sessionManager.invite(participantsToAdd, getSessionDescription(session));
 
@@ -210,9 +212,11 @@ public class CollaborationUtils {
                */
             }
 
-            fillReferencePointManager(session, convert(projectResources).keySet());
+            fillReferencePointManager(
+                session, convertToProjectResourceMapping(projectResources).keySet());
 
-            sessionManager.addResourcesToSession(convert(projectResources));
+            sessionManager.addReferencePointResourcesToSession(
+                convertToReferencePointResourceMapping(projectResources));
           }
         });
   }
@@ -445,8 +449,22 @@ public class CollaborationUtils {
     return String.format(Locale.US, "%.2f GB", size / (1000F * 1000F * 1000F));
   }
 
-  private static Map<saros.filesystem.IProject, List<saros.filesystem.IResource>> convert(
-      Map<IProject, List<IResource>> data) {
+  private static Map<saros.filesystem.IReferencePoint, List<saros.filesystem.IResource>>
+      convertToReferencePointResourceMapping(Map<IProject, List<IResource>> data) {
+
+    Map<saros.filesystem.IReferencePoint, List<saros.filesystem.IResource>> result =
+        new HashMap<saros.filesystem.IReferencePoint, List<saros.filesystem.IResource>>();
+
+    for (Entry<IProject, List<IResource>> entry : data.entrySet())
+      result.put(
+          ResourceAdapterFactory.create(entry.getKey()).getReferencePoint(),
+          ResourceAdapterFactory.convertTo(entry.getValue()));
+
+    return result;
+  }
+
+  private static Map<saros.filesystem.IProject, List<saros.filesystem.IResource>>
+      convertToProjectResourceMapping(Map<IProject, List<IResource>> data) {
 
     Map<saros.filesystem.IProject, List<saros.filesystem.IResource>> result =
         new HashMap<saros.filesystem.IProject, List<saros.filesystem.IResource>>();
