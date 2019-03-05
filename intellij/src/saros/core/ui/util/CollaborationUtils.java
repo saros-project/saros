@@ -183,6 +183,12 @@ public class CollaborationUtils {
 
     fillReferencePointManager(sarosSession, projectResources.keySet());
 
+    Map<IReferencePoint, List<IResource>> referencePointResources = new HashMap<>();
+
+    for (Entry<IProject, List<IResource>> entry : projectResources.entrySet()) {
+      referencePointResources.put(entry.getKey().getReferencePoint(), entry.getValue());
+    }
+
     ThreadUtils.runSafeAsync(
         "AddResourceToSession",
         LOG,
@@ -191,7 +197,7 @@ public class CollaborationUtils {
           public void run() {
 
             if (sarosSession.hasWriteAccess()) {
-              sessionManager.addResourcesToSession(projectResources);
+              sessionManager.addReferencePointResourcesToSession(referencePointResources);
               return;
             }
 
