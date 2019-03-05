@@ -6,6 +6,7 @@ import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.misc.xstream.SPathConverter;
 
@@ -97,9 +98,27 @@ public class SPath {
     return project.getFolder(projectRelativePath);
   }
 
-  /** Returns the project in which the referenced resource is located. */
+  /**
+   * Returns the project in which the referenced resource is located.
+   *
+   * @return the project in which the referenced resource is located.
+   * @deprecated Don't use this in Saros Core, because the Core of Saros is in a refactoring process
+   *     on which Saros is adjusted to reference points and the logic about project (especially
+   *     {@link IProject}) will be removed. Please Use {@link #getReferencePoint()}
+   *     getReferencePoint()} instead.
+   */
+  @Deprecated
   public IProject getProject() {
     return project;
+  }
+
+  /**
+   * Returns the reference point in which the referenced resource is located.
+   *
+   * @return the reference point in which the referenced resource is located.
+   */
+  public IReferencePoint getReferencePoint() {
+    return project.getReferencePoint();
   }
 
   /** Convenience method for getting the full path of the file identified by this SPath. */
