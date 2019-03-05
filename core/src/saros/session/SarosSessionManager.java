@@ -304,18 +304,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
   }
 
-  @Override
-  public void startSession(final Map<IProject, List<IResource>> projectResourcesMapping) {
-
-    Map<IReferencePoint, List<IResource>> list = new HashMap<>();
-
-    for (Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
-      list.put(entry.getKey().getReferencePoint(), entry.getValue());
-    }
-
-    startSessionWithReferencePoints(list);
-  }
-
   // FIXME offer a startSession method for the client and host !
   @Override
   public ISarosSession joinSession(
@@ -585,24 +573,6 @@ public class SarosSessionManager implements ISarosSessionManager {
           }
         };
     nextProjectNegotiationWorker = ThreadUtils.runSafeAsync(log, worker);
-  }
-
-  /**
-   * Adds project resources to an existing session.
-   *
-   * @param projectResourcesMapping
-   */
-  @Override
-  public synchronized void addResourcesToSession(
-      Map<IProject, List<IResource>> projectResourcesMapping) {
-
-    Map<IReferencePoint, List<IResource>> list = new HashMap<>();
-
-    for (Entry<IProject, List<IResource>> entry : projectResourcesMapping.entrySet()) {
-      list.put(entry.getKey().getReferencePoint(), entry.getValue());
-    }
-
-    addReferencePointResourcesToSession(list);
   }
 
   /**
