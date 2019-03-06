@@ -83,3 +83,11 @@ task stfTest (type: Test, dependsOn: [':de.fu_berlin.inf.dpp:build']) {
   exclude '**/stf/test/stf/**'
   exclude '**/whiteboard/**'
 }
+
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/STF.Test'
+    property 'sonar.projectDescription', 'STF-Tests'
+    property 'sonar.projectVersion', '0.1.0'
+  }
+}

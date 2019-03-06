@@ -92,3 +92,11 @@ task testJar(type: Jar) {
 artifacts {
   testing testJar
 }
+
+sonarqube {
+  properties {
+    property 'sonar.projectName', 'Saros/STF'
+    property 'sonar.projectDescription', 'Saros Test Framework'
+    property 'sonar.projectVersion', '0.1.0'
+  }
+}
