@@ -138,9 +138,11 @@ public class JGitFacadeTest {
     Git git = Git.init().setDirectory(workDirTree).call();
 
     File testFile1 = new File(workDirTree, "testFile1");
-    testFile1.createNewFile();
+    if (!testFile1.createNewFile()) {
+      throw new IOException("Could not create file" + testFile1);
+    }
 
-    git.add().addFilepattern(workDirTree.getAbsolutePath()).call();
+    git.add().addFilepattern("testFile1").call();
 
     git.commit().setMessage("Initial commit").call();
 
@@ -161,8 +163,11 @@ public class JGitFacadeTest {
     Git git = Git.open(workDirTree);
 
     File testfile = new File(workDirTree, "testfile" + numberOfCommit);
+    if (!testfile.createNewFile()) {
+      throw new IOException("Could not create file" + testfile);
+    }
 
-    git.add().addFilepattern(workDirTree.getAbsolutePath()).call(); // git add .
+    git.add().addFilepattern("testfile" + numberOfCommit).call();
 
     git.commit().setMessage("new file Commit Nr." + numberOfCommit).call();
 

@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand.FastForwardMode;
 import org.eclipse.jgit.api.RemoteRemoveCommand;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.NullProgressMonitor;
@@ -171,6 +172,8 @@ public class JGitFacade {
    */
   public void fastForwardMerge(String revString) throws IOException {
     try {
+      Status status = git.status().call();
+      if (!status.getMissing().isEmpty() || status.isClean()) return;
       git.merge()
           .include(git.getRepository().resolve(revString))
           .setFastForward(FastForwardMode.FF_ONLY)
