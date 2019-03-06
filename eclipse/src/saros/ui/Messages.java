@@ -191,6 +191,13 @@ public class Messages extends NLS {
   public static String GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_TITLE;
   public static String GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_MESSAGE;
 
+  public static String GitSendCommitAction_title;
+  public static String GitSendCommitAction_tooltip;
+
+  public static String GitChangeWorkDirTreeAction_title;
+  public static String GitChangeWorkDirTreeAction_tooltip;
+  public static String GitChangeWorkDirTreeAction_directorydialog_text;
+
   public static String GiveWriteAccessAction_title;
   public static String GiveWriteAccessAction_tooltip;
 
