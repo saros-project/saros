@@ -16,21 +16,18 @@ import saros.activities.IFileSystemModificationActivity;
 import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.SelectedEditorState;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
-import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityConsumer;
-import saros.session.AbstractActivityProducer;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.ISarosSession;
 
 /** The SharedResourcesManager creates and handles file and folder activities. */
-public class SharedResourcesManager extends AbstractActivityProducer implements Startable {
+public class SharedResourcesManager implements Startable {
 
   private static final Logger LOG = Logger.getLogger(SharedResourcesManager.class);
 
@@ -42,12 +39,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
 
   private final LocalFilesystemModificationHandler localFilesystemModificationHandler;
 
-  /**
-   * Should return <code>true</code> while executing resource changes to avoid an infinite resource
-   * event loop.
-   */
-  private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
-
   private final LocalEditorHandler localEditorHandler;
 
   private final LocalEditorManipulator localEditorManipulator;
@@ -58,11 +49,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
   public void start() {
     ApplicationManager.getApplication()
         .invokeAndWait(
-            () -> {
-              sarosSession.addActivityProducer(SharedResourcesManager.this);
-              sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
-              localFilesystemModificationHandler.setEnabled(true);
-            },
+            () -> sarosSession.addActivityConsumer(consumer, Priority.ACTIVE),
             ModalityState.defaultModalityState());
   }
 
@@ -70,30 +57,22 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
   public void stop() {
     ApplicationManager.getApplication()
         .invokeAndWait(
-            () -> {
-              localFilesystemModificationHandler.setEnabled(false);
-              sarosSession.removeActivityProducer(SharedResourcesManager.this);
-              sarosSession.removeActivityConsumer(consumer);
-            },
+            () -> sarosSession.removeActivityConsumer(consumer),
             ModalityState.defaultModalityState());
   }
 
   public SharedResourcesManager(
       ISarosSession sarosSession,
-      EditorManager editorManager,
-      FileReplacementInProgressObservable fileReplacementInProgressObservable,
       LocalEditorHandler localEditorHandler,
       LocalEditorManipulator localEditorManipulator,
-      AnnotationManager annotationManager) {
+      AnnotationManager annotationManager,
+      LocalFilesystemModificationHandler localFilesystemModificationHandler) {
 
     this.sarosSession = sarosSession;
-    this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
     this.annotationManager = annotationManager;
-
-    this.localFilesystemModificationHandler =
-        new LocalFilesystemModificationHandler(this, editorManager, sarosSession);
+    this.localFilesystemModificationHandler = localFilesystemModificationHandler;
   }
 
   private final IActivityConsumer consumer =
@@ -370,27 +349,5 @@ public class SharedResourcesManager extends AbstractActivityProducer implements 
     } finally {
       localFilesystemModificationHandler.setEnabled(true);
     }
-  }
-
-  /**
-   * Fires the given activity.
-   *
-   * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
-   * outside the filesystem package. If you still need to access this method, please consider
-   * whether your class should rather be located in the filesystem package.
-   *
-   * @param activity the activity to fire
-   */
-  public void internalFireActivity(IActivity activity) {
-    // HACK for now
-    if (fileReplacementInProgressObservable.isReplacementInProgress()) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace("File replacement in progress - Ignoring local activity " + activity);
-      }
-
-      return;
-    }
-
-    fireActivity(activity);
   }
 }

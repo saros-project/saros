@@ -16,15 +16,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.picocontainer.Disposable;
 import saros.filesystem.IFile;
 import saros.intellij.editor.colorstorage.ColorManager;
 import saros.session.User;
 
 /** Annotation manager used to create, delete and manage annotations for a Saros session. */
-// TODO save local selection before editor is closed
-// TODO move saved local selections affected by changes while editor is closed
-// TODO adjust position of local selection when editor is re-opened
-public class AnnotationManager {
+// TODO move local selections affected by changes while editor is closed; see issue #116
+public class AnnotationManager implements Disposable {
 
   private static final Logger LOG = Logger.getLogger(AnnotationManager.class);
 
@@ -41,6 +40,11 @@ public class AnnotationManager {
   private final AnnotationQueue<ContributionAnnotation> contributionAnnotationQueue;
 
   private final Application application;
+
+  @Override
+  public void dispose() {
+    removeAllAnnotations();
+  }
 
   public AnnotationManager() {
     this.selectionAnnotationStore = new AnnotationStore<>();
@@ -546,7 +550,7 @@ public class AnnotationManager {
    * Removes all annotations from all open editors and removes all the stored annotations from all
    * annotation stores.
    */
-  public void removeAllAnnotations() {
+  private void removeAllAnnotations() {
     selectionAnnotationStore.removeAllAnnotations().forEach(this::removeRangeHighlighter);
 
     contributionAnnotationQueue.removeAllAnnotations().forEach(this::removeRangeHighlighter);

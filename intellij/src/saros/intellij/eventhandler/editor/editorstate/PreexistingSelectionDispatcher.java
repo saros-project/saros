@@ -11,7 +11,7 @@ import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.intellij.session.SessionUtils;
+import saros.session.ISarosSession;
 
 /**
  * Dispatches a TextSelectionActivity containing the current selection when an editor for a shared
@@ -26,6 +26,7 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
 
   private final EditorManager editorManager;
   private final LocalEditorHandler localEditorHandler;
+  private final ISarosSession sarosSession;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -38,12 +39,16 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
       };
 
   public PreexistingSelectionDispatcher(
-      Project project, EditorManager editorManager, LocalEditorHandler localEditorHandler) {
+      Project project,
+      EditorManager editorManager,
+      LocalEditorHandler localEditorHandler,
+      ISarosSession sarosSession) {
 
     super(project);
 
     this.editorManager = editorManager;
     this.localEditorHandler = localEditorHandler;
+    this.sarosSession = sarosSession;
 
     setEnabled(true);
   }
@@ -60,7 +65,7 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
 
     SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
 
-    if (sPath != null && SessionUtils.isShared(sPath) && editor != null) {
+    if (sPath != null && sarosSession.isShared(sPath.getResource()) && editor != null) {
       editorManager.sendExistingSelection(sPath, editor);
     }
   }

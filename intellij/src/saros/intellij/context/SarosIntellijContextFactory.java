@@ -22,10 +22,7 @@ import saros.filesystem.IWorkspaceRoot;
 import saros.filesystem.NullChecksumCache;
 import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.editor.LocalEditorHandler;
-import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.ProjectAPI;
-import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.negotiation.hooks.ModuleTypeNegotiationHook;
 import saros.intellij.preferences.IntelliJPreferences;
 import saros.intellij.preferences.PropertiesComponentAdapter;
@@ -33,7 +30,6 @@ import saros.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import saros.intellij.project.filesystem.IntelliJWorkspaceRootImpl;
 import saros.intellij.project.filesystem.PathFactory;
 import saros.intellij.runtime.IntelliJSynchronizer;
-import saros.intellij.session.SessionUtils;
 import saros.intellij.ui.eventhandler.SessionStatusChangeHandler;
 import saros.intellij.ui.swt_browser.IntelliJDialogManager;
 import saros.intellij.ui.swt_browser.IntelliJUIResourceLocator;
@@ -61,12 +57,7 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
       Component.create(EditorAPI.class),
       Component.create(ProjectAPI.class),
       Component.create(IEditorManager.class, EditorManager.class),
-      Component.create(LocalEditorHandler.class),
-      Component.create(LocalEditorManipulator.class),
       Component.create(ISarosSessionContextFactory.class, SarosIntellijSessionContextFactory.class),
-
-      // Annotation utility to create, remove, and manage annotations
-      Component.create(AnnotationManager.class),
 
       // UI handlers
       Component.create(NegotiationHandler.class),
@@ -88,9 +79,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
       // Proxy Support for the XMPP server connection
       Component.create(IProxyResolver.class, NullProxyResolver.class),
-
-      // Utility
-      Component.create(SessionUtils.class),
     };
   }
 

@@ -12,7 +12,7 @@ import saros.filesystem.IFile;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.intellij.session.SessionUtils;
+import saros.session.ISarosSession;
 
 /**
  * Loads all stored annotations when an editor is opened for a shared file and updates the stored
@@ -22,6 +22,7 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
 
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
+  private final ISarosSession sarosSession;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -45,12 +46,16 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       };
 
   public AnnotationUpdater(
-      Project project, AnnotationManager annotationManager, LocalEditorHandler localEditorHandler) {
+      Project project,
+      AnnotationManager annotationManager,
+      LocalEditorHandler localEditorHandler,
+      ISarosSession sarosSession) {
 
     super(project);
 
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
+    this.sarosSession = sarosSession;
 
     setEnabled(true);
   }
@@ -67,8 +72,14 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
 
     SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
 
-    if (sPath != null && SessionUtils.isShared(sPath) && editor != null) {
-      annotationManager.applyStoredAnnotations(sPath.getFile(), editor);
+    if (sPath == null || editor == null) {
+      return;
+    }
+
+    IFile file = sPath.getFile();
+
+    if (sarosSession.isShared(file)) {
+      annotationManager.applyStoredAnnotations(file, editor);
     }
   }
 
@@ -81,9 +92,13 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
   private void cleanUpAnnotations(@NotNull VirtualFile virtualFile) {
     SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
 
-    if (sPath != null && SessionUtils.isShared(sPath)) {
-      IFile file = sPath.getFile();
+    if (sPath == null) {
+      return;
+    }
 
+    IFile file = sPath.getFile();
+
+    if (sarosSession.isShared(file)) {
       annotationManager.updateAnnotationStore(file);
       annotationManager.removeLocalRepresentation(file);
     }

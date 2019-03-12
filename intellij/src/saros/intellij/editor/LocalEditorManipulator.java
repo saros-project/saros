@@ -20,9 +20,9 @@ import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.SharedResourcesManager;
-import saros.intellij.session.SessionUtils;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
+import saros.session.ISarosSession;
 import saros.session.User;
 
 /** This class applies the logic for activities that were received from remote. */
@@ -33,6 +33,7 @@ public class LocalEditorManipulator {
   private final ProjectAPI projectAPI;
   private final EditorAPI editorAPI;
   private final AnnotationManager annotationManager;
+  private final ISarosSession sarosSession;
 
   /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
   private EditorPool editorPool;
@@ -40,16 +41,19 @@ public class LocalEditorManipulator {
   private EditorManager manager;
 
   public LocalEditorManipulator(
-      ProjectAPI projectAPI, EditorAPI editorAPI, AnnotationManager annotationManager) {
+      ProjectAPI projectAPI,
+      EditorAPI editorAPI,
+      AnnotationManager annotationManager,
+      EditorManager editorManager,
+      ISarosSession sarosSession) {
+
     this.projectAPI = projectAPI;
     this.editorAPI = editorAPI;
     this.annotationManager = annotationManager;
-  }
+    this.manager = editorManager;
+    this.sarosSession = sarosSession;
 
-  /** Initializes all fields that require an EditorManager. */
-  void initialize(EditorManager editorManager) {
-    editorPool = editorManager.getEditorPool();
-    manager = editorManager;
+    this.editorPool = manager.getEditorPool();
   }
 
   /**
@@ -63,8 +67,8 @@ public class LocalEditorManipulator {
    * @return the editor for the given path, or <code>null</code> if the file does not exist or is
    *     not shared
    */
-  public Editor openEditor(SPath path, boolean activate) {
-    if (!SessionUtils.isShared(path.getResource())) {
+  public Editor openEditor(@NotNull SPath path, boolean activate) {
+    if (!sarosSession.isShared(path.getResource())) {
       LOG.warn("Ignored open editor request for path " + path + " as it is not shared");
 
       return null;

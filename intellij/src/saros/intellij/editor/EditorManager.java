@@ -6,7 +6,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.activities.EditorActivity;
 import saros.activities.EditorActivity.Type;
-import saros.activities.IActivity;
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.activities.TextSelectionActivity;
@@ -25,7 +23,6 @@ import saros.activities.ViewportActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.text.DeleteOperation;
 import saros.concurrent.jupiter.internal.text.InsertOperation;
-import saros.core.editor.RemoteWriteAccessManager;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.SharedEditorListenerDispatch;
@@ -43,7 +40,6 @@ import saros.intellij.eventhandler.editor.editorstate.AnnotationUpdater;
 import saros.intellij.eventhandler.editor.editorstate.EditorStatusChangeActivityDispatcher;
 import saros.intellij.eventhandler.editor.editorstate.PreexistingSelectionDispatcher;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
-import saros.intellij.eventhandler.editor.selection.LocalTextSelectionChangeHandler;
 import saros.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.VirtualFileConverter;
@@ -81,15 +77,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   private final IActivityConsumer consumer =
       new AbstractActivityConsumer() {
-
-        @Override
-        public void exec(IActivity activity) {
-          // First let the remote manager update itself based on the
-          // Activity
-          remoteWriteAccessManager.exec(activity);
-
-          super.exec(activity);
-        }
 
         @Override
         public void receive(EditorActivity editorActivity) {
@@ -418,7 +405,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-          startSession(newSarosSession);
+          getSessionContextComponents(newSarosSession);
+
+          startSession();
         }
 
         @Override
@@ -428,12 +417,68 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.getStopManager().removeBlockable(stopManagerListener); // todo
 
           executeInUIThreadSynchronous(this::endSession);
+
+          dropHeldSessionContextComponents();
         }
 
-        private void startSession(ISarosSession newSarosSession) {
+        /**
+         * Reads the needed components from the session context.
+         *
+         * @param sarosSession the session to read from
+         */
+        private void getSessionContextComponents(ISarosSession sarosSession) {
+
+          session = sarosSession;
+
+          userEditorStateManager = session.getComponent(UserEditorStateManager.class);
+
+          localEditorHandler = sarosSession.getComponent(LocalEditorHandler.class);
+          localEditorManipulator = sarosSession.getComponent(LocalEditorManipulator.class);
+
+          annotationManager = sarosSession.getComponent(AnnotationManager.class);
+
+          localDocumentModificationHandler =
+              sarosSession.getComponent(LocalDocumentModificationHandler.class);
+          localClosedEditorModificationHandler =
+              sarosSession.getComponent(LocalClosedEditorModificationHandler.class);
+
+          annotationUpdater = sarosSession.getComponent(AnnotationUpdater.class);
+          editorStatusChangeActivityDispatcher =
+              sarosSession.getComponent(EditorStatusChangeActivityDispatcher.class);
+          preexistingSelectionDispatcher =
+              sarosSession.getComponent(PreexistingSelectionDispatcher.class);
+          viewportAdjustmentExecutor = sarosSession.getComponent(ViewportAdjustmentExecutor.class);
+
+          localViewPortChangeHandler = sarosSession.getComponent(LocalViewPortChangeHandler.class);
+        }
+
+        /** Drops all held components that were read from the session context. */
+        private void dropHeldSessionContextComponents() {
+
+          session = null;
+
+          userEditorStateManager = null;
+
+          localEditorHandler = null;
+          localEditorManipulator = null;
+
+          annotationManager = null;
+
+          localDocumentModificationHandler = null;
+          localClosedEditorModificationHandler = null;
+
+          annotationUpdater = null;
+          editorStatusChangeActivityDispatcher = null;
+          preexistingSelectionDispatcher = null;
+          viewportAdjustmentExecutor = null;
+
+          localViewPortChangeHandler = null;
+        }
+
+        /** Initializes all local components for the new session. */
+        private void startSession() {
           assert editorPool.getEditors().isEmpty() : "EditorPool was not correctly reset!";
 
-          session = newSarosSession;
           session.getStopManager().addBlockable(stopManagerListener);
 
           hasWriteAccess = session.hasWriteAccess();
@@ -444,17 +489,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           setLocalDocumentModificationHandlersEnabled(true);
 
-          userEditorStateManager = session.getComponent(UserEditorStateManager.class);
-          remoteWriteAccessManager = new RemoteWriteAccessManager(session);
-
           // TODO: Test, whether this leads to problems because it is not called
           // from the UI thread.
           LocalFileSystem.getInstance().refresh(true);
         }
 
+        /** Resets all local components for the session. */
         private void endSession() {
-          annotationManager.removeAllAnnotations();
-
           // This sets all editors, that were set to read only, writeable
           // again
           unlockAllEditors();
@@ -465,46 +506,37 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.removeActivityConsumer(consumer);
 
           setLocalDocumentModificationHandlersEnabled(false);
-
-          session = null;
-
-          userEditorStateManager = null;
-          remoteWriteAccessManager.dispose();
-          remoteWriteAccessManager = null;
         }
       };
 
-  private final LocalEditorHandler localEditorHandler;
-  private final LocalEditorManipulator localEditorManipulator;
-  private final AnnotationManager annotationManager;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
   private final ProjectAPI projectAPI;
   private final EditorAPI editorAPI;
 
+  /* Session Components */
+  private UserEditorStateManager userEditorStateManager;
+  private ISarosSession session;
+  private LocalEditorHandler localEditorHandler;
+  private LocalEditorManipulator localEditorManipulator;
+  private AnnotationManager annotationManager;
+
+  /* Event handlers */
+  // document changes
+  private LocalDocumentModificationHandler localDocumentModificationHandler;
+  private LocalClosedEditorModificationHandler localClosedEditorModificationHandler;
+  // editor state changes
+  private AnnotationUpdater annotationUpdater;
+  private EditorStatusChangeActivityDispatcher editorStatusChangeActivityDispatcher;
+  private PreexistingSelectionDispatcher preexistingSelectionDispatcher;
+  private ViewportAdjustmentExecutor viewportAdjustmentExecutor;
+  // viewport changes
+  private LocalViewPortChangeHandler localViewPortChangeHandler;
+
+  /* Session state */
   private final EditorPool editorPool = new EditorPool();
 
   private final SharedEditorListenerDispatch editorListenerDispatch =
       new SharedEditorListenerDispatch();
-  private UserEditorStateManager userEditorStateManager;
-  private RemoteWriteAccessManager remoteWriteAccessManager;
-  private ISarosSession session;
-
-  /* Event handlers */
-  // document changes
-  private final LocalDocumentModificationHandler localDocumentModificationHandler;
-  private final LocalClosedEditorModificationHandler localClosedEditorModificationHandler;
-
-  // editor state changes
-  private final AnnotationUpdater annotationUpdater;
-  private final EditorStatusChangeActivityDispatcher editorStatusChangeActivityDispatcher;
-  private final PreexistingSelectionDispatcher preexistingSelectionDispatcher;
-  private final ViewportAdjustmentExecutor viewportAdjustmentExecutor;
-
-  // text selection changes
-  private final LocalTextSelectionChangeHandler localTextSelectionChangeHandler;
-
-  // viewport changes
-  private final LocalViewPortChangeHandler localViewPortChangeHandler;
 
   private boolean hasWriteAccess;
   // FIXME why is this never assigned? Either assign or remove flag
@@ -512,39 +544,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   public EditorManager(
       ISarosSessionManager sessionManager,
-      LocalEditorHandler localEditorHandler,
-      LocalEditorManipulator localEditorManipulator,
       ProjectAPI projectAPI,
-      AnnotationManager annotationManager,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
-      Project project,
       EditorAPI editorAPI) {
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-    this.localEditorHandler = localEditorHandler;
-    this.localEditorManipulator = localEditorManipulator;
-    this.annotationManager = annotationManager;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.editorAPI = editorAPI;
-
-    localDocumentModificationHandler = new LocalDocumentModificationHandler(this);
-    localClosedEditorModificationHandler =
-        new LocalClosedEditorModificationHandler(this, projectAPI, annotationManager);
-
-    annotationUpdater = new AnnotationUpdater(project, annotationManager, localEditorHandler);
-    editorStatusChangeActivityDispatcher =
-        new EditorStatusChangeActivityDispatcher(project, localEditorHandler);
-    preexistingSelectionDispatcher =
-        new PreexistingSelectionDispatcher(project, this, localEditorHandler);
-    viewportAdjustmentExecutor =
-        new ViewportAdjustmentExecutor(project, projectAPI, localEditorManipulator);
-
-    localTextSelectionChangeHandler = new LocalTextSelectionChangeHandler(this);
-
-    localViewPortChangeHandler = new LocalViewPortChangeHandler(this, editorAPI);
-
-    localEditorHandler.initialize(this);
-    localEditorManipulator.initialize(this);
 
     this.projectAPI = projectAPI;
   }
@@ -838,55 +844,20 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Enables or disabled all text selection change handlers. This is not done by disabling the
-   * underlying listeners.
-   *
-   * @param enabled <code>true</code> to enable the handlers, <code>false</code> disable the
-   *     handlers
-   * @see LocalTextSelectionChangeHandler#setEnabled(boolean)
-   */
-  private void setLocalTextSelectionChangeHandlersEnabled(boolean enabled) {
-    localTextSelectionChangeHandler.setEnabled(enabled);
-  }
-
-  /**
-   * Updates the state of all held editor event handlers to match the given state.
-   *
-   * <p>Enables all listeners when <code> true</code> is passed and disables all listeners if <code>
-   * false</code> is passed.
-   *
-   * @param enable the state to set the handlers to
-   * @see #setLocalDocumentModificationHandlersEnabled(boolean)
-   * @see #setLocalEditorStatusChangeHandlersEnabled(boolean)
-   * @see #setLocalTextSelectionChangeHandlersEnabled(boolean)
-   * @see #setLocalViewPortChangeHandlersEnabled(boolean)
-   */
-  private void setHandlersEnabled(boolean enable) {
-    setLocalDocumentModificationHandlersEnabled(enable);
-    setLocalEditorStatusChangeHandlersEnabled(enable);
-    setLocalTextSelectionChangeHandlersEnabled(enable);
-    setLocalViewPortChangeHandlersEnabled(enable);
-  }
-
-  /**
    * Sets the editor's document writable and adds LocalTextSelectionChangeHandler,
    * LocalViewPortChangeHandler and the localDocumentModificationHandler.
    */
   void startEditor(Editor editor) {
     editor.getDocument().setReadOnly(isLocked || !hasWriteAccess);
-    localTextSelectionChangeHandler.register(editor);
-    localViewPortChangeHandler.register(editor);
   }
 
   /** Unlocks all editors in the editorPool. */
   private void unlockAllEditors() {
-    setHandlersEnabled(true);
     editorPool.unlockAllDocuments();
   }
 
   /** Locks all open editors, by setting them to read-only. */
   private void lockAllEditors() {
-    setHandlersEnabled(false);
     editorPool.lockAllDocuments();
   }
 
