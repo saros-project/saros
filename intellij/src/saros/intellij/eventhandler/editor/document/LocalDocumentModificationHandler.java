@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
+import saros.session.ISarosSession;
 
 /**
  * Tracks modifications of Documents and triggers matching TextEditActivities. These activities are
@@ -23,8 +24,8 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
         }
       };
 
-  public LocalDocumentModificationHandler(EditorManager editorManager) {
-    super(editorManager);
+  public LocalDocumentModificationHandler(EditorManager editorManager, ISarosSession sarosSession) {
+    super(editorManager, sarosSession);
   }
 
   /**

@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
+import org.picocontainer.Startable;
 import saros.intellij.eventhandler.DisableableHandler;
 
 /**
@@ -14,21 +15,24 @@ import saros.intellij.eventhandler.DisableableHandler;
  * #registerListeners(MessageBusConnection)}, which is called in {@link #subscribe()} with the
  * initialized MessageBusConnection object to register the needed listeners.
  *
+ * <p>The handle is enabled and listeners are registered by default. To change this behavior, {@link
+ * #start} should be overwritten by the implementation.
+ *
  * @see MessageBusConnection#subscribe(Topic, Object)
  */
-public abstract class AbstractLocalEditorStatusChangeHandler implements DisableableHandler {
+public abstract class AbstractLocalEditorStatusChangeHandler
+    implements DisableableHandler, Startable {
 
   private final Project project;
 
   private boolean enabled;
+  private boolean disposed;
 
   private MessageBusConnection messageBusConnection;
 
   /**
-   * Abstract class for local editor status change handlers. The handler is disabled by default and
-   * the listeners are also not registered by default. Each implementing class should call {@link
-   * #setEnabled(boolean)} with <code>true</code> as part of their constructor if the handler is
-   * supposed to be enabled by default.
+   * Abstract class for local editor status change handlers. The handler is enabled by default and
+   * the listeners are also registered by default.
    *
    * @param project the current Intellij project instance
    */
@@ -36,6 +40,18 @@ public abstract class AbstractLocalEditorStatusChangeHandler implements Disablea
     this.project = project;
 
     this.enabled = false;
+    this.disposed = false;
+  }
+
+  @Override
+  public void start() {
+    setEnabled(true);
+  }
+
+  @Override
+  public void stop() {
+    disposed = true;
+    setEnabled(false);
   }
 
   /**
@@ -75,6 +91,8 @@ public abstract class AbstractLocalEditorStatusChangeHandler implements Disablea
    */
   @Override
   public void setEnabled(boolean enabled) {
+    assert !disposed || !enabled : "disposed listeners must not be enabled";
+
     if (this.enabled && !enabled) {
       unsubscribe();
 

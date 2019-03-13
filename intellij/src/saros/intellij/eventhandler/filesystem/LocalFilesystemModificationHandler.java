@@ -1,5 +1,7 @@
 package saros.intellij.eventhandler.filesystem;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
@@ -23,8 +25,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.picocontainer.annotations.Inject;
-import saros.SarosPluginContext;
+import org.picocontainer.Startable;
 import saros.activities.EditorActivity;
 import saros.activities.FileActivity;
 import saros.activities.FileActivity.Type;
@@ -40,35 +41,35 @@ import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.DisableableHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.intellij.project.SharedResourcesManager;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
+import saros.observables.FileReplacementInProgressObservable;
+import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.User;
 
 /**
- * Uses a VirtualFileListener to generate and dispatch FileActivities for shared files. Activities
- * are dispatched using {@link SharedResourcesManager#fireActivity(IActivity)}.
+ * Uses a VirtualFileListener to generate and dispatch FileActivities for shared files.
  *
  * <p>The listener is enabled by default when the session context is created.
  *
  * @see VirtualFileListener
  */
-// TODO decouple from SharedResourceManager and add to session context instead
-public class LocalFilesystemModificationHandler implements DisableableHandler {
+public class LocalFilesystemModificationHandler extends AbstractActivityProducer
+    implements DisableableHandler, Startable {
 
   private static final Logger LOG = Logger.getLogger(LocalFilesystemModificationHandler.class);
 
   private final EditorManager editorManager;
-  private final SharedResourcesManager resourceManager;
   private final ISarosSession session;
   private final LocalFileSystem localFileSystem;
-
-  @Inject private ProjectAPI projectAPI;
-  @Inject private AnnotationManager annotationManager;
-  @Inject private Project project;
-  @Inject private LocalEditorHandler localEditorHandler;
+  private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
+  private final ProjectAPI projectAPI;
+  private final AnnotationManager annotationManager;
+  private final Project project;
+  private final LocalEditorHandler localEditorHandler;
 
   private boolean enabled;
+  private boolean disposed;
 
   private final VirtualFileListener virtualFileListener =
       new VirtualFileListener() {
@@ -87,6 +88,17 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
           generateRenamingResourceMoveActivity(event);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * <p>Works for all files in the application scope, including meta-files like Intellij
+         * configuration files.
+         *
+         * <p>File changes done though an Intellij editor are processed in the {@link
+         * LocalDocumentModificationHandler} instead.
+         *
+         * @param event
+         */
         @Override
         public void beforeContentsChange(@NotNull VirtualFileEvent event) {
           generateEditorSavedActivity(event);
@@ -97,55 +109,86 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
           generateResourceDeletionActivity(event);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * <p>Intellij offers multiple ways of moving resources through the UI that are handled in
+         * different ways internally:
+         * <li><i>Move file to other package:</i>
+         *
+         *     <p>Triggers the move listener for the file.
+         * <li><i>Move package to other package</i> and <i>Move package to other source root:</i>
+         *
+         *     <p>Just triggers the move listener for the package directory, does not trigger a
+         *     listener event for the contained files or folders. This means the listener has to
+         *     iterate the contained resources and create matching actions in the right order.
+         * <li><i>Move package to other directory:</i>
+         *
+         *     <p>Triggers the create listener for the new path of the contained directories in
+         *     right order. Then triggers the move listener for the contained files. Then triggers
+         *     the delete listener for the old path of the contained directories.
+         *
+         * @param event
+         */
         @Override
         public void beforeFileMovement(@NotNull VirtualFileMoveEvent event) {
-          generateResourceMoveActivitiy(event);
+          generateResourceMoveActivity(event);
         }
       };
+
+  @Override
+  public void start() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> session.addActivityProducer(LocalFilesystemModificationHandler.this),
+            ModalityState.defaultModalityState());
+
+    setEnabled(true);
+  }
+
+  @Override
+  public void stop() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> session.removeActivityProducer(LocalFilesystemModificationHandler.this),
+            ModalityState.defaultModalityState());
+
+    disposed = true;
+    setEnabled(false);
+  }
 
   /**
    * Instantiates a LocalFilesystemModificationHandler object. The handler, including the held
    * filesystem listener, is enabled by default.
    *
-   * @param resourceManager the ResourceManager instance
-   * @param editorManager the EditorManager instance
-   * @param session the current SarosSession instance
+   * @see #start()
+   * @see #stop()
    */
   public LocalFilesystemModificationHandler(
-      SharedResourcesManager resourceManager, EditorManager editorManager, ISarosSession session) {
+      EditorManager editorManager,
+      ISarosSession session,
+      FileReplacementInProgressObservable fileReplacementInProgressObservable,
+      ProjectAPI projectAPI,
+      AnnotationManager annotationManager,
+      Project project,
+      LocalEditorHandler localEditorHandler) {
 
-    this.resourceManager = resourceManager;
     this.editorManager = editorManager;
     this.session = session;
+    this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
+    this.projectAPI = projectAPI;
+    this.annotationManager = annotationManager;
+    this.project = project;
+    this.localEditorHandler = localEditorHandler;
 
-    SarosPluginContext.initComponent(this);
-
-    this.enabled = true;
+    this.enabled = false;
+    this.disposed = false;
 
     this.localFileSystem = LocalFileSystem.getInstance();
-
-    String projectBasePath = project.getBasePath();
-    if (projectBasePath == null) {
-      LOG.error(
-          "Could not register the VirtualFileListener as the current project does not have a base "
-              + "path. Saros will not be able to react to local filesystem changes. project: "
-              + project);
-
-      return;
-    }
-
-    // FIXME listen to all relevant roots; currently assuming all roots are located in project root
-    localFileSystem.addRootToWatch(projectBasePath, true);
-
-    localFileSystem.addVirtualFileListener(virtualFileListener);
   }
 
   /**
-   * Works for all files in the application scope, including meta-files like Intellij configuration
-   * files.
-   *
-   * <p>File changes done though an Intellij editor are processed in the {@link
-   * LocalDocumentModificationHandler} instead.
+   * Notifies the other session participants of the local save of the given file.
    *
    * @param virtualFileEvent the event to react to
    * @see LocalDocumentModificationHandler
@@ -244,11 +287,13 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       activity =
           new FileActivity(
               user, Type.CREATED, FileActivity.Purpose.ACTIVITY, path, null, content, charset);
-
-      editorManager.openEditor(path, false);
     }
 
-    fireActivity(activity);
+    dispatchActivity(activity);
+
+    if (!createdVirtualFile.isDirectory()) {
+      editorManager.openEditor(path, false);
+    }
   }
 
   /**
@@ -296,7 +341,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
         new FileActivity(
             user, Type.CREATED, FileActivity.Purpose.ACTIVITY, copyPath, null, content, charset);
 
-    fireActivity(activity);
+    dispatchActivity(activity);
   }
 
   /**
@@ -346,7 +391,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       annotationManager.removeAnnotations(path.getFile());
     }
 
-    fireActivity(activity);
+    dispatchActivity(activity);
 
     // TODO reset the vector time for the deleted file or contained files if folder
   }
@@ -354,29 +399,13 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
   /**
    * Generates and dispatches activities handling resources moves.
    *
-   * <p>Intellij offers multiple ways of moving resources through the UI that are handled in
-   * different ways internally:
-   * <li><i>Move file to other package:</i>
-   *
-   *     <p>Triggers the move listener for the file.
-   * <li><i>Move package to other package</i> and <i>Move package to other source root:</i>
-   *
-   *     <p>Just triggers the move listener for the package directory, does not trigger a listener
-   *     event for the contained files or folders. This means the listener has to iterate the
-   *     contained resources and create matching actions in the right order.
-   * <li><i>Move package to other directory:</i>
-   *
-   *     <p>Triggers the create listener for the new path of the contained directories in right
-   *     order. Then triggers the move listener for the contained files. Then triggers the delete
-   *     listener for the old path of the contained directories.
-   *
    * @param virtualFileMoveEvent the event to react to
    * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
    * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
    * @see #generateResourceCreationActivity(VirtualFileEvent) (VirtualFileEvent)
    * @see #generateResourceDeletionActivity(VirtualFileEvent) (VirtualFileEvent)
    */
-  private void generateResourceMoveActivitiy(@NotNull VirtualFileMoveEvent virtualFileMoveEvent) {
+  private void generateResourceMoveActivity(@NotNull VirtualFileMoveEvent virtualFileMoveEvent) {
 
     assert enabled : "the before file move listener was triggered while it was disabled";
 
@@ -507,7 +536,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
 
             IActivity newFolderCreatedActivity = new FolderCreatedActivity(user, newFolderPath);
 
-            fireActivity(newFolderCreatedActivity);
+            dispatchActivity(newFolderCreatedActivity);
           }
 
           if (oldPathIsShared) {
@@ -532,7 +561,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
     VfsUtilCore.iterateChildrenRecursively(oldFile, virtualFileFilter, contentIterator);
 
     while (!queuedDeletionActivities.isEmpty()) {
-      fireActivity(queuedDeletionActivities.pop());
+      dispatchActivity(queuedDeletionActivities.pop());
     }
   }
 
@@ -680,14 +709,14 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       return;
     }
 
-    fireActivity(activity);
+    dispatchActivity(activity);
 
     if (oldPathIsShared) {
       if (fileIsOpen) {
         EditorActivity closeOldEditorActivity =
             new EditorActivity(user, EditorActivity.Type.CLOSED, oldFilePath);
 
-        fireActivity(closeOldEditorActivity);
+        dispatchActivity(closeOldEditorActivity);
       }
 
       // TODO reset the vector time for the old file
@@ -702,7 +731,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
       EditorActivity openNewEditorActivity =
           new EditorActivity(user, EditorActivity.Type.ACTIVATED, newFilePath);
 
-      fireActivity(openNewEditorActivity);
+      dispatchActivity(openNewEditorActivity);
     }
   }
 
@@ -727,6 +756,7 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
     Object oldValue = filePropertyEvent.getOldValue();
     Object newValue = filePropertyEvent.getNewValue();
 
+    //noinspection SwitchStatementWithTooFewBranches
     switch (propertyName) {
       case (VirtualFile.PROP_NAME):
         String oldName = (String) oldValue;
@@ -842,16 +872,25 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
   }
 
   /**
-   * Dispatches the given activity.
+   * Dispatches the given activity. Drops the activity instead if there is currently a file
+   * replacement in progress.
    *
    * @param activity the activity to fire
-   * @see SharedResourcesManager#internalFireActivity(IActivity)
+   * @see FileReplacementInProgressObservable
    */
-  private void fireActivity(@NotNull IActivity activity) {
+  private void dispatchActivity(@NotNull IActivity activity) {
+    // HACK for now
+    if (fileReplacementInProgressObservable.isReplacementInProgress()) {
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("File replacement in progress - Ignoring local activity " + activity);
+      }
+
+      return;
+    }
 
     LOG.debug("Dispatching resource activity " + activity);
 
-    resourceManager.internalFireActivity(activity);
+    fireActivity(activity);
   }
 
   /**
@@ -865,6 +904,8 @@ public class LocalFilesystemModificationHandler implements DisableableHandler {
    */
   @Override
   public void setEnabled(boolean enabled) {
+    assert !disposed || !enabled : "disposed handlers must not be enabled";
+
     if (this.enabled && !enabled) {
       LOG.trace("Disabling filesystem listener");
 

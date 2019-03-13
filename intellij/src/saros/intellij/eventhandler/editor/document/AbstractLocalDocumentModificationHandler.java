@@ -7,21 +7,25 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.picocontainer.Startable;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.intellij.session.SessionUtils;
+import saros.session.ISarosSession;
 
 /** Parent class containing utility methods when working with document listeners. */
-public abstract class AbstractLocalDocumentModificationHandler implements DisableableHandler {
+public abstract class AbstractLocalDocumentModificationHandler
+    implements DisableableHandler, Startable {
 
   private static final Logger LOG =
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
 
   protected final EditorManager editorManager;
+  private final ISarosSession sarosSession;
 
   private boolean enabled;
+  private boolean disposed;
 
   /**
    * Sets the internal listener state flag to be disabled by default. The default state is set to
@@ -30,10 +34,25 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
    *
    * @param editorManager the EditorManager instance
    */
-  AbstractLocalDocumentModificationHandler(EditorManager editorManager) {
+  AbstractLocalDocumentModificationHandler(
+      EditorManager editorManager, ISarosSession sarosSession) {
+
     this.editorManager = editorManager;
+    this.sarosSession = sarosSession;
 
     this.enabled = false;
+    this.disposed = false;
+  }
+
+  @Override
+  public void start() {
+    setEnabled(true);
+  }
+
+  @Override
+  public void stop() {
+    disposed = true;
+    setEnabled(false);
   }
 
   /**
@@ -44,6 +63,8 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
    * @param documentListener the listener whose state to change
    */
   public void setEnabled(boolean enabled, @NotNull DocumentListener documentListener) {
+    assert !disposed || !enabled : "disposed listeners must not be enabled";
+
     if (!this.enabled && enabled) {
       LOG.debug("Started listening for document events");
 
@@ -102,7 +123,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements Disabl
 
     path = VirtualFileConverter.convertToSPath(virtualFile);
 
-    if (path == null || !SessionUtils.isShared(path)) {
+    if (path == null || !sarosSession.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring Event for document " + document + " - document is not shared");
       }
