@@ -1,12 +1,14 @@
 package saros.intellij.ui.views.buttons;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import saros.SarosPluginContext;
 import saros.activities.SPath;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -53,7 +55,7 @@ public class ConsistencyButton extends ToolbarButton {
 
           boolean userConfirmedRecovery =
               DialogUtils.showQuestion(
-                  null,
+                  project,
                   Messages.ConsistencyButton_confirm_dialog_title,
                   MessageFormat.format(
                       Messages.ConsistencyButton_confirm_dialog_message, inconsistentFiles));
@@ -91,6 +93,8 @@ public class ConsistencyButton extends ToolbarButton {
 
   private final ValueChangeListener<Boolean> isConsistencyListener = this::handleConsistencyChange;
 
+  private final Project project;
+
   @Inject private ISarosSessionManager sessionManager;
 
   @Inject private IsInconsistentObservable inconsistentObservable;
@@ -98,13 +102,15 @@ public class ConsistencyButton extends ToolbarButton {
   private volatile SessionInconsistencyState sessionInconsistencyState;
 
   /** Creates a Consistency button, adds a sessionListener and disables the button. */
-  public ConsistencyButton() {
+  public ConsistencyButton(@NotNull Project project) {
     super(
         ConsistencyAction.NAME,
         Messages.ConsistencyButton_tooltip_functionality,
         IconManager.IN_SYNC_ICON);
 
     SarosPluginContext.initComponent(this);
+
+    this.project = project;
 
     setSarosSession(sessionManager.getSession());
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);

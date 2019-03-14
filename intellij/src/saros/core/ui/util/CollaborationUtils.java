@@ -124,14 +124,14 @@ public class CollaborationUtils {
         reallyLeave = true;
       } else {
         reallyLeave =
-            DialogUtils.showConfirm(
+            DialogUtils.oldShowConfirm(
                 null,
                 Messages.CollaborationUtils_confirm_closing,
                 Messages.CollaborationUtils_confirm_closing_text);
       }
     } else {
       reallyLeave =
-          DialogUtils.showConfirm(
+          DialogUtils.oldShowConfirm(
               null,
               Messages.CollaborationUtils_confirm_leaving,
               Messages.CollaborationUtils_confirm_leaving_text);
