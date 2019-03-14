@@ -1,5 +1,6 @@
 package saros.intellij.ui.views.buttons;
 
+import com.intellij.openapi.project.Project;
 import saros.SarosPluginContext;
 import saros.intellij.ui.actions.LeaveSessionAction;
 import saros.intellij.ui.util.IconManager;
@@ -33,8 +34,8 @@ public class LeaveSessionButton extends SimpleButton {
    *
    * <p>LeaveSessionButton is created as disabled.
    */
-  public LeaveSessionButton() {
-    super(new LeaveSessionAction(), "Leave session", IconManager.LEAVE_SESSION_ICON);
+  public LeaveSessionButton(Project project) {
+    super(new LeaveSessionAction(project), "Leave session", IconManager.LEAVE_SESSION_ICON);
     SarosPluginContext.initComponent(this);
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     setEnabled(false);
