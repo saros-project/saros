@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import saros.SarosPluginContext;
 import saros.exceptions.IllegalAWTContextException;
-import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
  * Dialog helper used to show messages in safe manner by starting it on the AWT event dispatcher
@@ -29,8 +28,6 @@ public class SafeDialogUtils {
 
   private static final Application application;
 
-  @Inject private static Project project;
-
   static {
     application = ApplicationManager.getApplication();
 
@@ -40,9 +37,14 @@ public class SafeDialogUtils {
   private SafeDialogUtils() {}
 
   /**
-   * Shows an input dialog. This method must not be called from a write safe context as it needs to
-   * be executed synchronously and AWT actions are not allowed from a write safe context.
+   * Synchronously shows an input dialog. This method must not be called from a write safe context
+   * as it needs to be executed synchronously and AWT actions are not allowed from a write safe
+   * context.
    *
+   * @param project the project used as a reference to generate and position the dialog
+   * @param message the text displayed as the message of the dialog
+   * @param initialValue the initial value contained in the text field of the input dialog
+   * @param title the text displayed as the title of the dialog
    * @return the <code>String</code> entered by the user or <code>null</code> if the dialog did not
    *     finish with the exit code 0 (it was not closed by pressing the "OK" button)
    * @throws IllegalAWTContextException if the calling thread is currently inside a write safe
@@ -51,7 +53,7 @@ public class SafeDialogUtils {
    * @see com.intellij.openapi.ui.DialogWrapper#OK_EXIT_CODE
    */
   public static String showInputDialog(
-      final String message, final String initialValue, final String title)
+      Project project, final String message, final String initialValue, final String title)
       throws IllegalAWTContextException {
 
     if (application.isWriteAccessAllowed()) {
@@ -79,7 +81,14 @@ public class SafeDialogUtils {
     return response.get();
   }
 
-  public static void showError(final String message, final String title) {
+  /**
+   * Asynchronously shows an error dialog.
+   *
+   * @param project the project used as a reference to generate and position the dialog
+   * @param message the text displayed as the message of the dialog
+   * @param title the text displayed as the title of the dialog
+   */
+  public static void showError(Project project, final String message, final String title) {
     LOG.info("Showing error dialog: " + title + " - " + message);
 
     application.invokeLater(
@@ -93,9 +102,13 @@ public class SafeDialogUtils {
   }
 
   /**
-   * Shows a password dialog. This method must not be called from a write safe context as it needs
-   * to be executed synchronously and AWT actions are not allowed from a write safe context.
+   * Synchronously shows a password dialog. This method must not be called from a write safe context
+   * as it needs to be executed synchronously and AWT actions are not allowed from a write safe
+   * context.
    *
+   * @param project the project used as a reference to generate and position the dialog
+   * @param message the text displayed as the message of the dialog
+   * @param title the text displayed as the title of the dialog
    * @return the <code>String</code> entered by the user or <code>null</code> if the dialog did not
    *     finish with the exit code 0 (it was not closed by pressing the "OK" button)
    * @throws IllegalAWTContextException if the calling thread is currently inside a write safe
@@ -103,7 +116,7 @@ public class SafeDialogUtils {
    * @see Messages.InputDialog#getInputString()
    * @see com.intellij.openapi.ui.DialogWrapper#OK_EXIT_CODE
    */
-  public static String showPasswordDialog(final String message, final String title)
+  public static String showPasswordDialog(Project project, final String message, final String title)
       throws IllegalAWTContextException {
 
     if (application.isWriteAccessAllowed()) {
@@ -129,15 +142,19 @@ public class SafeDialogUtils {
   }
 
   /**
-   * Shows a yes/no dialog. This method must not be called from a write safe context as it needs to
-   * be executed synchronously and AWT actions are not allowed from a write safe context.
+   * Synchronously shows a yes/no dialog. This method must not be called from a write safe context
+   * as it needs to be executed synchronously and AWT actions are not allowed from a write safe
+   * context.
    *
+   * @param project the project used as a reference to generate and position the dialog
+   * @param message the text displayed as the message of the dialog
+   * @param title the text displayed as the title of the dialog
    * @return the value {@link Messages#YES} if "Yes" is chosen and {@link Messages#NO} if "No" is
    *     chosen or the dialog is closed
    * @throws IllegalAWTContextException if the calling thread is currently inside a write safe
    *     context
    */
-  public static Integer showYesNoDialog(final String message, final String title)
+  public static Integer showYesNoDialog(Project project, final String message, final String title)
       throws IllegalAWTContextException {
 
     if (application.isWriteAccessAllowed()) {

@@ -3,6 +3,9 @@ package saros.intellij.ui.actions;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
+import saros.SarosPluginContext;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
@@ -12,9 +15,17 @@ import saros.repackaged.picocontainer.annotations.Inject;
 public class ConnectServerAction extends AbstractSarosAction {
   public static final String NAME = "connect";
 
+  private final Project project;
+
   @Inject private XMPPAccountStore accountStore;
 
   @Inject private ConnectionHandler connectionHandler;
+
+  public ConnectServerAction(@NotNull Project project) {
+    this.project = project;
+
+    SarosPluginContext.initComponent(this);
+  }
 
   @Override
   public String getActionName() {
@@ -41,9 +52,6 @@ public class ConnectServerAction extends AbstractSarosAction {
    * @param account
    */
   private void connectAccount(final XMPPAccount account) {
-
-    // FIXME use the project from the action event !
-    // AnActionEvent.getDataContext().getData(DataConstants.PROJECT)
     ProgressManager.getInstance()
         .run(
             new Task.Modal(project, "Connecting...", false) {

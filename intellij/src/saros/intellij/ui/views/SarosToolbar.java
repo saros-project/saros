@@ -1,7 +1,9 @@
 package saros.intellij.ui.views;
 
+import com.intellij.openapi.project.Project;
 import java.awt.FlowLayout;
 import javax.swing.JToolBar;
+import org.jetbrains.annotations.NotNull;
 import saros.intellij.ui.actions.NotImplementedAction;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.views.buttons.ConnectButton;
@@ -22,15 +24,20 @@ class SarosToolbar extends JToolBar {
   private static final boolean ENABLE_PREFERENCES =
       Boolean.getBoolean("saros.intellij.ENABLE_PREFERENCES");
 
-  SarosToolbar() {
+  private final Project project;
+
+  SarosToolbar(@NotNull Project project) {
     super("Saros IDEA toolbar");
+
+    this.project = project;
+
     setLayout(new FlowLayout(FlowLayout.RIGHT));
     addToolbarButtons();
   }
 
   private void addToolbarButtons() {
 
-    add(new ConnectButton());
+    add(new ConnectButton(project));
 
     if (ENABLE_ADD_CONTACT) {
       add(
@@ -50,7 +57,7 @@ class SarosToolbar extends JToolBar {
 
     add(new FollowButton());
 
-    add(new ConsistencyButton());
+    add(new ConsistencyButton(project));
 
     add(new LeaveSessionButton());
   }

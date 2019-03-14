@@ -1,5 +1,6 @@
 package saros.intellij.ui.views;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -9,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ScrollPaneConstants;
+import org.jetbrains.annotations.NotNull;
 import saros.intellij.ui.tree.SessionAndContactsTreeView;
 
 /**
@@ -21,10 +23,10 @@ public class SarosMainPanelView extends JPanel {
    * Creates the content of the tool window panel, with {@link SarosToolbar} and the {@link
    * SessionAndContactsTreeView}.
    */
-  public SarosMainPanelView() throws HeadlessException {
+  public SarosMainPanelView(@NotNull Project project) throws HeadlessException {
     super(new BorderLayout());
     SessionAndContactsTreeView sarosTree = new SessionAndContactsTreeView();
-    SarosToolbar sarosToolbar = new SarosToolbar();
+    SarosToolbar sarosToolbar = new SarosToolbar(project);
 
     JScrollPane treeScrollPane = new JBScrollPane(sarosTree);
     treeScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);

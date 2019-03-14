@@ -39,7 +39,7 @@ public class XMPPAuthorizationHandler {
   private void handleAuthorizationRequest(final JID jid) {
 
     boolean accept =
-        DialogUtils.showConfirm(
+        DialogUtils.oldShowConfirm(
             null,
             Messages.SubscriptionManager_incoming_subscription_request_title,
             MessageFormat.format(
