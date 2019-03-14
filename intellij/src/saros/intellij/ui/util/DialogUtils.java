@@ -3,7 +3,6 @@ package saros.intellij.ui.util;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
 import java.awt.Component;
-import java.awt.Container;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import saros.SarosPluginContext;
@@ -19,21 +18,6 @@ public class DialogUtils {
 
   static {
     SarosPluginContext.initComponent(new DialogUtils());
-  }
-
-  /**
-   * Displays an error message.
-   *
-   * @param parent the parent Component. If <code>parent</code> is null, the project's window is
-   *     used.
-   * @param title
-   * @param msg
-   */
-  public static void showError(Component parent, String title, String msg) {
-    LOG.info("Showing error dialog: " + title + " - " + msg);
-
-    JOptionPane.showMessageDialog(
-        notNullOrDefaultParent(parent), msg, title, JOptionPane.ERROR_MESSAGE);
   }
 
   /**
@@ -74,21 +58,6 @@ public class DialogUtils {
             notNullOrDefaultParent(parent), msg, title, JOptionPane.YES_NO_OPTION);
 
     return answer == JOptionPane.YES_OPTION;
-  }
-
-  /**
-   * Shows an Info dialog.
-   *
-   * @param parent the parent Component. If <code>parent</code> is null, the project's window is
-   *     used.
-   * @param title
-   * @param msg
-   */
-  public static void showInfo(Container parent, String title, String msg) {
-    LOG.info("Showing info dialog: " + title + " - " + msg);
-
-    JOptionPane.showMessageDialog(
-        notNullOrDefaultParent(parent), msg, title, JOptionPane.INFORMATION_MESSAGE);
   }
 
   private static Component notNullOrDefaultParent(Component parent) {
