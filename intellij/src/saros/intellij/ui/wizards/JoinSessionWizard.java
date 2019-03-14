@@ -2,6 +2,7 @@ package saros.intellij.ui.wizards;
 
 import static saros.negotiation.NegotiationTools.CancelOption;
 
+import com.intellij.openapi.project.Project;
 import java.awt.Window;
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
@@ -49,16 +50,20 @@ public class JoinSessionWizard extends Wizard {
       };
 
   /**
-   * Creates wizard UI
+   * Instantiates the wizard and its pages.
    *
+   * @param project the Intellij project to use for the wizard
+   * @param parent the parent window relative to which the dialog is positioned
    * @param negotiation The negotiation this wizard displays
    */
-  public JoinSessionWizard(Window parent, IncomingSessionNegotiation negotiation) {
+  public JoinSessionWizard(Project project, Window parent, IncomingSessionNegotiation negotiation) {
     super(
+        project,
         parent,
         Messages.JoinSessionWizard_title,
         new HeaderPanel(
             Messages.ShowDescriptionPage_title2, Messages.ShowDescriptionPage_description));
+
     this.negotiation = negotiation;
 
     InfoPage infoPage = createInfoPage(negotiation);
