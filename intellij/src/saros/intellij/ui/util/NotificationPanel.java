@@ -22,7 +22,7 @@ public class NotificationPanel {
   private static final NotificationListener.UrlOpeningListener URL_OPENING_LISTENER =
       new NotificationListener.UrlOpeningListener(false);
 
-  @Inject private static Project project;
+  @Inject private static UIProjectUtils projectUtils;
 
   static {
     SarosPluginContext.initComponent(new NotificationPanel());
@@ -35,10 +35,11 @@ public class NotificationPanel {
    * Displays a notification of the given type. Notifications support html formatting, including
    * hyperlinks, by using html tags.
    *
+   * <p>The notifications are displayed in all projects that are part of the session or in all open
+   * projects if there is no running session.
+   *
    * <p>Possible types are {@link NotificationType#INFORMATION}, {@link NotificationType#WARNING}
    * and {@link NotificationType#ERROR}.
-   *
-   * <p>
    *
    * @param notificationType type of the notification
    * @param message content of the notification
@@ -46,6 +47,8 @@ public class NotificationPanel {
    */
   private static void showNotification(
       NotificationType notificationType, String message, String title) {
+
+    Project project = projectUtils.getSharedProject();
 
     LOG.info("Showing notification - " + notificationType + ": " + title + " - " + message);
 
