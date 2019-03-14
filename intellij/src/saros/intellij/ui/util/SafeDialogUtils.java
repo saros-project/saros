@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import java.awt.Component;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import saros.SarosPluginContext;
@@ -80,19 +79,6 @@ public class SafeDialogUtils {
     return response.get();
   }
 
-  public static void showWarning(final String message, final String title) {
-    LOG.info("Showing warning dialog: " + title + " - " + message);
-
-    application.invokeLater(
-        new Runnable() {
-          @Override
-          public void run() {
-            Messages.showWarningDialog(project, message, title);
-          }
-        },
-        ModalityState.defaultModalityState());
-  }
-
   public static void showError(final String message, final String title) {
     LOG.info("Showing error dialog: " + title + " - " + message);
 
@@ -101,21 +87,6 @@ public class SafeDialogUtils {
           @Override
           public void run() {
             Messages.showErrorDialog(project, message, title);
-          }
-        },
-        ModalityState.defaultModalityState());
-  }
-
-  public static void showError(
-      final Component component, final String message, final String title) {
-
-    LOG.info("Showing error dialog: " + title + " - " + message);
-
-    application.invokeLater(
-        new Runnable() {
-          @Override
-          public void run() {
-            Messages.showErrorDialog(component, message, title);
           }
         },
         ModalityState.defaultModalityState());
