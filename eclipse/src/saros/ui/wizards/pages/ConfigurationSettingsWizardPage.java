@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Text;
 import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.feedback.ErrorLogManager;
+import saros.feedback.FeedbackManager;
 import saros.feedback.StatisticManagerConfiguration;
 import saros.net.upnp.IUPnPService;
 import saros.preferences.Preferences;
@@ -77,14 +78,16 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
   @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
-    composite.setLayout(LayoutUtils.createGridLayout(2, true, 5, 10));
+    int columnNr = FeedbackManager.isFeedbackFeatureRequired() ? 2 : 1;
+    composite.setLayout(LayoutUtils.createGridLayout(columnNr, true, 5, 10));
     setControl(composite);
 
     Composite leftColumn = createLeftColumn(composite);
     leftColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    Composite rightColumn = createRightColumn(composite);
-    rightColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
+    if (FeedbackManager.isFeedbackFeatureRequired()) {
+      Composite rightColumn = createRightColumn(composite);
+      rightColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    }
     setInitialValues();
     populateGatewayCombo();
     hookListeners();
@@ -250,10 +253,12 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     this.skypeUsageButton.setSelection(!skypeUsername.isEmpty());
     this.skypeUsernameText.setText(skypeUsername);
 
-    this.statisticSubmissionButton.setSelection(
-        StatisticManagerConfiguration.isStatisticSubmissionAllowed());
+    if (FeedbackManager.isFeedbackFeatureRequired()) {
+      this.statisticSubmissionButton.setSelection(
+          StatisticManagerConfiguration.isStatisticSubmissionAllowed());
 
-    this.errorLogSubmissionButton.setSelection(ErrorLogManager.isErrorLogSubmissionAllowed());
+      this.errorLogSubmissionButton.setSelection(ErrorLogManager.isErrorLogSubmissionAllowed());
+    }
   }
 
   protected void hookListeners() {
@@ -297,8 +302,10 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     this.setupPortmappingButton.addListener(SWT.Selection, listener);
     this.skypeUsageButton.addListener(SWT.Selection, listener);
     this.skypeUsernameText.getControl().addListener(SWT.Modify, listener);
-    this.statisticSubmissionButton.addListener(SWT.Selection, listener);
-    this.errorLogSubmissionButton.addListener(SWT.Selection, listener);
+    if (FeedbackManager.isFeedbackFeatureRequired()) {
+      this.statisticSubmissionButton.addListener(SWT.Selection, listener);
+      this.errorLogSubmissionButton.addListener(SWT.Selection, listener);
+    }
   }
 
   protected void updateGatewaysComboEnablement() {
@@ -386,11 +393,13 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
   }
 
   public boolean isStatisticSubmissionAllowed() {
-    return this.statisticSubmissionButton.getSelection();
+    return FeedbackManager.isFeedbackFeatureRequired()
+        && this.statisticSubmissionButton.getSelection();
   }
 
   public boolean isErrorLogSubmissionAllowed() {
-    return this.errorLogSubmissionButton.getSelection();
+    return FeedbackManager.isFeedbackFeatureRequired()
+        && this.errorLogSubmissionButton.getSelection();
   }
 
   /**

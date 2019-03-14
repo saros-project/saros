@@ -27,20 +27,22 @@ public class FeedbackPreferences {
   }
 
   public static void applyDefaults(IPreferenceStore defaultPreferences) {
-    if (FeedbackPreferences.preferences == null)
-      throw new IllegalStateException("preferences are not initialized");
+    if (FeedbackManager.isFeedbackFeatureRequired()) {
+      if (FeedbackPreferences.preferences == null)
+        throw new IllegalStateException("preferences are not initialized");
 
-    final String[] keys = {
-      EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED,
-      EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL,
-      EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
-      EclipsePreferenceConstants.STATISTIC_ALLOW_PSEUDONYM,
-      EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
-      EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL
-    };
+      final String[] keys = {
+        EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED,
+        EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL,
+        EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
+        EclipsePreferenceConstants.STATISTIC_ALLOW_PSEUDONYM,
+        EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
+        EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL
+      };
 
-    for (final String key : keys)
-      if (preferences.get(key, null) == null)
-        preferences.put(key, defaultPreferences.getDefaultString(key));
+      for (final String key : keys)
+        if (preferences.get(key, null) == null)
+          preferences.put(key, defaultPreferences.getDefaultString(key));
+    }
   }
 }

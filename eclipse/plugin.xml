@@ -78,11 +78,11 @@
             class="saros.ui.preferencePages.NetworkPreferencePage"
             id="saros.preferences.network"
             name="Network"/>
-      <page
+      <!--page
             category="saros.preferences"
             class="saros.ui.preferencePages.FeedbackPreferencePage"
             id="saros.preferences.feedback"
-            name="Feedback"/>
+            name="Feedback"/-->
       <page
             category="saros.preferences"
             class="saros.ui.preferencePages.CommunicationPreferencePage"
