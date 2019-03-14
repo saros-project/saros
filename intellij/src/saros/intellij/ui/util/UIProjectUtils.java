@@ -42,6 +42,18 @@ public class UIProjectUtils {
    * Returns the <code>Project</code> object contained in the session context or <code>null</code>
    * if there currently is no session.
    *
+   * @return the <code>Project</code> object contained in the session context or <code>null</code>
+   *     if there currently is no session.
+   */
+  @Nullable
+  Project getSharedProject() {
+    return getProjectFromSession();
+  }
+
+  /**
+   * Returns the <code>Project</code> object contained in the session context or <code>null</code>
+   * if there currently is no session.
+   *
    * <p><b>NOTE:</b> This method should only be used to for UI purposes. To interact with the
    * project whose module is shared as part of a Saros session, please use the Project object
    * contained in the session context.
