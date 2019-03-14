@@ -59,6 +59,6 @@ class SarosToolbar extends JToolBar {
 
     add(new ConsistencyButton(project));
 
-    add(new LeaveSessionButton());
+    add(new LeaveSessionButton(project));
   }
 }

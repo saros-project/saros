@@ -1,6 +1,7 @@
 package saros.core.ui.util;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ public class CollaborationUtils {
    * Leaves the currently running {@link SarosSession}<br>
    * Does nothing if no {@link SarosSession} is running.
    */
-  public static void leaveSession() {
+  public static void leaveSession(Project project) {
 
     ISarosSession sarosSession = sessionManager.getSession();
 
@@ -124,15 +125,15 @@ public class CollaborationUtils {
         reallyLeave = true;
       } else {
         reallyLeave =
-            DialogUtils.oldShowConfirm(
-                null,
+            DialogUtils.showConfirm(
+                project,
                 Messages.CollaborationUtils_confirm_closing,
                 Messages.CollaborationUtils_confirm_closing_text);
       }
     } else {
       reallyLeave =
-          DialogUtils.oldShowConfirm(
-              null,
+          DialogUtils.showConfirm(
+              project,
               Messages.CollaborationUtils_confirm_leaving,
               Messages.CollaborationUtils_confirm_leaving_text);
     }
