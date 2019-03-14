@@ -19,11 +19,9 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import org.jetbrains.annotations.NotNull;
-import saros.SarosPluginContext;
 import saros.intellij.ui.wizards.pages.AbstractWizardPage;
 import saros.intellij.ui.wizards.pages.HeaderPanel;
 import saros.intellij.ui.wizards.pages.NavigationPanel;
-import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
  * Class represents a wizard. Usage:
@@ -71,17 +69,19 @@ public abstract class Wizard extends JDialog {
 
   private final NavigationPanel navigationPanel;
 
-  @Inject protected Project project;
-
+  protected Project project;
   /**
-   * Constructor creates wizard structure.
+   * Initializes the base structure of a wizard.
    *
+   * @param project the Intellij project to use for the wizard
+   * @param parent the parent window relative to which the dialog is positioned
    * @param title window title
-   * @param headerPanel
+   * @param headerPanel header panel of the wizard
    */
-  public Wizard(Window parent, String title, HeaderPanel headerPanel) {
+  public Wizard(Project project, Window parent, String title, HeaderPanel headerPanel) {
     super(parent, title);
-    SarosPluginContext.initComponent(this);
+
+    this.project = project;
 
     this.headerPanel = headerPanel;
 

@@ -1,8 +1,5 @@
 package saros.core.ui.eventhandler;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
@@ -16,6 +13,7 @@ import saros.intellij.SarosComponent;
 import saros.intellij.runtime.UIMonitoredJob;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
+import saros.intellij.ui.util.UIProjectUtils;
 import saros.intellij.ui.wizards.AddProjectToSessionWizard;
 import saros.intellij.ui.wizards.JoinSessionWizard;
 import saros.monitoring.IProgressMonitor;
@@ -37,11 +35,15 @@ import saros.session.ISarosSessionManager;
 public class NegotiationHandler implements INegotiationHandler {
 
   private static final Logger LOG = Logger.getLogger(NegotiationHandler.class);
-  private final ISarosSessionManager sessionManager;
 
-  public NegotiationHandler(ISarosSessionManager sessionManager) {
+  private final ISarosSessionManager sessionManager;
+  private final UIProjectUtils projectUtils;
+
+  public NegotiationHandler(ISarosSessionManager sessionManager, UIProjectUtils projectUtils) {
     sessionManager.setNegotiationHandler(this);
+
     this.sessionManager = sessionManager;
+    this.projectUtils = projectUtils;
   }
 
   private static String getNickname(JID jid) {
@@ -58,7 +60,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
   @Override
   public void handleIncomingSessionNegotiation(IncomingSessionNegotiation negotiation) {
-    showIncomingInvitationUI(negotiation);
+    projectUtils.runWithProject(project -> showIncomingInvitationUI(project, negotiation));
   }
 
   @Override
@@ -70,17 +72,19 @@ public class NegotiationHandler implements INegotiationHandler {
 
   @Override
   public void handleIncomingProjectNegotiation(AbstractIncomingProjectNegotiation negotiation) {
-    showIncomingProjectUI(negotiation);
+    projectUtils.runWithProject(project -> showIncomingProjectUI(project, negotiation));
   }
 
-  private void showIncomingInvitationUI(final IncomingSessionNegotiation negotiation) {
+  private void showIncomingInvitationUI(
+      Project project, final IncomingSessionNegotiation negotiation) {
 
     ApplicationManager.getApplication()
         .invokeLater(
             new Runnable() {
               @Override
               public void run() {
-                JoinSessionWizard wizard = new JoinSessionWizard(getWindow(), negotiation);
+                JoinSessionWizard wizard =
+                    new JoinSessionWizard(project, getWindow(project), negotiation);
                 wizard.setModal(true);
                 wizard.open();
               }
@@ -88,7 +92,8 @@ public class NegotiationHandler implements INegotiationHandler {
             ModalityState.defaultModalityState());
   }
 
-  private void showIncomingProjectUI(final AbstractIncomingProjectNegotiation negotiation) {
+  private void showIncomingProjectUI(
+      Project project, final AbstractIncomingProjectNegotiation negotiation) {
 
     ApplicationManager.getApplication()
         .invokeLater(
@@ -97,7 +102,7 @@ public class NegotiationHandler implements INegotiationHandler {
               public void run() {
 
                 AddProjectToSessionWizard wizard =
-                    new AddProjectToSessionWizard(getWindow(), negotiation);
+                    new AddProjectToSessionWizard(project, getWindow(project), negotiation);
 
                 wizard.setModal(false);
                 wizard.open();
@@ -106,9 +111,7 @@ public class NegotiationHandler implements INegotiationHandler {
             ModalityState.defaultModalityState());
   }
 
-  private static Window getWindow() {
-    DataContext dataContext = DataManager.getInstance().getDataContext();
-    Project project = DataKeys.PROJECT.getData(dataContext);
+  private Window getWindow(Project project) {
     return WindowManager.getInstance().getFrame(project);
   }
   /**
