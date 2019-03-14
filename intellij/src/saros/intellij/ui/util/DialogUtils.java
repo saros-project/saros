@@ -5,42 +5,12 @@ import com.intellij.openapi.wm.WindowManager;
 import java.awt.Component;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
-import saros.SarosPluginContext;
-import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Dialog message helper that shows Dialogs in the current Thread. */
 public class DialogUtils {
   private static final Logger LOG = Logger.getLogger(DialogUtils.class);
 
-  @Inject private static Project project;
-
   private DialogUtils() {}
-
-  static {
-    SarosPluginContext.initComponent(new DialogUtils());
-  }
-
-  /**
-   * Displays a confirmation dialog.
-   *
-   * @param parent the parent Component. If <code>parent</code> is null, the project's window is
-   *     used.
-   * @param title
-   * @param msg
-   * @return <code>true</code>, if OK was chosen, <code>false</code> otherwise
-   * @deprecated use {@link #showConfirm(Project, String, String)} instead
-   */
-  @Deprecated
-  public static boolean oldShowConfirm(Component parent, String title, String msg) {
-
-    LOG.info("Showing confirmation dialog: " + title + " - " + msg);
-
-    int resp =
-        JOptionPane.showConfirmDialog(
-            notNullOrDefaultParent(parent), msg, title, JOptionPane.OK_CANCEL_OPTION);
-
-    return resp == JOptionPane.OK_OPTION;
-  }
 
   /**
    * Displays a confirmation dialog.
@@ -80,10 +50,6 @@ public class DialogUtils {
         JOptionPane.showConfirmDialog(parentComponent, msg, title, JOptionPane.YES_NO_OPTION);
 
     return answer == JOptionPane.YES_OPTION;
-  }
-
-  private static Component notNullOrDefaultParent(Component parent) {
-    return parent != null ? parent : WindowManager.getInstance().getFrame(project);
   }
 
   private static Component getProjectComponent(Project project) {
