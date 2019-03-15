@@ -80,14 +80,11 @@ public class NegotiationHandler implements INegotiationHandler {
 
     ApplicationManager.getApplication()
         .invokeLater(
-            new Runnable() {
-              @Override
-              public void run() {
-                JoinSessionWizard wizard =
-                    new JoinSessionWizard(project, getWindow(project), negotiation);
-                wizard.setModal(true);
-                wizard.open();
-              }
+            () -> {
+              JoinSessionWizard wizard =
+                  new JoinSessionWizard(project, getWindow(project), negotiation);
+              wizard.setModal(true);
+              wizard.open();
             },
             ModalityState.defaultModalityState());
   }
@@ -97,16 +94,12 @@ public class NegotiationHandler implements INegotiationHandler {
 
     ApplicationManager.getApplication()
         .invokeLater(
-            new Runnable() {
-              @Override
-              public void run() {
+            () -> {
+              AddProjectToSessionWizard wizard =
+                  new AddProjectToSessionWizard(project, getWindow(project), negotiation);
 
-                AddProjectToSessionWizard wizard =
-                    new AddProjectToSessionWizard(project, getWindow(project), negotiation);
-
-                wizard.setModal(false);
-                wizard.open();
-              }
+              wizard.setModal(false);
+              wizard.open();
             },
             ModalityState.defaultModalityState());
   }
@@ -126,7 +119,7 @@ public class NegotiationHandler implements INegotiationHandler {
     private final OutgoingSessionNegotiation negotiation;
     private final String peer;
 
-    public OutgoingInvitationJob(OutgoingSessionNegotiation negotiation) {
+    OutgoingInvitationJob(OutgoingSessionNegotiation negotiation) {
       super(
           MessageFormat.format(
               Messages.NegotiationHandler_inviting_user, getNickname(negotiation.getPeer())));
@@ -189,7 +182,7 @@ public class NegotiationHandler implements INegotiationHandler {
     private final AbstractOutgoingProjectNegotiation negotiation;
     private final String peer;
 
-    public OutgoingProjectJob(AbstractOutgoingProjectNegotiation outgoingProjectNegotiation) {
+    OutgoingProjectJob(AbstractOutgoingProjectNegotiation outgoingProjectNegotiation) {
       super(Messages.NegotiationHandler_sharing_project);
       negotiation = outgoingProjectNegotiation;
       peer = negotiation.getPeer().getBase();
@@ -218,13 +211,9 @@ public class NegotiationHandler implements INegotiationHandler {
 
             ApplicationManager.getApplication()
                 .invokeLater(
-                    new Runnable() {
-                      @Override
-                      public void run() {
+                    () ->
                         NotificationPanel.showInformation(
-                            message, "Project sharing canceled remotely");
-                      }
-                    });
+                            message, "Project sharing canceled remotely"));
 
             return new Status(IStatus.CANCEL, SarosComponent.PLUGIN_ID, message);
 

@@ -10,12 +10,12 @@ import saros.ui.ide_embedding.DialogManager;
 import saros.ui.ide_embedding.IBrowserDialog;
 import saros.ui.pages.IBrowserPage;
 
-/** Implements the dialog manager for the IntelliJ platform. */
-public class IntelliJDialogManager extends DialogManager {
+/** Implements the dialog manager for the Intellij platform. */
+public class IntellijDialogManager extends DialogManager {
 
   private UIProjectUtils projectUtils;
 
-  public IntelliJDialogManager(UISynchronizer uiSynchronizer, UIProjectUtils projectUtils) {
+  public IntellijDialogManager(UISynchronizer uiSynchronizer, UIProjectUtils projectUtils) {
     super(uiSynchronizer);
 
     this.projectUtils = projectUtils;

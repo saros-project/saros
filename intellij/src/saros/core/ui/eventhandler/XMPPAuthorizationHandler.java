@@ -3,7 +3,6 @@ package saros.core.ui.eventhandler;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import java.text.MessageFormat;
-import org.apache.log4j.Logger;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.DialogUtils;
 import saros.intellij.ui.util.UIProjectUtils;
@@ -13,11 +12,9 @@ import saros.net.xmpp.subscription.SubscriptionListener;
 
 /** Handler for accepting or rejecting incoming XMPP subscription requests */
 public class XMPPAuthorizationHandler {
-
-  private static final Logger LOG = Logger.getLogger(XMPPAuthorizationHandler.class);
-
   private final UIProjectUtils projectUtils;
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final SubscriptionListener subscriptionListener =
       new SubscriptionListener() {
 
@@ -27,15 +24,10 @@ public class XMPPAuthorizationHandler {
           projectUtils.runWithProject(
               project ->
                   ApplicationManager.getApplication()
-                      .invokeLater(
-                          new Runnable() {
-                            @Override
-                            public void run() {
-                              handleAuthorizationRequest(project, jid);
-                            }
-                          }));
+                      .invokeLater(() -> handleAuthorizationRequest(project, jid)));
         }
       };
+
   private final SubscriptionHandler subscriptionHandler;
 
   public XMPPAuthorizationHandler(

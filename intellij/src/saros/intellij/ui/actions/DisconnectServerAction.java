@@ -4,13 +4,14 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import saros.SarosPluginContext;
 import saros.communication.connection.ConnectionHandler;
 import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Disconnects from XMPP/Jabber server */
 public class DisconnectServerAction extends AbstractSarosAction {
-  public static final String NAME = "disconnect";
+  private static final String NAME = "disconnect";
 
   private final Project project;
 
@@ -34,7 +35,7 @@ public class DisconnectServerAction extends AbstractSarosAction {
             new Task.Modal(project, "Disconnecting...", false) {
 
               @Override
-              public void run(ProgressIndicator indicator) {
+              public void run(@NotNull ProgressIndicator indicator) {
 
                 LOG.info(
                     "Disconnecting current connection: " + connectionHandler.getConnectionID());

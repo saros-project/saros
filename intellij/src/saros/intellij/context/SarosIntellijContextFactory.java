@@ -11,7 +11,7 @@ import saros.core.project.internal.SarosIntellijSessionContextFactory;
 import saros.core.ui.eventhandler.NegotiationHandler;
 import saros.core.ui.eventhandler.UserStatusChangeHandler;
 import saros.core.ui.eventhandler.XMPPAuthorizationHandler;
-import saros.core.util.IntelliJCollaborationUtilsImpl;
+import saros.core.util.IntellijCollaborationUtilsImpl;
 import saros.editor.IEditorManager;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IPathFactory;
@@ -27,8 +27,8 @@ import saros.intellij.project.filesystem.IntelliJWorkspaceRootImpl;
 import saros.intellij.project.filesystem.PathFactory;
 import saros.intellij.runtime.IntelliJSynchronizer;
 import saros.intellij.ui.eventhandler.SessionStatusChangeHandler;
-import saros.intellij.ui.swt_browser.IntelliJDialogManager;
 import saros.intellij.ui.swt_browser.IntelliJUIResourceLocator;
+import saros.intellij.ui.swt_browser.IntellijDialogManager;
 import saros.intellij.ui.util.UIProjectUtils;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.preferences.IPreferenceStore;
@@ -71,9 +71,9 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
       Component.create(UIProjectUtils.class),
 
       // IDE-specific classes for the HTML GUI
-      Component.create(DialogManager.class, IntelliJDialogManager.class),
+      Component.create(DialogManager.class, IntellijDialogManager.class),
       Component.create(IUIResourceLocator.class, IntelliJUIResourceLocator.class),
-      Component.create(ICollaborationUtils.class, IntelliJCollaborationUtilsImpl.class),
+      Component.create(ICollaborationUtils.class, IntellijCollaborationUtilsImpl.class),
       Component.create(IWorkspaceRoot.class, IntelliJWorkspaceRootImpl.class),
 
       // Proxy Support for the XMPP server connection

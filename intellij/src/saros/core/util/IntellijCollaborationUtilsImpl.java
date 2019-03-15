@@ -8,15 +8,15 @@ import saros.net.xmpp.JID;
 import saros.ui.util.ICollaborationUtils;
 
 /**
- * This delegates the {@link ICollaborationUtils} methods to the actual implementation in IntelliJ.
+ * This delegates the {@link ICollaborationUtils} methods to the actual implementation in Intellij.
  */
 // TODO: make CollaborationUtils non static and let it implement the interface
 // directly
-public class IntelliJCollaborationUtilsImpl implements ICollaborationUtils {
+public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
 
   private final UIProjectUtils projectUtils;
 
-  public IntelliJCollaborationUtilsImpl(UIProjectUtils projectUtils) {
+  public IntellijCollaborationUtilsImpl(UIProjectUtils projectUtils) {
     this.projectUtils = projectUtils;
   }
 
@@ -31,8 +31,8 @@ public class IntelliJCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void addResourcesToSession(List<IResource> resoruces) {
-    CollaborationUtils.addResourcesToSession(resoruces);
+  public void addResourcesToSession(List<IResource> resources) {
+    CollaborationUtils.addResourcesToSession(resources);
   }
 
   @Override

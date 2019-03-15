@@ -2,8 +2,6 @@ package saros.intellij.ui.widgets.progress;
 
 import com.intellij.openapi.wm.WindowManager;
 import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -14,18 +12,17 @@ import saros.monitoring.IProgressMonitor;
 import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Creates independent progress monitor window */
-// todo: use saros.monitoring.IProgressMonitor in all IntelliJ classes
+// todo: use saros.monitoring.IProgressMonitor in all Intellij classes
 public class ProgressFrame implements IProgressMonitor {
 
-  public static final String TITLE = "Progress monitor";
-  public static final String BUTTON_CANCEL = "Cancel";
+  private static final String TITLE = "Progress monitor";
+  private static final String BUTTON_CANCEL = "Cancel";
 
   private MonitorProgressBar monitorProgressBar;
 
   @Inject private UIProjectUtils projectUtils;
 
   private JFrame frmMain;
-  private JButton btnCancel;
 
   /** Constructor with default title */
   public ProgressFrame() {
@@ -51,14 +48,8 @@ public class ProgressFrame implements IProgressMonitor {
 
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    btnCancel = new JButton(BUTTON_CANCEL);
-    btnCancel.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            setCanceled(true);
-          }
-        });
+    JButton btnCancel = new JButton(BUTTON_CANCEL);
+    btnCancel.addActionListener(actionEvent -> setCanceled(true));
 
     JProgressBar progressBar =
         new JProgressBar(MonitorProgressBar.MIN_VALUE, MonitorProgressBar.MAX_VALUE);
