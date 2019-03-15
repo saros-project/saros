@@ -49,7 +49,7 @@ public class ConnectServerAction extends AbstractSarosAction {
   /**
    * Connects an Account to the XMPPService and sets it as active.
    *
-   * @param account
+   * @param account the account to connect to
    */
   private void connectAccount(final XMPPAccount account) {
     ProgressManager.getInstance()
@@ -57,7 +57,7 @@ public class ConnectServerAction extends AbstractSarosAction {
             new Task.Modal(project, "Connecting...", false) {
 
               @Override
-              public void run(ProgressIndicator indicator) {
+              public void run(@NotNull ProgressIndicator indicator) {
 
                 LOG.info(
                     "Connecting server: ["

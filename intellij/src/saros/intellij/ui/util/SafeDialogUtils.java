@@ -65,15 +65,12 @@ public class SafeDialogUtils {
     final AtomicReference<String> response = new AtomicReference<>();
 
     application.invokeAndWait(
-        new Runnable() {
-          @Override
-          public void run() {
-            String option =
-                Messages.showInputDialog(
-                    project, message, title, Messages.getQuestionIcon(), initialValue, null);
-            if (option != null) {
-              response.set(option);
-            }
+        () -> {
+          String option =
+              Messages.showInputDialog(
+                  project, message, title, Messages.getQuestionIcon(), initialValue, null);
+          if (option != null) {
+            response.set(option);
           }
         },
         ModalityState.defaultModalityState());
@@ -92,12 +89,7 @@ public class SafeDialogUtils {
     LOG.info("Showing error dialog: " + title + " - " + message);
 
     application.invokeLater(
-        new Runnable() {
-          @Override
-          public void run() {
-            Messages.showErrorDialog(project, message, title);
-          }
-        },
+        () -> Messages.showErrorDialog(project, message, title),
         ModalityState.defaultModalityState());
   }
 

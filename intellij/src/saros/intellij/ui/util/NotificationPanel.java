@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import saros.SarosPluginContext;
 import saros.repackaged.picocontainer.annotations.Inject;
 
-/** Class uses IntelliJ API to show notifications */
+/** Class uses Intellij API to show notifications */
 public class NotificationPanel {
   private static final Logger LOG = Logger.getLogger(NotificationPanel.class);
 
@@ -56,13 +56,7 @@ public class NotificationPanel {
         GROUP_DISPLAY_ID_INFO.createNotification(
             title, message, notificationType, URL_OPENING_LISTENER);
     ApplicationManager.getApplication()
-        .invokeLater(
-            new Runnable() {
-              @Override
-              public void run() {
-                Notifications.Bus.notify(notification, project);
-              }
-            });
+        .invokeLater(() -> Notifications.Bus.notify(notification, project));
   }
 
   /**

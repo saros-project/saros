@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 public abstract class AbstractSarosAction {
   protected static final Logger LOG = Logger.getLogger(AbstractSarosAction.class);
 
-  private final List<ActionListener> actionListeners = new ArrayList<ActionListener>();
+  private final List<ActionListener> actionListeners = new ArrayList<>();
 
   protected void actionPerformed() {
     for (ActionListener actionListener : actionListeners) {

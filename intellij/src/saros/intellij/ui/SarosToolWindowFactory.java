@@ -13,11 +13,9 @@ import saros.intellij.ui.views.SarosMainPanelView;
 /** This factory is the starting point of UI of the Saros plugin. */
 public class SarosToolWindowFactory implements ToolWindowFactory {
 
-  private SarosMainPanelView sarosMainPanelView;
-
   @Override
   public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-    sarosMainPanelView = new SarosMainPanelView(project);
+    SarosMainPanelView sarosMainPanelView = new SarosMainPanelView(project);
 
     Content content =
         toolWindow

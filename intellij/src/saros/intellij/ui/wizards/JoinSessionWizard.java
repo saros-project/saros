@@ -25,7 +25,7 @@ import saros.util.ThreadUtils;
  * <p>FIXME: Long-Running Operation after each step cancellation by a remote party auto-advance.
  */
 public class JoinSessionWizard extends Wizard {
-  public static final String PAGE_INFO_ID = "JoinSessionInfo";
+  private static final String PAGE_INFO_ID = "JoinSessionInfo";
 
   private static final Logger LOG = Logger.getLogger(JoinSessionWizard.class);
 
@@ -85,7 +85,7 @@ public class JoinSessionWizard extends Wizard {
    * Runs {@link IncomingSessionNegotiation#accept(IProgressMonitor)} with {@link #runTask(Runnable,
    * String)}. If the result is a cancel or error status, it displays an error message accordingly.
    */
-  public void joinSession() {
+  private void joinSession() {
 
     JobWithStatus job =
         new JobWithStatus() {
@@ -119,16 +119,11 @@ public class JoinSessionWizard extends Wizard {
    * Calls {@link IncomingSessionNegotiation#localCancel(String, CancelOption)} in a separate
    * thread.
    */
-  public void performCancel() {
+  private void performCancel() {
     ThreadUtils.runSafeAsync(
         "CancelJoinSessionWizard",
         LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
-          }
-        });
+        () -> negotiation.localCancel(null, CancelOption.NOTIFY_PEER));
   }
 
   private void showCancelMessage(JID jid, String errorMsg, CancelLocation cancelLocation) {
