@@ -17,16 +17,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import saros.SarosPluginContext;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.filesystem.IWorkspace;
+import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.net.xmpp.JID;
-import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
  * Contact pop-up menu for selecting a project and module to share. Opened when right-clicking on a
@@ -36,14 +34,10 @@ class ContactPopMenu extends JPopupMenu {
 
   private static final Logger LOG = Logger.getLogger(ContactPopMenu.class);
 
-  @Inject private IWorkspace workspace;
-
   private final ContactTreeRootNode.ContactInfo contactInfo;
 
   ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
     this.contactInfo = contactInfo;
-
-    SarosPluginContext.initComponent(this);
 
     JMenu menuShareProject = new JMenu("Work together on...");
     menuShareProject.setIcon(IconManager.SESSIONS_ICON);
@@ -118,7 +112,7 @@ class ContactPopMenu extends JPopupMenu {
       IProject wrappedModule;
 
       try {
-        wrappedModule = workspace.getProject(moduleName);
+        wrappedModule = new IntelliJProjectImpl(module);
 
       } catch (IllegalArgumentException exception) {
         LOG.debug(
