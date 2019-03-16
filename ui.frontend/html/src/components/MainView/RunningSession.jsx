@@ -6,17 +6,10 @@ function SessionMember ({ openedFile, jid, displayName, isHost }) {
     <div className='session-member'>
       <div>
         {displayName || jid}
-        {isHost &&
-          <span className='badge badge-success'>
-            <Text message='label.host' />
-          </span>
-        }
+        {isHost && <span className='badge badge-success'><Text message='label.host' /></span>}
       </div>
       <div>
-        {
-          openedFile ||
-          <Text message='message.nonSharedFileOpen' />
-        }
+        {openedFile || <Text message='message.nonSharedFileOpen' />}
       </div>
     </div>
   )
@@ -26,11 +19,12 @@ export default function RunningSession ({ runningSession }) {
   if (!runningSession) {
     return null
   }
-  const { members } = runningSession
+
+  let members = runningSession.members;
   return (
     <ul className='list-group'>
-      {members.map(member => (
-        <li className='list-group-item'>
+      {members && members.map(member => (
+        <li className='list-group-item' key={member.jid}>
           <SessionMember {...member} />
         </li>
       ))}

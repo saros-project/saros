@@ -5,6 +5,7 @@ import { spy } from 'sinon'
 import MainView from '~/components/MainView'
 import React from 'react'
 import initStores from '~/stores'
+import { expect } from 'chai';
 
 describe('<MainView />', () => {
   // We wire our stores up with the fake saros api
@@ -18,12 +19,12 @@ describe('<MainView />', () => {
   itRendersWithoutExploding(wrap.find('MainView'))
 
   it('opens the SessionWizard when the Start Session button is clicked', () => {
-    wrap.find('#start-session').simulate('click')
+    wrap.find('button#start-session').simulate('click')
     expect(fakeApi.showStartSessionWizard.calledOnce).to.equal(true)
   })
 
   it('opens the AddContact View when the Add Contact button is clicked', () => {
-    wrap.find('#add-contact').simulate('click')
+    wrap.find('button#add-contact').simulate('click')
     expect(stores.mainUI.doShowAddContactView.calledOnce).to.equal(true)
   })
 })

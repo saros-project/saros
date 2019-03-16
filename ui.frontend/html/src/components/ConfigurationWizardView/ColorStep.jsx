@@ -1,9 +1,12 @@
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import cn from 'classnames'
+
+
+export default
 @inject('configurationUI', 'api')
 @observer
-export default class ColorStep extends React.Component {
+class ColorStep extends React.Component {
   constructor (props) {
     super()
     this.colors = props.api.getUserColorSet()

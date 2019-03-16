@@ -1,11 +1,12 @@
-import { Button, Checkbox, Col, ControlLabel, DropdownButton, Form, FormControl, FormGroup, Grid, MenuItem, ProgressBar, Radio, Row, SplitButton } from 'react-bootstrap'
+import { Button, Col, FormLabel, DropdownButton, Form, FormControl, FormGroup, Container, Dropdown, ProgressBar, Row, SplitButton } from 'react-bootstrap'
 import { action, observable } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 
+export default
 @inject('mainUI')
 @observer
-export default class BasicWidgetTestView extends React.Component {
+class BasicWidgetTestView extends React.Component {
   componentDidMount () {
     window.view = this
   }
@@ -64,12 +65,12 @@ export default class BasicWidgetTestView extends React.Component {
   render () {
     return (
       <div style={{margin: 20}} id='basic-widget-test-root'>
-        <Grid>
+        <Container>
           <Row>
-            <Col sm={6}>
-              <Form horizontal>
-                <FormGroup controlId='text'>
-                  <Col componentClass={ControlLabel} sm={2}>
+            <Col sm={12}>
+              <Form>
+                <FormGroup as={Row} controlId='text'>
+                  <Col as={FormLabel} sm={2}>
                    Text
                   </Col>
                   <Col sm={10}>
@@ -77,8 +78,8 @@ export default class BasicWidgetTestView extends React.Component {
                   </Col>
                 </FormGroup>
 
-                <FormGroup controlId='email'>
-                  <Col componentClass={ControlLabel} sm={2}>
+                <FormGroup as={Row} controlId='email'>
+                  <Col as={FormLabel} sm={2}>
                     Email
                   </Col>
                   <Col sm={10}>
@@ -86,8 +87,8 @@ export default class BasicWidgetTestView extends React.Component {
                   </Col>
                 </FormGroup>
 
-                <FormGroup controlId='password'>
-                  <Col componentClass={ControlLabel} sm={2}>
+                <FormGroup as={Row} controlId='password'>
+                  <Col as={FormLabel} sm={2}>
                     Password
                   </Col>
                   <Col sm={10}>
@@ -95,34 +96,34 @@ export default class BasicWidgetTestView extends React.Component {
                   </Col>
                 </FormGroup>
 
-                <FormGroup>
-                  <Col componentClass={ControlLabel} sm={2}>
+                <FormGroup as={Row}>
+                  <Col as={FormLabel} sm={2}>
                     Checkbox
                   </Col>
                   <Col sm={10}>
-                    <Checkbox inline name='checkbox1' value='1' onChange={this.onChangeField} checked={this.fields.checkbox1}>1</Checkbox>
-                    <Checkbox inline name='checkbox2' value='2' onChange={this.onChangeField} checked={this.fields.checkbox2}>2</Checkbox>
-                    <Checkbox inline name='checkbox3' value='3' onChange={this.onChangeField} checked={this.fields.checkbox3}>3</Checkbox>
+                    <Form.Check type="checkbox" inline name='checkbox1' value='1' onChange={this.onChangeField} checked={this.fields.checkbox1} label="1" />
+                    <Form.Check type="checkbox" inline name='checkbox2' value='2' onChange={this.onChangeField} checked={this.fields.checkbox2} label="2" />
+                    <Form.Check type="checkbox" inline name='checkbox3' value='3' onChange={this.onChangeField} checked={this.fields.checkbox3} label="3" />
                   </Col>
                 </FormGroup>
 
-                <FormGroup>
-                  <Col componentClass={ControlLabel} sm={2}>
+                <FormGroup as={Row}>
+                  <Col as={FormLabel} sm={2}>
                     Radio
                   </Col>
                   <Col sm={10}>
-                    <Radio inline name='radioGroup' value='1' onChange={this.onChangeField} checked={this.fields.radioGroup === '1'}>1</Radio>
-                    <Radio inline name='radioGroup' value='2' onChange={this.onChangeField} checked={this.fields.radioGroup === '2'}>2</Radio>
-                    <Radio inline name='radioGroup' value='3' onChange={this.onChangeField} checked={this.fields.radioGroup === '3'}>3</Radio>
+                    <Form.Check type="radio" inline name='radioGroup' value='1' onChange={this.onChangeField} checked={this.fields.radioGroup === '1'} label="1" />
+                    <Form.Check type="radio" inline name='radioGroup' value='2' onChange={this.onChangeField} checked={this.fields.radioGroup === '2'} label="2" />
+                    <Form.Check type="radio" inline name='radioGroup' value='3' onChange={this.onChangeField} checked={this.fields.radioGroup === '3'} label="3" />
                   </Col>
                 </FormGroup>
 
-                <FormGroup controlId='select'>
-                  <Col componentClass={ControlLabel} sm={2}>
+                <FormGroup as={Row} controlId='select'>
+                  <Col as={FormLabel} sm={2}>
                     Select
                   </Col>
                   <Col sm={10}>
-                    <FormControl componentClass='select' name='select' onChange={this.onChangeField} value={this.fields.select}>
+                    <FormControl as='select' name='select' onChange={this.onChangeField} value={this.fields.select}>
                       <option value='option1'>Option1</option>
                       <option value='option2'>Option2</option>
                       <option value='option3'>Option3</option>
@@ -130,12 +131,12 @@ export default class BasicWidgetTestView extends React.Component {
                   </Col>
                 </FormGroup>
 
-                <FormGroup controlId='multiSelect'>
-                  <Col componentClass={ControlLabel} sm={2}>
+                <FormGroup as={Row} controlId='multiSelect'>
+                  <Col as={FormLabel} sm={2}>
                     MultiSelect
                   </Col>
                   <Col sm={10}>
-                    <FormControl componentClass='select' multiple name='multiSelect' onChange={this.onChangeField} value={this.fields.multiSelect}>
+                    <FormControl as='select' multiple name='multiSelect' onChange={this.onChangeField} value={this.fields.multiSelect}>
                       <option value='option1'>MultiOption1</option>
                       <option value='option2'>MultiOption2</option>
                       <option value='option3'>MultiOption3</option>
@@ -143,8 +144,8 @@ export default class BasicWidgetTestView extends React.Component {
                   </Col>
                 </FormGroup>
 
-                <FormGroup controlId='progressBar'>
-                  <Col componentClass={ControlLabel} sm={2}>
+                <FormGroup as={Row} controlId='progressBar'>
+                  <Col as={FormLabel} sm={2}>
                     ProgressBar
                   </Col>
                   <Col sm={10}>
@@ -152,22 +153,22 @@ export default class BasicWidgetTestView extends React.Component {
                   </Col>
                 </FormGroup>
 
-                <FormGroup>
-                  <Col smOffset={2} sm={10}>
+                <FormGroup as={Row}>
+                  <Col sm={10}>
                     <div>
                       <span>Pressed Button: </span><span id='button-display-text'>none</span>
                     </div>
                     <div className='btn-toolbar'>
                       <Button type='button' id='button' onClick={this.onClickButton} >Button</Button>
                       <DropdownButton title='DropdownButton' id='button-dropdown'>
-                        <MenuItem eventKey='key-dropdown-1' id='button-dropdown-1' onSelect={this.onClickButton}>Dropdown link 1</MenuItem>
-                        <MenuItem eventKey='key-dropdown-2' id='button-dropdown-2' onSelect={this.onClickButton}>Dropdown link 2</MenuItem>
-                        <MenuItem eventKey='key-dropdown-3' id='button-dropdown-3' onSelect={this.onClickButton}>Dropdown link 3</MenuItem>
+                        <Dropdown.Item eventKey='key-dropdown-1' id='button-dropdown-1' onSelect={this.onClickButton}>Dropdown link 1</Dropdown.Item>
+                        <Dropdown.Item eventKey='key-dropdown-2' id='button-dropdown-2' onSelect={this.onClickButton}>Dropdown link 2</Dropdown.Item>
+                        <Dropdown.Item eventKey='key-dropdown-3' id='button-dropdown-3' onSelect={this.onClickButton}>Dropdown link 3</Dropdown.Item>
                       </DropdownButton>
                       <SplitButton title='SplitButton' id='split-button' onClick={this.onClickButton}>
-                        <MenuItem eventKey='key-split-1' id='split-button-1' onSelect={this.onClickButton}>SplitButton link 1</MenuItem>
-                        <MenuItem eventKey='key-split-2' id='split-button-2' onSelect={this.onClickButton}>SplitButton link 2</MenuItem>
-                        <MenuItem eventKey='key-split-3' id='split-button-3' onSelect={this.onClickButton}>SplitButton link 3</MenuItem>
+                        <Dropdown.Item eventKey='key-split-1' id='split-button-1' onSelect={this.onClickButton}>SplitButton link 1</Dropdown.Item>
+                        <Dropdown.Item eventKey='key-split-2' id='split-button-2' onSelect={this.onClickButton}>SplitButton link 2</Dropdown.Item>
+                        <Dropdown.Item eventKey='key-split-3' id='split-button-3' onSelect={this.onClickButton}>SplitButton link 3</Dropdown.Item>
                       </SplitButton>
                     </div>
                   </Col>
@@ -175,7 +176,7 @@ export default class BasicWidgetTestView extends React.Component {
               </Form>
             </Col>
           </Row>
-        </Grid>
+        </Container>
       </div>
     )
   }
