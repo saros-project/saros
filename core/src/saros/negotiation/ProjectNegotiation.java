@@ -18,6 +18,7 @@ import saros.monitoring.MonitorableFileTransfer.TransferStatus;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
+import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -61,6 +62,8 @@ public abstract class ProjectNegotiation extends Negotiation {
    */
   protected FileTransferManager fileTransferManager;
 
+  private final User remoteUser;
+
   public ProjectNegotiation(
       final String id,
       final User remoteUser,
@@ -71,8 +74,9 @@ public abstract class ProjectNegotiation extends Negotiation {
       final XMPPConnectionService connectionService,
       final ITransmitter transmitter,
       final IReceiver receiver) {
-    super(id, remoteUser.getJID(), transmitter, receiver);
+    super(id, transmitter, receiver);
 
+    this.remoteUser = remoteUser;
     this.sessionManager = sessionManager;
     this.session = session;
     this.sessionID = session.getID();
@@ -91,6 +95,22 @@ public abstract class ProjectNegotiation extends Negotiation {
    */
   public final String getSessionID() {
     return sessionID;
+  }
+
+  /**
+   * Returns the JID of the peer with which the negotiation takes place.
+   *
+   * @deprecated because the JID should only be used in the network context, instead use {@link
+   *     #getRemoteUser()}.
+   * @return peer JID
+   */
+  @Deprecated
+  public JID getPeer() {
+    return remoteUser.getJID();
+  }
+
+  public User getRemoteUser() {
+    return remoteUser;
   }
 
   @Override
