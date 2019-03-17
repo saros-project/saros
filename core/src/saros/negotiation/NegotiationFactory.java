@@ -178,7 +178,7 @@ public final class NegotiationFactory {
     switch (transferType) {
       case ARCHIVE:
         return new ArchiveIncomingProjectNegotiation(
-            remoteUser.getJID(),
+            remoteUser,
             negotiationID,
             projectNegotiationData,
             sessionManager,
@@ -191,7 +191,7 @@ public final class NegotiationFactory {
             receiver);
       case INSTANT:
         return new InstantIncomingProjectNegotiation(
-            remoteUser.getJID(),
+            remoteUser,
             negotiationID,
             projectNegotiationData,
             sessionManager,

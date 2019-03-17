@@ -18,11 +18,11 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.stream.IncomingStreamProtocol;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
-import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
+import saros.session.User;
 
 /** Receive shared Projects and display them instant using a stream based solution. */
 public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNegotiation {
@@ -30,7 +30,7 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
   private static final Logger log = Logger.getLogger(InstantIncomingProjectNegotiation.class);
 
   public InstantIncomingProjectNegotiation(
-      final JID peer, //
+      final User remoteUser, //
       final String negotiationID, //
       final List<ProjectNegotiationData> projectNegotiationData, //
       final ISarosSessionManager sessionManager, //
@@ -43,7 +43,7 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
       final IReceiver receiver //
       ) {
     super(
-        peer,
+        remoteUser,
         negotiationID,
         projectNegotiationData,
         sessionManager,

@@ -20,11 +20,11 @@ import saros.monitoring.SubProgressMonitor;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
-import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
+import saros.session.User;
 import saros.util.CoreUtils;
 
 /**
@@ -36,7 +36,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
   private static final Logger LOG = Logger.getLogger(ArchiveIncomingProjectNegotiation.class);
 
   public ArchiveIncomingProjectNegotiation(
-      final JID peer, //
+      final User remoteUser, //
       final String negotiationID, //
       final List<ProjectNegotiationData> projectNegotiationData, //
       final ISarosSessionManager sessionManager, //
@@ -49,7 +49,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
       final IReceiver receiver //
       ) {
     super(
-        peer,
+        remoteUser,
         negotiationID,
         projectNegotiationData,
         sessionManager,

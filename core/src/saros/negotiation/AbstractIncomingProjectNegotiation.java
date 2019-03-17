@@ -28,12 +28,12 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
-import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.SessionEndReason;
+import saros.session.User;
 
 // MAJOR TODO refactor this class !!!
 
@@ -61,7 +61,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
   protected TransferListener transferListener = null;
 
   public AbstractIncomingProjectNegotiation(
-      final JID peer, //
+      final User remoteUser, //
       final String negotiationID, //
       final List<ProjectNegotiationData> projectNegotiationData, //
       final ISarosSessionManager sessionManager, //
@@ -75,7 +75,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       ) {
     super(
         negotiationID,
-        peer,
+        remoteUser.getJID(),
         sessionManager,
         session,
         workspace,
