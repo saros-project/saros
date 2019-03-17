@@ -62,7 +62,7 @@ public class GitSendCommitAction extends Action implements Disposable {
     SarosSession session = (SarosSession) sessionManager.getSession();
     if (session == null) return;
 
-    session.gitSendCommitRequest();
+    // session.gitSendCommitRequest();
   }
 
   @Override

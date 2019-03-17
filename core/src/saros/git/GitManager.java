@@ -11,7 +11,7 @@ import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
-import saros.session.internal.SarosSession;
+import saros.session.ISarosSession;
 
 /**
  * This Class is responsible for the negotiation between a user that want to send,receive and fetch
@@ -28,11 +28,11 @@ public class GitManager extends AbstractActivityProducer implements Startable {
 
   private static final Logger log = Logger.getLogger(GitManager.class.getName());
 
-  private final SarosSession session;
+  private final ISarosSession session;
 
   JGitFacade jGitFacade;
 
-  public GitManager(SarosSession session) {
+  public GitManager(ISarosSession session) {
     this.session = session;
   }
 
