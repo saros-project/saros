@@ -716,7 +716,7 @@ public class AddProjectToSessionWizard extends Wizard {
     IReferencePointManager referencePointManager =
         session.getComponent(IReferencePointManager.class);
 
-    referencePointManager.put(project.getReferencePoint(), project);
+    referencePointManager.putIfAbsent(project.getReferencePoint(), project);
   }
 
   private static final class ResourceMappingStorage {
