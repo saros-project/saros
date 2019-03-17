@@ -24,11 +24,9 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -252,6 +250,11 @@ public class AddProjectToSessionWizard extends Wizard {
 
           IProject sharedProject = new IntelliJProjectImpl(module);
 
+          IReferencePointManager referencePointManager =
+              sessionManager.getSession().getComponent(IReferencePointManager.class);
+
+          fillReferencePointManager(referencePointManager, sharedProject);
+
           localProjects.put(remoteProjectID, sharedProject);
 
           triggerProjectNegotiation();
@@ -297,6 +300,11 @@ public class AddProjectToSessionWizard extends Wizard {
            *  the module might change in that case
            */
           queueModuleConfigurationChange(existingModule, moduleConfiguration);
+
+          IReferencePointManager referencePointManager =
+              sessionManager.getSession().getComponent(IReferencePointManager.class);
+
+          fillReferencePointManager(referencePointManager, sharedProject);
 
           localProjects.put(remoteProjectID, sharedProject);
 
@@ -749,8 +757,6 @@ public class AddProjectToSessionWizard extends Wizard {
 
     subMonitor.setTaskName("\"Searching for files that will be modified...\",");
 
-    fillReferencePointManager(session, new HashSet<>(projectMapping.values()));
-
     IReferencePointManager referencePointManager =
         session.getComponent(IReferencePointManager.class);
 
@@ -760,6 +766,8 @@ public class AddProjectToSessionWizard extends Wizard {
       IProject project = entry.getValue();
 
       try {
+
+        fillReferencePointManager(referencePointManager, project);
 
         final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
 
@@ -791,10 +799,8 @@ public class AddProjectToSessionWizard extends Wizard {
     return modifiedResources;
   }
 
-  private void fillReferencePointManager(ISarosSession session, Set<IProject> projects) {
-    IReferencePointManager referencePointManager =
-        session.getComponent(IReferencePointManager.class);
-
-    referencePointManager.putSetOfProjects(projects);
+  private void fillReferencePointManager(
+      IReferencePointManager referencePointManager, IProject project) {
+    referencePointManager.putIfAbsent(project.getReferencePoint(), project);
   }
 }
