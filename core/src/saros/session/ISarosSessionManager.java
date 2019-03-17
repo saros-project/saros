@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.monitoring.IProgressMonitor;
 import saros.net.xmpp.JID;
@@ -22,8 +23,12 @@ public interface ISarosSessionManager {
    * Starts a new DPP session with the local user as only participant.
    *
    * @param referencePointResources the local reference point resources which should be shared.
+   * @param referencePointManager the prefilled reference point manager, which contains the mapping
+   *     of IReferencePoint to core.IProject
    */
-  public void startSession(Map<IReferencePoint, List<IResource>> referencePointResources);
+  public void startSession(
+      Map<IReferencePoint, List<IResource>> referencePointResources,
+      IReferencePointManager referencePointManager);
 
   // FIXME this method is error prone and only used by the IPN, find a better
   // abstraction

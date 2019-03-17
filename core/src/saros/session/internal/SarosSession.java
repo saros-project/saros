@@ -44,7 +44,6 @@ import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.context.IContainerContext;
-import saros.filesystem.CoreReferencePointManager;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
@@ -231,8 +230,17 @@ public final class SarosSession implements ISarosSession {
   // FIXME those parameter passing feels strange, find a better way
   /** Constructor for host. */
   public SarosSession(
-      final String id, IPreferenceStore properties, IContainerContext containerContext) {
-    this(id, containerContext, properties, /* unused */ null, /* unused */ null);
+      final String id,
+      IPreferenceStore properties,
+      IContainerContext containerContext,
+      IReferencePointManager referencePointManager) {
+    this(
+        id,
+        containerContext,
+        properties,
+        /* unused */ null,
+        /* unused */ null,
+        referencePointManager);
   }
 
   /** Constructor for client. */
@@ -241,8 +249,9 @@ public final class SarosSession implements ISarosSession {
       JID hostJID,
       IPreferenceStore localProperties,
       IPreferenceStore hostProperties,
-      IContainerContext containerContext) {
-    this(id, containerContext, localProperties, hostJID, hostProperties);
+      IContainerContext containerContext,
+      IReferencePointManager referencePointManager) {
+    this(id, containerContext, localProperties, hostJID, hostProperties, referencePointManager);
   }
 
   @Override
@@ -1068,7 +1077,8 @@ public final class SarosSession implements ISarosSession {
       IContainerContext context,
       IPreferenceStore localProperties,
       JID host,
-      IPreferenceStore hostProperties) {
+      IPreferenceStore hostProperties,
+      IReferencePointManager referencePointManager) {
 
     context.initComponent(this);
 
@@ -1098,7 +1108,7 @@ public final class SarosSession implements ISarosSession {
     sessionContainer = context.createChildContainer();
     sessionContainer.addComponent(ISarosSession.class, this);
     sessionContainer.addComponent(IActivityHandlerCallback.class, activityCallback);
-    sessionContainer.addComponent(IReferencePointManager.class, new CoreReferencePointManager());
+    sessionContainer.addComponent(IReferencePointManager.class, referencePointManager);
 
     ISarosSessionContextFactory factory = context.getComponent(ISarosSessionContextFactory.class);
     factory.createComponents(this, sessionContainer);
@@ -1120,7 +1130,7 @@ public final class SarosSession implements ISarosSession {
 
     userListHandler = sessionContainer.getComponent(UserInformationHandler.class);
 
-    referencePointManager = sessionContainer.getComponent(IReferencePointManager.class);
+    this.referencePointManager = sessionContainer.getComponent(IReferencePointManager.class);
 
     // ensure that the container uses caching
     assert sessionContainer.getComponent(ActivityHandler.class)

@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import saros.annotations.Component;
 import saros.context.IContainerContext;
+import saros.filesystem.CoreReferencePointManager;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
@@ -221,7 +222,8 @@ public class SarosSessionManager implements ISarosSessionManager {
    */
   @Override
   public void startSession(
-      final Map<IReferencePoint, List<IResource>> referencePointResourcesMapping) {
+      final Map<IReferencePoint, List<IResource>> referencePointResourcesMapping,
+      IReferencePointManager referencePointManager) {
     /*
      * FIXME split the logic, start a session without anything and then add
      * resources !
@@ -272,7 +274,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
       }
 
-      session = new SarosSession(sessionID, hostProperties, context);
+      session = new SarosSession(sessionID, hostProperties, context, referencePointManager);
 
       sessionStarting(session);
       session.start();
@@ -303,7 +305,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     assert session == null;
 
-    session = new SarosSession(id, host, localProperties, hostProperties, context);
+    session =
+        new SarosSession(
+            id, host, localProperties, hostProperties, context, new CoreReferencePointManager());
 
     log.info("joined uninitialized Saros session");
 
