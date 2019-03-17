@@ -167,18 +167,18 @@ public final class NegotiationFactory {
   }
 
   public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
-      final JID remoteAddress,
+      final User remoteUser,
       final String negotiationID,
       final List<ProjectNegotiationData> projectNegotiationData,
       final ISarosSessionManager sessionManager,
       final ISarosSession session) {
 
-    TransferType transferType = getTransferType(session, remoteAddress);
+    TransferType transferType = getTransferType(session, remoteUser.getJID());
 
     switch (transferType) {
       case ARCHIVE:
         return new ArchiveIncomingProjectNegotiation(
-            remoteAddress,
+            remoteUser.getJID(),
             negotiationID,
             projectNegotiationData,
             sessionManager,
@@ -191,7 +191,7 @@ public final class NegotiationFactory {
             receiver);
       case INSTANT:
         return new InstantIncomingProjectNegotiation(
-            remoteAddress,
+            remoteUser.getJID(),
             negotiationID,
             projectNegotiationData,
             sessionManager,

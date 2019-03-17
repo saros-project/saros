@@ -446,9 +446,17 @@ public class SarosSessionManager implements ISarosSessionManager {
       }
 
       try {
+        User remoteUser = session.getUser(remoteAddress);
+        if (remoteUser == null) {
+          log.warn(
+              "could not start a project negotiation because"
+                  + " the remote user is not part of the current session");
+          return;
+        }
+
         negotiation =
             negotiationFactory.newIncomingProjectNegotiation(
-                remoteAddress, negotiationID, projectNegotiationData, this, session);
+                remoteUser, negotiationID, projectNegotiationData, this, session);
 
         negotiation.setNegotiationListener(negotiationListener);
         currentProjectNegotiations.add(negotiation);
