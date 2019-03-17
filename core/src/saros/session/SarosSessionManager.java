@@ -150,8 +150,7 @@ public class SarosSessionManager implements ISarosSessionManager {
               projectSharingData.addProject(project, projectID, resourcesToShare);
             }
 
-            User originUser = session.getUser(negotiation.getPeer());
-            executeOutgoingProjectNegotiation(projectSharingData, originUser);
+            executeOutgoingProjectNegotiation(projectSharingData, negotiation.getRemoteUser());
           }
 
           if (currentProjectNegotiations.isEmpty()) {
