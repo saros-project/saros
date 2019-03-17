@@ -18,10 +18,10 @@ import saros.monitoring.MonitorableFileTransfer.TransferStatus;
 import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
-import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
+import saros.session.User;
 
 /**
  * This abstract class is the superclass for {@link AbstractOutgoingProjectNegotiation} and {@link
@@ -63,7 +63,7 @@ public abstract class ProjectNegotiation extends Negotiation {
 
   public ProjectNegotiation(
       final String id,
-      final JID peer,
+      final User remoteUser,
       final ISarosSessionManager sessionManager,
       final ISarosSession session,
       final IWorkspace workspace,
@@ -71,7 +71,7 @@ public abstract class ProjectNegotiation extends Negotiation {
       final XMPPConnectionService connectionService,
       final ITransmitter transmitter,
       final IReceiver receiver) {
-    super(id, peer, transmitter, receiver);
+    super(id, remoteUser.getJID(), transmitter, receiver);
 
     this.sessionManager = sessionManager;
     this.session = session;

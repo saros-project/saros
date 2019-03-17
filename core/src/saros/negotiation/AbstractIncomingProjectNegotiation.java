@@ -75,7 +75,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       ) {
     super(
         negotiationID,
-        remoteUser.getJID(),
+        remoteUser,
         sessionManager,
         session,
         workspace,
