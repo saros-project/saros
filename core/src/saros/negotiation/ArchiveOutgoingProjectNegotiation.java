@@ -37,7 +37,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   private File zipArchive = null;
 
   public ArchiveOutgoingProjectNegotiation( //
-      final JID peer, //
+      final User remoteUser, //
       final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
@@ -49,7 +49,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       final IReceiver receiver //
       ) {
     super(
-        peer,
+        remoteUser,
         projects,
         sessionManager,
         session,

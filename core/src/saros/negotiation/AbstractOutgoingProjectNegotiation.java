@@ -24,7 +24,6 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
-import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -53,7 +52,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
   private PacketCollector startActivityQueuingResponseCollector;
 
   protected AbstractOutgoingProjectNegotiation( //
-      final JID peer, //
+      final User remoteUser, //
       final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
@@ -66,7 +65,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
       ) {
     super(
         String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()),
-        peer,
+        remoteUser.getJID(),
         sessionManager,
         session,
         workspace,

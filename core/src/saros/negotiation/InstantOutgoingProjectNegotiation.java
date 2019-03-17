@@ -31,7 +31,6 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.stream.OutgoingStreamProtocol;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
-import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -62,7 +61,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   private User remoteUser = null;
 
   public InstantOutgoingProjectNegotiation(
-      final JID peer, //
+      final User remoteUser, //
       final ProjectSharingData projects, //
       final ISarosSessionManager sessionManager, //
       final ISarosSession session, //
@@ -74,7 +73,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       final IReceiver receiver) //
       {
     super(
-        peer,
+        remoteUser,
         projects,
         sessionManager,
         session,
