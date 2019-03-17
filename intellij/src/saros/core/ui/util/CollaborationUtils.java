@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import saros.SarosPluginContext;
 import saros.core.monitoring.IStatus;
 import saros.core.monitoring.Status;
+import saros.filesystem.CoreReferencePointManager;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
@@ -77,7 +78,13 @@ public class CollaborationUtils {
           protected IStatus run(IProgressMonitor monitor) {
             monitor.beginTask("Starting session...", IProgressMonitor.UNKNOWN);
             try {
-              sessionManager.startSession(convertToReferencePointResourcesMapping(newResources));
+
+              IReferencePointManager referencePointManager = new CoreReferencePointManager();
+
+              fillReferencePointManager(referencePointManager, newResources.keySet());
+
+              sessionManager.startSession(
+                  convertToReferencePointResourcesMapping(newResources), referencePointManager);
               Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
               monitor.worked(50);
@@ -86,8 +93,6 @@ public class CollaborationUtils {
               if (session == null) {
                 return Status.CANCEL_STATUS;
               }
-
-              fillReferencePointManager(session, newResources.keySet());
 
               monitor.setTaskName("Inviting participants...");
               sessionManager.invite(participantsToAdd, getShareProjectDescription(session));
@@ -180,7 +185,10 @@ public class CollaborationUtils {
       return;
     }
 
-    fillReferencePointManager(sarosSession, projectResources.keySet());
+    IReferencePointManager referencePointManager =
+        sarosSession.getComponent(IReferencePointManager.class);
+
+    fillReferencePointManager(referencePointManager, projectResources.keySet());
 
     Map<IReferencePoint, List<IResource>> referencePointResources = new HashMap<>();
 
@@ -515,10 +523,8 @@ public class CollaborationUtils {
     return Pair.of(totalFileSize, totalFileCount);
   }
 
-  private static void fillReferencePointManager(ISarosSession session, Set<IProject> projects) {
-    IReferencePointManager referencePointManager =
-        session.getComponent(IReferencePointManager.class);
-
+  private static void fillReferencePointManager(
+      IReferencePointManager referencePointManager, Set<IProject> projects) {
     referencePointManager.putSetOfProjects(projects);
   }
 }
