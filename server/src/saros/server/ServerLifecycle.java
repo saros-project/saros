@@ -11,6 +11,7 @@ import saros.communication.connection.ConnectionHandler;
 import saros.context.AbstractContextLifecycle;
 import saros.context.ContainerContext;
 import saros.context.IContextFactory;
+import saros.filesystem.CoreReferencePointManager;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
@@ -33,7 +34,8 @@ public class ServerLifecycle extends AbstractContextLifecycle {
     connectToXMPPServer(context);
     context
         .getComponent(ISarosSessionManager.class)
-        .startSession(new HashMap<IReferencePoint, List<IResource>>());
+        .startSession(
+            new HashMap<IReferencePoint, List<IResource>>(), new CoreReferencePointManager());
   }
 
   @Override

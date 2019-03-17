@@ -712,14 +712,6 @@ public class AddProjectToSessionWizard extends Wizard {
     mappingStorage.updateMapping(jid, currentProjectNameMapping);
   }
 
-  private void fillReferencePointManager(
-      ISarosSession session, Set<saros.filesystem.IProject> projects) {
-    IReferencePointManager referencePointManager =
-        session.getComponent(IReferencePointManager.class);
-
-    referencePointManager.putSetOfProjects(projects);
-  }
-
   private void fillReferencePointManager(ISarosSession session, saros.filesystem.IProject project) {
     IReferencePointManager referencePointManager =
         session.getComponent(IReferencePointManager.class);
