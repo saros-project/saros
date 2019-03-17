@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.server.filesystem.ServerProjectImpl;
@@ -49,6 +50,7 @@ public class ShareCommand extends ConsoleCommand {
       for (String path : args) {
         try {
           IProject project = new ServerProjectImpl(this.workspace, path);
+          fillReferencePointManager(session, project);
           referencePoints.put(project.getReferencePoint(), null);
         } catch (Exception e) {
           log.error(path + " could not be added to the session", e);
@@ -58,5 +60,11 @@ public class ShareCommand extends ConsoleCommand {
     } catch (Exception e) {
       log.error("Error sharing resources", e);
     }
+  }
+
+  private void fillReferencePointManager(ISarosSession session, IProject project) {
+    IReferencePointManager referencePointManager =
+        session.getComponent(IReferencePointManager.class);
+    referencePointManager.putIfAbsent(project.getReferencePoint(), project);
   }
 }
