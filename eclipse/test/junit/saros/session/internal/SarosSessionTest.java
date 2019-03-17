@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
@@ -44,6 +45,7 @@ import saros.feedback.FeedbackManager;
 import saros.feedback.FeedbackPreferences;
 import saros.feedback.StatisticManager;
 import saros.filesystem.IPathFactory;
+import saros.filesystem.IReferencePointManager;
 import saros.net.IConnectionManager;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
@@ -125,6 +127,13 @@ public class SarosSessionTest {
 
     replay(srv);
     return srv;
+  }
+
+  private static IReferencePointManager createReferencePointManagerMock() {
+    IReferencePointManager referencePointManager = createMock(IReferencePointManager.class);
+    replay(referencePointManager);
+
+    return referencePointManager;
   }
 
   private static IContainerContext createContextMock(final MutablePicoContainer container) {
@@ -328,8 +337,15 @@ public class SarosSessionTest {
 
     final IContainerContext context = createContextMock(container);
 
+    final IReferencePointManager referencePointManager =
+        EasyMock.createMock(IReferencePointManager.class);
+    createReferencePointManagerMock();
+
+    EasyMock.replay(referencePointManager);
+
     // Test creating, starting and stopping the session.
-    SarosSession session = new SarosSession(SAROS_SESSION_ID, new PreferenceStore(), context);
+    SarosSession session =
+        new SarosSession(SAROS_SESSION_ID, new PreferenceStore(), context, referencePointManager);
 
     assertFalse(session.hasActivityConsumers());
     assertFalse(session.hasActivityProducers());
