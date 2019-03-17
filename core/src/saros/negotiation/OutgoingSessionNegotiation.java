@@ -85,9 +85,11 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
   @Override
   protected void executeCancellation() {
-    final User user = sarosSession.getUser(getPeer());
+    if (getPeer().isResourceQualifiedJID()) {
+      User user = sarosSession.getUser(getPeer());
 
-    if (user != null) sarosSession.removeUser(user);
+      if (user != null) sarosSession.removeUser(user);
+    }
   }
 
   /**
