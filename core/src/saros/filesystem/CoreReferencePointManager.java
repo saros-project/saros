@@ -18,7 +18,7 @@ public class CoreReferencePointManager implements IReferencePointManager {
   }
 
   @Override
-  public void put(IReferencePoint referencePoint, IProject project) {
+  public void putIfAbsent(IReferencePoint referencePoint, IProject project) {
     if (referencePoint == null) throw new IllegalArgumentException("ReferencePoint is null");
 
     if (project == null) throw new IllegalArgumentException("Project is null");
@@ -44,7 +44,7 @@ public class CoreReferencePointManager implements IReferencePointManager {
     if (projects == null) throw new IllegalArgumentException("Set of projects is null");
 
     for (IProject project : projects) {
-      put(project.getReferencePoint(), project);
+      putIfAbsent(project.getReferencePoint(), project);
     }
   }
 
