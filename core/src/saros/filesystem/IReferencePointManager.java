@@ -14,12 +14,13 @@ import saros.activities.SPath;
 public interface IReferencePointManager {
 
   /**
-   * Insert a pair of reference point and project
+   * Insert a pair of reference point and project, if the reference point has no mapping to the
+   * project
    *
    * @param referencePoint the key of the pair
    * @param project the value of the pair
    */
-  void put(IReferencePoint referencePoint, IProject project);
+  void putIfAbsent(IReferencePoint referencePoint, IProject project);
 
   /**
    * Insert a set of projects. The IReferencePointManager determinates the reference points of the
