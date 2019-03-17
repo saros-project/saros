@@ -165,7 +165,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
        * bound to its use in OutgoingProjectNegotiation.
        */
       if (session.isHost()) {
-        session.userStartedQueuing(session.getUser(getPeer()));
+        session.userStartedQueuing(getRemoteUser());
       }
 
       transmitter.send(

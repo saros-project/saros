@@ -116,10 +116,10 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
       transfer(monitor, fileLists);
 
-      User user = session.getUser(getPeer());
-      if (user == null) throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
+      if (!getRemoteUser().isInSession())
+        throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
 
-      session.userFinishedProjectNegotiation(user);
+      session.userFinishedProjectNegotiation(getRemoteUser());
     } catch (Exception e) {
       exception = e;
     } finally {

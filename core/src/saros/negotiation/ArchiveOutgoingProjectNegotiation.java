@@ -80,9 +80,8 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       sendAndAwaitActivityQueueingActivation(monitor);
       monitor.subTask("");
 
-      User user = session.getUser(getPeer());
-
-      if (user == null) throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
+      if (!getRemoteUser().isInSession())
+        throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
 
       /*
        * inform all listeners that the peer has started queuing and can
@@ -93,7 +92,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
        * this time. Maybe change the description of the listener interface
        * ?
        */
-      session.userStartedQueuing(user);
+      session.userStartedQueuing(getRemoteUser());
 
       zipArchive = createProjectArchive(fileLists, monitor);
       monitor.subTask("");

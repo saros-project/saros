@@ -58,7 +58,6 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       };
 
   private List<StartHandle> stoppedUsers = null;
-  private User remoteUser = null;
 
   public InstantOutgoingProjectNegotiation(
       final User remoteUser, //
@@ -106,8 +105,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     stoppedUsers = stopUsers(monitor);
     sendAndAwaitActivityQueueingActivation(monitor);
 
-    remoteUser = session.getUser(getPeer());
-    if (remoteUser == null)
+    if (!getRemoteUser().isInSession())
       throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
 
     int fileCount = 0;
@@ -171,7 +169,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   @Override
   protected void cleanup(IProgressMonitor monitor) {
     editorManager.removeSharedEditorListener(listener);
-    session.userStartedQueuing(remoteUser);
+    session.userStartedQueuing(getRemoteUser());
 
     if (stoppedUsers != null) startUsers(stoppedUsers);
 
