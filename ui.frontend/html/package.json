@@ -34,7 +34,7 @@
     "jquery": "^3.2.1",
     "jsdom": "^14.0.0",
     "jsdom-global": "^3.0.2",
-    "mobx": "^5.9.0",
+    "mobx": "^4.9.3",
     "mobx-react": "^5.4.3",
     "mocha": "^6.0.2",
     "mochapack": "^1.1.0",
