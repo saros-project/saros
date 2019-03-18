@@ -39,7 +39,7 @@ public class GitChangeWorkDirTreeAction extends Action implements Disposable {
 
   @Inject private ISarosSessionManager sessionManager;
 
-  private saros.git.GitManager gitManager;
+  // private saros.git.GitManager gitManager;
 
   public GitChangeWorkDirTreeAction() {
     super(Messages.GitChangeWorkDirTreeAction_title);
