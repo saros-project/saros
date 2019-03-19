@@ -1,15 +1,81 @@
 /* Avoids navbar (of ToolBar) width restriction:
   react-bootstrap generates a <div class='container'> into the navbar,
   which creates a navbar that fills only the center of the window. */
-.navbar > .container {
+.navbar>.container {
   width: auto;
 }
 
 .navbar {
-  min-height:auto
+  min-height: auto;
+  background-color: #fff;
+  border-bottom: 1px solid #444;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.15);
 }
 
 /* Avoid that the navbar covers content */
 .content-container {
   margin-top: 50px;
+}
+
+/* Global (for now) */
+body {
+  padding: 5px;
+}
+.dropdown-item {
+  cursor: default;
+}
+
+.dropdown-item:active {
+  color: #000;
+}
+
+.btn {
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.15);
+  margin-left: 5px;
+}
+
+/* Main View */
+.activeAccount {
+  padding: 0.75rem 1.25rem;
+}
+
+.session-member {
+  border-left: 1px solid #17a2b8;
+  border-right: 1px solid #17a2b8;
+  border-bottom: 1px solid #17a2b8;
+}
+
+.session-member:focus, .session-member:active {
+  border-left: 1px solid #17a2b8;
+  border-right: 1px solid #17a2b8;
+  border-bottom: 1px solid #17a2b8;
+  background-color: rgba(68, 68, 68, 0.2);
+}
+
+.contact-list-container {
+  padding: 5px;
+}
+
+
+/* Context Menu */
+#contextMenu {
+  position: absolute;
+  z-index: 99999;
+  outline: 1px solid #444;
+  background-color: #fff;
+  min-width: 150px;
+  user-select: none;
+}
+
+.contextMenuHidden {
+  display: none;
+}
+
+#contextMenu .dropdown-item {
+  padding: 0.25rem 0.5rem;
+}
+
+#contextMenu .dropdown-item:focus, #contextMenu .dropdown-item:active {
+  background-color: rgb(137, 253, 253);
+  outline: none;
 }

@@ -22,7 +22,7 @@ export class FakeSarosApi {
 export function wrapWithContextProvider (element, stores) {
   return (
     <Localization messages={{}}>
-      <Provider {...stores} >
+      <Provider {...stores} contextMenu={{}}>
         {element}
       </Provider>
     </Localization>
