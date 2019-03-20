@@ -2,9 +2,11 @@ import { firstCharToLowerCase } from 'Utils'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 
+
+export default
 @inject('configurationUI')
 @observer
-export default class ReviewStep extends React.Component {
+class ReviewStep extends React.Component {
   settingLabels = {
     autoConnect: 'Connect automatically',
     isSkypeUsernameVisible: 'Show my Skype username',
@@ -25,8 +27,8 @@ export default class ReviewStep extends React.Component {
       <div className='container review-step'>
         <div className='row settings-container'>
           <div className='col-sm-12'>
-            { Object.keys(this.settingLabels).map(key => (
-              <div className='row setting-review'>
+            {Object.keys(this.settingLabels).map(key => (
+              <div className='row setting-review' key={key}>
                 <div className='col-sm-12'>
                   {this.getLabel(key)}
                 </div>

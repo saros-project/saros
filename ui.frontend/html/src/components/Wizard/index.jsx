@@ -3,8 +3,10 @@ import { observer } from 'mobx-react'
 import React from 'react'
 export { default as Step } from './Step'
 
+
+export default
 @observer
-export default class Wizard extends React.Component {
+class Wizard extends React.Component {
   @observable step = 0
 
   @computed

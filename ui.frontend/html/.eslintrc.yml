@@ -1,35 +1,23 @@
 extends:
+- google
 - eslint:recommended
-- standard
-- standard-react
+- plugin:react/recommended
+
 env:
-  browser: true,
-  node: true,
-  mocha: true,
-globals:
-  expect: true,
+  browser: true
+  es6: true
+  mocha: true
+  node: true
+
 parser: babel-eslint
+
 plugins:
-- sort-imports-es6
+- react
+- mocha
+
+settings:
+  react:
+    version: detect
+
 rules:
-  strict: off
   react/prop-types: off
-  react/jsx-space-before-closing: off
-  react/jsx-tag-spacing:
-  - error
-  - closingSlash: never
-    beforeSelfClosing: always
-    afterOpening: never
-  sort-imports-es6/sort-imports-es6:
-  - error
-  - ignoreCase: false
-    ignoreMemberSort: false
-    memberSyntaxSortOrder:
-    - none
-    - all
-    - multiple
-    - single
-  valid-jsdoc: error
-  comma-dangle:
-  - error
-  - never

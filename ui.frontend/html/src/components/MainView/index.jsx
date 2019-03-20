@@ -6,6 +6,7 @@ import React from 'react'
 import RunningSession from './RunningSession'
 import ToolBar from '../ToolBar'
 
+export default
 @inject('core', 'mainUI')
 @observer
 class MainView extends React.Component {
@@ -23,5 +24,3 @@ class MainView extends React.Component {
     )
   }
 }
-
-export default MainView

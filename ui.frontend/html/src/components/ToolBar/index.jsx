@@ -5,7 +5,7 @@ import ConnectionSplitButton from './ConnectionSplitButton'
 import React from 'react'
 
 const ToolBar = ({core, mainUI}) => (
-  <Navbar fixedTop>
+  <Navbar fixed={"top"}>
     <ConnectionSplitButton
       accounts={core.accounts}
       onConnect={core.doConnect}

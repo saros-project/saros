@@ -1,7 +1,7 @@
 import { Text } from 'react-localize'
 import React from 'react'
 
-class ActiveAccount extends React.Component {
+export default class ActiveAccount extends React.Component {
   render () {
     const { activeAccount } = this.props
     let accountText
@@ -16,7 +16,6 @@ class ActiveAccount extends React.Component {
     }
 
     return (
-
       <div className={className}>
         <strong>
           { accountText }
@@ -25,5 +24,3 @@ class ActiveAccount extends React.Component {
     )
   }
 }
-
-export default ActiveAccount

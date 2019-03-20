@@ -24,7 +24,7 @@ export default class SarosStore {
 
   @computed
   get sortedContactList () {
-    return this.state.contactList.sort(onlineFirst)
+    return this.state.contactList.slice(0).sort(onlineFirst)
   }
 
   @action.bound

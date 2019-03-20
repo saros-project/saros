@@ -7,10 +7,12 @@ import P from 'prop-types'
 import React from 'react'
 import cn from 'classnames'
 
+
+export default
 @observer
-export default class Step extends React.Component {
+class Step extends React.Component {
   static propTypes = {
-    Component: P.node.isRequired,
+    Component: P.oneOfType([ P.node, P.func ]).isRequired,
     title: P.string,
     wizard: P.shape({
       hasNext: P.boolean,
