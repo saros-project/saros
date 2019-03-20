@@ -72,6 +72,8 @@ public class CollaborationUtils {
 
     final Map<IProject, List<IResource>> newResources = acquireResources(resources, null);
 
+    final List<JID> contactsToInvite = ensureFQJID(contacts);
+
     Job sessionStartupJob =
         new Job("Session Startup") {
 
@@ -82,7 +84,7 @@ public class CollaborationUtils {
             try {
               refreshProjects(newResources.keySet(), null);
               sessionManager.startSession(convert(newResources));
-              Set<JID> participantsToAdd = new HashSet<JID>(contacts);
+              Set<JID> participantsToAdd = new HashSet<JID>(contactsToInvite);
 
               ISarosSession session = sessionManager.getSession();
 
@@ -228,6 +230,8 @@ public class CollaborationUtils {
       return;
     }
 
+    final List<JID> contactsToInvite = ensureFQJID(contacts);
+
     ThreadUtils.runSafeAsync(
         "AddContactToSession",
         LOG,
@@ -235,7 +239,7 @@ public class CollaborationUtils {
           @Override
           public void run() {
 
-            Set<JID> participantsToAdd = new HashSet<JID>(contacts);
+            Set<JID> participantsToAdd = new HashSet<JID>(contactsToInvite);
 
             for (User user : sarosSession.getUsers()) participantsToAdd.remove(user.getJID());
 
@@ -459,5 +463,28 @@ public class CollaborationUtils {
     }
 
     progress.done();
+  }
+
+  private static List<JID> ensureFQJID(final Collection<JID> jids) {
+
+    final List<JID> result = new ArrayList<>();
+
+    for (final JID jid : jids) {
+      if (jid.isResourceQualifiedJID()) {
+        result.add(jid);
+        continue;
+      }
+
+      final Shell shell = SWTUtils.getShell();
+
+      MessageDialog.openWarning(
+          shell,
+          "Invalid JID",
+          "The JID of the invited contact "
+              + jid
+              + " is not resource qualified. This can happen if the contact is currently offine or no subscription is available.\n\nThis contact will not be added to the current session.");
+    }
+
+    return result;
   }
 }

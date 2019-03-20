@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -137,23 +138,32 @@ public final class RosterContentProvider extends TreeContentProvider {
       elements.add(
           new RosterGroupElement(
               group,
-              filterRosterEntryElements(createRosterEntryElements(group.getEntries()))
+              filterRosterEntryElements(createRosterEntryElements(inputRoster, group.getEntries()))
                   .toArray(new RosterEntryElement[0])));
     }
 
     elements.addAll(
-        filterRosterEntryElements(createRosterEntryElements(inputRoster.getUnfiledEntries())));
+        filterRosterEntryElements(
+            createRosterEntryElements(inputRoster, inputRoster.getUnfiledEntries())));
 
     return elements.toArray();
   }
 
   private List<RosterEntryElement> createRosterEntryElements(
-      final Collection<RosterEntry> entries) {
+      final Roster roster, final Collection<RosterEntry> entries) {
 
     final List<RosterEntryElement> elements = new ArrayList<RosterEntryElement>();
 
-    for (final RosterEntry entry : entries)
-      elements.add(createRosterEntryElement(new JID(entry.getUser())));
+    for (final RosterEntry entry : entries) {
+      for (final Iterator<Presence> it = roster.getPresences(entry.getUser()); it.hasNext(); ) {
+        final Presence presence = it.next();
+        final String fromAddress = presence.getFrom();
+
+        if (fromAddress == null) continue;
+
+        elements.add(createRosterEntryElement(new JID(fromAddress)));
+      }
+    }
 
     return elements;
   }
@@ -193,6 +203,7 @@ public final class RosterContentProvider extends TreeContentProvider {
   private final List<RosterEntryElement> filterRosterEntryElements(
       final Collection<RosterEntryElement> elements) {
 
+    // TODO every entry should be compared against its priority, see Presence#getPriority
     final Map<JID, RosterEntryElement> filteredElements =
         new HashMap<JID, RosterEntryElement>(elements.size());
 

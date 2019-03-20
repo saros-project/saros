@@ -28,6 +28,10 @@ public class RosterEntryElement extends TreeElement {
 
   private final boolean hasSarosSupport;
 
+  /* TODO away mode is can be displayed wrong if multiple resources for a given JID exist. This
+   * currently does not matter as the content provider will only return one RosterEntryElement for a JID.
+   */
+
   public RosterEntryElement(Roster roster, JID jid, boolean hasSarosSupport) {
 
     this.roster = roster;
@@ -48,7 +52,7 @@ public class RosterEntryElement extends TreeElement {
     final RosterEntry rosterEntry = getRosterEntry();
 
     if (rosterEntry == null) {
-      styledString.append(jid.toString());
+      styledString.append(jid.getBase().toString());
       return styledString;
     }
 

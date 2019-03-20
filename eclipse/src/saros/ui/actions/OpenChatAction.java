@@ -100,7 +100,7 @@ public class OpenChatAction extends Action implements Disposable {
 
         return user.getJID();
       } else {
-        return contacts.get(0);
+        return contacts.get(0).getBareJID();
       }
     }
 
