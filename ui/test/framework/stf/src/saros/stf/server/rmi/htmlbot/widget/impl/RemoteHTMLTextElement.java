@@ -2,6 +2,7 @@ package saros.stf.server.rmi.htmlbot.widget.impl;
 
 import java.rmi.RemoteException;
 import saros.stf.server.HTMLSTFRemoteObject;
+import saros.stf.server.bot.jquery.JQueryHelper;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLTextElement;
 
 public final class RemoteHTMLTextElement extends HTMLSTFRemoteObject
@@ -15,13 +16,12 @@ public final class RemoteHTMLTextElement extends HTMLSTFRemoteObject
 
   @Override
   public String getText() throws RemoteException {
-
-    Object text = browser.syncRun(String.format("return %s.text()", selector.getStatement()));
+    Object text = new JQueryHelper(browser).getTextOfSelection(selector);
     return text != null ? text.toString() : null;
   }
 
   @Override
   public void setText(String text) throws RemoteException {
-    browser.run(String.format("%s.text('%s')", selector.getStatement(), text));
+    new JQueryHelper(browser).setTextOfSelection(selector, text);
   }
 }

@@ -3,6 +3,7 @@ package saros.stf.server.rmi.htmlbot.widget.impl;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.Selector;
 import java.rmi.RemoteException;
 import saros.stf.server.HTMLSTFRemoteObject;
+import saros.stf.server.bot.jquery.JQueryHelper;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLTree;
 
 public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements IRemoteHTMLTree {
@@ -17,7 +18,7 @@ public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements IRemote
   public void check(String title) throws RemoteException {
     if (isChecked(title) == false) {
       Selector nodeSelector = new Selector("span[title=\"" + title + "\"]");
-      browser.run(String.format("%s[0].click();", nodeSelector.getStatement()));
+      new JQueryHelper(browser).clickOnSelection(nodeSelector);
     }
   }
 
@@ -25,7 +26,7 @@ public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements IRemote
   public void uncheck(String title) throws RemoteException {
     if (isChecked(title)) {
       Selector nodeSelector = new Selector("span[title=\"" + title + "\"]");
-      browser.run(String.format("%s[0].click();", nodeSelector.getStatement()));
+      new JQueryHelper(browser).clickOnSelection(nodeSelector);
     }
   }
 
