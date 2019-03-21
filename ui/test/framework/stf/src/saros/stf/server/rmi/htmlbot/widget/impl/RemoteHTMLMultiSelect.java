@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 import saros.stf.server.HTMLSTFRemoteObject;
-import saros.stf.server.bot.jquery.JQueryHelper;
+import saros.stf.server.bot.BotUtils;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLMultiSelect;
 
 public final class RemoteHTMLMultiSelect extends HTMLSTFRemoteObject
@@ -18,7 +18,8 @@ public final class RemoteHTMLMultiSelect extends HTMLSTFRemoteObject
 
   @Override
   public List<String> getSelection() throws RemoteException {
-    Object selection = new JQueryHelper(browser).getFieldValue(selector);
+    String name = BotUtils.getSelectorName(selector);
+    Object selection = browser.syncRun(String.format("return view.getFieldValue('%s')", name));
     if (selection != null) {
       String raw = selection.toString();
       String[] items = raw.replaceAll("(\\[|\\]|\\s)", "").split(",");
@@ -30,7 +31,9 @@ public final class RemoteHTMLMultiSelect extends HTMLSTFRemoteObject
 
   @Override
   public void select(List<String> value) throws RemoteException {
-    new JQueryHelper(browser).setFieldValue(selector, value.toString());
+    String name = BotUtils.getSelectorName(selector);
+
+    browser.syncRun(String.format("view.setFieldValue('%s', '%s')", name, value.toString()));
   }
 
   @Override
@@ -40,6 +43,6 @@ public final class RemoteHTMLMultiSelect extends HTMLSTFRemoteObject
 
   @Override
   public List<String> options() throws RemoteException {
-    return new JQueryHelper(browser).getSelectOptions(selector);
+    return BotUtils.getSelectOptions(browser, selector);
   }
 }
