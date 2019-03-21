@@ -3,7 +3,7 @@ package saros.stf.server.rmi.htmlbot.widget.impl;
 import java.rmi.RemoteException;
 import java.util.List;
 import saros.stf.server.HTMLSTFRemoteObject;
-import saros.stf.server.bot.jquery.JQueryHelper;
+import saros.stf.server.bot.BotUtils;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLRadioGroup;
 
 public final class RemoteHTMLRadioGroup extends HTMLSTFRemoteObject
@@ -17,13 +17,15 @@ public final class RemoteHTMLRadioGroup extends HTMLSTFRemoteObject
 
   @Override
   public String getSelected() throws RemoteException {
-    Object value = new JQueryHelper(browser).getFieldValue(selector);
+    String name = BotUtils.getSelectorName(selector);
+    Object value = browser.syncRun(String.format("return view.getFieldValue('%s')", name));
     return value != null ? value.toString() : null;
   }
 
   @Override
   public void select(String value) throws RemoteException {
-    new JQueryHelper(browser).setFieldValue(selector, value);
+    String name = BotUtils.getSelectorName(selector);
+    browser.syncRun(String.format("view.setFieldValue('%s', '%s')", name, value));
   }
 
   @Override
@@ -33,6 +35,6 @@ public final class RemoteHTMLRadioGroup extends HTMLSTFRemoteObject
 
   @Override
   public List<String> values() throws RemoteException {
-    return new JQueryHelper(browser).getListItemsValue(selector);
+    return BotUtils.getListItemsValue(browser, selector);
   }
 }

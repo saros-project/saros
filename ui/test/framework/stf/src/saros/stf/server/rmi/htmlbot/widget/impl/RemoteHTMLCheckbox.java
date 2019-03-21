@@ -2,7 +2,7 @@ package saros.stf.server.rmi.htmlbot.widget.impl;
 
 import java.rmi.RemoteException;
 import saros.stf.server.HTMLSTFRemoteObject;
-import saros.stf.server.bot.jquery.JQueryHelper;
+import saros.stf.server.bot.BotUtils;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLCheckbox;
 
 public final class RemoteHTMLCheckbox extends HTMLSTFRemoteObject implements IRemoteHTMLCheckbox {
@@ -15,17 +15,20 @@ public final class RemoteHTMLCheckbox extends HTMLSTFRemoteObject implements IRe
 
   @Override
   public boolean isChecked() throws RemoteException {
-    Object checked = new JQueryHelper(browser).getFieldValue(selector);
+    String name = BotUtils.getSelectorName(selector);
+    Object checked = browser.syncRun(String.format("return view.getFieldValue('%s')", name));
     return checked != null ? (Boolean) checked : null;
   }
 
   @Override
   public void check() throws RemoteException {
-    new JQueryHelper(browser).setFieldValue(selector, true);
+    String name = BotUtils.getSelectorName(selector);
+    browser.run(String.format("view.setFieldValue('%s', true)", name));
   }
 
   @Override
   public void uncheck() throws RemoteException {
-    new JQueryHelper(browser).setFieldValue(selector, false);
+    String name = BotUtils.getSelectorName(selector);
+    browser.run(String.format("view.setFieldValue('%s', false)", name));
   }
 }

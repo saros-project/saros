@@ -6,7 +6,7 @@ import de.fu_berlin.inf.ag_se.browser.html.ISelector.CssClassSelector;
 import java.rmi.RemoteException;
 import java.util.List;
 import saros.stf.server.HTMLSTFRemoteObject;
-import saros.stf.server.bot.jquery.JQueryHelper;
+import saros.stf.server.bot.BotUtils;
 import saros.stf.server.rmi.htmlbot.IHTMLBot;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLView;
 import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLView;
@@ -36,13 +36,13 @@ public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 
   @Override
   public List<String> getAccountList() throws RemoteException {
-    return new JQueryHelper(getBrowser(MainPage.class)).getListItemsText(SELECTOR_ACCOUNT_ENTRY);
+    return BotUtils.getListItemsText(getBrowser(MainPage.class), SELECTOR_ACCOUNT_ENTRY);
   }
 
   @Override
   public List<String> getContactList(View view) throws RemoteException {
-    return new JQueryHelper(getBrowser(view.getPageClass()))
-        .getListItemsText(SELECTOR_CONTACT_ITEM_DISPLAY_NAME);
+    return BotUtils.getListItemsText(
+        getBrowser(view.getPageClass()), SELECTOR_CONTACT_ITEM_DISPLAY_NAME);
   }
 
   private IJQueryBrowser getBrowser(Class<? extends IBrowserPage> browserPageClass) {

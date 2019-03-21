@@ -3,7 +3,7 @@ package saros.stf.server.rmi.htmlbot.widget.impl;
 import java.rmi.RemoteException;
 import java.util.List;
 import saros.stf.server.HTMLSTFRemoteObject;
-import saros.stf.server.bot.jquery.JQueryHelper;
+import saros.stf.server.bot.BotUtils;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLSelect;
 
 public final class RemoteHTMLSelect extends HTMLSTFRemoteObject implements IRemoteHTMLSelect {
@@ -16,13 +16,15 @@ public final class RemoteHTMLSelect extends HTMLSTFRemoteObject implements IRemo
 
   @Override
   public String getSelection() throws RemoteException {
-    Object selection = new JQueryHelper(browser).getFieldValue(selector);
+    String name = BotUtils.getSelectorName(selector);
+    Object selection = browser.syncRun(String.format("return view.getFieldValue('%s')", name));
     return selection != null ? selection.toString() : null;
   }
 
   @Override
   public void select(String value) throws RemoteException {
-    new JQueryHelper(browser).setFieldValue(selector, value);
+    String name = BotUtils.getSelectorName(selector);
+    browser.syncRun(String.format("view.setFieldValue('%s', '%s')", name, value));
   }
 
   @Override
@@ -32,6 +34,6 @@ public final class RemoteHTMLSelect extends HTMLSTFRemoteObject implements IRemo
 
   @Override
   public List<String> options() throws RemoteException {
-    return new JQueryHelper(browser).getSelectOptions(selector);
+    return BotUtils.getSelectOptions(browser, selector);
   }
 }
