@@ -1,0 +1,63 @@
+<?xml version='1.0'?>
+<list>
+  <option name="SAROS_DEFAULT_TEXT_SELECTION">
+    <value>
+      <option name="BACKGROUND" value="A7A7A7"/>
+    </value>
+  </option>
+  <option name="SAROS_DEFAULT_TEXT_CONTRIBUTION">
+    <value>
+      <option name="BACKGROUND" value="CFCFCF"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_0_TEXT_SELECTION">
+    <value>
+      <option name="BACKGROUND" value="8DCEE7"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_0_TEXT_CONTRIBUTION">
+    <value>
+      <option name="BACKGROUND" value="B7E0F0"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_1_TEXT_SELECTION">
+    <value>
+      <option name="BACKGROUND" value="BFBB82"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_1_TEXT_CONTRIBUTION">
+    <value>
+      <option name="BACKGROUND" value="D0CDA4"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_2_TEXT_SELECTION">
+    <value>
+      <option name="BACKGROUND" value="BADC51"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_2_TEXT_CONTRIBUTION">
+    <value>
+      <option name="BACKGROUND" value="DCEDA6"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_3_TEXT_SELECTION">
+    <value>
+      <option name="BACKGROUND" value="EDEDA9"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_3_TEXT_CONTRIBUTION">
+    <value>
+      <option name="BACKGROUND" value="F6F6D3"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_4_TEXT_SELECTION">
+    <value>
+      <option name="BACKGROUND" value="89B4B2"/>
+    </value>
+  </option>
+  <option name="SAROS_USER_4_TEXT_CONTRIBUTION">
+    <value>
+      <option name="BACKGROUND" value="B8D2D1"/>
+    </value>
+  </option>
+</list>

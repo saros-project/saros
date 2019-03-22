@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -687,23 +686,8 @@ public class AnnotationManager implements Disposable {
       return null;
     }
 
-    Color color;
-    switch (annotationType) {
-      case SELECTION_ANNOTATION:
-        color = ColorManager.getColorModel(user.getColorID()).getSelectColor();
-        break;
-
-      case CONTRIBUTION_ANNOTATION:
-        color = ColorManager.getColorModel(user.getColorID()).getEditColor();
-        break;
-
-      default:
-        throw new IllegalArgumentException("Unknown annotation type: " + annotationType);
-    }
-
-    TextAttributes textAttr = new TextAttributes();
-    textAttr.setBackgroundColor(color);
-
+    final TextAttributes textAttr =
+        ColorManager.getHighlightColor(editor.getColorsScheme(), user.getColorID(), annotationType);
     AtomicReference<RangeHighlighter> result = new AtomicReference<>();
 
     application.invokeAndWait(
