@@ -60,5 +60,10 @@
                     anchor="bottom" secondary="true"
                     factoryClass="saros.intellij.ui.swt_browser.SwtToolWindowFactory"
                     conditionClass="saros.intellij.ui.swt_browser.BrowserCondition"/>
+
+        <colorSettingsPage id="saros"
+                           implementation="saros.intellij.preferences.colors.SarosColorsPage" />
+        <additionalTextAttributes scheme="Default" file="/colorSchemes/SarosDefault.xml" />
+        <additionalTextAttributes scheme="Darcula" file="/colorSchemes/SarosDarcula.xml" />
     </extensions>
 </idea-plugin>

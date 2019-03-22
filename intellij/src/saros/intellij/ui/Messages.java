@@ -170,5 +170,12 @@ public class Messages {
   public static String ModuleTab_create_new_module_base_path_invalid_tooltip;
   public static String ModuleTab_use_existing_module_local_module_invalid_tooltip;
 
+  public static String ColorPreferences_display_name;
+  public static String ColorPreferences_text_selection_attribute_display_name;
+  public static String ColorPreferences_text_contribution_attribute_display_name;
+  public static String ColorPreferences_default_user_text_selection_attribute_display_name;
+  public static String ColorPreferences_default_user_text_contribution_attribute_display_name;
+  public static String ColorPreferences_user_example_text;
+
   private Messages() {}
 }

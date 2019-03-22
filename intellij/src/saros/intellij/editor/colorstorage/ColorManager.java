@@ -1,44 +1,145 @@
 package saros.intellij.editor.colorstorage;
 
-import java.awt.Color;
+import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.editor.HighlighterColors;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.editor.markup.TextAttributes;
+import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-/** IntelliJ color manager */
-// todo: temporary implementation to provide default colors
-public class ColorManager {
+/**
+ * IntelliJ color manager. This specifies the available colors that are used for Saros highlights
+ * and that are available for configuration inside the Color Scheme preferences.
+ */
+public final class ColorManager {
 
-  public static final Color DEFAULT_COLOR = new Color(128, 128, 128);
+  /**
+   * List of keys for supported colors. A user can select one of these colors by referencing the
+   * {@link IdentifiableColorKeys#getId()}.
+   */
+  public static final List<IdentifiableColorKeys> COLOR_KEYS;
+  /** Color keys for the default colors. These are used if no */
+  public static final ColorKeys DEFAULT_COLOR_KEYS = new DefaultColorKeys();
+  /** Number of supported users. */
+  private static final int USER_COUNT = 5;
 
-  static final Color[] CONTRIBUTION_COLORS = {
-    new Color(141, 206, 231),
-    new Color(191, 187, 130),
-    new Color(186, 220, 81),
-    new Color(237, 237, 169),
-    new Color(137, 180, 178)
-  };
-
-  static final Color[] SELECTION_COLORS = {
-    new Color(183, 224, 240),
-    new Color(208, 205, 164),
-    new Color(220, 237, 166),
-    new Color(246, 246, 211),
-    new Color(184, 210, 209)
-  };
+  static {
+    final ImmutableList.Builder<IdentifiableColorKeys> builder = ImmutableList.builder();
+    for (int i = 0; i < USER_COUNT; i++) {
+      builder.add(new IdentifiableColorKeys(i));
+    }
+    COLOR_KEYS = builder.build();
+  }
 
   private ColorManager() {}
 
   /**
-   * Returns the color for the given userID. Returns the DEFAULT_COLOR when there is no color for
-   * the userID.
+   * Returns {@link ColorKeys} for the given {@code colorId}. If no keys were found for the given
+   * {@code colorId}, this method returns the default {@link ColorKeys} instance.
    *
-   * @param userID
-   * @return the color for the given userID.
+   * @param colorId ID of the color keys to retrieve.
+   * @return The {@link ColorKeys} matching the given {@code colorId} or the default color keys.
+   *     This method always returns a non-{@code null} value.
    */
-  public static ColorModel getColorModel(int userID) {
+  @NotNull
+  public static ColorKeys getColorKeys(final int colorId) {
+    return COLOR_KEYS
+        .stream()
+        .filter(x -> x.getId() == colorId)
+        .findFirst()
+        .map(ColorKeys.class::cast)
+        .orElse(DEFAULT_COLOR_KEYS);
+  }
 
-    if (userID < 0 || userID >= 5) {
-      return new ColorModel(DEFAULT_COLOR, DEFAULT_COLOR);
+  /**
+   * Set of IntelliJ attribute keys that are used to define appearance of Saros users inside the
+   * IDE.
+   */
+  public interface ColorKeys {
+
+    /**
+     * Returns the IntelliJ color key of the {@link TextAttributes} that should be used for
+     * highlighting the selection of a user.
+     *
+     * @return attribute key used for text selection highlighting. Always non-null.
+     */
+    @NotNull
+    TextAttributesKey getSelectionColorKey();
+
+    /**
+     * Returns the IntelliJ color key of the {@link TextAttributes} that should be used for
+     * highlighting recent code contributions of a user.
+     *
+     * @return attribute key used for text contribution highlighting. Always non-null.
+     */
+    @NotNull
+    TextAttributesKey getContributionColorKey();
+  }
+
+  /** A set of IntelliJ color keys that can be referenced using a color ID. */
+  public static class IdentifiableColorKeys implements ColorKeys {
+    /** ID of this color key set. Used for being referenced by a Saros user. */
+    private final int id;
+
+    @NotNull private final TextAttributesKey selectionColorKey;
+    @NotNull private final TextAttributesKey contributionColorKey;
+
+    private IdentifiableColorKeys(final int id) {
+      final String selectionKeyName = "SAROS_TEXT_SELECTION_" + id;
+      final String contributionKeyName = "SAROS_TEXT_CONTRIBUTION_" + id;
+      this.selectionColorKey =
+          TextAttributesKey.createTextAttributesKey(selectionKeyName, HighlighterColors.TEXT);
+      this.contributionColorKey =
+          TextAttributesKey.createTextAttributesKey(contributionKeyName, HighlighterColors.TEXT);
+      this.id = id;
     }
 
-    return new ColorModel(CONTRIBUTION_COLORS[userID], SELECTION_COLORS[userID]);
+    @NotNull
+    @Override
+    public TextAttributesKey getSelectionColorKey() {
+      return selectionColorKey;
+    }
+
+    @NotNull
+    @Override
+    public TextAttributesKey getContributionColorKey() {
+      return contributionColorKey;
+    }
+
+    /**
+     * Returns the ID of this color.
+     *
+     * @return ID of this color.
+     */
+    public int getId() {
+      return id;
+    }
+  }
+
+  /**
+   * Holds IntelliJ color keys that are used if no matching {@link IdentifiableColorKeys} was found.
+   * These color keys are used if user specific color keys have been requested, but no color keys
+   * matching a given user ID were found.
+   */
+  private static final class DefaultColorKeys implements ColorKeys {
+
+    private static final TextAttributesKey DEFAULT_SELECTION_COLOR_KEY =
+        TextAttributesKey.createTextAttributesKey(
+            "SAROS_DEFAULT_TEXT_SELECTION", HighlighterColors.TEXT);
+    private static final TextAttributesKey DEFAULT_CONTRIBUTION_COLOR_KEY =
+        TextAttributesKey.createTextAttributesKey(
+            "SAROS_DEFAULT_TEXT_CONTRIBUTION", HighlighterColors.TEXT);
+
+    @NotNull
+    @Override
+    public TextAttributesKey getSelectionColorKey() {
+      return DEFAULT_SELECTION_COLOR_KEY;
+    }
+
+    @NotNull
+    @Override
+    public TextAttributesKey getContributionColorKey() {
+      return DEFAULT_CONTRIBUTION_COLOR_KEY;
+    }
   }
 }

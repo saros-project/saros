@@ -4,11 +4,11 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
 import saros.intellij.editor.colorstorage.ColorManager;
+import saros.intellij.editor.colorstorage.ColorManager.ColorKeys;
 import saros.repackaged.picocontainer.Disposable;
 import saros.session.User;
 
@@ -687,24 +688,24 @@ public class AnnotationManager implements Disposable {
       return null;
     }
 
-    Color color;
+    // Retrieve color keys based on the color ID selected by this user. This will automatically
+    // fall back to default colors, if no colors for the given ID are available.
+    final ColorKeys colorKeys = ColorManager.getColorKeys(user.getColorID());
+    final TextAttributesKey highlightColorKey;
     switch (annotationType) {
       case SELECTION_ANNOTATION:
-        color = ColorManager.getColorModel(user.getColorID()).getSelectColor();
+        highlightColorKey = colorKeys.getSelectionColorKey();
         break;
-
       case CONTRIBUTION_ANNOTATION:
-        color = ColorManager.getColorModel(user.getColorID()).getEditColor();
+        highlightColorKey = colorKeys.getContributionColorKey();
         break;
-
       default:
-        throw new IllegalArgumentException("Unknown annotation type: " + annotationType);
+        throw new IllegalStateException("Unknown AnnotationType: " + annotationType);
     }
 
-    TextAttributes textAttr = new TextAttributes();
-    textAttr.setBackgroundColor(color);
-
-    AtomicReference<RangeHighlighter> result = new AtomicReference<>();
+    // Resolve the correct text attributes based on the currently configured IDE scheme.
+    final TextAttributes textAttr = editor.getColorsScheme().getAttributes(highlightColorKey);
+    final AtomicReference<RangeHighlighter> result = new AtomicReference<>();
 
     application.invokeAndWait(
         () ->
