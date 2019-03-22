@@ -13,9 +13,10 @@ public class SarosServer {
 
   private ServerLifecycle lifecycle;
 
-  /** The Saros server's version. */
-  // FIXME move to META-INF or config file
-  public static final String SAROS_VERSION = "14.11.28.DEVEL";
+  /** The Saros version which is impersonated by the current server version. */
+  // FIXME create a version handling that allows a separate server versioning
+  // the current handling is tied to the current Saros/E versioning
+  public static final String SAROS_VERSION = "15.0.0";
 
   /** Initializes and starts a Saros server. */
   public SarosServer() {
