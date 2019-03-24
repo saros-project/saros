@@ -4,6 +4,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.picocontainer.Disposable;
 import saros.filesystem.IFile;
 import saros.intellij.editor.colorstorage.ColorManager;
+import saros.intellij.editor.colorstorage.ColorManager.ColorKeys;
 import saros.session.User;
 
 /** Annotation manager used to create, delete and manage annotations for a Saros session. */
@@ -686,9 +688,24 @@ public class AnnotationManager implements Disposable {
       return null;
     }
 
-    final TextAttributes textAttr =
-        ColorManager.getHighlightColor(editor.getColorsScheme(), user.getColorID(), annotationType);
-    AtomicReference<RangeHighlighter> result = new AtomicReference<>();
+    // Retrieve color keys based on the color ID selected by this user. This will automatically
+    // fall back to default colors, if no colors for the given ID are available.
+    final ColorKeys colorKeys = ColorManager.getColorKeys(user.getColorID());
+    final TextAttributesKey highlightColorKey;
+    switch (annotationType) {
+      case SELECTION_ANNOTATION:
+        highlightColorKey = colorKeys.getSelectionColorKey();
+        break;
+      case CONTRIBUTION_ANNOTATION:
+        highlightColorKey = colorKeys.getContributionColorKey();
+        break;
+      default:
+        throw new IllegalStateException("Unknown AnnotationType: " + annotationType);
+    }
+
+    // Resolve the correct text attributes based on the currently configured IDE scheme.
+    final TextAttributes textAttr = editor.getColorsScheme().getAttributes(highlightColorKey);
+    final AtomicReference<RangeHighlighter> result = new AtomicReference<>();
 
     application.invokeAndWait(
         () ->

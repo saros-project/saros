@@ -18,32 +18,32 @@ import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.intellij.editor.colorstorage.ColorManager;
-import saros.intellij.editor.colorstorage.ColorManager.SarosUserColorKeys;
+import saros.intellij.editor.colorstorage.ColorManager.IdentifiableColorKeys;
 import saros.intellij.ui.Messages;
 
 /** IntelliJ color scheme preferences for Saros specific colors. */
 public class SarosColorsPage implements ColorSettingsPage {
 
-  /** List of descriptors for colors specific for each user. */
-  private static final List<AttributesDescriptor> USER_ATTRIBUTE_DESCRIPTORS;
+  /** List of descriptors for colors that can be selected by users. */
+  private static final List<AttributesDescriptor> COLOR_ATTRIBUTE_DESCRIPTORS;
 
   static {
     final ImmutableList.Builder<AttributesDescriptor> builder = ImmutableList.builder();
-    for (SarosUserColorKeys colorKeys : ColorManager.USER_COLOR_KEYS) {
-      final int userDisplayID = colorKeys.getUserID() + 1;
+    for (IdentifiableColorKeys colorKeys : ColorManager.COLOR_KEYS) {
+      final int userDisplayID = colorKeys.getId() + 1;
       builder.add(
           new AttributesDescriptor(
               MessageFormat.format(
-                  Messages.ColorPreferences_user_text_selection_attribute_display_name,
+                  Messages.ColorPreferences_text_selection_attribute_display_name,
                   userDisplayID),
               colorKeys.getSelectionColorKey()),
           new AttributesDescriptor(
               MessageFormat.format(
-                  Messages.ColorPreferences_user_text_contribution_attribute_display_name,
+                  Messages.ColorPreferences_text_contribution_attribute_display_name,
                   userDisplayID),
               colorKeys.getContributionColorKey()));
     }
-    USER_ATTRIBUTE_DESCRIPTORS = builder.build();
+    COLOR_ATTRIBUTE_DESCRIPTORS = builder.build();
   }
 
   /** List of descriptors for colors not specific to Saros users. */
@@ -51,21 +51,21 @@ public class SarosColorsPage implements ColorSettingsPage {
       ImmutableList.of(
           new AttributesDescriptor(
               Messages.ColorPreferences_default_user_text_selection_attribute_display_name,
-              ColorManager.DEFAULT_USER_COLOR_KEYS.getSelectionColorKey()),
+              ColorManager.DEFAULT_COLOR_KEYS.getSelectionColorKey()),
           new AttributesDescriptor(
               Messages.ColorPreferences_default_user_text_contribution_attribute_display_name,
-              ColorManager.DEFAULT_USER_COLOR_KEYS.getContributionColorKey()));
+              ColorManager.DEFAULT_COLOR_KEYS.getContributionColorKey()));
 
   private static final Map<String, TextAttributesKey> HIGHLIGHT_MAP;
 
   static {
     final ImmutableMap.Builder<String, TextAttributesKey> builder = ImmutableMap.builder();
-    for (SarosUserColorKeys userColorKeys : ColorManager.USER_COLOR_KEYS) {
-      builder.put("sel" + userColorKeys.getUserID(), userColorKeys.getSelectionColorKey());
-      builder.put("contrib" + userColorKeys.getUserID(), userColorKeys.getContributionColorKey());
+    for (IdentifiableColorKeys identifiableColorKeys : ColorManager.COLOR_KEYS) {
+      builder.put("sel" + identifiableColorKeys.getId(), identifiableColorKeys.getSelectionColorKey());
+      builder.put("contrib" + identifiableColorKeys.getId(), identifiableColorKeys.getContributionColorKey());
     }
-    builder.put("sel", ColorManager.DEFAULT_USER_COLOR_KEYS.getSelectionColorKey());
-    builder.put("contrib", ColorManager.DEFAULT_USER_COLOR_KEYS.getContributionColorKey());
+    builder.put("sel", ColorManager.DEFAULT_COLOR_KEYS.getSelectionColorKey());
+    builder.put("contrib", ColorManager.DEFAULT_COLOR_KEYS.getContributionColorKey());
     HIGHLIGHT_MAP = builder.build();
   }
 
@@ -87,10 +87,10 @@ public class SarosColorsPage implements ColorSettingsPage {
   public String getDemoText() {
     final StringBuilder sb = new StringBuilder();
     sb.append(MessageFormat.format(Messages.ColorPreferences_user_example_text, ""));
-    for (SarosUserColorKeys userColorKeys : ColorManager.USER_COLOR_KEYS) {
+    for (IdentifiableColorKeys identifiableColorKeys : ColorManager.COLOR_KEYS) {
       sb.append(
           MessageFormat.format(
-              Messages.ColorPreferences_user_example_text, userColorKeys.getUserID()));
+              Messages.ColorPreferences_user_example_text, identifiableColorKeys.getId()));
     }
     return sb.toString();
   }
@@ -104,7 +104,7 @@ public class SarosColorsPage implements ColorSettingsPage {
   @NotNull
   @Override
   public AttributesDescriptor[] getAttributeDescriptors() {
-    return Stream.of(USER_ATTRIBUTE_DESCRIPTORS, ADDITIONAL_ATTRIBUTE_DESCRIPTORS)
+    return Stream.of(COLOR_ATTRIBUTE_DESCRIPTORS, ADDITIONAL_ATTRIBUTE_DESCRIPTORS)
         .flatMap(Collection::stream)
         .toArray(AttributesDescriptor[]::new);
   }

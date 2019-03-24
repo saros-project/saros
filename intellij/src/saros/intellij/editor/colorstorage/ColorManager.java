@@ -2,74 +2,60 @@ package saros.intellij.editor.colorstorage;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.editor.HighlighterColors;
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
-import saros.intellij.editor.annotations.AnnotationManager.AnnotationType;
 
 /**
- * IntelliJ color manager. This specifies the available colors that are used for Saros
- * highlights and that are available for configuration inside the Color Scheme preferences.
+ * IntelliJ color manager. This specifies the available colors that are used for Saros highlights
+ * and that are available for configuration inside the Color Scheme preferences.
  */
 public final class ColorManager {
 
-  /** List of keys for supported user colors. */
-  public static final List<SarosUserColorKeys> USER_COLOR_KEYS;
-  /** Color keys for the default (unknown) user. */
-  public static final UserColorKeys DEFAULT_USER_COLOR_KEYS = new DefaultUserColorKeys();
+  /**
+   * List of keys for supported colors. A user can select one of these colors by referencing the
+   * {@link IdentifiableColorKeys#getId()}.
+   */
+  public static final List<IdentifiableColorKeys> COLOR_KEYS;
+  /** Color keys for the default colors. These are used if no */
+  public static final ColorKeys DEFAULT_COLOR_KEYS = new DefaultColorKeys();
   /** Number of supported users. */
   private static final int USER_COUNT = 5;
 
   static {
-    final ImmutableList.Builder<SarosUserColorKeys> builder = ImmutableList.builder();
+    final ImmutableList.Builder<IdentifiableColorKeys> builder = ImmutableList.builder();
     for (int i = 0; i < USER_COUNT; i++) {
-      builder.add(new SarosUserColorKeys(i));
+      builder.add(new IdentifiableColorKeys(i));
     }
-    USER_COLOR_KEYS = builder.build();
+    COLOR_KEYS = builder.build();
   }
 
   private ColorManager() {}
 
   /**
-   * Returns the color for the given userID. Returns the DEFAULT_COLOR when there is no color for
-   * the userID.
+   * Returns {@link ColorKeys} for the given {@code colorId}. If no keys were found for the given
+   * {@code colorId}, this method returns the default {@link ColorKeys} instance.
    *
-   * @return the color for the given userID.
+   * @param colorId ID of the color keys to retrieve.
+   * @return The {@link ColorKeys} matching the given {@code colorId} or the default color keys.
+   *     This method always returns a non-{@code null} value.
    */
-  public static TextAttributes getHighlightColor(
-      @NotNull final EditorColorsScheme colorsScheme,
-      final int userID,
-      @NotNull final AnnotationType annotationType) {
-
-    // Find the matching color keys based on the user ID, or fall back to the default user.
-    final UserColorKeys colorKeys =
-        USER_COLOR_KEYS
-            .stream()
-            .filter(x -> x.getUserID() == userID)
-            .findFirst()
-            .map(UserColorKeys.class::cast)
-            .orElse(DEFAULT_USER_COLOR_KEYS);
-
-    // Extract the relevant color key, based on the annotation type.
-    final TextAttributesKey highlightColorKey;
-    switch (annotationType) {
-      case SELECTION_ANNOTATION:
-        highlightColorKey = colorKeys.getSelectionColorKey();
-        break;
-      case CONTRIBUTION_ANNOTATION:
-        highlightColorKey = colorKeys.getContributionColorKey();
-        break;
-      default:
-        throw new IllegalStateException("Unknown AnnotationType: " + annotationType);
-    }
-
-    return colorsScheme.getAttributes(highlightColorKey);
+  @NotNull
+  public static ColorKeys getColorKeys(final int colorId) {
+    return COLOR_KEYS
+        .stream()
+        .filter(x -> x.getId() == colorId)
+        .findFirst()
+        .map(ColorKeys.class::cast)
+        .orElse(DEFAULT_COLOR_KEYS);
   }
 
-  /** Holds IntelliJ color keys specific to a user. */
-  public interface UserColorKeys {
+  /**
+   * Set of IntelliJ attribute keys that are used to define appearance of Saros users inside the
+   * IDE.
+   */
+  public interface ColorKeys {
 
     /**
      * Returns the IntelliJ color key of the {@link TextAttributes} that should be used for
@@ -90,21 +76,22 @@ public final class ColorManager {
     TextAttributesKey getContributionColorKey();
   }
 
-  /** Holds IntelliJ color keys for a specific Saros user, based on the user's ID. */
-  public static class SarosUserColorKeys implements UserColorKeys {
+  /** A set of IntelliJ color keys that can be referenced using a color ID. */
+  public static class IdentifiableColorKeys implements ColorKeys {
+    /** ID of this color key set. Used for being referenced by a Saros user. */
+    private final int id;
 
-    private final TextAttributesKey selectionColorKey;
-    private final TextAttributesKey contributionColorKey;
-    private int userID;
+    @NotNull private final TextAttributesKey selectionColorKey;
+    @NotNull private final TextAttributesKey contributionColorKey;
 
-    SarosUserColorKeys(final int userID) {
-      final String selectionKeyName = "SAROS_USER_" + userID + "_TEXT_SELECTION";
-      final String contributionKeyName = "SAROS_USER_" + userID + "_TEXT_CONTRIBUTION";
+    private IdentifiableColorKeys(final int id) {
+      final String selectionKeyName = "SAROS_TEXT_SELECTION_" + id;
+      final String contributionKeyName = "SAROS_TEXT_CONTRIBUTION_" + id;
       this.selectionColorKey =
           TextAttributesKey.createTextAttributesKey(selectionKeyName, HighlighterColors.TEXT);
       this.contributionColorKey =
           TextAttributesKey.createTextAttributesKey(contributionKeyName, HighlighterColors.TEXT);
-      this.userID = userID;
+      this.id = id;
     }
 
     @NotNull
@@ -120,20 +107,21 @@ public final class ColorManager {
     }
 
     /**
-     * Returns the ID of the user to whom these color keys belong.
+     * Returns the ID of this color.
      *
-     * @return ID of a user.
+     * @return ID of this color.
      */
-    public int getUserID() {
-      return userID;
+    public int getId() {
+      return id;
     }
   }
 
   /**
-   * Holds IntelliJ color keys for the default user. These color keys are used if user specific
-   * color keys have been requested, but no color keys matching a given user ID were found.
+   * Holds IntelliJ color keys that are used if no matching {@link IdentifiableColorKeys} was found.
+   * These color keys are used if user specific color keys have been requested, but no color keys
+   * matching a given user ID were found.
    */
-  public static final class DefaultUserColorKeys implements UserColorKeys {
+  private static final class DefaultColorKeys implements ColorKeys {
 
     private static final TextAttributesKey DEFAULT_SELECTION_COLOR_KEY =
         TextAttributesKey.createTextAttributesKey(
