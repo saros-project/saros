@@ -1,0 +1,102 @@
+eclipse{
+    project {
+        natures 'org.eclipse.pde.PluginNature'
+    }
+}
+
+buildscript {
+    repositories {
+        maven {
+            url  "http://dl.bintray.com/monkey-works/BuildMonkey"
+        }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "de.monkeyworks.buildmonkey:gradle.dependency:0.4.13"
+    }
+}
+
+apply plugin: 'de.monkeyworks.buildmonkey.ManifestDependencyPlugin'
+
+repositories {
+    maven { url rootProject.file('build/maven') }
+}
+
+sourceSets {
+    main {
+        java.srcDirs = ['src']
+        resources {
+            srcDir 'src'
+            exclude '**/*.java'
+        }
+    }
+    test {
+        java.srcDirs = ['test']
+    }
+}
+
+manifestDependencies {
+    eclipseGroup = 'eclipse-deps'
+
+    dependencyHandling {
+        def ids = [:]
+
+        return ids
+    }
+}
+
+dependencies {
+    compile junitVersion
+    compile project(':saros.core')
+    compile project(':saros.ui')
+    compile project(':saros.eclipse')
+
+    compile project(path: ':saros.ui', configuration: 'testing')
+    compile project(path: ':saros.eclipse', configuration: 'testing')
+
+    releaseDep fileTree(dir: 'libs', include: '*.jar', exclude: '*source*.jar')
+    compile fileTree(dir: eclipseHome + '/plugins').matching {
+        include '*.jar'
+        exclude '*commons.lang*'
+        exclude 'de.fu_berlin.*'
+    }
+    compile configurations.releaseDep
+}
+
+jar {
+    manifest {
+        def manif = "${projectDir}/META-INF/MANIFEST.MF"
+        if (new File(manif).exists()) {
+            from (manif)
+        }
+    }
+
+    from sourceSets.main.output
+    from 'plugin.xml'
+
+    into('lib') {
+        from configurations.getByName('releaseDep')
+    }
+    into('test/resources') {
+        from('test/resources')
+    }
+}
+
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+artifacts {
+    testing testJar
+}
+
+sonarqube {
+    properties {
+        property 'sonar.projectName', 'Saros/STF'
+        property 'sonar.projectDescription', 'Saros Test Framework'
+        property 'sonar.projectVersion', '0.1.0'
+    }
+}
