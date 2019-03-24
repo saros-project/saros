@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import saros.intellij.editor.annotations.AnnotationManager.AnnotationType;
 
 /**
- * IntelliJ color manager. This specifies the available colors that are used for for Saros
+ * IntelliJ color manager. This specifies the available colors that are used for Saros
  * highlights and that are available for configuration inside the Color Scheme preferences.
  */
 public final class ColorManager {
