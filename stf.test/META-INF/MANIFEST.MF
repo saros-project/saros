@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Saros STF Test
+Bundle-SymbolicName: saros.stf.test
+Bundle-Version: 0.1.0.DEVEL
+Bundle-Vendor: FU-Berlin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: saros.eclipse
+ saros.core,
+ saros.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jface,
+ org.junit
