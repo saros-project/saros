@@ -26,26 +26,6 @@ public class SarosColorsPage implements ColorSettingsPage {
 
   /** List of descriptors for colors that can be selected by users. */
   private static final List<AttributesDescriptor> COLOR_ATTRIBUTE_DESCRIPTORS;
-
-  static {
-    final ImmutableList.Builder<AttributesDescriptor> builder = ImmutableList.builder();
-    for (IdentifiableColorKeys colorKeys : ColorManager.COLOR_KEYS) {
-      final int userDisplayID = colorKeys.getId() + 1;
-      builder.add(
-          new AttributesDescriptor(
-              MessageFormat.format(
-                  Messages.ColorPreferences_text_selection_attribute_display_name,
-                  userDisplayID),
-              colorKeys.getSelectionColorKey()),
-          new AttributesDescriptor(
-              MessageFormat.format(
-                  Messages.ColorPreferences_text_contribution_attribute_display_name,
-                  userDisplayID),
-              colorKeys.getContributionColorKey()));
-    }
-    COLOR_ATTRIBUTE_DESCRIPTORS = builder.build();
-  }
-
   /** List of descriptors for colors not specific to Saros users. */
   private static final List<AttributesDescriptor> ADDITIONAL_ATTRIBUTE_DESCRIPTORS =
       ImmutableList.of(
@@ -59,10 +39,31 @@ public class SarosColorsPage implements ColorSettingsPage {
   private static final Map<String, TextAttributesKey> HIGHLIGHT_MAP;
 
   static {
+    final ImmutableList.Builder<AttributesDescriptor> builder = ImmutableList.builder();
+    for (IdentifiableColorKeys colorKeys : ColorManager.COLOR_KEYS) {
+      final int userDisplayID = colorKeys.getId() + 1;
+      builder.add(
+          new AttributesDescriptor(
+              MessageFormat.format(
+                  Messages.ColorPreferences_text_selection_attribute_display_name, userDisplayID),
+              colorKeys.getSelectionColorKey()),
+          new AttributesDescriptor(
+              MessageFormat.format(
+                  Messages.ColorPreferences_text_contribution_attribute_display_name,
+                  userDisplayID),
+              colorKeys.getContributionColorKey()));
+    }
+    COLOR_ATTRIBUTE_DESCRIPTORS = builder.build();
+  }
+
+  static {
     final ImmutableMap.Builder<String, TextAttributesKey> builder = ImmutableMap.builder();
     for (IdentifiableColorKeys identifiableColorKeys : ColorManager.COLOR_KEYS) {
-      builder.put("sel" + identifiableColorKeys.getId(), identifiableColorKeys.getSelectionColorKey());
-      builder.put("contrib" + identifiableColorKeys.getId(), identifiableColorKeys.getContributionColorKey());
+      builder.put(
+          "sel" + identifiableColorKeys.getId(), identifiableColorKeys.getSelectionColorKey());
+      builder.put(
+          "contrib" + identifiableColorKeys.getId(),
+          identifiableColorKeys.getContributionColorKey());
     }
     builder.put("sel", ColorManager.DEFAULT_COLOR_KEYS.getSelectionColorKey());
     builder.put("contrib", ColorManager.DEFAULT_COLOR_KEYS.getContributionColorKey());
