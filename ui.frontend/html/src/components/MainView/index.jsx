@@ -13,7 +13,7 @@ class MainView extends React.Component {
   render () {
     const { core, mainUI } = this.props
     return (
-      <div>
+      <div className="main-view">
         <ToolBar core={core} mainUI={mainUI} />
         <div className='content-container'>
           <ActiveAccount activeAccount={core.state.activeAccount} />

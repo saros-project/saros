@@ -1,0 +1,58 @@
+.folder-tree * {
+  cursor: default;
+  user-select: none;
+}
+
+.tree-item {
+  margin-left: 25px;
+}
+
+.tree-item-line {
+  height: 30px;
+  position: relative;
+}
+
+.tree-item-arrow {
+  float: left;
+  width: 15px;
+  margin: 0px 3px;
+  font-size: 20px;
+}
+.tree-item-fill-background {
+  background-color: white;
+}
+
+.tree-item-checkbox {
+  width: 16px;
+  height: 16px;
+  margin: 7px;
+  float: left;
+  outline: 1px solid black;
+  font-size: 11px;
+}
+
+.checkbox-highlighted {
+  background-color: rgba(46, 185, 33, 0.3);
+}
+
+.tree-item-checkbox:hover{
+  background-color: rgb(204, 248, 207);
+}
+
+.tree-item-text {
+  float: left;
+  line-height: 30px;
+}
+
+.tree-item-children {
+  position: relative;
+}
+.tree-item-vertical-hierarchy-line {
+  position: absolute;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 0px;
+  height: calc(100% - 20px);
+  border: 1px dashed rgb(230, 230, 230);
+  left: 35px;
+}

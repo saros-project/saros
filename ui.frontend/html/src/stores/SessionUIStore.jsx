@@ -3,8 +3,8 @@ import { traverse } from 'Utils'
 import invariant from 'invariant'
 
 export default class SessionUIStore {
-  @observable.ref checkedKeys = new Set()
-  @observable.ref selectedContacts = new Set()
+  @observable.ref checkedKeys = []
+  @observable.ref selectedContacts = []
 
   constructor (core, view) {
     this.core = core
@@ -45,7 +45,7 @@ export default class SessionUIStore {
 
   @action.bound
   setCheckedKeys (checkedKeys) {
-    this.checkedKeys = new Set(checkedKeys)
+    this.checkedKeys = checkedKeys;
   }
 
   @action.bound

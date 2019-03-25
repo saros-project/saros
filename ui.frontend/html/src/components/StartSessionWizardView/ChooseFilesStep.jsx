@@ -1,40 +1,19 @@
-import './style.css'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
-import Tree, { TreeNode } from 'rc-tree'
+import TreeRoot from './FileTree/TreeRoot';
 
 export default
-@inject(({ core, sessionUI }) => ({
-  initialProjectTrees: core.projectTrees,
-  setCheckedKeys: sessionUI.setCheckedKeys,
-  checkedKeys: sessionUI.checkedKeys
-}))
+@inject('core', 'sessionUI')
 @observer
 class ChooseFilesStep extends React.Component {
   render() {
-    const { initialProjectTrees, checkedKeys, setCheckedKeys } = this.props
-    // This renders once before the initialProjectTrees got injected
-    // Thats why we need to render something that does not depend on
-    // initialProjectTrees first (e.g. null)
-    if (!initialProjectTrees) return null
     return (
-      <Tree
-        className='project-tree'
-        showLine checkable defaultExpandAll
-        selectable={false}
-        checkedKeys={Array.from(checkedKeys)}
-        onCheck={setCheckedKeys}
-      >
-        {initialProjectTrees.map(({ root }, i) => renderTreeNode(root, i))}
-      </Tree>
+      <TreeRoot
+        roots={this.props.core.projectTrees.map(tree => tree.root)}
+        checkedKeys={this.props.sessionUI.checkedKeys}
+        onKeysChange={keys => this.props.sessionUI.setCheckedKeys(keys)}
+        initialDepth={0}
+      />
     )
   }
-}
-
-function renderTreeNode(root, i) {
-  return (
-    <TreeNode title={root.label} key={i}>
-      {!!root.members.length && root.members.map(renderTreeNode)}
-    </TreeNode>
-  )
 }

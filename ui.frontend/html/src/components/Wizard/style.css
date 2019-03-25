@@ -1,8 +1,10 @@
 .wizard-step .navbar {
+  margin:0;
   position: fixed;
   width: 100%;
   margin-bottom: 0;
-  height: 50px
+  height: 50px;
+  z-index: 2;
 }
 
 .wizard-step .footer {
@@ -14,7 +16,7 @@
 }
 
 .wizard-step .wizard-body {
-  overflow-y: scroll;
+  overflow: auto;
   position: fixed;
   top: 50px;
   bottom: 50px;
