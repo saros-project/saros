@@ -1,6 +1,7 @@
 const { resolve } = require('path')
 // This plugin is used for generating the .html files, based on the template.ejs file
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { views } = require('./src/constants');
 
 // see https://github.com/jantimon/html-webpack-plugin
 // EJS template engine is used by default
@@ -46,10 +47,10 @@ module.exports = {
   },
   plugins: [
     // TODO there should be a more elegant way of telling the application which view to show
-    createPage('main-page'),
-    createPage('start-session-wizard'),
-    createPage('configuration-page'),
-    createPage('basic-widget-test')
+    createPage(views.MAIN),
+    createPage(views.START_SESSION_WIZARD),
+    createPage(views.CONFIGURATION_WIZARD),
+    createPage(views.BASIC_WIDGET_TEST)
   ],
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -57,7 +58,7 @@ module.exports = {
     alias: {
       '~': resolve(__dirname, 'src/'),
       Utils: resolve(__dirname, 'src/utils/'),
-      Constants: resolve(__dirname, 'src/constants.jsx')
+      Constants: resolve(__dirname, 'src/constants.js')
     }
   }
 }
