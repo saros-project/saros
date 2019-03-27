@@ -34,7 +34,7 @@ class AddContactView extends React.Component {
   render() {
     return (
       <Row id='add-contact-form'>
-        <Col lg={{ offset: 4, span: 4 }}>
+        <Col sm={12} md={{offset: 1, span: 10}} lg={{ offset: 2, span: 8 }}>
           <Form>
             <Form.Group>
               <Form.Label><Text message='label.jid' /></Form.Label>
