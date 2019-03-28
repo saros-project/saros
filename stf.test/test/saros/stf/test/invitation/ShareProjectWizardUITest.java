@@ -17,7 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
-import saros.stf.test.Constants;
+import saros.stf.test.stf.Constants;
 
 /*
  * 1. open the invitation wizard

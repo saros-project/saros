@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.client.StfHtmlTestCase;
-import saros.stf.test.Constants;
+import saros.stf.test.stf.Constants;
 
 public class StartSessionWizardTest extends StfHtmlTestCase {
 

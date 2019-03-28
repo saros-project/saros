@@ -17,7 +17,7 @@ import saros.session.User.Permission;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
-import saros.stf.test.Constants;
+import saros.stf.test.stf.Constants;
 
 public class NonHostInvitesContactTest extends StfTestCase {
 

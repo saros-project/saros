@@ -1,4 +1,4 @@
-package saros.stf.test;
+package saros.stf.test.stf;
 
 import saros.SarosConstants;
 import saros.net.xmpp.JID;

@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
-import saros.stf.test.Constants;
+import saros.stf.test.stf.Constants;
 
 public class PackageExplorerViewTest extends StfTestCase {
 
