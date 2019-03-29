@@ -8,14 +8,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -55,6 +54,8 @@ public final class XMPPAccountStore {
   private static final int MAX_ACCOUNT_DATA_SIZE = 10 * 1024 * 1024;
 
   private static final String DEFAULT_SECRET_KEY = "Saros";
+
+  private static final int ACCOUNT_FILE_MAGIC_NUMBER = "SarosAccountStore".hashCode();
 
   private final CopyOnWriteArrayList<IAccountStoreListener> listeners =
       new CopyOnWriteArrayList<IAccountStoreListener>();
@@ -141,7 +142,6 @@ public final class XMPPAccountStore {
     notifyActiveAccountListeners();
   }
 
-  @SuppressWarnings("unchecked")
   private synchronized void loadAccounts() {
 
     if (accountFile == null || !accountFile.exists()) return;
@@ -150,44 +150,40 @@ public final class XMPPAccountStore {
 
     LOG.debug("loading accounts from file: " + accountFile.getAbsolutePath());
 
-    DataInputStream dataIn = null;
-
-    int size;
-
-    byte[] buffer;
+    DataInputStream accountFileInputStream = null;
 
     try {
-      dataIn = new DataInputStream(new FileInputStream(accountFile));
+      accountFileInputStream = new DataInputStream(new FileInputStream(accountFile));
 
-      size = dataIn.readInt();
+      final int magicNumber = accountFileInputStream.readInt();
 
-      if (size <= 0 || size > MAX_ACCOUNT_DATA_SIZE)
-        throw new IOException(
-            "account data seems malformed, refused to load " + size + " bytes into memory");
+      if (magicNumber != ACCOUNT_FILE_MAGIC_NUMBER)
+        throw new IOException("file " + accountFile.getAbsolutePath() + " is not an account file");
 
-      buffer = new byte[size];
-
-      dataIn.readFully(buffer);
-
-      activeAccount =
-          (XMPPAccount)
-              new ObjectInputStream(new ByteArrayInputStream(Crypto.decrypt(buffer, secretKey)))
-                  .readObject();
-
-      size = dataIn.readInt();
+      final int size = accountFileInputStream.readInt();
 
       if (size <= 0 || size > MAX_ACCOUNT_DATA_SIZE)
         throw new IOException(
             "account data seems malformed, refused to load " + size + " bytes into memory");
 
-      buffer = new byte[size];
+      final byte[] buffer = new byte[size];
 
-      dataIn.readFully(buffer);
+      accountFileInputStream.readFully(buffer);
 
-      accounts =
-          (Set<XMPPAccount>)
-              new ObjectInputStream(new ByteArrayInputStream(Crypto.decrypt(buffer, secretKey)))
-                  .readObject();
+      final DataInputStream accountDataInputStream =
+          new DataInputStream(new ByteArrayInputStream(Crypto.decrypt(buffer, secretKey)));
+
+      final int accountsCount = accountDataInputStream.readInt();
+
+      final List<XMPPAccount> accountsToLoad = new ArrayList<>(accountsCount);
+
+      for (int i = 0; i < accountsCount; i++)
+        accountsToLoad.add(XMPPAccount.unmarshall(accountDataInputStream));
+
+      final int activeAccountIdx = accountDataInputStream.readInt();
+
+      activeAccount = accountsToLoad.get(activeAccountIdx);
+      accounts.addAll(accountsToLoad);
 
     } catch (RuntimeException e) {
       LOG.error("internal error while loading account data", e);
@@ -196,18 +192,23 @@ public final class XMPPAccountStore {
       LOG.error("could not load account data", e);
       return;
     } finally {
-      IOUtils.closeQuietly(dataIn);
+      IOUtils.closeQuietly(accountFileInputStream);
     }
-
-    /*
-     * remove us first and re add us, otherwise the active account object is
-     * not in the set and the wrong object will be updated
-     */
-    accounts.remove(activeAccount);
-    accounts.add(activeAccount);
 
     LOG.debug("loaded " + accounts.size() + " account(s)");
   }
+
+  /*
+   * TODO layout should be
+   * 1. Magic Number
+   * 2. Size of uncompressed content
+   * 3. (hash of compressed content ?)
+   * ---------------------------------
+   * Uncompressed content is
+   * 1. Number of stored accounts
+   * 2. idx of currently active account
+   * 3. account 0 ... account n-1
+   */
 
   private synchronized void saveAccounts() {
 
@@ -223,33 +224,43 @@ public final class XMPPAccountStore {
       }
     }
 
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    ObjectOutputStream oos;
-
-    DataOutputStream dataOut = null;
+    DataOutputStream accountFileOutputStream = null;
 
     try {
-      dataOut = new DataOutputStream(new FileOutputStream(accountFile));
 
-      oos = new ObjectOutputStream(out);
-      oos.writeObject(activeAccount);
-      oos.flush();
+      final List<XMPPAccount> accountsToSave = Arrays.asList(accounts.toArray(new XMPPAccount[0]));
 
-      byte[] activeAccount = Crypto.encrypt(out.toByteArray(), secretKey);
-      out.reset();
+      final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-      oos = new ObjectOutputStream(out);
-      oos.writeObject(accounts);
-      oos.flush();
+      final DataOutputStream accountFileDataOutputStream = new DataOutputStream(buffer);
 
-      byte[] allAccounts = Crypto.encrypt(out.toByteArray(), secretKey);
+      int activeAccountIdx = -1;
 
-      dataOut.writeInt(activeAccount.length);
-      dataOut.write(activeAccount);
-      dataOut.writeInt(allAccounts.length);
-      dataOut.write(allAccounts);
+      accountFileDataOutputStream.writeInt(accountsToSave.size());
 
-      dataOut.flush();
+      int accountIdx = 0;
+
+      for (final XMPPAccount account : accountsToSave) {
+        XMPPAccount.marshall(account, accountFileDataOutputStream);
+
+        if (account.equals(activeAccount)) activeAccountIdx = accountIdx;
+
+        accountIdx++;
+      }
+
+      accountFileDataOutputStream.writeInt(activeAccountIdx);
+      accountFileDataOutputStream.close();
+
+      accountFileOutputStream = new DataOutputStream(new FileOutputStream(accountFile));
+
+      byte[] data = Crypto.encrypt(buffer.toByteArray(), secretKey);
+
+      accountFileOutputStream.writeInt(ACCOUNT_FILE_MAGIC_NUMBER);
+
+      accountFileOutputStream.writeInt(data.length);
+      accountFileOutputStream.write(data);
+
+      accountFileOutputStream.flush();
 
     } catch (RuntimeException e) {
       LOG.error("internal error while storing account data", e);
@@ -258,7 +269,7 @@ public final class XMPPAccountStore {
       LOG.error("could not store account data", e);
       return;
     } finally {
-      IOUtils.closeQuietly(dataOut);
+      IOUtils.closeQuietly(accountFileOutputStream);
     }
 
     LOG.debug("saved " + accounts.size() + " account(s)");
@@ -608,7 +619,7 @@ public final class XMPPAccountStore {
     private static final String MESSAGE_DIGEST_ALGORITHM = "SHA-256";
     private static final String SECRET_KEY_ALGORITHM = "AES";
 
-    public static byte[] encrypt(byte[] data, String key)
+    public static byte[] encrypt(final byte[] data, final String key)
         throws NoSuchAlgorithmException, NoSuchPaddingException, UnsupportedEncodingException,
             InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
             InvalidAlgorithmParameterException {
@@ -625,19 +636,15 @@ public final class XMPPAccountStore {
       SecretKeySpec keySpec = new SecretKeySpec(keyData, SECRET_KEY_ALGORITHM);
       IvParameterSpec ivSpec = new IvParameterSpec(IV);
 
-      data = deflate(data);
-
       cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
 
-      return xor(cipher.doFinal(data));
+      return xor(cipher.doFinal(deflate(data)));
     }
 
-    public static byte[] decrypt(byte[] data, String key)
+    public static byte[] decrypt(final byte[] data, final String key)
         throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException,
             IOException {
-
-      data = xor(data);
 
       Cipher cipher = Cipher.getInstance(TRANSFORMATION);
 
@@ -653,7 +660,7 @@ public final class XMPPAccountStore {
 
       cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
 
-      return inflate(cipher.doFinal(data));
+      return inflate(cipher.doFinal(xor(data)));
     }
 
     private static byte[] deflate(byte[] input) {

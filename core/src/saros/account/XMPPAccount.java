@@ -1,5 +1,10 @@
 package saros.account;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 /**
@@ -121,6 +126,36 @@ public final class XMPPAccount implements Serializable {
 
   void setServer(String server) {
     this.server = server;
+  }
+
+  static void marshall(final XMPPAccount account, final OutputStream out) throws IOException {
+
+    final DataOutputStream dos = new DataOutputStream(out);
+
+    dos.writeUTF(account.username);
+    dos.writeUTF(account.password);
+    dos.writeUTF(account.domain);
+    dos.writeUTF(account.server);
+    dos.writeInt(account.port);
+    dos.writeBoolean(account.useTLS);
+    dos.writeBoolean(account.useSASL);
+
+    dos.flush();
+  }
+
+  static XMPPAccount unmarshall(final InputStream in) throws IOException {
+
+    final DataInputStream dis = new DataInputStream(in);
+
+    final String username = dis.readUTF();
+    final String password = dis.readUTF();
+    final String domain = dis.readUTF();
+    final String server = dis.readUTF();
+    final int port = dis.readInt();
+    final boolean useTLS = dis.readBoolean();
+    final boolean useSASL = dis.readBoolean();
+
+    return new XMPPAccount(username, password, domain, server, port, useTLS, useSASL);
   }
 
   @Override
