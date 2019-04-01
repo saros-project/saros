@@ -30,7 +30,7 @@ bin_test/
 /update_beta/logs.zip
 /update_beta/features/
 /update_beta/plugins/
-/eclipse/test/framework/stf/src/saros.eclipse/stf/client/configuration.properties
+/stf/src/saros/stf/client/configuration.properties
 /eclipse/lib
 /core/lib
 /ui/lib
