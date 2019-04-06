@@ -3,6 +3,7 @@ import { action, observable } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { Form, Row, Col, Button, ButtonGroup } from 'react-bootstrap';
+import Dictionary from '~/dictionary';
 import './style.css'
 
 export default
@@ -38,13 +39,13 @@ class AddContactView extends React.Component {
           <Form>
             <Form.Group>
               <Form.Label><Text message='label.jid' /></Form.Label>
-              <Form.Control autoFocus type='text' placeholder='Contact JID'
+              <Form.Control autoFocus type='text' placeholder={Dictionary.label.jid}
                 value={this.fields.jid} onChange={this.onChangeField} name='jid' />
             </Form.Group>
 
             <Form.Group>
               <Form.Label><Text message='label.nickname' /></Form.Label>
-              <Form.Control type='text' placeholder='Nickname'
+              <Form.Control type='text' placeholder={Dictionary.label.nickname}
                 value={this.fields.displayName} onChange={this.onChangeField} name='displayName' />
             </Form.Group>
 
