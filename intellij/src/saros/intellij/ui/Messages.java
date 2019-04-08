@@ -131,5 +131,13 @@ public class Messages {
   public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_STOPPED;
   public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_SWITCHES_FOLLOWEE;
 
+  public static String ModuleTab_project_label;
+  public static String ModuleTab_create_new_module;
+  public static String ModuleTab_create_new_module_name;
+  public static String ModuleTab_create_new_module_base_path;
+  public static String ModuleTab_use_existing_module;
+  public static String ModuleTab_use_existing_module_local_module;
+
+
   private Messages() {}
 }
