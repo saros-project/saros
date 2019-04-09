@@ -50,7 +50,7 @@ ext.projectsToConfigure = subprojects - project(':saros.ui.frontend') - project(
 // Configurations that are specific to all subprojects
 // saros.ui.frontend is not a real subproject and contains
 // only a build.gradle in order to allow to scan the sources of this subproject
-configure(projectsToConfigure) { project ->
+configure(projectsToConfigure) { projectToConf ->
 
   apply plugin: 'eclipse'
   apply plugin: 'java' // default java build plugin
@@ -78,7 +78,7 @@ configure(projectsToConfigure) { project ->
 
     // Exclude test suites if property is set. Otherwise tests are executed multiple times
     // in the ci server (via test class and suite).
-    if (project.hasProperty('skipTestSuites') && skipTestSuites.equalsIgnoreCase("true")) {
+    if (projectToConf.hasProperty('skipTestSuites') && skipTestSuites.equalsIgnoreCase("true")) {
       exclude '**/*TestSuite*'
     }
 
@@ -99,8 +99,8 @@ configure(projectsToConfigure) { project ->
     }
   }
 
-  project.ext.junitVersion = 'junit:junit:4.11'
-  project.ext.log4jVersion = 'log4j:log4j:1.2.15'
+  projectToConf.ext.junitVersion = 'junit:junit:4.11'
+  projectToConf.ext.log4jVersion = 'log4j:log4j:1.2.15'
 
   dependencies {
     compile (log4jVersion) {
@@ -120,11 +120,28 @@ configure(projectsToConfigure) { project ->
   // gradle dependency resolution
   task generateLib(type: Copy) {
     into "${project.projectDir}/lib"
-    from project.configurations.releaseDep
+    from projectToConf.configurations.releaseDep
   }
 
-  project.ext.eclipseHome = project.hasProperty('eclipseHome') ? eclipseHome : System.getenv('ECLIPSE_HOME')
-  project.ext.intellijHome = project.hasProperty('intellijHome') ? intellijHome : System.getenv('INTELLIJ_HOME')
+  projectToConf.ext.eclipseHome = projectToConf.hasProperty('eclipseHome') ? eclipseHome : System.getenv('ECLIPSE_HOME')
+  projectToConf.ext.intellijHome = projectToConf.hasProperty('intellijHome') ? intellijHome : System.getenv('INTELLIJ_HOME')
+
+    // In order to use the relocated shadowJar of picocontainer it is necessary to replace
+    // the eclipse classpath entry that points to the sources of saros.picocontainer with
+    // the reference to the reloacted jar
+    eclipse.classpath {
+      file {
+        whenMerged { classpath ->
+          classpath.entries.removeAll{ it.path.contains('saros.picocontainer')}
+        }
+        withXml {
+          String jarPath = project(':saros.picocontainer').configurations.getByName('shadow').artifacts.first().file
+          it.asNode().appendNode('classpathentry', [kind: 'lib', path: jarPath])
+             .appendNode('attributes')
+             .appendNode('attribute', [name: 'gradle_used_by_scope', value: 'main,test'])
+          }
+        }
+    }
 }
 
 
