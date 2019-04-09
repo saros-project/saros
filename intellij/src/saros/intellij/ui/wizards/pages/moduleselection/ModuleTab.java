@@ -1,5 +1,6 @@
 package saros.intellij.ui.wizards.pages.moduleselection;
 
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -78,10 +79,7 @@ class ModuleTab {
 
     setUpRadioButtons();
 
-    /*
-     * TODO set up new module fields logic
-     *  - add file chooser and register it with the browse button
-     */
+    setUpFolderChooser();
 
     /*
      * TODO set up logic to determine whether the current input is valid
@@ -167,6 +165,18 @@ class ModuleTab {
    */
   private void setUseExistingModuleFieldsEnabled(boolean enabled) {
     existingModuleComboBox.setEnabled(enabled);
+  }
+
+  /**
+   * Adds a directory chooser to the base path text field. The current path entered in the text
+   * field is used as the default selection when the folder chooser is opened by the user.
+   */
+  private void setUpFolderChooser() {
+    newModuleBasePathTextField.addBrowseFolderListener(
+        Messages.ModuleTab_module_base_path_file_chooser_title,
+        Messages.ModuleTab_module_base_path_file_chooser_description,
+        null,
+        FileChooserDescriptorFactory.createSingleFolderDescriptor());
   }
 
   /**

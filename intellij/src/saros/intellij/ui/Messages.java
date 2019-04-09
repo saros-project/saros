@@ -135,6 +135,8 @@ public class Messages {
   public static String ModuleTab_create_new_module;
   public static String ModuleTab_create_new_module_name;
   public static String ModuleTab_create_new_module_base_path;
+  public static String ModuleTab_module_base_path_file_chooser_title;
+  public static String ModuleTab_module_base_path_file_chooser_description;
   public static String ModuleTab_use_existing_module;
   public static String ModuleTab_use_existing_module_local_module;
 
