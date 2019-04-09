@@ -1,8 +1,8 @@
 package saros.context;
 
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.PicoCompositionException;
-import org.picocontainer.PicoContainer;
+import saros.repackaged.picocontainer.MutablePicoContainer;
+import saros.repackaged.picocontainer.PicoCompositionException;
+import saros.repackaged.picocontainer.PicoContainer;
 
 /** Interface for accessing components of a (container based) context. */
 public interface IContainerContext {

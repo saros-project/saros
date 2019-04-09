@@ -2,10 +2,10 @@ package saros.stf;
 
 import org.apache.log4j.Logger;
 import org.eclipse.ui.IStartup;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.context.IContainerContext;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.stf.server.STFController;
 import saros.util.ThreadUtils;
 

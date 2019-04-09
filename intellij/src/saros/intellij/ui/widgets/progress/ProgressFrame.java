@@ -9,9 +9,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.monitoring.IProgressMonitor;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Creates independent progress monitor window */
 // todo: use saros.monitoring.IProgressMonitor in all IntelliJ classes

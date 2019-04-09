@@ -8,7 +8,6 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
-import org.picocontainer.annotations.Nullable;
 import saros.SarosConstants;
 import saros.account.XMPPAccount;
 import saros.net.ConnectionState;
@@ -17,6 +16,7 @@ import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.Preferences;
+import saros.repackaged.picocontainer.annotations.Nullable;
 
 /**
  * Facade for handling connection establishment and connection events. This facade should be

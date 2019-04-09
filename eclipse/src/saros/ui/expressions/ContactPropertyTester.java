@@ -1,9 +1,9 @@
 package saros.ui.expressions;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.net.xmpp.JID;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.User;

@@ -12,10 +12,10 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.picocontainer.MutablePicoContainer;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.test.mocks.ContextMocker;
 
 @RunWith(PowerMockRunner.class)

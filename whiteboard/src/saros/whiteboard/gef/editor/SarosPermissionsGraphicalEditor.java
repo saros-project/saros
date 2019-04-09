@@ -1,7 +1,7 @@
 package saros.whiteboard.gef.editor;
 
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISessionLifecycleListener;
 import saros.session.ISessionListener;

@@ -7,11 +7,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.activities.SPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
  * Provides static methods to convert VirtualFiles to Saros resource objects or Saros resources

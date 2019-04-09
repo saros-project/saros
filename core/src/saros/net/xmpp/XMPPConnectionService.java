@@ -17,12 +17,12 @@ import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
-import org.picocontainer.annotations.Nullable;
 import saros.annotations.Component;
 import saros.net.ConnectionState;
 import saros.net.stun.IStunService;
 import saros.net.upnp.IUPnPService;
 import saros.net.util.NetworkingUtils;
+import saros.repackaged.picocontainer.annotations.Nullable;
 import saros.util.ThreadUtils;
 
 /**

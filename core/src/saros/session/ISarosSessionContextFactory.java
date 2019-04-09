@@ -1,6 +1,6 @@
 package saros.session;
 
-import org.picocontainer.MutablePicoContainer;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 
 /** Responsible for creating the components of a {@link ISarosSession session}. */
 public interface ISarosSessionContextFactory {

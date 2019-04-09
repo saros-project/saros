@@ -1,6 +1,6 @@
 package saros.feedback;
 
-import org.picocontainer.Startable;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 
 /**

@@ -1,8 +1,6 @@
 package saros.context;
 
 import java.util.Arrays;
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
 import saros.account.XMPPAccountStore;
 import saros.communication.chat.muc.MultiUserChatService;
 import saros.communication.chat.single.SingleUserChatService;
@@ -33,6 +31,8 @@ import saros.net.xmpp.discovery.DiscoveryManager;
 import saros.net.xmpp.roster.RosterTracker;
 import saros.net.xmpp.subscription.SubscriptionHandler;
 import saros.observables.FileReplacementInProgressObservable;
+import saros.repackaged.picocontainer.BindKey;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ColorNegotiationHook;
 import saros.session.ProjectNegotiationTypeHook;
 import saros.session.SarosSessionManager;
