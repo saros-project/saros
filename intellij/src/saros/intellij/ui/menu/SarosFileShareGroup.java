@@ -14,11 +14,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSessionManager;
 
 /** Saros action group for the pop-up menu when right-clicking on a module. */

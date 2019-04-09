@@ -6,7 +6,6 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Connection;
-import org.picocontainer.annotations.Nullable;
 import saros.communication.chat.muc.MultiUserChatPreferences;
 import saros.negotiation.hooks.ISessionNegotiationHook;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
@@ -14,6 +13,7 @@ import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.EclipsePreferenceConstants;
+import saros.repackaged.picocontainer.annotations.Nullable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 

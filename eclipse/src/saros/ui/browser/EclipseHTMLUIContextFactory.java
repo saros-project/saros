@@ -1,8 +1,8 @@
 package saros.ui.browser;
 
-import org.picocontainer.MutablePicoContainer;
 import saros.HTMLUIContextFactory;
 import saros.context.AbstractContextFactory;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.ui.ide_embedding.DialogManager;
 import saros.ui.ide_embedding.IUIResourceLocator;
 import saros.ui.util.ICollaborationUtils;

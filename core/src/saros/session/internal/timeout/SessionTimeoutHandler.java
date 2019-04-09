@@ -1,10 +1,10 @@
 package saros.session.internal.timeout;
 
 import org.apache.log4j.Logger;
-import org.picocontainer.Startable;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.SessionEndReason;

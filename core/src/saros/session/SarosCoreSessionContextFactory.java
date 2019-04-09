@@ -1,6 +1,5 @@
 package saros.session;
 
-import org.picocontainer.MutablePicoContainer;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -11,6 +10,7 @@ import saros.editor.FollowModeManager;
 import saros.editor.remote.UserEditorStateManager;
 import saros.misc.xstream.SPathConverter;
 import saros.misc.xstream.UserConverter;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.internal.ActivityHandler;
 import saros.session.internal.ActivitySequencer;
 import saros.session.internal.ChangeColorManager;

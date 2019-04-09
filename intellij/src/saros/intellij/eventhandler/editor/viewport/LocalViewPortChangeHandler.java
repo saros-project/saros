@@ -10,12 +10,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.Rectangle;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.picocontainer.Startable;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
 import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
+import saros.repackaged.picocontainer.Startable;
 
 /** Dispatches activities for viewport changes. */
 public class LocalViewPortChangeHandler implements DisableableHandler, Startable {

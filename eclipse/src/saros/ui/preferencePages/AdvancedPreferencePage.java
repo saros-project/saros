@@ -6,12 +6,12 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.picocontainer.annotations.Inject;
 import saros.Saros;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.preferences.PreferenceConstants;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
 
 /**

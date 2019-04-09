@@ -3,14 +3,6 @@ package saros.context;
 import java.io.File;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.picocontainer.ComponentMonitor;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.PicoBuilder;
-import org.picocontainer.PicoContainer;
-import org.picocontainer.injectors.AnnotatedFieldInjection;
-import org.picocontainer.injectors.CompositeInjection;
-import org.picocontainer.injectors.ConstructorInjection;
-import org.picocontainer.injectors.Reinjector;
 import saros.account.XMPPAccountStore;
 import saros.communication.extensions.ActivitiesExtension;
 import saros.communication.extensions.CancelInviteExtension;
@@ -39,6 +31,14 @@ import saros.communication.extensions.UserListReceivedExtension;
 import saros.communication.extensions.VersionExchangeExtension;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.repackaged.picocontainer.ComponentMonitor;
+import saros.repackaged.picocontainer.MutablePicoContainer;
+import saros.repackaged.picocontainer.PicoBuilder;
+import saros.repackaged.picocontainer.PicoContainer;
+import saros.repackaged.picocontainer.injectors.AnnotatedFieldInjection;
+import saros.repackaged.picocontainer.injectors.CompositeInjection;
+import saros.repackaged.picocontainer.injectors.ConstructorInjection;
+import saros.repackaged.picocontainer.injectors.Reinjector;
 
 /**
  * @JTourBusStop 5, Some Basics:
