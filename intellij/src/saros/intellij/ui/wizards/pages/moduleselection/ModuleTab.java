@@ -18,6 +18,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.io.File;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import javax.swing.Box;
@@ -85,11 +89,6 @@ class ModuleTab {
     addProjectComboBoxListener();
     addCreateNewModuleFieldListeners();
     addUseExistingModuleFieldListeners();
-
-    /*
-     * TODO set up logic to determine whether the current input is valid
-     *  - add logic to updateInputValidity
-     */
   }
 
   /**
@@ -344,8 +343,33 @@ class ModuleTab {
    * <p>This method should be called by all change listeners of the panel components.
    */
   private void updateInputValidity() {
-    // TODO check input validity and set correct value
-    boolean newInputValidityState = false;
+    boolean newInputValidityState;
+
+    if (createNewModuleRadioButton.isSelected()) {
+      boolean hasValidNewName = moduleName.equals(newModuleNameTextField.getText());
+
+      boolean hasValidNewBasePath;
+      try {
+        Path newBasePath = Paths.get(newModuleBasePathTextField.getText());
+        File newBasePathFile = newBasePath.toFile();
+
+        hasValidNewBasePath = newBasePathFile.exists() && newBasePathFile.isDirectory();
+
+      } catch (InvalidPathException | UnsupportedOperationException e) {
+        hasValidNewBasePath = false;
+      }
+
+      newInputValidityState = hasValidNewName && hasValidNewBasePath;
+
+    } else if (useExistingModuleRadioButton.isSelected()) {
+      Module selectedExistingModule = (Module) existingModuleComboBox.getSelectedItem();
+
+      newInputValidityState =
+          selectedExistingModule != null && selectedExistingModule.getName().equals(moduleName);
+
+    } else {
+      newInputValidityState = false;
+    }
 
     if (newInputValidityState != hasValidInput) {
       hasValidInput = newInputValidityState;
