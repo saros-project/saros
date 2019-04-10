@@ -2,10 +2,13 @@ package saros.intellij.ui.wizards.pages.moduleselection;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
@@ -80,6 +83,8 @@ class ModuleTab {
     setUpRadioButtons();
 
     setUpFolderChooser();
+
+    setInitialInput();
 
     /*
      * TODO set up logic to determine whether the current input is valid
@@ -177,6 +182,99 @@ class ModuleTab {
         Messages.ModuleTab_module_base_path_file_chooser_description,
         null,
         FileChooserDescriptorFactory.createSingleFolderDescriptor());
+  }
+
+  /**
+   * Checks all open projects if they contain a module with the given name. If such a module is
+   * found, the project containing the module is chosen as the default selection. If multiple of
+   * such projects exist, the first one found by the search is used. If not project is found, the
+   * first one of the list is selected instead.
+   *
+   * <p>Calls {@link #setInitialInputForProject(Project)} with the selected project to determine the
+   * default values and selection for the other fields.
+   */
+  private void setInitialInput() {
+    int projectCount = projectComboBox.getItemCount();
+
+    for (int i = 0; i < projectCount; i++) {
+      Project project = projectComboBox.getItemAt(i);
+
+      Module[] modules = ModuleManager.getInstance(project).getModules();
+
+      for (Module module : modules) {
+        if (module.getName().equals(moduleName)) {
+          setInitialInputForProject(project);
+
+          return;
+        }
+      }
+    }
+
+    if (projectCount > 0) {
+      setInitialInputForProject(projectComboBox.getItemAt(0));
+    }
+  }
+
+  /**
+   * Selects the given project in the project combo-box, updates the other fields of the dialogs
+   * accordingly and updates the validity state of the module tab.
+   *
+   * @param project the newly selected project
+   * @see #updateFieldsForProjectChange(Project)
+   * @see #updateInputValidity()
+   */
+  private void setInitialInputForProject(@NotNull Project project) {
+    projectComboBox.setSelectedItem(project);
+    updateFieldsForProjectChange(project);
+
+    updateInputValidity();
+  }
+
+  /**
+   * Updates the contained fields for the given project. Sets the given module name as the new
+   * module name. Sets the base path of the chosen project as the base path for the new module. Adds
+   * all modules of the project to the combo-box for existing modules.
+   *
+   * <p>Also sets the default selection for the selected project. If the project contains a module
+   * with the given module name, the option to use it for the project negotiation is selected by
+   * default. Otherwise, the option to create a new module is selected by default and the selection
+   * in the existing module combo-box is cleared.
+   *
+   * @param project the newly selected project to set the default values and selection for
+   */
+  private void updateFieldsForProjectChange(@NotNull Project project) {
+    newModuleNameTextField.setText(moduleName);
+
+    VirtualFile projectBaseDir = ProjectUtil.guessProjectDir(project);
+    if (projectBaseDir != null) {
+      newModuleBasePathTextField.setText(projectBaseDir.getPath());
+    }
+
+    Module[] modules = ModuleManager.getInstance(project).getModules();
+    Arrays.sort(modules, Comparator.comparing(Module::getName));
+
+    existingModuleComboBox.removeAllItems();
+
+    Module preselectedModule = null;
+
+    for (Module module : modules) {
+      existingModuleComboBox.addItem(module);
+
+      if (module.getName().equals(moduleName)) {
+        preselectedModule = module;
+      }
+    }
+
+    if (preselectedModule != null) {
+      useExistingModuleRadioButton.doClick();
+
+      existingModuleComboBox.setSelectedItem(preselectedModule);
+
+      return;
+    }
+
+    createNewModuleRadioButton.doClick();
+    existingModuleComboBox.setSelectedIndex(-1);
   }
 
   /**
