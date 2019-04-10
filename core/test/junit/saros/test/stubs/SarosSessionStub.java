@@ -10,7 +10,6 @@ import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
-import saros.preferences.IPreferenceStore;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.IActivityProducer;
@@ -66,11 +65,6 @@ public class SarosSessionStub implements ISarosSession {
 
   @Override
   public User getUser(JID jid) {
-    throw new RuntimeException("Unexpected call to Stub");
-  }
-
-  @Override
-  public IPreferenceStore getUserProperties(User user) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 

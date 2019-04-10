@@ -656,13 +656,6 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public IPreferenceStore getUserProperties(User user) {
-    if (user == null) throw new IllegalArgumentException("user is null");
-
-    return user.getPreferences();
-  }
-
-  @Override
   public JID getResourceQualifiedJID(JID jid) {
 
     if (jid == null) throw new IllegalArgumentException("jid is null");
