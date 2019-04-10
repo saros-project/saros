@@ -130,7 +130,7 @@ public class SarosSessionStub implements ISarosSession {
   }
 
   @Override
-  public void addUser(User user, IPreferenceStore properties) {
+  public void addUser(User user) {
     throw new RuntimeException("Unexpected call to Stub");
   }
 

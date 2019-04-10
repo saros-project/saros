@@ -21,8 +21,6 @@ import saros.activities.NOPActivity;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
-import saros.preferences.IPreferenceStore;
-import saros.preferences.PreferenceStore;
 import saros.session.User;
 import saros.test.fakes.net.FakeConnectionFactory;
 import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
@@ -54,7 +52,7 @@ public class ActivitySequencerTest {
      * needed
      */
     @Override
-    public void addUser(User user, IPreferenceStore properties) {
+    public void addUser(User user) {
       users.add(user);
     }
 
@@ -228,8 +226,8 @@ public class ActivitySequencerTest {
     User bobUserInAliceSession = new User(BOB_JID, false, false, null);
     User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
 
-    sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
-    sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
+    sessionStubAlice.addUser(bobUserInAliceSession);
+    sessionStubBob.addUser(aliceUserInBobSession);
 
     aliceSequencer.registerUser(bobUserInAliceSession);
     bobSequencer.registerUser(aliceUserInBobSession);
@@ -264,8 +262,8 @@ public class ActivitySequencerTest {
     User bobUserInAliceSession = new User(BOB_JID, false, false, null);
     User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
 
-    sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
-    sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
+    sessionStubAlice.addUser(bobUserInAliceSession);
+    sessionStubBob.addUser(aliceUserInBobSession);
 
     bobSequencer.registerUser(aliceUserInBobSession);
 
@@ -296,8 +294,8 @@ public class ActivitySequencerTest {
     User bobUserInAliceSession = new User(BOB_JID, false, false, null);
     User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
 
-    sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
-    sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
+    sessionStubAlice.addUser(bobUserInAliceSession);
+    sessionStubBob.addUser(aliceUserInBobSession);
 
     aliceSequencer.registerUser(bobUserInAliceSession);
 
@@ -329,8 +327,8 @@ public class ActivitySequencerTest {
     User bobUserInAliceSession = new User(BOB_JID, false, false, null);
     User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
 
-    sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
-    sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
+    sessionStubAlice.addUser(bobUserInAliceSession);
+    sessionStubBob.addUser(aliceUserInBobSession);
 
     aliceSequencer.registerUser(bobUserInAliceSession);
     bobSequencer.registerUser(aliceUserInBobSession);

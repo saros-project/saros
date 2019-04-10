@@ -301,7 +301,7 @@ public class UserInformationHandler implements Startable {
         user = new User(userEntry.jid, false, false, preferences);
 
         user.setPermission(userEntry.permission);
-        session.addUser(user, preferences);
+        session.addUser(user);
 
       } else if ((userEntry.flags & UserListEntry.USER_REMOVED) != 0) {
         user = session.getUser(userEntry.jid);

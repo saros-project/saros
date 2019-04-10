@@ -357,7 +357,7 @@ public final class SarosSession implements ISarosSession {
    * proper initialization etc. of User objects !
    */
   @Override
-  public void addUser(final User user, IPreferenceStore properties) {
+  public void addUser(final User user) {
 
     // TODO synchronize this method !
 

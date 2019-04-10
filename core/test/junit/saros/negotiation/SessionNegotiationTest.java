@@ -110,7 +110,7 @@ public class SessionNegotiationTest {
 
     aliceSession = createNiceMock(ISarosSession.class);
 
-    aliceSession.addUser(eq(INVITEE), anyObject(IPreferenceStore.class));
+    aliceSession.addUser(eq(INVITEE));
     expectLastCall().once();
 
     bobSession = createNiceMock(ISarosSession.class);

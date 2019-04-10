@@ -102,9 +102,8 @@ public interface ISarosSession {
    * will be noticed about the new user.
    *
    * @param user the user that is to be added
-   * @param preferences the initial properties of the new user
    */
-  public void addUser(User user, IPreferenceStore preferences);
+  public void addUser(User user);
 
   /**
    * Informs all listeners that a user now has Projects and can process {@link IResourceActivity}s.

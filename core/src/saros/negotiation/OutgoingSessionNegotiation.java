@@ -463,7 +463,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     User user = new User(getPeer(), false, false, properties);
 
     synchronized (REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE) {
-      sarosSession.addUser(user, properties);
+      sarosSession.addUser(user);
       log.debug(
           this
               + " : added "
