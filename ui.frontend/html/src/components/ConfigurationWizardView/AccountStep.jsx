@@ -2,9 +2,11 @@ import { Text } from 'react-localize'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 
+
+export default
 @inject('configurationUI')
 @observer
-export default class AccountStep extends React.Component {
+class AccountStep extends React.Component {
   onChangeField = (e) => {
     this.props.configurationUI.changeWizardData('account', e.target.name, e.target.value)
   }

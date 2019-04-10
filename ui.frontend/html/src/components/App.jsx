@@ -16,6 +16,8 @@ const viewComponents = {
   [views.BASIC_WIDGET_TEST]: BasicWidgetTestView
 }
 
+
+export default
 @inject('view')
 @observer
 class App extends React.Component {
@@ -28,5 +30,3 @@ class App extends React.Component {
     return <View />
   }
 }
-
-export default App

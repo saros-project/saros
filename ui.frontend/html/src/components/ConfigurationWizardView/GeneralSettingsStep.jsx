@@ -1,6 +1,7 @@
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 
+//TODO: move to root dictionary
 const dict = {
   autoConnect: {
     description: 'Automatically connect to XMPP server on startup?',
@@ -16,9 +17,9 @@ const dict = {
   analytics: {
     description: (
       <span>
-        Saros is a research project of the <a href='#'>Software Engineering Group</a>
-         at <a href='#'>Freie Universität Berlin</a>. We need your help to gather scientific data about distributed
-        pair programming.
+        Saros is a research project of the <a href='#'>Software Engineering Group </a> at
+        <a href='#'>Freie Universität Berlin</a>.
+        We need your help to gather scientific data about distributed pair programming.
         We will not collect any personal data. <a href='#'>Tell me more</a>
       </span>
     ),
@@ -29,14 +30,16 @@ const dict = {
   }
 }
 
+
+export default
 @inject('configurationUI')
 @observer
-export default class GeneralSettingsStep extends React.Component {
-  onChangeField = (e) => {
+class GeneralSettingsStep extends React.Component {
+  onChangeField(e) {
     this.props.configurationUI.changeWizardData('settings', e.target.name, e.target.value)
   }
 
-  onToggleCheckbox = (e) => {
+  onToggleCheckbox(e) {
     this.props.configurationUI.toggleWizardDataBool('settings', e.target.name)
   }
 

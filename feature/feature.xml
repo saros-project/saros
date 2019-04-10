@@ -388,4 +388,11 @@ Public License instead of this License.
          version="0.1.0"
          unpack="false"/>
 
+   <plugin
+         id="saros.ui"
+         download-size="0"
+         install-size="0"
+         version="0.1.0"
+         unpack="false"/>
+
 </feature>

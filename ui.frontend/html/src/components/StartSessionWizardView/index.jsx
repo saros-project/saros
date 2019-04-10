@@ -4,8 +4,10 @@ import ChooseFilesStep from './ChooseFilesStep'
 import React from 'react'
 import Wizard, { Step } from '../Wizard'
 
+
+export default
 @inject('core', 'sessionUI')
-export default class StartSessionWizardView extends React.Component {
+class StartSessionWizardView extends React.Component {
   render () {
     const { sessionUI, core } = this.props
     return (

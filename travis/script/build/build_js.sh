@@ -8,8 +8,8 @@ npm cache verify
 echo "Building the HTML GUI"
 cd /home/ci/saros_src/ui.frontend/html
 npm install
+npm run test
 npm run build
-npm run test:log
 
 
 echo "Building the HTML Whiteboard"

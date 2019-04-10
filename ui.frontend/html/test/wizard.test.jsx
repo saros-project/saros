@@ -4,18 +4,14 @@ import { mount } from 'enzyme'
 import { spy } from 'sinon'
 import React from 'react'
 import Wizard, { Step } from '~/components/Wizard'
+import { expect } from 'chai';
 
 describe('<Wizard />', () => {
   const onFinish = spy()
   const wrap = mount(
     <Wizard onFinish={onFinish}>
       {[1, 2, 3].map(i => (
-        <Step
-          title={i}
-          Component={
-            () => <span className={`step-${i}`} />
-          }
-        />
+        <Step title={i.toString()} key={i} Component={() => <span className={`step-${i}`} />} />
       ))}
     </Wizard>
   )

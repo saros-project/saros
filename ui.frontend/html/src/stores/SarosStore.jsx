@@ -17,14 +17,14 @@ export default class SarosStore {
   }
 
   @observable accounts = []
-  @observable projectTrees = null
+  @observable projectTrees = []
   @observable runningSession = null
 
   sarosApi = null
 
   @computed
   get sortedContactList () {
-    return this.state.contactList.sort(onlineFirst)
+    return this.state.contactList.slice(0).sort(onlineFirst)
   }
 
   @action.bound

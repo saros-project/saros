@@ -2,9 +2,11 @@ import { inject, observer } from 'mobx-react'
 import ContactList from '../ContactList'
 import React from 'react'
 
+
+export default
 @inject('sessionUI')
 @observer
-export default class ChooseContactsStep extends React.Component {
+class ChooseContactsStep extends React.Component {
   toggleSelectContact = (e) => {
     const jid = e.target.dataset.jid
     const selectedContacts = new Set(this.props.sessionUI.selectedContacts)

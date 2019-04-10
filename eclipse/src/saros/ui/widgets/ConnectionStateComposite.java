@@ -1,5 +1,6 @@
 package saros.ui.widgets;
 
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -11,6 +12,8 @@ import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
+import saros.account.IAccountStoreListener;
+import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
@@ -22,6 +25,14 @@ import saros.ui.util.LayoutUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.views.SarosView;
 
+/**
+ * The ConnectionStateComposite can be used to display the current state of the connection. It
+ * basically pretty prints the {@linkplain ConnectionState connection states}.
+ *
+ * <p>In addition it keeps track of errors that can occur and ensures that these errors stay
+ * visible.
+ */
+// FIXME displaying account related information is not the best decision.
 public class ConnectionStateComposite extends Composite {
 
   private static final Logger LOG = Logger.getLogger(ConnectionStateComposite.class);
@@ -38,6 +49,20 @@ public class ConnectionStateComposite extends Composite {
   private final CLabel stateLabel;
 
   private ConnectionState lastConnectionState;
+
+  private Exception lastError;
+
+  private final IAccountStoreListener accountStoreListener =
+      new IAccountStoreListener() {
+        @Override
+        public void accountsChanged(List<XMPPAccount> currentAccounts) {
+          SWTUtils.runSafeSWTAsync(
+              LOG,
+              () -> {
+                if (!ConnectionStateComposite.this.isDisposed()) updateLabel(null, null);
+              });
+        }
+      };
 
   private final IConnectionStateListener connectionListener =
       new IConnectionStateListener() {
@@ -75,6 +100,8 @@ public class ConnectionStateComposite extends Composite {
 
     connectionHandler.addConnectionStateListener(connectionListener);
 
+    accountStore.addListener(accountStoreListener);
+
     updateLabel(connectionHandler.getConnectionState(), connectionHandler.getConnectionError());
 
     addDisposeListener(
@@ -82,23 +109,47 @@ public class ConnectionStateComposite extends Composite {
           @Override
           public void widgetDisposed(DisposeEvent e) {
             connectionHandler.removeConnectionStateListener(connectionListener);
+            accountStore.removeListener(accountStoreListener);
           }
         });
   }
 
+  /**
+   * Updates the composite label using the given connection state. If <i>state</i> is <code>null
+   * </code> the label is simply updated with the information that is currently available e.g the
+   * latest connection state.
+   *
+   * @param state the current connection state or <code>null</code>
+   * @param error additional error information or <code>null</code>
+   */
   private void updateLabel(ConnectionState state, Exception error) {
 
     // do not hide the latest error
     if (lastConnectionState == ConnectionState.ERROR && state == ConnectionState.NOT_CONNECTED)
       return;
 
-    stateLabel.setText(getDescription(state, error));
+    String labelDescription = null;
+
+    if (accountStore.isEmpty()) {
+      labelDescription = Messages.ConnectionStateComposite_info_add_jabber_account;
+    } else if (state != null) {
+      labelDescription = getDescription(state, error);
+    } else if (lastConnectionState != null) {
+      labelDescription = getDescription(lastConnectionState, lastError);
+    }
+
+    if (labelDescription == null) return;
+
+    stateLabel.setText(labelDescription);
     stateLabel.setToolTipText(
         state == ConnectionState.CONNECTED ? String.format(CONNECTED_TOOLTIP, version) : null);
 
     layout();
 
-    lastConnectionState = state;
+    if (state != null) {
+      lastConnectionState = state;
+      lastError = error;
+    }
   }
 
   /**
@@ -106,9 +157,6 @@ public class ConnectionStateComposite extends Composite {
    * (e.g. CONNECTING becomes "Connecting...").
    */
   private String getDescription(ConnectionState state, Exception error) {
-    if (accountStore.isEmpty()) {
-      return Messages.ConnectionStateComposite_info_add_jabber_account;
-    }
 
     switch (state) {
       case NOT_CONNECTED:
