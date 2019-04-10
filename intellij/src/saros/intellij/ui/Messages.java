@@ -22,6 +22,9 @@ public class Messages {
   public static String AddProjectToSessionWizard_error_creating_module_object_message;
   public static String AddProjectToSessionWizard_error_reading_module_selection_result_title;
   public static String AddProjectToSessionWizard_error_reading_module_selection_result_message;
+  public static String AddProjectToSessionWizard_title2;
+  public static String AddProjectToSessionWizard_description;
+  public static String AddProjectToSessionWizard_description_changed_files;
 
   public static String CollaborationUtils_confirm_closing;
   public static String CollaborationUtils_confirm_closing_text;
@@ -53,13 +56,6 @@ public class Messages {
   public static String NegotiationHandler_sharing_project;
   public static String NegotiationHandler_sharing_project_canceled_remotely;
   public static String NegotiationHandler_sharing_project_canceled_remotely_text;
-
-  public static String EnterProjectNamePage_create_new_project;
-  public static String EnterProjectNamePage_project_name;
-  public static String EnterProjectNamePage_title2;
-  public static String EnterProjectNamePage_description;
-  public static String EnterProjectNamePage_description_changed_files;
-  public static String EnterProjectNamePage_use_existing_project;
 
   public static String ShowDescriptionPage_description;
   public static String ShowDescriptionPage_title2;
