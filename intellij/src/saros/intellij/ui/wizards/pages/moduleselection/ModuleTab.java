@@ -28,6 +28,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.jetbrains.annotations.NotNull;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.wizards.pages.moduleselection.SelectLocalModuleRepresentationPage.ModuleTabStateListener;
@@ -81,12 +83,12 @@ class ModuleTab {
     setInitialInput();
 
     addProjectComboBoxListener();
+    addCreateNewModuleFieldListeners();
+    addUseExistingModuleFieldListeners();
 
     /*
      * TODO set up logic to determine whether the current input is valid
      *  - add logic to updateInputValidity
-     *  - call updateValidity whenever a field changes to inform the wizard page of potential state
-     *    changes
      */
   }
 
@@ -291,6 +293,46 @@ class ModuleTab {
               updateFieldsForProjectChange(newSelectedProject);
             }
 
+            updateInputValidity();
+          }
+        });
+  }
+
+  /**
+   * Adds listeners which update the module tab validity state on input changes to the fields used
+   * when creating a new module as part of the project negotiation.
+   */
+  private void addCreateNewModuleFieldListeners() {
+    DocumentListener documentListener =
+        new DocumentListener() {
+          @Override
+          public void insertUpdate(DocumentEvent e) {
+            updateInputValidity();
+          }
+
+          @Override
+          public void removeUpdate(DocumentEvent e) {
+            updateInputValidity();
+          }
+
+          @Override
+          public void changedUpdate(DocumentEvent e) {
+            updateInputValidity();
+          }
+        };
+
+    newModuleNameTextField.getDocument().addDocumentListener(documentListener);
+    newModuleBasePathTextField.getTextField().getDocument().addDocumentListener(documentListener);
+  }
+
+  /**
+   * Adds listeners which update the module tab validity state on input changes to the fields used
+   * when using an existing module as part of the project negotiation.
+   */
+  private void addUseExistingModuleFieldListeners() {
+    existingModuleComboBox.addItemListener(
+        itemEvent -> {
+          if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
             updateInputValidity();
           }
         });
