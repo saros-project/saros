@@ -16,12 +16,12 @@ public class Messages {
   public static String AddProjectToSessionWizard_module_creation_failed_message_condition;
   public static String AddProjectToSessionWizard_module_already_exists_title;
   public static String AddProjectToSessionWizard_module_already_exists_message_condition;
-  public static String AddProjectToSessionWizard_module_not_found_title;
-  public static String AddProjectToSessionWizard_module_not_found_message_condition;
   public static String AddProjectToSessionWizard_invalid_module_title;
   public static String AddProjectToSessionWizard_invalid_module_message_condition;
   public static String AddProjectToSessionWizard_error_creating_module_object_title;
   public static String AddProjectToSessionWizard_error_creating_module_object_message;
+  public static String AddProjectToSessionWizard_error_reading_module_selection_result_title;
+  public static String AddProjectToSessionWizard_error_reading_module_selection_result_message;
 
   public static String CollaborationUtils_confirm_closing;
   public static String CollaborationUtils_confirm_closing_text;
@@ -139,7 +139,6 @@ public class Messages {
   public static String ModuleTab_module_base_path_file_chooser_description;
   public static String ModuleTab_use_existing_module;
   public static String ModuleTab_use_existing_module_local_module;
-
 
   private Messages() {}
 }

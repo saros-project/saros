@@ -21,8 +21,8 @@ import java.awt.Window;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +32,6 @@ import org.jetbrains.annotations.Nullable;
 import saros.SarosPluginContext;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
-import saros.filesystem.IWorkspace;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
@@ -41,8 +40,10 @@ import saros.intellij.ui.util.NotificationPanel;
 import saros.intellij.ui.widgets.progress.ProgessMonitorAdapter;
 import saros.intellij.ui.wizards.pages.HeaderPanel;
 import saros.intellij.ui.wizards.pages.PageActionListener;
-import saros.intellij.ui.wizards.pages.SelectProjectPage;
 import saros.intellij.ui.wizards.pages.TextAreaPage;
+import saros.intellij.ui.wizards.pages.moduleselection.LocalRepresentationOption;
+import saros.intellij.ui.wizards.pages.moduleselection.ModuleSelectionResult;
+import saros.intellij.ui.wizards.pages.moduleselection.SelectLocalModuleRepresentationPage;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
 import saros.monitoring.SubProgressMonitor;
@@ -79,7 +80,7 @@ import saros.util.ThreadUtils;
 public class AddProjectToSessionWizard extends Wizard {
   private static final Logger LOG = Logger.getLogger(AddProjectToSessionWizard.class);
 
-  public static final String SELECT_PROJECT_PAGE_ID = "selectProject";
+  public static final String SELECT_MODULE_REPRESENTATION_PAGE_ID = "selectModuleRepresentation";
   public static final String FILE_LIST_PAGE_ID = "fileListPage";
 
   private final String remoteProjectID;
@@ -97,9 +98,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
   @Inject private ISarosSessionManager sessionManager;
 
-  @Inject private IWorkspace workspace;
-
-  private final SelectProjectPage selectProjectPage;
+  private final SelectLocalModuleRepresentationPage selectLocalModuleRepresentationPage;
   private final TextAreaPage fileListPage;
 
   private final PageActionListener selectProjectsPageListener =
@@ -118,16 +117,52 @@ public class AddProjectToSessionWizard extends Wizard {
 
           DocumentAPI.saveAllDocuments();
 
-          // FIXME: Only projects with the same name are supported,
-          // because the project name is connected to the name of the .iml file
-          // and it is unclear how that resolves.
-          final String moduleName = selectProjectPage.getLocalProjectName();
+          ModuleSelectionResult moduleSelectionResult;
 
-          if (selectProjectPage.isNewProjectSelected()) {
+          try {
+            moduleSelectionResult =
+                selectLocalModuleRepresentationPage.getModuleSelectionResult(remoteProjectName);
+
+          } catch (IllegalStateException e) {
+            noisyCancel("Request to get module selection result failed: " + e.getMessage(), e);
+
+            return;
+          }
+
+          if (moduleSelectionResult == null) {
+            noisyCancel(
+                "Could not find a module selection result for the module " + remoteProjectName,
+                null);
+
+            return;
+          }
+
+          Project project = moduleSelectionResult.getProject();
+
+          String moduleName = moduleSelectionResult.getNewModuleName();
+          Path moduleBasePath = moduleSelectionResult.getNewModuleBasePath();
+
+          if (moduleName == null || moduleBasePath == null) {
+            noisyCancel("No valid new module name or base path was given", null);
+
+            return;
+          }
+
+          Module existingModule = moduleSelectionResult.getExistingModule();
+
+          if (existingModule == null) {
+            noisyCancel("No valid existing module was given", null);
+
+            return;
+          }
+
+          if (moduleSelectionResult.getLocalRepresentationOption()
+              == LocalRepresentationOption.CREATE_NEW_MODULE) {
+
             Module module;
 
             try {
-              module = createModuleStub(moduleName);
+              module = createModuleStub(moduleName, moduleBasePath, project);
 
             } catch (IOException e) {
               LOG.error("Could not create the shared module " + moduleName + ".", e);
@@ -174,7 +209,7 @@ public class AddProjectToSessionWizard extends Wizard {
             IProject sharedProject;
 
             try {
-              sharedProject = workspace.getProject(moduleName);
+              sharedProject = new IntelliJProjectImpl(existingModule);
 
             } catch (IllegalArgumentException e) {
               LOG.debug("No session is started as an invalid module was chosen");
@@ -213,28 +248,34 @@ public class AddProjectToSessionWizard extends Wizard {
               return;
             }
 
-            if (sharedProject == null) {
-              LOG.error("Could not find the shared module " + moduleName + ".");
-
-              cancelNegotiation("Could not find chosen local representation of shared module");
-
-              NotificationPanel.showError(
-                  MessageFormat.format(
-                      Messages.Contact_saros_message_conditional,
-                      MessageFormat.format(
-                          Messages.AddProjectToSessionWizard_module_not_found_message_condition,
-                          moduleName)),
-                  Messages.AddProjectToSessionWizard_module_not_found_title);
-
-              return;
-            }
-
             localProjects.put(remoteProjectID, sharedProject);
 
             prepareFilesChangedPage(localProjects);
 
             setTopPanelText(Messages.EnterProjectNamePage_description_changed_files);
           }
+        }
+
+        /**
+         * Cancels the project negotiation. Informs all channels of this cancellation by logging an
+         * error and showing an error notification to the local user.
+         *
+         * @param reason the reason for the cancellation
+         */
+        private void noisyCancel(@NotNull String reason, @Nullable Throwable throwable) {
+          if (throwable != null) {
+            LOG.error("Encountered error reading module selection results: " + reason, throwable);
+          } else {
+            LOG.error("Encountered error reading module selection results: " + reason);
+          }
+
+          NotificationPanel.showError(
+              MessageFormat.format(
+                  Messages.AddProjectToSessionWizard_error_reading_module_selection_result_message,
+                  reason),
+              Messages.AddProjectToSessionWizard_error_reading_module_selection_result_title);
+
+          cancelNegotiation("Encountered an error during project negotiation");
         }
 
         @Override
@@ -268,12 +309,14 @@ public class AddProjectToSessionWizard extends Wizard {
   }
 
   /**
-   * Creates an empty stub module with the given name in the base directory of the current project.
+   * Creates an empty stub module with the given name and given base path in the given project.
    *
    * <p>The created module has the module type {@link IntelliJProjectImpl#RELOAD_STUB_MODULE_TYPE}
    * which allows us to easily identify it as stub.
    *
    * @param moduleName name of the module
+   * @param targetBasePath the base path of the created module
+   * @param targetProject the project to create the module in
    * @return a stub <code>Module</code> object with the given name
    * @throws FileNotFoundException if the base directory of the current project, the base directory
    *     of the created module, or the module file of the created module could not be found in the
@@ -282,10 +325,11 @@ public class AddProjectToSessionWizard extends Wizard {
    *     object
    */
   @NotNull
-  private Module createModuleStub(@NotNull final String moduleName)
+  private Module createModuleStub(
+      @NotNull String moduleName, @NotNull Path targetBasePath, @NotNull Project targetProject)
       throws IOException, ModuleWithNameAlreadyExists {
 
-    for (Module module : ModuleManager.getInstance(project).getModules()) {
+    for (Module module : ModuleManager.getInstance(targetProject).getModules()) {
       if (moduleName.equals(module.getName()))
         throw new ModuleWithNameAlreadyExists(
             "Could not create stub module as a module with the chosen name already exists",
@@ -298,27 +342,20 @@ public class AddProjectToSessionWizard extends Wizard {
 
               @Override
               public Module compute() throws IOException {
-                VirtualFile baseDir = project.getBaseDir();
-
-                if (baseDir == null) {
-                  throw new FileNotFoundException(
-                      "Could not find base directory for project " + project + ".");
-                }
-
-                Path moduleBasePath = Paths.get(baseDir.getPath()).resolve(moduleName);
+                Path moduleBasePath = targetBasePath.resolve(moduleName);
 
                 Path moduleFilePath =
                     moduleBasePath.resolve(moduleName + ModuleFileType.DOT_DEFAULT_EXTENSION);
 
                 ModifiableModuleModel modifiableModuleModel =
-                    ModuleManager.getInstance(project).getModifiableModel();
+                    ModuleManager.getInstance(targetProject).getModifiableModel();
 
                 Module module =
                     modifiableModuleModel.newModule(
                         moduleFilePath.toString(), IntelliJProjectImpl.RELOAD_STUB_MODULE_TYPE);
 
                 modifiableModuleModel.commit();
-                project.save();
+                targetProject.save();
 
                 ModifiableRootModel modifiableRootModel =
                     ModuleRootManager.getInstance(module).getModifiableModel();
@@ -414,15 +451,13 @@ public class AddProjectToSessionWizard extends Wizard {
     remoteProjectID = data.get(0).getProjectID();
     remoteProjectName = data.get(0).getProjectName();
 
-    selectProjectPage =
-        new SelectProjectPage(
-            SELECT_PROJECT_PAGE_ID,
-            remoteProjectName,
-            remoteProjectName,
-            workspace.getLocation().toOSString(),
-            selectProjectsPageListener);
+    selectLocalModuleRepresentationPage =
+        new SelectLocalModuleRepresentationPage(
+            SELECT_MODULE_REPRESENTATION_PAGE_ID,
+            selectProjectsPageListener,
+            Collections.singleton(remoteProjectName));
 
-    registerPage(selectProjectPage);
+    registerPage(selectLocalModuleRepresentationPage);
 
     fileListPage =
         new TextAreaPage(

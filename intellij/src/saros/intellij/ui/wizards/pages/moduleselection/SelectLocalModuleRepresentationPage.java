@@ -78,7 +78,7 @@ public class SelectLocalModuleRepresentationPage extends AbstractWizardPage {
    *     </code> if there is no module tab for the given name
    */
   @Nullable
-  ModuleSelectionResult getModuleSelectionResult(@NotNull String moduleName) {
+  public ModuleSelectionResult getModuleSelectionResult(@NotNull String moduleName) {
     ModuleTab moduleTab = moduleTabs.get(moduleName);
 
     if (moduleTab == null) {
