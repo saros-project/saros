@@ -20,6 +20,8 @@
 package saros.session;
 
 import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.PreferenceStore;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse instance for the use in one
@@ -50,21 +52,32 @@ public class User {
 
   private final JID jid;
 
-  private volatile int colorID;
-
-  private final int favoriteColorID;
+  private final IPreferenceStore preferences;
 
   private volatile Permission permission = Permission.WRITE_ACCESS;
 
   private volatile boolean isInSession;
 
   public User(JID jid, boolean isHost, boolean isLocal, int colorID, int favoriteColorID) {
-
     this.jid = jid;
     this.isHost = isHost;
     this.isLocal = isLocal;
-    this.colorID = colorID;
-    this.favoriteColorID = favoriteColorID;
+
+    preferences = new PreferenceStore();
+    preferences.setValue(ColorNegotiationHook.KEY_INITIAL_COLOR, colorID);
+    preferences.setValue(ColorNegotiationHook.KEY_FAV_COLOR, favoriteColorID);
+  }
+
+  public User(JID jid, boolean isHost, boolean isLocal, IPreferenceStore preferences) {
+    this.jid = jid;
+    this.isHost = isHost;
+    this.isLocal = isLocal;
+
+    if (preferences == null) {
+      this.preferences = new PreferenceStore();
+    } else {
+      this.preferences = preferences;
+    }
   }
 
   /**
@@ -153,11 +166,11 @@ public class User {
   }
 
   public int getColorID() {
-    return colorID;
+    return preferences.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
   }
 
   public int getFavoriteColorID() {
-    return favoriteColorID;
+    return preferences.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
   }
 
   /**
@@ -194,7 +207,7 @@ public class User {
    */
   @Deprecated
   public void setColorID(int colorID) {
-    this.colorID = colorID;
+    preferences.setValue(ColorNegotiationHook.KEY_INITIAL_COLOR, colorID);
   }
 
   /** FOR INTERNAL USE ONLY */
