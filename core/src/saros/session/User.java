@@ -181,4 +181,8 @@ public class User {
   public void setInSession(boolean isInSession) {
     this.isInSession = isInSession;
   }
+
+  public IPreferenceStore getPreferences() {
+    return preferences;
+  }
 }

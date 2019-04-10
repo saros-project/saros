@@ -109,9 +109,6 @@ public final class SarosSession implements ISarosSession {
 
   private final ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
 
-  private final ConcurrentHashMap<User, IPreferenceStore> userProperties =
-      new ConcurrentHashMap<User, IPreferenceStore>();
-
   private final SessionListenerDispatch listenerDispatch = new SessionListenerDispatch();
 
   private final User hostUser;
@@ -376,9 +373,6 @@ public final class SarosSession implements ISarosSession {
       log.error("user " + user + " added twice to SarosSession", new StackTrace());
       throw new IllegalArgumentException();
     }
-    if (this.userProperties.putIfAbsent(user, properties) != null) {
-      log.warn("user " + user + " already has properties");
-    }
 
     /*
      *
@@ -491,9 +485,6 @@ public final class SarosSession implements ISarosSession {
     if (participants.remove(jid) == null) {
       log.error("tried to remove user " + user + " who was never added to the session");
       return;
-    }
-    if (userProperties.remove(user) == null) {
-      log.error("tried to remove properties of user " + user + " that were never initialized");
     }
 
     activitySequencer.unregisterUser(user);
@@ -668,7 +659,7 @@ public final class SarosSession implements ISarosSession {
   public IPreferenceStore getUserProperties(User user) {
     if (user == null) throw new IllegalArgumentException("user is null");
 
-    return userProperties.get(user);
+    return user.getPreferences();
   }
 
   @Override
@@ -1079,14 +1070,11 @@ public final class SarosSession implements ISarosSession {
     if (host == null) {
       hostUser = localUser;
       participants.put(hostUser.getJID(), hostUser);
-      userProperties.put(hostUser, localProperties);
     } else {
       hostUser = new User(host, true, false, hostProperties);
       hostUser.setInSession(true);
       participants.put(hostUser.getJID(), hostUser);
       participants.put(localUser.getJID(), localUser);
-      userProperties.put(hostUser, hostProperties);
-      userProperties.put(localUser, localProperties);
     }
 
     sessionContainer = context.createChildContainer();
