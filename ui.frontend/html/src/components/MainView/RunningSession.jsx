@@ -1,33 +1,40 @@
 import { Text } from 'react-localize'
 import React from 'react'
+import { inject } from 'mobx-react'
+import FocusableItem from '../Focusable/FocusableItem';
+import FocusableMenu from '../Focusable/FocusableMenu';
 
-function SessionMember ({ openedFile, jid, displayName, isHost }) {
-  return (
-    <div className='session-member'>
-      <div>
-        {displayName || jid}
-        {isHost && <span className='badge badge-success'><Text message='label.host' /></span>}
-      </div>
-      <div>
-        {openedFile || <Text message='message.nonSharedFileOpen' />}
-      </div>
-    </div>
-  )
-}
+export default
+@inject('contextMenu')
+class RunningSession extends React.Component {
 
-export default function RunningSession ({ runningSession }) {
-  if (!runningSession) {
-    return null
+  showContextMenu(jid, event) {
+    this.props.contextMenu.showSessionMemberMenu(jid, event.currentTarget, event);
   }
 
-  let members = runningSession.members;
-  return (
-    <ul className='list-group'>
-      {members && members.map(member => (
-        <li className='list-group-item' key={member.jid}>
-          <SessionMember {...member} />
-        </li>
-      ))}
-    </ul>
-  )
+  render() {
+    let runningSession = this.props.runningSession;
+    if (!runningSession) {
+      return null
+    }
+
+    let members = runningSession.members;
+    return (
+      <FocusableMenu>
+        {members.map(({ openedFile, jid, displayName, isHost }, index) => (
+          <FocusableItem key={jid} className= 'session-member'
+            onContextMenu={e => this.showContextMenu(jid, e)}>
+            <div>
+              {displayName || jid}
+              &nbsp;
+              {isHost && <span className='badge badge-success'><Text message='label.host' /></span>}
+            </div>
+            <div>
+              {openedFile || <Text message='message.nonSharedFileOpen' />}
+            </div>
+          </FocusableItem>
+        ))}
+      </FocusableMenu>
+    )
+  }
 }
