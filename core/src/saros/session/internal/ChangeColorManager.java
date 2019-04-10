@@ -19,6 +19,7 @@ import saros.editor.colorstorage.UserColorID;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
+import saros.session.ColorNegotiationHook;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.ISessionListener;
@@ -130,7 +131,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
 
       if (!isValidColorID(colorID)) {
         colorID = getNextAvailableColorID();
-        session.getLocalUser().setColorID(colorID);
+        setUserColor(session.getLocalUser(), colorID);
       } else removeColorIdFromPool(colorID);
     } else {
       /*
@@ -223,7 +224,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
         removeColorIdFromPool(colorID);
 
         // this fails if a new copy is returned !
-        affected.setColorID(colorID);
+        setUserColor(affected, colorID);
       } else {
 
         assert session.isHost() : "only the session host can assign a color id";
@@ -233,7 +234,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
 
         addColorIdToPool(affected.getColorID());
 
-        affected.setColorID(colorID);
+        setUserColor(affected, colorID);
         fireChanges = true;
       }
     }
@@ -244,6 +245,10 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
 
     updateColorSet(currentUsers);
     session.userColorChanged(affected);
+  }
+
+  private void setUserColor(User user, int colorId) {
+    user.getPreferences().setValue(ColorNegotiationHook.KEY_INITIAL_COLOR, colorId);
   }
 
   /*
@@ -370,7 +375,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
 
       // make sure user uses the colorId we calculated
       User user = entry.getKey();
-      user.setColorID(colorId);
+      setUserColor(user, colorId);
     }
   }
 

@@ -166,17 +166,6 @@ public class User {
     return !isHost();
   }
 
-  /**
-   * FOR INTERNAL USE ONLY
-   *
-   * @param colorID
-   * @deprecated this must only be called by the component that handles color changes
-   */
-  @Deprecated
-  public void setColorID(int colorID) {
-    preferences.setValue(ColorNegotiationHook.KEY_INITIAL_COLOR, colorID);
-  }
-
   /** FOR INTERNAL USE ONLY */
   public void setInSession(boolean isInSession) {
     this.isInSession = isInSession;
