@@ -54,7 +54,6 @@ import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.IPreferenceStore;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.repackaged.picocontainer.annotations.Inject;
-import saros.session.ColorNegotiationHook;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.IActivityHandlerCallback;
@@ -1074,10 +1073,7 @@ public final class SarosSession implements ISarosSession {
 
     assert localUserJID != null;
 
-    int localColorID = localProperties.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
-    int localFavoriteColorID = localProperties.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
-    localUser = new User(localUserJID, host == null, true, localColorID, localFavoriteColorID);
-
+    localUser = new User(localUserJID, host == null, true, localProperties);
     localUser.setInSession(true);
 
     if (host == null) {
@@ -1085,9 +1081,7 @@ public final class SarosSession implements ISarosSession {
       participants.put(hostUser.getJID(), hostUser);
       userProperties.put(hostUser, localProperties);
     } else {
-      int hostColorID = hostProperties.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
-      int hostFavoriteColorID = hostProperties.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
-      hostUser = new User(host, true, false, hostColorID, hostFavoriteColorID);
+      hostUser = new User(host, true, false, hostProperties);
       hostUser.setInSession(true);
       participants.put(hostUser.getJID(), hostUser);
       participants.put(localUser.getJID(), localUser);
