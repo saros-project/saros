@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** Data holder class representing the input of a {@link ModuleTab}. */
-class ModuleSelectionResult {
+public class ModuleSelectionResult {
   private final LocalRepresentationOption localRepresentationOption;
   private final Project project;
   private final String newModuleName;
@@ -45,7 +45,7 @@ class ModuleSelectionResult {
    * @return the chosen mode of how to locally represent the shared module
    */
   @NotNull
-  LocalRepresentationOption getLocalRepresentationOption() {
+  public LocalRepresentationOption getLocalRepresentationOption() {
     return localRepresentationOption;
   }
 
