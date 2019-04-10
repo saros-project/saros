@@ -17,7 +17,7 @@ export default class SarosStore {
   }
 
   @observable accounts = []
-  @observable projectTrees = null
+  @observable projectTrees = []
   @observable runningSession = null
 
   sarosApi = null
