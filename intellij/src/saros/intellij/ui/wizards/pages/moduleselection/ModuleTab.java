@@ -17,6 +17,7 @@ import com.intellij.util.ui.JBInsets;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.util.Arrays;
 import java.util.Comparator;
 import javax.swing.Box;
@@ -74,17 +75,12 @@ class ModuleTab {
     initPanel();
 
     fillProjectComboBox();
-
-    /*
-     * TODO set up project combo box logic
-     *  - add listener to update other fields + set new default selection for chosen project
-     */
-
     setUpRadioButtons();
-
     setUpFolderChooser();
 
     setInitialInput();
+
+    addProjectComboBoxListener();
 
     /*
      * TODO set up logic to determine whether the current input is valid
@@ -275,6 +271,29 @@ class ModuleTab {
 
     createNewModuleRadioButton.doClick();
     existingModuleComboBox.setSelectedIndex(-1);
+  }
+
+  /**
+   * Registers a listener with the project combo box that sets default values for all other fields
+   * when a new project is selected. After the new values are set, the validity state of the module
+   * tab input is updated.
+   *
+   * @see #updateFieldsForProjectChange(Project)
+   * @see #updateInputValidity()
+   */
+  private void addProjectComboBoxListener() {
+    projectComboBox.addItemListener(
+        itemEvent -> {
+          if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+            Project newSelectedProject = (Project) projectComboBox.getSelectedItem();
+
+            if (newSelectedProject != null) {
+              updateFieldsForProjectChange(newSelectedProject);
+            }
+
+            updateInputValidity();
+          }
+        });
   }
 
   /**
