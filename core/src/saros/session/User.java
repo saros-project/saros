@@ -35,16 +35,6 @@ public class User {
   private volatile Permission permission = Permission.WRITE_ACCESS;
   private volatile boolean isInSession;
 
-  public User(JID jid, boolean isHost, boolean isLocal, int colorID, int favoriteColorID) {
-    this.jid = jid;
-    this.isHost = isHost;
-    this.isLocal = isLocal;
-
-    preferences = new PreferenceStore();
-    preferences.setValue(ColorNegotiationHook.KEY_INITIAL_COLOR, colorID);
-    preferences.setValue(ColorNegotiationHook.KEY_FAV_COLOR, favoriteColorID);
-  }
-
   public User(JID jid, boolean isHost, boolean isLocal, IPreferenceStore preferences) {
     this.jid = jid;
     this.isHost = isHost;
