@@ -41,7 +41,6 @@ import saros.intellij.ui.widgets.progress.ProgessMonitorAdapter;
 import saros.intellij.ui.wizards.pages.HeaderPanel;
 import saros.intellij.ui.wizards.pages.PageActionListener;
 import saros.intellij.ui.wizards.pages.TextAreaPage;
-import saros.intellij.ui.wizards.pages.moduleselection.LocalRepresentationOption;
 import saros.intellij.ui.wizards.pages.moduleselection.ModuleSelectionResult;
 import saros.intellij.ui.wizards.pages.moduleselection.SelectLocalModuleRepresentationPage;
 import saros.monitoring.IProgressMonitor;
@@ -139,121 +138,150 @@ public class AddProjectToSessionWizard extends Wizard {
 
           Project project = moduleSelectionResult.getProject();
 
-          String moduleName = moduleSelectionResult.getNewModuleName();
-          Path moduleBasePath = moduleSelectionResult.getNewModuleBasePath();
+          switch (moduleSelectionResult.getLocalRepresentationOption()) {
+            case CREATE_NEW_MODULE:
+              String newModuleName = moduleSelectionResult.getNewModuleName();
+              Path newModuleBasePath = moduleSelectionResult.getNewModuleBasePath();
 
-          if (moduleName == null || moduleBasePath == null) {
-            noisyCancel("No valid new module name or base path was given", null);
+              if (newModuleName == null || newModuleBasePath == null) {
+                noisyCancel("No valid new module name or base path was given", null);
+
+                return;
+              }
+
+              doNewModule(project, newModuleName, newModuleBasePath);
+              break;
+
+            case USE_EXISTING_MODULE:
+              Module existingModule = moduleSelectionResult.getExistingModule();
+
+              if (existingModule == null) {
+                noisyCancel("No valid existing module was given", null);
+
+                return;
+              }
+
+              doExistingModule(existingModule);
+              break;
+
+            default:
+              noisyCancel("No valid option on how to represent the shared module was given", null);
+          }
+        }
+
+        /**
+         * Creates a stub module and starts the project negotiation with the newly created module.
+         *
+         * @param project the project to create the module in
+         * @param moduleName the name for the new module
+         * @param moduleBasePath the base path for the new module
+         * @see AddProjectToSessionWizard#createModuleStub(String, Path, Project)
+         */
+        private void doNewModule(
+            @NotNull Project project, @NotNull String moduleName, @NotNull Path moduleBasePath) {
+
+          Module module;
+
+          try {
+            module = createModuleStub(moduleName, moduleBasePath, project);
+
+          } catch (IOException e) {
+            LOG.error("Could not create the shared module " + moduleName + ".", e);
+
+            cancelNegotiation("Failed to create shared module");
+
+            NotificationPanel.showError(
+                MessageFormat.format(
+                    Messages.Contact_saros_message_conditional,
+                    MessageFormat.format(
+                            Messages
+                                .AddProjectToSessionWizard_module_creation_failed_message_condition,
+                            moduleName)
+                        + "\n"
+                        + e),
+                Messages.AddProjectToSessionWizard_module_creation_failed_title);
+
+            return;
+
+          } catch (ModuleWithNameAlreadyExists e) {
+            LOG.warn("Could not create the shared module " + moduleName + ".", e);
+
+            cancelNegotiation("Failed to create shared module");
+
+            NotificationPanel.showError(
+                MessageFormat.format(
+                    Messages.Contact_saros_message_conditional,
+                    MessageFormat.format(
+                        Messages.AddProjectToSessionWizard_module_already_exists_message_condition,
+                        moduleName)),
+                Messages.AddProjectToSessionWizard_module_already_exists_title);
 
             return;
           }
 
-          Module existingModule = moduleSelectionResult.getExistingModule();
+          IProject sharedProject = new IntelliJProjectImpl(module);
 
-          if (existingModule == null) {
-            noisyCancel("No valid existing module was given", null);
+          localProjects.put(remoteProjectID, sharedProject);
+
+          triggerProjectNegotiation();
+        }
+
+        /**
+         * Checks if the chosen module is valid and then starts the project negotiation with the
+         * module.
+         *
+         * @param existingModule the existing module to use for the project negotiation
+         */
+        private void doExistingModule(@NotNull Module existingModule) {
+          String moduleName = existingModule.getName();
+
+          IProject sharedProject;
+
+          try {
+            sharedProject = new IntelliJProjectImpl(existingModule);
+
+          } catch (IllegalArgumentException e) {
+            LOG.debug("No session is started as an invalid module was chosen");
+
+            cancelNegotiation("Invalid module chosen by client");
+
+            NotificationPanel.showError(
+                MessageFormat.format(
+                    Messages.Contact_saros_message_conditional,
+                    MessageFormat.format(
+                        Messages.AddProjectToSessionWizard_invalid_module_message_condition,
+                        moduleName)),
+                Messages.AddProjectToSessionWizard_invalid_module_title);
+
+            return;
+
+          } catch (IllegalStateException e) {
+            LOG.warn(
+                "Aborted negotiation as an error occurred while trying to create an "
+                    + "IProject object for "
+                    + moduleName
+                    + ".",
+                e);
+
+            cancelNegotiation("Error while processing module chosen by client");
+
+            NotificationPanel.showWarning(
+                MessageFormat.format(
+                    Messages.AddProjectToSessionWizard_error_creating_module_object_message,
+                    moduleName,
+                    e),
+                MessageFormat.format(
+                    Messages.AddProjectToSessionWizard_error_creating_module_object_title,
+                    moduleName));
 
             return;
           }
 
-          if (moduleSelectionResult.getLocalRepresentationOption()
-              == LocalRepresentationOption.CREATE_NEW_MODULE) {
+          localProjects.put(remoteProjectID, sharedProject);
 
-            Module module;
+          prepareFilesChangedPage(localProjects);
 
-            try {
-              module = createModuleStub(moduleName, moduleBasePath, project);
-
-            } catch (IOException e) {
-              LOG.error("Could not create the shared module " + moduleName + ".", e);
-
-              cancelNegotiation("Failed to create shared module");
-
-              NotificationPanel.showError(
-                  MessageFormat.format(
-                      Messages.Contact_saros_message_conditional,
-                      MessageFormat.format(
-                              Messages
-                                  .AddProjectToSessionWizard_module_creation_failed_message_condition,
-                              moduleName)
-                          + "\n"
-                          + e),
-                  Messages.AddProjectToSessionWizard_module_creation_failed_title);
-
-              return;
-
-            } catch (ModuleWithNameAlreadyExists e) {
-              LOG.warn("Could not create the shared module " + moduleName + ".", e);
-
-              cancelNegotiation("Failed to create shared module");
-
-              NotificationPanel.showError(
-                  MessageFormat.format(
-                      Messages.Contact_saros_message_conditional,
-                      MessageFormat.format(
-                          Messages
-                              .AddProjectToSessionWizard_module_already_exists_message_condition,
-                          moduleName)),
-                  Messages.AddProjectToSessionWizard_module_already_exists_title);
-
-              return;
-            }
-
-            IProject sharedProject = new IntelliJProjectImpl(module);
-
-            localProjects.put(remoteProjectID, sharedProject);
-
-            triggerProjectNegotiation();
-
-          } else {
-            IProject sharedProject;
-
-            try {
-              sharedProject = new IntelliJProjectImpl(existingModule);
-
-            } catch (IllegalArgumentException e) {
-              LOG.debug("No session is started as an invalid module was chosen");
-
-              cancelNegotiation("Invalid module chosen by client");
-
-              NotificationPanel.showError(
-                  MessageFormat.format(
-                      Messages.Contact_saros_message_conditional,
-                      MessageFormat.format(
-                          Messages.AddProjectToSessionWizard_invalid_module_message_condition,
-                          moduleName)),
-                  Messages.AddProjectToSessionWizard_invalid_module_title);
-
-              return;
-
-            } catch (IllegalStateException e) {
-              LOG.warn(
-                  "Aborted negotiation as an error occurred while trying to create an "
-                      + "IProject object for "
-                      + moduleName
-                      + ".",
-                  e);
-
-              cancelNegotiation("Error while processing module chosen by client");
-
-              NotificationPanel.showWarning(
-                  MessageFormat.format(
-                      Messages.AddProjectToSessionWizard_error_creating_module_object_message,
-                      moduleName,
-                      e),
-                  MessageFormat.format(
-                      Messages.AddProjectToSessionWizard_error_creating_module_object_title,
-                      moduleName));
-
-              return;
-            }
-
-            localProjects.put(remoteProjectID, sharedProject);
-
-            prepareFilesChangedPage(localProjects);
-
-            setTopPanelText(Messages.EnterProjectNamePage_description_changed_files);
-          }
+          setTopPanelText(Messages.AddProjectToSessionWizard_description_changed_files);
         }
 
         /**
@@ -435,7 +463,8 @@ public class AddProjectToSessionWizard extends Wizard {
         parent,
         Messages.AddProjectToSessionWizard_title,
         new HeaderPanel(
-            Messages.EnterProjectNamePage_title2, Messages.EnterProjectNamePage_description));
+            Messages.AddProjectToSessionWizard_title2,
+            Messages.AddProjectToSessionWizard_description));
 
     SarosPluginContext.initComponent(this);
 
