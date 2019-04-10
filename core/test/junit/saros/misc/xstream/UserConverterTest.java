@@ -20,10 +20,10 @@ public class UserConverterTest {
   @BeforeClass
   public static void prepare() {
     JID aliceJid = new JID("alice@saros-con");
-    alice = new User(aliceJid, true, true, 0, 0);
+    alice = new User(aliceJid, true, true, null);
 
     JID bobJid = new JID("bob@saros-con");
-    bob = new User(bobJid, false, false, 0, 0);
+    bob = new User(bobJid, false, false, null);
 
     /* Mocks */
     ISarosSession session = EasyMock.createMock(ISarosSession.class);

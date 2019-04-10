@@ -108,8 +108,8 @@ public class ActivitySequencerTest {
     sessionStubAlice = new SequencerSessionStub();
     sessionStubBob = new SequencerSessionStub();
 
-    aliceUser = new User(ALICE_JID, true, true, 0, 0);
-    bobUser = new User(BOB_JID, false, true, 0, 0);
+    aliceUser = new User(ALICE_JID, true, true, null);
+    bobUser = new User(BOB_JID, false, true, null);
 
     sessionStubAlice.setLocalUser(aliceUser);
     sessionStubBob.setLocalUser(bobUser);
@@ -198,7 +198,7 @@ public class ActivitySequencerTest {
 
     aliceSequencer.start();
 
-    User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
+    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
 
     aliceSequencer.registerUser(bobUserInAliceSession);
 
@@ -225,8 +225,8 @@ public class ActivitySequencerTest {
     aliceSequencer.start();
     bobSequencer.start();
 
-    User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
-    User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
+    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
+    User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
 
     sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
     sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
@@ -261,8 +261,8 @@ public class ActivitySequencerTest {
     aliceSequencer.start();
     bobSequencer.start();
 
-    User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
-    User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
+    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
+    User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
 
     sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
     sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
@@ -293,8 +293,8 @@ public class ActivitySequencerTest {
     aliceSequencer.start();
     bobSequencer.start();
 
-    User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
-    User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
+    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
+    User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
 
     sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
     sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
@@ -326,8 +326,8 @@ public class ActivitySequencerTest {
     aliceSequencer.start();
     bobSequencer.start();
 
-    User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
-    User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
+    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
+    User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
 
     sessionStubAlice.addUser(bobUserInAliceSession, new PreferenceStore());
     sessionStubBob.addUser(aliceUserInBobSession, new PreferenceStore());
