@@ -80,7 +80,6 @@ import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
 import saros.ui.widgets.ConnectionStateComposite;
 import saros.ui.widgets.chat.ChatRoomsComposite;
 import saros.ui.widgets.viewer.ViewerComposite;
-import saros.ui.widgets.viewer.session.MDNSSessionDisplayComposite;
 import saros.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
 
 /**
@@ -106,8 +105,6 @@ public class SarosView extends ViewPart {
   private static final Logger LOG = Logger.getLogger(SarosView.class);
 
   public static final String ID = "saros.ui.views.SarosView";
-
-  private static final boolean MDNS_MODE = false;
 
   private final IRosterListener rosterListener =
       new IRosterListener() {
@@ -306,12 +303,7 @@ public class SarosView extends ViewPart {
         new ConnectionStateComposite(leftComposite, SWT.NONE);
     connectionStateComposite.setLayoutData(LayoutUtils.createFillHGrabGridData());
 
-    if (MDNS_MODE) {
-      sessionDisplay = new MDNSSessionDisplayComposite(leftComposite, SWT.V_SCROLL);
-    } else {
-      sessionDisplay = new XMPPSessionDisplayComposite(leftComposite, SWT.V_SCROLL);
-    }
-
+    sessionDisplay = new XMPPSessionDisplayComposite(leftComposite, SWT.V_SCROLL);
     sessionDisplay.setLayoutData(LayoutUtils.createFillGridData());
 
     final Control control = sessionDisplay.getViewer().getControl();
