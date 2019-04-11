@@ -31,7 +31,7 @@ public class ConnectionHandler {
 
   private static final Logger LOG = Logger.getLogger(ConnectionHandler.class);
 
-  private static final boolean MDNS_MODE = Boolean.getBoolean("saros.net.ENABLE_MDNS");
+  private static final boolean MDNS_MODE = false;
 
   private final XMPPConnectionService connectionService;
   private final MDNSService mDNSService;

@@ -107,7 +107,7 @@ public class SarosView extends ViewPart {
 
   public static final String ID = "saros.ui.views.SarosView";
 
-  private static final boolean MDNS_MODE = Boolean.getBoolean("saros.net.ENABLE_MDNS");
+  private static final boolean MDNS_MODE = false;
 
   private final IRosterListener rosterListener =
       new IRosterListener() {

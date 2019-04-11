@@ -12,7 +12,7 @@ import saros.communication.connection.ConnectionHandler;
  */
 public class SarosPropertyTester extends PropertyTester {
 
-  private static final boolean MDNS_MODE = Boolean.getBoolean("saros.net.ENABLE_MDNS");
+  private static final boolean MDNS_MODE = false;
 
   @Inject private ConnectionHandler connectionHandler;
 
