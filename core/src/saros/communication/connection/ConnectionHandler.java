@@ -1,6 +1,5 @@
 package saros.communication.connection;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
@@ -14,8 +13,6 @@ import saros.SarosConstants;
 import saros.account.XMPPAccount;
 import saros.net.ConnectionState;
 import saros.net.IConnectionManager;
-import saros.net.internal.TCPServer;
-import saros.net.mdns.MDNSService;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
@@ -31,12 +28,7 @@ public class ConnectionHandler {
 
   private static final Logger LOG = Logger.getLogger(ConnectionHandler.class);
 
-  private static final boolean MDNS_MODE = false;
-
   private final XMPPConnectionService connectionService;
-  private final MDNSService mDNSService;
-
-  private final TCPServer tcpServer;
 
   private final IProxyResolver proxyResolver;
 
@@ -77,15 +69,11 @@ public class ConnectionHandler {
 
   public ConnectionHandler(
       final XMPPConnectionService connectionService,
-      final TCPServer tcpServer,
-      final MDNSService mDNSService,
       final IConnectionManager transferManager,
       @Nullable final IProxyResolver proxyResolver,
       final Preferences preferences) {
 
     this.connectionService = connectionService;
-    this.tcpServer = tcpServer;
-    this.mDNSService = mDNSService;
     this.connectionManager = transferManager;
     this.proxyResolver = proxyResolver;
     this.preferences = preferences;
@@ -118,8 +106,6 @@ public class ConnectionHandler {
    *     established or the connection has no unique id
    */
   public String getConnectionID() {
-    if (MDNS_MODE) return mDNSService.getQualifiedServiceName();
-
     final JID jid = connectionService.getJID();
 
     if (jid == null) return null;
@@ -133,9 +119,6 @@ public class ConnectionHandler {
    * @return <code>true</code> if a connection is established, <code>false</code> otherwise
    */
   public boolean isConnected() {
-
-    if (MDNS_MODE) return mDNSService.getQualifiedServiceName() != null;
-
     return connectionService.isConnected();
   }
 
@@ -167,8 +150,7 @@ public class ConnectionHandler {
     }
 
     try {
-      if (MDNS_MODE) connectMDNSInternal(account, failSilently);
-      else connectXMPPInternal(account, failSilently);
+      connectXMPPInternal(account, failSilently);
     } finally {
       synchronized (this) {
         isConnecting = false;
@@ -185,8 +167,7 @@ public class ConnectionHandler {
     }
 
     try {
-      if (MDNS_MODE) disconnectMDNSInternal();
-      else disconnectXMPPInternal();
+      disconnectXMPPInternal();
     } finally {
       synchronized (this) {
         isDisconnecting = false;
@@ -201,54 +182,6 @@ public class ConnectionHandler {
 
   private void disconnectXMPPInternal() {
     connectionService.disconnect();
-  }
-
-  private void disconnectMDNSInternal() {
-    setConnectionState(ConnectionState.DISCONNECTING, null, true);
-    mDNSService.stop();
-    tcpServer.stop();
-    setConnectionState(ConnectionState.NOT_CONNECTED, null, true);
-  }
-
-  private void connectMDNSInternal(final XMPPAccount account, final boolean failSilently) {
-    IConnectingFailureCallback callbackTmp = callback;
-
-    // misuse the XMPP account credentials for now;
-
-    if (isConnected()) {
-      disconnectMDNSInternal();
-    }
-
-    // misuse the Socks5 proxy port for now
-    int portUsed = 0;
-    try {
-      portUsed = tcpServer.start(null, preferences.getFileTransferPort());
-    } catch (IOException e) {
-      LOG.error("failed to start TCP server: " + e.getMessage(), e);
-
-      synchronized (this) {
-        isConnecting = false;
-      }
-
-      if (callbackTmp != null && !failSilently) {
-        callbackTmp.connectingFailed(e);
-        return;
-      }
-    }
-
-    String serviceName = account.getUsername();
-
-    mDNSService.configure("_dpp._tcp.local.", serviceName, portUsed, null);
-
-    setConnectionState(ConnectionState.CONNECTING, null, true);
-    try {
-      mDNSService.start();
-      setConnectionState(ConnectionState.CONNECTED, null, true);
-    } catch (IOException e) {
-      LOG.error("failed to start MDNS service", e);
-      setConnectionState(ConnectionState.ERROR, e, true);
-      setConnectionState(ConnectionState.NOT_CONNECTED, null, true);
-    }
   }
 
   private void connectXMPPInternal(final XMPPAccount account, final boolean failSilently) {
