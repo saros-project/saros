@@ -1,15 +1,12 @@
 package saros.account;
 
+import com.thoughtworks.xstream.XStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -32,6 +29,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import saros.annotations.Component;
 import saros.net.xmpp.JID;
@@ -150,44 +149,21 @@ public final class XMPPAccountStore {
 
     LOG.debug("loading accounts from file: " + accountFile.getAbsolutePath());
 
-    DataInputStream dataIn = null;
-
-    int size;
-
-    byte[] buffer;
+    FileInputStream dataIn = null;
 
     try {
-      dataIn = new DataInputStream(new FileInputStream(accountFile));
+      dataIn = new FileInputStream(accountFile);
 
-      size = dataIn.readInt();
+      byte[] encryptedAccountData = IOUtils.toByteArray(dataIn);
 
-      if (size <= 0 || size > MAX_ACCOUNT_DATA_SIZE)
-        throw new IOException(
-            "account data seems malformed, refused to load " + size + " bytes into memory");
+      XStream xStream = createXStream();
+      Pair<XMPPAccount, Set<XMPPAccount>> accountData =
+          (ImmutablePair<XMPPAccount, Set<XMPPAccount>>)
+              xStream.fromXML(
+                  new ByteArrayInputStream(Crypto.decrypt(encryptedAccountData, secretKey)));
 
-      buffer = new byte[size];
-
-      dataIn.readFully(buffer);
-
-      activeAccount =
-          (XMPPAccount)
-              new ObjectInputStream(new ByteArrayInputStream(Crypto.decrypt(buffer, secretKey)))
-                  .readObject();
-
-      size = dataIn.readInt();
-
-      if (size <= 0 || size > MAX_ACCOUNT_DATA_SIZE)
-        throw new IOException(
-            "account data seems malformed, refused to load " + size + " bytes into memory");
-
-      buffer = new byte[size];
-
-      dataIn.readFully(buffer);
-
-      accounts =
-          (Set<XMPPAccount>)
-              new ObjectInputStream(new ByteArrayInputStream(Crypto.decrypt(buffer, secretKey)))
-                  .readObject();
+      activeAccount = accountData.getLeft();
+      accounts = accountData.getRight();
 
     } catch (RuntimeException e) {
       LOG.error("internal error while loading account data", e);
@@ -224,31 +200,18 @@ public final class XMPPAccountStore {
     }
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    ObjectOutputStream oos;
+    XStream xStream = createXStream();
 
-    DataOutputStream dataOut = null;
+    FileOutputStream dataOut = null;
 
     try {
-      dataOut = new DataOutputStream(new FileOutputStream(accountFile));
+      dataOut = new FileOutputStream(accountFile);
+      // use a pair in order to create a artificial xml root node
+      xStream.toXML(new ImmutablePair(activeAccount, accounts), out);
 
-      oos = new ObjectOutputStream(out);
-      oos.writeObject(activeAccount);
-      oos.flush();
+      byte[] encryptedAccountData = Crypto.encrypt(out.toByteArray(), secretKey);
 
-      byte[] activeAccount = Crypto.encrypt(out.toByteArray(), secretKey);
-      out.reset();
-
-      oos = new ObjectOutputStream(out);
-      oos.writeObject(accounts);
-      oos.flush();
-
-      byte[] allAccounts = Crypto.encrypt(out.toByteArray(), secretKey);
-
-      dataOut.writeInt(activeAccount.length);
-      dataOut.write(activeAccount);
-      dataOut.writeInt(allAccounts.length);
-      dataOut.write(allAccounts);
-
+      dataOut.write(encryptedAccountData);
       dataOut.flush();
 
     } catch (RuntimeException e) {
@@ -262,6 +225,15 @@ public final class XMPPAccountStore {
     }
 
     LOG.debug("saved " + accounts.size() + " account(s)");
+  }
+
+  private XStream createXStream() {
+    XStream xStream = new XStream();
+    xStream.alias("accounts", ImmutablePair.class);
+    xStream.aliasField("activeAccount", ImmutablePair.class, "left");
+    xStream.aliasField("configuredAccounts", ImmutablePair.class, "right");
+    xStream.alias("xmppAccount", XMPPAccount.class);
+    return xStream;
   }
 
   /**
@@ -594,7 +566,7 @@ public final class XMPPAccountStore {
    * save the result in the user home directory which should be default only be accessible by the
    * user itself or administrators.
    */
-  private static class Crypto {
+  static class Crypto {
     private static final byte[] IV = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private static final int CHUNK_SIZE = 4096;
