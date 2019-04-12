@@ -471,7 +471,7 @@ public class AddProjectToSessionWizard extends Wizard {
     this.negotiation = negotiation;
     this.peer = negotiation.getPeer();
 
-    this.setPreferredSize(new Dimension(650, 515));
+    this.setPreferredSize(new Dimension(650, 535));
 
     List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
 
