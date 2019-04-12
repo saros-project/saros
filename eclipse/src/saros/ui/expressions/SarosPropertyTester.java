@@ -12,8 +12,6 @@ import saros.communication.connection.ConnectionHandler;
  */
 public class SarosPropertyTester extends PropertyTester {
 
-  private static final boolean MDNS_MODE = Boolean.getBoolean("saros.net.ENABLE_MDNS");
-
   @Inject private ConnectionHandler connectionHandler;
 
   public SarosPropertyTester() {
@@ -26,10 +24,6 @@ public class SarosPropertyTester extends PropertyTester {
 
       if ("isConnected".equals(property)) {
         return connectionHandler.isConnected();
-      }
-
-      if ("isXMPPEnabled".equals(property)) {
-        return !MDNS_MODE;
       }
     }
     return false;

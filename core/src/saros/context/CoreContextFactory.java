@@ -17,10 +17,8 @@ import saros.net.IConnectionManager;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.internal.DataTransferManager;
-import saros.net.internal.TCPServer;
 import saros.net.internal.XMPPReceiver;
 import saros.net.internal.XMPPTransmitter;
-import saros.net.mdns.MDNSService;
 import saros.net.stream.IBBStreamService;
 import saros.net.stream.IStreamService;
 import saros.net.stream.Socks5StreamService;
@@ -87,8 +85,6 @@ public class CoreContextFactory extends AbstractContextFactory {
           Socks5StreamService.class),
       Component.create(RosterTracker.class),
       Component.create(XMPPConnectionService.class),
-      Component.create(MDNSService.class),
-      Component.create(TCPServer.class),
       Component.create(IStunService.class, StunServiceImpl.class),
       Component.create(SubscriptionHandler.class),
       Component.create(IUPnPService.class, UPnPServiceImpl.class),

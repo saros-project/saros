@@ -17,7 +17,6 @@ import saros.editor.EditorManager;
 import saros.editor.FollowModeManager;
 import saros.editor.IFollowModeListener;
 import saros.editor.ISharedEditorListener;
-import saros.net.mdns.MDNSService;
 import saros.net.xmpp.roster.IRosterListener;
 import saros.project.internal.FollowingActivitiesManager;
 import saros.project.internal.IFollowModeChangesListener;
@@ -26,8 +25,6 @@ import saros.session.ISessionListener;
 import saros.session.User;
 import saros.ui.model.HeaderElement;
 import saros.ui.model.TreeContentProvider;
-import saros.ui.model.mdns.MDNSContentProvider;
-import saros.ui.model.mdns.MDNSHeaderElement;
 import saros.ui.model.roster.RosterContentProvider;
 import saros.ui.model.roster.RosterHeaderElement;
 import saros.ui.util.SWTUtils;
@@ -236,12 +233,6 @@ public class SessionContentProvider extends TreeContentProvider {
               viewer.getControl().getFont(),
               (RosterContentProvider) additionalContentProvider,
               (Roster) input.getCustomContent());
-    } else if (additionalContentProvider instanceof MDNSContentProvider) {
-      contentHeaderElement =
-          new MDNSHeaderElement(
-              viewer.getControl().getFont(),
-              (MDNSContentProvider) additionalContentProvider,
-              (MDNSService) input.getCustomContent());
     }
   }
 
