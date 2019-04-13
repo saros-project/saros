@@ -1,4 +1,4 @@
-package saros.core.project.internal;
+package saros.intellij.context;
 
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
