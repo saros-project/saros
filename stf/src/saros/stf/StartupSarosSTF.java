@@ -34,13 +34,13 @@ public class StartupSarosSTF implements IStartup {
   @Override
   public void earlyStartup() {
 
-    Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
+    Integer port = Integer.getInteger("saros.testmode");
 
     if (port != null && port > 0 && port <= 65535) {
       LOG.info("starting STF controller on port " + port);
       startSTFController(port);
 
-    } else if (port != null) {
+    } else {
       LOG.error("could not start STF controller: port " + port + " is not a valid port number");
     }
   }

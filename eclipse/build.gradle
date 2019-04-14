@@ -38,7 +38,6 @@ sourceSets {
 
   test {
     java.srcDir 'test/junit'
-    resources.srcDir 'test/resources'
   }
 }
 
@@ -92,9 +91,6 @@ jar {
   }
   into('icons') {
     from 'icons'
-  }
-  into('test/resources') {
-    from('test/resources')
   }
   from('.') {
     include '*.properties'

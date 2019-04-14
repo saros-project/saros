@@ -5,8 +5,6 @@
   <extension
     id="saros.stf"
     point="org.eclipse.ui.startup">
-    <startup
-      class="saros.stf.StartupSarosSTF">
-    </startup>
+    <startup class="saros.stf.StartupSarosSTF"/>
   </extension>
 </plugin>
