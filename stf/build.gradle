@@ -34,7 +34,6 @@ sourceSets {
     }
     test {
         java.srcDirs = ['test']
-        resources.srcDir 'test/resources'
     }
 }
 
