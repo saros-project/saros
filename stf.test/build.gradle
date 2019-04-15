@@ -1,0 +1,93 @@
+buildscript {
+    repositories {
+        maven {
+            url  "http://dl.bintray.com/monkey-works/BuildMonkey"
+        }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "de.monkeyworks.buildmonkey:gradle.dependency:0.4.13"
+    }
+}
+
+apply plugin: 'de.monkeyworks.buildmonkey.ManifestDependencyPlugin'
+
+repositories {
+    maven { url rootProject.file('build/maven') }
+}
+
+configurations {
+    stfTest
+}
+
+sourceSets {
+    stfTest {
+        java.srcDir 'test'
+//    resources.srcDir 'test/resources'
+    }
+}
+
+manifestDependencies {
+    eclipseGroup = 'eclipse-deps'
+
+    dependencyHandling {
+        def ids = [:]
+        if (it.matches('org.junit'))
+        {
+            ids['groupId'] = 'junit'
+            ids['artifactId'] = 'junit'
+            ids['version'] = '4.11'
+        }
+        return ids
+    }
+}
+
+dependencies {
+    stfTestCompile project(':saros.stf')
+    stfTestCompile project(path: ':saros.stf', configuration: 'testing')
+    stfTestCompile configurations.testConfig
+    testCompile configurations.stfTestCompile // for running the tests in eclipse
+}
+
+task stfTest (type: Test, dependsOn: [':saros.eclipse:build']) {
+    group 'Verification'
+    description 'Runs the stf tests. Requires a corresponding test environment'
+
+    testClassesDirs = sourceSets.stfTest.output.classesDirs
+
+    systemProperty 'saros.stf.client.configuration.files', System.getProperty('stf.client.configuration.files', '')
+
+    classpath = sourceSets.stfTest.runtimeClasspath
+
+    testLogging {
+        showStandardStreams = true
+        events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+    // Print summary of failed tests
+    ext.failedStfTests = []
+    afterTest { descriptor, result ->
+        if(result.resultType == org.gradle.api.tasks.testing.TestResult.ResultType.FAILURE){
+            ext.failedStfTests << "${descriptor.className}.${descriptor.name}"
+        }
+    }
+    afterSuite { suite, result ->
+        if (!suite.parent && !ext.failedStfTests.isEmpty()) {
+            logger.lifecycle("Failed tests:")
+            ext.failedStfTests.each { logger.lifecycle(it) }
+        }
+    }
+
+    include '**/stf/test/**/*Test.*'
+    exclude '**/stf/test/stf/**'
+    exclude '**/whiteboard/**'
+}
+
+sonarqube {
+    properties {
+        property 'sonar.projectName', 'Saros/STF.Test'
+        property 'sonar.projectDescription', 'STF-Tests'
+        property 'sonar.projectVersion', '0.1.0'
+    }
+}

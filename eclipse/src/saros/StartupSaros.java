@@ -16,7 +16,6 @@ import saros.communication.connection.ConnectionHandler;
 import saros.context.IContainerContext;
 import saros.feedback.FeedbackPreferences;
 import saros.preferences.Preferences;
-import saros.stf.server.STFController;
 import saros.ui.commandHandlers.GettingStartedHandler;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.ViewUtils;
@@ -67,15 +66,9 @@ public class StartupSaros implements IStartup {
 
     if (xmppAccountStore.isEmpty()) showSarosView();
 
-    Integer port = Integer.getInteger("saros.testmode");
+    Integer testmode = Integer.getInteger("saros.testmode");
 
-    if (port != null && port > 0 && port <= 65535) {
-      LOG.info("starting STF controller on port " + port);
-      startSTFController(port);
-
-    } else if (port != null) {
-      LOG.error("could not start STF controller: port " + port + " is not a valid port number");
-    } else {
+    if (testmode == null) {
       /*
        * Only show configuration wizard if no accounts are configured. If
        * Saros is already configured, do not show the tutorial because the
@@ -122,23 +115,6 @@ public class StartupSaros implements IStartup {
               new GettingStartedHandler().execute(new ExecutionEvent());
             } catch (ExecutionException e) {
               LOG.warn("failed to execute tutorial handler", e);
-            }
-          }
-        });
-  }
-
-  private void startSTFController(final int port) {
-
-    ThreadUtils.runSafeAsync(
-        "dpp-stf-startup",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              STFController.start(port, context);
-            } catch (Exception e) {
-              LOG.error("starting STF controller failed", e);
             }
           }
         });

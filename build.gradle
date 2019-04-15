@@ -136,6 +136,8 @@ task cleanGenerateLibAll {
     project(':saros.eclipse').file('lib').deleteDir()
     project(':saros.core').file('lib').deleteDir()
     project(':saros.whiteboard').file('lib').deleteDir()
+    project(':saros.stf').file('lib').deleteDir()
+    project(':saros.stf.test').file('lib').deleteDir()
     project(':saros.ui').file('lib').deleteDir()
   }
 }
@@ -145,6 +147,8 @@ task generateLibAll(dependsOn:['cleanGenerateLibAll',
                                ':saros.core:generateLib',
                                ':saros.ui:generateLib',
                                ':saros.eclipse:generateLib',
+                               ':saros.stf:generateLib',
+                               ':saros.stf.test:generateLib',
                                ':saros.whiteboard:generateLib'])
 
 task sarosEclipse(type: Copy, dependsOn: [
@@ -163,6 +167,11 @@ task sarosEclipse(type: Copy, dependsOn: [
   from project(':saros.ui').jar
   from project(':saros.eclipse').jar
   from project(':saros.whiteboard').jar
+  into 'build/distribution/eclipse'
+}
+
+task sarosStf(type: Copy, dependsOn: ['sarosEclipse', 'saros.stf:jar']) {
+  from project(':saros.stf').jar
   into 'build/distribution/eclipse'
 }
 
