@@ -555,9 +555,6 @@
       <handler
             class="saros.ui.commandHandlers.AddContactHandler"
             commandId="saros.ui.commands.AddContact">
-         <activeWhen>
-                <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
-         </activeWhen>
          <enabledWhen>
              <reference definitionId="saros.ui.definitions.isConnected" />
          </enabledWhen>
@@ -716,26 +713,17 @@
                   commandId="saros.ui.commands.CreateXMPPAccount"
                   icon="icons/elcl16/xmpp_create_account_tsk.png"
                   style="push">
-                <visibleWhen>
-                    <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
-                </visibleWhen>
             </command>
             <command
                   commandId="saros.ui.commands.AddXMPPAccount"
                   icon="icons/elcl16/xmpp_create_account_tsk.png"
                   style="push">
-                <visibleWhen>
-                    <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
-                </visibleWhen>
             </command>
             <command
                   commandId="saros.ui.commands.AddContact"
                   disabledIcon="icons/dlcl16/contact_add_tsk.png"
                   icon="icons/elcl16/contact_add_tsk.png"
                   style="push">
-               <visibleWhen>
-                  <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
-               </visibleWhen>
             </command>
             <separator
                   name="RosterEnd"
@@ -914,7 +902,6 @@
                style="push">
             <visibleWhen checkEnabled="false">
                <and>
-                  <reference definitionId="saros.ui.definitions.isXMPPEnabled" />
                   <not>
                      <reference definitionId="saros.ui.definitions.contactsSelected" />
                   </not>
@@ -1146,11 +1133,6 @@
             <test
                   property="saros.isConnected">
             </test>
-         </with>
-      </definition>
-      <definition id="saros.ui.definitions.isXMPPEnabled">
-         <with variable="saros.Saros">
-            <test property="saros.isXMPPEnabled" />
          </with>
       </definition>
       <definition
@@ -1450,7 +1432,7 @@
             class="saros.ui.expressions.SarosPropertyTester"
             id="saros.propertyTesters.SarosPropertyTester"
             namespace="saros"
-            properties="isConnected,isXMPPEnabled"
+            properties="isConnected"
             type="saros.Saros">
       </propertyTester>
       <propertyTester
