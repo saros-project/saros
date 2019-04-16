@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.picocontainer.annotations.Inject;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
@@ -238,7 +239,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
         @Override
         public void cancel() {
-          cancelNegotiation("Not accepted");
+          cancelNegotiation(null);
         }
       };
 
@@ -249,9 +250,10 @@ public class AddProjectToSessionWizard extends Wizard {
    * <p><b>Note:</b> This is an asynchronous action. It is not guaranteed that the negotiation is
    * canceled when this method returns.
    *
-   * @param reason description why the negotiation was canceled
+   * @param reason description why the negotiation was canceled or <code>null</code> if it was
+   *     actively canceled by the user
    */
-  private void cancelNegotiation(@NotNull final String reason) {
+  private void cancelNegotiation(@Nullable final String reason) {
     ThreadUtils.runSafeAsync(
         LOG,
         new Runnable() {
@@ -368,7 +370,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
         @Override
         public void cancel() {
-          cancelNegotiation("Not accepted");
+          cancelNegotiation(null);
         }
       };
 
