@@ -7,7 +7,9 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.intellij.project.ProjectWrapper;
@@ -93,5 +95,28 @@ public class NotificationPanel {
    */
   public static void showError(String message, String title) {
     showNotification(NotificationType.ERROR, message, title);
+  }
+
+  public static void showProjectSpecificWarning(
+      @NotNull Project project, @NotNull String message, @NotNull String title) {
+
+    NotificationType notificationType = NotificationType.WARNING;
+
+    LOG.info(
+        "Showing notification in project "
+            + project
+            + " - "
+            + notificationType
+            + ": "
+            + title
+            + " - "
+            + message);
+
+    final Notification notification =
+        GROUP_DISPLAY_ID_INFO.createNotification(
+            title, message, notificationType, URL_OPENING_LISTENER);
+
+    ApplicationManager.getApplication()
+        .invokeLater(() -> Notifications.Bus.notify(notification, project));
   }
 }
