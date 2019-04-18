@@ -69,6 +69,22 @@ tool prior to submission. The formatting is also checked by the CI server
 and will fail if a commit does not comply with the formatting rules.
 See the [development environment documentation](development-environment.md) for more information.
 
+### Naming Conventions
+We use the conventions defined in [Java TM Programming Language, Chapter 9](http://www.oracle.com/technetwork/java/codeconventions-135099.html#367).
+
+The only differences and additional conventions are:
+* Non-Listener interfaces should be preceded by an I.</br>
+  e.g. `IProject`, `IPreferenceStore`
+* Listener interfaces should use the name of their corresponding class and add Listener to it.</br>
+  e.g. `MouseListener`
+* All test case classes must end with `Test`.</br>
+  e.g `HelloWorldTest`
+* A test suite classes must contain  `TestSuite`.</br>
+* Every test class that is used for White-Box testing must be declared in the same package.</br>
+  e.g. `foo.bar.HelloWorld` -> `foo.bar.HelloWorldTest`
+* STF test cases must be put in any subpackage of `de.fu_berlin.inf.dpp.stf.test`.</br>
+  e.g `de.fu_berlin.inf.dpp.stf.test.account.AccountPreferencePageTest`
+
 ### Structure
 
 #### Getters and Setters
@@ -127,7 +143,7 @@ is not acceptable to make a member part of a package's API
     of your interface will not want to implement all methods. Also it
     helps to improve ability to change the program, as methods can be
     added to the interface more easily.
-    *   see [Naming Conventions](../index.md#naming_conventions) for
+    *   see [Naming Conventions](#naming-conventions) for
         more information
 *   Do not implement more than one listener interface per class,
     especially if using a top level class, because it makes the code
