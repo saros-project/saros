@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -57,17 +56,18 @@ public class XMPPAccountStoreTest {
         new XMPPAccount(
             "anotherAccount2", "anotherPwd2", "anotherdomain2", "anotherserver2", 2, true, true);
 
-    final ArrayList<XMPPAccount> otherAccounts = new ArrayList<XMPPAccount>();
-    otherAccounts.add(anotherAcc1);
-    otherAccounts.add(anotherAcc2);
+    final ArrayList<XMPPAccount> configuredAccounts = new ArrayList<XMPPAccount>();
+    configuredAccounts.add(anotherAcc1);
+    configuredAccounts.add(activeAcc);
+    configuredAccounts.add(anotherAcc2);
 
     final File tmpAccountFile = tmpFolder.newFile("saros_account.dat");
-    final String xmlContent = createAccountFileContent(activeAcc, otherAccounts);
+    final String xmlContent = createAccountFileContent(activeAcc, configuredAccounts);
     writeAccountFile(tmpAccountFile, key, xmlContent);
 
     store.setAccountFile(tmpAccountFile, key);
 
-    assertEquals(otherAccounts.size() + 1, store.getAllAccounts().size());
+    assertEquals(configuredAccounts.size(), store.getAllAccounts().size());
 
     assertTrue(store.exists("activeAccount", "activedomain", "activeserver", 3));
     assertTrue(store.exists("anotherAccount1", "anotherdomain1", "anotherserver1", 1));
@@ -89,26 +89,16 @@ public class XMPPAccountStoreTest {
   }
 
   private String createAccountFileContent(
-      XMPPAccount activeAccount, List<XMPPAccount> otherAccounts) {
+      XMPPAccount activeAccount, ArrayList<XMPPAccount> configuredAccounts) {
 
+    Integer index = configuredAccounts.indexOf(activeAccount);
     StringBuilder xmlContent =
         new StringBuilder()
             .append("<accounts>\n")
-            .append("  <activeAccount class=\"xmppAccount\">\n")
-            .append(String.format("    <username>%s</username>\n", activeAccount.getUsername()))
-            .append(String.format("    <password>%s</password>\n", activeAccount.getPassword()))
-            .append(String.format("    <domain>%s</domain>\n", activeAccount.getDomain()))
-            .append(String.format("    <server>%s</server>\n", activeAccount.getServer()))
-            .append(String.format("    <port>%d</port>\n", activeAccount.getPort()))
-            .append(String.format("    <useTLS>%s</useTLS>\n", activeAccount.useTLS()))
-            .append(String.format("    <useSASL>%s</useSASL>\n", activeAccount.useSASL()))
-            .append("  </activeAccount>\n");
+            .append(String.format("  <activeAccountIndex>%d</activeAccountIndex>\n", index));
 
-    xmlContent
-        .append("  <configuredAccounts class=\"set\">\n")
-        .append("    <xmppAccount reference=\"../../activeAccount\"/>\n");
-
-    for (XMPPAccount acc : otherAccounts) {
+    xmlContent.append("  <configuredAccounts>\n");
+    for (XMPPAccount acc : configuredAccounts) {
       xmlContent
           .append("    <xmppAccount>\n")
           .append(String.format("    <username>%s</username>\n", acc.getUsername()))

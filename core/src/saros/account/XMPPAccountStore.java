@@ -29,8 +29,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import saros.annotations.Component;
 import saros.net.xmpp.JID;
@@ -51,7 +49,7 @@ import saros.net.xmpp.JID;
 public final class XMPPAccountStore {
   private static final Logger LOG = Logger.getLogger(XMPPAccountStore.class);
 
-  private static final int MAX_ACCOUNT_DATA_SIZE = 10 * 1024 * 1024;
+  private static final long MAX_ACCOUNT_DATA_SIZE = 10 * 1024 * 1024;
 
   private static final String DEFAULT_SECRET_KEY = "Saros";
 
@@ -145,25 +143,30 @@ public final class XMPPAccountStore {
 
     if (accountFile == null || !accountFile.exists()) return;
 
-    if (accountFile.length() == 0) return;
-
     LOG.debug("loading accounts from file: " + accountFile.getAbsolutePath());
 
     FileInputStream dataIn = null;
 
     try {
+      long accountFileSize = accountFile.length();
+      if (accountFileSize <= 0 || accountFileSize > MAX_ACCOUNT_DATA_SIZE)
+        throw new IOException(
+            "account data seems malformed, refused to load "
+                + accountFileSize
+                + " bytes into memory");
+
       dataIn = new FileInputStream(accountFile);
 
       byte[] encryptedAccountData = IOUtils.toByteArray(dataIn);
 
       XStream xStream = createXStream();
-      Pair<XMPPAccount, Set<XMPPAccount>> accountData =
-          (ImmutablePair<XMPPAccount, Set<XMPPAccount>>)
+      AccountStoreInformation accountData =
+          (AccountStoreInformation)
               xStream.fromXML(
                   new ByteArrayInputStream(Crypto.decrypt(encryptedAccountData, secretKey)));
 
-      activeAccount = accountData.getLeft();
-      accounts = accountData.getRight();
+      accounts = new HashSet<>(accountData.configuredAccounts);
+      activeAccount = accountData.configuredAccounts.get(accountData.activeAccountIndex);
 
     } catch (RuntimeException e) {
       LOG.error("internal error while loading account data", e);
@@ -207,7 +210,9 @@ public final class XMPPAccountStore {
     try {
       dataOut = new FileOutputStream(accountFile);
       // use a pair in order to create a artificial xml root node
-      xStream.toXML(new ImmutablePair(activeAccount, accounts), out);
+      ArrayList<XMPPAccount> accountsToSave = new ArrayList<>(accounts);
+      Integer activeAccountIndex = accountsToSave.indexOf(activeAccount);
+      xStream.toXML(new AccountStoreInformation(activeAccountIndex, accountsToSave), out);
 
       byte[] encryptedAccountData = Crypto.encrypt(out.toByteArray(), secretKey);
 
@@ -229,9 +234,7 @@ public final class XMPPAccountStore {
 
   private XStream createXStream() {
     XStream xStream = new XStream();
-    xStream.alias("accounts", ImmutablePair.class);
-    xStream.aliasField("activeAccount", ImmutablePair.class, "left");
-    xStream.aliasField("configuredAccounts", ImmutablePair.class, "right");
+    xStream.alias("accounts", AccountStoreInformation.class);
     xStream.alias("xmppAccount", XMPPAccount.class);
     return xStream;
   }
@@ -559,6 +562,16 @@ public final class XMPPAccountStore {
     return null;
   }
 
+  // class which is used for serialization of account information
+  private static class AccountStoreInformation {
+    public Integer activeAccountIndex;
+    public ArrayList<XMPPAccount> configuredAccounts;
+
+    public AccountStoreInformation(Integer activeAccountIndex, ArrayList<XMPPAccount> accounts) {
+      this.configuredAccounts = accounts;
+      this.activeAccountIndex = activeAccountIndex;
+    }
+  }
   /**
    * As Saros source code is open source both methods (and other) are not intended to produce a
    * secure encryption. We only do it to prevent foreign users stumbling across the account file to

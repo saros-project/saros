@@ -1,7 +1,6 @@
 package saros.editor.colorstorage;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +22,6 @@ import saros.preferences.IPreferenceStore;
 public final class ColorIDSetStorage {
 
   private static final Logger LOG = Logger.getLogger(ColorIDSetStorage.class);
-
-  private static final String CHARSET = "ISO-8859-1";
 
   private static final String PREFERENCE_STORE_KEY = "saros.coloridsets";
 
@@ -184,7 +181,7 @@ public final class ColorIDSetStorage {
   }
 
   private XStream createXStream() {
-    XStream xStream = new XStream(new DomDriver(CHARSET));
+    XStream xStream = new XStream();
     xStream.alias("colorIDSet", ColorIDSet.class);
     return xStream;
   }
