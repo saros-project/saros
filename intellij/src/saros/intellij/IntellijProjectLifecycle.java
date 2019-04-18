@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.HTMLUIContextFactory;
 import saros.context.AbstractContextLifecycle;
 import saros.context.IContextFactory;
@@ -60,6 +61,16 @@ public class IntellijProjectLifecycle extends AbstractContextLifecycle {
 
   private IntellijProjectLifecycle(Project project) {
     projectWrapper = new ProjectWrapper(project);
+  }
+
+  /**
+   * Returns the current project held by the lifecycle.
+   *
+   * @return the current project held by the lifecycle
+   */
+  @Nullable
+  Project getProject() {
+    return projectWrapper.getProject();
   }
 
   @Override

@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import java.awt.event.KeyEvent;
 import java.io.InputStream;
 import javax.swing.KeyStroke;
@@ -11,7 +12,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
 import org.jetbrains.annotations.NotNull;
-import saros.intellij.project.ProjectWrapper;
+import saros.intellij.ui.util.NotificationPanel;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.SessionEndReason;
@@ -121,18 +122,27 @@ public class SarosComponent implements com.intellij.openapi.components.ProjectCo
 
     ISarosSession currentSession = sarosSessionManager.getSession();
 
-    if (currentSession != null
-        && currentSession.getComponent(ProjectWrapper.class).getProject().equals(project)) {
+    if (project.equals(intellijProjectLifecycle.getProject())) {
+      if (currentSession != null) {
+        log.debug(
+            "Leaving current session as the project "
+                + project.getName()
+                + " containing the shared module was closed");
 
-      log.debug(
-          "Leaving current session as the project "
-              + project.getName()
-              + " containing the shared module was closed");
+        ThreadUtils.runSafeAsync(
+            "StopSession",
+            log,
+            () -> sarosSessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT));
+      }
 
-      ThreadUtils.runSafeAsync(
-          "StopSession",
-          log,
-          () -> sarosSessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT));
+      for (Project openProject : ProjectManager.getInstance().getOpenProjects()) {
+        NotificationPanel.showProjectSpecificWarning(
+            openProject,
+            "Saros is currently in a headless state as you closed the shareable project! "
+                + "Please open a new project that you would like to share a module of before trying to share something!\n"
+                + "More information about this issue will be given in the Saros/I release notes.",
+            "Saros entered a headless state");
+      }
     }
   }
 
