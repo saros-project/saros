@@ -2,6 +2,7 @@ import { Provider } from 'mobx-react'
 import { spy, stub } from 'sinon'
 import Localization from 'react-localize'
 import React from 'react'
+import { expect } from 'chai';
 
 export class FakeSarosApi {
   constructor () {
@@ -21,7 +22,7 @@ export class FakeSarosApi {
 export function wrapWithContextProvider (element, stores) {
   return (
     <Localization messages={{}}>
-      <Provider {...stores} >
+      <Provider {...stores} contextMenu={{}}>
         {element}
       </Provider>
     </Localization>

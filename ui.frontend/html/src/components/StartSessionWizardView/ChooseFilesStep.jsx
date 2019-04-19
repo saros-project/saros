@@ -3,21 +3,15 @@ import { inject, observer } from 'mobx-react'
 import React from 'react'
 import Tree, { TreeNode } from 'rc-tree'
 
-function renderTreeNode (root) {
-  return (
-    <TreeNode title={root.label}>
-      {!!root.members.length && root.members.map(renderTreeNode)}
-    </TreeNode>
-  )
-}
+export default
 @inject(({ core, sessionUI }) => ({
   initialProjectTrees: core.projectTrees,
   setCheckedKeys: sessionUI.setCheckedKeys,
   checkedKeys: sessionUI.checkedKeys
 }))
 @observer
-export default class ChooseFilesStep extends React.Component {
-  render () {
+class ChooseFilesStep extends React.Component {
+  render() {
     const { initialProjectTrees, checkedKeys, setCheckedKeys } = this.props
     // This renders once before the initialProjectTrees got injected
     // Thats why we need to render something that does not depend on
@@ -31,8 +25,16 @@ export default class ChooseFilesStep extends React.Component {
         checkedKeys={Array.from(checkedKeys)}
         onCheck={setCheckedKeys}
       >
-        {initialProjectTrees.map(({ root }) => renderTreeNode(root))}
+        {initialProjectTrees.map(({ root }, i) => renderTreeNode(root, i))}
       </Tree>
     )
   }
+}
+
+function renderTreeNode(root, i) {
+  return (
+    <TreeNode title={root.label} key={i}>
+      {!!root.members.length && root.members.map(renderTreeNode)}
+    </TreeNode>
+  )
 }

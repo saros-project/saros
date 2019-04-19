@@ -1,5 +1,5 @@
 String prefix = 'saros.'
-List projectDirs = ['core', 'ui', 'ui.frontend', 'eclipse', 'whiteboard', 'intellij', 'server'].each { dir ->
+List projectDirs = ['core', 'ui', 'ui.frontend', 'eclipse', 'whiteboard', 'intellij', 'server', 'stf', 'stf.test'].each { dir ->
   String projectName = prefix + dir
   include projectName
   project(":$projectName").projectDir = file(dir)

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="4.6"?>
+
+<plugin>
+  <extension
+    id="saros.stf"
+    point="org.eclipse.ui.startup">
+    <startup class="saros.stf.StartupSarosSTF"/>
+  </extension>
+</plugin>

@@ -3,9 +3,11 @@ import { action, observable } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 
+
+export default
 @inject('mainUI')
 @observer
-export default class AddContactView extends React.Component {
+class AddContactView extends React.Component {
   @observable fields = {
     jid: '',
     displayName: ''

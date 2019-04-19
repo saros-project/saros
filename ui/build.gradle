@@ -25,7 +25,7 @@ dependencies {
 }
 
 sourceSets.main.java.srcDir 'src'
-sourceSets.test.java.srcDirs = ['test/junit', 'test/framework/stf/src/']
+sourceSets.test.java.srcDirs = ['test/junit']
 
 jar {
   manifest {

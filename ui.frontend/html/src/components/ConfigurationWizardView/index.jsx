@@ -28,9 +28,11 @@ const configurationDict = {
   }
 }
 
+
+export default
 @inject('configurationUI')
-export default class ConfigurationWizardView extends React.Component {
-  render () {
+class ConfigurationWizardView extends React.Component {
+  render() {
     return (
       <Wizard onFinish={noop}>
         <Step
