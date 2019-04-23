@@ -177,14 +177,14 @@ public class LocalEditorManipulator {
 
       for (ITextOperation op : operations.getTextOperations()) {
         if (op instanceof DeleteOperation) {
-          editorAPI.deleteText(
+          DocumentAPI.deleteText(
               project, doc, op.getPosition(), op.getPosition() + op.getTextLength());
         } else {
           boolean writePermission = doc.isWritable();
           if (!writePermission) {
             doc.setReadOnly(false);
           }
-          editorAPI.insertText(project, doc, op.getPosition(), op.getText());
+          DocumentAPI.insertText(project, doc, op.getPosition(), op.getText());
           if (!writePermission) {
             doc.setReadOnly(true);
           }
@@ -354,8 +354,8 @@ public class LocalEditorManipulator {
         manager.setLocalDocumentModificationHandlersEnabled(false);
       }
 
-      editorAPI.deleteText(project, document, 0, documentLength);
-      editorAPI.insertText(project, document, 0, text);
+      DocumentAPI.deleteText(project, document, 0, documentLength);
+      DocumentAPI.insertText(project, document, 0, text);
 
     } finally {
 
