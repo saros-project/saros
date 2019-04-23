@@ -3,19 +3,14 @@ package saros.intellij.editor;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.command.UndoConfirmationPolicy;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import java.awt.Point;
 import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
 import saros.editor.text.LineRange;
-import saros.intellij.filesystem.Filesystem;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.
@@ -25,12 +20,10 @@ import saros.intellij.filesystem.Filesystem;
 public class EditorAPI {
 
   private Application application;
-  private CommandProcessor commandProcessor;
 
   /** Creates an EditorAPI with the current Project and initializes Fields. */
   public EditorAPI() {
     this.application = ApplicationManager.getApplication();
-    this.commandProcessor = CommandProcessor.getInstance();
   }
 
   /**
@@ -135,79 +128,5 @@ public class EditorAPI {
     int rangeLength = endLine - startLine;
 
     return new LineRange(startLine, rangeLength);
-  }
-
-  /**
-   * Inserts the specified text at the specified offset in the document. Line breaks in the inserted
-   * text must be normalized as '\n'.
-   *
-   * <p>The insertion will be wrapped in a command processor action. The action will be assigned to
-   * the passed project. This means the action will be registered with the undo-buffer of the given
-   * project.
-   *
-   * @param project the project to assign the resulting insertion action to
-   * @param document the document to insert the text into
-   * @param offset the offset to insert the text at
-   * @param text the text to insert
-   * @see Document#insertString(int, CharSequence)
-   * @see CommandProcessor
-   */
-  void insertText(
-      @NotNull Project project,
-      @NotNull final Document document,
-      final int offset,
-      final String text) {
-
-    Runnable insertCommand =
-        () -> {
-          Runnable insertString = () -> document.insertString(offset, text);
-
-          String commandName = "Saros text insertion at index " + offset + " of \"" + text + "\"";
-
-          commandProcessor.executeCommand(
-              project,
-              insertString,
-              commandName,
-              commandProcessor.getCurrentCommandGroupId(),
-              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-              document);
-        };
-
-    Filesystem.runWriteAction(insertCommand, ModalityState.defaultModalityState());
-  }
-
-  /**
-   * Deletes the specified range of text from the given document.
-   *
-   * <p>The deletion will be wrapped in a command processor action. The action will be assigned to
-   * the passed project. This means the action will be registered with the undo-buffer of the given
-   * project.
-   *
-   * @param project the project to assign the resulting deletion action to
-   * @param doc the document to delete text from
-   * @param start the start offset of the range to delete
-   * @param end the end offset of the range to delete
-   * @see Document#deleteString(int, int)
-   * @see CommandProcessor
-   */
-  void deleteText(
-      @NotNull Project project, @NotNull final Document doc, final int start, final int end) {
-
-    Runnable deletionCommand =
-        () -> {
-          Runnable deleteRange = () -> doc.deleteString(start, end);
-
-          String commandName = "Saros text deletion from index " + start + " to " + end;
-
-          commandProcessor.executeCommand(
-              project,
-              deleteRange,
-              commandName,
-              commandProcessor.getCurrentCommandGroupId(),
-              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-              doc);
-        };
-
-    Filesystem.runWriteAction(deletionCommand, ModalityState.defaultModalityState());
   }
 }
