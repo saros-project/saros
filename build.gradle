@@ -61,10 +61,6 @@ configure(projectsToConfigure) { project ->
     mavenCentral()
     // repositories for specific artifacts
     maven {
-      url 'https://maven.atlassian.com/3rdparty/'
-      content { includeGroup 'org.igniterealtime.smack' }
-    }
-    maven {
       url 'http://maven-eclipse.github.io/maven'
       content { includeGroup 'org.eclipse.swt' }
     }
