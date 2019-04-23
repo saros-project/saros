@@ -37,9 +37,9 @@ public class XMPPAccountStoreTest {
     store.getActiveAccount();
   }
 
-  /* Test whether the currently expected XML format is accepted by
-   * the load method. Otherwise saros could became incompatible with
-   * previous versions.
+  /*
+   * Test whether the currently expected XML format is accepted by the load
+   * method. Otherwise saros could became incompatible with previous versions.
    */
   @Test
   public void testAccountsFileFormat() throws Exception {
@@ -91,7 +91,7 @@ public class XMPPAccountStoreTest {
   private String createAccountFileContent(
       XMPPAccount activeAccount, ArrayList<XMPPAccount> configuredAccounts) {
 
-    Integer index = configuredAccounts.indexOf(activeAccount);
+    int index = configuredAccounts.indexOf(activeAccount);
     StringBuilder xmlContent =
         new StringBuilder()
             .append("<accounts>\n")

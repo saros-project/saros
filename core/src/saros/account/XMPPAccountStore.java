@@ -211,7 +211,7 @@ public final class XMPPAccountStore {
       dataOut = new FileOutputStream(accountFile);
       // use a pair in order to create a artificial xml root node
       ArrayList<XMPPAccount> accountsToSave = new ArrayList<>(accounts);
-      Integer activeAccountIndex = accountsToSave.indexOf(activeAccount);
+      int activeAccountIndex = accountsToSave.indexOf(activeAccount);
       xStream.toXML(new AccountStoreInformation(activeAccountIndex, accountsToSave), out);
 
       byte[] encryptedAccountData = Crypto.encrypt(out.toByteArray(), secretKey);
@@ -564,14 +564,15 @@ public final class XMPPAccountStore {
 
   // class which is used for serialization of account information
   private static class AccountStoreInformation {
-    public Integer activeAccountIndex;
+    public int activeAccountIndex;
     public ArrayList<XMPPAccount> configuredAccounts;
 
-    public AccountStoreInformation(Integer activeAccountIndex, ArrayList<XMPPAccount> accounts) {
+    public AccountStoreInformation(int activeAccountIndex, ArrayList<XMPPAccount> accounts) {
       this.configuredAccounts = accounts;
       this.activeAccountIndex = activeAccountIndex;
     }
   }
+
   /**
    * As Saros source code is open source both methods (and other) are not intended to produce a
    * secure encryption. We only do it to prevent foreign users stumbling across the account file to
