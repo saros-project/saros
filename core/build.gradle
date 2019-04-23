@@ -7,8 +7,6 @@ dependencies {
   releaseDep 'commons-io:commons-io:2.0.1'
   releaseDep 'org.apache.commons:commons-lang3:3.8.1'
   releaseDep 'org.picocontainer:picocontainer:2.11.2'
-  releaseDep 'org.igniterealtime.smack:smack:3.4.1'
-  releaseDep 'org.igniterealtime.smack:smackx:3.4.1'
   releaseDep 'xpp3:xpp3:1.1.4c'
   releaseDep 'com.thoughtworks.xstream:xstream:1.4.10'
   releaseDep 'org.gnu.inet:libidn:1.15'
@@ -21,6 +19,9 @@ dependencies {
   // The used version is a SNAPSHOT version which is not available!
   // TODO: use real release
   releaseDep files('libs/weupnp.jar')
+  // Workaround until we updated to a newer smack version
+  releaseDep files('libs/smack-3.4.1.jar')
+  releaseDep files('libs/smackx-3.4.1.jar')
 
   compile configurations.releaseDep
   testCompile configurations.testConfig

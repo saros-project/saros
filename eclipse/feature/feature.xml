@@ -2,7 +2,7 @@
 <feature
       id="saros.feature"
       label="Saros"
-      version="14.10.31">
+      version="15.0.0">
 
    <description>
       Distributed Party Programming for Eclipse.
@@ -368,17 +368,17 @@ Public License instead of this License.
    </requires>
 
    <plugin
-         id="saros"
+         id="saros.eclipse"
          download-size="0"
          install-size="0"
-         version="14.10.31"
+         version="15.0.0"
          unpack="false"/>
 
    <plugin
          id="saros.whiteboard"
          download-size="0"
          install-size="0"
-         version="14.10.31"
+         version="0.1.0"
          unpack="false"/>
 
    <plugin
