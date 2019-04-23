@@ -27,11 +27,8 @@ public class EditorAPI {
   private Application application;
   private CommandProcessor commandProcessor;
 
-  private Project project;
-
   /** Creates an EditorAPI with the current Project and initializes Fields. */
-  public EditorAPI(Project project) {
-    this.project = project;
+  public EditorAPI() {
     this.application = ApplicationManager.getApplication();
     this.commandProcessor = CommandProcessor.getInstance();
   }
@@ -142,14 +139,24 @@ public class EditorAPI {
 
   /**
    * Inserts the specified text at the specified offset in the document. Line breaks in the inserted
-   * text must be normalized as \n.
+   * text must be normalized as '\n'.
    *
+   * <p>The insertion will be wrapped in a command processor action. The action will be assigned to
+   * the passed project. This means the action will be registered with the undo-buffer of the given
+   * project.
+   *
+   * @param project the project to assign the resulting insertion action to
    * @param document the document to insert the text into
    * @param offset the offset to insert the text at
    * @param text the text to insert
    * @see Document#insertString(int, CharSequence)
+   * @see CommandProcessor
    */
-  void insertText(@NotNull final Document document, final int offset, final String text) {
+  void insertText(
+      @NotNull Project project,
+      @NotNull final Document document,
+      final int offset,
+      final String text) {
 
     Runnable insertCommand =
         () -> {
@@ -172,12 +179,20 @@ public class EditorAPI {
   /**
    * Deletes the specified range of text from the given document.
    *
+   * <p>The deletion will be wrapped in a command processor action. The action will be assigned to
+   * the passed project. This means the action will be registered with the undo-buffer of the given
+   * project.
+   *
+   * @param project the project to assign the resulting deletion action to
    * @param doc the document to delete text from
    * @param start the start offset of the range to delete
    * @param end the end offset of the range to delete
    * @see Document#deleteString(int, int)
+   * @see CommandProcessor
    */
-  void deleteText(@NotNull final Document doc, final int start, final int end) {
+  void deleteText(
+      @NotNull Project project, @NotNull final Document doc, final int start, final int end) {
+
     Runnable deletionCommand =
         () -> {
           Runnable deleteRange = () -> doc.deleteString(start, end);
