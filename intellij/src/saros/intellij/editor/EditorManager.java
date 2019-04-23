@@ -324,7 +324,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return;
           }
 
-          LineRange localViewPort = editorAPI.getLocalViewPortRange(editor);
+          LineRange localViewPort = EditorAPI.getLocalViewPortRange(editor);
           int viewPortStartLine = localViewPort.getStartLine();
           int viewPortLength = localViewPort.getNumberOfLines();
 
@@ -360,7 +360,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private void sendSelectionInformation(
       @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
 
-    Pair<Integer, Integer> localSelectionOffsets = editorAPI.getLocalSelectionOffsets(editor);
+    Pair<Integer, Integer> localSelectionOffsets = EditorAPI.getLocalSelectionOffsets(editor);
     int selectionStartOffset = localSelectionOffsets.first;
     int selectionLength = localSelectionOffsets.second;
 
@@ -432,7 +432,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           projectAPI = sarosSession.getComponent(ProjectAPI.class);
 
-          editorAPI = sarosSession.getComponent(EditorAPI.class);
           localEditorHandler = sarosSession.getComponent(LocalEditorHandler.class);
           localEditorManipulator = sarosSession.getComponent(LocalEditorManipulator.class);
 
@@ -465,7 +464,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           projectAPI = null;
 
-          editorAPI = null;
           localEditorHandler = null;
           localEditorManipulator = null;
 
@@ -524,7 +522,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private UserEditorStateManager userEditorStateManager;
   private ISarosSession session;
   private ProjectAPI projectAPI;
-  private EditorAPI editorAPI;
   private LocalEditorHandler localEditorHandler;
   private LocalEditorManipulator localEditorManipulator;
   private AnnotationManager annotationManager;
