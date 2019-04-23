@@ -19,11 +19,10 @@ import saros.editor.text.LineRange;
  */
 public class EditorAPI {
 
-  private Application application;
+  private static final Application application = ApplicationManager.getApplication();
 
-  /** Creates an EditorAPI with the current Project and initializes Fields. */
-  public EditorAPI() {
-    this.application = ApplicationManager.getApplication();
+  private EditorAPI() {
+    // NOP
   }
 
   /**
@@ -40,7 +39,7 @@ public class EditorAPI {
    * @param line the line to scroll to
    * @see LogicalPosition
    */
-  void scrollToViewPortCenter(final Editor editor, final int line) {
+  static void scrollToViewPortCenter(final Editor editor, final int line) {
     application.invokeAndWait(
         () -> {
           LogicalPosition logicalPosition = new LogicalPosition(line, 0);
@@ -62,7 +61,7 @@ public class EditorAPI {
    * @see LogicalPosition
    */
   @NotNull
-  LineRange getLocalViewPortRange(@NotNull Editor editor) {
+  static LineRange getLocalViewPortRange(@NotNull Editor editor) {
     Rectangle visibleAreaRectangle = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
 
     return getLocalViewPortRange(editor, visibleAreaRectangle);
@@ -76,7 +75,7 @@ public class EditorAPI {
    * @return the logical line range of the local viewport for the given editor
    * @see LogicalPosition
    */
-  public LineRange getLocalViewPortRange(
+  public static LineRange getLocalViewPortRange(
       @NotNull Editor editor, @NotNull Rectangle visibleAreaRectangle) {
     int basePos = visibleAreaRectangle.y;
     int endPos = visibleAreaRectangle.y + visibleAreaRectangle.height;
@@ -98,7 +97,7 @@ public class EditorAPI {
    * @return a Pair containing the local selection offset and length for the given editor.
    */
   @NotNull
-  Pair<Integer, Integer> getLocalSelectionOffsets(@NotNull Editor editor) {
+  static Pair<Integer, Integer> getLocalSelectionOffsets(@NotNull Editor editor) {
     int selectionStartOffset = editor.getSelectionModel().getSelectionStart();
     int selectionEndOffset = editor.getSelectionModel().getSelectionEnd();
 
@@ -119,7 +118,7 @@ public class EditorAPI {
    * @see LogicalPosition
    */
   @NotNull
-  LineRange getLineRange(@NotNull Editor editor, int startOffset, int endOffset) {
+  static LineRange getLineRange(@NotNull Editor editor, int startOffset, int endOffset) {
     assert startOffset <= endOffset;
 
     int startLine = editor.offsetToLogicalPosition(startOffset).line;

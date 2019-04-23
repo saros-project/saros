@@ -22,7 +22,6 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
   private static final Logger log = Logger.getLogger(LocalViewPortChangeHandler.class);
 
   private final EditorManager editorManager;
-  private final EditorAPI editorAPI;
 
   private final VisibleAreaListener visibleAreaListener = this::generateViewportActivity;
 
@@ -35,9 +34,8 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
    *
    * @param editorManager the EditorManager instance
    */
-  public LocalViewPortChangeHandler(EditorManager editorManager, EditorAPI editorAPI) {
+  public LocalViewPortChangeHandler(EditorManager editorManager) {
     this.editorManager = editorManager;
-    this.editorAPI = editorAPI;
 
     this.enabled = false;
     this.disposed = false;
@@ -104,7 +102,7 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
       return;
     }
 
-    LineRange newVisibleLineRange = editorAPI.getLocalViewPortRange(editor, newVisibleRectangle);
+    LineRange newVisibleLineRange = EditorAPI.getLocalViewPortRange(editor, newVisibleRectangle);
 
     editorManager.generateViewport(path, newVisibleLineRange);
   }

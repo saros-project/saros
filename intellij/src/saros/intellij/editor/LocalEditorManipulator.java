@@ -30,7 +30,6 @@ public class LocalEditorManipulator {
   private static final Logger LOG = Logger.getLogger(LocalEditorManipulator.class);
 
   private final ProjectAPI projectAPI;
-  private final EditorAPI editorAPI;
   private final AnnotationManager annotationManager;
   private final ISarosSession sarosSession;
 
@@ -41,13 +40,11 @@ public class LocalEditorManipulator {
 
   public LocalEditorManipulator(
       ProjectAPI projectAPI,
-      EditorAPI editorAPI,
       AnnotationManager annotationManager,
       EditorManager editorManager,
       ISarosSession sarosSession) {
 
     this.projectAPI = projectAPI;
-    this.editorAPI = editorAPI;
     this.annotationManager = annotationManager;
     this.manager = editorManager;
     this.sarosSession = sarosSession;
@@ -224,7 +221,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    LineRange localViewport = editorAPI.getLocalViewPortRange(editor);
+    LineRange localViewport = EditorAPI.getLocalViewPortRange(editor);
 
     int localStartLine = localViewport.getStartLine();
     int localEndLine = localViewport.getStartLine() + localViewport.getNumberOfLines();
@@ -240,7 +237,7 @@ public class LocalEditorManipulator {
       int startOffset = selection.getOffset();
       int endOffset = selection.getOffset() + selection.getLength();
 
-      LineRange selectionRange = editorAPI.getLineRange(editor, startOffset, endOffset);
+      LineRange selectionRange = EditorAPI.getLineRange(editor, startOffset, endOffset);
 
       remoteStartLine = selectionRange.getStartLine();
       remoteEndLine = selectionRange.getStartLine() + selectionRange.getNumberOfLines();
@@ -265,7 +262,7 @@ public class LocalEditorManipulator {
 
     int remoteViewPortCenter = findCenter(remoteStartLine, remoteEndLine);
 
-    editorAPI.scrollToViewPortCenter(editor, remoteViewPortCenter);
+    EditorAPI.scrollToViewPortCenter(editor, remoteViewPortCenter);
   }
 
   /**
