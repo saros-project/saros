@@ -13,4 +13,8 @@ In the processes list you will find documents that **explains the processes** wi
 
 If you want to contribute to Saros by improving the source code you have to set-up your [development environment](development-environment.md).
 
+### Something is missing?
+* If something is missing in the developer documentation, please look into the [old documentation](https://saros-project.github.io/legacy_docs/). If you find something useful, please migrate the information to this documentation.
+* Ask on [Gitter](https://gitter.im/saros-project/saros).
+
 # Thanks for contributing!
