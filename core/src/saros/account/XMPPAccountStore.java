@@ -562,7 +562,11 @@ public final class XMPPAccountStore {
     return null;
   }
 
-  // class which is used for serialization of account information
+  /**
+   * class which is used for serialization of account information
+   *
+   * <p>WARNING: If you change this class you may change the XML format of the account file.
+   */
   private static class AccountStoreInformation {
     public int activeAccountIndex;
     public ArrayList<XMPPAccount> configuredAccounts;
