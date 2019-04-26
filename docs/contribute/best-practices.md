@@ -59,7 +59,7 @@ is not acceptable to make a member part of a package's API
     of your interface will not want to implement all methods. Also it
     helps to improve ability to change the program, as methods can be
     added to the interface more easily.
-    *   see [Naming Conventions](../index.md#naming_conventions) for
+    *   see [Naming Conventions](guidelines.md#naming-conventions) for
         more information
 *   Do not implement more than one listener interface per class,
     especially if using a top level class, because it makes the code
