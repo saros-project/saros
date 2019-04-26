@@ -1,15 +1,12 @@
 package saros.account;
 
+import com.thoughtworks.xstream.XStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -52,7 +49,7 @@ import saros.net.xmpp.JID;
 public final class XMPPAccountStore {
   private static final Logger LOG = Logger.getLogger(XMPPAccountStore.class);
 
-  private static final int MAX_ACCOUNT_DATA_SIZE = 10 * 1024 * 1024;
+  private static final long MAX_ACCOUNT_DATA_SIZE = 10 * 1024 * 1024;
 
   private static final String DEFAULT_SECRET_KEY = "Saros";
 
@@ -146,48 +143,30 @@ public final class XMPPAccountStore {
 
     if (accountFile == null || !accountFile.exists()) return;
 
-    if (accountFile.length() == 0) return;
-
     LOG.debug("loading accounts from file: " + accountFile.getAbsolutePath());
 
-    DataInputStream dataIn = null;
-
-    int size;
-
-    byte[] buffer;
+    FileInputStream dataIn = null;
 
     try {
-      dataIn = new DataInputStream(new FileInputStream(accountFile));
-
-      size = dataIn.readInt();
-
-      if (size <= 0 || size > MAX_ACCOUNT_DATA_SIZE)
+      long accountFileSize = accountFile.length();
+      if (accountFileSize <= 0 || accountFileSize > MAX_ACCOUNT_DATA_SIZE)
         throw new IOException(
-            "account data seems malformed, refused to load " + size + " bytes into memory");
+            "account data seems malformed, refused to load "
+                + accountFileSize
+                + " bytes into memory");
 
-      buffer = new byte[size];
+      dataIn = new FileInputStream(accountFile);
 
-      dataIn.readFully(buffer);
+      byte[] encryptedAccountData = IOUtils.toByteArray(dataIn);
 
-      activeAccount =
-          (XMPPAccount)
-              new ObjectInputStream(new ByteArrayInputStream(Crypto.decrypt(buffer, secretKey)))
-                  .readObject();
+      XStream xStream = createXStream();
+      AccountStoreInformation accountData =
+          (AccountStoreInformation)
+              xStream.fromXML(
+                  new ByteArrayInputStream(Crypto.decrypt(encryptedAccountData, secretKey)));
 
-      size = dataIn.readInt();
-
-      if (size <= 0 || size > MAX_ACCOUNT_DATA_SIZE)
-        throw new IOException(
-            "account data seems malformed, refused to load " + size + " bytes into memory");
-
-      buffer = new byte[size];
-
-      dataIn.readFully(buffer);
-
-      accounts =
-          (Set<XMPPAccount>)
-              new ObjectInputStream(new ByteArrayInputStream(Crypto.decrypt(buffer, secretKey)))
-                  .readObject();
+      accounts = new HashSet<>(accountData.configuredAccounts);
+      activeAccount = accountData.configuredAccounts.get(accountData.activeAccountIndex);
 
     } catch (RuntimeException e) {
       LOG.error("internal error while loading account data", e);
@@ -224,31 +203,20 @@ public final class XMPPAccountStore {
     }
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    ObjectOutputStream oos;
+    XStream xStream = createXStream();
 
-    DataOutputStream dataOut = null;
+    FileOutputStream dataOut = null;
 
     try {
-      dataOut = new DataOutputStream(new FileOutputStream(accountFile));
+      dataOut = new FileOutputStream(accountFile);
+      // use a pair in order to create a artificial xml root node
+      ArrayList<XMPPAccount> accountsToSave = new ArrayList<>(accounts);
+      int activeAccountIndex = accountsToSave.indexOf(activeAccount);
+      xStream.toXML(new AccountStoreInformation(activeAccountIndex, accountsToSave), out);
 
-      oos = new ObjectOutputStream(out);
-      oos.writeObject(activeAccount);
-      oos.flush();
+      byte[] encryptedAccountData = Crypto.encrypt(out.toByteArray(), secretKey);
 
-      byte[] activeAccount = Crypto.encrypt(out.toByteArray(), secretKey);
-      out.reset();
-
-      oos = new ObjectOutputStream(out);
-      oos.writeObject(accounts);
-      oos.flush();
-
-      byte[] allAccounts = Crypto.encrypt(out.toByteArray(), secretKey);
-
-      dataOut.writeInt(activeAccount.length);
-      dataOut.write(activeAccount);
-      dataOut.writeInt(allAccounts.length);
-      dataOut.write(allAccounts);
-
+      dataOut.write(encryptedAccountData);
       dataOut.flush();
 
     } catch (RuntimeException e) {
@@ -262,6 +230,13 @@ public final class XMPPAccountStore {
     }
 
     LOG.debug("saved " + accounts.size() + " account(s)");
+  }
+
+  private XStream createXStream() {
+    XStream xStream = new XStream();
+    xStream.alias("accounts", AccountStoreInformation.class);
+    xStream.alias("xmppAccount", XMPPAccount.class);
+    return xStream;
   }
 
   /**
@@ -588,13 +563,28 @@ public final class XMPPAccountStore {
   }
 
   /**
+   * class which is used for serialization of account information
+   *
+   * <p>WARNING: If you change this class you may change the XML format of the account file.
+   */
+  private static class AccountStoreInformation {
+    public int activeAccountIndex;
+    public ArrayList<XMPPAccount> configuredAccounts;
+
+    public AccountStoreInformation(int activeAccountIndex, ArrayList<XMPPAccount> accounts) {
+      this.configuredAccounts = accounts;
+      this.activeAccountIndex = activeAccountIndex;
+    }
+  }
+
+  /**
    * As Saros source code is open source both methods (and other) are not intended to produce a
    * secure encryption. We only do it to prevent foreign users stumbling across the account file to
    * easily gaining its contents (the password and account name). The only security we ensure is to
    * save the result in the user home directory which should be default only be accessible by the
    * user itself or administrators.
    */
-  private static class Crypto {
+  static class Crypto {
     private static final byte[] IV = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private static final int CHUNK_SIZE = 4096;

@@ -2,34 +2,123 @@ package saros.account;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class XMPPAccountStoreTest {
 
+  @Rule public TemporaryFolder tmpFolder = new TemporaryFolder();
+
+  private XMPPAccountStore store;
+
+  @Before
+  public void setUp() {
+    this.store = new XMPPAccountStore();
+  }
+
   @Test
   public void testWithNoAccountFile() {
-    XMPPAccountStore store = new XMPPAccountStore();
-    assertEquals(true, store.isEmpty());
+    assertTrue(store.isEmpty());
   }
 
   @Test(expected = IllegalStateException.class)
   public void testActiveAccountWithEmptyAccountStore() {
-    XMPPAccountStore store = new XMPPAccountStore();
     store.getActiveAccount();
+  }
+
+  /*
+   * Test whether the currently expected XML format is accepted by the load
+   * method. Otherwise saros could became incompatible with previous versions.
+   */
+  @Test
+  public void testAccountsFileFormat() throws Exception {
+
+    final String key = "testKey";
+
+    final XMPPAccount activeAcc =
+        new XMPPAccount(
+            "activeAccount", "activePwd", "activedomain", "activeserver", 3, false, false);
+    final XMPPAccount anotherAcc1 =
+        new XMPPAccount(
+            "anotherAccount1", "anotherPwd1", "anotherdomain1", "anotherserver1", 1, true, true);
+    final XMPPAccount anotherAcc2 =
+        new XMPPAccount(
+            "anotherAccount2", "anotherPwd2", "anotherdomain2", "anotherserver2", 2, true, true);
+
+    final ArrayList<XMPPAccount> configuredAccounts = new ArrayList<XMPPAccount>();
+    configuredAccounts.add(anotherAcc1);
+    configuredAccounts.add(activeAcc);
+    configuredAccounts.add(anotherAcc2);
+
+    final File tmpAccountFile = tmpFolder.newFile("saros_account.dat");
+    final String xmlContent = createAccountFileContent(activeAcc, configuredAccounts);
+    writeAccountFile(tmpAccountFile, key, xmlContent);
+
+    store.setAccountFile(tmpAccountFile, key);
+
+    assertEquals(configuredAccounts.size(), store.getAllAccounts().size());
+
+    assertTrue(store.exists("activeAccount", "activedomain", "activeserver", 3));
+    assertTrue(store.exists("anotherAccount1", "anotherdomain1", "anotherserver1", 1));
+    assertTrue(store.exists("anotherAccount2", "anotherdomain2", "anotherserver2", 2));
+
+    assertEquals("activeAccount", store.getActiveAccount().getUsername());
+  }
+
+  private void writeAccountFile(File accountFile, String key, String content) throws Exception {
+    final FileOutputStream dataOut = new FileOutputStream(accountFile);
+    final byte[] encryptedXmlContent = XMPPAccountStore.Crypto.encrypt(content.getBytes(), key);
+
+    try {
+      dataOut.write(encryptedXmlContent);
+      dataOut.flush();
+    } finally {
+      IOUtils.closeQuietly(dataOut);
+    }
+  }
+
+  private String createAccountFileContent(
+      XMPPAccount activeAccount, ArrayList<XMPPAccount> configuredAccounts) {
+
+    int index = configuredAccounts.indexOf(activeAccount);
+    StringBuilder xmlContent =
+        new StringBuilder()
+            .append("<accounts>\n")
+            .append(String.format("  <activeAccountIndex>%d</activeAccountIndex>\n", index));
+
+    xmlContent.append("  <configuredAccounts>\n");
+    for (XMPPAccount acc : configuredAccounts) {
+      xmlContent
+          .append("    <xmppAccount>\n")
+          .append(String.format("    <username>%s</username>\n", acc.getUsername()))
+          .append(String.format("    <password>%s</password>\n", acc.getPassword()))
+          .append(String.format("    <domain>%s</domain>\n", acc.getDomain()))
+          .append(String.format("    <server>%s</server>\n", acc.getServer()))
+          .append(String.format("    <port>%d</port>\n", acc.getPort()))
+          .append(String.format("    <useTLS>%s</useTLS>\n", acc.useTLS()))
+          .append(String.format("    <useSASL>%s</useSASL>\n", acc.useSASL()))
+          .append("    </xmppAccount>\n");
+    }
+    xmlContent.append("  </configuredAccounts>\n").append("</accounts>");
+
+    return xmlContent.toString();
   }
 
   @Test
   public void testAutoActivation() throws Exception {
-    XMPPAccountStore store = new XMPPAccountStore();
-
     store.createAccount("a", "a", "a", "a", 1, true, true);
-    assertEquals(false, store.isEmpty());
+    assertFalse(store.isEmpty());
     assertEquals("a", store.getActiveAccount().getUsername());
 
     // only the first account must be auto activated
@@ -40,7 +129,7 @@ public class XMPPAccountStoreTest {
   @Test
   public void testLoadAccountsWithError() throws IOException {
 
-    File tmpAccountFile = File.createTempFile("saros_account", ".dat");
+    File tmpAccountFile = tmpFolder.newFile("saros_account.dat");
 
     FileOutputStream out = new FileOutputStream(tmpAccountFile);
 
@@ -51,46 +140,38 @@ public class XMPPAccountStoreTest {
     out.write(data);
     out.close();
 
-    XMPPAccountStore store = new XMPPAccountStore();
     store.setAccountFile(tmpAccountFile, null);
 
-    assertEquals(true, store.isEmpty());
+    assertTrue(store.isEmpty());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDeleteNonExistingAccount() {
-
-    XMPPAccountStore store = new XMPPAccountStore();
     store.deleteAccount(null);
   }
 
   @Test
   public void testDeleteExistingAccount() {
-
-    XMPPAccountStore store = new XMPPAccountStore();
     store.createAccount("a", "a", "a", "a", 1, true, true);
     store.createAccount("b", "a", "a", "a", 1, true, true);
     store.deleteAccount(new XMPPAccount("b", "a", "a", "a", 1, true, true));
-    assertEquals(store.getAllAccounts().size(), 1);
+    assertEquals(1, store.getAllAccounts().size());
   }
 
   @Test(expected = IllegalStateException.class)
   public void testDeleteActiveAccount() {
-    XMPPAccountStore store = new XMPPAccountStore();
     store.createAccount("a", "a", "a", "a", 1, true, true);
     store.deleteAccount(store.getActiveAccount());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateDuplicateAccount() {
-    XMPPAccountStore store = new XMPPAccountStore();
     store.createAccount("a", "a", "a", "a", 1, true, true);
     store.createAccount("a", "a", "a", "a", 1, true, true);
   }
 
   @Test
   public void setAccountActive() {
-    XMPPAccountStore store = new XMPPAccountStore();
     store.createAccount("a", "a", "a", "a", 1, true, true);
     XMPPAccount account = store.createAccount("b", "a", "a", "a", 1, true, true);
     store.setAccountActive(account);
@@ -99,7 +180,6 @@ public class XMPPAccountStoreTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void setNonExistingAccountActive() {
-    XMPPAccountStore store = new XMPPAccountStore();
     store.createAccount("a", "a", "a", "a", 1, true, true);
     XMPPAccount account = store.createAccount("b", "a", "a", "a", 1, true, true);
     store.deleteAccount(account);
@@ -108,8 +188,6 @@ public class XMPPAccountStoreTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testChangeAccountDataToAlreadyExistingAccount() {
-
-    XMPPAccountStore store = new XMPPAccountStore();
     store.createAccount("a", "a", "a", "a", 1, true, true);
     XMPPAccount account = store.createAccount("b", "a", "a", "a", 1, true, true);
     store.changeAccountData(account, "a", "a", "a", "a", 1, false, false);
@@ -117,29 +195,24 @@ public class XMPPAccountStoreTest {
 
   @Test
   public void testChangeAccountData() {
-    XMPPAccountStore store = new XMPPAccountStore();
     store.createAccount("a", "a", "a", "a", 1, true, true);
     store.changeAccountData(store.getActiveAccount(), "b", "b", "b", "b", 5, false, false);
 
     XMPPAccount account = store.getActiveAccount();
 
-    assertEquals(account.getPassword(), "b");
-    assertEquals(account.getServer(), "b");
-    assertEquals(account.getDomain(), "b");
-    assertEquals(account.getUsername(), "b");
-    assertEquals(account.getPort(), 5);
-    assertEquals(account.useTLS(), false);
-    assertEquals(account.useSASL(), false);
+    assertEquals("b", account.getPassword());
+    assertEquals("b", account.getServer());
+    assertEquals("b", account.getDomain());
+    assertEquals("b", account.getUsername());
+    assertEquals(5, account.getPort());
+    assertFalse(account.useTLS());
+    assertFalse(account.useSASL());
   }
 
   @Test
   public void testLoadAndSaveAccounts() throws IOException {
+    File tmpAccountFile = tmpFolder.newFile("saros_account.dat");
 
-    File tmpAccountFile = File.createTempFile("saros_account", ".dat");
-
-    XMPPAccountStore store;
-
-    store = new XMPPAccountStore();
     store.setAccountFile(tmpAccountFile, null);
 
     for (int i = 0; i < 10; i++) store.createAccount("" + i, "a", "a", "a", 1, true, true);
@@ -153,8 +226,6 @@ public class XMPPAccountStoreTest {
   @Test
   public void testGetServers() {
 
-    XMPPAccountStore store = new XMPPAccountStore();
-
     for (int i = 0; i < 10; i++)
       for (int j = 0; j < 10; j++) store.createAccount("" + j, "a", "a", "" + i, 1, true, true);
 
@@ -164,8 +235,6 @@ public class XMPPAccountStoreTest {
   @Test
   public void testGetDomains() {
 
-    XMPPAccountStore store = new XMPPAccountStore();
-
     for (int i = 0; i < 10; i++)
       for (int j = 0; j < 10; j++) store.createAccount("" + j, "a", "" + i, "a", 1, true, true);
 
@@ -174,7 +243,6 @@ public class XMPPAccountStoreTest {
 
   @Test
   public void testComparator() {
-    XMPPAccountStore store = new XMPPAccountStore();
     XMPPAccount account0 = store.createAccount("alice", "alice", "b", "b", 1, true, true);
     XMPPAccount account1 = store.createAccount("bob", "bob", "b", "b", 1, true, true);
     XMPPAccount account2 = store.createAccount("alice", "alice", "b", "b", 2, true, true);
@@ -186,7 +254,6 @@ public class XMPPAccountStoreTest {
 
   @Test
   public void testChangeAccountDataAndThenDeleteAccount() {
-    XMPPAccountStore store = new XMPPAccountStore();
     store.createAccount("alice", "alice", "b", "b", 1, true, true);
     XMPPAccount account1 = store.createAccount("bob", "bob", "b", "b", 1, true, true);
     store.changeAccountData(account1, "a", "a", "a", "a", 5, false, false);
@@ -196,7 +263,6 @@ public class XMPPAccountStoreTest {
 
   @Test
   public void testAccountexists() {
-    XMPPAccountStore store = new XMPPAccountStore();
     store.createAccount("alice", "alice", "b", "b", 1, true, true);
 
     assertTrue(store.exists("alice", "b", "b", 1));
@@ -209,19 +275,16 @@ public class XMPPAccountStoreTest {
   @Test
   public void testChangeAccountDataAndActiveAccountAfterDeserialization() throws IOException {
 
-    File tmpAccountFile = File.createTempFile("saros_account", ".dat");
+    File tmpAccountFile = tmpFolder.newFile("saros_account.dat");
 
-    XMPPAccountStore store;
+    store.setAccountFile(tmpAccountFile, null);
+
+    store.createAccount("alice", "alice", "b", "b", 1, true, true);
 
     store = new XMPPAccountStore();
     store.setAccountFile(tmpAccountFile, null);
 
-    XMPPAccount account = store.createAccount("alice", "alice", "b", "b", 1, true, true);
-
-    store = new XMPPAccountStore();
-    store.setAccountFile(tmpAccountFile, null);
-
-    account = store.getActiveAccount();
+    XMPPAccount account = store.getActiveAccount();
 
     XMPPAccount another = store.getAllAccounts().get(0);
 
@@ -240,8 +303,6 @@ public class XMPPAccountStoreTest {
 
   @Test
   public void testFindsExistingAccount() {
-    XMPPAccountStore store = new XMPPAccountStore();
-
     XMPPAccount created =
         store.createAccount("alice", "alice", "domain", "server", 12345, true, true);
 
@@ -251,15 +312,12 @@ public class XMPPAccountStoreTest {
 
   @Test
   public void testUnsuccessfulFindAccount() {
-    XMPPAccountStore store = new XMPPAccountStore();
-
     XMPPAccount found = store.findAccount("alice@domain");
-    assertEquals(null, found);
+    assertNull(found);
   }
 
   @Test
   public void testFindAccountIgnoresCase() {
-    XMPPAccountStore store = new XMPPAccountStore();
     XMPPAccount created =
         store.createAccount("alice", "alice", "domain", "server", 12345, true, true);
     XMPPAccount found = store.findAccount("Alice@Domain");
@@ -268,14 +326,12 @@ public class XMPPAccountStoreTest {
 
   @Test(expected = NullPointerException.class)
   public void testFindAccountWithNull() {
-    XMPPAccountStore store = new XMPPAccountStore();
     store.findAccount(null);
   }
 
   @Test
   public void testFindAccountWithEmptyString() {
-    XMPPAccountStore store = new XMPPAccountStore();
     XMPPAccount found = store.findAccount("");
-    assertEquals(null, found);
+    assertNull(found);
   }
 }

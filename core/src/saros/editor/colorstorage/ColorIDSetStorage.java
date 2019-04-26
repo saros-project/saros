@@ -1,10 +1,7 @@
 package saros.editor.colorstorage;
 
-import java.io.ByteArrayInputStream;
+import com.thoughtworks.xstream.XStream;
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,8 +22,6 @@ import saros.preferences.IPreferenceStore;
 public final class ColorIDSetStorage {
 
   private static final Logger LOG = Logger.getLogger(ColorIDSetStorage.class);
-
-  private static final Charset CHARSET = Charset.forName("ISO-8859-1");
 
   private static final String PREFERENCE_STORE_KEY = "saros.coloridsets";
 
@@ -159,10 +154,7 @@ public final class ColorIDSetStorage {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
 
     try {
-      ObjectOutputStream oos = new ObjectOutputStream(out);
-      oos.writeObject(currentAvailableSets);
-      oos.flush();
-      serializedData = new String(out.toByteArray(), CHARSET);
+      serializedData = createXStream().toXML(currentAvailableSets);
     } catch (Exception e) {
       LOG.error("error while saving color sets", e);
       return;
@@ -182,12 +174,15 @@ public final class ColorIDSetStorage {
     if (serializedData.isEmpty()) return;
 
     try {
-      currentAvailableSets =
-          (List<ColorIDSet>)
-              new ObjectInputStream(new ByteArrayInputStream(serializedData.getBytes(CHARSET)))
-                  .readObject();
+      currentAvailableSets = (List<ColorIDSet>) createXStream().fromXML(serializedData);
     } catch (Exception e) {
       LOG.error("error while loading color sets", e);
     }
+  }
+
+  private XStream createXStream() {
+    XStream xStream = new XStream();
+    xStream.alias("colorIDSet", ColorIDSet.class);
+    return xStream;
   }
 }
