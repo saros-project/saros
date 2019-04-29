@@ -71,13 +71,6 @@ or from within Eclipse:
 
 ## Good to know
 
-*   The last version tested with Java SE 5 was [DPP
-    10.6.25.r2236](https://sourceforge.net/projects/dpp/files/Saros/DPP%2010.6.25.r2236/)
-*   Saros is by-and-large compatible with almost all other
-    Eclipse plug-ins.
-*   In our tests, we mainly use Windows (7 and 10), Linux (Ubuntu) and
-    Mac OS X (10.6). In Mac OS X 10.6 you will need Eclipse 3.5 64bit
-    version
 *   Please note that Saros requires higher bandwidth and lower latency
     than normal chatting, so public chat servers might be too slow for
     smooth operation of Saros.
