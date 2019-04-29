@@ -4,25 +4,24 @@ title: Install Saros for Eclipse
 
 ## Prerequisites
 
-*   Saros requires **Java SE 6** or higher
-    *   [Java download](http://www.java.com/en/)
-*   Saros is developed and tested using **Eclipse 3.6 and 3.7**, but it
+*   Saros requires **Java SE 8** or higher
+*   Saros is developed and tested using **Eclipse 4.6**, but it
     should work on any newer version without problems.
     *   [Download Eclipse](http://www.eclipse.org/downloads/)
 *   Saros ought to run on all platforms that can execute Eclipse
     cleanly. 
 *   If you want to try Saros, you may use our public XMPP/Jabber server
     `saros-con.imp.fu-berlin.de`. However, if you want to use Saros for
-    commercial purposes, we recommend [**setting up your own XMPP
-    server**](setup-xmpp.md) for maximum control over all
-    exchanged data.
+    commercial purposes, we recommend
+    [setting up your own XMPP server](setup-xmpp.md) for maximum
+    control over all exchanged data.
 *   The whiteboard feature is based on the Eclipse Graphical Editing
     Framework (GEF) 3.6 or higher
     *   It is **part of the Eclipse RCP and Eclipse EE** downloads
     *   Using the Saros update site (see beyond), GEF should be
         **automatically installed**.
-    *   You can also install it using the [GEF update
-        site](http://www.eclipse.org/gef/updates/index.php)
+    *   You can also install it using the 'GEF-Legacy Releases' update site listed
+        [here](https://projects.eclipse.org/projects/tools.gef/downloads)
     *   Or [download as
         dropin](http://www.eclipse.org/gef/downloads/index.php)
 
