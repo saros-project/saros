@@ -202,7 +202,7 @@ public abstract class Wizard extends JDialog {
     wizardPageModel.setNextPage(page);
   }
 
-  public void enableNextButtion() {
+  public void enableNextButton() {
     navigationPanel.enableNextButton();
   }
 

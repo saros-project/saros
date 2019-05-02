@@ -67,7 +67,7 @@ public class SelectLocalModuleRepresentationPage extends AbstractWizardPage {
       }
     }
 
-    wizard.enableNextButtion();
+    wizard.enableNextButton();
   }
 
   /**
