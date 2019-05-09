@@ -15,16 +15,6 @@ title: Install Saros for Eclipse
     commercial purposes, we recommend
     [setting up your own XMPP server](setup-xmpp.md) for maximum
     control over all exchanged data.
-*   The whiteboard feature is based on the Eclipse Graphical Editing
-    Framework (GEF) 3.6 or higher
-    *   It is **part of the Eclipse RCP and Eclipse EE** downloads
-    *   Using the Saros update site (see beyond), GEF should be
-        **automatically installed**.
-    *   You can also install it using the 'GEF-Legacy Releases' update site listed
-        [here](https://projects.eclipse.org/projects/tools.gef/downloads)
-    *   Or [download as
-        dropin](http://www.eclipse.org/gef/downloads/index.php)
-
 
 ## Installation Steps
 
@@ -63,11 +53,9 @@ or from within Eclipse:
 
 1.  Download the [latest *saros-dropin-\*.zip*
     from Sourceforge](http://sourceforge.net/projects/dpp/files/latest/download?source=files).
-2.  If not already available, download the [Graphical Editing
-    Framework](http://www.eclipse.org/gef/downloads/index.php)
-3.  Uncompress the archives into the dropins folder of your
+2.  Uncompress the archive into the dropins folder of your
     Eclipse installation.
-4.  Restart Eclipse.
+3.  Restart Eclipse.
 
 ## Good to know
 
