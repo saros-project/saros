@@ -10,7 +10,8 @@ public class GettingStartedHandler extends AbstractHandler {
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
 
-    SWTUtils.openInternalBrowser("http://www.saros-project.org/GettingStarted", "Welcome to Saros");
+    SWTUtils.openInternalBrowser(
+        "https://www.saros-project.org/documentation/getting-started.html", "Welcome to Saros");
 
     return null;
   }
