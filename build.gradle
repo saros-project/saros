@@ -81,6 +81,16 @@ configure(projectsToConfigure) { project ->
     if (project.hasProperty('skipTestSuites') && skipTestSuites.equalsIgnoreCase("true")) {
       exclude '**/*TestSuite*'
     }
+
+    /*
+     * Exclude STF tests if property is set. Otherwise the STF self-tests (which are reliant on test
+     * workers to function properly) are also run when executing the 'test' task to run all Saros
+     * test.
+     */
+    if (project.hasProperty('skipSTFTests') && skipSTFTests.equalsIgnoreCase("true")) {
+      exclude 'saros/stf/test/stf/*'
+    }
+
     exclude '**/Abstract*'
 
     testLogging {
