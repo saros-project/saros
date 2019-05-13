@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Saros STF Test
 Bundle-SymbolicName: saros.stf.test
 Bundle-Version: 0.1.0.DEVEL
-Bundle-Vendor: FU-Berlin
+Bundle-Vendor: Saros Project
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: saros.eclipse,
  saros.core,
