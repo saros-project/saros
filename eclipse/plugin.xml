@@ -1002,9 +1002,12 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?before=menustart">
-         <menu
+         <command
+               commandId="saros.ui.commands.ShareResource"
+               disabledIcon="icons/dlcl16/spacer.png"
                icon="icons/elcl16/session_tsk.png"
-               label="Work Together on..."
+               label="Share Project(s)..."
+               style="push"
                tooltip="Share Projects With Selected Contacts">
             <visibleWhen
                   checkEnabled="false">
@@ -1019,41 +1022,7 @@
                   </reference>
                </and>
             </visibleWhen>
-            <separator
-                  name="ProjectsStart"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="saros.ui.commands.Empty"
-                  label="Not Connected"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <not>
-                     <reference
-                           definitionId="saros.ui.definitions.isConnected">
-                     </reference>
-                  </not>
-               </visibleWhen>
-            </command>
-            <dynamic
-                  class="saros.ui.menuContributions.StartSessionWithProjects"
-                  id="saros.ui.menus.ProjectShareResources">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="saros.ui.definitions.isConnected">
-                  </reference>
-               </visibleWhen>
-            </dynamic>
-            <separator
-                  name="ProjectsEnd"
-                  visible="true">
-            </separator>
-            <separator
-                  name="additions">
-            </separator>
-         </menu>
+         </command>
          <command
                commandId="saros.ui.commands.SessionAddSelectedContacts"
                disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
