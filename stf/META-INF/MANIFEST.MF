@@ -92,3 +92,4 @@ Export-Package: saros.stf,
  saros.stf.server.rmi.superbot.internal,
  saros.stf.server.rmi.superbot.internal.impl,
  saros.stf.shared
+Bundle-Vendor: Saros Project
