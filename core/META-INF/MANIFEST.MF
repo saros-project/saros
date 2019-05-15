@@ -140,3 +140,4 @@ Bundle-ClassPath: .,
  lib/picocontainer-2.11.2.jar,
  lib/weupnp.jar,
  lib/libidn-1.15.jar
+Bundle-Vendor: Saros Project
