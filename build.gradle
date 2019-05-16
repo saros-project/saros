@@ -11,7 +11,6 @@ buildscript
 plugins {
   id "de.monkeyworks.buildmonkey.mavenizer.MavenizerPlugin" version "0.4.2"
   id 'com.gradle.build-scan' version '2.0.2'
-  id 'org.sonarqube' version '2.6.2'
 }
 
 // avoid that the buildmonkey plugin triggers verbose ant logging
@@ -35,21 +34,9 @@ mavenize {
   }
 }
 
-sonarqube {
-  properties {
-    property 'sonar.preview.excludePlugins', 'devcockpit, jira, pdfreport, views, report, buildstability, scmactivity, buildbreaker, scmstats'
-    property 'sonar.projectName', 'Saros/Complete'
-    property 'sonar.projectKey', 'saros_complete'
-    property 'sonar.projectDescription', 'The whole Saros product family'
-    property 'sonar.projectVersion', '14.11.28.DEVEL'
-    property 'sonar.cpd.cross_project', 'true'
-  }
-}
 
-ext.projectsToConfigure = subprojects - project(':saros.ui.frontend') - project(':saros.picocontainer')
+ext.projectsToConfigure = subprojects - project(':saros.picocontainer')
 // Configurations that are specific to all subprojects
-// saros.ui.frontend is not a real subproject and contains
-// only a build.gradle in order to allow to scan the sources of this subproject
 configure(projectsToConfigure) { projectToConf ->
 
   apply plugin: 'eclipse'

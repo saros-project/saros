@@ -117,11 +117,3 @@ afterEvaluate {
 artifacts {
   archives buildPlugin
 }
-
-sonarqube {
-  properties {
-    property 'sonar.projectName', 'Saros/Intellij'
-    property 'sonar.projectDescription', 'Saros plugin for IntelliJ IDEA'
-    property 'sonar.projectVersion', '0.1.0.DEVEL'
-  }
-}

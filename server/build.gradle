@@ -9,14 +9,6 @@ sourceSets {
   test.java.srcDir 'test/junit'
 }
 
-sonarqube {
-  properties {
-    property 'sonar.projectName', 'Saros/Server'
-    property 'sonar.projectDescription', 'Standalone Saros Server'
-    property 'sonar.projectVersion', '0.1.0.DEVEL'
-  }
-}
-
 jar {
   manifest {
     attributes 'Main-Class': 'saros.server.SarosServer'
