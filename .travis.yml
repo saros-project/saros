@@ -16,13 +16,6 @@ notifications:
 
 services: docker
 
-# Sonar token is encrypted via travis encrypt
-env:
-  global:
-    # SONAR_TOKEN
-    secure: "aMWLDDcMN1uxvIHbYK5Tl8Rk7/QkbxSQ21K3S/ZSUIfTnHxZL0mcPbXOuqqwBxD1cTNXf2MeZK96+xzNbesNzWEe2iM0h5MWz8kgjOTAU0a+Hd0giMq+Gb9PWinJDjLTNryK88nG/MSaya9hwMPQJaNH1wwAaCMpfzLa5BxN0GxKBiIF5Kpk3qLpkwGRq6UPgsL8nZ65KYfh2O3uJ5vv4dtEIEEqzsXGTZHi1o0oEbn6dOnRg+8yE8cYgx4GUfHJ9bGNUMr4KCBejCOgMRxXvp5UUh9l0pZnCHqAorSGPr2CS1jq4JxVTrYP6p8Zj4K5w72VcXaEij6lbcPXoGzB+tOKgIEvlKMzXtIiIKCcyEir6/OCoK0U0CuzK1X76sK/JW3tgC9jQxaxqt6GymqicNUFm8dnGv6F2WtMexmViedLTLzsBmg2Uw8WqbsHW8vSUpH0kumvpnZ8pp4Vl9tXqiMOsQ7Z0FOuRHZIPY2eCGaBtpTe2ORUPrCVjB58iYGwfDjbdaZYtR6O+7a895+UEGlnIcpgN4rS1uihC4Nm3GBQFUnJBw7izSvkzqN2qJAjU3MrwJXawUB1bKtrRSPih9RNYyJxID1E7NW7TxNL78ZriKI8Zv/GVQgBo82Oq7UDypgMpK2HqN6utwgiq6tZ40JRpmBS8n2EsYrFAGd/GsE="
-
-
 # Avoid config duplication via yaml anchors
 _stf_setup_config: &stf_before_script
   if: type in (cron, api)
@@ -55,8 +48,6 @@ jobs:
       script:
         - docker run -td --name build -v $PWD:/home/ci/saros_src saros/ci_build:0.4 bash
         - docker exec -t build /home/ci/saros_src/travis/script/build/build_all.sh
-      after_success:
-        - docker exec -t build /home/ci/saros_src/travis/script/scan/scan_all.sh $SONAR_TOKEN $TRAVIS_PULL_REQUEST
 
     - <<: *stf_before_script
       script: docker exec -t stf_master /home/ci/saros_src/travis/script/stf/master/start_stf_tests.sh
