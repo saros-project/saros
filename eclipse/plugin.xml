@@ -956,71 +956,27 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-            <menu
-                  icon="icons/elcl16/session_tsk.png"
-                  label="Share With"
-                  tooltip="Share the Selected Projects With Your Contacts">
-                  <visibleWhen
+         <command
+               commandId="saros.ui.commands.ShareResource"
+               disabledIcon="icons/dlcl16/spacer.png"
+               icon="icons/elcl16/session_tsk.png"
+               label="Share Project(s)..."
+               style="push"
+               tooltip="Share the Selected Projects With Your Contacts">
+            <visibleWhen
                   checkEnabled="false">
-                     <and>
-                        <not>
-                           <reference
-                                 definitionId="saros.ui.definitions.isSarosSessionRunning">
-                           </reference>
-                        </not>
-                        <reference
-                              definitionId="saros.ui.definitions.resourcesSelected">
-                        </reference>
-                     </and>
-            </visibleWhen>
-               <separator
-                     name="ContactsStart"
-                     visible="true">
-               </separator>
-               <command
-                     commandId="saros.ui.commands.Empty"
-                     label="Not Connected"
-                     style="push">
-                  <visibleWhen
-                        checkEnabled="false">
-                     <not>
-                        <reference
-                              definitionId="saros.ui.definitions.isConnected">
-                        </reference>
-                     </not>
-                  </visibleWhen>
-               </command>
-               <dynamic
-                     class="saros.ui.menuContributions.StartSessionWithContacts"
-                     id="saros.ui.menus.ProjectShareContacts">
-                  <visibleWhen
-                        checkEnabled="false">
+               <and>
+                  <not>
                      <reference
-                           definitionId="saros.ui.definitions.isConnected">
+                           definitionId="saros.ui.definitions.isSarosSessionRunning">
                      </reference>
-                  </visibleWhen>
-               </dynamic>
-               <separator
-                     name="ContactsEnd"
-                     visible="true">
-               </separator>
-               <command
-                     commandId="saros.ui.commands.ShareResource"
-                     label="Multiple Contacts..."
-                     style="push">
-               </command>
-               <separator
-                     name="OtherStart"
-                     visible="true">
-               </separator>
-               <separator
-                     name="OtherEnd"
-                     visible="true">
-               </separator>
-               <separator
-                     name="additions">
-               </separator>
-            </menu>
+                  </not>
+                  <reference
+                        definitionId="saros.ui.definitions.resourcesSelected">
+                  </reference>
+               </and>
+            </visibleWhen>
+         </command>
             <command
                   commandId="saros.ui.commands.SessionAddSelectedResources"
                   disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
@@ -1046,9 +1002,12 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?before=menustart">
-         <menu
+         <command
+               commandId="saros.ui.commands.ShareResource"
+               disabledIcon="icons/dlcl16/spacer.png"
                icon="icons/elcl16/session_tsk.png"
-               label="Work Together on..."
+               label="Share Project(s)..."
+               style="push"
                tooltip="Share Projects With Selected Contacts">
             <visibleWhen
                   checkEnabled="false">
@@ -1063,41 +1022,7 @@
                   </reference>
                </and>
             </visibleWhen>
-            <separator
-                  name="ProjectsStart"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="saros.ui.commands.Empty"
-                  label="Not Connected"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <not>
-                     <reference
-                           definitionId="saros.ui.definitions.isConnected">
-                     </reference>
-                  </not>
-               </visibleWhen>
-            </command>
-            <dynamic
-                  class="saros.ui.menuContributions.StartSessionWithProjects"
-                  id="saros.ui.menus.ProjectShareResources">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="saros.ui.definitions.isConnected">
-                  </reference>
-               </visibleWhen>
-            </dynamic>
-            <separator
-                  name="ProjectsEnd"
-                  visible="true">
-            </separator>
-            <separator
-                  name="additions">
-            </separator>
-         </menu>
+         </command>
          <command
                commandId="saros.ui.commands.SessionAddSelectedContacts"
                disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
