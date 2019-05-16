@@ -32,16 +32,14 @@ or from within Eclipse:
 ### Via Update Site
 
 **The Eclipse plugin update site is:
-<http://dpp.sourceforge.net/update>**
+<https://www.saros-project.org/update-site/eclipse>**
 
 1.  Open Eclipse
 2.  Open the software updates manager: *Menu &gt; Help &gt; Install
     New Software...*
 3.  In the *Available Software* wizard select *Add*
-4.  Enter `http://dpp.sourceforge.net/update` in the Location field;
+4.  Enter `https://www.saros-project.org/update-site/eclipse` in the Location field;
     press OK
-    -   You may also use our secondary update site:
-        `https://get-saros.herokuapp.com/eclipse/`
 
 5.  Choose the plugin in the the list of available software and select
     it
