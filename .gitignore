@@ -24,12 +24,11 @@ bin_test/
 /ui.frontend/html/js/templates.js
 /ui.frontend/html/npm-debug.log
 /ui.frontend/html/package-lock.json
-/update/logs.zip
-/update/features/
-/update/plugins/
-/update_beta/logs.zip
-/update_beta/features/
-/update_beta/plugins/
+/eclipse/update/logs.zip
+/eclipse/update/features/
+/eclipse/update/plugins/
+/eclipse/update/artifacts.jar
+/eclipse/update/content.jar
 /stf/src/saros/stf/client/configuration.properties
 /eclipse/lib
 /core/lib
