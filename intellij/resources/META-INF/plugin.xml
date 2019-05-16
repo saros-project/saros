@@ -9,12 +9,19 @@
     </description>
 
     <change-notes>
+        <![CDATA[
         This is the first alpha version of Saros for IntelliJ. Use at your own risk.
+        <br><br>
+        Detailed release notes can be found at
+        <a href="https://www.saros-project.org/releases/saros-i_0.1.0.html">
+            https://www.saros-project.org/releases/saros-i_0.1.0.html
+        </a>
+        ]]>
     </change-notes>
 
     <version>0.1.0</version>
 
-    <vendor url="http://www.saros-project.org" email="saros-devel@googlegroups.com">
+    <vendor url="https://www.saros-project.org" email="saros-devel@googlegroups.com">
         Saros Project
     </vendor>
 
