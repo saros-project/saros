@@ -11,10 +11,10 @@ Is an Open Source plugin for connecting multiple IDEs for distributed collaborat
 ## Installation instructions
 ### Eclipse
 - Via Marketplace Client: drag and drop [this link](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=856887 "Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client") to your running Eclipse workspace
-- Or add this update-site: https://www.saros-project.org/update-site
+- Or add this update-site: https://www.saros-project.org/update-site/eclipse
 
 ### IntelliJ alpha release
-Please read the [details about restrictions](https://www.saros-project.org/release-notes/saros-i_0.1.0) first, because Saros for IntelliJ is still a first alpha release!
+Please read the [details about restrictions](https://www.saros-project.org/releases/saros-i_0.1.0.html) first, because Saros for IntelliJ is still a first alpha release!
 
 - Search for "Saros" in the IntelliJ Marketplace
 - Or Download the plugin zip from our [release page](https://github.com/saros-project/saros/releases)
