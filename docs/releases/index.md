@@ -16,8 +16,8 @@ Update site <https://www.saros-project.org/update-site/eclipse>
 
 ## Eclipse Dropin
 
-Find latest release in [GitHub](https://github.com/saros-project/saros/releases/latest)
+Find latest release in [GitHub](https://github.com/saros-project/saros/releases)
 
 ## IntelliJ Zip
 
-Find latest release in [GitHub](https://github.com/saros-project/saros/releases/latest)
+Find latest release in [GitHub](https://github.com/saros-project/saros/releases)

@@ -50,8 +50,8 @@ or from within Eclipse:
 ### As Dropin
 
 1.  Download the [latest *saros-dropin-\*.zip*
-    from Sourceforge](http://sourceforge.net/projects/dpp/files/latest/download?source=files).
-2.  Uncompress the archive into the dropins folder of your
+    from GitHub](https://github.com/saros-project/saros/releases).
+2.  Uncompress the archives into the dropins folder of your
     Eclipse installation.
 3.  Restart Eclipse.
 
