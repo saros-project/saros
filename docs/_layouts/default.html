@@ -12,6 +12,8 @@
       {% assign sidebar_data = site.data.documentation.sidebar %}
     {% elsif page.url contains '/contribute' %}
       {% assign sidebar_data = site.data.contribute.sidebar %}
+    {% elsif page.url contains '/releases' %}
+      {% assign sidebar_data = site.data.releases.sidebar %}
     {% endif %}
 
      <div class="row flex-xl-nowrap">
