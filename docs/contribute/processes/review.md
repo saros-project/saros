@@ -10,13 +10,13 @@ Make sure that your change:
 * is small
 * is formatted as defined in the [guidelines](../guidelines.md#formatting)
 
-In order to merge a pull request you need:
+In order for a pull request to get merged, it needs to fulfill the following requirements:
 
-* all checks (Travis CI, Sonar) passed
+* all checks (Travis CI, Codacy) passed
 * two reviewers approved **OR**
 * one reviewer approved two days ago and no further modification requests are posted
 
-*For each review you received you have to perform two reviews.*
+*For each review you received you should perform at least two reviews to maintain an equilibrium.*
 
 ## Why do reviews at all?
 
@@ -67,14 +67,14 @@ code. This rigid process serves a dual purpose:
     probably mixed up different concerns and should address them in
     separate pull requests instead.
 
-### Step 2/3/6: Pushing and Pushing again
+### Step 2/3/6: Pushing and pushing again
 
 In case you don't know yet:
 
 *   [Learn how to push your first change.](https://help.github.com/articles/pushing-to-a-remote/)
 *   [Learn how to amend an existing patch.](https://medium.com/@igor_marques/git-basics-adding-more-changes-to-your-last-commit-1629344cb9a8)
 
-### Step 4: Invite Reviewers
+### Step 4: Invite reviewers
 
 *   You can invite individual reviewers by their names.
     *   Take a look into the [commit history](https://github.com/saros-project/saros/commits/master)
@@ -111,23 +111,27 @@ In case you don't know yet:
     ground and focus the discussion on the actual pull request, not some
     imaginary perfect pull request-to-be.
 
-### Step 6: Merge pull request
+### Step 6 - External pull requests: Request the merge of the pull request
+
+*   Ensure that the pull request is up-to-date with the target branch and meets the [merge requirements](#review-rules-at-a-glance).
+*   Request that a developer with the necessary rights merges your pull request.
+
+### Step 6 - Internal: Merge the pull request
 
 *   Normally, submitting an approved pull request is the duty of the author, i.e. you.
     *   Vice versa, don't just simply submit foreign pull requests even if
         they meet the submission criteria. Talk to the pull request author first.
-*   If you are new to the project, you'll probably not have the to merge a pull request.
-    *   If this is one of your very first pull requests, ask someone else to
-        submit your pull request or ask for permissions.
 *   Technically a pull request requires that all by a reviewer requested changes are addressed and
     at least one reviewer approved the request. Otherwise it is not possible to use the merge button.
 
-#### Which merge option should I use?
+#### Which merge option should be used?
 
 ![GitHub merge options](../images/processes/GitHub_choose_merge_method.png)
 
 We allow the two options [merge and squash](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits) and [rebase and merge](https://help.github.com/articles/about-pull-request-merges/#rebase-and-merge-your-pull-request-commits).
 Both options avoid merge commits which lead to a strict chronological commit history.
+
+Information on when to use which merge strategy is given in our [development process documentation](development.md#pull-request-structure).
 
 ##### Merge and squash
 This method squashes all changes of your pull request. If you choose this option, GitHub proposes a possible commit name
@@ -167,7 +171,7 @@ perspectives on the code. Here are just two of them:
    * all identifiers are easy to read and understand
 * Then look at the surrounding method
    * Does it fulfill its contract?
-   * Does the documentation match with the codè?
+   * Does the documentation match with the code?
    * Is this method well placed within the surrounding class?
 * Comment on the [corresponding line of the pull request](https://help.github.com/articles/commenting-on-a-pull-request/#adding-line-comments-to-a-pull-request).
 

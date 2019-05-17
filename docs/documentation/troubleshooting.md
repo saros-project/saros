@@ -13,28 +13,6 @@ for updates to all plug-ins that you have installed. To work around this
 problem, uncheck "Contact all update sites during install to find
 required software" in Eclipse's installation dialog.
 
-#### When I try to use the update site, I get a certificate error. What can I do?
-
-The Eclipse error message reads something like *"An error occured while
-collecting items to be installed"* and *"unable to find valid
-certification path to requested target"*.
-
-In December 2016, Sourceforge (where we host our JAR files) introduced
-forwarding to HTTPS servers which are certified by "Let's Encrypt"
-certificates. Older Java versions (below Java 8u101 and Java 7u111) do
-not recognize "Let's Encrypt"'s root certificate and this results in
-said error message.
-
-You may use our **secondary update site** which is hosted by Heroku:
-<https://get-saros.herokuapp.com/eclipse>. Alternatively, you can either
-update your Java installation to compatible version, or follow [these
-instructions](https://www.topjavablogs.com/news/how-to-trust-lets-encrypt-certificate-with-java)
-to add the root certificate manually. (Also refer to [the bugtracker
-entry in
-SourceForge](https://sourceforge.net/p/forge/site-support/14016/) -- we
-are not the only project suffering from this issue.) Alternatively, you
-can download the dropin archive and follow the [instructions for installation as dropin](installation.md).
-
 #### I cannot connect with my jabber account?
 
 Go to Eclipse -&gt; Saros -&gt; Preferences -&gt; General -&gt; Network
