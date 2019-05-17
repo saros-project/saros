@@ -10,10 +10,11 @@
 
     {% if link.sublinks %}
 
-    {% assign link_id = (link.title | strip | uri_escape) %}
+    {% assign link_id = (link.title | strip | replace:'/','-' | replace:' ','-') %}
     <li class="nav-item">
 
         {% for sublink in link.sublinks %}
+        {% assign collapse_state = '' %}
         {% if page.url contains sublink.url %}
         {% assign collapse_state = 'show' %}
         {% endif %}

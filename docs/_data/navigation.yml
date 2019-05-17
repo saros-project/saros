@@ -3,9 +3,9 @@
   url: /documentation
   icon_class: fa fa-book
 
-- title: Downloads
+- title: Releases
   long_title: Get Saros
-  url: /downloads
+  url: /releases
   icon_class: fa fa-download
 
 - title: Contribute
