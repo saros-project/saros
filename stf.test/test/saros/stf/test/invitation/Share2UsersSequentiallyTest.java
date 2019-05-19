@@ -6,62 +6,66 @@ import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import saros.session.User.Permission;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
 import saros.stf.test.stf.Constants;
+import saros.stf.testwatcher.Share2UsersSequentiallyTestWatcher;
 
 public class Share2UsersSequentiallyTest extends StfTestCase {
 
-  @BeforeClass
-  public static void selectTesters() throws Exception {
-    select(ALICE, BOB);
-  }
+    @BeforeClass
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
+    }
 
-  /**
-   * Steps:
-   *
-   * <ol>
-   *   <li>Alice share project with BOB.
-   *   <li>Alice and BOB leave the session.
-   * </ol>
-   *
-   * Result:
-   *
-   * <ol>
-   *   <li>Alice and Bob are participants and have both {@link Permission#WRITE_ACCESS}.
-   *   <li>Alice and BOB have no {@link Permission}s after leaving the session.
-   * </ol>
-   */
-  @Test
-  public void testAliceShareProjectWithBobSequentially() throws Exception {
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .tree()
-        .newC()
-        .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    @Rule
+    public Share2UsersSequentiallyTestWatcher share2userssequentially = new Share2UsersSequentiallyTestWatcher();
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    /**
+     * Steps:
+     *
+     * <ol>
+     * <li>Alice share project with BOB.
+     * <li>Alice and BOB leave the session.
+     * </ol>
+     *
+     * Result:
+     *
+     * <ol>
+     * <li>Alice and Bob are participants and have both
+     * {@link Permission#WRITE_ACCESS}.
+     * <li>Alice and BOB have no {@link Permission}s after leaving the session.
+     * </ol>
+     */
+    @Test
+    public void testAliceShareProjectWithBobSequentially() throws Exception {
 
-    assertTrue(BOB.superBot().views().sarosView().isInSession());
-    assertTrue(ALICE.superBot().views().sarosView().isInSession());
+        ALICE.superBot().views().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
 
-    BOB.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        Util.buildSessionSequentially(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
-    assertFalse(ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).hasReadOnlyAccess());
+        assertTrue(BOB.superBot().views().sarosView().isInSession());
+        assertTrue(ALICE.superBot().views().sarosView().isInSession());
 
-    assertTrue(ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).hasWriteAccess());
+        BOB.superBot().views().packageExplorerView().waitUntilClassExists(
+            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    leaveSessionPeersFirst(ALICE);
+        assertFalse(ALICE.superBot().views().sarosView()
+            .selectUser(BOB.getJID()).hasReadOnlyAccess());
 
-    assertFalse(BOB.superBot().views().sarosView().isInSession());
-    assertFalse(ALICE.superBot().views().sarosView().isInSession());
-  }
+        assertTrue(ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
+            .hasWriteAccess());
+
+        leaveSessionPeersFirst(ALICE);
+
+        assertFalse(BOB.superBot().views().sarosView().isInSession());
+        assertFalse(ALICE.superBot().views().sarosView().isInSession());
+    }
 }

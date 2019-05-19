@@ -7,85 +7,90 @@ import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
 
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import saros.session.User.Permission;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
 import saros.stf.test.stf.Constants;
+import saros.stf.testwatcher.Share3UsersConcurrentlyTestWatcher;
 
 public class Share3UsersConcurrentlyTest extends StfTestCase {
 
-  /**
-   * Preconditions:
-   *
-   * <ol>
-   *   <li>Alice (Host, Write Access)
-   *   <li>Bob (Read-Only Access)
-   *   <li>Carl (Read-Only Access)
-   * </ol>
-   */
-  @BeforeClass
-  public static void selectTesters() throws Exception {
-    select(ALICE, BOB, CARL);
-  }
+    /**
+     * Preconditions:
+     *
+     * <ol>
+     * <li>Alice (Host, Write Access)
+     * <li>Bob (Read-Only Access)
+     * <li>Carl (Read-Only Access)
+     * </ol>
+     */
+    @BeforeClass
+    public static void selectTesters() throws Exception {
 
-  /**
-   * Steps:
-   *
-   * <ol>
-   *   <li>Alice share project with BOB and CARL concurrently.
-   *   <li>Alice and BOB leave the session.
-   * </ol>
-   *
-   * Result:
-   *
-   * <ol>
-   *   <li>Alice, Bob and Carl are participants and have {@link Permission#WRITE_ACCESS}.
-   *   <li>Alice, Bob and Carl have no {@link Permission}s after leaving the session.
-   * </ol>
-   *
-   * @throws InterruptedException
-   */
-  @Test
-  public void testShareProjectConcurrently() throws Exception, InterruptedException {
+        select(ALICE, BOB, CARL);
+    }
 
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .tree()
-        .newC()
-        .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
-    Util.buildSessionConcurrently(
-        Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+    @Rule
 
-    BOB.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    public Share3UsersConcurrentlyTestWatcher share3usersconcurrently = new Share3UsersConcurrentlyTestWatcher();
 
-    CARL.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    /**
+     * Steps:
+     *
+     * <ol>
+     * <li>Alice share project with BOB and CARL concurrently.
+     * <li>Alice and BOB leave the session.
+     * </ol>
+     *
+     * Result:
+     *
+     * <ol>
+     * <li>Alice, Bob and Carl are participants and have
+     * {@link Permission#WRITE_ACCESS}.
+     * <li>Alice, Bob and Carl have no {@link Permission}s after leaving the
+     * session.
+     * </ol>
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void testShareProjectConcurrently()
+        throws Exception, InterruptedException {
+        ALICE.superBot().views().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+        Util.buildSessionConcurrently(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
 
-    assertTrue(CARL.superBot().views().sarosView().isInSession());
-    assertFalse(ALICE.superBot().views().sarosView().selectUser(CARL.getJID()).hasReadOnlyAccess());
-    assertTrue(ALICE.superBot().views().sarosView().selectUser(CARL.getJID()).hasWriteAccess());
+        BOB.superBot().views().packageExplorerView().waitUntilClassExists(
+            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    assertTrue(BOB.superBot().views().sarosView().isInSession());
-    assertFalse(ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).hasReadOnlyAccess());
-    assertTrue(ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).hasWriteAccess());
+        CARL.superBot().views().packageExplorerView().waitUntilClassExists(
+            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    assertTrue(ALICE.superBot().views().sarosView().isInSession());
+        assertTrue(CARL.superBot().views().sarosView().isInSession());
+        assertFalse(ALICE.superBot().views().sarosView()
+            .selectUser(CARL.getJID()).hasReadOnlyAccess());
+        assertTrue(ALICE.superBot().views().sarosView()
+            .selectUser(CARL.getJID()).hasWriteAccess());
 
-    leaveSessionPeersFirst(ALICE);
+        assertTrue(BOB.superBot().views().sarosView().isInSession());
+        assertFalse(ALICE.superBot().views().sarosView()
+            .selectUser(BOB.getJID()).hasReadOnlyAccess());
+        assertTrue(ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
+            .hasWriteAccess());
 
-    assertFalse(CARL.superBot().views().sarosView().isInSession());
+        assertTrue(ALICE.superBot().views().sarosView().isInSession());
 
-    assertFalse(BOB.superBot().views().sarosView().isInSession());
+        leaveSessionPeersFirst(ALICE);
 
-    assertFalse(ALICE.superBot().views().sarosView().isInSession());
-  }
+        assertFalse(CARL.superBot().views().sarosView().isInSession());
+
+        assertFalse(BOB.superBot().views().sarosView().isInSession());
+
+        assertFalse(ALICE.superBot().views().sarosView().isInSession());
+    }
 }

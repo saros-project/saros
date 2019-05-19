@@ -6,86 +6,95 @@ import static saros.stf.client.tester.SarosTester.BOB;
 
 import java.rmi.RemoteException;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
+import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
 import saros.stf.test.stf.Constants;
+import saros.stf.testwatcher.ConcurrentEditingTestWatcher;
 
 public class ConcurrentEditingTest extends StfTestCase {
 
-  @BeforeClass
-  public static void selectTesters() throws Exception {
-    select(ALICE, BOB);
-  }
+    @BeforeClass
+    public static void selectTesters() throws Exception {
+        Assume.assumeTrue(checkIfShare2UsersSequentiallySucceeded());
+        select(ALICE, BOB);
+    }
 
-  static final String FILE = "file.txt";
+    static final String FILE = "file.txt";
+    @Rule
+    public ConcurrentEditingTestWatcher concurrenteditting = new ConcurrentEditingTestWatcher();
 
-  /**
-   * Test to reproduce bug "Inconsistency when concurrently writing at same position"
-   *
-   * @throws RemoteException
-   * @throws InterruptedException
-   * @see <a href="https://sourceforge.net/p/dpp/bugs/419/">Bug tracker entry 419</a>
-   */
-  @Test
-  public void testBugInconsistencyConcurrentEditing() throws Exception, InterruptedException {
-    ALICE.superBot().views().packageExplorerView().tree().newC().project(Constants.PROJECT1);
+    /**
+     * Test to reproduce bug "Inconsistency when concurrently writing at same
+     * position"
+     *
+     * @throws RemoteException
+     * @throws InterruptedException
+     * @see <a href="https://sourceforge.net/p/dpp/bugs/419/">Bug tracker entry
+     *      419</a>
+     */
+    @Test
+    public void testBugInconsistencyConcurrentEditing()
+        throws Exception, InterruptedException {
 
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .selectProject(Constants.PROJECT1)
-        .newC()
-        .file(FILE);
-    ALICE.remoteBot().waitUntilEditorOpen(FILE);
-    ALICE.remoteBot().editor(FILE).setTextFromFile("test/resources/lorem.txt");
-    ALICE.remoteBot().editor(FILE).navigateTo(0, 6);
+        ALICE.superBot().views().packageExplorerView().tree().newC()
+            .project(Constants.PROJECT1);
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
-    BOB.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilFileExists(Constants.PROJECT1 + "/" + FILE);
-    BOB.superBot().views().packageExplorerView().selectFile(Constants.PROJECT1, FILE).open();
+        ALICE.superBot().views().packageExplorerView()
+            .selectProject(Constants.PROJECT1).newC().file(FILE);
+        ALICE.remoteBot().waitUntilEditorOpen(FILE);
+        ALICE.remoteBot().editor(FILE)
+            .setTextFromFile("test/resources/lorem.txt");
+        ALICE.remoteBot().editor(FILE).navigateTo(0, 6);
 
-    BOB.remoteBot().waitUntilEditorOpen(FILE);
-    BOB.remoteBot().editor(FILE).navigateTo(0, 30);
+        Util.buildSessionSequentially(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+        BOB.superBot().views().packageExplorerView()
+            .waitUntilFileExists(Constants.PROJECT1 + "/" + FILE);
+        BOB.superBot().views().packageExplorerView()
+            .selectFile(Constants.PROJECT1, FILE).open();
 
-    Thread.sleep(1000);
+        BOB.remoteBot().waitUntilEditorOpen(FILE);
+        BOB.remoteBot().editor(FILE).navigateTo(0, 30);
 
-    // Alice goes to 0,6 and hits Delete
-    ALICE.remoteBot().activateWorkbench();
-    int waitActivate = 100;
-    ALICE.remoteBot().editor(FILE).show();
+        Thread.sleep(1000);
 
-    ALICE.remoteBot().editor(FILE).waitUntilIsActive();
-    // at the same time, Bob enters L at 0,30
-    BOB.remoteBot().activateWorkbench();
-    Thread.sleep(waitActivate);
-    BOB.remoteBot().editor(FILE).show();
-    BOB.remoteBot().editor(FILE).waitUntilIsActive();
+        // Alice goes to 0,6 and hits Delete
+        ALICE.remoteBot().activateWorkbench();
+        int waitActivate = 100;
+        ALICE.remoteBot().editor(FILE).show();
 
-    Thread.sleep(waitActivate);
-    ALICE.remoteBot().editor(FILE).pressShortcut(new String[] {IKeyLookup.BACKSPACE_NAME});
+        ALICE.remoteBot().editor(FILE).waitUntilIsActive();
+        // at the same time, Bob enters L at 0,30
+        BOB.remoteBot().activateWorkbench();
+        Thread.sleep(waitActivate);
+        BOB.remoteBot().editor(FILE).show();
+        BOB.remoteBot().editor(FILE).waitUntilIsActive();
 
-    BOB.remoteBot().editor(FILE).typeText("L");
-    // both sleep for less than 1000ms
+        Thread.sleep(waitActivate);
+        ALICE.remoteBot().editor(FILE)
+            .pressShortcut(new String[] { IKeyLookup.BACKSPACE_NAME });
 
-    // Alice hits Delete again
-    ALICE.remoteBot().editor(FILE).pressShortcut(new String[] {IKeyLookup.BACKSPACE_NAME});
-    // Bob enters o
-    BOB.remoteBot().editor(FILE).typeText("o");
+        BOB.remoteBot().editor(FILE).typeText("L");
+        // both sleep for less than 1000ms
 
-    Thread.sleep(1000);
-    String ALICEText = ALICE.remoteBot().editor(FILE).getText();
-    String BOBText = BOB.remoteBot().editor(FILE).getText();
+        // Alice hits Delete again
+        ALICE.remoteBot().editor(FILE)
+            .pressShortcut(new String[] { IKeyLookup.BACKSPACE_NAME });
+        // Bob enters o
+        BOB.remoteBot().editor(FILE).typeText("o");
 
-    ALICE.remoteBot().editor(FILE).closeWithoutSave();
-    BOB.remoteBot().editor(FILE).closeWithoutSave();
+        Thread.sleep(1000);
+        String ALICEText = ALICE.remoteBot().editor(FILE).getText();
+        String BOBText = BOB.remoteBot().editor(FILE).getText();
 
-    assertEquals(ALICEText, BOBText);
-  }
+        ALICE.remoteBot().editor(FILE).closeWithoutSave();
+        BOB.remoteBot().editor(FILE).closeWithoutSave();
+
+        assertEquals(ALICEText, BOBText);
+    }
 }
