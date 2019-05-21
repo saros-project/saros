@@ -6,78 +6,106 @@ import static saros.stf.client.tester.SarosTester.BOB;
 
 import java.util.List;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
-import saros.stf.client.util.Util;
 
 @TestLink(id = "Saros-44_simple_follow_mode_1")
 public class SimpleFollowModeITest extends StfTestCase {
 
-  private final String fileContent =
-      "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n";
+    private final String fileContent = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n";
 
-  @BeforeClass
-  public static void selectTesters() throws Exception {
-    select(ALICE, BOB);
-  }
+    @BeforeClass
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
+        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+    }
 
-  @Test
-  public void testSimpleFollowMode() throws Exception {
-    Util.setUpSessionWithProjectAndFile("foo", "readme.txt", fileContent, ALICE, BOB);
+    @Before
+    public void setUp() throws Exception {
+        closeAllShells();
+        closeAllEditors();
+    }
 
-    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/readme.txt");
+    @After
+    public void cleanUpSaros() throws Exception {
+        if (checkIfTestRunInTestSuite()) {
+            ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
+            tearDownSaros();
+        } else {
+            tearDownSarosLast();
+        }
 
-    ALICE.superBot().views().packageExplorerView().selectFile("foo", "readme.txt").open();
+    }
 
-    BOB.superBot().views().sarosView().selectUser(ALICE.getJID()).followParticipant();
+    @Test
+    public void testSimpleFollowMode() throws Exception {
 
-    ALICE.remoteBot().editor("readme.txt").typeText("123456789");
+        ALICE.superBot().internal().createFile("Foo1_Saros", "src/readme.txt",
+            fileContent);
 
-    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+        BOB.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
 
-    ALICE.remoteBot().editor("readme.txt").selectCurrentLine();
+        ALICE.superBot().views().packageExplorerView()
+            .selectFile("Foo1_Saros", "src", "readme.txt").open();
 
-    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
+            .followParticipant();
 
-    assertEquals(
-        ALICE.remoteBot().editor("readme.txt").getSelection(),
-        BOB.remoteBot().editor("readme.txt").getSelectionByAnnotation());
+        ALICE.remoteBot().editor("readme.txt").typeText("123456789");
 
-    ALICE.remoteBot().editor("readme.txt").navigateTo(0, 2);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
-    BOB.remoteBot().editor("readme.txt").navigateTo(0, 0);
+        ALICE.remoteBot().editor("readme.txt").selectCurrentLine();
 
-    ALICE
-        .remoteBot()
-        .editor("readme.txt")
-        .pressShortcut(IKeyLookup.BACKSPACE_NAME, IKeyLookup.BACKSPACE_NAME);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
-    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+        assertEquals(ALICE.remoteBot().editor("readme.txt").getSelection(),
+            BOB.remoteBot().editor("readme.txt").getSelectionByAnnotation());
 
-    assertEquals(
-        ALICE.remoteBot().editor("readme.txt").getTextOnCurrentLine(),
-        BOB.remoteBot().editor("readme.txt").getTextOnCurrentLine());
+        ALICE.remoteBot().editor("readme.txt").navigateTo(0, 2);
 
-    int lineCount = ALICE.remoteBot().editor("readme.txt").getLineCount();
+        BOB.remoteBot().editor("readme.txt").navigateTo(0, 0);
 
-    ALICE.remoteBot().editor("readme.txt").navigateTo(lineCount - 1, 0);
+        ALICE.remoteBot().editor("readme.txt").pressShortcut(new String[] {
+            IKeyLookup.BACKSPACE_NAME, IKeyLookup.BACKSPACE_NAME });
 
-    // type one character, otherwise bobs view port does not change because
-    // navigateTo does not trigger events
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
-    ALICE.remoteBot().editor("readme.txt").typeText("0");
+        assertEquals(
+            ALICE.remoteBot().editor("readme.txt").getTextOnCurrentLine(),
+            BOB.remoteBot().editor("readme.txt").getTextOnCurrentLine());
 
-    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+        int lineCount = ALICE.remoteBot().editor("readme.txt").getLineCount();
 
-    List<Integer> viewport = BOB.remoteBot().editor("readme.txt").getViewport();
+        ALICE.remoteBot().editor("readme.txt").navigateTo(lineCount - 1, 0);
 
-    assertEquals(lineCount, viewport.get(0) + viewport.get(1));
+        // type one character, otherwise bobs view port does not change because
+        // navigateTo does not trigger events
 
-    ALICE.superBot().internal().createFile("foo", "help.txt", "HELP ME !");
-    ALICE.superBot().views().packageExplorerView().selectFile("foo", "help.txt").open();
+        ALICE.remoteBot().editor("readme.txt").typeText("0");
 
-    BOB.remoteBot().editor("help.txt").waitUntilIsActive();
-  }
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+
+        List<Integer> viewport = BOB.remoteBot().editor("readme.txt")
+            .getViewport();
+
+        assertEquals(lineCount, viewport.get(0) + viewport.get(1));
+
+        ALICE.superBot().internal().createFile("Foo1_Saros", "src/help.txt",
+            "HELP ME !");
+        ALICE.superBot().views().packageExplorerView()
+            .selectFile("Foo1_Saros", "src", "help.txt").open();
+
+        BOB.remoteBot().editor("help.txt").waitUntilIsActive();
+
+    }
 }

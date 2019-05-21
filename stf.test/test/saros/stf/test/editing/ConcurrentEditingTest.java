@@ -6,86 +6,106 @@ import static saros.stf.client.tester.SarosTester.BOB;
 
 import java.rmi.RemoteException;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
-import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
 import saros.stf.test.stf.Constants;
 
 public class ConcurrentEditingTest extends StfTestCase {
 
-  @BeforeClass
-  public static void selectTesters() throws Exception {
-    select(ALICE, BOB);
-  }
+    @BeforeClass
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
+        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+    }
 
-  static final String FILE = "file.txt";
+    @Before
+    public void setUp() throws Exception {
+        closeAllShells();
+        closeAllEditors();
+    }
 
-  /**
-   * Test to reproduce bug "Inconsistency when concurrently writing at same position"
-   *
-   * @throws RemoteException
-   * @throws InterruptedException
-   * @see <a href="https://sourceforge.net/p/dpp/bugs/419/">Bug tracker entry 419</a>
-   */
-  @Test
-  public void testBugInconsistencyConcurrentEditing() throws Exception, InterruptedException {
-    ALICE.superBot().views().packageExplorerView().tree().newC().project(Constants.PROJECT1);
+    @After
+    public void cleanUpSaros() throws Exception {
+        if (checkIfTestRunInTestSuite()) {
+            ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
+            tearDownSaros();
+        } else {
+            tearDownSarosLast();
+        }
+    }
 
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .selectProject(Constants.PROJECT1)
-        .newC()
-        .file(FILE);
-    ALICE.remoteBot().waitUntilEditorOpen(FILE);
-    ALICE.remoteBot().editor(FILE).setTextFromFile("test/resources/lorem.txt");
-    ALICE.remoteBot().editor(FILE).navigateTo(0, 6);
+    static final String FILE = "file.txt";
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
-    BOB.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilFileExists(Constants.PROJECT1 + "/" + FILE);
-    BOB.superBot().views().packageExplorerView().selectFile(Constants.PROJECT1, FILE).open();
+    /**
+     * Test to reproduce bug "Inconsistency when concurrently writing at same
+     * position"
+     *
+     * @throws RemoteException
+     * @throws InterruptedException
+     *
+     * @see <a href="https://sourceforge.net/p/dpp/bugs/419/">Bug tracker entry
+     *      419</a>
+     */
+    @Test
+    public void testBugInconsistencyConcurrentEditing()
+        throws Exception, InterruptedException {
 
-    BOB.remoteBot().waitUntilEditorOpen(FILE);
-    BOB.remoteBot().editor(FILE).navigateTo(0, 30);
+        ALICE.superBot().internal().createFile(Constants.PROJECT1,
+            "src/file.txt", "");
+        ALICE.superBot().views().packageExplorerView()
+            .selectFile(Constants.PROJECT1, "src", FILE).open();
 
-    Thread.sleep(1000);
+        ALICE.remoteBot().waitUntilEditorOpen(FILE);
+        ALICE.remoteBot().editor(FILE)
+            .setTextFromFile("test/resources/lorem.txt");
+        ALICE.remoteBot().editor(FILE).navigateTo(0, 6);
 
-    // Alice goes to 0,6 and hits Delete
-    ALICE.remoteBot().activateWorkbench();
-    int waitActivate = 100;
-    ALICE.remoteBot().editor(FILE).show();
+        BOB.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared(Constants.PROJECT1 + "/src/" + FILE);
+        BOB.superBot().views().packageExplorerView()
+            .selectFile(Constants.PROJECT1, "src", FILE).open();
 
-    ALICE.remoteBot().editor(FILE).waitUntilIsActive();
-    // at the same time, Bob enters L at 0,30
-    BOB.remoteBot().activateWorkbench();
-    Thread.sleep(waitActivate);
-    BOB.remoteBot().editor(FILE).show();
-    BOB.remoteBot().editor(FILE).waitUntilIsActive();
+        BOB.remoteBot().waitUntilEditorOpen(FILE);
+        BOB.remoteBot().editor(FILE).navigateTo(0, 30);
 
-    Thread.sleep(waitActivate);
-    ALICE.remoteBot().editor(FILE).pressShortcut(new String[] {IKeyLookup.BACKSPACE_NAME});
+        Thread.sleep(1000);
 
-    BOB.remoteBot().editor(FILE).typeText("L");
-    // both sleep for less than 1000ms
+        // Alice goes to 0,6 and hits Delete
+        ALICE.remoteBot().activateWorkbench();
+        int waitActivate = 100;
+        ALICE.remoteBot().editor(FILE).show();
 
-    // Alice hits Delete again
-    ALICE.remoteBot().editor(FILE).pressShortcut(new String[] {IKeyLookup.BACKSPACE_NAME});
-    // Bob enters o
-    BOB.remoteBot().editor(FILE).typeText("o");
+        ALICE.remoteBot().editor(FILE).waitUntilIsActive();
+        // at the same time, Bob enters L at 0,30
+        BOB.remoteBot().activateWorkbench();
+        Thread.sleep(waitActivate);
+        BOB.remoteBot().editor(FILE).show();
+        BOB.remoteBot().editor(FILE).waitUntilIsActive();
 
-    Thread.sleep(1000);
-    String ALICEText = ALICE.remoteBot().editor(FILE).getText();
-    String BOBText = BOB.remoteBot().editor(FILE).getText();
+        Thread.sleep(waitActivate);
+        ALICE.remoteBot().editor(FILE)
+            .pressShortcut(new String[] { IKeyLookup.BACKSPACE_NAME });
 
-    ALICE.remoteBot().editor(FILE).closeWithoutSave();
-    BOB.remoteBot().editor(FILE).closeWithoutSave();
+        BOB.remoteBot().editor(FILE).typeText("L");
+        // both sleep for less than 1000ms
 
-    assertEquals(ALICEText, BOBText);
-  }
+        // Alice hits Delete again
+        ALICE.remoteBot().editor(FILE)
+            .pressShortcut(new String[] { IKeyLookup.BACKSPACE_NAME });
+        // Bob enters o
+        BOB.remoteBot().editor(FILE).typeText("o");
+
+        Thread.sleep(3000);
+        String ALICEText = ALICE.remoteBot().editor(FILE).getText();
+        String BOBText = BOB.remoteBot().editor(FILE).getText();
+
+        ALICE.remoteBot().editor(FILE).closeWithoutSave();
+        BOB.remoteBot().editor(FILE).closeWithoutSave();
+
+        assertEquals(ALICEText, BOBText);
+
+    }
 }

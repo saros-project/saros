@@ -20,6 +20,7 @@ import static saros.stf.shared.Constants.SHELL_PREFERNCES;
 import static saros.stf.shared.Constants.YES;
 
 import java.util.Arrays;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,197 +30,198 @@ import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
 public class AccountPreferenceTest extends StfTestCase {
 
-  @BeforeClass
-  public static void selectTesters() throws Exception {
-    select(ALICE);
-  }
+    @BeforeClass
+    public static void selectTesters() throws Exception {
+        selectFirst(ALICE);
+    }
 
-  @Before
-  public void runBeforeEveryTest() throws Exception {
-    closeAllShells();
-    resetDefaultAccount();
-  }
+    @Before
+    public void runBeforeEveryTest() throws Exception {
+        closeAllShells();
+        resetDefaultAccount();
+    }
 
-  // @Test(expected = TimeoutException.class)
-  // public void testCreateDuplicateAccount() throws Exception {
-  // ALICE.superBot().menuBar().saros().preferences()
-  // .addAccount(new JID("foo@bar.com"), "foobar");
-  //
-  // ALICE.superBot().menuBar().saros().preferences()
-  // .addAccount(new JID("foo@bar.com"), "foobar1");
-  // }
+    @AfterClass
+    public static void cleanUpSaros() throws Exception {
+        tearDownSarosLast();// tearDownSaros completely
 
-  @Test
-  public void testActivateAccountButton() throws Exception {
-    ALICE.superBot().menuBar().saros().preferences().addAccount(new JID("a@bar.com"), "a");
+    }
 
-    ALICE.superBot().menuBar().saros().preferences().addAccount(new JID("b@bar.com"), "b");
+    // @Test(expected = TimeoutException.class)
+    // public void testCreateDuplicateAccount() throws Exception {
+    // ALICE.superBot().menuBar().saros().preferences()
+    // .addAccount(new JID("foo@bar.com"), "foobar");
+    //
+    // ALICE.superBot().menuBar().saros().preferences()
+    // .addAccount(new JID("foo@bar.com"), "foobar1");
+    // }
 
-    ALICE.remoteBot().activateWorkbench();
+    @Test
+    public void testActivateAccountButton() throws Exception {
+        ALICE.superBot().menuBar().saros().preferences()
+            .addAccount(new JID("a@bar.com"), "a");
 
-    openPreferencePage();
+        ALICE.superBot().menuBar().saros().preferences()
+            .addAccount(new JID("b@bar.com"), "b");
 
-    IRemoteBotShell shell = getPreferencePageShell();
+        ALICE.remoteBot().activateWorkbench();
 
-    // UNIX SELECTS THE FIRST ENTRY BY DEFAULT
+        openPreferencePage();
 
-    // assertDefaultStates(shell);
+        IRemoteBotShell shell = getPreferencePageShell();
 
-    shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).select(ALICE.getBaseJid());
+        // UNIX SELECTS THE FIRST ENTRY BY DEFAULT
 
-    assertFalse(
-        "activate account button must no be enabled when the active account is already selected",
-        shell
-            .bot()
-            .buttonInGroup(BUTTON_ACTIVATE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
-            .isEnabled());
+        // assertDefaultStates(shell);
 
-    shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).select("a@bar.com");
+        shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
+            .select(ALICE.getBaseJid());
 
-    assertTrue(
-        "activate account button must be enabled when a non active account is selected",
-        shell
-            .bot()
-            .buttonInGroup(BUTTON_ACTIVATE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
-            .isEnabled());
+        assertFalse(
+            "activate account button must no be enabled when the active account is already selected",
+            shell.bot().buttonInGroup(BUTTON_ACTIVATE_ACCOUNT,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).isEnabled());
 
-    shell.bot().buttonInGroup(BUTTON_ACTIVATE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
+        shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
+            .select("a@bar.com");
 
-    shell = shell.bot().shell(ACTIVATE_ACCOUNT_DIALOG_TITLE);
+        assertTrue(
+            "activate account button must be enabled when a non active account is selected",
+            shell.bot().buttonInGroup(BUTTON_ACTIVATE_ACCOUNT,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).isEnabled());
 
-    shell.activate();
-    shell.bot().button(OK).click();
-    shell.waitShortUntilIsClosed();
+        shell.bot().buttonInGroup(BUTTON_ACTIVATE_ACCOUNT,
+            GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
 
-    shell = getPreferencePageShell();
+        shell = shell.bot().shell(ACTIVATE_ACCOUNT_DIALOG_TITLE);
 
-    String[] selection = shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).selection();
+        shell.activate();
+        shell.bot().button(OK).click();
+        shell.waitShortUntilIsClosed();
 
-    assertTrue(
-        "list item must not be deselected after activation",
-        selection != null && selection.length == 1 && selection[0].equals("a@bar.com"));
+        shell = getPreferencePageShell();
 
-    assertFalse(
-        "activate account button must no be enabled when the active account is already selected",
-        shell
-            .bot()
-            .buttonInGroup(BUTTON_ACTIVATE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
-            .isEnabled());
-  }
+        String[] selection = shell.bot()
+            .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).selection();
 
-  @Test
-  public void testRemoveAccountButton() throws Exception {
-    ALICE.superBot().menuBar().saros().preferences().addAccount(new JID("a@bar.com"), "a");
+        assertTrue("list item must not be deselected after activation",
+            selection != null && selection.length == 1
+                && selection[0].equals("a@bar.com"));
 
-    ALICE.superBot().menuBar().saros().preferences().addAccount(new JID("b@bar.com"), "b");
+        assertFalse(
+            "activate account button must no be enabled when the active account is already selected",
+            shell.bot().buttonInGroup(BUTTON_ACTIVATE_ACCOUNT,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).isEnabled());
+    }
 
-    ALICE.remoteBot().activateWorkbench();
+    @Test
+    public void testRemoveAccountButton() throws Exception {
+        ALICE.superBot().menuBar().saros().preferences()
+            .addAccount(new JID("a@bar.com"), "a");
 
-    openPreferencePage();
+        ALICE.superBot().menuBar().saros().preferences()
+            .addAccount(new JID("b@bar.com"), "b");
 
-    IRemoteBotShell shell = getPreferencePageShell();
+        ALICE.remoteBot().activateWorkbench();
 
-    // UNIX SELECTS THE FIRST ENTRY BY DEFAULT
+        openPreferencePage();
 
-    // assertDefaultStates(shell);
+        IRemoteBotShell shell = getPreferencePageShell();
 
-    shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).select(ALICE.getBaseJid());
+        // UNIX SELECTS THE FIRST ENTRY BY DEFAULT
 
-    assertFalse(
-        "remove account button must no be enabled when the active account is already selected",
-        shell
-            .bot()
-            .buttonInGroup(BUTTON_REMOVE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
-            .isEnabled());
+        // assertDefaultStates(shell);
 
-    shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).select("a@bar.com");
+        shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
+            .select(ALICE.getBaseJid());
 
-    assertTrue(
-        "remove account button must be enabled when a non active account is selected",
-        shell
-            .bot()
-            .buttonInGroup(BUTTON_REMOVE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
-            .isEnabled());
+        assertFalse(
+            "remove account button must no be enabled when the active account is already selected",
+            shell.bot().buttonInGroup(BUTTON_REMOVE_ACCOUNT,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).isEnabled());
 
-    shell.bot().buttonInGroup(BUTTON_REMOVE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
+        shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
+            .select("a@bar.com");
 
-    shell = shell.bot().shell(REMOVE_ACCOUNT_DIALOG_TITLE);
+        assertTrue(
+            "remove account button must be enabled when a non active account is selected",
+            shell.bot().buttonInGroup(BUTTON_REMOVE_ACCOUNT,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).isEnabled());
 
-    shell.activate();
-    shell.bot().button(NO).click();
-    shell.waitShortUntilIsClosed();
+        shell.bot().buttonInGroup(BUTTON_REMOVE_ACCOUNT,
+            GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
 
-    shell = getPreferencePageShell();
+        shell = shell.bot().shell(REMOVE_ACCOUNT_DIALOG_TITLE);
 
-    String[] selection = shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).selection();
+        shell.activate();
+        shell.bot().button(NO).click();
+        shell.waitShortUntilIsClosed();
 
-    assertTrue(
-        "list item must not be deselected after cancel the removal of the account",
-        selection != null && selection.length == 1 && selection[0].equals("a@bar.com"));
+        shell = getPreferencePageShell();
 
-    shell.bot().buttonInGroup(BUTTON_REMOVE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
+        String[] selection = shell.bot()
+            .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).selection();
 
-    shell = shell.bot().shell(REMOVE_ACCOUNT_DIALOG_TITLE);
+        assertTrue(
+            "list item must not be deselected after cancel the removal of the account",
+            selection != null && selection.length == 1
+                && selection[0].equals("a@bar.com"));
 
-    shell.activate();
-    shell.bot().button(YES).click();
-    shell.waitShortUntilIsClosed();
+        shell.bot().buttonInGroup(BUTTON_REMOVE_ACCOUNT,
+            GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
 
-    shell = getPreferencePageShell();
+        shell = shell.bot().shell(REMOVE_ACCOUNT_DIALOG_TITLE);
 
-    assertDefaultStates(shell);
+        shell.activate();
+        shell.bot().button(YES).click();
+        shell.waitShortUntilIsClosed();
 
-    assertFalse(
-        "account 'a@bar.com' is still in list after removal",
-        Arrays.asList(shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems())
-            .contains("a@bar.com"));
-  }
+        shell = getPreferencePageShell();
 
-  private void assertDefaultStates(IRemoteBotShell shell) throws Exception {
+        assertDefaultStates(shell);
 
-    assertEquals(
-        "item(s) were selected in the default state",
-        0,
-        shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).selectionCount());
+        assertFalse("account 'a@bar.com' is still in list after removal",
+            Arrays
+                .asList(shell.bot()
+                    .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems())
+                .contains("a@bar.com"));
+    }
 
-    assertFalse(
-        "activate account button must no be enabled without any item selected",
-        shell
-            .bot()
-            .buttonInGroup(BUTTON_ACTIVATE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
-            .isEnabled());
+    private void assertDefaultStates(IRemoteBotShell shell) throws Exception {
 
-    assertFalse(
-        "edit account must no be enabled without any item selected",
-        shell
-            .bot()
-            .buttonInGroup(BUTTON_EDIT_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
-            .isEnabled());
+        assertEquals("item(s) were selected in the default state", 0,
+            shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
+                .selectionCount());
 
-    assertFalse(
-        "activate account button must no be enabled without any item selected",
-        shell
-            .bot()
-            .buttonInGroup(REMOVE_ACCOUNT_DIALOG_TITLE, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
-            .isEnabled());
+        assertFalse(
+            "activate account button must no be enabled without any item selected",
+            shell.bot().buttonInGroup(BUTTON_ACTIVATE_ACCOUNT,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).isEnabled());
 
-    assertTrue(
-        "add account button must be enabled all the time",
-        shell
+        assertFalse("edit account must no be enabled without any item selected",
+            shell.bot().buttonInGroup(BUTTON_EDIT_ACCOUNT,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).isEnabled());
+
+        assertFalse(
+            "activate account button must no be enabled without any item selected",
+            shell.bot().buttonInGroup(REMOVE_ACCOUNT_DIALOG_TITLE,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).isEnabled());
+
+        assertTrue("add account button must be enabled all the time", shell
             .bot()
             .buttonInGroup(BUTTON_ADD_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .isEnabled());
-  }
+    }
 
-  private void openPreferencePage() throws Exception {
-    ALICE.remoteBot().activateWorkbench();
-    ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
-  }
+    private void openPreferencePage() throws Exception {
+        ALICE.remoteBot().activateWorkbench();
+        ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
+    }
 
-  private IRemoteBotShell getPreferencePageShell() throws Exception {
-    IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_PREFERNCES);
-    shell.activate();
-    shell.bot().tree().expandNode(NODE_SAROS).select();
-    return shell;
-  }
+    private IRemoteBotShell getPreferencePageShell() throws Exception {
+        IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_PREFERNCES);
+        shell.activate();
+        shell.bot().tree().expandNode(NODE_SAROS).select();
+        return shell;
+    }
 }

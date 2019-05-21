@@ -9,6 +9,7 @@ import static saros.stf.shared.Constants.ACCEPT;
 import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -21,226 +22,206 @@ import saros.stf.test.stf.Constants;
 
 public class NonHostInvitesContactTest extends StfTestCase {
 
-  /**
-   * Preconditions:
-   *
-   * <ol>
-   *   <li>Alice (Host, Write Access)
-   *   <li>Bob (Write Access)
-   *   <li>Carl (Write Access)
-   * </ol>
-   */
-  @BeforeClass
-  public static void selectTesters() throws Exception {
-    select(ALICE, BOB, CARL);
-  }
+    /**
+     * Preconditions:
+     *
+     * <ol>
+     * <li>Alice (Host, Write Access)
+     * <li>Bob (Write Access)
+     * <li>Carl (Write Access)
+     * </ol>
+     */
+    @BeforeClass
+    public static void selectTesters() throws Exception {
+        selectFirst(ALICE, BOB, CARL);
+    }
 
-  @Before
-  public void tidyUp() throws Exception {
-    closeAllShells();
-    closeAllEditors();
-    clearWorkspaces();
-  }
+    @Before
+    public void tidyUp() throws Exception {
+        closeAllShells();
+        closeAllEditors();
+        clearWorkspaces();
+    }
 
-  /**
-   * * Steps:
-   *
-   * <ol>
-   *   <li>ALICE share project with BOB.
-   *   <li>BOB invites CARL to session
-   * </ol>
-   *
-   * Result:
-   *
-   * <ol>
-   *   <li>Alice, Bob and Carl are participants and have {@link Permission#WRITE_ACCESS}.
-   * </ol>
-   *
-   * @throws Exception
-   */
-  @Test
-  @Ignore("Non-Host Invitation is currently deactivated")
-  public void AliceInvitesBobAndBobInvitesCarlTest() throws Exception {
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .tree()
-        .newC()
-        .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    @After
+    public void runAfterEveryTest() throws Exception {
+        leaveSessionHostFirst(ALICE);
+        clearWorkspaces();
+    }
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    @AfterClass
+    public static void cleanUpSaros() throws Exception {
+        tearDownSarosLast();
+    }
 
-    assertTrue(BOB.superBot().views().sarosView().isInSession());
-    assertTrue(ALICE.superBot().views().sarosView().isInSession());
+    /**
+     * * Steps:
+     *
+     * <ol>
+     * <li>ALICE share project with BOB.
+     * <li>BOB invites CARL to session
+     * </ol>
+     *
+     * Result:
+     *
+     * <ol>
+     * <li>Alice, Bob and Carl are participants and have
+     * {@link Permission#WRITE_ACCESS}.
+     * </ol>
+     *
+     * @throws Exception
+     */
+    @Test
+    @Ignore("Non-Host Invitation is currently deactivated")
+    public void AliceInvitesBobAndBobInvitesCarlTest() throws Exception {
+        ALICE.superBot().views().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
 
-    BOB.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        Util.buildSessionSequentially(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
-    BOB.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
+        assertTrue(BOB.superBot().views().sarosView().isInSession());
+        assertTrue(ALICE.superBot().views().sarosView().isInSession());
 
-    CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
+        BOB.superBot().views().packageExplorerView().waitUntilClassExists(
+            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+        BOB.superBot().views().sarosView().selectContact(CARL.getJID())
+            .addToSarosSession();
 
-    CARL.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-    assertTrue(CARL.superBot().views().sarosView().isInSession());
-  }
+        CARL.superBot()
+            .confirmShellAddProjectWithNewProject(Constants.PROJECT1);
 
-  @Test
-  @Ignore("Non-Host Invitation is currently deactivated")
-  public void CarlTypesAndEverybodyGetsCarlsTextTest() throws Exception {
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .tree()
-        .newC()
-        .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        CARL.superBot().views().packageExplorerView().waitUntilClassExists(
+            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+        assertTrue(CARL.superBot().views().sarosView().isInSession());
+    }
 
-    assertTrue(BOB.superBot().views().sarosView().isInSession());
-    assertTrue(ALICE.superBot().views().sarosView().isInSession());
+    @Test
+    @Ignore("Non-Host Invitation is currently deactivated")
+    public void CarlTypesAndEverybodyGetsCarlsTextTest() throws Exception {
+        ALICE.superBot().views().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
 
-    BOB.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        Util.buildSessionSequentially(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
-    BOB.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
+        assertTrue(BOB.superBot().views().sarosView().isInSession());
+        assertTrue(ALICE.superBot().views().sarosView().isInSession());
 
-    CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
+        BOB.superBot().views().packageExplorerView().waitUntilClassExists(
+            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+        BOB.superBot().views().sarosView().selectContact(CARL.getJID())
+            .addToSarosSession();
 
-    CARL.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-    assertTrue(CARL.superBot().views().sarosView().isInSession());
+        CARL.superBot()
+            .confirmShellAddProjectWithNewProject(Constants.PROJECT1);
 
-    CARL.superBot()
-        .views()
-        .packageExplorerView()
-        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-        .open();
+        CARL.superBot().views().packageExplorerView().waitUntilClassExists(
+            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    CARL.remoteBot().editor(Constants.CLS1_SUFFIX).selectLine(3);
+        assertTrue(CARL.superBot().views().sarosView().isInSession());
 
-    CARL.remoteBot().editor(Constants.CLS1_SUFFIX).typeText("Foo was going in a bar");
+        CARL.superBot().views().packageExplorerView()
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .open();
 
-    CARL.remoteBot().editor(Constants.CLS1_SUFFIX).save();
+        CARL.remoteBot().editor(Constants.CLS1_SUFFIX).selectLine(3);
 
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-        .open();
+        CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .typeText("Foo was going in a bar");
 
-    BOB.superBot()
-        .views()
-        .packageExplorerView()
-        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-        .open();
+        CARL.remoteBot().editor(Constants.CLS1_SUFFIX).save();
 
-    String textByCarl = CARL.remoteBot().editor(Constants.CLS1_SUFFIX).getText();
+        ALICE.superBot().views().packageExplorerView()
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .open();
 
-    ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsTextSame(textByCarl);
-    BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsTextSame(textByCarl);
+        BOB.superBot().views().packageExplorerView()
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .open();
 
-    assertTrue(ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getText().equals(textByCarl));
-    assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).getText().equals(textByCarl));
+        String textByCarl = CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .getText();
 
-    assertFalse(ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
-    assertFalse(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
-  }
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .waitUntilIsTextSame(textByCarl);
+        BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .waitUntilIsTextSame(textByCarl);
 
-  @Test
-  @Ignore("Non-Host Invitation is currently deactivated")
-  public void NonHostBobInvitesCarlAndLeavesTest() throws Exception {
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .tree()
-        .newC()
-        .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        assertTrue(ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getText()
+            .equals(textByCarl));
+        assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).getText()
+            .equals(textByCarl));
 
-    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+        assertFalse(ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
+        assertFalse(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
+    }
 
-    assertTrue(BOB.superBot().views().sarosView().isInSession());
-    assertTrue(ALICE.superBot().views().sarosView().isInSession());
+    @Test
+    @Ignore("Non-Host Invitation is currently deactivated")
+    public void NonHostBobInvitesCarlAndLeavesTest() throws Exception {
+        ALICE.superBot().views().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
 
-    BOB.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        Util.buildSessionSequentially(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
-    BOB.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
+        assertTrue(BOB.superBot().views().sarosView().isInSession());
+        assertTrue(ALICE.superBot().views().sarosView().isInSession());
 
-    CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
+        BOB.superBot().views().packageExplorerView().waitUntilClassExists(
+            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+        BOB.superBot().views().sarosView().selectContact(CARL.getJID())
+            .addToSarosSession();
 
-    CARL.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-    assertTrue(CARL.superBot().views().sarosView().isInSession());
+        CARL.superBot()
+            .confirmShellAddProjectWithNewProject(Constants.PROJECT1);
 
-    // //////////////////////////////////////////////////////////////
+        CARL.superBot().views().packageExplorerView().waitUntilClassExists(
+            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    BOB.superBot().views().sarosView().leaveSession();
+        assertTrue(CARL.superBot().views().sarosView().isInSession());
 
-    assertFalse(BOB.superBot().views().sarosView().isInSession());
+        // //////////////////////////////////////////////////////////////
 
-    CARL.superBot()
-        .views()
-        .packageExplorerView()
-        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-        .open();
+        BOB.superBot().views().sarosView().leaveSession();
 
-    ALICE
-        .superBot()
-        .views()
-        .packageExplorerView()
-        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-        .open();
+        assertFalse(BOB.superBot().views().sarosView().isInSession());
 
-    CARL.remoteBot().editor(Constants.CLS1_SUFFIX).selectLine(3);
-    CARL.remoteBot()
-        .editor(Constants.CLS1_SUFFIX)
-        .typeText("public static void main(String args[]){\n\n}");
+        CARL.superBot().views().packageExplorerView()
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .open();
 
-    ALICE
-        .remoteBot()
-        .editor(Constants.CLS1_SUFFIX)
-        .waitUntilIsTextSame(CARL.remoteBot().editor(Constants.CLS1_SUFFIX).getText());
+        ALICE.superBot().views().packageExplorerView()
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .open();
 
-    ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).selectLine(4);
-    ALICE
-        .remoteBot()
-        .editor(Constants.CLS1_SUFFIX)
-        .typeText("System.out.println(\"Hello World\");");
+        CARL.remoteBot().editor(Constants.CLS1_SUFFIX).selectLine(3);
+        CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .typeText("public static void main(String args[]){\n\n}");
 
-    CARL.remoteBot()
-        .editor(Constants.CLS1_SUFFIX)
-        .waitUntilIsTextSame(ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getText());
-  }
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsTextSame(
+            CARL.remoteBot().editor(Constants.CLS1_SUFFIX).getText());
 
-  @After
-  public void runAfterEveryTest() throws Exception {
-    leaveSessionHostFirst(ALICE);
-    clearWorkspaces();
-  }
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).selectLine(4);
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .typeText("System.out.println(\"Hello World\");");
+
+        CARL.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsTextSame(
+            ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getText());
+    }
+
 }

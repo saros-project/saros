@@ -5,80 +5,95 @@ import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 
 import java.util.List;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
-import saros.stf.client.util.Util;
-import saros.stf.shared.Constants.TypeOfCreateProject;
 
 @TestLink(id = "Saros-40_followmode_and_refactoring")
 public class RefactorInFollowModeTest extends StfTestCase {
 
-  @BeforeClass
-  public static void selectTesters() throws Exception {
-    select(ALICE, BOB);
-  }
+    @BeforeClass
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
+        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+    }
 
-  @Test
-  public void testRefactorInFollowMode() throws Exception {
+    @Before
+    public void setUp() throws Exception {
+        closeAllShells();
+        closeAllEditors();
+    }
 
-    ALICE.superBot().internal().createJavaProject("foo");
-    ALICE.superBot().internal().createJavaClass("foo", "bar", "HelloWorld");
+    @After
+    public void cleanUpSaros() throws Exception {
+        if (checkIfTestRunInTestSuite()) {
+            ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
+            tearDownSaros();
+        } else {
+            tearDownSarosLast();
+        }
+    }
 
-    ALICE.superBot().views().packageExplorerView().selectClass("foo", "bar", "HelloWorld").open();
+    @Test
+    public void testRefactorInFollowMode() throws Exception {
 
-    StringBuilder builder = new StringBuilder();
-    builder.append(ALICE.remoteBot().editor("HelloWorld.java").getText());
-    builder.setLength(builder.length() - 1);
-    builder.append("\n\nint myfoobar = 0;\n");
-    for (int i = 0; i < 10; i++)
-      builder
-          .append("public void test")
-          .append(i)
-          .append("()\n{myfoobar = ")
-          .append(i)
-          .append(
-              ";\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        ALICE.superBot().internal().createJavaClass("Foo1_Saros", "bar",
+            "HelloWorld");
 
-    builder.append("}");
+        ALICE.superBot().views().packageExplorerView()
+            .selectClass("Foo1_Saros", "bar", "HelloWorld").open();
 
-    ALICE.remoteBot().editor("HelloWorld.java").closeWithSave();
+        StringBuilder builder = new StringBuilder();
+        builder.append(ALICE.remoteBot().editor("HelloWorld.java").getText());
+        builder.setLength(builder.length() - 1);
+        builder.append("\n\nint myfoobar = 0;\n");
+        for (int i = 0; i < 10; i++)
+            builder.append("public void test").append(i)
+                .append("()\n{myfoobar = ").append(i).append(
+                    ";\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
-    Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+        builder.append("}");
 
-    BOB.superBot()
-        .views()
-        .packageExplorerView()
-        .waitUntilResourceIsShared("foo/src/bar/HelloWorld.java");
+        ALICE.remoteBot().editor("HelloWorld.java").closeWithSave();
 
-    ALICE.superBot().views().packageExplorerView().selectClass("foo", "bar", "HelloWorld").open();
+        BOB.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("Foo1_Saros/src/bar/HelloWorld.java");
 
-    BOB.superBot().views().sarosView().selectUser(ALICE.getJID()).followParticipant();
+        ALICE.superBot().views().packageExplorerView()
+            .selectClass("Foo1_Saros", "bar", "HelloWorld").open();
 
-    List<Integer> viewPortBeforeRefactor = BOB.remoteBot().editor("HelloWorld.java").getViewport();
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
+            .followParticipant();
 
-    ALICE.remoteBot().editor("HelloWorld.java").setText(builder.toString());
+        List<Integer> viewPortBeforeRefactor = BOB.remoteBot()
+            .editor("HelloWorld.java").getViewport();
 
-    ALICE.remoteBot().editor("HelloWorld.java").navigateTo(4, 8);
+        ALICE.remoteBot().editor("HelloWorld.java").setText(builder.toString());
 
-    // wait for the text to be selected
-    Thread.sleep(10000);
+        ALICE.remoteBot().editor("HelloWorld.java").navigateTo(4, 8);
 
-    ALICE.remoteBot().activateWorkbench();
-    ALICE.remoteBot().menu("Refactor").menu("Rename...").click();
-    ALICE.remoteBot().editor("HelloWorld.java").typeText("bar\n");
+        // wait for the text to be selected
+        Thread.sleep(10000);
 
-    // refactor might take a while
-    Thread.sleep(10000);
+        ALICE.remoteBot().activateWorkbench();
+        ALICE.remoteBot().menu("Refactor").menu("Rename...").click();
+        ALICE.remoteBot().editor("HelloWorld.java").typeText("bar\n");
 
-    List<Integer> viewPortAfterRefactor = BOB.remoteBot().editor("HelloWorld.java").getViewport();
+        // refactor might take a while
+        Thread.sleep(10000);
 
-    assertEquals("viewport changed", viewPortBeforeRefactor.get(0), viewPortAfterRefactor.get(0));
+        List<Integer> viewPortAfterRefactor = BOB.remoteBot()
+            .editor("HelloWorld.java").getViewport();
 
-    assertEquals(
-        "file content is not the same",
-        ALICE.remoteBot().editor("HelloWorld.java").getText(),
-        BOB.remoteBot().editor("HelloWorld.java").getText());
-  }
+        assertEquals("viewport changed", viewPortBeforeRefactor.get(0),
+            viewPortAfterRefactor.get(0));
+
+        assertEquals("file content is not the same",
+            ALICE.remoteBot().editor("HelloWorld.java").getText(),
+            BOB.remoteBot().editor("HelloWorld.java").getText());
+
+    }
 }
