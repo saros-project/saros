@@ -8,15 +8,14 @@ import static saros.stf.shared.Constants.ACCEPT;
 import static saros.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.test.stf.Constants;
-import saros.stf.testwatcher.EditDuringInvitationTestWatcher;
 import saros.test.util.EclipseTestThread;
 
 @TestLink(id = "Saros-36_edit_during_invitation")
@@ -28,12 +27,9 @@ public class EditDuringInvitationTest extends StfTestCase {
         select(ALICE, BOB, CARL);
     }
 
-    @Rule
-    public EditDuringInvitationTestWatcher editduringinvitation = new EditDuringInvitationTestWatcher();
-
     @Test
     public void testEditDuringInvitation() throws Exception {
-
+        Assert.assertTrue(false);
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 

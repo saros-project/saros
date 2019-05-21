@@ -34,10 +34,17 @@ import saros.stf.test.session.EstablishSessionWithDifferentTransportModesTest;
 import saros.stf.test.session.OverlappingSharingTest;
 import saros.stf.test.whiteboard.ObjectCreationTest;
 
-//order of the test classes is important
+//order of the test classes is important if you want to test first Saros' main functionalities
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ Share2UsersSequentiallyTest.class,
+    HostInvitesBelatedlyTest.class, InviteWithDifferentVersionsTest.class,
+    ShareProjectUsingExistingProjectTest.class, ModifyNonSharedFilesTest.class,
+    ShareFilesFromOneProjectToMultipleRemoteProjectsTest.class,
+    ShareFilesToProjectsWithDifferentEncodingTest.class,
+    HandleContactsTest.class, Share2UsersSequentiallyInstantSessionTest.class,
+    EstablishSessionWithDifferentTransportModesTest.class, AddContactTest.class,
+    StartSessionWizardTest.class, OverlappingSharingTest.class,
     ChatViewFunctionsTest.class, AddMultipleFilesTest.class,
     ModifyFileWithoutEditorTest.class, RecoveryWhileTypingTest.class,
     ConcurrentEditingTest.class, EditDifferentFilesTest.class,
@@ -45,16 +52,9 @@ import saros.stf.test.whiteboard.ObjectCreationTest;
     FolderOperationsTest.class, SimpleFollowModeIITest.class,
     FollowModeDisabledInNewSessionTest.class, FollowModeTest.class,
     RefactorInFollowModeTest.class, SimpleFollowModeITest.class,
-    ObjectCreationTest.class, WriteAccessChangeAndImmediateWriteTest.class,
-    HostInvitesBelatedlyTest.class, InviteWithDifferentVersionsTest.class,
-    ShareProjectUsingExistingProjectTest.class, ModifyNonSharedFilesTest.class,
-    ShareFilesFromOneProjectToMultipleRemoteProjectsTest.class,
-    ShareFilesToProjectsWithDifferentEncodingTest.class,
-    HandleContactsTest.class, EditFileThatIsNotOpenOnRemoteSideTest.class,
-    Share2UsersSequentiallyInstantSessionTest.class,
-    EstablishSessionWithDifferentTransportModesTest.class, AddContactTest.class,
-    StartSessionWizardTest.class, DerivedResourcesTest.class,
-    OverlappingSharingTest.class })
+    ObjectCreationTest.class, DerivedResourcesTest.class,
+    EditFileThatIsNotOpenOnRemoteSideTest.class,
+    WriteAccessChangeAndImmediateWriteTest.class })
 public class AliceAndBobTestSuite {
     //
 }

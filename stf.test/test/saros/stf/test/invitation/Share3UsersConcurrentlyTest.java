@@ -7,14 +7,12 @@ import static saros.stf.client.tester.SarosTester.BOB;
 import static saros.stf.client.tester.SarosTester.CARL;
 
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import saros.session.User.Permission;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
 import saros.stf.test.stf.Constants;
-import saros.stf.testwatcher.Share3UsersConcurrentlyTestWatcher;
 
 public class Share3UsersConcurrentlyTest extends StfTestCase {
 
@@ -32,10 +30,6 @@ public class Share3UsersConcurrentlyTest extends StfTestCase {
 
         select(ALICE, BOB, CARL);
     }
-
-    @Rule
-
-    public Share3UsersConcurrentlyTestWatcher share3usersconcurrently = new Share3UsersConcurrentlyTestWatcher();
 
     /**
      * Steps:

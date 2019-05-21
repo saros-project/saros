@@ -22,23 +22,26 @@ import saros.stf.test.invitation.UserDeclinesInvitationToCurrentSessionTest;
 import saros.stf.test.roster.SortContactsOnlineOverOfflineTest;
 import saros.stf.test.session.CreatingNewFileTest;
 import saros.stf.test.session.ShareMultipleProjectsTest;
-//order of the test classes is important
 
+//order of the test classes is important if you want to test first the main Saros' functionalities
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ Share3UsersConcurrentlyTest.class,
-    CreateSameFileAtOnceTest.class, EditDuringInvitationTest.class,
-    EditDuringNonHostAddsProjectTest.class,
-    ConcurrentEditingInsert100CharactersTest.class,
-    ConcurrentEditingWith3UsersTest.class, Share3UsersLeavingSessionTest.class,
-    UserDeclinesInvitationToCurrentSessionTest.class,
-    EditDuringNonHostInvitationTest.class, EditDuringInvitationStressTest.class,
-    CreatingNewFileTest.class, Share3UsersSequentiallyTest.class,
+@Suite.SuiteClasses({
+
+    Share3UsersConcurrentlyTest.class, EditDuringInvitationTest.class,
+    EditDuringInvitationStressTest.class, Share3UsersSequentiallyTest.class,
     ModifyDocumentBeforeProjectNegotiationTest.class,
     AwarenessInformationVisibleAfterInvitationTest.class,
     InviteAndLeaveStressTest.class,
     InviteAndLeaveStressInstantSessionTest.class,
     NonHostInvitesContactTest.class, SortContactsOnlineOverOfflineTest.class,
-    ShareMultipleProjectsTest.class, FileOperationsTest.class
+    ShareMultipleProjectsTest.class, FileOperationsTest.class,
+    CreateSameFileAtOnceTest.class,
+    ConcurrentEditingInsert100CharactersTest.class,
+    ConcurrentEditingWith3UsersTest.class,
+    EditDuringNonHostAddsProjectTest.class, CreatingNewFileTest.class,
+    Share3UsersLeavingSessionTest.class,
+    UserDeclinesInvitationToCurrentSessionTest.class,
+    EditDuringNonHostInvitationTest.class
 
 })
 public class AliceAndBobAndCarlTestSuite {

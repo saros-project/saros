@@ -22,11 +22,6 @@ import saros.net.xmpp.JID;
 import saros.stf.client.tester.AbstractTester;
 import saros.stf.client.util.Util;
 import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
-import saros.stf.testwatcher.ConcurrentEditingTestWatcher;
-import saros.stf.testwatcher.EditDuringInvitationTestWatcher;
-import saros.stf.testwatcher.Share2UsersSequentiallyTestWatcher;
-import saros.stf.testwatcher.Share3UsersConcurrentlyTestWatcher;
-import saros.stf.testwatcher.SimpleFollowModeIITestWatcher;
 import saros.test.util.EclipseTestThread;
 
 public abstract class StfTestCase {
@@ -35,7 +30,7 @@ public abstract class StfTestCase {
         .getLogger(StfTestCase.class.getName());
 
     /** JUnit monitor. Do <b>NOT</b> call any method of this instance ! */
-
+    public static ArrayList<String> allFailedTests = new ArrayList<String>();
     @Rule
     public final TestWatcher watcher = new TestWatcher() {
         @Override
@@ -48,6 +43,11 @@ public abstract class StfTestCase {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 e.printStackTrace(new PrintStream(out));
                 this.logMessage(new String(out.toByteArray()));
+                // all names of the test classes are saved in allClassNames, in
+                // order to see if the test is run by itself or in a TestSuite
+                if (!allFailedTests.contains(description.getClassName())) {
+                    allFailedTests.add(description.getClassName());
+                }
             }
         }
 
@@ -55,6 +55,7 @@ public abstract class StfTestCase {
         public void succeeded(Description description) {
             this.logMessage("******* TESTCASE " + description.getClassName()
                 + ":" + description.getMethodName() + " SUCCEDED *******");
+
         }
 
         @Override
@@ -683,7 +684,12 @@ public abstract class StfTestCase {
      * Checks if the test for establishing a session between two users passed
      */
     public static boolean checkIfShare2UsersSequentiallySucceeded() {
-        return Share2UsersSequentiallyTestWatcher.checkIfAllSucceeded();
+        for (String failedTest : allFailedTests) {
+            if (failedTest.contains("Share2UsersSequentiallyTest")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -691,7 +697,12 @@ public abstract class StfTestCase {
      * users passed
      */
     public static boolean checkIfShare3UsersConcurrentlySucceeded() {
-        return Share3UsersConcurrentlyTestWatcher.checkIfAllSucceeded();
+        for (String failedTest : allFailedTests) {
+            if (failedTest.contains("Share3UsersConcurrentlyTest")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -699,8 +710,13 @@ public abstract class StfTestCase {
      * users passed and if ConcurrentEditingTest passed
      */
     public static boolean checkIfShare2UsersSequentiallyandConcurrentEditingSucceeded() {
-        return Share2UsersSequentiallyTestWatcher.checkIfAllSucceeded()
-            && ConcurrentEditingTestWatcher.checkIfAllSucceeded();
+        for (String failedTest : allFailedTests) {
+            if (failedTest.contains("Share2UsersSequentiallyTest")
+                || failedTest.contains("ConcurrentEditingTest")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -709,8 +725,13 @@ public abstract class StfTestCase {
      */
 
     public static boolean checkIfShare2UsersSequentiallyandSimpleFollowModeIISucceeded() {
-        return Share2UsersSequentiallyTestWatcher.checkIfAllSucceeded()
-            && SimpleFollowModeIITestWatcher.checkIfAllSucceeded();
+        for (String failedTest : allFailedTests) {
+            if (failedTest.contains("Share2UsersSequentiallyTest")
+                || failedTest.contains("SimpleFollowModeIITest")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -718,8 +739,13 @@ public abstract class StfTestCase {
      * users passed and EditDuringInvitationTest passed
      */
     public static boolean checkIfShare2UsersSequentiallyandEditDuringInvitationSucceeded() {
-        return Share2UsersSequentiallyTestWatcher.checkIfAllSucceeded()
-            && EditDuringInvitationTestWatcher.checkIfAllSucceeded();
+        for (String failedTest : allFailedTests) {
+            if (failedTest.contains("Share2UsersSequentiallyTest")
+                || failedTest.contains("EditDuringInvitationTest")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -727,8 +753,13 @@ public abstract class StfTestCase {
      * users passed and ConcurrentEditingTest passed
      */
     public static boolean checkIfShare3UsersConcurrentlyandConcurrentEditingSucceeded() {
-        return Share3UsersConcurrentlyTestWatcher.checkIfAllSucceeded()
-            && ConcurrentEditingTestWatcher.checkIfAllSucceeded();
+        for (String failedTest : allFailedTests) {
+            if (failedTest.contains("Share3UsersConcurrentlyTest")
+                || failedTest.contains("ConcurrentEditingTest")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -736,7 +767,13 @@ public abstract class StfTestCase {
      * users passed and EditDuringInvitationTest passed
      */
     public static boolean Share3UsersConcurrentlyandEditDuringInvitationSucceeded() {
-        return Share3UsersConcurrentlyTestWatcher.checkIfAllSucceeded()
-            && EditDuringInvitationTestWatcher.checkIfAllSucceeded();
+
+        for (String failedTest : allFailedTests) {
+            if (failedTest.contains("Share3UsersConcurrentlyTest")
+                || failedTest.contains("EditDuringInvitationTest")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

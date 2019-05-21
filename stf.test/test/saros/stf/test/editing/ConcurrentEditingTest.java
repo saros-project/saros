@@ -8,13 +8,11 @@ import java.rmi.RemoteException;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.junit.Assume;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
 import saros.stf.test.stf.Constants;
-import saros.stf.testwatcher.ConcurrentEditingTestWatcher;
 
 public class ConcurrentEditingTest extends StfTestCase {
 
@@ -25,8 +23,6 @@ public class ConcurrentEditingTest extends StfTestCase {
     }
 
     static final String FILE = "file.txt";
-    @Rule
-    public ConcurrentEditingTestWatcher concurrenteditting = new ConcurrentEditingTestWatcher();
 
     /**
      * Test to reproduce bug "Inconsistency when concurrently writing at same

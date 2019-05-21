@@ -6,14 +6,12 @@ import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
 
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import saros.session.User.Permission;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
 import saros.stf.test.stf.Constants;
-import saros.stf.testwatcher.Share2UsersSequentiallyTestWatcher;
 
 public class Share2UsersSequentiallyTest extends StfTestCase {
 
@@ -21,9 +19,6 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
     public static void selectTesters() throws Exception {
         select(ALICE, BOB);
     }
-
-    @Rule
-    public Share2UsersSequentiallyTestWatcher share2userssequentially = new Share2UsersSequentiallyTestWatcher();
 
     /**
      * Steps:
@@ -43,7 +38,6 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
      */
     @Test
     public void testAliceShareProjectWithBobSequentially() throws Exception {
-
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
