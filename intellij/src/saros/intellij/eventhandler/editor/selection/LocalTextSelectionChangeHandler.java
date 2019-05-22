@@ -4,10 +4,10 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.editor.event.SelectionListener;
 import org.jetbrains.annotations.NotNull;
-import org.picocontainer.Startable;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
+import saros.repackaged.picocontainer.Startable;
 
 /** Dispatches activities for selection changes. */
 public class LocalTextSelectionChangeHandler implements DisableableHandler, Startable {

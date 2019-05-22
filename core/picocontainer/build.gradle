@@ -1,0 +1,45 @@
+
+/*
+   This build applies our picocontainer patches and creates a new picocontainer jar with a different package naming
+   instead of the package structure org.picocontainer the package name saros.org.picocontainer is used.
+
+   Even if this sub-project is integrated in the whole build process (via the setting.gradle). It is intended to configure
+   this project only in this file and not in the parent build.gradle (in the repository root).
+
+   This is required, because intellij uses another picocontainer version and this results in conflicts during build.
+   The previous solution was to exclude the picocontainer jar from the intellij installation (with a hidden feature
+   of the gradle/intellij plugin) this feature will be removed.
+*/
+
+buildscript {
+  repositories {
+    maven {
+      url 'https://plugins.gradle.org/m2/'
+    }
+  }
+  dependencies {
+    classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
+  }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+version = '2.11.2'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+  implementation "org.picocontainer:picocontainer:$version"
+  testImplementation 'junit:junit:4.12'
+}
+
+shadowJar {
+  relocate 'org.picocontainer', 'saros.repackaged.picocontainer'
+  baseName = 'picocontainer'
+  classifier = 'patched_relocated'
+  version = version
+}

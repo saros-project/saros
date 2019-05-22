@@ -2,13 +2,13 @@ package saros.ui.wizards;
 
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.editor.colorstorage.UserColorID;
 import saros.feedback.ErrorLogManager;
 import saros.feedback.FeedbackManager;
 import saros.feedback.StatisticManagerConfiguration;
 import saros.preferences.PreferenceConstants;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.wizards.pages.ColorChooserWizardPage;

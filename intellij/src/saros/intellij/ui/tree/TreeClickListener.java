@@ -5,8 +5,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSessionManager;
 import saros.session.User;
 

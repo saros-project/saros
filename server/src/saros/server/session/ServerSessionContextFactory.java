@@ -1,6 +1,6 @@
 package saros.server.session;
 
-import org.picocontainer.MutablePicoContainer;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.server.editor.ServerEditorManager;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionContextFactory;

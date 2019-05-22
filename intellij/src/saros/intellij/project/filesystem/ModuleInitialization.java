@@ -10,11 +10,11 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
 import org.apache.log4j.Logger;
-import org.picocontainer.Startable;
 import saros.exceptions.ModuleNotFoundException;
 import saros.filesystem.IProject;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.wizards.AddProjectToSessionWizard;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 import saros.session.ISessionListener;
 

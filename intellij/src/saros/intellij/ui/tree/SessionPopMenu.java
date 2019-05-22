@@ -2,9 +2,9 @@ package saros.intellij.ui.tree;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.editor.FollowModeManager;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSessionManager;
 import saros.session.User;
 

@@ -2,8 +2,6 @@ package saros.intellij.context;
 
 import com.intellij.openapi.project.Project;
 import java.util.Arrays;
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
 import saros.communication.connection.IProxyResolver;
 import saros.communication.connection.NullProxyResolver;
 import saros.context.AbstractContextFactory;
@@ -36,6 +34,8 @@ import saros.intellij.ui.swt_browser.IntelliJUIResourceLocator;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.Preferences;
+import saros.repackaged.picocontainer.BindKey;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ISarosSessionContextFactory;
 import saros.synchronize.UISynchronizer;
 import saros.ui.ide_embedding.DialogManager;

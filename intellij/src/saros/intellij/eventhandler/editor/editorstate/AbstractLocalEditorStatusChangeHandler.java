@@ -4,8 +4,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
-import org.picocontainer.Startable;
 import saros.intellij.eventhandler.DisableableHandler;
+import saros.repackaged.picocontainer.Startable;
 
 /**
  * Abstract class defining the base functionality needed to create and register/unregister a

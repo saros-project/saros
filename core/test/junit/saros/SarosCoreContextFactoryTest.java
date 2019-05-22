@@ -4,8 +4,6 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
 import saros.communication.connection.IProxyResolver;
 import saros.context.CoreContextFactory;
 import saros.context.IContainerContext;
@@ -17,6 +15,8 @@ import saros.filesystem.IWorkspace;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.Preferences;
+import saros.repackaged.picocontainer.BindKey;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.test.mocks.ContextMocker;
 import saros.test.util.MemoryPreferenceStore;
 

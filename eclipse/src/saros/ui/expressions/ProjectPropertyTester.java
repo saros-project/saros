@@ -3,9 +3,9 @@ package saros.ui.expressions;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.filesystem.ResourceAdapterFactory;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 

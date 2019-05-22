@@ -1,7 +1,6 @@
 package saros.editor;
 
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.picocontainer.Startable;
 import saros.activities.EditorActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
@@ -14,6 +13,7 @@ import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;

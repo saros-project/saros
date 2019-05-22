@@ -13,11 +13,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.preferences.PreferenceConstants;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 @Component(module = "prefs")
 public class CommunicationPreferencePage extends FieldEditorPreferencePage

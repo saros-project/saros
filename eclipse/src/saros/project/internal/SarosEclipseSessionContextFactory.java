@@ -1,6 +1,5 @@
 package saros.project.internal;
 
-import org.picocontainer.MutablePicoContainer;
 import saros.feedback.DataTransferCollector;
 import saros.feedback.ErrorLogManager;
 import saros.feedback.FeedbackManager;
@@ -16,6 +15,7 @@ import saros.feedback.TextEditCollector;
 import saros.project.FileActivityConsumer;
 import saros.project.FolderActivityConsumer;
 import saros.project.SharedResourcesManager;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionContextFactory;
 import saros.session.SarosCoreSessionContextFactory;

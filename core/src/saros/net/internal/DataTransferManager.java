@@ -17,7 +17,6 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
-import org.picocontainer.annotations.Nullable;
 import saros.annotations.Component;
 import saros.context.IContextKeyBindings.IBBStreamService;
 import saros.context.IContextKeyBindings.Socks5StreamService;
@@ -31,6 +30,7 @@ import saros.net.stream.StreamMode;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.repackaged.picocontainer.annotations.Nullable;
 
 /**
  * This class is responsible for handling all transfers of binary data. It maintains a map of
