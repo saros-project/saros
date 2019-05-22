@@ -53,7 +53,7 @@ public class RosterTrackerTest {
 
   private XMPPConnectionService connectionServiceMock;
 
-  private Capture<IConnectionListener> connectionListener = new Capture<IConnectionListener>();
+  private Capture<IConnectionListener> connectionListener = Capture.newInstance();
 
   private XMPPConnectionService createXMPPConnectionServiceMock(
       Capture<IConnectionListener> connectionListener) {

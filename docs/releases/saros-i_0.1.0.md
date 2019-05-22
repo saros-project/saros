@@ -28,6 +28,7 @@ Saros/I can be installed from the JetBrains plugin repository or from disk.
 - Choose "Settings..." > "Plugins".
 - Choose a source to install from:
   - *From the plugin repository:* Select the tab "Marketplace"
+    - If you have not already done so, add the `alpha` release channel to your list of plugin repositories. A guide on how to do this is given [here](https://www.jetbrains.org/intellij/sdk/docs/plugin_repository/custom_channels.html#configuring-a-custom-channel-in-intellij-platform-based-ides).
     - Search for "Saros" in the search bar and select the entry from the list.
     - Click the "Install" button.
     - Close the settings menu.
