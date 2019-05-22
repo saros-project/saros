@@ -3,9 +3,9 @@ package saros.ui.browser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.picocontainer.MutablePicoContainer;
 import saros.HTMLUIContextFactory;
 import saros.context.IContextFactory;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.synchronize.UISynchronizer;
 import saros.test.mocks.ContextMocker;
 

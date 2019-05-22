@@ -7,11 +7,11 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccountStore;
 import saros.net.xmpp.JID;
 import saros.preferences.Preferences;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.util.SWTUtils;
 
 /**

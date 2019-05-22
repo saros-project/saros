@@ -16,9 +16,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.picocontainer.Disposable;
 import saros.filesystem.IFile;
 import saros.intellij.editor.colorstorage.ColorManager;
+import saros.repackaged.picocontainer.Disposable;
 import saros.session.User;
 
 /** Annotation manager used to create, delete and manage annotations for a Saros session. */

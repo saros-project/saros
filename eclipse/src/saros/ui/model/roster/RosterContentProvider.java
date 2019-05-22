@@ -13,12 +13,12 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.packet.Presence;
-import org.picocontainer.annotations.Inject;
 import saros.SarosConstants;
 import saros.SarosPluginContext;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.discovery.DiscoveryManager;
 import saros.net.xmpp.discovery.DiscoveryManagerListener;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.model.TreeContentProvider;
 import saros.ui.util.ViewerUtils;
 

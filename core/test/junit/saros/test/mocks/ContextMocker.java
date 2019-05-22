@@ -3,16 +3,16 @@ package saros.test.mocks;
 import java.util.ArrayList;
 import java.util.List;
 import org.easymock.EasyMock;
-import org.picocontainer.BindKey;
-import org.picocontainer.DefaultPicoContainer;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.Parameter;
-import org.picocontainer.PicoBuilder;
-import org.picocontainer.injectors.AnnotatedFieldInjection;
-import org.picocontainer.injectors.CompositeInjection;
-import org.picocontainer.injectors.ConstructorInjection;
 import org.powermock.api.easymock.PowerMock;
 import saros.context.IContextFactory;
+import saros.repackaged.picocontainer.BindKey;
+import saros.repackaged.picocontainer.DefaultPicoContainer;
+import saros.repackaged.picocontainer.MutablePicoContainer;
+import saros.repackaged.picocontainer.Parameter;
+import saros.repackaged.picocontainer.PicoBuilder;
+import saros.repackaged.picocontainer.injectors.AnnotatedFieldInjection;
+import saros.repackaged.picocontainer.injectors.CompositeInjection;
+import saros.repackaged.picocontainer.injectors.ConstructorInjection;
 
 /**
  * Facilitates integration tests by offering multiple ways to create a PicoContainer full of mocked

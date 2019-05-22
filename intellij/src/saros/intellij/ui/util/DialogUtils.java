@@ -6,8 +6,8 @@ import java.awt.Component;
 import java.awt.Container;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Dialog message helper that shows Dialogs in the current Thread. */
 public class DialogUtils {

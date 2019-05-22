@@ -3,10 +3,10 @@ package saros.intellij.ui.actions;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import org.picocontainer.annotations.Inject;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Connects to XMPP/Jabber server with given account or active account */
 public class ConnectServerAction extends AbstractSarosAction {

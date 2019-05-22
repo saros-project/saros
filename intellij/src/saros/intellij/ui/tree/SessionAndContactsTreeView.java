@@ -10,7 +10,6 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.jivesoftware.smack.Connection;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccountStore;
 import saros.intellij.ui.util.IconManager;
@@ -18,6 +17,7 @@ import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Saros tree view for contacts and sessions. */
 public class SessionAndContactsTreeView extends JTree {

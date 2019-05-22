@@ -8,9 +8,9 @@ import com.intellij.openapi.ui.Messages;
 import java.awt.Component;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.exceptions.IllegalAWTContextException;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
  * Dialog helper used to show messages in safe manner by starting it on the AWT event dispatcher

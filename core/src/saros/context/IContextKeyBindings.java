@@ -23,16 +23,17 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.PicoContainer;
-import org.picocontainer.annotations.Bind;
+import saros.repackaged.picocontainer.BindKey;
+import saros.repackaged.picocontainer.MutablePicoContainer;
+import saros.repackaged.picocontainer.PicoContainer;
+import saros.repackaged.picocontainer.annotations.Bind;
 
 /**
  * This interface contains marker interfaces for binding components to specific keys.
  *
  * @see PicoContainer#getComponent(Object)
- * @see MutablePicoContainer#addComponent(Object, Object, org.picocontainer.Parameter...)
+ * @see MutablePicoContainer#addComponent(Object, Object,
+ *     saros.repackaged.picocontainer.Parameter...)
  * @see BindKey#bindKey(Class, Class)
  */
 public interface IContextKeyBindings {

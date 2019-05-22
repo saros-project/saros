@@ -174,7 +174,7 @@ public class DataTransferManagerTest {
 
   private XMPPConnectionService connectionServiceStub;
 
-  private Capture<IConnectionListener> connectionListener = new Capture<IConnectionListener>();
+  private Capture<IConnectionListener> connectionListener = Capture.newInstance();
 
   private Connection connectionMock;
 

@@ -21,9 +21,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.intellij.ui.Messages;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Selects local project. FIXME: Add tabs for multiple projects. */
 public class SelectProjectPage extends AbstractWizardPage {

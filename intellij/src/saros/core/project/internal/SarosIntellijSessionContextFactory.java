@@ -1,6 +1,5 @@
 package saros.core.project.internal;
 
-import org.picocontainer.MutablePicoContainer;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.annotations.AnnotationManager;
@@ -16,6 +15,7 @@ import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler
 import saros.intellij.followmode.FollowModeNotificationDispatcher;
 import saros.intellij.project.SharedResourcesManager;
 import saros.intellij.project.filesystem.ModuleInitialization;
+import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionContextFactory;
 import saros.session.SarosCoreSessionContextFactory;

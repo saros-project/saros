@@ -1,8 +1,8 @@
 package saros;
 
-import org.picocontainer.PicoCompositionException;
-import org.picocontainer.annotations.Inject;
 import saros.context.IContainerContext;
+import saros.repackaged.picocontainer.PicoCompositionException;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
  * Provides the possibility to initialize a component with the components hold in the given {@link

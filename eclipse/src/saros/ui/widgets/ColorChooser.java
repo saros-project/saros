@@ -13,9 +13,9 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.editor.annotations.SarosAnnotation;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 

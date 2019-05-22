@@ -13,7 +13,7 @@ public class IResourceTest {
     org.eclipse.core.resources.IFolder folder =
         EasyMock.createMock(org.eclipse.core.resources.IFolder.class);
 
-    Capture<Class<Object>> mappedAdapterClassCapture = new Capture<Class<Object>>();
+    Capture<Class<Object>> mappedAdapterClassCapture = Capture.newInstance();
 
     EasyMock.expect(folder.getAdapter(EasyMock.capture(mappedAdapterClassCapture)))
         .andStubReturn(folder);
