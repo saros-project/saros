@@ -10,24 +10,24 @@ import org.junit.Test;
 import saros.stf.client.StfHtmlTestCase;
 
 public class MainViewTest extends StfHtmlTestCase {
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        selectFirst(ALICE);
-    }
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    selectFirst(ALICE);
+  }
 
-    @AfterClass
-    public static void cleanUpSaros() throws Exception {
-        tearDownSarosLast();
-    }
+  @AfterClass
+  public static void cleanUpSaros() throws Exception {
+    tearDownSarosLast();
+  }
 
-    @Test
-    public void expectedButtonsInMainView() throws Exception {
-        assertTrue("Main view did not load",
-            ALICE.htmlBot().view(MAIN_VIEW).isOpen());
+  @Test
+  public void expectedButtonsInMainView() throws Exception {
+    assertTrue("Main view did not load", ALICE.htmlBot().view(MAIN_VIEW).isOpen());
 
-        assertTrue("No 'Add Contact' button",
-            ALICE.htmlBot().view(MAIN_VIEW).hasElementWithId("add-contact"));
-        assertTrue("No 'Start Session' button",
-            ALICE.htmlBot().view(MAIN_VIEW).hasElementWithId("start-session"));
-    }
+    assertTrue(
+        "No 'Add Contact' button", ALICE.htmlBot().view(MAIN_VIEW).hasElementWithId("add-contact"));
+    assertTrue(
+        "No 'Start Session' button",
+        ALICE.htmlBot().view(MAIN_VIEW).hasElementWithId("start-session"));
+  }
 }

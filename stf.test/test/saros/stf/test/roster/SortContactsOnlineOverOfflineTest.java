@@ -16,76 +16,73 @@ import saros.stf.client.StfTestCase;
 @TestLink(id = "Saros-117_sort_online_contacts_over_offline")
 public class SortContactsOnlineOverOfflineTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        selectFirst(ALICE, CARL, BOB);
-    }
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    selectFirst(ALICE, CARL, BOB);
+  }
 
-    @AfterClass
-    public static void cleanUpSaros() throws Exception {
-        tearDownSarosLast();
-    }
+  @AfterClass
+  public static void cleanUpSaros() throws Exception {
+    tearDownSarosLast();
+  }
 
-    @Test
-    public void testSortContactsOnlineOverOffline() throws Exception {
+  @Test
+  public void testSortContactsOnlineOverOffline() throws Exception {
 
-        // wait for roster update
-        Thread.sleep(1000);
+    // wait for roster update
+    Thread.sleep(1000);
 
-        List<String> contacts = ALICE.superBot().views().sarosView()
-            .getContacts();
+    List<String> contacts = ALICE.superBot().views().sarosView().getContacts();
 
-        assertTrue("corrupted size on roster", contacts.size() >= 2);
-        assertEquals(BOB.getBaseJid(), contacts.get(0));
-        assertEquals(CARL.getBaseJid(), contacts.get(1));
+    assertTrue("corrupted size on roster", contacts.size() >= 2);
+    assertEquals(BOB.getBaseJid(), contacts.get(0));
+    assertEquals(CARL.getBaseJid(), contacts.get(1));
 
-        checkContactsOrder(contacts, 2);
+    checkContactsOrder(contacts, 2);
 
-        BOB.superBot().views().sarosView().disconnect();
-        BOB.superBot().views().sarosView().waitUntilIsDisconnected();
+    BOB.superBot().views().sarosView().disconnect();
+    BOB.superBot().views().sarosView().waitUntilIsDisconnected();
 
-        // wait for roster update
-        Thread.sleep(1000);
+    // wait for roster update
+    Thread.sleep(1000);
 
-        contacts = ALICE.superBot().views().sarosView().getContacts();
+    contacts = ALICE.superBot().views().sarosView().getContacts();
 
-        assertTrue("corrupted size on roster", contacts.size() >= 2);
-        assertEquals(CARL.getBaseJid(), contacts.get(0));
+    assertTrue("corrupted size on roster", contacts.size() >= 2);
+    assertEquals(CARL.getBaseJid(), contacts.get(0));
 
-        checkContactsOrder(contacts, 1);
+    checkContactsOrder(contacts, 1);
 
-        BOB.superBot().views().sarosView().connectWith(BOB.getJID(),
-            BOB.getPassword(), false);
-        BOB.superBot().views().sarosView().waitUntilIsConnected();
+    BOB.superBot().views().sarosView().connectWith(BOB.getJID(), BOB.getPassword(), false);
+    BOB.superBot().views().sarosView().waitUntilIsConnected();
 
-        // wait for roster update
-        Thread.sleep(1000);
+    // wait for roster update
+    Thread.sleep(1000);
 
-        contacts = ALICE.superBot().views().sarosView().getContacts();
+    contacts = ALICE.superBot().views().sarosView().getContacts();
 
-        assertTrue("corrupted size on roster", contacts.size() >= 2);
-        assertEquals(BOB.getBaseJid(), contacts.get(0));
-        assertEquals(CARL.getBaseJid(), contacts.get(1));
+    assertTrue("corrupted size on roster", contacts.size() >= 2);
+    assertEquals(BOB.getBaseJid(), contacts.get(0));
+    assertEquals(CARL.getBaseJid(), contacts.get(1));
 
-        checkContactsOrder(contacts, 2);
+    checkContactsOrder(contacts, 2);
 
-        BOB.superBot().views().sarosView().disconnect();
-        CARL.superBot().views().sarosView().disconnect();
+    BOB.superBot().views().sarosView().disconnect();
+    CARL.superBot().views().sarosView().disconnect();
 
-        // wait for roster update
-        Thread.sleep(1000);
+    // wait for roster update
+    Thread.sleep(1000);
 
-        contacts = ALICE.superBot().views().sarosView().getContacts();
+    contacts = ALICE.superBot().views().sarosView().getContacts();
 
-        assertTrue("corrupted size on roster", contacts.size() >= 2);
-        checkContactsOrder(contacts, 0);
-    }
+    assertTrue("corrupted size on roster", contacts.size() >= 2);
+    checkContactsOrder(contacts, 0);
+  }
 
-    private void checkContactsOrder(List<String> contacts, int s) {
-        for (int i = s; i < contacts.size() - 1; i++)
-            assertTrue(
-                "roster is not sorted asc. : " + contacts.get(i) + " > "
-                    + contacts.get(i + 1),
-                contacts.get(i).compareTo(contacts.get(i + 1)) <= 0);
-    }
+  private void checkContactsOrder(List<String> contacts, int s) {
+    for (int i = s; i < contacts.size() - 1; i++)
+      assertTrue(
+          "roster is not sorted asc. : " + contacts.get(i) + " > " + contacts.get(i + 1),
+          contacts.get(i).compareTo(contacts.get(i + 1)) <= 0);
+  }
 }

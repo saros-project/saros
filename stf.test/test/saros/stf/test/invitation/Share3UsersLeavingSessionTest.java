@@ -18,74 +18,73 @@ import saros.stf.test.stf.Constants;
 
 public class Share3UsersLeavingSessionTest extends StfTestCase {
 
-    /**
-     * Preconditions:
-     *
-     * <ol>
-     * <li>Alice (Host, Write Access)
-     * <li>Bob (Read-Only Access)
-     * </ol>
-     */
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        selectFirst(ALICE, BOB, CARL);
-        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  /**
+   * Preconditions:
+   *
+   * <ol>
+   *   <li>Alice (Host, Write Access)
+   *   <li>Bob (Read-Only Access)
+   * </ol>
+   */
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    selectFirst(ALICE, BOB, CARL);
+    restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  }
+
+  @After
+  public void restoreNetwork() throws Exception {
+    if (checkIfTestRunInTestSuite()) {
+      ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
+      tearDownSaros();
+    } else {
+      tearDownSarosLast();
     }
+  }
 
-    @After
-    public void restoreNetwork() throws Exception {
-        if (checkIfTestRunInTestSuite()) {
-            ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
-            tearDownSaros();
-        } else {
-            tearDownSarosLast();
-        }
+  /**
+   * Steps:
+   *
+   * <ol>
+   *   <li>Alice share project with Bob.
+   *   <li>Alice invites Carl.
+   *   <li>Alice and Bob leave the session.
+   *   <li>Carl accepts the session.
+   * </ol>
+   *
+   * Result: Alice, Bob and Carl are not in a session.
+   */
+  @Test
+  public void testShare3UsersLeavingSession() throws Exception {
+    ALICE.superBot().internal().createJavaClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/my/pkg/MyClass.java");
+
+    assertTrue(BOB.superBot().views().sarosView().isInSession());
+    assertTrue(ALICE.superBot().views().sarosView().isInSession());
+
+    ALICE.superBot().views().sarosView().selectSession().addContactsToSession(CARL.getBaseJid());
+
+    CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_SESSION_INVITATION);
+
+    ALICE.superBot().views().sarosView().leaveSession();
+
+    ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
+    BOB.superBot().views().sarosView().waitUntilIsNotInSession();
+
+    Thread.sleep(2000);
+
+    try {
+      CARL.remoteBot().shell("Invitation Canceled").confirm(OK);
+    } catch (WidgetNotFoundException e) {
+      fail("Invitation Canceled is not open: " + e.getMessage());
     }
-
-    /**
-     * Steps:
-     *
-     * <ol>
-     * <li>Alice share project with Bob.
-     * <li>Alice invites Carl.
-     * <li>Alice and Bob leave the session.
-     * <li>Carl accepts the session.
-     * </ol>
-     *
-     * Result: Alice, Bob and Carl are not in a session.
-     */
-    @Test
-    public void testShare3UsersLeavingSession() throws Exception {
-        ALICE.superBot().internal().createJavaClass(Constants.PROJECT1,
-            Constants.PKG1, Constants.CLS1);
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/my/pkg/MyClass.java");
-
-        assertTrue(BOB.superBot().views().sarosView().isInSession());
-        assertTrue(ALICE.superBot().views().sarosView().isInSession());
-
-        ALICE.superBot().views().sarosView().selectSession()
-            .addContactsToSession(CARL.getBaseJid());
-
-        CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_SESSION_INVITATION);
-
-        ALICE.superBot().views().sarosView().leaveSession();
-
-        ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
-        BOB.superBot().views().sarosView().waitUntilIsNotInSession();
-
-        Thread.sleep(2000);
-
-        try {
-            CARL.remoteBot().shell("Invitation Canceled").confirm(OK);
-        } catch (WidgetNotFoundException e) {
-            fail("Invitation Canceled is not open: " + e.getMessage());
-        }
-        assertFalse(CARL + " is in a closed session",
-            CARL.superBot().views().sarosView().isInSession());
-        assertFalse(ALICE + " is in a closed session",
-            ALICE.superBot().views().sarosView().isInSession());
-        assertFalse(BOB + " is in a closed session",
-            BOB.superBot().views().sarosView().isInSession());
-    }
+    assertFalse(
+        CARL + " is in a closed session", CARL.superBot().views().sarosView().isInSession());
+    assertFalse(
+        ALICE + " is in a closed session", ALICE.superBot().views().sarosView().isInSession());
+    assertFalse(BOB + " is in a closed session", BOB.superBot().views().sarosView().isInSession());
+  }
 }

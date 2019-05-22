@@ -17,39 +17,37 @@ import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 @TestLink(id = "Saros-133_user_declines_invitation_to_an_already_established_session")
 public class UserDeclinesInvitationToCurrentSessionTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        select(ALICE, BOB, CARL);
-        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    select(ALICE, BOB, CARL);
+    restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  }
 
-    }
+  @After
+  public void restoreNetwork() throws Exception {
 
-    @After
-    public void restoreNetwork() throws Exception {
+    tearDownSarosLast();
+  }
 
-        tearDownSarosLast();
-    }
+  @Test
+  public void testUserDeclinesInvitationToCurrentSession() throws Exception {
 
-    @Test
-    public void testUserDeclinesInvitationToCurrentSession() throws Exception {
+    ALICE.superBot().internal().createFile("Foo1_Saros", "src/readme.txt", "1234/1234=1");
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
 
-        ALICE.superBot().internal().createFile("Foo1_Saros", "src/readme.txt",
-            "1234/1234=1");
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
+    ALICE.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
 
-        ALICE.superBot().views().sarosView().selectContact(CARL.getJID())
-            .addToSarosSession();
+    IRemoteBotShell shell = CARL.remoteBot().shell(SHELL_SESSION_INVITATION);
 
-        IRemoteBotShell shell = CARL.remoteBot()
-            .shell(SHELL_SESSION_INVITATION);
+    shell.bot().button(CANCEL).click();
 
-        shell.bot().button(CANCEL).click();
+    Thread.sleep(5000);
 
-        Thread.sleep(5000);
-
-        assertTrue(
-            "Alice closed the session because Carl cancels the invitation but Bob was in the session",
-            ALICE.superBot().views().sarosView().isInSession());
-    }
+    assertTrue(
+        "Alice closed the session because Carl cancels the invitation but Bob was in the session",
+        ALICE.superBot().views().sarosView().isInSession());
+  }
 }

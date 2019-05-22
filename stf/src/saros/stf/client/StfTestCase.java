@@ -26,853 +26,767 @@ import saros.test.util.EclipseTestThread;
 
 public abstract class StfTestCase {
 
-    private static final Logger LOGGER = Logger
-        .getLogger(StfTestCase.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(StfTestCase.class.getName());
 
-    /** JUnit monitor. Do <b>NOT</b> call any method of this instance ! */
-    public static ArrayList<String> allClassNames = new ArrayList<String>();
-    @Rule
-    public final TestWatcher watcher = new TestWatcher() {
+  /** JUnit monitor. Do <b>NOT</b> call any method of this instance ! */
+  public static ArrayList<String> allClassNames = new ArrayList<String>();
+
+  @Rule
+  public final TestWatcher watcher =
+      new TestWatcher() {
 
         @Override
         public void failed(Throwable e, Description description) {
-            if (!(e instanceof AssumptionViolatedException)) {
-                this.logMessage("******* TESTCASE " + description.getClassName()
-                    + ":" + description.getMethodName() + " FAILED *******");
-                this.captureScreenshot((description.getClassName() + "_"
-                    + description.getMethodName()).replace('.', '_'));
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                e.printStackTrace(new PrintStream(out));
-                this.logMessage(new String(out.toByteArray()));
-            }
+          if (!(e instanceof AssumptionViolatedException)) {
+            this.logMessage(
+                "******* TESTCASE "
+                    + description.getClassName()
+                    + ":"
+                    + description.getMethodName()
+                    + " FAILED *******");
+            this.captureScreenshot(
+                (description.getClassName() + "_" + description.getMethodName()).replace('.', '_'));
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            e.printStackTrace(new PrintStream(out));
+            this.logMessage(new String(out.toByteArray()));
+          }
         }
 
         @Override
         public void succeeded(Description description) {
-            this.logMessage("******* TESTCASE " + description.getClassName()
-                + ":" + description.getMethodName() + " SUCCEDED *******");
-
+          this.logMessage(
+              "******* TESTCASE "
+                  + description.getClassName()
+                  + ":"
+                  + description.getMethodName()
+                  + " SUCCEDED *******");
         }
 
         @Override
         public void finished(Description description) {
-            this.logMessage("******* TESTCASE " + description.getClassName()
-                + ":" + description.getMethodName() + " FINISHED *******");
+          this.logMessage(
+              "******* TESTCASE "
+                  + description.getClassName()
+                  + ":"
+                  + description.getMethodName()
+                  + " FINISHED *******");
         }
 
         @Override
         public void starting(Description description) {
-            StfTestCase.lastTestClass = description.getClass();
-            this.logMessage(
-                "******* STARTING TESTCASE " + description.getClassName() + ":"
-                    + description.getMethodName() + " *******");
-            // all names of the test classes are saved in allClassNames, in
-            // order to see if the test is run by itself or in a TestSuite
-            if (!allClassNames.contains(description.getClassName())) {
-                allClassNames.add(description.getClassName());
-            }
+          StfTestCase.lastTestClass = description.getClass();
+          this.logMessage(
+              "******* STARTING TESTCASE "
+                  + description.getClassName()
+                  + ":"
+                  + description.getMethodName()
+                  + " *******");
+          // all names of the test classes are saved in allClassNames, in
+          // order to see if the test is run by itself or in a TestSuite
+          if (!allClassNames.contains(description.getClassName())) {
+            allClassNames.add(description.getClassName());
+          }
         }
 
         private void logMessage(String message) {
-            Iterator var3 = StfTestCase.currentTesters.iterator();
+          Iterator var3 = StfTestCase.currentTesters.iterator();
 
-            while (var3.hasNext()) {
-                AbstractTester tester = (AbstractTester) var3.next();
+          while (var3.hasNext()) {
+            AbstractTester tester = (AbstractTester) var3.next();
 
-                try {
-                    tester.remoteBot().logMessage(message);
-                } catch (Exception var5) {
-                    StfTestCase.LOGGER.log(Level.WARNING,
-                        "could not log message '" + message
-                            + "' at remote bot of tester " + tester,
-                        var5);
-                }
+            try {
+              tester.remoteBot().logMessage(message);
+            } catch (Exception var5) {
+              StfTestCase.LOGGER.log(
+                  Level.WARNING,
+                  "could not log message '" + message + "' at remote bot of tester " + tester,
+                  var5);
             }
-
+          }
         }
 
         private void captureScreenshot(String name) {
-            Iterator var3 = StfTestCase.currentTesters.iterator();
+          Iterator var3 = StfTestCase.currentTesters.iterator();
 
-            while (var3.hasNext()) {
-                AbstractTester tester = (AbstractTester) var3.next();
+          while (var3.hasNext()) {
+            AbstractTester tester = (AbstractTester) var3.next();
 
-                try {
-                    tester.remoteBot().captureScreenshot(name + "_" + tester
-                        + "_" + System.currentTimeMillis() + ".jpg");
-                } catch (Exception var5) {
-                    StfTestCase.LOGGER.log(Level.WARNING,
-                        "could capture a screenshot at remote bot of tester "
-                            + tester,
-                        var5);
-                }
-            }
-
-        }
-    };
-
-    private static List<AbstractTester> currentTesters = new ArrayList<AbstractTester>();
-
-    private static List<EclipseTestThread> currentTestThreads = new ArrayList<EclipseTestThread>();
-
-    private static Class<?> lastTestClass;
-
-    /*
-     * Make sure that the JUNIT Ant task does not load every test case with a
-     * new class loader or this will NOT work during a regression !
-     */
-
-    private static boolean abortAllTests = false;
-
-    @BeforeClass
-    public static void checkThreadsBeforeClass() {
-        checkAndStopRunningTestThreads(true);
-    }
-
-    @Before
-    public final void checkThreadsBeforeTest() {
-        checkAndStopRunningTestThreads(false);
-    }
-
-    /**
-     * Calls
-     *
-     * <ol>
-     * <li>reset all contact names by calling for the first test case of the
-     * category {@linkplain #initTesters(AbstractTester, AbstractTester...)}
-     * <li>{@linkplain #setUpWorkbench()}
-     * <li>{@linkplain #setUpSaros()}
-     * <li>{@linkplain #reconnectAllTesters()}
-     * </ol>
-     *
-     * @param tester
-     *            a tester e.g ALICE
-     * @param testers
-     *            additional testers e.g BOB, CARL
-     * @throws Exception
-     */
-    public static void selectFirst(AbstractTester tester,
-        AbstractTester... testers) throws Exception {
-        initTesters(tester, testers);
-        setUpWorkbench();
-        setUpSaros();
-        reconnectAllTesters();
-    }
-
-    /**
-     * Calls
-     *
-     * <ol>
-     * <li>reset all contact names by calling for the test cases of the
-     * category, which are not the first case
-     * {@linkplain #initTesters(AbstractTester, AbstractTester...)}
-     * <li>{@linkplain #setUpWorkbench()}
-     * <li>{@linkplain #setUpSaros()}
-     * <li>{@linkplain #reconnectAllTesters()}
-     * </ol>
-     *
-     * @param tester
-     *            a tester e.g ALICE
-     * @param testers
-     *            additional testers e.g BOB, CARL
-     * @throws Exception
-     */
-    public static void select(AbstractTester tester, AbstractTester... testers)
-        throws Exception {
-        initTesters(tester, testers);
-        reconnectAllTesters();
-    }
-
-    /**
-     * Registers the given testers to be participants of the current test case.
-     * <b>THIS METHOD SHOULD ALWAYS BE THE FIRST METHOD CALLED IN THE
-     * <tt>BEFORECLASS</tt> METHOD.</b>
-     *
-     * @param tester
-     *            a tester e.g ALICE
-     * @param testers
-     *            additional testers e.g BOB, CARL
-     */
-    public static void initTesters(AbstractTester tester,
-        AbstractTester... testers) {
-
-        currentTesters.clear();
-        currentTesters.add(tester);
-        currentTesters.addAll(Arrays.asList(testers));
-
-        for (AbstractTester t : currentTesters)
-            if (t == null)
-                throw new NullPointerException(
-                    "got null reference for a tester object");
-    }
-
-    public static List<AbstractTester> getCurrentTesters() {
-        return Collections.unmodifiableList(currentTesters);
-    }
-
-    /**
-     * Tries to reset Saros to a stable state for the given tester(s). It does
-     * that be performing the following actions
-     *
-     * <ol>
-     * <li>reset all contact names by calling
-     * {@linkplain #resetNicknames(AbstractTester)}
-     * <li>reseting the Workbench
-     * </ol>
-     *
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static void tearDownSaros() throws Exception {
-        try {
-            terminateTestThreads(60 * 1000);
-        } catch (Throwable t) {
-            LOGGER.log(Level.SEVERE,
-                "aborting execution of all tests: " + t.getMessage(), t);
-            checkAndStopRunningTestThreads(true);
-        }
-
-        Exception exception = null;
-
-        for (AbstractTester tester : currentTesters) {
             try {
-                tester.superBot().internal().resetSarosVersion();
-
-                tester.remoteBot().resetWorkbench();
-
-                // TODO clear the chat history, should be done via non-gui
-                // access
-                if (tester.superBot().views().sarosView().hasOpenChatrooms()) {
-                    try {
-                        tester.superBot().views().sarosView()
-                            .closeChatroomWithRegex(".*");
-                    } catch (Exception e) {
-                        LOGGER.log(Level.WARNING,
-                            "chatsrooms were closed lately by Saros", e);
-                    }
-                }
-
-            } catch (Exception e) {
-                exception = e;
+              tester
+                  .remoteBot()
+                  .captureScreenshot(
+                      name + "_" + tester + "_" + System.currentTimeMillis() + ".jpg");
+            } catch (Exception var5) {
+              StfTestCase.LOGGER.log(
+                  Level.WARNING,
+                  "could capture a screenshot at remote bot of tester " + tester,
+                  var5);
             }
+          }
         }
-        if (exception != null)
-            throw exception;
+      };
 
+  private static List<AbstractTester> currentTesters = new ArrayList<AbstractTester>();
+
+  private static List<EclipseTestThread> currentTestThreads = new ArrayList<EclipseTestThread>();
+
+  private static Class<?> lastTestClass;
+
+  /*
+   * Make sure that the JUNIT Ant task does not load every test case with a
+   * new class loader or this will NOT work during a regression !
+   */
+
+  private static boolean abortAllTests = false;
+
+  @BeforeClass
+  public static void checkThreadsBeforeClass() {
+    checkAndStopRunningTestThreads(true);
+  }
+
+  @Before
+  public final void checkThreadsBeforeTest() {
+    checkAndStopRunningTestThreads(false);
+  }
+
+  /**
+   * Calls
+   *
+   * <ol>
+   *   <li>reset all contact names by calling for the first test case of the category {@linkplain
+   *       #initTesters(AbstractTester, AbstractTester...)}
+   *   <li>{@linkplain #setUpWorkbench()}
+   *   <li>{@linkplain #setUpSaros()}
+   *   <li>{@linkplain #reconnectAllTesters()}
+   * </ol>
+   *
+   * @param tester a tester e.g ALICE
+   * @param testers additional testers e.g BOB, CARL
+   * @throws Exception
+   */
+  public static void selectFirst(AbstractTester tester, AbstractTester... testers)
+      throws Exception {
+    initTesters(tester, testers);
+    setUpWorkbench();
+    setUpSaros();
+    reconnectAllTesters();
+  }
+
+  /**
+   * Calls
+   *
+   * <ol>
+   *   <li>reset all contact names by calling for the test cases of the category, which are not the
+   *       first case {@linkplain #initTesters(AbstractTester, AbstractTester...)}
+   *   <li>{@linkplain #setUpWorkbench()}
+   *   <li>{@linkplain #setUpSaros()}
+   *   <li>{@linkplain #reconnectAllTesters()}
+   * </ol>
+   *
+   * @param tester a tester e.g ALICE
+   * @param testers additional testers e.g BOB, CARL
+   * @throws Exception
+   */
+  public static void select(AbstractTester tester, AbstractTester... testers) throws Exception {
+    initTesters(tester, testers);
+    reconnectAllTesters();
+  }
+
+  /**
+   * Registers the given testers to be participants of the current test case. <b>THIS METHOD SHOULD
+   * ALWAYS BE THE FIRST METHOD CALLED IN THE <tt>BEFORECLASS</tt> METHOD.</b>
+   *
+   * @param tester a tester e.g ALICE
+   * @param testers additional testers e.g BOB, CARL
+   */
+  public static void initTesters(AbstractTester tester, AbstractTester... testers) {
+
+    currentTesters.clear();
+    currentTesters.add(tester);
+    currentTesters.addAll(Arrays.asList(testers));
+
+    for (AbstractTester t : currentTesters)
+      if (t == null) throw new NullPointerException("got null reference for a tester object");
+  }
+
+  public static List<AbstractTester> getCurrentTesters() {
+    return Collections.unmodifiableList(currentTesters);
+  }
+
+  /**
+   * Tries to reset Saros to a stable state for the given tester(s). It does that be performing the
+   * following actions
+   *
+   * <ol>
+   *   <li>reset all contact names by calling {@linkplain #resetNicknames(AbstractTester)}
+   *   <li>reseting the Workbench
+   * </ol>
+   *
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void tearDownSaros() throws Exception {
+    try {
+      terminateTestThreads(60 * 1000);
+    } catch (Throwable t) {
+      LOGGER.log(Level.SEVERE, "aborting execution of all tests: " + t.getMessage(), t);
+      checkAndStopRunningTestThreads(true);
     }
 
-    /**
-     * Tries to reset Saros to a stable state for the given tester(s). It does
-     * that be performing the following actions (for the last test case of the
-     * category)
-     *
-     * <ol>
-     * <li>reset all contact names by calling
-     * {@linkplain #resetNicknames(AbstractTester)}
-     * <li>disconnect from the current session
-     * <li>delete the contents of the workspace
-     * </ol>
-     *
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static void tearDownSarosLast() throws Exception {
+    Exception exception = null;
 
-        try {
-            terminateTestThreads(60 * 1000);
-        } catch (Throwable t) {
-            LOGGER.log(Level.SEVERE,
-                "aborting execution of all tests: " + t.getMessage(), t);
-            checkAndStopRunningTestThreads(true);
+    for (AbstractTester tester : currentTesters) {
+      try {
+        tester.superBot().internal().resetSarosVersion();
+
+        tester.remoteBot().resetWorkbench();
+
+        // TODO clear the chat history, should be done via non-gui
+        // access
+        if (tester.superBot().views().sarosView().hasOpenChatrooms()) {
+          try {
+            tester.superBot().views().sarosView().closeChatroomWithRegex(".*");
+          } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "chatsrooms were closed lately by Saros", e);
+          }
         }
 
-        Exception exception = null;
+      } catch (Exception e) {
+        exception = e;
+      }
+    }
+    if (exception != null) throw exception;
+  }
 
-        for (AbstractTester tester : currentTesters) {
-            try {
-                tester.superBot().internal().resetSarosVersion();
+  /**
+   * Tries to reset Saros to a stable state for the given tester(s). It does that be performing the
+   * following actions (for the last test case of the category)
+   *
+   * <ol>
+   *   <li>reset all contact names by calling {@linkplain #resetNicknames(AbstractTester)}
+   *   <li>disconnect from the current session
+   *   <li>delete the contents of the workspace
+   * </ol>
+   *
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void tearDownSarosLast() throws Exception {
 
-                if (tester.superBot().views().sarosView().isConnected())
-                    tester.superBot().views().sarosView().disconnect();
-
-                tester.superBot().views().sarosView().disconnect();
-                tester.remoteBot().resetWorkbench();
-
-                // TODO clear the chat history, should be done via non-gui
-                // access
-                if (tester.superBot().views().sarosView().hasOpenChatrooms()) {
-                    try {
-                        tester.superBot().views().sarosView()
-                            .closeChatroomWithRegex(".*");
-                    } catch (Exception e) {
-                        LOGGER.log(Level.WARNING,
-                            "chatsrooms were closed lately by Saros", e);
-                    }
-                }
-
-                // Consistency watch dog seems to lock some files from time to
-                // time
-                int timeout = 0;
-                boolean cleared = false;
-                do {
-                    cleared = tester.superBot().internal().clearWorkspace();
-                    if (cleared)
-                        break;
-                    Thread.sleep(10000);
-                } while (++timeout < 6);
-
-                if (!cleared)
-                    throw new IOException(
-                        "could not clear the workspace of tester: "
-                            + tester.toString());
-            } catch (Exception e) {
-                exception = e;
-            }
-        }
-        currentTesters.clear();
-
-        if (exception != null)
-            throw exception;
+    try {
+      terminateTestThreads(60 * 1000);
+    } catch (Throwable t) {
+      LOGGER.log(Level.SEVERE, "aborting execution of all tests: " + t.getMessage(), t);
+      checkAndStopRunningTestThreads(true);
     }
 
-    /**
-     * Checks if all current testers are in an active session
-     *
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
+    Exception exception = null;
 
-    public static boolean isSession() throws Exception {
-        for (AbstractTester tester : currentTesters) {
+    for (AbstractTester tester : currentTesters) {
+      try {
+        tester.superBot().internal().resetSarosVersion();
 
-            if (tester.superBot().views().sarosView().isInSession() == false)
-                return false;
+        if (tester.superBot().views().sarosView().isConnected())
+          tester.superBot().views().sarosView().disconnect();
 
+        tester.superBot().views().sarosView().disconnect();
+        tester.remoteBot().resetWorkbench();
+
+        // TODO clear the chat history, should be done via non-gui
+        // access
+        if (tester.superBot().views().sarosView().hasOpenChatrooms()) {
+          try {
+            tester.superBot().views().sarosView().closeChatroomWithRegex(".*");
+          } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "chatsrooms were closed lately by Saros", e);
+          }
         }
-        return true;
+
+        // Consistency watch dog seems to lock some files from time to
+        // time
+        int timeout = 0;
+        boolean cleared = false;
+        do {
+          cleared = tester.superBot().internal().clearWorkspace();
+          if (cleared) break;
+          Thread.sleep(10000);
+        } while (++timeout < 6);
+
+        if (!cleared)
+          throw new IOException("could not clear the workspace of tester: " + tester.toString());
+      } catch (Exception e) {
+        exception = e;
+      }
+    }
+    currentTesters.clear();
+
+    if (exception != null) throw exception;
+  }
+
+  /**
+   * Checks if all current testers are in an active session
+   *
+   * @throws Exception if a (internal) failure occur
+   */
+  public static boolean isSession() throws Exception {
+    for (AbstractTester tester : currentTesters) {
+
+      if (tester.superBot().views().sarosView().isInSession() == false) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Reconnects all the current testers
+   *
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void reconnectAllTesters() throws Exception {
+    for (AbstractTester tester : currentTesters) {
+      if (!tester.superBot().views().sarosView().isConnected()) {
+        tester.superBot().views().sarosView().connect();
+      }
+    }
+  }
+
+  /**
+   * Brings workbench to a original state before beginning your tests
+   *
+   * <ul>
+   *   <li>activate Saros instance workbench
+   *   <li>close all opened popUp windows
+   *   <li>close all opened editors
+   *   <li>deletes all projects
+   *   <li>close welcome view, if it is open
+   *   <li>opens the default perspective
+   *   <li>close all unnecessary views
+   * </ul>
+   *
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void setUpWorkbench() throws Exception {
+
+    Exception exception = null;
+
+    for (AbstractTester tester : currentTesters) {
+      try {
+        tester.remoteBot().activateWorkbench();
+        if (tester.remoteBot().isViewOpen("Welcome")) tester.remoteBot().view("Welcome").close();
+        tester.superBot().menuBar().window().openPerspective();
+        Util.closeUnnecessaryViews(tester);
+      } catch (Exception e) {
+        exception = e;
+      }
     }
 
-    /**
-     * Reconnects all the current testers
-     *
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
+    if (exception != null) throw exception;
+  }
 
-    public static void reconnectAllTesters() throws Exception {
-        for (AbstractTester tester : currentTesters) {
-            if (!tester.superBot().views().sarosView().isConnected()) {
-                tester.superBot().views().sarosView().connect();
+  /**
+   * Brings Saros to a original state before beginning your tests.
+   *
+   * <ul>
+   *   <li>make automaticReminder disable
+   *   <li>open sarosViews
+   *   <li>connect
+   *   <li>ensured that all testers are available in each testers contact list
+   * </ul>
+   *
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void setUpSaros() throws Exception {
+    Exception exception = null;
 
-            }
+    for (AbstractTester tester : currentTesters) {
+      try {
+        tester.superBot().menuBar().saros().preferences().disableAutomaticReminder();
+        tester.superBot().menuBar().saros().preferences().restoreDefaults();
+        Util.openSarosView(tester);
 
-        }
+        tester
+            .controlBot()
+            .getAccountManipulator()
+            .restoreDefaultAccount(tester.getName(), tester.getPassword(), tester.getDomain());
 
+      } catch (Exception e) {
+        exception = e;
+      }
     }
 
-    /**
-     * Brings workbench to a original state before beginning your tests
-     *
-     * <ul>
-     * <li>activate Saros instance workbench
-     * <li>close all opened popUp windows
-     * <li>close all opened editors
-     * <li>deletes all projects
-     * <li>close welcome view, if it is open
-     * <li>opens the default perspective
-     * <li>close all unnecessary views
-     * </ul>
-     *
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static void setUpWorkbench() throws Exception {
+    if (exception != null) throw exception;
 
-        Exception exception = null;
+    final List<Callable<Void>> connectTasks = new ArrayList<Callable<Void>>();
 
-        for (AbstractTester tester : currentTesters) {
-            try {
-                tester.remoteBot().activateWorkbench();
-                if (tester.remoteBot().isViewOpen("Welcome"))
-                    tester.remoteBot().view("Welcome").close();
-                tester.superBot().menuBar().window().openPerspective();
-                Util.closeUnnecessaryViews(tester);
-            } catch (Exception e) {
-                exception = e;
+    for (final AbstractTester tester : currentTesters) {
+      connectTasks.add(
+          new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+              tester
+                  .superBot()
+                  .views()
+                  .sarosView()
+                  .connectWith(tester.getJID(), tester.getPassword(), true);
+
+              return null;
             }
-        }
-
-        if (exception != null)
-            throw exception;
+          });
     }
 
-    /**
-     * Brings Saros to a original state before beginning your tests.
-     *
-     * <ul>
-     * <li>make automaticReminder disable
-     * <li>open sarosViews
-     * <li>connect
-     * <li>ensured that all testers are available in each testers contact list
-     * </ul>
-     *
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static void setUpSaros() throws Exception {
-        Exception exception = null;
+    Util.workAll(connectTasks);
 
-        for (AbstractTester tester : currentTesters) {
-            try {
-                tester.superBot().menuBar().saros().preferences()
-                    .disableAutomaticReminder();
-                tester.superBot().menuBar().saros().preferences()
-                    .restoreDefaults();
-                Util.openSarosView(tester);
+    resetNicknames();
+    resetContacts();
+  }
 
-                tester.controlBot().getAccountManipulator()
-                    .restoreDefaultAccount(tester.getName(),
-                        tester.getPassword(), tester.getDomain());
+  /**
+   * Resets the workbench for every active tester to their original state.
+   *
+   * @see IRemoteWorkbenchBot#resetWorkbench()
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void resetWorkbenches() throws Exception {
+    for (AbstractTester tester : currentTesters) {
+      tester.remoteBot().resetWorkbench();
+    }
+  }
 
-            } catch (Exception e) {
-                exception = e;
-            }
-        }
+  /**
+   * Closes all editors for all active testers.
+   *
+   * @see IRemoteWorkbenchBot#closeAllShells()
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void closeAllEditors() throws Exception {
+    for (AbstractTester tester : currentTesters) {
+      tester.remoteBot().closeAllEditors();
+    }
+  }
 
-        if (exception != null)
-            throw exception;
+  /**
+   * Closes all shells for all active testers.
+   *
+   * @see IRemoteWorkbenchBot#closeAllShells()
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void closeAllShells() throws Exception {
+    for (AbstractTester tester : currentTesters) {
+      tester.remoteBot().closeAllShells();
+    }
+  }
 
-        final List<Callable<Void>> connectTasks = new ArrayList<Callable<Void>>();
+  /**
+   * Resets the account of all testers.
+   *
+   * <ul>
+   *   <li>Add the account of the tester to the account store
+   *   <li>Activate the account of the tester
+   *   <li>Deletes all non active accounts
+   * </ul>
+   *
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void resetDefaultAccount() throws Exception {
+    for (AbstractTester tester : currentTesters)
+      tester
+          .controlBot()
+          .getAccountManipulator()
+          .restoreDefaultAccount(tester.getName(), tester.getPassword(), tester.getDomain());
+  }
 
-        for (final AbstractTester tester : currentTesters) {
-            connectTasks.add(new Callable<Void>() {
-                @Override
-                public Void call() throws Exception {
-                    tester.superBot().views().sarosView().connectWith(
-                        tester.getJID(), tester.getPassword(), true);
+  /**
+   * Resets the nicknames in the contact list for all active testers by sequentially calling {@link
+   * #resetNicknames(AbstractTester)}.
+   *
+   * @throws IllegalStateException if one of the current testers is not connected
+   * @throws Exception for any other (internal) failure
+   */
+  public static void resetNicknames() throws Exception {
+    for (AbstractTester tester : currentTesters) resetNicknames(tester);
+  }
 
-                    return null;
-                }
+  /**
+   * Resets the nicknames of all contacts in the contact list of the tester to their original states
+   * (base JID) as defined in the configuration file.
+   *
+   * @param tester the tester
+   * @throws IllegalStateException if the tester is not connected
+   * @throws Exception for any other (internal) failure
+   */
+  public static void resetNicknames(AbstractTester tester) throws Exception {
+
+    if (!tester.superBot().views().sarosView().isConnected())
+      throw new IllegalStateException(tester + " is not connected");
+
+    for (int i = 0; i < currentTesters.size(); i++) {
+      if (tester == currentTesters.get(i)) continue;
+
+      if (tester.superBot().views().sarosView().isInContactList(currentTesters.get(i).getJID())) {
+        tester
+            .superBot()
+            .views()
+            .sarosView()
+            .selectContact(currentTesters.get(i).getJID())
+            .rename(currentTesters.get(i).getBaseJid());
+      }
+    }
+  }
+
+  /**
+   * Resets the contacts of the testers involved in this test case to their original states.
+   *
+   * <p>This method will only add connections between testers, but not remove them. Example: If the
+   * test case involves ALICE, BOB, and CARL, this method will make sure that all three of them are
+   * pair-wise contacts, but it will neither create nor cut any connection to DAVE.
+   *
+   * @throws IllegalStateException if one of the current testers is not connected
+   * @throws Exception for any other (internal) failure
+   */
+  public static void resetContacts() throws Exception {
+    // Create all unique pairs of distinct testers
+    for (int first = 0; first < currentTesters.size(); first++) {
+      for (int second = first + 1; second < currentTesters.size(); second++) {
+        Util.addTestersToContactList(currentTesters.get(first), currentTesters.get(second));
+      }
+    }
+  }
+
+  /**
+   * Deletes all projects from all active testers by sequentially removing all projects from the
+   * workspace. @NOTE this method does not invoke any GUI action, instead it uses the Eclipse API.
+   * Unexpected results can occur when there are still open unsaved editor windows before this
+   * method is called.
+   *
+   * @return <code>true</code> if all workspaces could be cleared, <code>false</code> otherwise
+   * @throws Exception if a (internal) failure occurs
+   */
+  public static boolean clearWorkspaces() throws Exception {
+    boolean cleared = true;
+    for (AbstractTester tester : currentTesters) {
+      cleared &= tester.superBot().internal().clearWorkspace();
+    }
+    return cleared;
+  }
+
+  /**
+   * Disconnects all active testers in the order the were initialized by {@link
+   * #initTesters(AbstractTester tester, AbstractTester... testers)}
+   *
+   * @throws Exception if a (internal) failure occurs
+   */
+  public static void disconnectAllActiveTesters() throws Exception {
+    for (AbstractTester tester : currentTesters) {
+      if (tester != null) {
+        tester.superBot().views().sarosView().disconnect();
+      }
+    }
+  }
+
+  /**
+   * Stops the current session for all testers. The host is leaving the session first.
+   *
+   * @param host the host of the current session
+   * @throws IllegalStateException if the host is not host of the current session
+   * @throws Exception if a (internal) failure occurs
+   */
+  public static void leaveSessionHostFirst(AbstractTester host) throws Exception {
+
+    if (!host.superBot().views().sarosView().isHost())
+      throw new IllegalStateException(host + " is not host of the current session");
+
+    host.superBot().views().sarosView().leaveSession();
+    for (final AbstractTester tester : currentTesters) {
+      if (tester != host) {
+        tester.superBot().views().sarosView().waitUntilIsNotInSession();
+      }
+    }
+  }
+
+  /**
+   * Stops the current session for all testers. The host is the last one who is leaving the session.
+   *
+   * <ol>
+   *   <li>All non-host session users leave the session first.(concurrently)
+   *   <li>Host waits until all remote users are no longer in the session.
+   *   <li>Host leaves the session.
+   * </ol>
+   *
+   * @param host the host of the current session
+   * @throws IllegalStateException if the host is not host of the current session
+   * @throws Exception if a (internal) failure occurs
+   */
+  public static void leaveSessionPeersFirst(AbstractTester host) throws Exception {
+
+    if (!host.superBot().views().sarosView().isHost())
+      throw new IllegalStateException(host + " is not host of the current session");
+
+    List<JID> peerJIDs = new ArrayList<JID>();
+    List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
+    for (final AbstractTester tester : currentTesters) {
+
+      if (tester != host) {
+        peerJIDs.add(tester.getJID());
+        leaveTasks.add(
+            new Callable<Void>() {
+              @Override
+              public Void call() throws Exception {
+                tester.superBot().views().sarosView().leaveSession();
+                return null;
+              }
             });
-        }
-
-        Util.workAll(connectTasks);
-
-        resetNicknames();
-        resetContacts();
+      }
     }
 
-    /**
-     * Resets the workbench for every active tester to their original state.
-     *
-     * @see IRemoteWorkbenchBot#resetWorkbench()
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static void resetWorkbenches() throws Exception {
-        for (AbstractTester tester : currentTesters) {
-            tester.remoteBot().resetWorkbench();
-        }
+    Util.workAll(leaveTasks);
+
+    host.superBot().views().sarosView().waitUntilAllPeersLeaveSession(peerJIDs);
+
+    host.superBot().views().sarosView().leaveSession();
+    host.superBot().views().sarosView().waitUntilIsNotInSession();
+  }
+
+  /**
+   * Restores Saros session with empty project with given project name if non existant
+   *
+   * @param projectName name of the project
+   * @param tester a tester e.g. ALICE
+   * @param testers additional testers e.g. BOB,CARL,DAVE
+   * @throws Exception if a (internal) failure occur
+   */
+  public static void restoreSessionIfNecessary(
+      String projectName, AbstractTester tester, AbstractTester... testers) throws Exception {
+
+    if (!isSession()
+        || !areConnected(tester, testers)
+        || !isResourceSharedForAllTesters(projectName, tester, testers)) {
+      disconnectAllActiveTesters();
+      clearWorkspaces();
+      reconnectAllTesters();
+      tester.superBot().internal().createProject(projectName);
+      Util.buildSessionConcurrently(projectName, TypeOfCreateProject.NEW_PROJECT, tester, testers);
+    }
+    for (AbstractTester othertester : testers) {
+      othertester.superBot().views().packageExplorerView().waitUntilResourceIsShared(projectName);
+    }
+  }
+
+  /**
+   * Checks if all given users are connected
+   *
+   * @param tester a tester e.g. ALICE
+   * @param testers additional testers e.g. BOB,CARL,DAVE
+   * @throws Exception if a (internal) failure occur
+   */
+  public static boolean areConnected(AbstractTester tester, AbstractTester... testers)
+      throws Exception {
+    boolean areConnected = tester.superBot().views().sarosView().isConnected();
+    for (AbstractTester othertester : testers) {
+      if (othertester != null) {
+        areConnected = areConnected && othertester.superBot().views().sarosView().isConnected();
+      }
+    }
+    return areConnected;
+  }
+
+  /**
+   * Checks if a resource is Shared for all testers
+   *
+   * @param projectName name of the project
+   * @param tester a tester e.g. ALICE
+   * @param testers additional testers e.g. BOB,CARL,DAVE
+   * @throws Exception if a (internal) failure occur
+   */
+  public static boolean isResourceSharedForAllTesters(
+      String resourcePath, AbstractTester tester, AbstractTester... testers) throws Exception {
+    boolean isResourceShared =
+        tester.superBot().views().packageExplorerView().isResourceShared(resourcePath);
+    for (AbstractTester othertester : testers) {
+      if (othertester != null) {
+        isResourceShared =
+            isResourceShared
+                && othertester
+                    .superBot()
+                    .views()
+                    .packageExplorerView()
+                    .isResourceShared(resourcePath);
+      }
+    }
+    return isResourceShared;
+  }
+
+  public static ArrayList<String> getAllClassNamesList() {
+    return allClassNames;
+  }
+
+  /**
+   * Checks if the test is run by itself or is part of a TestSuite. If it is part of a TestSuite,
+   * the array allClassNames will contain more than one element.
+   */
+  public static boolean checkIfTestRunInTestSuite() {
+    if (getAllClassNamesList().size() > 1) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Creates a new {@link EclipseTestThread}. The test thread can be terminated by calling {@link
+   * #terminateTestThreads}. The test thread is automatically terminated after the <b>last</b> test
+   * of the test class is executed.
+   *
+   * @param runnable the runnable that should be executed in this test thread
+   * @return a new, not yet started, test thread
+   */
+  public static EclipseTestThread createTestThread(EclipseTestThread.Runnable runnable) {
+    EclipseTestThread thread = new EclipseTestThread(runnable);
+    currentTestThreads.add(thread);
+    return thread;
+  }
+
+  /**
+   * Terminates all test threads that were created with {@link #createTestThread}.
+   *
+   * @param timeout timeout in milliseconds to wait for the termination of all test threads
+   * @throws IllegalStateException if there are still test threads running
+   */
+  public static void terminateTestThreads(long timeout) {
+    for (EclipseTestThread thread : currentTestThreads) thread.interrupt();
+
+    if (Util.joinAll(timeout, currentTestThreads.toArray(new EclipseTestThread[0]))) {
+      currentTestThreads.clear();
+      return;
     }
 
-    /**
-     * Closes all editors for all active testers.
-     *
-     * @see IRemoteWorkbenchBot#closeAllShells()
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static void closeAllEditors() throws Exception {
-        for (AbstractTester tester : currentTesters) {
-            tester.remoteBot().closeAllEditors();
-        }
+    for (Iterator<EclipseTestThread> it = currentTestThreads.iterator(); it.hasNext(); ) {
+
+      EclipseTestThread thread = it.next();
+
+      if (!thread.isAlive()) it.remove();
     }
 
-    /**
-     * Closes all shells for all active testers.
-     *
-     * @see IRemoteWorkbenchBot#closeAllShells()
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static void closeAllShells() throws Exception {
-        for (AbstractTester tester : currentTesters) {
-            tester.remoteBot().closeAllShells();
-        }
-    }
+    if (!currentTestThreads.isEmpty())
+      throw new IllegalStateException(currentTestThreads.size() + " test threads are still alive");
+  }
 
-    /**
-     * Resets the account of all testers.
-     *
-     * <ul>
-     * <li>Add the account of the tester to the account store
-     * <li>Activate the account of the tester
-     * <li>Deletes all non active accounts
-     * </ul>
-     *
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static void resetDefaultAccount() throws Exception {
-        for (AbstractTester tester : currentTesters)
-            tester.controlBot().getAccountManipulator().restoreDefaultAccount(
-                tester.getName(), tester.getPassword(), tester.getDomain());
-    }
+  @SuppressWarnings("deprecation")
+  private static void checkAndStopRunningTestThreads(boolean abortAllTests) {
 
-    /**
-     * Resets the nicknames in the contact list for all active testers by
-     * sequentially calling {@link #resetNicknames(AbstractTester)}.
-     *
-     * @throws IllegalStateException
-     *             if one of the current testers is not connected
-     * @throws Exception
-     *             for any other (internal) failure
-     */
-    public static void resetNicknames() throws Exception {
-        for (AbstractTester tester : currentTesters)
-            resetNicknames(tester);
-    }
+    if (currentTestThreads.isEmpty() && !StfTestCase.abortAllTests) return;
 
-    /**
-     * Resets the nicknames of all contacts in the contact list of the tester to
-     * their original states (base JID) as defined in the configuration file.
-     *
-     * @param tester
-     *            the tester
-     * @throws IllegalStateException
-     *             if the tester is not connected
-     * @throws Exception
-     *             for any other (internal) failure
-     */
-    public static void resetNicknames(AbstractTester tester) throws Exception {
+    assert lastTestClass != null;
 
-        if (!tester.superBot().views().sarosView().isConnected())
-            throw new IllegalStateException(tester + " is not connected");
+    IllegalStateException exception =
+        new IllegalStateException(
+            "could not terminate all test threads for test class " + lastTestClass.getName());
 
-        for (int i = 0; i < currentTesters.size(); i++) {
-            if (tester == currentTesters.get(i))
-                continue;
+    if (!abortAllTests) throw exception;
 
-            if (tester.superBot().views().sarosView()
-                .isInContactList(currentTesters.get(i).getJID())) {
-                tester.superBot().views().sarosView()
-                    .selectContact(currentTesters.get(i).getJID())
-                    .rename(currentTesters.get(i).getBaseJid());
-            }
-        }
-    }
+    // do it the hard way and give up
 
-    /**
-     * Resets the contacts of the testers involved in this test case to their
-     * original states.
-     *
-     * <p>
-     * This method will only add connections between testers, but not remove
-     * them. Example: If the test case involves ALICE, BOB, and CARL, this
-     * method will make sure that all three of them are pair-wise contacts, but
-     * it will neither create nor cut any connection to DAVE.
-     *
-     * @throws IllegalStateException
-     *             if one of the current testers is not connected
-     * @throws Exception
-     *             for any other (internal) failure
-     */
-    public static void resetContacts() throws Exception {
-        // Create all unique pairs of distinct testers
-        for (int first = 0; first < currentTesters.size(); first++) {
-            for (int second = first + 1; second < currentTesters
-                .size(); second++) {
-                Util.addTestersToContactList(currentTesters.get(first),
-                    currentTesters.get(second));
-            }
-        }
-    }
+    StfTestCase.abortAllTests = true;
 
-    /**
-     * Deletes all projects from all active testers by sequentially removing all
-     * projects from the workspace. @NOTE this method does not invoke any GUI
-     * action, instead it uses the Eclipse API. Unexpected results can occur
-     * when there are still open unsaved editor windows before this method is
-     * called.
-     *
-     * @return <code>true</code> if all workspaces could be cleared,
-     *         <code>false</code> otherwise
-     * @throws Exception
-     *             if a (internal) failure occurs
-     */
-    public static boolean clearWorkspaces() throws Exception {
-        boolean cleared = true;
-        for (AbstractTester tester : currentTesters) {
-            cleared &= tester.superBot().internal().clearWorkspace();
-        }
-        return cleared;
-    }
+    for (EclipseTestThread thread : currentTestThreads) thread.stop();
 
-    /**
-     * Disconnects all active testers in the order the were initialized by
-     * {@link #initTesters(AbstractTester tester, AbstractTester... testers)}
-     *
-     * @throws Exception
-     *             if a (internal) failure occurs
-     */
-    public static void disconnectAllActiveTesters() throws Exception {
-        for (AbstractTester tester : currentTesters) {
-            if (tester != null) {
-                tester.superBot().views().sarosView().disconnect();
-            }
-        }
-    }
+    currentTestThreads.clear();
 
-    /**
-     * Stops the current session for all testers. The host is leaving the
-     * session first.
-     *
-     * @param host
-     *            the host of the current session
-     * @throws IllegalStateException
-     *             if the host is not host of the current session
-     * @throws Exception
-     *             if a (internal) failure occurs
-     */
-    public static void leaveSessionHostFirst(AbstractTester host)
-        throws Exception {
-
-        if (!host.superBot().views().sarosView().isHost())
-            throw new IllegalStateException(
-                host + " is not host of the current session");
-
-        host.superBot().views().sarosView().leaveSession();
-        for (final AbstractTester tester : currentTesters) {
-            if (tester != host) {
-                tester.superBot().views().sarosView().waitUntilIsNotInSession();
-            }
-        }
-    }
-
-    /**
-     * Stops the current session for all testers. The host is the last one who
-     * is leaving the session.
-     *
-     * <ol>
-     * <li>All non-host session users leave the session first.(concurrently)
-     * <li>Host waits until all remote users are no longer in the session.
-     * <li>Host leaves the session.
-     * </ol>
-     *
-     * @param host
-     *            the host of the current session
-     * @throws IllegalStateException
-     *             if the host is not host of the current session
-     * @throws Exception
-     *             if a (internal) failure occurs
-     */
-    public static void leaveSessionPeersFirst(AbstractTester host)
-        throws Exception {
-
-        if (!host.superBot().views().sarosView().isHost())
-            throw new IllegalStateException(
-                host + " is not host of the current session");
-
-        List<JID> peerJIDs = new ArrayList<JID>();
-        List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
-        for (final AbstractTester tester : currentTesters) {
-
-            if (tester != host) {
-                peerJIDs.add(tester.getJID());
-                leaveTasks.add(new Callable<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        tester.superBot().views().sarosView().leaveSession();
-                        return null;
-                    }
-                });
-            }
-        }
-
-        Util.workAll(leaveTasks);
-
-        host.superBot().views().sarosView()
-            .waitUntilAllPeersLeaveSession(peerJIDs);
-
-        host.superBot().views().sarosView().leaveSession();
-        host.superBot().views().sarosView().waitUntilIsNotInSession();
-    }
-
-    /**
-     * Restores Saros session with empty project with given project name if non
-     * existant
-     *
-     * @param projectName
-     *            name of the project
-     * @param tester
-     *            a tester e.g. ALICE
-     * @param testers
-     *            additional testers e.g. BOB,CARL,DAVE
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static void restoreSessionIfNecessary(String projectName,
-        AbstractTester tester, AbstractTester... testers) throws Exception {
-
-        if (!isSession() || !areConnected(tester, testers)
-            || !isResourceSharedForAllTesters(projectName, tester, testers)) {
-            disconnectAllActiveTesters();
-            clearWorkspaces();
-            reconnectAllTesters();
-            tester.superBot().internal().createProject(projectName);
-            Util.buildSessionConcurrently(projectName,
-                TypeOfCreateProject.NEW_PROJECT, tester, testers);
-        }
-        for (AbstractTester othertester : testers) {
-            othertester.superBot().views().packageExplorerView()
-                .waitUntilResourceIsShared(projectName);
-        }
-    }
-
-    /**
-     * Checks if all given users are connected
-     *
-     *
-     * @param tester
-     *            a tester e.g. ALICE
-     * @param testers
-     *            additional testers e.g. BOB,CARL,DAVE
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-
-    public static boolean areConnected(AbstractTester tester,
-        AbstractTester... testers) throws Exception {
-        boolean areConnected = tester.superBot().views().sarosView()
-            .isConnected();
-        for (AbstractTester othertester : testers) {
-            if (othertester != null) {
-                areConnected = areConnected
-                    && othertester.superBot().views().sarosView().isConnected();
-            }
-        }
-        return areConnected;
-    }
-
-    /**
-     * Checks if a resource is Shared for all testers
-     *
-     * @param projectName
-     *            name of the project
-     * @param tester
-     *            a tester e.g. ALICE
-     * @param testers
-     *            additional testers e.g. BOB,CARL,DAVE
-     * @throws Exception
-     *             if a (internal) failure occur
-     */
-    public static boolean isResourceSharedForAllTesters(String resourcePath,
-        AbstractTester tester, AbstractTester... testers) throws Exception {
-        boolean isResourceShared = tester.superBot().views()
-            .packageExplorerView().isResourceShared(resourcePath);
-        for (AbstractTester othertester : testers) {
-            if (othertester != null) {
-                isResourceShared = isResourceShared
-                    && othertester.superBot().views().packageExplorerView()
-                        .isResourceShared(resourcePath);
-            }
-        }
-        return isResourceShared;
-    }
-
-    public static ArrayList<String> getAllClassNamesList() {
-        return allClassNames;
-    }
-
-    /**
-     * Checks if the test is run by itself or is part of a TestSuite. If it is
-     * part of a TestSuite, the array allClassNames will contain more than one
-     * element.
-     *
-     */
-    public static boolean checkIfTestRunInTestSuite() {
-        if (getAllClassNamesList().size() > 1) {
-            return true;
-        }
-        return false;
-
-    }
-
-    /**
-     * Creates a new {@link EclipseTestThread}. The test thread can be
-     * terminated by calling {@link #terminateTestThreads}. The test thread is
-     * automatically terminated after the <b>last</b> test of the test class is
-     * executed.
-     *
-     * @param runnable
-     *            the runnable that should be executed in this test thread
-     * @return a new, not yet started, test thread
-     */
-    public static EclipseTestThread createTestThread(
-        EclipseTestThread.Runnable runnable) {
-        EclipseTestThread thread = new EclipseTestThread(runnable);
-        currentTestThreads.add(thread);
-        return thread;
-    }
-
-    /**
-     * Terminates all test threads that were created with
-     * {@link #createTestThread}.
-     *
-     * @param timeout
-     *            timeout in milliseconds to wait for the termination of all
-     *            test threads
-     * @throws IllegalStateException
-     *             if there are still test threads running
-     */
-    public static void terminateTestThreads(long timeout) {
-        for (EclipseTestThread thread : currentTestThreads)
-            thread.interrupt();
-
-        if (Util.joinAll(timeout,
-            currentTestThreads.toArray(new EclipseTestThread[0]))) {
-            currentTestThreads.clear();
-            return;
-        }
-
-        for (Iterator<EclipseTestThread> it = currentTestThreads.iterator(); it
-            .hasNext();) {
-
-            EclipseTestThread thread = it.next();
-
-            if (!thread.isAlive())
-                it.remove();
-        }
-
-        if (!currentTestThreads.isEmpty())
-            throw new IllegalStateException(
-                currentTestThreads.size() + " test threads are still alive");
-    }
-
-    @SuppressWarnings("deprecation")
-    private static void checkAndStopRunningTestThreads(boolean abortAllTests) {
-
-        if (currentTestThreads.isEmpty() && !StfTestCase.abortAllTests)
-            return;
-
-        assert lastTestClass != null;
-
-        IllegalStateException exception = new IllegalStateException(
-            "could not terminate all test threads for test class "
-                + lastTestClass.getName());
-
-        if (!abortAllTests)
-            throw exception;
-
-        // do it the hard way and give up
-
-        StfTestCase.abortAllTests = true;
-
-        for (EclipseTestThread thread : currentTestThreads)
-            thread.stop();
-
-        currentTestThreads.clear();
-
-        throw exception;
-    }
+    throw exception;
+  }
 }

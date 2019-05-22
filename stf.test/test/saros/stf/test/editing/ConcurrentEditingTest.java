@@ -15,97 +15,93 @@ import saros.stf.test.stf.Constants;
 
 public class ConcurrentEditingTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        select(ALICE, BOB);
-        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    select(ALICE, BOB);
+    restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    closeAllShells();
+    closeAllEditors();
+  }
+
+  @After
+  public void cleanUpSaros() throws Exception {
+    if (checkIfTestRunInTestSuite()) {
+      ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
+      tearDownSaros();
+    } else {
+      tearDownSarosLast();
     }
+  }
 
-    @Before
-    public void setUp() throws Exception {
-        closeAllShells();
-        closeAllEditors();
-    }
+  static final String FILE = "file.txt";
 
-    @After
-    public void cleanUpSaros() throws Exception {
-        if (checkIfTestRunInTestSuite()) {
-            ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
-            tearDownSaros();
-        } else {
-            tearDownSarosLast();
-        }
-    }
+  /**
+   * Test to reproduce bug "Inconsistency when concurrently writing at same position"
+   *
+   * @throws RemoteException
+   * @throws InterruptedException
+   * @see <a href="https://sourceforge.net/p/dpp/bugs/419/">Bug tracker entry 419</a>
+   */
+  @Test
+  public void testBugInconsistencyConcurrentEditing() throws Exception, InterruptedException {
 
-    static final String FILE = "file.txt";
+    ALICE.superBot().internal().createFile(Constants.PROJECT1, "src/file.txt", "");
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile(Constants.PROJECT1, "src", FILE)
+        .open();
 
-    /**
-     * Test to reproduce bug "Inconsistency when concurrently writing at same
-     * position"
-     *
-     * @throws RemoteException
-     * @throws InterruptedException
-     *
-     * @see <a href="https://sourceforge.net/p/dpp/bugs/419/">Bug tracker entry
-     *      419</a>
-     */
-    @Test
-    public void testBugInconsistencyConcurrentEditing()
-        throws Exception, InterruptedException {
+    ALICE.remoteBot().waitUntilEditorOpen(FILE);
+    ALICE.remoteBot().editor(FILE).setTextFromFile("test/resources/lorem.txt");
+    ALICE.remoteBot().editor(FILE).navigateTo(0, 6);
 
-        ALICE.superBot().internal().createFile(Constants.PROJECT1,
-            "src/file.txt", "");
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile(Constants.PROJECT1, "src", FILE).open();
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared(Constants.PROJECT1 + "/src/" + FILE);
+    BOB.superBot().views().packageExplorerView().selectFile(Constants.PROJECT1, "src", FILE).open();
 
-        ALICE.remoteBot().waitUntilEditorOpen(FILE);
-        ALICE.remoteBot().editor(FILE)
-            .setTextFromFile("test/resources/lorem.txt");
-        ALICE.remoteBot().editor(FILE).navigateTo(0, 6);
+    BOB.remoteBot().waitUntilEditorOpen(FILE);
+    BOB.remoteBot().editor(FILE).navigateTo(0, 30);
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared(Constants.PROJECT1 + "/src/" + FILE);
-        BOB.superBot().views().packageExplorerView()
-            .selectFile(Constants.PROJECT1, "src", FILE).open();
+    Thread.sleep(1000);
 
-        BOB.remoteBot().waitUntilEditorOpen(FILE);
-        BOB.remoteBot().editor(FILE).navigateTo(0, 30);
+    // Alice goes to 0,6 and hits Delete
+    ALICE.remoteBot().activateWorkbench();
+    int waitActivate = 100;
+    ALICE.remoteBot().editor(FILE).show();
 
-        Thread.sleep(1000);
+    ALICE.remoteBot().editor(FILE).waitUntilIsActive();
+    // at the same time, Bob enters L at 0,30
+    BOB.remoteBot().activateWorkbench();
+    Thread.sleep(waitActivate);
+    BOB.remoteBot().editor(FILE).show();
+    BOB.remoteBot().editor(FILE).waitUntilIsActive();
 
-        // Alice goes to 0,6 and hits Delete
-        ALICE.remoteBot().activateWorkbench();
-        int waitActivate = 100;
-        ALICE.remoteBot().editor(FILE).show();
+    Thread.sleep(waitActivate);
+    ALICE.remoteBot().editor(FILE).pressShortcut(new String[] {IKeyLookup.BACKSPACE_NAME});
 
-        ALICE.remoteBot().editor(FILE).waitUntilIsActive();
-        // at the same time, Bob enters L at 0,30
-        BOB.remoteBot().activateWorkbench();
-        Thread.sleep(waitActivate);
-        BOB.remoteBot().editor(FILE).show();
-        BOB.remoteBot().editor(FILE).waitUntilIsActive();
+    BOB.remoteBot().editor(FILE).typeText("L");
+    // both sleep for less than 1000ms
 
-        Thread.sleep(waitActivate);
-        ALICE.remoteBot().editor(FILE)
-            .pressShortcut(new String[] { IKeyLookup.BACKSPACE_NAME });
+    // Alice hits Delete again
+    ALICE.remoteBot().editor(FILE).pressShortcut(new String[] {IKeyLookup.BACKSPACE_NAME});
+    // Bob enters o
+    BOB.remoteBot().editor(FILE).typeText("o");
 
-        BOB.remoteBot().editor(FILE).typeText("L");
-        // both sleep for less than 1000ms
+    Thread.sleep(3000);
+    String ALICEText = ALICE.remoteBot().editor(FILE).getText();
+    String BOBText = BOB.remoteBot().editor(FILE).getText();
 
-        // Alice hits Delete again
-        ALICE.remoteBot().editor(FILE)
-            .pressShortcut(new String[] { IKeyLookup.BACKSPACE_NAME });
-        // Bob enters o
-        BOB.remoteBot().editor(FILE).typeText("o");
+    ALICE.remoteBot().editor(FILE).closeWithoutSave();
+    BOB.remoteBot().editor(FILE).closeWithoutSave();
 
-        Thread.sleep(3000);
-        String ALICEText = ALICE.remoteBot().editor(FILE).getText();
-        String BOBText = BOB.remoteBot().editor(FILE).getText();
-
-        ALICE.remoteBot().editor(FILE).closeWithoutSave();
-        BOB.remoteBot().editor(FILE).closeWithoutSave();
-
-        assertEquals(ALICEText, BOBText);
-
-    }
+    assertEquals(ALICEText, BOBText);
+  }
 }

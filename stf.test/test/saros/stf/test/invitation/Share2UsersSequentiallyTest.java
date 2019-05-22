@@ -16,57 +16,58 @@ import saros.stf.test.stf.Constants;
 
 public class Share2UsersSequentiallyTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        selectFirst(ALICE, BOB);
-    }
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    selectFirst(ALICE, BOB);
+  }
 
-    @AfterClass
-    public static void cleanUpSaros() throws Exception {
-        tearDownSarosLast();
-    }
+  @AfterClass
+  public static void cleanUpSaros() throws Exception {
+    tearDownSarosLast();
+  }
 
-    /**
-     * Steps:
-     *
-     * <ol>
-     * <li>Alice share project with BOB.
-     * <li>Alice and BOB leave the session.
-     * </ol>
-     *
-     * Result:
-     *
-     * <ol>
-     * <li>Alice and Bob are participants and have both
-     * {@link Permission#WRITE_ACCESS}.
-     * <li>Alice and BOB have no {@link Permission}s after leaving the session.
-     * </ol>
-     */
+  /**
+   * Steps:
+   *
+   * <ol>
+   *   <li>Alice share project with BOB.
+   *   <li>Alice and BOB leave the session.
+   * </ol>
+   *
+   * Result:
+   *
+   * <ol>
+   *   <li>Alice and Bob are participants and have both {@link Permission#WRITE_ACCESS}.
+   *   <li>Alice and BOB have no {@link Permission}s after leaving the session.
+   * </ol>
+   */
+  @Test
+  public void testAliceShareProjectWithBobSequentially() throws Exception {
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .tree()
+        .newC()
+        .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-    @Test
-    public void testAliceShareProjectWithBobSequentially() throws Exception {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1);
+    Util.buildSessionSequentially(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
-        Util.buildSessionSequentially(Constants.PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    assertTrue(BOB.superBot().views().sarosView().isInSession());
+    assertTrue(ALICE.superBot().views().sarosView().isInSession());
 
-        assertTrue(BOB.superBot().views().sarosView().isInSession());
-        assertTrue(ALICE.superBot().views().sarosView().isInSession());
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-        BOB.superBot().views().packageExplorerView().waitUntilClassExists(
-            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    assertFalse(ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).hasReadOnlyAccess());
 
-        assertFalse(ALICE.superBot().views().sarosView()
-            .selectUser(BOB.getJID()).hasReadOnlyAccess());
+    assertTrue(ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).hasWriteAccess());
 
-        assertTrue(ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
-            .hasWriteAccess());
+    leaveSessionPeersFirst(ALICE);
 
-        leaveSessionPeersFirst(ALICE);
-
-        assertFalse(BOB.superBot().views().sarosView().isInSession());
-        assertFalse(ALICE.superBot().views().sarosView().isInSession());
-    }
+    assertFalse(BOB.superBot().views().sarosView().isInSession());
+    assertFalse(ALICE.superBot().views().sarosView().isInSession());
+  }
 }

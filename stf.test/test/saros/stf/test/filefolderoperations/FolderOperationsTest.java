@@ -17,96 +17,106 @@ import saros.stf.client.StfTestCase;
 @TestLink(id = "Saros-43_folder_operations")
 public class FolderOperationsTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        select(ALICE, BOB);
-        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    select(ALICE, BOB);
+    restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    closeAllShells();
+    closeAllEditors();
+  }
+
+  @After
+  public void cleanUpSaros() throws Exception {
+    if (checkIfTestRunInTestSuite()) {
+      ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
+      tearDownSaros();
+    } else {
+      tearDownSarosLast();
     }
+  }
 
-    @Before
-    public void setUp() throws Exception {
-        closeAllShells();
-        closeAllEditors();
-    }
+  @Test
+  public void testRenameFolder() throws Exception {
 
-    @After
-    public void cleanUpSaros() throws Exception {
-        if (checkIfTestRunInTestSuite()) {
-            ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
-            tearDownSaros();
-        } else {
-            tearDownSarosLast();
-        }
-    }
+    ALICE.superBot().internal().createFile("Foo1_Saros", "src/test/foo.txt", "");
 
-    @Test
-    public void testRenameFolder() throws Exception {
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/test/foo.txt");
 
-        ALICE.superBot().internal().createFile("Foo1_Saros", "src/test/foo.txt",
-            "");
+    ALICE.superBot().internal().createFolder("Foo1_Saros", "src/a/b/c");
+    ALICE.superBot().internal().createFolder("Foo1_Saros", "src/a/c/a");
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/test/foo.txt");
+    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("Foo1_Saros/src/a/b/c");
 
-        ALICE.superBot().internal().createFolder("Foo1_Saros", "src/a/b/c");
-        ALICE.superBot().internal().createFolder("Foo1_Saros", "src/a/c/a");
+    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("Foo1_Saros/src/a/c/a");
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/a/b/c");
+    /*
+     * 5 * 100 = 0.5 GB (that should not be transfered)
+     */
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/a/c/a");
+    long duration = 0;
 
-        /*
-         * 5 * 100 = 0.5 GB (that should not be transfered)
-         */
+    duration += moveAndMeasure("src/test", "src/a");
 
-        long duration = 0;
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilFileExists("Foo1_Saros", "src", "a", "foo.txt");
 
-        duration += moveAndMeasure("src/test", "src/a");
+    duration += moveAndMeasure("src/a", "src/a/b");
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilFileExists("Foo1_Saros", "src", "a", "foo.txt");
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilFileExists("Foo1_Saros", "src", "a/b", "foo.txt");
 
-        duration += moveAndMeasure("src/a", "src/a/b");
+    duration += moveAndMeasure("src/a/b", "src/a/b/c");
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilFileExists("Foo1_Saros", "src", "a/b", "foo.txt");
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilFileExists("Foo1_Saros", "src", "a/b/c", "foo.txt");
 
-        duration += moveAndMeasure("src/a/b", "src/a/b/c");
+    duration += moveAndMeasure("src/a/b/c", "src/a/c");
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilFileExists("Foo1_Saros", "src", "a/b/c", "foo.txt");
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilFileExists("Foo1_Saros", "src", "a/c", "foo.txt");
 
-        duration += moveAndMeasure("src/a/b/c", "src/a/c");
+    duration += moveAndMeasure("src/a/c", "src/a/c/a");
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilFileExists("Foo1_Saros", "src", "a/c", "foo.txt");
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilFileExists("Foo1_Saros", "src", "a/c/a", "foo.txt");
 
-        duration += moveAndMeasure("src/a/c", "src/a/c/a");
+    assertTrue("file was transmitted on every move", duration < 10000);
+  }
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilFileExists("Foo1_Saros", "src", "a/c/a", "foo.txt");
+  private long moveAndMeasure(String from, String to) throws Exception {
+    long start = System.currentTimeMillis();
 
-        assertTrue("file was transmitted on every move", duration < 10000);
+    List<String> source = new ArrayList<String>(Arrays.asList(from.split("/")));
 
-    }
+    source.add("foo.txt");
 
-    private long moveAndMeasure(String from, String to) throws Exception {
-        long start = System.currentTimeMillis();
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", source.toArray(new String[0]))
+        .refactor()
+        .moveTo("Foo1_Saros", to);
 
-        List<String> source = new ArrayList<String>(
-            Arrays.asList(from.split("/")));
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
-        source.add("foo.txt");
-
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", source.toArray(new String[0])).refactor()
-            .moveTo("Foo1_Saros", to);
-
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
-
-        return System.currentTimeMillis() - start;
-    }
+    return System.currentTimeMillis() - start;
+  }
 }

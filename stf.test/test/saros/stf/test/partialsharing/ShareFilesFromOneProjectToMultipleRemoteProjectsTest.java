@@ -17,78 +17,86 @@ import saros.stf.client.util.Util;
 import saros.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import saros.stf.shared.Constants.TypeOfCreateProject;
 
-public class ShareFilesFromOneProjectToMultipleRemoteProjectsTest
-    extends StfTestCase {
+public class ShareFilesFromOneProjectToMultipleRemoteProjectsTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        selectFirst(ALICE, BOB);
-    }
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    selectFirst(ALICE, BOB);
+  }
 
-    @AfterClass
-    public static void cleanUpSaros() throws Exception {
-        tearDownSarosLast();
-    }
+  @AfterClass
+  public static void cleanUpSaros() throws Exception {
+    tearDownSarosLast();
+  }
 
-    @Test
-    public void testShareFilesFromOneProjectToMultipleRemoteProjects()
-        throws Exception {
+  @Test
+  public void testShareFilesFromOneProjectToMultipleRemoteProjects() throws Exception {
 
-        ALICE.superBot().internal().createProject("A");
-        ALICE.superBot().internal().createFile("A", "a/a.txt", "");
-        ALICE.superBot().internal().createFile("A", "b/b.txt", "");
+    ALICE.superBot().internal().createProject("A");
+    ALICE.superBot().internal().createFile("A", "a/a.txt", "");
+    ALICE.superBot().internal().createFile("A", "b/b.txt", "");
 
-        Util.buildFileSessionConcurrently("A", new String[] { "a/a.txt" },
-            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+    Util.buildFileSessionConcurrently(
+        "A", new String[] {"a/a.txt"}, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("A/a/a.txt");
+    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("A/a/a.txt");
 
-        ALICE.superBot().menuBar().saros().addProject("A",
-            new String[] { "b/b.txt" });
+    ALICE.superBot().menuBar().saros().addProject("A", new String[] {"b/b.txt"});
 
-        IRemoteBotShell projectDialog = BOB.remoteBot()
-            .shell(SHELL_ADD_PROJECTS);
+    IRemoteBotShell projectDialog = BOB.remoteBot().shell(SHELL_ADD_PROJECTS);
 
-        assertTrue("partial shared project is not preselected", projectDialog
-            .bot().radio(RADIO_USING_EXISTING_PROJECT).isSelected());
-        assertFalse("option to choose project location must be disabled",
-            projectDialog.bot().radio(RADIO_USING_EXISTING_PROJECT)
-                .isEnabled());
+    assertTrue(
+        "partial shared project is not preselected",
+        projectDialog.bot().radio(RADIO_USING_EXISTING_PROJECT).isSelected());
+    assertFalse(
+        "option to choose project location must be disabled",
+        projectDialog.bot().radio(RADIO_USING_EXISTING_PROJECT).isEnabled());
 
-        projectDialog.bot().button(FINISH).click();
-        projectDialog.waitShortUntilIsClosed();
+    projectDialog.bot().button(FINISH).click();
+    projectDialog.waitShortUntilIsClosed();
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("A/b/b.txt");
+    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("A/b/b.txt");
 
-        BOB.superBot().views().packageExplorerView()
-            .selectFile("A", new String[] { "b", "b.txt" }).open();
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("A", new String[] {"b", "b.txt"})
+        .open();
 
-        BOB.remoteBot().editor("b.txt").waitUntilIsActive();
-        BOB.remoteBot().editor("b.txt").typeText("Triple BBB");
+    BOB.remoteBot().editor("b.txt").waitUntilIsActive();
+    BOB.remoteBot().editor("b.txt").typeText("Triple BBB");
 
-        BOB.superBot().views().packageExplorerView()
-            .selectFile("A", new String[] { "a", "a.txt" }).open();
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("A", new String[] {"a", "a.txt"})
+        .open();
 
-        BOB.remoteBot().editor("a.txt").waitUntilIsActive();
-        BOB.remoteBot().editor("a.txt").typeText("Triple AAA");
+    BOB.remoteBot().editor("a.txt").waitUntilIsActive();
+    BOB.remoteBot().editor("a.txt").typeText("Triple AAA");
 
-        BOB.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+    BOB.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("A", new String[] { "b", "b.txt" }).open();
-        ALICE.remoteBot().editor("b.txt").waitUntilIsActive();
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("A", new String[] {"b", "b.txt"})
+        .open();
+    ALICE.remoteBot().editor("b.txt").waitUntilIsActive();
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("A", new String[] { "a", "a.txt" }).open();
-        ALICE.remoteBot().editor("a.txt").waitUntilIsActive();
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("A", new String[] {"a", "a.txt"})
+        .open();
+    ALICE.remoteBot().editor("a.txt").waitUntilIsActive();
 
-        assertEquals(BOB.remoteBot().editor("a.txt").getText(),
-            ALICE.remoteBot().editor("a.txt").getText());
+    assertEquals(
+        BOB.remoteBot().editor("a.txt").getText(), ALICE.remoteBot().editor("a.txt").getText());
 
-        assertEquals(BOB.remoteBot().editor("b.txt").getText(),
-            ALICE.remoteBot().editor("b.txt").getText());
-    }
+    assertEquals(
+        BOB.remoteBot().editor("b.txt").getText(), ALICE.remoteBot().editor("b.txt").getText());
+  }
 }

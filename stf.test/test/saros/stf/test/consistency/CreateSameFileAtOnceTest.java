@@ -16,106 +16,127 @@ import saros.stf.client.tester.AbstractTester;
 @TestLink(id = "Saros-131_create_same_file_at_once")
 public class CreateSameFileAtOnceTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        selectFirst(ALICE, BOB, CARL);
-        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB, CARL);
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    selectFirst(ALICE, BOB, CARL);
+    restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB, CARL);
+  }
+
+  @After
+  public void restoreNetwork() throws Exception {
+    BOB.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
+    CARL.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
+
+    if (checkIfTestRunInTestSuite()) {
+      ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
+      tearDownSaros();
+    } else {
+      tearDownSarosLast();
+    }
+  }
+
+  @Test
+  public void testCreateSameFileAtOnce() throws Exception {
+
+    ALICE.superBot().internal().createFile("Foo1_Saros", "src/sync.dummy", "dummy");
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/sync.dummy");
+    CARL.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/sync.dummy");
+
+    AbstractTester firstTester = BOB;
+    AbstractTester secondTester = CARL;
+
+    if ((System.currentTimeMillis() & 1L) == 0L) {
+      firstTester = CARL;
+      secondTester = BOB;
     }
 
-    @After
-    public void restoreNetwork() throws Exception {
-        BOB.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets();
-        CARL.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets();
+    BOB.controlBot().getNetworkManipulator().blockOutgoingSessionPackets();
+    CARL.controlBot().getNetworkManipulator().blockOutgoingSessionPackets();
 
-        if (checkIfTestRunInTestSuite()) {
-            ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
-            tearDownSaros();
-        } else {
-            tearDownSarosLast();
-        }
+    firstTester
+        .superBot()
+        .internal()
+        .createFile("Foo1_Saros", "src/readme.txt", firstTester.toString());
+
+    secondTester
+        .superBot()
+        .internal()
+        .createFile("Foo1_Saros", "src/readme.txt", secondTester.toString());
+
+    BOB.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
+
+    CARL.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
+
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
+
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();
+
+    String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
+
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    BOB.remoteBot().editor("readme.txt").waitUntilIsActive();
+
+    String bobText = BOB.remoteBot().editor("readme.txt").getText();
+
+    CARL.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    CARL.remoteBot().editor("readme.txt").waitUntilIsActive();
+
+    String carlText = CARL.remoteBot().editor("readme.txt").getText();
+
+    if (bobText.equals(aliceText) && carlText.equals(aliceText)) return; // already corrected
+
+    AbstractTester tester = null;
+
+    if (aliceText.equals(bobText)) tester = CARL;
+    else if (aliceText.equals(carlText)) tester = BOB;
+    else {
+      fail(
+          "the content of Alice editor: '"
+              + aliceText
+              + "' is not expected, it must be '"
+              + BOB.toString()
+              + "' or '"
+              + CARL.toString()
+              + "'");
+      return; // just for get rid of the null pointer warning
     }
 
-    @Test
-    public void testCreateSameFileAtOnce() throws Exception {
+    tester.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
+    tester.superBot().views().sarosView().resolveInconsistency();
 
-        ALICE.superBot().internal().createFile("Foo1_Saros", "src/sync.dummy",
-            "dummy");
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/sync.dummy");
-        CARL.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/sync.dummy");
+    tester
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    tester.remoteBot().editor("readme.txt").waitUntilIsActive();
 
-        AbstractTester firstTester = BOB;
-        AbstractTester secondTester = CARL;
-
-        if ((System.currentTimeMillis() & 1L) == 0L) {
-            firstTester = CARL;
-            secondTester = BOB;
-        }
-
-        BOB.controlBot().getNetworkManipulator().blockOutgoingSessionPackets();
-        CARL.controlBot().getNetworkManipulator().blockOutgoingSessionPackets();
-
-        firstTester.superBot().internal().createFile("Foo1_Saros",
-            "src/readme.txt", firstTester.toString());
-
-        secondTester.superBot().internal().createFile("Foo1_Saros",
-            "src/readme.txt", secondTester.toString());
-
-        BOB.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets();
-
-        CARL.controlBot().getNetworkManipulator()
-            .unblockOutgoingSessionPackets();
-
-        ALICE.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
-
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();
-
-        String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
-
-        BOB.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        BOB.remoteBot().editor("readme.txt").waitUntilIsActive();
-
-        String bobText = BOB.remoteBot().editor("readme.txt").getText();
-
-        CARL.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        CARL.remoteBot().editor("readme.txt").waitUntilIsActive();
-
-        String carlText = CARL.remoteBot().editor("readme.txt").getText();
-
-        if (bobText.equals(aliceText) && carlText.equals(aliceText))
-            return; // already corrected
-
-        AbstractTester tester = null;
-
-        if (aliceText.equals(bobText))
-            tester = CARL;
-        else if (aliceText.equals(carlText))
-            tester = BOB;
-        else {
-            fail("the content of Alice editor: '" + aliceText
-                + "' is not expected, it must be '" + BOB.toString() + "' or '"
-                + CARL.toString() + "'");
-            return; // just for get rid of the null pointer warning
-        }
-
-        tester.superBot().views().sarosView()
-            .waitUntilIsInconsistencyDetected();
-        tester.superBot().views().sarosView().resolveInconsistency();
-
-        tester.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        tester.remoteBot().editor("readme.txt").waitUntilIsActive();
-
-        String repairedText = tester.remoteBot().editor("readme.txt").getText();
-        assertEquals(aliceText, repairedText);
-    }
+    String repairedText = tester.remoteBot().editor("readme.txt").getText();
+    assertEquals(aliceText, repairedText);
+  }
 }

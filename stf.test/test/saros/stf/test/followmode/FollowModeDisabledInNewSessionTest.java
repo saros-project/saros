@@ -15,76 +15,83 @@ import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class FollowModeDisabledInNewSessionTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        select(ALICE, BOB);
-        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    select(ALICE, BOB);
+    restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    closeAllShells();
+    closeAllEditors();
+  }
+
+  @After
+  public void cleanUpSaros() throws Exception {
+    if (checkIfTestRunInTestSuite()) {
+      ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
+      tearDownSaros();
+    } else {
+      tearDownSarosLast();
     }
+  }
 
-    @Before
-    public void setUp() throws Exception {
-        closeAllShells();
-        closeAllEditors();
-    }
+  @Test
+  public void testFollowModeDisabledInNewSession() throws Exception {
 
-    @After
-    public void cleanUpSaros() throws Exception {
-        if (checkIfTestRunInTestSuite()) {
-            ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
-            tearDownSaros();
-        } else {
-            tearDownSarosLast();
-        }
-    }
+    ALICE.superBot().internal().createFile("Foo1_Saros", "src/readme.txt", "bla bla bla");
 
-    @Test
-    public void testFollowModeDisabledInNewSession() throws Exception {
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
 
-        ALICE.superBot().internal().createFile("Foo1_Saros", "src/readme.txt",
-            "bla bla bla");
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
+    BOB.superBot().views().sarosView().selectUser(ALICE.getJID()).followParticipant();
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
+    BOB.superBot().views().sarosView().selectUser(ALICE.getJID()).waitUntilIsFollowing();
 
-        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
-            .followParticipant();
+    ALICE.superBot().internal().createFile("Foo1_Saros", "src/info.txt", "info");
 
-        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
-            .waitUntilIsFollowing();
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
-        ALICE.superBot().internal().createFile("Foo1_Saros", "src/info.txt",
-            "info");
+    leaveSessionPeersFirst(ALICE);
 
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+    BOB.remoteBot().closeAllEditors();
 
-        leaveSessionPeersFirst(ALICE);
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
 
-        BOB.remoteBot().closeAllEditors();
+    Util.buildSessionSequentially("Foo1_Saros", TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
 
-        BOB.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
 
-        Util.buildSessionSequentially("Foo1_Saros",
-            TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
+    assertFalse(
+        "BOB is following ALICE",
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID()).isFollowing());
 
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
-
-        assertFalse("BOB is following ALICE", BOB.superBot().views().sarosView()
-            .selectUser(ALICE.getJID()).isFollowing());
-
-        assertTrue("editor changed",
-            BOB.remoteBot().editor("readme.txt").isActive());
-
-    }
+    assertTrue("editor changed", BOB.remoteBot().editor("readme.txt").isActive());
+  }
 }

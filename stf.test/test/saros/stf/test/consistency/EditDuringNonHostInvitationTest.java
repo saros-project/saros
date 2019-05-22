@@ -18,83 +18,87 @@ import saros.test.util.EclipseTestThread;
 
 public class EditDuringNonHostInvitationTest extends StfTestCase {
 
-    private EclipseTestThread aliceIsWriting;
+  private EclipseTestThread aliceIsWriting;
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        select(ALICE, BOB, CARL);
-        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
-    }
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    select(ALICE, BOB, CARL);
+    restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB);
+  }
 
-    @AfterClass
-    public static void cleanUpSaros() throws Exception {
-        tearDownSarosLast();
-    }
+  @AfterClass
+  public static void cleanUpSaros() throws Exception {
+    tearDownSarosLast();
+  }
 
-    @Test
-    @Ignore("Non-Host Invitation is currently deactivated")
-    public void testEditDuringInvitationNonHostInvites() throws Exception {
+  @Test
+  @Ignore("Non-Host Invitation is currently deactivated")
+  public void testEditDuringInvitationNonHostInvites() throws Exception {
 
-        ALICE.superBot().internal().createJavaClass(Constants.PROJECT1,
-            Constants.PKG1, Constants.CLS1);
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/my/pkg/MyClass.java");
+    ALICE.superBot().internal().createJavaClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/my/pkg/MyClass.java");
 
-        BOB.superBot().views().sarosView().selectContact(CARL.getJID())
-            .addToSarosSession();
+    BOB.superBot().views().sarosView().selectContact(CARL.getJID()).addToSarosSession();
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "my", "pkg", "MyClass.java")
-            .open();
-        CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "my", "pkg", "MyClass.java")
+        .open();
+    CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-        aliceIsWriting = createTestThread(new EclipseTestThread.Runnable() {
+    aliceIsWriting =
+        createTestThread(
+            new EclipseTestThread.Runnable() {
 
-            @Override
-            public void run() throws Exception {
+              @Override
+              public void run() throws Exception {
                 for (int i = 0; i < 20; i++)
-                    ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-                        .typeText("FooBar");
-            }
-        });
+                  ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).typeText("FooBar");
+              }
+            });
 
-        aliceIsWriting.start();
+    aliceIsWriting.start();
 
-        CARL.superBot()
-            .confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+    CARL.superBot().confirmShellAddProjectWithNewProject(Constants.PROJECT1);
 
-        aliceIsWriting.join();
-        aliceIsWriting.verify();
-        CARL.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/my/pkg/MyClass.java");
+    aliceIsWriting.join();
+    aliceIsWriting.verify();
+    CARL.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/my/pkg/MyClass.java");
 
-        CARL.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "my", "pkg", "MyClass.java")
-            .open();
+    CARL.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "my", "pkg", "MyClass.java")
+        .open();
 
-        BOB.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "my", "pkg", "MyClass.java")
-            .open();
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "my", "pkg", "MyClass.java")
+        .open();
 
-        String textByBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .getText();
+    String textByBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX).getText();
 
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .waitUntilIsTextSame(textByBob);
+    ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsTextSame(textByBob);
 
-        String textByAlice = ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .getText();
+    String textByAlice = ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getText();
 
-        try {
-            CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
-                .waitUntilIsTextSame(textByBob);
-        } catch (TimeoutException e) {
-            //
-        }
-        String textByCarl = CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .getText();
-
-        assertEquals(textByBob, textByAlice);
-        assertEquals(textByBob, textByCarl);
+    try {
+      CARL.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsTextSame(textByBob);
+    } catch (TimeoutException e) {
+      //
     }
+    String textByCarl = CARL.remoteBot().editor(Constants.CLS1_SUFFIX).getText();
+
+    assertEquals(textByBob, textByAlice);
+    assertEquals(textByBob, textByCarl);
+  }
 }

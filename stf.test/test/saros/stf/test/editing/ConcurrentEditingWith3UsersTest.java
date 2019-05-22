@@ -17,323 +17,348 @@ import saros.test.util.EclipseTestThread;
  * @author nwarnatsch
  */
 public class ConcurrentEditingWith3UsersTest extends StfTestCase {
-    private EclipseTestThread aliceEditTaskThread;
-    private EclipseTestThread bobEditTaskThread;
-    private EclipseTestThread carlEditTaskThread;
+  private EclipseTestThread aliceEditTaskThread;
+  private EclipseTestThread bobEditTaskThread;
+  private EclipseTestThread carlEditTaskThread;
+
+  /*
+   * The interval is the period of time in which the users edit the file. The
+   * interval is set in minutes
+   */
+  private static final int INTERVAL = 1;
+
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    select(ALICE, BOB, CARL);
+    restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB, CARL);
+  }
+
+  @After
+  public void runAfterEveryTest() throws Exception {
+    terminateTestThreads(10000);
+    if (checkIfTestRunInTestSuite()) {
+      ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
+      tearDownSaros();
+    } else {
+      tearDownSarosLast();
+    }
+  }
+
+  /**
+   * The User ALICE and BOB insert characters in the file, CARL deletes a range of characters
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testTwoInsertOneDelete() throws Exception {
+    ALICE
+        .superBot()
+        .internal()
+        .createFile(
+            "Foo1_Saros",
+            "src/readme.txt",
+            "\nVerbesserung des algorithmischen Kerns, Gleichzeitiges Editieren\n");
+
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
+    CARL.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
+
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();
+
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    BOB.remoteBot().editor("readme.txt").waitUntilIsActive();
+
+    CARL.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    CARL.remoteBot().editor("readme.txt").waitUntilIsActive();
 
     /*
-     * The interval is the period of time in which the users edit the file. The
-     * interval is set in minutes
+     * The Alice-Thread insert the lower case characters
      */
-    private static final int INTERVAL = 1;
+    EclipseTestThread.Runnable aliceEditTask =
+        new EclipseTestThread.Runnable() {
+          @Override
+          public void run() throws Exception {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        select(ALICE, BOB, CARL);
-        restoreSessionIfNecessary("Foo1_Saros", ALICE, BOB, CARL);
-    }
+            int i = 97;
+            while (!Thread.currentThread().isInterrupted()) {
+              if (i >= 123) { //
+                ALICE.remoteBot().editor("readme.txt").typeText("\n");
+                i = 96;
+              } else {
+                ALICE.remoteBot().editor("readme.txt").typeText("" + ((char) i) + "");
+                ALICE.remoteBot().editor("readme.txt").navigateTo(1, 1);
+              }
+              i++;
+            }
+          }
+        };
 
-    @After
-    public void runAfterEveryTest() throws Exception {
-        terminateTestThreads(10000);
-        if (checkIfTestRunInTestSuite()) {
-            ALICE.superBot().internal().deleteFolder("Foo1_Saros", "src");
-            tearDownSaros();
-        } else {
-            tearDownSarosLast();
-        }
-    }
-
-    /**
-     * The User ALICE and BOB insert characters in the file, CARL deletes a
-     * range of characters
-     *
-     * @throws Exception
+    /*
+     * The Carl-Thread delete a range of characters
      */
+    EclipseTestThread.Runnable carlEditTask =
+        new EclipseTestThread.Runnable() {
+          @Override
+          public void run() throws Exception {
+            int i = 48;
+            while (!Thread.currentThread().isInterrupted()) {
+              if (i >= 58) {
+                CARL.remoteBot().editor("readme.txt").selectRange(1, 1, 5);
+                CARL.remoteBot().editor("readme.txt").pressShortCutDelete();
+                CARL.remoteBot().editor("readme.txt").selectRange(1, 1, 6);
+                CARL.remoteBot().editor("readme.txt").typeText("#");
+                i = 47;
+              } else {
+                CARL.remoteBot().editor("readme.txt").navigateTo(1, 1);
+              }
+              i++;
+            }
+          }
+        };
 
-    @Test
-    public void testTwoInsertOneDelete() throws Exception {
-        ALICE.superBot().internal().createFile("Foo1_Saros", "src/readme.txt",
+    /*
+     * The Bob-Thread insert the upper case characters
+     */
+    EclipseTestThread.Runnable bobEditTask =
+        new EclipseTestThread.Runnable() {
+          @Override
+          public void run() throws Exception {
+            int i = 65;
+            while (!Thread.currentThread().isInterrupted()) {
+              if (i >= 91) {
+                BOB.remoteBot().editor("readme.txt").typeText("\n");
+                i = 64;
+              } else {
+                BOB.remoteBot().editor("readme.txt").typeText("" + ((char) i) + "");
+                BOB.remoteBot().editor("readme.txt").navigateTo(1, 1);
+              }
+              i++;
+            }
+          }
+        };
+
+    aliceEditTaskThread = createTestThread(aliceEditTask);
+    aliceEditTaskThread.start();
+
+    bobEditTaskThread = createTestThread(bobEditTask);
+    bobEditTaskThread.start();
+
+    carlEditTaskThread = createTestThread(carlEditTask);
+    carlEditTaskThread.start();
+
+    Thread.sleep(INTERVAL * 60 * 1000);
+
+    aliceEditTaskThread.interrupt();
+    bobEditTaskThread.interrupt();
+    carlEditTaskThread.interrupt();
+
+    aliceEditTaskThread.join(10000);
+    bobEditTaskThread.join(10000);
+    carlEditTaskThread.join(10000);
+
+    aliceEditTaskThread.verify();
+    bobEditTaskThread.verify();
+    carlEditTaskThread.verify();
+
+    // ensure that all queues on the client sides are flushed
+    BOB.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+
+    CARL.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(CARL.getJID(), 60 * 1000);
+
+    String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
+    String bobText = BOB.remoteBot().editor("readme.txt").getText();
+    String carlText = CARL.remoteBot().editor("readme.txt").getText();
+
+    ALICE.remoteBot().editor("readme.txt").closeWithoutSave();
+    ALICE.remoteBot().waitUntilEditorClosed("readme.txt");
+
+    BOB.remoteBot().editor("readme.txt").closeWithoutSave();
+    BOB.remoteBot().waitUntilEditorClosed("readme.txt");
+
+    CARL.remoteBot().editor("readme.txt").closeWithoutSave();
+    CARL.remoteBot().waitUntilEditorClosed("readme.txt");
+
+    assertEquals(bobText, carlText);
+    assertEquals(aliceText, bobText);
+  }
+
+  /**
+   * Three users (everyone in one thread) insert text in the same file on the same line (Line 1).
+   *
+   * @throws Exception
+   */
+  // @Test
+  public void testThreeInsert() throws Exception {
+    ALICE
+        .superBot()
+        .internal()
+        .createFile(
+            "Foo1_Saros",
+            "src/readme.txt",
             "\nVerbesserung des algorithmischen Kerns, Gleichzeitiges Editieren\n");
 
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
-        CARL.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
+    CARL.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();
+    ALICE
+        .superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();
 
-        BOB.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        BOB.remoteBot().editor("readme.txt").waitUntilIsActive();
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    BOB.remoteBot().editor("readme.txt").waitUntilIsActive();
 
-        CARL.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        CARL.remoteBot().editor("readme.txt").waitUntilIsActive();
+    CARL.superBot()
+        .views()
+        .packageExplorerView()
+        .selectFile("Foo1_Saros", "src", "readme.txt")
+        .open();
+    CARL.remoteBot().editor("readme.txt").waitUntilIsActive();
 
-        /*
-         * The Alice-Thread insert the lower case characters
-         */
-        EclipseTestThread.Runnable aliceEditTask = new EclipseTestThread.Runnable() {
-            @Override
-            public void run() throws Exception {
-
-                int i = 97;
-                while (!Thread.currentThread().isInterrupted()) {
-                    if (i >= 123) { //
-                        ALICE.remoteBot().editor("readme.txt").typeText("\n");
-                        i = 96;
-                    } else {
-                        ALICE.remoteBot().editor("readme.txt")
-                            .typeText("" + ((char) i) + "");
-                        ALICE.remoteBot().editor("readme.txt").navigateTo(1, 1);
-                    }
-                    i++;
-                }
-            }
-        };
-
-        /*
-         * The Carl-Thread delete a range of characters
-         */
-        EclipseTestThread.Runnable carlEditTask = new EclipseTestThread.Runnable() {
-            @Override
-            public void run() throws Exception {
-                int i = 48;
-                while (!Thread.currentThread().isInterrupted()) {
-                    if (i >= 58) {
-                        CARL.remoteBot().editor("readme.txt").selectRange(1, 1,
-                            5);
-                        CARL.remoteBot().editor("readme.txt")
-                            .pressShortCutDelete();
-                        CARL.remoteBot().editor("readme.txt").selectRange(1, 1,
-                            6);
-                        CARL.remoteBot().editor("readme.txt").typeText("#");
-                        i = 47;
-                    } else {
-                        CARL.remoteBot().editor("readme.txt").navigateTo(1, 1);
-                    }
-                    i++;
-                }
-            }
-        };
-
-        /*
-         * The Bob-Thread insert the upper case characters
-         */
-        EclipseTestThread.Runnable bobEditTask = new EclipseTestThread.Runnable() {
-            @Override
-            public void run() throws Exception {
-                int i = 65;
-                while (!Thread.currentThread().isInterrupted()) {
-                    if (i >= 91) {
-                        BOB.remoteBot().editor("readme.txt").typeText("\n");
-                        i = 64;
-                    } else {
-                        BOB.remoteBot().editor("readme.txt")
-                            .typeText("" + ((char) i) + "");
-                        BOB.remoteBot().editor("readme.txt").navigateTo(1, 1);
-                    }
-                    i++;
-                }
-            }
-        };
-
-        aliceEditTaskThread = createTestThread(aliceEditTask);
-        aliceEditTaskThread.start();
-
-        bobEditTaskThread = createTestThread(bobEditTask);
-        bobEditTaskThread.start();
-
-        carlEditTaskThread = createTestThread(carlEditTask);
-        carlEditTaskThread.start();
-
-        Thread.sleep(INTERVAL * 60 * 1000);
-
-        aliceEditTaskThread.interrupt();
-        bobEditTaskThread.interrupt();
-        carlEditTaskThread.interrupt();
-
-        aliceEditTaskThread.join(10000);
-        bobEditTaskThread.join(10000);
-        carlEditTaskThread.join(10000);
-
-        aliceEditTaskThread.verify();
-        bobEditTaskThread.verify();
-        carlEditTaskThread.verify();
-
-        // ensure that all queues on the client sides are flushed
-        BOB.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
-
-        CARL.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
-
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
-
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(CARL.getJID(), 60 * 1000);
-
-        String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
-        String bobText = BOB.remoteBot().editor("readme.txt").getText();
-        String carlText = CARL.remoteBot().editor("readme.txt").getText();
-
-        ALICE.remoteBot().editor("readme.txt").closeWithoutSave();
-        ALICE.remoteBot().waitUntilEditorClosed("readme.txt");
-
-        BOB.remoteBot().editor("readme.txt").closeWithoutSave();
-        BOB.remoteBot().waitUntilEditorClosed("readme.txt");
-
-        CARL.remoteBot().editor("readme.txt").closeWithoutSave();
-        CARL.remoteBot().waitUntilEditorClosed("readme.txt");
-
-        assertEquals(bobText, carlText);
-        assertEquals(aliceText, bobText);
-    }
-
-    /**
-     * Three users (everyone in one thread) insert text in the same file on the
-     * same line (Line 1).
-     *
-     * @throws Exception
+    /*
+     * The Alice-Thread insert the lower case characters
      */
-    // @Test
-    public void testThreeInsert() throws Exception {
-        ALICE.superBot().internal().createFile("Foo1_Saros", "src/readme.txt",
-            "\nVerbesserung des algorithmischen Kerns, Gleichzeitiges Editieren\n");
-
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
-        CARL.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("Foo1_Saros/src/readme.txt");
-
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();
-
-        BOB.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        BOB.remoteBot().editor("readme.txt").waitUntilIsActive();
-
-        CARL.superBot().views().packageExplorerView()
-            .selectFile("Foo1_Saros", "src", "readme.txt").open();
-        CARL.remoteBot().editor("readme.txt").waitUntilIsActive();
-
-        /*
-         * The Alice-Thread insert the lower case characters
-         */
-        EclipseTestThread.Runnable aliceEditTask = new EclipseTestThread.Runnable() {
-            @Override
-            public void run() throws Exception {
-                int i = 97;
-                while (!Thread.currentThread().isInterrupted()) {
-                    if (i >= 123) {
-                        ALICE.remoteBot().editor("readme.txt").typeText("\n");
-                        i = 96;
-                    } else {
-                        ALICE.remoteBot().editor("readme.txt")
-                            .typeText("" + ((char) i) + "");
-                        ALICE.remoteBot().editor("readme.txt").navigateTo(1, 1);
-                    }
-                    i++;
-                }
+    EclipseTestThread.Runnable aliceEditTask =
+        new EclipseTestThread.Runnable() {
+          @Override
+          public void run() throws Exception {
+            int i = 97;
+            while (!Thread.currentThread().isInterrupted()) {
+              if (i >= 123) {
+                ALICE.remoteBot().editor("readme.txt").typeText("\n");
+                i = 96;
+              } else {
+                ALICE.remoteBot().editor("readme.txt").typeText("" + ((char) i) + "");
+                ALICE.remoteBot().editor("readme.txt").navigateTo(1, 1);
+              }
+              i++;
             }
+          }
         };
 
-        /*
-         * The Carl-Thread insert numbers
-         */
-        EclipseTestThread.Runnable carlEditTask = new EclipseTestThread.Runnable() {
-            @Override
-            public void run() throws Exception {
-                int i = 48;
-                while (!Thread.currentThread().isInterrupted()) {
-                    if (i >= 58) {
-                        CARL.remoteBot().editor("readme.txt").typeText("\n");
-                        i = 47;
-                    } else {
-                        CARL.remoteBot().editor("readme.txt")
-                            .typeText("" + ((char) i) + "");
-                        CARL.remoteBot().editor("readme.txt").navigateTo(1, 1);
-                    }
-                    i++;
-                }
+    /*
+     * The Carl-Thread insert numbers
+     */
+    EclipseTestThread.Runnable carlEditTask =
+        new EclipseTestThread.Runnable() {
+          @Override
+          public void run() throws Exception {
+            int i = 48;
+            while (!Thread.currentThread().isInterrupted()) {
+              if (i >= 58) {
+                CARL.remoteBot().editor("readme.txt").typeText("\n");
+                i = 47;
+              } else {
+                CARL.remoteBot().editor("readme.txt").typeText("" + ((char) i) + "");
+                CARL.remoteBot().editor("readme.txt").navigateTo(1, 1);
+              }
+              i++;
             }
+          }
         };
 
-        /*
-         * The Bob-Thread insert the upper case characters
-         */
-        EclipseTestThread.Runnable bobEditTask = new EclipseTestThread.Runnable() {
-            @Override
-            public void run() throws Exception {
-                int i = 65;
-                while (!Thread.currentThread().isInterrupted()) {
-                    if (i >= 91) {
-                        BOB.remoteBot().editor("readme.txt").typeText("\n");
-                        i = 64;
-                    } else {
-                        BOB.remoteBot().editor("readme.txt")
-                            .typeText("" + ((char) i) + "");
-                        BOB.remoteBot().editor("readme.txt").navigateTo(1, 1);
-                    }
-                    i++;
-                }
+    /*
+     * The Bob-Thread insert the upper case characters
+     */
+    EclipseTestThread.Runnable bobEditTask =
+        new EclipseTestThread.Runnable() {
+          @Override
+          public void run() throws Exception {
+            int i = 65;
+            while (!Thread.currentThread().isInterrupted()) {
+              if (i >= 91) {
+                BOB.remoteBot().editor("readme.txt").typeText("\n");
+                i = 64;
+              } else {
+                BOB.remoteBot().editor("readme.txt").typeText("" + ((char) i) + "");
+                BOB.remoteBot().editor("readme.txt").navigateTo(1, 1);
+              }
+              i++;
             }
+          }
         };
 
-        aliceEditTaskThread = createTestThread(aliceEditTask);
-        aliceEditTaskThread.start();
+    aliceEditTaskThread = createTestThread(aliceEditTask);
+    aliceEditTaskThread.start();
 
-        bobEditTaskThread = createTestThread(bobEditTask);
-        bobEditTaskThread.start();
+    bobEditTaskThread = createTestThread(bobEditTask);
+    bobEditTaskThread.start();
 
-        carlEditTaskThread = createTestThread(carlEditTask);
-        carlEditTaskThread.start();
+    carlEditTaskThread = createTestThread(carlEditTask);
+    carlEditTaskThread.start();
 
-        Thread.sleep(INTERVAL * 60 * 1000);
+    Thread.sleep(INTERVAL * 60 * 1000);
 
-        aliceEditTaskThread.interrupt();
-        bobEditTaskThread.interrupt();
-        carlEditTaskThread.interrupt();
-        aliceEditTaskThread.join(10000);
-        bobEditTaskThread.join(10000);
-        carlEditTaskThread.join(10000);
+    aliceEditTaskThread.interrupt();
+    bobEditTaskThread.interrupt();
+    carlEditTaskThread.interrupt();
+    aliceEditTaskThread.join(10000);
+    bobEditTaskThread.join(10000);
+    carlEditTaskThread.join(10000);
 
-        aliceEditTaskThread.verify();
-        bobEditTaskThread.verify();
-        carlEditTaskThread.verify();
+    aliceEditTaskThread.verify();
+    bobEditTaskThread.verify();
+    carlEditTaskThread.verify();
 
-        // ensure that all queues on the client sides are flushed
-        BOB.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+    // ensure that all queues on the client sides are flushed
+    BOB.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
 
-        CARL.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+    CARL.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
 
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
-        ALICE.controlBot().getNetworkManipulator()
-            .synchronizeOnActivityQueue(CARL.getJID(), 60 * 1000);
+    ALICE.controlBot().getNetworkManipulator().synchronizeOnActivityQueue(CARL.getJID(), 60 * 1000);
 
-        String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
-        String bobText = BOB.remoteBot().editor("readme.txt").getText();
-        String carlText = CARL.remoteBot().editor("readme.txt").getText();
+    String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
+    String bobText = BOB.remoteBot().editor("readme.txt").getText();
+    String carlText = CARL.remoteBot().editor("readme.txt").getText();
 
-        ALICE.remoteBot().editor("readme.txt").closeWithoutSave();
-        ALICE.remoteBot().waitUntilEditorClosed("readme.txt");
+    ALICE.remoteBot().editor("readme.txt").closeWithoutSave();
+    ALICE.remoteBot().waitUntilEditorClosed("readme.txt");
 
-        BOB.remoteBot().editor("readme.txt").closeWithoutSave();
-        BOB.remoteBot().waitUntilEditorClosed("readme.txt");
+    BOB.remoteBot().editor("readme.txt").closeWithoutSave();
+    BOB.remoteBot().waitUntilEditorClosed("readme.txt");
 
-        CARL.remoteBot().editor("readme.txt").closeWithoutSave();
-        CARL.remoteBot().waitUntilEditorClosed("readme.txt");
+    CARL.remoteBot().editor("readme.txt").closeWithoutSave();
+    CARL.remoteBot().waitUntilEditorClosed("readme.txt");
 
-        assertEquals(bobText, carlText);
-        assertEquals(aliceText, bobText);
-    }
+    assertEquals(bobText, carlText);
+    assertEquals(aliceText, bobText);
+  }
 }
