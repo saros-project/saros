@@ -17,66 +17,60 @@ import saros.stf.test.stf.Constants;
 
 public class WriteAccessChangeAndImmediateWriteTest extends StfTestCase {
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        Assume.assumeTrue(checkIfShare2UsersSequentiallySucceeded());
-        select(ALICE, BOB);
-    }
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    Assume.assumeTrue(checkIfShare2UsersSequentiallySucceeded());
+    select(ALICE, BOB);
+  }
 
-    /**
-     * Steps:
-     *
-     * <p>
-     * 1. ALICE restrict to read only access.
-     *
-     * <p>
-     * 2. BOB try to create inconsistency (set Text)
-     *
-     * <p>
-     * 3. ALICE grants write access to BOB
-     *
-     * <p>
-     * 4. BOB immediately begins to write it.
-     *
-     * <p>
-     * Expected Results:
-     *
-     * <p>
-     * 2. inconsistency should occur by BOB.
-     *
-     * <p>
-     * 4. no inconsistency occur by BOB.
-     */
-    @Test
-    public void testFollowModeByOpenClassbyAlice() throws Exception {
-        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
-            Constants.PKG1, Constants.CLS1, ALICE, BOB);
+  /**
+   * Steps:
+   *
+   * <p>1. ALICE restrict to read only access.
+   *
+   * <p>2. BOB try to create inconsistency (set Text)
+   *
+   * <p>3. ALICE grants write access to BOB
+   *
+   * <p>4. BOB immediately begins to write it.
+   *
+   * <p>Expected Results:
+   *
+   * <p>2. inconsistency should occur by BOB.
+   *
+   * <p>4. no inconsistency occur by BOB.
+   */
+  @Test
+  public void testFollowModeByOpenClassbyAlice() throws Exception {
+    Util.setUpSessionWithJavaProjectAndClass(
+        Constants.PROJECT1, Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
-        BOB.superBot().views().packageExplorerView().waitUntilClassExists(
-            Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
 
-        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
-            .restrictToReadOnlyAccess();
-        BOB.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-            .open();
-        BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextFromFile(Constants.CP1);
-        BOB.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
+    ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).restrictToReadOnlyAccess();
+    BOB.superBot()
+        .views()
+        .packageExplorerView()
+        .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+        .open();
+    BOB.remoteBot().editor(Constants.CLS1_SUFFIX).setTextFromFile(Constants.CP1);
+    BOB.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
 
-        assertTrue(BOB.remoteBot().view(VIEW_SAROS)
+    assertTrue(
+        BOB.remoteBot()
+            .view(VIEW_SAROS)
             .toolbarButtonWithRegex(TB_INCONSISTENCY_DETECTED + ".*")
             .isEnabled());
-        BOB.superBot().views().sarosView().resolveInconsistency();
+    BOB.superBot().views().sarosView().resolveInconsistency();
 
-        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
-            .grantWriteAccess();
-        BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextFromFile(Constants.CP2);
+    ALICE.superBot().views().sarosView().selectUser(BOB.getJID()).grantWriteAccess();
+    BOB.remoteBot().editor(Constants.CLS1_SUFFIX).setTextFromFile(Constants.CP2);
 
-        Thread.sleep(5000);
+    Thread.sleep(5000);
 
-        assertFalse(BOB.remoteBot().view(VIEW_SAROS)
-            .toolbarButton(TB_NO_INCONSISTENCIES).isEnabled());
-    }
+    assertFalse(BOB.remoteBot().view(VIEW_SAROS).toolbarButton(TB_NO_INCONSISTENCIES).isEnabled());
+  }
 }

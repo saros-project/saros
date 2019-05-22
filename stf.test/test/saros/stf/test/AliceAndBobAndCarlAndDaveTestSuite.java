@@ -6,8 +6,10 @@ import saros.stf.test.invitation.ParallelInvitationWithTerminationByHostTest;
 import saros.stf.test.permissions.AllParticipantsFollowUserWithWriteAccessTest;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ ParallelInvitationWithTerminationByHostTest.class,
-    AllParticipantsFollowUserWithWriteAccessTest.class })
+@Suite.SuiteClasses({
+  ParallelInvitationWithTerminationByHostTest.class,
+  AllParticipantsFollowUserWithWriteAccessTest.class
+})
 public class AliceAndBobAndCarlAndDaveTestSuite {
-    //
+  //
 }

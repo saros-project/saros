@@ -13,27 +13,26 @@ import saros.stf.shared.Constants.TypeOfCreateProject;
 
 public class InviteAndLeaveStressTest extends StfTestCase {
 
-    private static final int MAX_PROJECTS = 10;
+  private static final int MAX_PROJECTS = 10;
 
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        Assume.assumeTrue(checkIfShare3UsersConcurrentlySucceeded());
-        select(ALICE, BOB, CARL);
+  @BeforeClass
+  public static void selectTesters() throws Exception {
+    Assume.assumeTrue(checkIfShare3UsersConcurrentlySucceeded());
+    select(ALICE, BOB, CARL);
+  }
+
+  @Test
+  public void testInviteAndLeaveStress() throws Exception {
+
+    for (int i = 0; i < MAX_PROJECTS; i++) {
+      ALICE.superBot().internal().createProject("foo" + i);
+      ALICE.superBot().internal().createFile("foo" + i, "foo.txt", "foo");
     }
 
-    @Test
-    public void testInviteAndLeaveStress() throws Exception {
+    for (int i = 0; i < MAX_PROJECTS; i++) {
+      Util.buildSessionConcurrently("foo" + i, TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
 
-        for (int i = 0; i < MAX_PROJECTS; i++) {
-            ALICE.superBot().internal().createProject("foo" + i);
-            ALICE.superBot().internal().createFile("foo" + i, "foo.txt", "foo");
-        }
-
-        for (int i = 0; i < MAX_PROJECTS; i++) {
-            Util.buildSessionConcurrently("foo" + i,
-                TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
-
-            leaveSessionHostFirst(ALICE);
-        }
+      leaveSessionHostFirst(ALICE);
     }
+  }
 }

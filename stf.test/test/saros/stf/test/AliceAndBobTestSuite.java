@@ -34,27 +34,42 @@ import saros.stf.test.session.EstablishSessionWithDifferentTransportModesTest;
 import saros.stf.test.session.OverlappingSharingTest;
 import saros.stf.test.whiteboard.ObjectCreationTest;
 
-//order of the test classes is important if you want to test first Saros' main functionalities
+// order of the test classes is important if you want to test first Saros' main functionalities
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ Share2UsersSequentiallyTest.class,
-    HostInvitesBelatedlyTest.class, InviteWithDifferentVersionsTest.class,
-    ShareProjectUsingExistingProjectTest.class, ModifyNonSharedFilesTest.class,
-    ShareFilesFromOneProjectToMultipleRemoteProjectsTest.class,
-    ShareFilesToProjectsWithDifferentEncodingTest.class,
-    HandleContactsTest.class, Share2UsersSequentiallyInstantSessionTest.class,
-    EstablishSessionWithDifferentTransportModesTest.class, AddContactTest.class,
-    StartSessionWizardTest.class, OverlappingSharingTest.class,
-    ChatViewFunctionsTest.class, AddMultipleFilesTest.class,
-    ModifyFileWithoutEditorTest.class, RecoveryWhileTypingTest.class,
-    ConcurrentEditingTest.class, EditDifferentFilesTest.class,
-    Editing3ProjectsTest.class, EditWithReadAccessOnlyTest.class,
-    FolderOperationsTest.class, SimpleFollowModeIITest.class,
-    FollowModeDisabledInNewSessionTest.class, FollowModeTest.class,
-    RefactorInFollowModeTest.class, SimpleFollowModeITest.class,
-    ObjectCreationTest.class, DerivedResourcesTest.class,
-    EditFileThatIsNotOpenOnRemoteSideTest.class,
-    WriteAccessChangeAndImmediateWriteTest.class })
+@Suite.SuiteClasses({
+  Share2UsersSequentiallyTest.class,
+  HostInvitesBelatedlyTest.class,
+  InviteWithDifferentVersionsTest.class,
+  ShareProjectUsingExistingProjectTest.class,
+  ModifyNonSharedFilesTest.class,
+  ShareFilesFromOneProjectToMultipleRemoteProjectsTest.class,
+  ShareFilesToProjectsWithDifferentEncodingTest.class,
+  HandleContactsTest.class,
+  Share2UsersSequentiallyInstantSessionTest.class,
+  EstablishSessionWithDifferentTransportModesTest.class,
+  AddContactTest.class,
+  StartSessionWizardTest.class,
+  OverlappingSharingTest.class,
+  ChatViewFunctionsTest.class,
+  AddMultipleFilesTest.class,
+  ModifyFileWithoutEditorTest.class,
+  RecoveryWhileTypingTest.class,
+  ConcurrentEditingTest.class,
+  EditDifferentFilesTest.class,
+  Editing3ProjectsTest.class,
+  EditWithReadAccessOnlyTest.class,
+  FolderOperationsTest.class,
+  SimpleFollowModeIITest.class,
+  FollowModeDisabledInNewSessionTest.class,
+  FollowModeTest.class,
+  RefactorInFollowModeTest.class,
+  SimpleFollowModeITest.class,
+  ObjectCreationTest.class,
+  DerivedResourcesTest.class,
+  EditFileThatIsNotOpenOnRemoteSideTest.class,
+  WriteAccessChangeAndImmediateWriteTest.class
+})
 public class AliceAndBobTestSuite {
-    //
+  //
 }
