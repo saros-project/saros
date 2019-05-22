@@ -16,7 +16,7 @@ Is an Open Source plugin for connecting multiple IDEs for distributed collaborat
 ### IntelliJ alpha release
 Please read the [details about restrictions](https://www.saros-project.org/releases/saros-i_0.1.0.html) first, because Saros for IntelliJ is still a first alpha release!
 
-- Search for "Saros" in the IntelliJ Marketplace
+- Search for "Saros" in the IntelliJ Marketplace (this requires the `alpha` release channel; more information on this is given in the [release notes](https://www.saros-project.org/releases/saros-i_0.1.0.html#installation))
 - Or Download the plugin zip from our [release page](https://github.com/saros-project/saros/releases)
 
 ## Where to get help
