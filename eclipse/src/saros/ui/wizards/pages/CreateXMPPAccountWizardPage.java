@@ -20,10 +20,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccountStore;
 import saros.preferences.Preferences;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
 
 /**

@@ -2,12 +2,12 @@ package saros.server.session;
 
 import java.io.IOException;
 import org.apache.log4j.Logger;
-import org.picocontainer.Startable;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.SPath;
 import saros.filesystem.IFolder;
 import saros.filesystem.IResource;
+import saros.repackaged.picocontainer.Startable;
 import saros.server.editor.ServerEditorManager;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;

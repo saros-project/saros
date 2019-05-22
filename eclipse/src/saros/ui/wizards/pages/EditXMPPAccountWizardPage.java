@@ -7,11 +7,11 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.net.xmpp.JID;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
 import saros.ui.widgets.wizard.EnterXMPPAccountComposite;
 

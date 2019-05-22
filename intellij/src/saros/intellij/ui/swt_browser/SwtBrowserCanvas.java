@@ -8,8 +8,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ide_embedding.BrowserCreator;
 import saros.ui.pages.IBrowserPage;
 

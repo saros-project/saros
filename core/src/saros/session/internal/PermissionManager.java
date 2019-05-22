@@ -2,9 +2,9 @@ package saros.session.internal;
 
 import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
-import org.picocontainer.Startable;
 import saros.activities.PermissionActivity;
 import saros.annotations.Component;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
 import saros.session.IActivityConsumer;

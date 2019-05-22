@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.feedback.AbstractFeedbackManager;
@@ -32,6 +31,7 @@ import saros.feedback.Messages;
 import saros.feedback.StatisticManager;
 import saros.feedback.StatisticManagerConfiguration;
 import saros.preferences.EclipsePreferenceConstants;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.util.LinkListener;
 import saros.ui.util.SWTUtils;
 

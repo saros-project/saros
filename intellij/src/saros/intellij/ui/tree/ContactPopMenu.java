@@ -14,7 +14,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
 import saros.SarosPluginContext;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
@@ -24,6 +23,7 @@ import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.net.xmpp.JID;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
  * Contact pop-up menu for selecting a project to share. Opened when right-clicking on a contact.

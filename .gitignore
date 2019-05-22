@@ -38,6 +38,7 @@ bin_test/
 /stf.test/lib
 /eclipse/build
 /core/build
+/core/picocontainer/build
 /ui/build
 /server/build
 /whiteboard/build
@@ -46,6 +47,7 @@ bin_test/
 /stf.test/build
 /eclipse/.classpath
 /core/.classpath
+/core/picocontainer/.classpath
 /ui/.classpath
 /server/.classpath
 /whiteboard/.classpath
@@ -54,6 +56,7 @@ bin_test/
 /stf.test/.classpath
 /eclipse/.project
 /core/.project
+/core/picocontainer/.project
 /ui/.project
 /server/.project
 /whiteboard/.project

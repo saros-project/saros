@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.picocontainer.Startable;
 import saros.activities.IResourceActivity;
 import saros.annotations.Component;
 import saros.communication.extensions.UserFinishedProjectNegotiationExtension;
@@ -22,6 +21,7 @@ import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
 import saros.preferences.PreferenceStore;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 import saros.session.User;
 

@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.picocontainer.Startable;
 import saros.activities.EditorActivity;
 import saros.activities.FileActivity;
 import saros.activities.FileActivity.Type;
@@ -43,6 +42,7 @@ import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHand
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.observables.FileReplacementInProgressObservable;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.User;

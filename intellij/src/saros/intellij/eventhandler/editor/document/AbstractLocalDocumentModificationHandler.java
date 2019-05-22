@@ -7,11 +7,11 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.picocontainer.Startable;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 
 /** Parent class containing utility methods when working with document listeners. */

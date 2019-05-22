@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/picocontainer" />
             <option value="$PROJECT_DIR$/eclipse" />
             <option value="$PROJECT_DIR$/intellij" />
             <option value="$PROJECT_DIR$/server" />
