@@ -45,14 +45,6 @@
     </project-components>
 
     <actions>
-        <!-- Add your actions here -->
-        <group id="saros.MainMenu" text="S_aros" description="Saros menu">
-            <add-to-group group-id="MainMenu" relative-to-action="HelpMenu" anchor="before"/>
-            <action id="saros.about"
-                    class="saros.intellij.ui.menu.AboutSarosHandler"
-                    text="_About Saros"/>
-        </group>
-
         <group keep-content="true" compact="false" popup="true"
                id="saros.ShareWith"
                icon="/icons/famfamfam/session_tsk.png" text="_Share With..."
@@ -60,7 +52,6 @@
                class="saros.intellij.ui.menu.SarosFileShareGroup">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </group>
-
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
