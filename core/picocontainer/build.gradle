@@ -1,7 +1,7 @@
 
 /*
    This build applies our picocontainer patches and creates a new picocontainer jar with a different package naming
-   instead of the package structure org.picocontainer the package name saros.org.picocontainer is used.
+   instead of the package structure org.picocontainer the package name saros.repackaged.picocontainer is used.
 
    Even if this sub-project is integrated in the whole build process (via the setting.gradle). It is intended to configure
    this project only in this file and not in the parent build.gradle (in the repository root).
