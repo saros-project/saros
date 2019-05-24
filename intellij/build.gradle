@@ -5,7 +5,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.3.4"
+    classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.8"
   }
 }
 
@@ -71,14 +71,13 @@ intellij {
   if (project.hasProperty('intellijHome')) {
     localPath = intellijHome
   } else {
-    version = 'IC-2018.2.6'
+    version = 'IC-2019.1.2'
   }
 
   // don't overwrite the version compatibility defined in the plugin.xml
   updateSinceUntilBuild = false
 
   pluginName 'Saros'
-  configureDefaultDependencies = false
 
   // determine new sandbox dir that is not locked
   Integer sandboxCount = 1
@@ -111,7 +110,7 @@ runIde.finalizedBy(unlockIntellijSandbox)
 
 afterEvaluate {
   dependencies {
-    compile intellij {exclude 'junit*.jar'}
+    compile intellij {}
   }
 }
 
