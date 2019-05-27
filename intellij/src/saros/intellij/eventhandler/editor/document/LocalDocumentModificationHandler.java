@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
+import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
 /**
@@ -24,8 +25,12 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
         }
       };
 
-  public LocalDocumentModificationHandler(EditorManager editorManager, ISarosSession sarosSession) {
-    super(editorManager, sarosSession);
+  public LocalDocumentModificationHandler(
+      EditorManager editorManager,
+      ISarosSession sarosSession,
+      VirtualFileConverter virtualFileConverter) {
+
+    super(editorManager, sarosSession, virtualFileConverter);
   }
 
   /**

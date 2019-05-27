@@ -5,13 +5,13 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.VisibleAreaEvent;
 import com.intellij.openapi.editor.event.VisibleAreaListener;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.Rectangle;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
+import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
@@ -77,7 +77,7 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
 
     if (path == null) {
       if (log.isTraceEnabled()) {
-        VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
+        VirtualFile file = DocumentAPI.getVirtualFile(editor.getDocument());
 
         log.trace(
             "Ignoring local view port change for "

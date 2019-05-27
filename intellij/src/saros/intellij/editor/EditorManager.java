@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -306,8 +305,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             @NotNull Editor editor,
             @NotNull Set<String> visibleFilePaths) {
 
-          VirtualFile fileForEditor =
-              FileDocumentManager.getInstance().getFile(editor.getDocument());
+          VirtualFile fileForEditor = DocumentAPI.getVirtualFile(editor.getDocument());
 
           if (fileForEditor == null) {
             LOG.warn(
@@ -380,8 +378,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private void addProjectResources(IProject project) {
     VirtualFile[] openFiles = projectAPI.getOpenFiles();
 
-    SelectedEditorState selectedEditorState = new SelectedEditorState();
-    selectedEditorState.captureState();
+    SelectedEditorStateSnapshot selectedEditorStateSnapshot =
+        selectedEditorStateSnapshotFactory.capturedState();
 
     try {
       setLocalEditorStatusChangeHandlersEnabled(false);
@@ -396,7 +394,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalEditorStatusChangeHandlersEnabled(true);
     }
 
-    selectedEditorState.applyCapturedState();
+    selectedEditorStateSnapshot.applyHeldState();
   }
 
   @SuppressWarnings("FieldCanBeLocal")
@@ -432,10 +430,16 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           userEditorStateManager = session.getComponent(UserEditorStateManager.class);
 
+          projectAPI = sarosSession.getComponent(ProjectAPI.class);
+
+          editorAPI = sarosSession.getComponent(EditorAPI.class);
           localEditorHandler = sarosSession.getComponent(LocalEditorHandler.class);
           localEditorManipulator = sarosSession.getComponent(LocalEditorManipulator.class);
 
           annotationManager = sarosSession.getComponent(AnnotationManager.class);
+
+          selectedEditorStateSnapshotFactory =
+              sarosSession.getComponent(SelectedEditorStateSnapshotFactory.class);
 
           localDocumentModificationHandler =
               sarosSession.getComponent(LocalDocumentModificationHandler.class);
@@ -459,10 +463,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           userEditorStateManager = null;
 
+          projectAPI = null;
+
+          editorAPI = null;
           localEditorHandler = null;
           localEditorManipulator = null;
 
           annotationManager = null;
+
+          selectedEditorStateSnapshotFactory = null;
 
           localDocumentModificationHandler = null;
           localClosedEditorModificationHandler = null;
@@ -510,15 +519,16 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       };
 
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
-  private final ProjectAPI projectAPI;
-  private final EditorAPI editorAPI;
 
   /* Session Components */
   private UserEditorStateManager userEditorStateManager;
   private ISarosSession session;
+  private ProjectAPI projectAPI;
+  private EditorAPI editorAPI;
   private LocalEditorHandler localEditorHandler;
   private LocalEditorManipulator localEditorManipulator;
   private AnnotationManager annotationManager;
+  private SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory;
 
   /* Event handlers */
   // document changes
@@ -544,15 +554,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   public EditorManager(
       ISarosSessionManager sessionManager,
-      ProjectAPI projectAPI,
-      FileReplacementInProgressObservable fileReplacementInProgressObservable,
-      EditorAPI editorAPI) {
+      FileReplacementInProgressObservable fileReplacementInProgressObservable) {
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
-    this.editorAPI = editorAPI;
-
-    this.projectAPI = projectAPI;
   }
 
   @Override
@@ -577,7 +582,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return null;
           }
 
-          Document doc = projectAPI.getDocument(virtualFile);
+          Document doc = DocumentAPI.getDocument(virtualFile);
 
           return (doc != null) ? doc.getText() : null;
         });

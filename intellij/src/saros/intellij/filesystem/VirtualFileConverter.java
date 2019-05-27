@@ -7,11 +7,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.SarosPluginContext;
 import saros.activities.SPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
  * Provides static methods to convert VirtualFiles to Saros resource objects or Saros resources
@@ -21,14 +19,10 @@ public class VirtualFileConverter {
 
   private static final Logger log = Logger.getLogger(VirtualFileConverter.class);
 
-  @Inject private static Project project;
+  private final Project project;
 
-  static {
-    SarosPluginContext.initComponent(new VirtualFileConverter());
-  }
-
-  private VirtualFileConverter() {
-    // NOP
+  public VirtualFileConverter(Project project) {
+    this.project = project;
   }
 
   /**
@@ -41,7 +35,7 @@ public class VirtualFileConverter {
    *     constructed
    */
   @Nullable
-  public static SPath convertToSPath(@NotNull VirtualFile virtualFile) {
+  public SPath convertToSPath(@NotNull VirtualFile virtualFile) {
 
     IResource resource = convertToResource(virtualFile);
 
@@ -58,7 +52,7 @@ public class VirtualFileConverter {
    *     be constructed
    */
   @Nullable
-  public static IResource convertToResource(@NotNull VirtualFile virtualFile) {
+  public IResource convertToResource(@NotNull VirtualFile virtualFile) {
 
     Module module = ModuleUtil.findModuleForFile(virtualFile, project);
 

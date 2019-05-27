@@ -3,11 +3,11 @@ package saros.intellij.eventhandler.editor.document;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
+import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.DisableableHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
@@ -22,7 +22,9 @@ public abstract class AbstractLocalDocumentModificationHandler
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
 
   protected final EditorManager editorManager;
+
   private final ISarosSession sarosSession;
+  private final VirtualFileConverter virtualFileConverter;
 
   private boolean enabled;
   private boolean disposed;
@@ -35,10 +37,14 @@ public abstract class AbstractLocalDocumentModificationHandler
    * @param editorManager the EditorManager instance
    */
   AbstractLocalDocumentModificationHandler(
-      EditorManager editorManager, ISarosSession sarosSession) {
+      EditorManager editorManager,
+      ISarosSession sarosSession,
+      VirtualFileConverter virtualFileConverter) {
 
     this.editorManager = editorManager;
+
     this.sarosSession = sarosSession;
+    this.virtualFileConverter = virtualFileConverter;
 
     this.enabled = false;
     this.disposed = false;
@@ -107,7 +113,7 @@ public abstract class AbstractLocalDocumentModificationHandler
       return path;
     }
 
-    VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(document);
+    VirtualFile virtualFile = DocumentAPI.getVirtualFile(document);
 
     if (virtualFile == null) {
       if (LOG.isTraceEnabled()) {
@@ -121,7 +127,7 @@ public abstract class AbstractLocalDocumentModificationHandler
       return null;
     }
 
-    path = VirtualFileConverter.convertToSPath(virtualFile);
+    path = virtualFileConverter.convertToSPath(virtualFile);
 
     if (path == null || !sarosSession.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {

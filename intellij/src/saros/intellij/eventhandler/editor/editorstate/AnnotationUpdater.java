@@ -23,6 +23,7 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
   private final ISarosSession sarosSession;
+  private final VirtualFileConverter virtualFileConverter;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -49,13 +50,15 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       Project project,
       AnnotationManager annotationManager,
       LocalEditorHandler localEditorHandler,
-      ISarosSession sarosSession) {
+      ISarosSession sarosSession,
+      VirtualFileConverter virtualFileConverter) {
 
     super(project);
 
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
     this.sarosSession = sarosSession;
+    this.virtualFileConverter = virtualFileConverter;
 
     setEnabled(true);
   }
@@ -70,7 +73,7 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
   private void setUpOpenedEditor(@NotNull VirtualFile virtualFile) {
     Editor editor = localEditorHandler.openEditor(virtualFile, false);
 
-    SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
+    SPath sPath = virtualFileConverter.convertToSPath(virtualFile);
 
     if (sPath == null || editor == null) {
       return;
@@ -90,7 +93,7 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
    * @see FileEditorManagerListener.Before#beforeFileClosed(FileEditorManager, VirtualFile)
    */
   private void cleanUpAnnotations(@NotNull VirtualFile virtualFile) {
-    SPath sPath = VirtualFileConverter.convertToSPath(virtualFile);
+    SPath sPath = virtualFileConverter.convertToSPath(virtualFile);
 
     if (sPath == null) {
       return;

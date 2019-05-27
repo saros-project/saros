@@ -1,7 +1,10 @@
 package saros.core.project.internal;
 
+import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
+import saros.intellij.editor.ProjectAPI;
+import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
@@ -12,6 +15,7 @@ import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor
 import saros.intellij.eventhandler.editor.selection.LocalTextSelectionChangeHandler;
 import saros.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
 import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
+import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.followmode.FollowModeNotificationDispatcher;
 import saros.intellij.project.SharedResourcesManager;
 import saros.intellij.project.filesystem.ModuleInitialization;
@@ -25,9 +29,14 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
 
   @Override
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {
+    // Project interaction
+    container.addComponent(ProjectAPI.class);
+
     // Editor interaction
+    container.addComponent(EditorAPI.class);
     container.addComponent(LocalEditorHandler.class);
     container.addComponent(LocalEditorManipulator.class);
+    container.addComponent(SelectedEditorStateSnapshotFactory.class);
 
     // Annotation utility to create, remove, and manage annotations
     container.addComponent(AnnotationManager.class);
@@ -56,5 +65,8 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
 
     // User notifications
     container.addComponent(FollowModeNotificationDispatcher.class);
+
+    // Utility
+    container.addComponent(VirtualFileConverter.class);
   }
 }

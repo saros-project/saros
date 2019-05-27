@@ -2,13 +2,11 @@ package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import saros.activities.FileActivity;
 import saros.activities.SPath;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.text.DeleteOperation;
@@ -19,7 +17,6 @@ import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.intellij.project.SharedResourcesManager;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.session.ISarosSession;
@@ -153,7 +150,7 @@ public class LocalEditorManipulator {
         return;
       }
 
-      doc = projectAPI.getDocument(virtualFile);
+      doc = DocumentAPI.getDocument(virtualFile);
 
       if (doc == null) {
         LOG.warn(
@@ -212,7 +209,7 @@ public class LocalEditorManipulator {
    */
   public void adjustViewport(@NotNull Editor editor, LineRange range, TextSelection selection) {
     if (selection == null && range == null) {
-      VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
+      VirtualFile file = DocumentAPI.getVirtualFile(editor.getDocument());
 
       LOG.warn(
           "Could not adjust viewport for "
@@ -293,7 +290,6 @@ public class LocalEditorManipulator {
    * @param encoding the encoding of the content
    * @param source the user that send the recovery action
    * @see Document
-   * @see SharedResourcesManager#handleFileRecovery(FileActivity)
    */
   public void handleContentRecovery(SPath path, byte[] content, String encoding, User source) {
     VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
@@ -306,7 +302,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Document document = projectAPI.getDocument(virtualFile);
+    Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {
       LOG.warn(
           "Could not recover file content of "

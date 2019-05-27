@@ -1,128 +1,85 @@
 package saros.intellij.editor;
 
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import saros.intellij.filesystem.Filesystem;
 
-/** IntellIJ API for project-level operations on editors and documents. */
+/** Wrapper for interacting with the project-level Intellij editor API. */
 public class ProjectAPI {
-  private FileDocumentManager fileDocumentManager;
-
   private Project project;
   private FileEditorManager editorFileManager;
 
-  /** Creates an ProjectAPI with the current Project and initializes Fields. */
   public ProjectAPI(Project project) {
     this.project = project;
 
     this.editorFileManager = FileEditorManager.getInstance(project);
-    this.fileDocumentManager = FileDocumentManager.getInstance();
   }
 
   /**
-   * Returns whether the file is opened.
+   * Returns whether there is an open editor for the given file.
    *
-   * @param file
-   * @return
+   * @param virtualFile the file to check
+   * @return whether there is an open editor for the given file
    */
-  public boolean isOpen(VirtualFile file) {
-    return editorFileManager.isFileOpen(file);
+  public boolean isOpen(VirtualFile virtualFile) {
+    return editorFileManager.isFileOpen(virtualFile);
   }
 
   /**
-   * Returns whether the document is opened.
+   * Returns whether there is an open editor for the given document.
    *
-   * @param doc
-   * @return
+   * @param document the document to check
+   * @return Returns whether there is an open editor for the given document.
    */
-  public boolean isOpen(Document doc) {
-    VirtualFile file = fileDocumentManager.getFile(doc);
+  public boolean isOpen(Document document) {
+    VirtualFile file = DocumentAPI.getVirtualFile(document);
+
     return isOpen(file);
   }
 
   /**
-   * Opens an editor for the given path in the UI thread.
+   * Opens an editor for the given file in the UI thread.
    *
-   * @param path path of the file to open
+   * @param virtualFile file for which to open an editor
    * @param activate activate editor after opening
    * @return Editor managing the passed file
    */
-  public Editor openEditor(final VirtualFile path, final boolean activate) {
+  public Editor openEditor(final VirtualFile virtualFile, final boolean activate) {
     return Filesystem.runReadAction(
-        new Computable<Editor>() {
-
-          @Override
-          public Editor compute() {
-            return editorFileManager.openTextEditor(
-                new OpenFileDescriptor(project, path), activate);
-          }
-        });
-  }
-
-  /**
-   * Returns a document for the given file.
-   *
-   * @param file the <code>VirtualFile</code> for which the document is requested
-   * @return a <code>Document</code> for the given file or <code>null</code> if the file does not
-   *     exist, could not be read, is a directory, or is to large
-   */
-  @Nullable
-  public Document getDocument(@NotNull final VirtualFile file) {
-    if (!file.exists()) {
-      return null;
-    }
-
-    return Filesystem.runReadAction(
-        new Computable<Document>() {
-
-          @Override
-          public Document compute() {
-            return fileDocumentManager.getDocument(file);
-          }
-        });
+        () ->
+            editorFileManager.openTextEditor(
+                new OpenFileDescriptor(project, virtualFile), activate));
   }
 
   /**
    * Closes the editor for the given file in the UI thread.
    *
-   * @param file
+   * @param virtualFile the file whose editor to close
    */
-  public void closeEditor(final VirtualFile file) {
+  public void closeEditor(final VirtualFile virtualFile) {
 
-    Filesystem.runReadAction(
-        new Runnable() {
-
-          @Override
-          public void run() {
-            editorFileManager.closeFile(file);
-          }
-        });
-  }
-
-  public void closeEditor(Document doc) {
-    VirtualFile file = fileDocumentManager.getFile(doc);
-    closeEditor(file);
+    Filesystem.runReadAction(() -> editorFileManager.closeFile(virtualFile));
   }
 
   /**
    * Returns an array containing the files of all currently open editors. It is sorted by the order
    * of the editor tabs.
    *
-   * @return
+   * @return array containing the files of all currently open editors
    */
   public VirtualFile[] getOpenFiles() {
     return editorFileManager.getOpenFiles();
   }
 
+  /**
+   * Returns the currently selected editor.
+   *
+   * @return the currently selected editor
+   */
   public Editor getActiveEditor() {
     return editorFileManager.getSelectedTextEditor();
   }
@@ -131,55 +88,9 @@ public class ProjectAPI {
    * Returns an array containing the files of all currently active editors. It is sorted by time of
    * last activation, starting with the most recent one.
    *
-   * @return
+   * @return an array containing the files of all currently active editors
    */
   public VirtualFile[] getSelectedFiles() {
     return editorFileManager.getSelectedFiles();
-  }
-
-  /**
-   * Saves the given document in the UI thread.
-   *
-   * @param doc
-   */
-  public void saveDocument(final Document doc) {
-    Filesystem.runWriteAction(
-        new Runnable() {
-
-          @Override
-          public void run() {
-            fileDocumentManager.saveDocument(doc);
-          }
-        },
-        ModalityState.NON_MODAL);
-  }
-
-  /**
-   * Reloads the current document in the UI thread.
-   *
-   * @param doc
-   */
-  public void reloadFromDisk(final Document doc) {
-    Filesystem.runReadAction(
-        new Runnable() {
-
-          @Override
-          public void run() {
-            fileDocumentManager.reloadFromDisk(doc);
-          }
-        });
-  }
-
-  /** Saves all documents in the UI thread. */
-  public void saveAllDocuments() {
-    Filesystem.runWriteAction(
-        new Runnable() {
-
-          @Override
-          public void run() {
-            fileDocumentManager.saveAllDocuments();
-          }
-        },
-        ModalityState.NON_MODAL);
   }
 }
