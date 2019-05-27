@@ -11,5 +11,26 @@
       <entry name="!?*.kt" />
       <entry name="!?*.clj" />
     </wildcardResourcePatterns>
+    <bytecodeTargetLevel>
+      <module name="saros.core_main" target="1.8" />
+      <module name="saros.core_test" target="1.8" />
+      <module name="saros.eclipse_main" target="1.8" />
+      <module name="saros.eclipse_test" target="1.8" />
+      <module name="saros.intellij_main" target="1.8" />
+      <module name="saros.intellij_test" target="1.8" />
+      <module name="saros.picocontainer_main" target="1.8" />
+      <module name="saros.picocontainer_test" target="1.8" />
+      <module name="saros.server_main" target="1.8" />
+      <module name="saros.server_test" target="1.8" />
+      <module name="saros.stf.test_main" target="1.8" />
+      <module name="saros.stf.test_stfTest" target="1.8" />
+      <module name="saros.stf.test_test" target="1.8" />
+      <module name="saros.stf_main" target="1.8" />
+      <module name="saros.stf_test" target="1.8" />
+      <module name="saros.ui_main" target="1.8" />
+      <module name="saros.ui_test" target="1.8" />
+      <module name="saros.whiteboard_main" target="1.8" />
+      <module name="saros.whiteboard_test" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
