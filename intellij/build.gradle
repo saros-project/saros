@@ -68,7 +68,7 @@ intellij {
   }
 
   // Download intellij only if the home property is not set
-  if (project.hasProperty('intellijHome')) {
+  if (intellijHome) {
     localPath = intellijHome
   } else {
     version = 'IC-2019.1.2'
