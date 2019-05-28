@@ -1,6 +1,7 @@
 package saros.intellij.ui.views;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.JBColor;
 import java.awt.FlowLayout;
 import javax.swing.JToolBar;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,17 @@ class SarosToolbar extends JToolBar {
     this.project = project;
 
     setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+    /*
+     * For an unknown reason, the color of the toolbar does not automatically match the IDE theme
+     * starting with Intellij 2019.1. This is described in more detail in issue #535.
+     *
+     * As a workaround, this explicitly sets the color of the component to the current IDE theme
+     * colors.
+     */
+    setForeground(JBColor.foreground());
+    setBackground(JBColor.background());
+
     addToolbarButtons();
   }
 
