@@ -39,7 +39,7 @@ class ContactPopMenu extends JPopupMenu {
   ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
     this.contactInfo = contactInfo;
 
-    JMenu menuShareProject = new JMenu("Work together on...");
+    JMenu menuShareProject = new JMenu(Messages.ContactPopMenu_root_popup_text);
     menuShareProject.setIcon(IconManager.SESSIONS_ICON);
 
     List<String> nonCompliantModules = new ArrayList<>();
@@ -165,11 +165,9 @@ class ContactPopMenu extends JPopupMenu {
 
       projectMenu.add(
           new JMenuItem(
-              "No modules "
-                  + (nonCompliantModules.isEmpty()
-                      ? ""
-                      : "complying with our current release restrictions ")
-                  + " found!"));
+              nonCompliantModules.isEmpty()
+                  ? Messages.ContactPopMenu_menu_entry_no_modules_found
+                  : Messages.ContactPopMenu_menu_entry_no_valid_modules_found));
     }
 
     return new Pair<>(projectMenu, nonCompliantModules);
