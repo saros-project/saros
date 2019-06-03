@@ -91,6 +91,9 @@ public class Messages {
 
   public static String Contact_saros_message_conditional;
 
+  public static String ContactPopMenu_root_popup_text;
+  public static String ContactPopMenu_menu_entry_no_modules_found;
+  public static String ContactPopMenu_menu_entry_no_valid_modules_found;
   public static String ContactPopMenu_unsupported_ide_title;
   public static String ContactPopMenu_unsupported_ide_message_condition;
   public static String ContactPopMenu_module_not_found_title;
