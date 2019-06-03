@@ -163,11 +163,15 @@ class ContactPopMenu extends JPopupMenu {
                   : "complying with our current release restrictions ")
               + "were found");
 
-      projectMenu.add(
+      JMenuItem noModulesFoundMenuItem =
           new JMenuItem(
               nonCompliantModules.isEmpty()
                   ? Messages.ContactPopMenu_menu_entry_no_modules_found
-                  : Messages.ContactPopMenu_menu_entry_no_valid_modules_found));
+                  : Messages.ContactPopMenu_menu_entry_no_valid_modules_found);
+
+      noModulesFoundMenuItem.setEnabled(false);
+
+      projectMenu.add(noModulesFoundMenuItem);
     }
 
     return new Pair<>(projectMenu, nonCompliantModules);
