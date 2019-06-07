@@ -28,8 +28,9 @@ public class LocalViewPortChangeHandler implements IStartableDisableableHandler 
   private boolean disposed;
 
   /**
-   * Instantiates a LocalViewPortChangeHandler object. The handler is enabled by default and the
-   * contained listener is registered by default.
+   * Instantiates a LocalViewPortChangeHandler object.
+   *
+   * <p>The handler is disabled and the contained listener is not registered by default.
    *
    * @param editorManager the EditorManager instance
    */

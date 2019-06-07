@@ -50,7 +50,7 @@ import saros.session.User;
 /**
  * Uses a VirtualFileListener to generate and dispatch FileActivities for shared files.
  *
- * <p>The listener is enabled by default when the session context is created.
+ * <p>The handler is disabled and the listener is not registered by default.
  *
  * @see VirtualFileListener
  */
