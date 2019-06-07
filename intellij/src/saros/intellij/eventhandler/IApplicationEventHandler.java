@@ -5,9 +5,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A handler dealing with global/application-level events.
  *
- * @see IStartableDisableableHandler
+ * @see IEventHandler
  */
-public interface IApplicationEventHandler extends IStartableDisableableHandler {
+public interface IApplicationEventHandler extends IEventHandler {
   /**
    * Returns the type of the application event handler.
    *

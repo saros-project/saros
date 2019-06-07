@@ -1,14 +1,18 @@
 package saros.intellij.eventhandler;
 
-import saros.repackaged.picocontainer.Startable;
-
 /**
  * A handler that can be enabled/disabled at runtime.
  *
- * <p>The handler is disabled by default and is first started through {@link Startable#start()}. The
- * handler is disposed through {@link Startable#stop()}.
+ * <p>The handler <b>must</b> be disabled by default. It can be initialized and started through
+ * {@link #initialize()}. The handler is stopped and disposed through {@link #dispose()}.
  */
-public interface IStartableDisableableHandler extends Startable {
+public interface IEventHandler {
+
+  /** Initializes and subsequently enables the event handler. */
+  void initialize();
+
+  /** Disables and subsequently disposes the event handler. */
+  void dispose();
 
   /**
    * Disables or enables the handler. Preferably, this should be done by un- and re-registering the

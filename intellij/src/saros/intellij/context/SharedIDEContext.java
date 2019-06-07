@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import saros.intellij.eventhandler.ApplicationEventHandlers;
 import saros.intellij.eventhandler.ApplicationEventHandlersFactory;
 import saros.intellij.eventhandler.IApplicationEventHandler.ApplicationEventHandlerType;
+import saros.intellij.eventhandler.IEventHandler;
 import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
-import saros.intellij.eventhandler.IStartableDisableableHandler;
 import saros.intellij.eventhandler.ProjectEventHandlers;
 import saros.intellij.eventhandler.ProjectEventHandlersFactory;
 import saros.repackaged.picocontainer.Disposable;
@@ -124,7 +124,7 @@ public class SharedIDEContext implements Disposable {
   /**
    * Starts all project-level event handlers for the given project.
    *
-   * @param project the shared project to start the event handlers for
+   * @param project the shared project to initialize the event handlers for
    */
   private void startProjectListeners(@NotNull Project project) {
     assert projectEventHandlers == null : "project level handlers already initialized";
@@ -139,7 +139,7 @@ public class SharedIDEContext implements Disposable {
    *
    * <p>Stops and disposes all registered application- and project-level event handlers.
    *
-   * @see IStartableDisableableHandler#stop()
+   * @see IEventHandler#dispose()
    */
   @Override
   public void dispose() {

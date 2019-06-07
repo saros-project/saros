@@ -144,7 +144,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   }
 
   @Override
-  public void start() {
+  public void initialize() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> session.addActivityProducer(LocalFilesystemModificationHandler.this),
@@ -154,7 +154,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   }
 
   @Override
-  public void stop() {
+  public void dispose() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> session.removeActivityProducer(LocalFilesystemModificationHandler.this),
@@ -168,8 +168,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * Instantiates a LocalFilesystemModificationHandler object. The handler, including the held
    * filesystem listener, is enabled by default.
    *
-   * @see #start()
-   * @see #stop()
+   * @see #initialize()
+   * @see #dispose()
    */
   public LocalFilesystemModificationHandler(
       EditorManager editorManager,
