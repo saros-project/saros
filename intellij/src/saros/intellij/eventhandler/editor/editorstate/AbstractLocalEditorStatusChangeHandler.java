@@ -109,7 +109,8 @@ public abstract class AbstractLocalEditorStatusChangeHandler
    *
    * @return whether the handler is currently enabled
    */
-  boolean isEnabled() {
+  @Override
+  public boolean isEnabled() {
     return enabled;
   }
 }

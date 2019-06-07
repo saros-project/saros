@@ -129,4 +129,9 @@ public class LocalViewPortChangeHandler implements IStartableDisableableHandler 
       this.enabled = true;
     }
   }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
 }

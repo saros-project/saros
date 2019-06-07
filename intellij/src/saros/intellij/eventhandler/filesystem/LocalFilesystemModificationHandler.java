@@ -924,4 +924,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       localFileSystem.addVirtualFileListener(virtualFileListener);
     }
   }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
 }

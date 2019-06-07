@@ -87,11 +87,7 @@ public abstract class AbstractLocalDocumentModificationHandler
     }
   }
 
-  /**
-   * Returns whether the handler is enabled.
-   *
-   * @return whether the handle is enabled
-   */
+  @Override
   public boolean isEnabled() {
     return enabled;
   }
