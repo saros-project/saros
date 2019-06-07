@@ -40,22 +40,22 @@ public class ApplicationEventHandlers {
   /**
    * Initializes and enables all held handlers.
    *
-   * @see IStartableDisableableHandler#start()
+   * @see IEventHandler#initialize()
    */
   public void start() {
     for (Set<IApplicationEventHandler> eventHandlers : handlers.values()) {
-      eventHandlers.forEach(IApplicationEventHandler::start);
+      eventHandlers.forEach(IApplicationEventHandler::initialize);
     }
   }
 
   /**
    * Disables and disposes all held handlers. Subsequently drops all held handler references.
    *
-   * @see IStartableDisableableHandler#stop()
+   * @see IEventHandler#dispose()
    */
   public void stop() {
     for (Set<IApplicationEventHandler> eventHandlers : handlers.values()) {
-      eventHandlers.forEach(IApplicationEventHandler::stop);
+      eventHandlers.forEach(IApplicationEventHandler::dispose);
       eventHandlers.clear();
     }
 
@@ -66,7 +66,7 @@ public class ApplicationEventHandlers {
    * Enables or disables all held local filesystem modification handlers.
    *
    * @param enabled the new state of the held local filesystem modification handlers
-   * @see IStartableDisableableHandler#setEnabled(boolean)
+   * @see IEventHandler#setEnabled(boolean)
    */
   public void setHandlersEnabled(@NotNull ApplicationEventHandlerType type, boolean enabled) {
     for (IApplicationEventHandler handler : handlers.get(type)) {

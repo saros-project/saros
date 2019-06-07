@@ -40,22 +40,22 @@ public class ProjectEventHandlers {
   /**
    * Initializes and enables all held handlers.
    *
-   * @see IProjectEventHandler#start()
+   * @see IProjectEventHandler#initialize()
    */
   public void start() {
     for (Set<IProjectEventHandler> eventHandlers : handlers.values()) {
-      eventHandlers.forEach(IProjectEventHandler::start);
+      eventHandlers.forEach(IProjectEventHandler::initialize);
     }
   }
 
   /**
    * Disables and disposes all held handlers. Subsequently drops all held handler references.
    *
-   * @see IProjectEventHandler#stop()
+   * @see IProjectEventHandler#dispose()
    */
   public void stop() {
     for (Set<IProjectEventHandler> eventHandlers : handlers.values()) {
-      eventHandlers.forEach(IProjectEventHandler::stop);
+      eventHandlers.forEach(IProjectEventHandler::dispose);
       eventHandlers.clear();
     }
 

@@ -48,12 +48,12 @@ public class LocalViewPortChangeHandler implements IProjectEventHandler {
   }
 
   @Override
-  public void start() {
+  public void initialize() {
     setEnabled(true);
   }
 
   @Override
-  public void stop() {
+  public void dispose() {
     disposed = true;
     setEnabled(false);
   }

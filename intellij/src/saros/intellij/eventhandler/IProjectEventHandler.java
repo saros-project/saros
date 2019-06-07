@@ -5,9 +5,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A handler dealing with project specific events.
  *
- * @see IStartableDisableableHandler
+ * @see IEventHandler
  */
-public interface IProjectEventHandler extends IStartableDisableableHandler {
+public interface IProjectEventHandler extends IEventHandler {
   /**
    * Returns the type of the project event handler.
    *
