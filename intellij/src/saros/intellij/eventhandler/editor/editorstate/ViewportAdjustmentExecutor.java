@@ -7,8 +7,8 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.editor.text.LineRange;
@@ -24,7 +24,8 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
   private final ProjectAPI projectAPI;
   private final LocalEditorManipulator localEditorManipulator;
 
-  private final Map<String, QueuedViewPortChange> queuedViewPortChanges;
+  private static final Map<String, QueuedViewPortChange> queuedViewPortChanges =
+      new ConcurrentHashMap<>();
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -43,8 +44,6 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
 
     this.projectAPI = projectAPI;
     this.localEditorManipulator = localEditorManipulator;
-
-    this.queuedViewPortChanges = new HashMap<>();
   }
 
   @Override
@@ -97,7 +96,7 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
    * @param range the line range used for the viewport adjustment
    * @param selection the text selection used for the viewport adjustment
    */
-  public void queueViewPortChange(
+  public static void queueViewPortChange(
       @NotNull String path,
       @Nullable Editor editor,
       @Nullable LineRange range,
@@ -110,7 +109,7 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
   }
 
   /** Data storage class for queued viewport changes. */
-  private class QueuedViewPortChange {
+  private static class QueuedViewPortChange {
     private final Editor editor;
     private final LineRange range;
     private final TextSelection selection;
