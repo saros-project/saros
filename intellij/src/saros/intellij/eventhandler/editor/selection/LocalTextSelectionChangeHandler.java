@@ -6,10 +6,10 @@ import com.intellij.openapi.editor.event.SelectionListener;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.eventhandler.IStartableDisableableHandler;
+import saros.intellij.eventhandler.IProjectEventHandler;
 
 /** Dispatches activities for selection changes. */
-public class LocalTextSelectionChangeHandler implements IStartableDisableableHandler {
+public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
 
   private final EditorManager editorManager;
 
@@ -36,6 +36,12 @@ public class LocalTextSelectionChangeHandler implements IStartableDisableableHan
 
     this.enabled = false;
     this.disposed = false;
+  }
+
+  @Override
+  @NotNull
+  public ProjectEventHandlerType getHandlerType() {
+    return ProjectEventHandlerType.TEXT_SELECTION_CHANGE_HANDLER;
   }
 
   @Override

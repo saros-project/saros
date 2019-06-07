@@ -9,13 +9,12 @@ import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.eventhandler.IStartableDisableableHandler;
+import saros.intellij.eventhandler.IProjectEventHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
 /** Parent class containing utility methods when working with document listeners. */
-public abstract class AbstractLocalDocumentModificationHandler
-    implements IStartableDisableableHandler {
+public abstract class AbstractLocalDocumentModificationHandler implements IProjectEventHandler {
 
   private static final Logger LOG =
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
@@ -47,6 +46,12 @@ public abstract class AbstractLocalDocumentModificationHandler
 
     this.enabled = false;
     this.disposed = false;
+  }
+
+  @Override
+  @NotNull
+  public ProjectEventHandlerType getHandlerType() {
+    return ProjectEventHandlerType.DOCUMENT_MODIFICATION_HANDLER;
   }
 
   @Override
