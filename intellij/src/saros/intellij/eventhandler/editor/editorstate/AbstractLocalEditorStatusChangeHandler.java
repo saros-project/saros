@@ -4,8 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
-import saros.intellij.eventhandler.DisableableHandler;
-import saros.repackaged.picocontainer.Startable;
+import saros.intellij.eventhandler.IStartableDisableableHandler;
 
 /**
  * Abstract class defining the base functionality needed to create and register/unregister a
@@ -21,7 +20,7 @@ import saros.repackaged.picocontainer.Startable;
  * @see MessageBusConnection#subscribe(Topic, Object)
  */
 public abstract class AbstractLocalEditorStatusChangeHandler
-    implements DisableableHandler, Startable {
+    implements IStartableDisableableHandler {
 
   private final Project project;
 
