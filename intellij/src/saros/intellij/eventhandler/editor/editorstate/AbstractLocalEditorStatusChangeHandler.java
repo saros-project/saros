@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
-import saros.intellij.eventhandler.IStartableDisableableHandler;
+import saros.intellij.eventhandler.IProjectEventHandler;
 
 /**
  * Abstract class defining the base functionality needed to create and register/unregister a
@@ -18,8 +18,7 @@ import saros.intellij.eventhandler.IStartableDisableableHandler;
  *
  * @see MessageBusConnection#subscribe(Topic, Object)
  */
-public abstract class AbstractLocalEditorStatusChangeHandler
-    implements IStartableDisableableHandler {
+public abstract class AbstractLocalEditorStatusChangeHandler implements IProjectEventHandler {
 
   private final Project project;
 
@@ -39,6 +38,12 @@ public abstract class AbstractLocalEditorStatusChangeHandler
 
     this.enabled = false;
     this.disposed = false;
+  }
+
+  @Override
+  @NotNull
+  public ProjectEventHandlerType getHandlerType() {
+    return ProjectEventHandlerType.EDITOR_STATUS_CHANGE_HANDLER;
   }
 
   @Override
