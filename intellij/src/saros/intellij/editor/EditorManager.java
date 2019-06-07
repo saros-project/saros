@@ -934,7 +934,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     Editor editor = editorPool.getEditor(path);
 
     if (!visibleFilePaths.contains(passedFile.getPath())) {
-      viewportAdjustmentExecutor.queueViewPortChange(
+      ViewportAdjustmentExecutor.queueViewPortChange(
           passedFile.getPath(), editor, range, selection);
 
       return;
