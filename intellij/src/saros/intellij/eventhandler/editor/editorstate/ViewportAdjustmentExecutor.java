@@ -45,8 +45,6 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
     this.localEditorManipulator = localEditorManipulator;
 
     this.queuedViewPortChanges = new HashMap<>();
-
-    setEnabled(true);
   }
 
   @Override

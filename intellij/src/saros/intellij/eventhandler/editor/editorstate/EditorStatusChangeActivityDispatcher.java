@@ -40,8 +40,6 @@ public class EditorStatusChangeActivityDispatcher extends AbstractLocalEditorSta
     super(project);
 
     this.localEditorHandler = localEditorHandler;
-
-    setEnabled(true);
   }
 
   /**

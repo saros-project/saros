@@ -494,8 +494,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.addActivityProducer(EditorManager.this);
           session.addActivityConsumer(consumer, Priority.ACTIVE);
 
-          setLocalDocumentModificationHandlersEnabled(true);
-
           // TODO: Test, whether this leads to problems because it is not called
           // from the UI thread.
           LocalFileSystem.getInstance().refresh(true);
@@ -511,8 +509,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.removeListener(sessionListener);
           session.removeActivityProducer(EditorManager.this);
           session.removeActivityConsumer(consumer);
-
-          setLocalDocumentModificationHandlersEnabled(false);
         }
       };
 

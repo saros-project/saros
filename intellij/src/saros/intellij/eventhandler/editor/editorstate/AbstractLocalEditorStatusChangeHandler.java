@@ -14,8 +14,7 @@ import saros.intellij.eventhandler.IStartableDisableableHandler;
  * #registerListeners(MessageBusConnection)}, which is called in {@link #subscribe()} with the
  * initialized MessageBusConnection object to register the needed listeners.
  *
- * <p>The handle is enabled and listeners are registered by default. To change this behavior, {@link
- * #start} should be overwritten by the implementation.
+ * <p>The handler is disabled and the listeners are not registered by default.
  *
  * @see MessageBusConnection#subscribe(Topic, Object)
  */
