@@ -1,7 +1,15 @@
 package saros.intellij.eventhandler;
 
-/** Provides a method to disable the listener held in the handler, thereby disabling the handler. */
-public interface DisableableHandler {
+import saros.repackaged.picocontainer.Startable;
+
+/**
+ * A handler that can be enabled/disabled at runtime.
+ *
+ * <p>The handler is disabled by default and is first started through {@link Startable#start()}. The
+ * handler is disposed through {@link Startable#stop()}.
+ */
+public interface IStartableDisableableHandler extends Startable {
+
   /**
    * Disables or enables the handler. Preferably, this should be done by un- and re-registering the
    * held listener. Otherwise, it could occur that the listener is called for an event that took

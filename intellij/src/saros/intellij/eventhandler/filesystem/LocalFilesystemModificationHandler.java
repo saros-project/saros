@@ -38,12 +38,11 @@ import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.eventhandler.DisableableHandler;
+import saros.intellij.eventhandler.IStartableDisableableHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.observables.FileReplacementInProgressObservable;
-import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.User;
@@ -56,7 +55,7 @@ import saros.session.User;
  * @see VirtualFileListener
  */
 public class LocalFilesystemModificationHandler extends AbstractActivityProducer
-    implements DisableableHandler, Startable {
+    implements IStartableDisableableHandler {
 
   private static final Logger LOG = Logger.getLogger(LocalFilesystemModificationHandler.class);
 

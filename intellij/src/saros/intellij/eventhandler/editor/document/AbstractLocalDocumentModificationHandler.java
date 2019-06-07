@@ -9,14 +9,13 @@ import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.eventhandler.DisableableHandler;
+import saros.intellij.eventhandler.IStartableDisableableHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
-import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 
 /** Parent class containing utility methods when working with document listeners. */
 public abstract class AbstractLocalDocumentModificationHandler
-    implements DisableableHandler, Startable {
+    implements IStartableDisableableHandler {
 
   private static final Logger LOG =
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);

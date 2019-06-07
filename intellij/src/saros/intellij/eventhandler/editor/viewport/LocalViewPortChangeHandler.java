@@ -14,11 +14,10 @@ import saros.editor.text.LineRange;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.eventhandler.DisableableHandler;
-import saros.repackaged.picocontainer.Startable;
+import saros.intellij.eventhandler.IStartableDisableableHandler;
 
 /** Dispatches activities for viewport changes. */
-public class LocalViewPortChangeHandler implements DisableableHandler, Startable {
+public class LocalViewPortChangeHandler implements IStartableDisableableHandler {
   private static final Logger log = Logger.getLogger(LocalViewPortChangeHandler.class);
 
   private final EditorManager editorManager;
