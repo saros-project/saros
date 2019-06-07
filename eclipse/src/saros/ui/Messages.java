@@ -325,6 +325,7 @@ public class Messages extends NLS {
   public static String RenameContactAction_rename_message;
   public static String RenameContactAction_title;
   public static String RenameContactAction_tooltip;
+  public static String RequestSessionInviteAction_title;
   public static String ResourceSelectionComposite_new_project;
   public static String ResourceSelectionComposite_undo;
   public static String ResourceSelectionComposite_redo;
