@@ -87,4 +87,9 @@ public class LocalTextSelectionChangeHandler implements IStartableDisableableHan
       this.enabled = true;
     }
   }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
 }

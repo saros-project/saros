@@ -19,4 +19,11 @@ public interface IStartableDisableableHandler extends Startable {
    * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
    */
   void setEnabled(boolean enabled);
+
+  /**
+   * Returns whether the handler currently is enabled.
+   *
+   * @return whether the handler currently is enabled
+   */
+  boolean isEnabled();
 }
