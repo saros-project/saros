@@ -23,7 +23,6 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
   private final ISarosSession sarosSession;
-  private final VirtualFileConverter virtualFileConverter;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -50,15 +49,13 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       Project project,
       AnnotationManager annotationManager,
       LocalEditorHandler localEditorHandler,
-      ISarosSession sarosSession,
-      VirtualFileConverter virtualFileConverter) {
+      ISarosSession sarosSession) {
 
     super(project);
 
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
     this.sarosSession = sarosSession;
-    this.virtualFileConverter = virtualFileConverter;
   }
 
   /**
@@ -69,9 +66,9 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
    * @see FileEditorManagerListener#fileOpened(FileEditorManager, VirtualFile)
    */
   private void setUpOpenedEditor(@NotNull VirtualFile virtualFile) {
-    Editor editor = localEditorHandler.openEditor(virtualFile, false);
+    Editor editor = localEditorHandler.openEditor(project, virtualFile, false);
 
-    SPath sPath = virtualFileConverter.convertToSPath(virtualFile);
+    SPath sPath = VirtualFileConverter.convertToSPath(project, virtualFile);
 
     if (sPath == null || editor == null) {
       return;
@@ -91,7 +88,7 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
    * @see FileEditorManagerListener.Before#beforeFileClosed(FileEditorManager, VirtualFile)
    */
   private void cleanUpAnnotations(@NotNull VirtualFile virtualFile) {
-    SPath sPath = virtualFileConverter.convertToSPath(virtualFile);
+    SPath sPath = VirtualFileConverter.convertToSPath(project, virtualFile);
 
     if (sPath == null) {
       return;

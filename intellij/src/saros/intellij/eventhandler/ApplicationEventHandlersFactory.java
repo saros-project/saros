@@ -9,7 +9,6 @@ import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
-import saros.intellij.filesystem.VirtualFileConverter;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 
@@ -22,7 +21,6 @@ public class ApplicationEventHandlersFactory {
   private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
-  private final VirtualFileConverter virtualFileConverter;
 
   public ApplicationEventHandlersFactory(
       EditorManager editorManager,
@@ -30,8 +28,7 @@ public class ApplicationEventHandlersFactory {
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       ProjectAPI projectAPI,
       AnnotationManager annotationManager,
-      LocalEditorHandler localEditorHandler,
-      VirtualFileConverter virtualFileConverter) {
+      LocalEditorHandler localEditorHandler) {
 
     this.editorManager = editorManager;
     this.sarosSession = sarosSession;
@@ -39,7 +36,6 @@ public class ApplicationEventHandlersFactory {
     this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
-    this.virtualFileConverter = virtualFileConverter;
   }
 
   /**
@@ -71,14 +67,13 @@ public class ApplicationEventHandlersFactory {
      */
     applicationEventHandlers.add(
         new LocalFilesystemModificationHandler(
+            project,
             editorManager,
             sarosSession,
             fileReplacementInProgressObservable,
             projectAPI,
             annotationManager,
-            project,
-            localEditorHandler,
-            virtualFileConverter));
+            localEditorHandler));
 
     return new ApplicationEventHandlers(applicationEventHandlers);
   }

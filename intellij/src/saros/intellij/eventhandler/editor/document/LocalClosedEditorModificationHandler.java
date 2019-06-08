@@ -3,13 +3,13 @@ package saros.intellij.eventhandler.editor.document;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
 /**
@@ -31,13 +31,13 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
       };
 
   public LocalClosedEditorModificationHandler(
+      Project project,
       EditorManager editorManager,
-      VirtualFileConverter virtualFileConverter,
       ISarosSession sarosSession,
       ProjectAPI projectAPI,
       AnnotationManager annotationManager) {
 
-    super(editorManager, sarosSession, virtualFileConverter);
+    super(project, editorManager, sarosSession);
 
     this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;

@@ -2,6 +2,7 @@ package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -23,21 +24,16 @@ public class LocalEditorHandler {
   private final ProjectAPI projectAPI;
   private final EditorManager manager;
   private final ISarosSession sarosSession;
-  private final VirtualFileConverter virtualFileConverter;
 
   /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
   private final EditorPool editorPool;
 
   public LocalEditorHandler(
-      ProjectAPI projectAPI,
-      EditorManager editorManager,
-      ISarosSession sarosSession,
-      VirtualFileConverter virtualFileConverter) {
+      ProjectAPI projectAPI, EditorManager editorManager, ISarosSession sarosSession) {
 
     this.projectAPI = projectAPI;
     this.manager = editorManager;
     this.sarosSession = sarosSession;
-    this.virtualFileConverter = virtualFileConverter;
 
     this.editorPool = manager.getEditorPool();
   }
@@ -48,19 +44,21 @@ public class LocalEditorHandler {
    *
    * <p><b>Note:</b> This only works for shared resources.
    *
+   * @param project the project in which to open the editor
    * @param virtualFile path of the file to open
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
    *     to a shared module
    */
   @Nullable
-  public Editor openEditor(@NotNull VirtualFile virtualFile, boolean activate) {
+  public Editor openEditor(
+      @NotNull Project project, @NotNull VirtualFile virtualFile, boolean activate) {
 
     if (!manager.hasSession()) {
       return null;
     }
 
-    SPath path = virtualFileConverter.convertToSPath(virtualFile);
+    SPath path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
     if (path == null || !sarosSession.isShared(path.getResource())) {
       LOG.debug(
@@ -148,10 +146,11 @@ public class LocalEditorHandler {
   /**
    * Removes a file from the editorPool and calls {@link EditorManager#generateEditorClosed(SPath)}
    *
-   * @param virtualFile
+   * @param project the project in which to close the editor
+   * @param virtualFile the file for which to close the editor
    */
-  public void closeEditor(@NotNull VirtualFile virtualFile) {
-    SPath path = virtualFileConverter.convertToSPath(virtualFile);
+  public void closeEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+    SPath path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
     if (path != null && sarosSession.isShared(path.getResource())) {
       editorPool.removeEditor(path);
@@ -206,9 +205,10 @@ public class LocalEditorHandler {
    * outside the editor package. If you still need to access this method, please consider whether
    * your class should rather be located in the editor package.
    *
+   * @param project the project in which to activate the editor
    * @param file the file whose editor was activated or <code>null</code> if there is no editor open
    */
-  public void activateEditor(@Nullable VirtualFile file) {
+  public void activateEditor(@NotNull Project project, @Nullable VirtualFile file) {
     if (file == null) {
 
       if (manager.hasSession()) {
@@ -218,7 +218,7 @@ public class LocalEditorHandler {
       return;
     }
 
-    SPath path = virtualFileConverter.convertToSPath(file);
+    SPath path = VirtualFileConverter.convertToSPath(project, file);
 
     if (path != null && sarosSession.isShared(path.getResource())) {
       manager.generateEditorActivated(path);

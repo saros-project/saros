@@ -59,15 +59,15 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
   private static final Logger LOG = Logger.getLogger(LocalFilesystemModificationHandler.class);
 
+  private final Project project;
+
   private final EditorManager editorManager;
   private final ISarosSession session;
   private final LocalFileSystem localFileSystem;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
   private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
-  private final Project project;
   private final LocalEditorHandler localEditorHandler;
-  private final VirtualFileConverter virtualFileConverter;
 
   private boolean enabled;
   private boolean disposed;
@@ -172,23 +172,22 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @see #dispose()
    */
   public LocalFilesystemModificationHandler(
+      Project project,
       EditorManager editorManager,
       ISarosSession session,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       ProjectAPI projectAPI,
       AnnotationManager annotationManager,
-      Project project,
-      LocalEditorHandler localEditorHandler,
-      VirtualFileConverter virtualFileConverter) {
+      LocalEditorHandler localEditorHandler) {
+
+    this.project = project;
 
     this.editorManager = editorManager;
     this.session = session;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
-    this.project = project;
     this.localEditorHandler = localEditorHandler;
-    this.virtualFileConverter = virtualFileConverter;
 
     this.enabled = false;
     this.disposed = false;
@@ -213,7 +212,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting before resource contents changed: " + file);
     }
 
-    SPath path = virtualFileConverter.convertToSPath(file);
+    SPath path = VirtualFileConverter.convertToSPath(project, file);
 
     if (path == null || !session.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
@@ -271,7 +270,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting to resource creation: " + createdVirtualFile);
     }
 
-    SPath path = virtualFileConverter.convertToSPath(createdVirtualFile);
+    SPath path = VirtualFileConverter.convertToSPath(project, createdVirtualFile);
 
     if (path == null || !session.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
@@ -331,7 +330,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               + copy);
     }
 
-    SPath copyPath = virtualFileConverter.convertToSPath(copy);
+    SPath copyPath = VirtualFileConverter.convertToSPath(project, copy);
 
     if (copyPath == null || !session.isShared(copyPath.getResource())) {
       if (LOG.isTraceEnabled()) {
@@ -371,7 +370,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting before resource deletion: " + deletedVirtualFile);
     }
 
-    SPath path = virtualFileConverter.convertToSPath(deletedVirtualFile);
+    SPath path = VirtualFileConverter.convertToSPath(project, deletedVirtualFile);
 
     if (path == null || !session.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
@@ -477,8 +476,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String folderName = newFolderName != null ? newFolderName : oldFile.getName();
 
-    SPath oldPath = virtualFileConverter.convertToSPath(oldFile);
-    SPath newParentPath = virtualFileConverter.convertToSPath(newParent);
+    SPath oldPath = VirtualFileConverter.convertToSPath(project, oldFile);
+    SPath newParentPath = VirtualFileConverter.convertToSPath(project, newParent);
 
     User user = session.getLocalUser();
 
@@ -618,8 +617,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String encoding = oldFile.getCharset().name();
 
-    SPath oldFilePath = virtualFileConverter.convertToSPath(oldFile);
-    SPath newParentPath = virtualFileConverter.convertToSPath(newBaseParent);
+    SPath oldFilePath = VirtualFileConverter.convertToSPath(project, oldFile);
+    SPath newParentPath = VirtualFileConverter.convertToSPath(project, newBaseParent);
 
     User user = session.getLocalUser();
 
@@ -785,7 +784,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
         if (parent == null) {
 
-          SPath path = virtualFileConverter.convertToSPath(file);
+          SPath path = VirtualFileConverter.convertToSPath(project, file);
 
           if (path != null && session.isShared(path.getResource())) {
             LOG.error(
