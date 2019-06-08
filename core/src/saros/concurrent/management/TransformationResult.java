@@ -3,7 +3,7 @@ package saros.concurrent.management;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.activities.IActivity;
 import saros.activities.QueueItem;
 import saros.session.User;
@@ -36,7 +36,7 @@ public class TransformationResult {
   public List<QueueItem> sendToPeers = new ArrayList<QueueItem>();
 
   public void addAll(TransformationResult other) {
-    if (!ObjectUtils.equals(other.localUser, this.localUser)) {
+    if (!Objects.equals(other.localUser, this.localUser)) {
       throw new IllegalArgumentException(
           "can only merge two transformation result objects if they are managing the same local user");
     }

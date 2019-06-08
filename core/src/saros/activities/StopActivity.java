@@ -2,7 +2,7 @@ package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.session.User;
 
 /**
@@ -72,11 +72,11 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ObjectUtils.hashCode(initiator);
-    result = prime * result + ObjectUtils.hashCode(state);
-    result = prime * result + ObjectUtils.hashCode(stopActivityID);
-    result = prime * result + ObjectUtils.hashCode(type);
-    result = prime * result + ObjectUtils.hashCode(affected);
+    result = prime * result + Objects.hashCode(initiator);
+    result = prime * result + Objects.hashCode(state);
+    result = prime * result + Objects.hashCode(stopActivityID);
+    result = prime * result + Objects.hashCode(type);
+    result = prime * result + Objects.hashCode(affected);
     return result;
   }
 
@@ -90,9 +90,9 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
 
     if (this.state != other.state) return false;
     if (this.type != other.type) return false;
-    if (!ObjectUtils.equals(this.stopActivityID, other.stopActivityID)) return false;
-    if (!ObjectUtils.equals(this.initiator, other.initiator)) return false;
-    if (!ObjectUtils.equals(this.affected, other.affected)) return false;
+    if (!Objects.equals(this.stopActivityID, other.stopActivityID)) return false;
+    if (!Objects.equals(this.initiator, other.initiator)) return false;
+    if (!Objects.equals(this.affected, other.affected)) return false;
 
     return true;
   }

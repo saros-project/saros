@@ -2,7 +2,7 @@ package saros.concurrent.undo;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
@@ -266,7 +266,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
         @Override
         public void editorActivated(User user, SPath newActiveEditor) {
 
-          if (!user.isLocal() || ObjectUtils.equals(currentActiveEditor, newActiveEditor)) return;
+          if (!user.isLocal() || Objects.equals(currentActiveEditor, newActiveEditor)) return;
 
           updateCurrentLocalAtomicOperation(null);
           storeCurrentLocalOperation();
@@ -275,7 +275,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
         @Override
         public void editorClosed(User user, SPath closedEditor) {
-          if (ObjectUtils.equals(currentActiveEditor, closedEditor)) {
+          if (Objects.equals(currentActiveEditor, closedEditor)) {
             updateCurrentLocalAtomicOperation(null);
             storeCurrentLocalOperation();
             currentActiveEditor = null;

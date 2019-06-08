@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -235,8 +235,8 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
 
     /** Returns whether this XStreamPacketExtension is compatible with the given provider */
     public boolean accept(XStreamExtensionProvider<?> provider) {
-      return ObjectUtils.equals(getElementName(), provider.getElementName())
-          && ObjectUtils.equals(getNamespace(), provider.getNamespace());
+      return Objects.equals(getElementName(), provider.getElementName())
+          && Objects.equals(getNamespace(), provider.getNamespace());
     }
 
     @Override

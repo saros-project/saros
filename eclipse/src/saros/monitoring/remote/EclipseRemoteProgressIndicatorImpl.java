@@ -1,8 +1,8 @@
 package saros.monitoring.remote;
 
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -205,8 +205,8 @@ final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicat
 
     if (!(obj instanceof EclipseRemoteProgressIndicatorImpl)) return false;
 
-    return ObjectUtils.equals(
+    return Objects.equals(
             remoteProgressID, ((EclipseRemoteProgressIndicatorImpl) obj).remoteProgressID)
-        && ObjectUtils.equals(remoteUser, ((EclipseRemoteProgressIndicatorImpl) obj).remoteUser);
+        && Objects.equals(remoteUser, ((EclipseRemoteProgressIndicatorImpl) obj).remoteUser);
   }
 }
