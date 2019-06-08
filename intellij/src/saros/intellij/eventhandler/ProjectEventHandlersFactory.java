@@ -17,14 +17,12 @@ import saros.intellij.eventhandler.editor.editorstate.PreexistingSelectionDispat
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
 import saros.intellij.eventhandler.editor.selection.LocalTextSelectionChangeHandler;
 import saros.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
-import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
 /** Factory to instantiate {@link ProjectEventHandlers} objects. */
 public class ProjectEventHandlersFactory {
 
   private final EditorManager editorManager;
-  private final VirtualFileConverter virtualFileConverter;
   private final ISarosSession sarosSession;
   private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
@@ -33,7 +31,6 @@ public class ProjectEventHandlersFactory {
 
   public ProjectEventHandlersFactory(
       EditorManager editorManager,
-      VirtualFileConverter virtualFileConverter,
       ISarosSession sarosSession,
       ProjectAPI projectAPI,
       AnnotationManager annotationManager,
@@ -41,7 +38,6 @@ public class ProjectEventHandlersFactory {
       LocalEditorManipulator localEditorManipulator) {
 
     this.editorManager = editorManager;
-    this.virtualFileConverter = virtualFileConverter;
     this.sarosSession = sarosSession;
     this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
@@ -69,23 +65,22 @@ public class ProjectEventHandlersFactory {
      */
     projectEventHandlers.add(
         new LocalClosedEditorModificationHandler(
-            editorManager, virtualFileConverter, sarosSession, projectAPI, annotationManager));
+            project, editorManager, sarosSession, projectAPI, annotationManager));
 
     projectEventHandlers.add(
-        new LocalDocumentModificationHandler(editorManager, sarosSession, virtualFileConverter));
+        new LocalDocumentModificationHandler(project, editorManager, sarosSession));
 
     /*
      * editor state change handlers
      */
     projectEventHandlers.add(
-        new AnnotationUpdater(
-            project, annotationManager, localEditorHandler, sarosSession, virtualFileConverter));
+        new AnnotationUpdater(project, annotationManager, localEditorHandler, sarosSession));
 
     projectEventHandlers.add(new EditorStatusChangeActivityDispatcher(project, localEditorHandler));
 
     projectEventHandlers.add(
         new PreexistingSelectionDispatcher(
-            project, editorManager, localEditorHandler, sarosSession, virtualFileConverter));
+            project, editorManager, localEditorHandler, sarosSession));
 
     projectEventHandlers.add(
         new ViewportAdjustmentExecutor(project, projectAPI, localEditorManipulator));

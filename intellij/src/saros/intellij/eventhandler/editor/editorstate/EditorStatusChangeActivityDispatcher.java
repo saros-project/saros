@@ -43,23 +43,23 @@ public class EditorStatusChangeActivityDispatcher extends AbstractLocalEditorSta
   }
 
   /**
-   * Calls {@link LocalEditorHandler#closeEditor(VirtualFile)}.
+   * Calls {@link LocalEditorHandler#closeEditor(Project, VirtualFile)}.
    *
    * @param virtualFile the file whose editor was closed
    * @see FileEditorManagerListener#fileClosed(FileEditorManager, VirtualFile)
    */
   private void generateEditorClosedActivity(@NotNull VirtualFile virtualFile) {
-    localEditorHandler.closeEditor(virtualFile);
+    localEditorHandler.closeEditor(project, virtualFile);
   }
 
   /**
-   * Calls {@link LocalEditorHandler#activateEditor(VirtualFile)}.
+   * Calls {@link LocalEditorHandler#activateEditor(Project, VirtualFile)}.
    *
    * @param event the event to react to
    * @see FileEditorManagerListener#selectionChanged(FileEditorManagerEvent)
    */
   private void generateEditorActivatedActivity(@NotNull FileEditorManagerEvent event) {
-    localEditorHandler.activateEditor(event.getNewFile());
+    localEditorHandler.activateEditor(project, event.getNewFile());
   }
 
   @Override
