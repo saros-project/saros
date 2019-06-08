@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
-import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
@@ -24,7 +23,6 @@ public class ProjectEventHandlersFactory {
 
   private final EditorManager editorManager;
   private final ISarosSession sarosSession;
-  private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
   private final LocalEditorManipulator localEditorManipulator;
@@ -32,14 +30,12 @@ public class ProjectEventHandlersFactory {
   public ProjectEventHandlersFactory(
       EditorManager editorManager,
       ISarosSession sarosSession,
-      ProjectAPI projectAPI,
       AnnotationManager annotationManager,
       LocalEditorHandler localEditorHandler,
       LocalEditorManipulator localEditorManipulator) {
 
     this.editorManager = editorManager;
     this.sarosSession = sarosSession;
-    this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
@@ -65,7 +61,7 @@ public class ProjectEventHandlersFactory {
      */
     projectEventHandlers.add(
         new LocalClosedEditorModificationHandler(
-            project, editorManager, sarosSession, projectAPI, annotationManager));
+            project, editorManager, sarosSession, annotationManager));
 
     projectEventHandlers.add(
         new LocalDocumentModificationHandler(project, editorManager, sarosSession));
@@ -82,8 +78,7 @@ public class ProjectEventHandlersFactory {
         new PreexistingSelectionDispatcher(
             project, editorManager, localEditorHandler, sarosSession));
 
-    projectEventHandlers.add(
-        new ViewportAdjustmentExecutor(project, projectAPI, localEditorManipulator));
+    projectEventHandlers.add(new ViewportAdjustmentExecutor(project, localEditorManipulator));
 
     /*
      * editor selection change handlers
