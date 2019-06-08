@@ -1,6 +1,5 @@
-package saros.core.project.internal;
+package saros.intellij.context;
 
-import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.ProjectAPI;
@@ -33,7 +32,6 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
     container.addComponent(ProjectAPI.class);
 
     // Editor interaction
-    container.addComponent(EditorAPI.class);
     container.addComponent(LocalEditorHandler.class);
     container.addComponent(LocalEditorManipulator.class);
     container.addComponent(SelectedEditorStateSnapshotFactory.class);
