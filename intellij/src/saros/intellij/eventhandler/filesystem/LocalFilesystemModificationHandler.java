@@ -65,7 +65,6 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private final ISarosSession session;
   private final LocalFileSystem localFileSystem;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
-  private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
 
@@ -176,7 +175,6 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       EditorManager editorManager,
       ISarosSession session,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
-      ProjectAPI projectAPI,
       AnnotationManager annotationManager,
       LocalEditorHandler localEditorHandler) {
 
@@ -185,7 +183,6 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     this.editorManager = editorManager;
     this.session = session;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
-    this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
 
@@ -626,7 +623,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     boolean newPathIsShared =
         newParentPath != null && session.isShared(newParentPath.getResource());
 
-    boolean fileIsOpen = projectAPI.isOpen(oldFile);
+    boolean fileIsOpen = ProjectAPI.isOpen(project, oldFile);
 
     IPath relativePath = getRelativePath(oldBaseParent, oldFile);
 
@@ -687,7 +684,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               encoding);
 
       if (fileIsOpen) {
-        Editor editor = projectAPI.openEditor(oldFile, false);
+        Editor editor = ProjectAPI.openEditor(project, oldFile, false);
 
         editorManager.addEditorMapping(newFilePath, editor);
       }

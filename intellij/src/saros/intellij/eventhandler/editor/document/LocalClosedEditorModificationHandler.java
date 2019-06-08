@@ -19,7 +19,6 @@ import saros.session.ISarosSession;
  * @see com.intellij.openapi.editor.event.DocumentListener
  */
 public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentModificationHandler {
-  private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
 
   private final DocumentListener documentListener =
@@ -34,12 +33,10 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
       Project project,
       EditorManager editorManager,
       ISarosSession sarosSession,
-      ProjectAPI projectAPI,
       AnnotationManager annotationManager) {
 
     super(project, editorManager, sarosSession);
 
-    this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
   }
 
@@ -64,7 +61,7 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
     String newText = event.getNewFragment().toString();
     String replacedText = event.getOldFragment().toString();
 
-    if (!projectAPI.isOpen(document)) {
+    if (!ProjectAPI.isOpen(project, document)) {
       IFile file = path.getFile();
 
       int replacedTextLength = replacedText.length();

@@ -6,7 +6,6 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
-import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
 import saros.observables.FileReplacementInProgressObservable;
@@ -18,7 +17,6 @@ public class ApplicationEventHandlersFactory {
   private final EditorManager editorManager;
   private final ISarosSession sarosSession;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
-  private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
 
@@ -26,14 +24,12 @@ public class ApplicationEventHandlersFactory {
       EditorManager editorManager,
       ISarosSession sarosSession,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
-      ProjectAPI projectAPI,
       AnnotationManager annotationManager,
       LocalEditorHandler localEditorHandler) {
 
     this.editorManager = editorManager;
     this.sarosSession = sarosSession;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
-    this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
   }
@@ -71,7 +67,6 @@ public class ApplicationEventHandlersFactory {
             editorManager,
             sarosSession,
             fileReplacementInProgressObservable,
-            projectAPI,
             annotationManager,
             localEditorHandler));
 

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import saros.activities.SPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
@@ -21,17 +22,13 @@ public class LocalEditorHandler {
 
   private static final Logger LOG = Logger.getLogger(LocalEditorHandler.class);
 
-  private final ProjectAPI projectAPI;
   private final EditorManager manager;
   private final ISarosSession sarosSession;
 
   /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
   private final EditorPool editorPool;
 
-  public LocalEditorHandler(
-      ProjectAPI projectAPI, EditorManager editorManager, ISarosSession sarosSession) {
-
-    this.projectAPI = projectAPI;
+  public LocalEditorHandler(EditorManager editorManager, ISarosSession sarosSession) {
     this.manager = editorManager;
     this.sarosSession = sarosSession;
 
@@ -133,7 +130,9 @@ public class LocalEditorHandler {
       return null;
     }
 
-    Editor editor = projectAPI.openEditor(virtualFile, activate);
+    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+
+    Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
     editorPool.add(path, editor);
     manager.startEditor(editor);
@@ -245,6 +244,8 @@ public class LocalEditorHandler {
       return false;
     }
 
-    return projectAPI.isOpen(doc);
+    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+
+    return ProjectAPI.isOpen(project, doc);
   }
 }
