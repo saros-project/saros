@@ -2,6 +2,7 @@ package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -16,6 +17,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
+import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
@@ -28,7 +30,6 @@ public class LocalEditorManipulator {
   private static final Logger LOG = Logger.getLogger(LocalEditorManipulator.class);
 
   private final ProjectAPI projectAPI;
-  private final EditorAPI editorAPI;
   private final AnnotationManager annotationManager;
   private final ISarosSession sarosSession;
 
@@ -39,13 +40,11 @@ public class LocalEditorManipulator {
 
   public LocalEditorManipulator(
       ProjectAPI projectAPI,
-      EditorAPI editorAPI,
       AnnotationManager annotationManager,
       EditorManager editorManager,
       ISarosSession sarosSession) {
 
     this.projectAPI = projectAPI;
-    this.editorAPI = editorAPI;
     this.annotationManager = annotationManager;
     this.manager = editorManager;
     this.sarosSession = sarosSession;
@@ -130,6 +129,8 @@ public class LocalEditorManipulator {
    * @param operations the operations to apply to the document
    */
   void applyTextOperations(SPath path, Operation operations) {
+    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+
     Document doc = editorPool.getDocument(path);
 
     /*
@@ -173,13 +174,14 @@ public class LocalEditorManipulator {
 
       for (ITextOperation op : operations.getTextOperations()) {
         if (op instanceof DeleteOperation) {
-          editorAPI.deleteText(doc, op.getPosition(), op.getPosition() + op.getTextLength());
+          DocumentAPI.deleteText(
+              project, doc, op.getPosition(), op.getPosition() + op.getTextLength());
         } else {
           boolean writePermission = doc.isWritable();
           if (!writePermission) {
             doc.setReadOnly(false);
           }
-          editorAPI.insertText(doc, op.getPosition(), op.getText());
+          DocumentAPI.insertText(project, doc, op.getPosition(), op.getText());
           if (!writePermission) {
             doc.setReadOnly(true);
           }
@@ -219,7 +221,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    LineRange localViewport = editorAPI.getLocalViewPortRange(editor);
+    LineRange localViewport = EditorAPI.getLocalViewPortRange(editor);
 
     int localStartLine = localViewport.getStartLine();
     int localEndLine = localViewport.getStartLine() + localViewport.getNumberOfLines();
@@ -235,7 +237,7 @@ public class LocalEditorManipulator {
       int startOffset = selection.getOffset();
       int endOffset = selection.getOffset() + selection.getLength();
 
-      LineRange selectionRange = editorAPI.getLineRange(editor, startOffset, endOffset);
+      LineRange selectionRange = EditorAPI.getLineRange(editor, startOffset, endOffset);
 
       remoteStartLine = selectionRange.getStartLine();
       remoteEndLine = selectionRange.getStartLine() + selectionRange.getNumberOfLines();
@@ -260,7 +262,7 @@ public class LocalEditorManipulator {
 
     int remoteViewPortCenter = findCenter(remoteStartLine, remoteEndLine);
 
-    editorAPI.scrollToViewPortCenter(editor, remoteViewPortCenter);
+    EditorAPI.scrollToViewPortCenter(editor, remoteViewPortCenter);
   }
 
   /**
@@ -301,6 +303,8 @@ public class LocalEditorManipulator {
 
       return;
     }
+
+    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {
@@ -347,8 +351,8 @@ public class LocalEditorManipulator {
         manager.setLocalDocumentModificationHandlersEnabled(false);
       }
 
-      editorAPI.deleteText(document, 0, documentLength);
-      editorAPI.insertText(document, 0, text);
+      DocumentAPI.deleteText(project, document, 0, documentLength);
+      DocumentAPI.insertText(project, document, 0, text);
 
     } finally {
 
