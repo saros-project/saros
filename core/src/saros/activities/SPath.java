@@ -87,7 +87,10 @@ public class SPath {
    *
    * @return the resource represented by this SPath or <code>null</code> if such or resource does
    *     not exist
+   * @deprecated this method will be removed when SPath completely based on {@link IReferencePoint}
+   *     reference points and {@link IPath} relative path to resource
    */
+  @Deprecated
   public IResource getResource() {
     return project.findMember(projectRelativePath);
   }
