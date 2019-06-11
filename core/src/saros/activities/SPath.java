@@ -72,7 +72,10 @@ public class SPath {
    * Returns a handle for an IFile represented by this SPath.
    *
    * @return the IFile contained in the associated IProject for the given project relative path
+   * @deprecated this method will be removed when SPath completely based on {@link IReferencePoint}
+   *     reference points and {@link IPath} relative path to resource
    */
+  @Deprecated
   public IFile getFile() {
     return project.getFile(projectRelativePath);
   }
