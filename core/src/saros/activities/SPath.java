@@ -1,7 +1,7 @@
 package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
@@ -112,8 +112,8 @@ public class SPath {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ObjectUtils.hashCode(project);
-    result = prime * result + ObjectUtils.hashCode(projectRelativePath);
+    result = prime * result + Objects.hashCode(project);
+    result = prime * result + Objects.hashCode(projectRelativePath);
     return result;
   }
 
@@ -127,8 +127,8 @@ public class SPath {
 
     SPath other = (SPath) obj;
 
-    return ObjectUtils.equals(project, other.project)
-        && ObjectUtils.equals(projectRelativePath, other.projectRelativePath);
+    return Objects.equals(project, other.project)
+        && Objects.equals(projectRelativePath, other.projectRelativePath);
   }
 
   @Override

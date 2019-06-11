@@ -23,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import java.util.List;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.session.User;
 
 /**
@@ -76,9 +76,9 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ObjectUtils.hashCode(paths);
-    result = prime * result + ObjectUtils.hashCode(recoveryID);
-    result = prime * result + ObjectUtils.hashCode(target);
+    result = prime * result + Objects.hashCode(paths);
+    result = prime * result + Objects.hashCode(recoveryID);
+    result = prime * result + Objects.hashCode(target);
     return result;
   }
 
@@ -90,9 +90,9 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
 
     ChecksumErrorActivity other = (ChecksumErrorActivity) obj;
 
-    if (!ObjectUtils.equals(this.recoveryID, other.recoveryID)) return false;
-    if (!ObjectUtils.equals(this.paths, other.paths)) return false;
-    if (!ObjectUtils.equals(this.target, other.target)) return false;
+    if (!Objects.equals(this.recoveryID, other.recoveryID)) return false;
+    if (!Objects.equals(this.paths, other.paths)) return false;
+    if (!Objects.equals(this.target, other.target)) return false;
 
     return true;
   }

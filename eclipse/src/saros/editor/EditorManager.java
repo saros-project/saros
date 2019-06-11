@@ -3,9 +3,9 @@ package saros.editor;
 import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -575,7 +575,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     for (IEditorPart editor : editorPool.getAllEditors()) {
       IEditorInput input = editor.getEditorInput();
 
-      if (ObjectUtils.equals(EditorAPI.getDocumentProvider(input).getDocument(input), document)) {
+      if (Objects.equals(EditorAPI.getDocumentProvider(input).getDocument(input), document)) {
         changedEditor = editor;
         break;
       }

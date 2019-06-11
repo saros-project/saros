@@ -1,7 +1,7 @@
 package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.session.User;
 
 public abstract class AbstractResourceActivity extends AbstractActivity
@@ -35,7 +35,7 @@ public abstract class AbstractResourceActivity extends AbstractActivity
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ObjectUtils.hashCode(path);
+    result = prime * result + Objects.hashCode(path);
     return result;
   }
 
@@ -47,7 +47,7 @@ public abstract class AbstractResourceActivity extends AbstractActivity
 
     AbstractResourceActivity other = (AbstractResourceActivity) obj;
 
-    if (!ObjectUtils.equals(this.path, other.path)) return false;
+    if (!Objects.equals(this.path, other.path)) return false;
 
     return true;
   }

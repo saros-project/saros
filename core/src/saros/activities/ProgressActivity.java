@@ -2,7 +2,7 @@ package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.session.User;
 
 /** A {@link ProgressActivity} is used for controlling a progress bar at a remote peer. */
@@ -116,10 +116,10 @@ public class ProgressActivity extends AbstractActivity implements ITargetedActiv
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ObjectUtils.hashCode(action);
-    result = prime * result + ObjectUtils.hashCode(progressID);
-    result = prime * result + ObjectUtils.hashCode(taskName);
-    result = prime * result + ObjectUtils.hashCode(target);
+    result = prime * result + Objects.hashCode(action);
+    result = prime * result + Objects.hashCode(progressID);
+    result = prime * result + Objects.hashCode(taskName);
+    result = prime * result + Objects.hashCode(target);
     result = prime * result + workCurrent;
     result = prime * result + workTotal;
 
@@ -137,9 +137,9 @@ public class ProgressActivity extends AbstractActivity implements ITargetedActiv
     if (this.workCurrent != other.workCurrent) return false;
     if (this.workTotal != other.workTotal) return false;
     if (this.action != other.action) return false;
-    if (!ObjectUtils.equals(this.progressID, other.progressID)) return false;
-    if (!ObjectUtils.equals(this.taskName, other.taskName)) return false;
-    if (!ObjectUtils.equals(this.target, other.target)) return false;
+    if (!Objects.equals(this.progressID, other.progressID)) return false;
+    if (!Objects.equals(this.taskName, other.taskName)) return false;
+    if (!Objects.equals(this.target, other.target)) return false;
 
     return true;
   }
