@@ -26,7 +26,7 @@ import saros.annotations.Component;
 import saros.editor.EditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.annotations.SarosAnnotation;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -83,6 +83,8 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
   @Inject private EditorManager editorManager;
 
   @Inject private ISarosSessionManager sessionManager;
+
+  @Inject private EclipseReferencePointManager eclipseReferencePointManager;
 
   private static class MemoryImageDescriptor extends ImageDescriptor {
 
@@ -148,7 +150,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
           if (filePath != null) {
 
-            IResource resource = ResourceAdapterFactory.convertBack(filePath.getResource());
+            IResource resource = eclipseReferencePointManager.findMember(filePath);
 
             if (resource != null) activeEditorResources.put(user, getResources(resource));
             else LOG.warn("resource for editor " + filePath + " does not exist locally");
