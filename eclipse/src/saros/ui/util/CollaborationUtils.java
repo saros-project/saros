@@ -29,6 +29,7 @@ import saros.Saros;
 import saros.SarosPluginContext;
 import saros.filesystem.CoreReferencePointManager;
 import saros.filesystem.EclipseProjectImpl;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.filesystem.IReferencePointManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.net.xmpp.JID;
@@ -53,6 +54,8 @@ public class CollaborationUtils {
   private static final Logger LOG = Logger.getLogger(CollaborationUtils.class);
 
   @Inject private static ISarosSessionManager sessionManager;
+
+  @Inject private static EclipseReferencePointManager eclipseReferencePointManager;
 
   static {
     SarosPluginContext.initComponent(new CollaborationUtils());
@@ -86,9 +89,7 @@ public class CollaborationUtils {
 
               IReferencePointManager coreReferencePointManager = new CoreReferencePointManager();
 
-              fillReferencePointManager(
-                  coreReferencePointManager,
-                  convertToProjectResourceMapping(newResources).keySet());
+              fillReferencePointManager(coreReferencePointManager, newResources.keySet());
 
               sessionManager.startSession(
                   convertToReferencePointResourceMapping(newResources), coreReferencePointManager);
@@ -221,8 +222,7 @@ public class CollaborationUtils {
             IReferencePointManager referencePointManager =
                 session.getComponent(IReferencePointManager.class);
 
-            fillReferencePointManager(
-                referencePointManager, convertToProjectResourceMapping(projectResources).keySet());
+            fillReferencePointManager(referencePointManager, projectResources.keySet());
 
             sessionManager.addReferencePointResources(
                 convertToReferencePointResourceMapping(projectResources));
@@ -502,7 +502,13 @@ public class CollaborationUtils {
   }
 
   private static void fillReferencePointManager(
-      IReferencePointManager referencePointManager, Set<saros.filesystem.IProject> projects) {
-    referencePointManager.putSetOfProjects(projects);
+      IReferencePointManager referencePointManager, Set<IProject> projects) {
+
+    projects.forEach(
+        project -> {
+          eclipseReferencePointManager.putIfAbsent(project);
+          referencePointManager.putIfAbsent(
+              EclipseReferencePointManager.create(project), ResourceAdapterFactory.create(project));
+        });
   }
 }
