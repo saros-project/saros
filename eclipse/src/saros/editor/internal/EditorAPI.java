@@ -37,7 +37,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
-import saros.filesystem.EclipseFileImpl;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.ui.dialogs.WarningMessageDialog;
 import saros.ui.util.SWTUtils;
@@ -96,10 +96,12 @@ public class EditorAPI {
    * Opens the editor with given path. Needs to be called from an UI thread.
    *
    * @param activate <code>true</code>, if editor should get focus, otherwise <code>false</code>
+   * @param eclipseReferencePointManager which determine the file
    * @return the opened editor or <code>null</code> if the editor couldn't be opened.
    */
-  public static IEditorPart openEditor(SPath path, boolean activate) {
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+  public static IEditorPart openEditor(
+      SPath path, boolean activate, EclipseReferencePointManager eclipseReferencePointManager) {
+    IFile file = eclipseReferencePointManager.getFile(path);
 
     if (!file.exists()) {
       LOG.error("EditorAPI cannot open file which does not exist: " + file, new StackTrace());
