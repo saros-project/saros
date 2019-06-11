@@ -490,7 +490,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     this.locallyActiveEditor = path;
 
-    if (path != null && session.isShared(path.getResource())) openEditorPaths.add(path);
+    if (path != null) {
+      IResource eclipseResource = eclipseReferencePointManager.findMember(path);
+      saros.filesystem.IResource sarosResource = ResourceAdapterFactory.create(eclipseResource);
+
+      if (session.isShared(sarosResource)) openEditorPaths.add(path);
+    }
 
     editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
@@ -1386,7 +1391,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
       if (resource == null) continue;
 
-      if (ResourceAdapterFactory.create(resource).equals(path.getResource())) return true;
+      if (resource.equals(eclipseReferencePointManager.findMember(path))) return true;
     }
 
     return false;
