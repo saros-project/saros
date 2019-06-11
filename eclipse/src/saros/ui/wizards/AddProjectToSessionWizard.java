@@ -40,6 +40,7 @@ import org.eclipse.ui.IFileEditorInput;
 import saros.Saros;
 import saros.SarosPluginContext;
 import saros.editor.internal.EditorAPI;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
@@ -87,6 +88,8 @@ public class AddProjectToSessionWizard extends Wizard {
   @Inject private Preferences preferences;
 
   @Inject private ISarosSessionManager sessionManager;
+
+  @Inject private EclipseReferencePointManager eclipseReferencePointManager;
 
   private static class OverwriteErrorDialog extends ErrorDialog {
 
@@ -313,12 +316,11 @@ public class AddProjectToSessionWizard extends Wizard {
                   new HashMap<String, IReferencePoint>();
 
               for (final Entry<String, IProject> entry : targetProjectMapping.entrySet()) {
-                saros.filesystem.IProject sarosProject =
-                    ResourceAdapterFactory.create(entry.getValue());
+                IProject project = entry.getValue();
 
-                convertedMapping.put(entry.getKey(), sarosProject.getReferencePoint());
+                convertedMapping.put(entry.getKey(), EclipseReferencePointManager.create(project));
 
-                fillReferencePointManager(sessionManager.getSession(), sarosProject);
+                fillReferencePointManager(sessionManager.getSession(), project);
               }
 
               final ProjectNegotiation.Status status =
@@ -551,7 +553,7 @@ public class AddProjectToSessionWizard extends Wizard {
       final saros.filesystem.IProject adaptedProject =
           ResourceAdapterFactory.create(entry.getValue());
 
-      fillReferencePointManager(session, adaptedProject);
+      fillReferencePointManager(session, project);
 
       /*
        * do not refresh already partially shared projects as this may
@@ -679,10 +681,14 @@ public class AddProjectToSessionWizard extends Wizard {
     }
   }
 
-  private void fillReferencePointManager(ISarosSession session, saros.filesystem.IProject project) {
+  private void fillReferencePointManager(ISarosSession session, IProject project) {
     IReferencePointManager referencePointManager =
         session.getComponent(IReferencePointManager.class);
 
-    referencePointManager.putIfAbsent(project.getReferencePoint(), project);
+    saros.filesystem.IProject sarosProject = ResourceAdapterFactory.create(project);
+    IReferencePoint referencePoint = EclipseReferencePointManager.create(project);
+
+    eclipseReferencePointManager.putIfAbsent(referencePoint, project);
+    referencePointManager.putIfAbsent(referencePoint, sarosProject);
   }
 }
