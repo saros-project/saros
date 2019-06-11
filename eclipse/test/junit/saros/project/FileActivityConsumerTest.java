@@ -13,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,8 +23,10 @@ import org.junit.Test;
 import saros.activities.FileActivity;
 import saros.activities.FileActivity.Purpose;
 import saros.activities.FileActivity.Type;
+import saros.activities.IActivity;
 import saros.activities.SPath;
-import saros.filesystem.IResource;
+import saros.filesystem.EclipseReferencePointManager;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.net.xmpp.JID;
 import saros.session.User;
@@ -43,8 +46,10 @@ public class FileActivityConsumerTest {
 
   private IProject project;
   private IPath path;
+  private IReferencePoint referencePoint;
 
   private SharedResourcesManager resourceChangeListener;
+  private EclipseReferencePointManager eclipseReferencePointManager;
 
   @Before
   public void setUp() throws CoreException {
@@ -59,13 +64,14 @@ public class FileActivityConsumerTest {
 
     replay(resourceChangeListener);
 
-    consumer = new FileActivityConsumer(null, resourceChangeListener, null);
+    referencePoint = createMock(IReferencePoint.class);
+
+    replay(referencePoint);
 
     path = createMock(IPath.class);
     replay(path);
 
     project = createMock(IProject.class);
-    expect(project.getFullPath()).andStubReturn(path);
     replay(project);
 
     file = createMock(IFile.class);
@@ -76,6 +82,7 @@ public class FileActivityConsumerTest {
     expect(file.getType()).andStubReturn(IResource.FILE);
     expect(file.getAdapter(IFile.class)).andStubReturn(file);
     expect(file.getProject()).andStubReturn(project);
+    expect(file.getProjectRelativePath()).andStubReturn(path);
   }
 
   @After
@@ -93,7 +100,8 @@ public class FileActivityConsumerTest {
 
     replay(file);
 
-    consumer.exec(createFileActivity(file, INCOMING_SAME_CONTENT));
+    IActivity activity = createFileActivity(file, INCOMING_SAME_CONTENT);
+    consumer.exec(activity);
 
     verify(file);
   }
@@ -108,7 +116,9 @@ public class FileActivityConsumerTest {
 
     replay(file);
 
-    consumer.exec(createFileActivity(file, INCOMING_DIFFERENT_CONTENT));
+    IActivity activity = createFileActivity(file, INCOMING_DIFFERENT_CONTENT);
+
+    consumer.exec(activity);
 
     // ensure file was written
     verify(file);
@@ -117,9 +127,18 @@ public class FileActivityConsumerTest {
   private SPath createPathMockForFile(IFile file) {
     final SPath path = createMock(SPath.class);
 
-    expect(path.getFile()).andStubReturn(ResourceAdapterFactory.create(file));
-
+    expect(path.getReferencePoint()).andStubReturn(referencePoint);
+    expect(path.getProjectRelativePath()).andStubReturn(ResourceAdapterFactory.create(this.path));
     replay(path);
+
+    eclipseReferencePointManager = createMock(EclipseReferencePointManager.class);
+    expect(eclipseReferencePointManager.getProject(referencePoint)).andStubReturn(project);
+    expect(eclipseReferencePointManager.getFile(path)).andStubReturn(file);
+
+    replay(eclipseReferencePointManager);
+
+    consumer =
+        new FileActivityConsumer(null, resourceChangeListener, null, eclipseReferencePointManager);
 
     return path;
   }
