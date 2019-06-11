@@ -54,7 +54,7 @@ public class SarosViewBrowserVersion extends ViewPart {
       // Provide a LinkWidget instead
       Link link = new Link(parent, SWT.BORDER);
       link.setText(
-          "Saros couldn't initzialisieren the SWT browser widget to display the HTML UI. Find help here <A>"
+          "Saros couldn't initialize the SWT browser widget to display the HTML UI. Find help here <A>"
               + TROUBLESHOOTING_URL
               + "</A>.");
       link.setBounds(10, 10, 140, 40);
