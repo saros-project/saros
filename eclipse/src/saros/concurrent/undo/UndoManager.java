@@ -40,7 +40,7 @@ import saros.concurrent.undo.OperationHistory.Type;
 import saros.editor.EditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.internal.EditorAPI;
-import saros.filesystem.EclipseFileImpl;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.Disposable;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -95,6 +95,8 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
   protected EditorManager editorManager;
 
   protected SPath currentActiveEditor = null;
+
+  private EclipseReferencePointManager eclipseReferencePointManager;
 
   /** This UndoManager is disabled when not in a Saros session. */
   protected boolean enabled;
@@ -368,7 +370,10 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
         }
       };
 
-  public UndoManager(ISarosSessionManager sessionManager, EditorManager editorManager) {
+  public UndoManager(
+      ISarosSessionManager sessionManager,
+      EditorManager editorManager,
+      EclipseReferencePointManager eclipseReferencePointManager) {
 
     if (log.isDebugEnabled()) DefaultOperationHistory.DEBUG_OPERATION_HISTORY_APPROVAL = true;
 
@@ -379,6 +384,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
     editorManager.addActivityListener(this.activityListener);
     this.editorManager = editorManager;
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
 
     editorManager.addSharedEditorListener(sharedEditorListener);
   }
@@ -489,7 +495,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
     List<ITextOperation> textOps = activity.toOperation().getTextOperations();
 
-    IFile file = ((EclipseFileImpl) currentActiveEditor.getFile()).getDelegate();
+    IFile file = eclipseReferencePointManager.getFile(currentActiveEditor);
 
     FileEditorInput input = new FileEditorInput(file);
     IDocumentProvider provider = EditorAPI.connect(input);

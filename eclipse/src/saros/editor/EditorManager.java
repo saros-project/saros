@@ -53,7 +53,7 @@ import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
-import saros.filesystem.EclipseFileImpl;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
@@ -128,6 +128,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private TextSelection localSelection;
 
   private LineRange localViewport;
+
+  private EclipseReferencePointManager eclipseReferencePointManager;
 
   /** all files that have connected document providers */
   private final Set<IFile> connectedFiles = new HashSet<IFile>();
@@ -369,9 +371,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
       };
 
-  public EditorManager(ISarosSessionManager sessionManager, IPreferenceStore preferenceStore) {
+  public EditorManager(
+      ISarosSessionManager sessionManager,
+      IPreferenceStore preferenceStore,
+      EclipseReferencePointManager eclipseReferencePointManager) {
 
     this.preferenceStore = preferenceStore;
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
 
     editorPool = new EditorPool(this);
     partListener = new SafePartListener2(LOG, new EditorPartListener(this));
@@ -439,7 +445,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   private String doGetContent(SPath path) {
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IFile file = eclipseReferencePointManager.getFile(path);
+
     FileEditorInput input = new FileEditorInput(file);
 
     IDocumentProvider provider = EditorAPI.connect(input);
@@ -677,7 +684,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     LOG.trace(".execTextEdit invoked");
 
     SPath path = textEdit.getPath();
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IFile file = eclipseReferencePointManager.getFile(path);
 
     if (!file.exists()) {
       LOG.error("TextEditActivity refers to file which" + " is not available locally: " + textEdit);
@@ -996,7 +1003,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   private void replaceText(SPath path, int offset, String replacedText, String text, User source) {
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IFile file = eclipseReferencePointManager.getFile(path);
     FileEditorInput input = new FileEditorInput(file);
     IDocumentProvider provider = EditorAPI.connect(input);
 
@@ -1096,7 +1103,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   private boolean isDirty(SPath path) throws FileNotFoundException {
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IFile file = eclipseReferencePointManager.getFile(path);
 
     if (file == null || !file.exists()) {
       throw new FileNotFoundException("File not found: " + path);
@@ -1124,7 +1131,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   public void saveEditor(SPath path) {
     checkThreadAccess();
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IFile file = eclipseReferencePointManager.getFile(path);
 
     LOG.trace(".saveEditor (" + file.getName() + ") invoked");
 
@@ -1389,7 +1396,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         new Runnable() {
           @Override
           public void run() {
-            EditorAPI.openEditor(path, activate);
+            EditorAPI.openEditor(path, activate, eclipseReferencePointManager);
           }
         });
   }
@@ -1460,7 +1467,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         new Runnable() {
           @Override
           public void run() {
-            IEditorPart newEditor = EditorAPI.openEditor(path, true);
+            IEditorPart newEditor = EditorAPI.openEditor(path, true, eclipseReferencePointManager);
             if (newEditor == null) {
               LOG.warn("editor for " + path + " couldn't be opened");
               return;
@@ -1653,7 +1660,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     followModeManager = session.getComponent(FollowModeManager.class);
     userEditorStateManager = session.getComponent(UserEditorStateManager.class);
-    remoteWriteAccessManager = new RemoteWriteAccessManager(session);
+    remoteWriteAccessManager = new RemoteWriteAccessManager(session, eclipseReferencePointManager);
 
     preferenceStore.addPropertyChangeListener(annotationPreferenceListener);
 

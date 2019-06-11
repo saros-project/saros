@@ -112,7 +112,7 @@ public class AwarenessInformationTreeElement extends TreeElement {
       details.add(
           activeFile.getProject().getName()
               + ": "
-              + activeFile.getFile().getProjectRelativePath().toString());
+              + activeFile.getProjectRelativePath().toString());
     }
 
     return details;
