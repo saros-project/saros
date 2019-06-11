@@ -11,7 +11,7 @@ import saros.activities.FileActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
 import saros.editor.EditorManager;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;
@@ -24,15 +24,18 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   private final ISarosSession session;
   private final SharedResourcesManager resourceChangeListener;
   private final EditorManager editorManager;
+  private final EclipseReferencePointManager eclipseReferencePointManager;
 
   public FileActivityConsumer(
       final ISarosSession session,
       final SharedResourcesManager resourceChangeListener,
-      final EditorManager editorManager) {
+      final EditorManager editorManager,
+      final EclipseReferencePointManager eclipseReferencePointManager) {
 
     this.session = session;
     this.resourceChangeListener = resourceChangeListener;
     this.editorManager = editorManager;
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
   }
 
   @Override
@@ -127,9 +130,9 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
 
   private void handleFileMove(FileActivity activity) throws CoreException {
 
-    final IFile fileDestination = toEclipseIFile(activity.getPath().getFile());
+    final IFile fileDestination = eclipseReferencePointManager.getFile(activity.getPath());
 
-    final IFile fileToMove = toEclipseIFile(activity.getOldPath().getFile());
+    final IFile fileToMove = eclipseReferencePointManager.getFile(activity.getOldPath());
 
     FileUtils.mkdirs(fileDestination);
 
@@ -141,14 +144,14 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   }
 
   private void handleFileDeletion(FileActivity activity) throws CoreException {
-    final IFile file = toEclipseIFile(activity.getPath().getFile());
+    final IFile file = eclipseReferencePointManager.getFile(activity.getPath());
 
     if (file.exists()) FileUtils.delete(file);
     else LOG.warn("could not delete file " + file + " because it does not exist");
   }
 
   private void handleFileCreation(FileActivity activity) throws CoreException {
-    final IFile file = toEclipseIFile(activity.getPath().getFile());
+    final IFile file = eclipseReferencePointManager.getFile(activity.getPath());
 
     final String encoding = activity.getEncoding();
     final byte[] newContent = activity.getContent();
@@ -223,9 +226,5 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     LOG.debug("changing encoding for file " + file + " to encoding: " + encoding);
 
     file.setCharset(encoding, new NullProgressMonitor());
-  }
-
-  private static IFile toEclipseIFile(saros.filesystem.IFile file) {
-    return (IFile) ResourceAdapterFactory.convertBack(file);
   }
 }
