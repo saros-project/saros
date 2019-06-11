@@ -44,6 +44,7 @@ import saros.editor.EditorManager;
 import saros.feedback.FeedbackManager;
 import saros.feedback.FeedbackPreferences;
 import saros.feedback.StatisticManager;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IReferencePointManager;
 import saros.net.IConnectionManager;
@@ -321,6 +322,7 @@ public class SarosSessionTest {
 
     addMockedComponent(IPathFactory.class);
     addMockedComponent(ISarosSessionManager.class);
+    addMockedComponent(EclipseReferencePointManager.class);
 
     container.start();
   }
