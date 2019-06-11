@@ -11,7 +11,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import saros.activities.EditorActivity;
 import saros.activities.SPath;
 import saros.editor.internal.EditorAPI;
-import saros.filesystem.EclipseFileImpl;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
 import saros.session.ISarosSession;
@@ -47,9 +47,13 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
   protected ISarosSession sarosSession;
 
-  public RemoteWriteAccessManager(final ISarosSession sarosSession) {
+  private EclipseReferencePointManager eclipseReferencePointManager;
+
+  public RemoteWriteAccessManager(
+      final ISarosSession sarosSession, EclipseReferencePointManager eclipseReferencePointManager) {
     this.sarosSession = sarosSession;
     this.sarosSession.addListener(sessionListener);
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
   }
 
   /** This method is called from the shared project when a new Activity arrives */
@@ -131,7 +135,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     assert !connectedUserWithWriteAccessFiles.contains(path);
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IFile file = eclipseReferencePointManager.getFile(path);
     if (!file.exists()) {
       log.error(
           "Attempting to connect to file which" + " is not available locally: " + path,
@@ -154,7 +158,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     connectedUserWithWriteAccessFiles.remove(path);
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    IFile file = eclipseReferencePointManager.getFile(path);
     EditorAPI.disconnect(new FileEditorInput(file));
   }
 
