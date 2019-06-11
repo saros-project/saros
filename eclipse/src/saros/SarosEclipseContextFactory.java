@@ -15,6 +15,7 @@ import saros.context.IContextKeyBindings;
 import saros.editor.EditorManager;
 import saros.editor.IEditorManager;
 import saros.filesystem.EclipsePathFactory;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.filesystem.EclipseWorkspaceImpl;
 import saros.filesystem.EclipseWorkspaceRootImpl;
 import saros.filesystem.FileContentNotifierBridge;
@@ -62,6 +63,9 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
    */
   private final Component[] getContextComponents() {
     return new Component[] {
+      // ReferencePointManager
+      Component.create(EclipseReferencePointManager.class),
+
       // Core Managers
       Component.create(IEditorManager.class, EditorManager.class),
       Component.create(SessionViewOpener.class),
