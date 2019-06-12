@@ -2,7 +2,7 @@ package saros.ui.model.session;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -74,7 +74,7 @@ public class SessionHeaderElement extends HeaderElement {
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCode(sessionInput);
+    return Objects.hashCode(sessionInput);
   }
 
   @Override
@@ -86,6 +86,6 @@ public class SessionHeaderElement extends HeaderElement {
     if (getClass() != obj.getClass()) return false;
 
     SessionHeaderElement other = (SessionHeaderElement) obj;
-    return ObjectUtils.equals(sessionInput, other.sessionInput);
+    return Objects.equals(sessionInput, other.sessionInput);
   }
 }

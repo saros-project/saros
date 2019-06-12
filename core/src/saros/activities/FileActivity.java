@@ -3,7 +3,7 @@ package saros.activities;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.Arrays;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.session.User;
 
 @XStreamAlias("fileActivity")
@@ -136,9 +136,9 @@ public class FileActivity extends AbstractResourceActivity
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + Arrays.hashCode(content);
-    result = prime * result + ObjectUtils.hashCode(oldPath);
-    result = prime * result + ObjectUtils.hashCode(type);
-    result = prime * result + ObjectUtils.hashCode(purpose);
+    result = prime * result + Objects.hashCode(oldPath);
+    result = prime * result + Objects.hashCode(type);
+    result = prime * result + Objects.hashCode(purpose);
     return result;
   }
 
@@ -156,11 +156,11 @@ public class FileActivity extends AbstractResourceActivity
 
     if (purpose != other.purpose) return false;
 
-    if (!ObjectUtils.equals(oldPath, other.oldPath)) return false;
+    if (!Objects.equals(oldPath, other.oldPath)) return false;
 
     if (!Arrays.equals(content, other.content)) return false;
 
-    return ObjectUtils.equals(encoding, other.encoding);
+    return Objects.equals(encoding, other.encoding);
   }
 
   @Override

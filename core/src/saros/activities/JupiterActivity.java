@@ -1,7 +1,7 @@
 package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.Timestamp;
 import saros.session.User;
@@ -41,8 +41,8 @@ public class JupiterActivity extends AbstractResourceActivity {
 
     JupiterActivity other = (JupiterActivity) obj;
 
-    if (!ObjectUtils.equals(this.operation, other.operation)) return false;
-    if (!ObjectUtils.equals(this.timestamp, other.timestamp)) return false;
+    if (!Objects.equals(this.operation, other.operation)) return false;
+    if (!Objects.equals(this.timestamp, other.timestamp)) return false;
 
     return true;
   }
@@ -51,8 +51,8 @@ public class JupiterActivity extends AbstractResourceActivity {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ObjectUtils.hashCode(operation);
-    result = prime * result + ObjectUtils.hashCode(timestamp);
+    result = prime * result + Objects.hashCode(operation);
+    result = prime * result + Objects.hashCode(timestamp);
     return result;
   }
 
