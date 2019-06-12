@@ -99,8 +99,15 @@ public class FileActivityConsumerTest {
     expectLastCall().andStubThrow(new AssertionError("file was written unnecessarily"));
 
     replay(file);
+    SPath path = createPathMockForFile(file);
 
-    IActivity activity = createFileActivity(file, INCOMING_SAME_CONTENT);
+    createReferencePointManagerMock(referencePoint, project, file, path);
+
+    IActivity activity = createFileActivity(path, INCOMING_SAME_CONTENT);
+
+    consumer =
+        new FileActivityConsumer(null, resourceChangeListener, null, eclipseReferencePointManager);
+
     consumer.exec(activity);
 
     verify(file);
@@ -116,7 +123,14 @@ public class FileActivityConsumerTest {
 
     replay(file);
 
-    IActivity activity = createFileActivity(file, INCOMING_DIFFERENT_CONTENT);
+    SPath path = createPathMockForFile(file);
+
+    createReferencePointManagerMock(referencePoint, project, file, path);
+
+    IActivity activity = createFileActivity(path, INCOMING_DIFFERENT_CONTENT);
+
+    consumer =
+        new FileActivityConsumer(null, resourceChangeListener, null, eclipseReferencePointManager);
 
     consumer.exec(activity);
 
@@ -131,24 +145,24 @@ public class FileActivityConsumerTest {
     expect(path.getProjectRelativePath()).andStubReturn(ResourceAdapterFactory.create(this.path));
     replay(path);
 
+    return path;
+  }
+
+  private void createReferencePointManagerMock(
+      IReferencePoint referencePoint, IProject project, IFile file, SPath path) {
     eclipseReferencePointManager = createMock(EclipseReferencePointManager.class);
     expect(eclipseReferencePointManager.getProject(referencePoint)).andStubReturn(project);
     expect(eclipseReferencePointManager.getFile(path)).andStubReturn(file);
 
     replay(eclipseReferencePointManager);
-
-    consumer =
-        new FileActivityConsumer(null, resourceChangeListener, null, eclipseReferencePointManager);
-
-    return path;
   }
 
-  private FileActivity createFileActivity(IFile file, byte[] content) {
+  private FileActivity createFileActivity(SPath path, byte[] content) {
     return new FileActivity(
         new User(new JID("foo@bar"), true, true, null),
         Type.CREATED,
         Purpose.ACTIVITY,
-        createPathMockForFile(file),
+        path,
         null,
         content,
         null);
