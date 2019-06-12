@@ -34,7 +34,7 @@ import saros.repackaged.picocontainer.BindKey;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ISarosSessionContextFactory;
 import saros.synchronize.UISynchronizer;
-import saros.synchronize.internal.SWTSynchronizer;
+import saros.synchronize.internal.EclipseSWTSynchronizer;
 import saros.ui.eventhandler.ConnectingFailureHandler;
 import saros.ui.eventhandler.HostLeftAloneInSessionHandler;
 import saros.ui.eventhandler.JoinSessionRejectedHandler;
@@ -96,7 +96,7 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
       Component.create(IPathFactory.class, EclipsePathFactory.class),
 
       // SWT EDT support
-      Component.create(UISynchronizer.class, SWTSynchronizer.class),
+      Component.create(UISynchronizer.class, EclipseSWTSynchronizer.class),
 
       // Proxy Support for the XMPP server connection
       Component.create(IProxyResolver.class, Socks5ProxyResolver.class),
