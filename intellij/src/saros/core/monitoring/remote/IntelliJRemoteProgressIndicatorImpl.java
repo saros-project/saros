@@ -1,8 +1,8 @@
 package saros.core.monitoring.remote;
 
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.Logger;
 import saros.activities.ProgressActivity;
 import saros.activities.ProgressActivity.ProgressAction;
@@ -203,8 +203,8 @@ final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndica
 
     if (!(obj instanceof IntelliJRemoteProgressIndicatorImpl)) return false;
 
-    return ObjectUtils.equals(
+    return Objects.equals(
             remoteProgressID, ((IntelliJRemoteProgressIndicatorImpl) obj).remoteProgressID)
-        && ObjectUtils.equals(remoteUser, ((IntelliJRemoteProgressIndicatorImpl) obj).remoteUser);
+        && Objects.equals(remoteUser, ((IntelliJRemoteProgressIndicatorImpl) obj).remoteUser);
   }
 }

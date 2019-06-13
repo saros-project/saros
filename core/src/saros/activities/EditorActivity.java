@@ -21,7 +21,7 @@ package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.session.User;
 
 /**
@@ -79,7 +79,7 @@ public class EditorActivity extends AbstractResourceActivity {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ObjectUtils.hashCode(type);
+    result = prime * result + Objects.hashCode(type);
     return result;
   }
 
