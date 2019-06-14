@@ -348,26 +348,11 @@ class ModuleTab {
     boolean newInputValidityState;
 
     if (createNewModuleRadioButton.isSelected()) {
-      boolean hasValidNewName = moduleName.equals(newModuleNameTextField.getText());
-
-      boolean hasValidNewBasePath;
-      try {
-        Path newBasePath = Paths.get(newModuleBasePathTextField.getText());
-        File newBasePathFile = newBasePath.toFile();
-
-        hasValidNewBasePath = newBasePathFile.exists() && newBasePathFile.isDirectory();
-
-      } catch (InvalidPathException | UnsupportedOperationException e) {
-        hasValidNewBasePath = false;
-      }
-
-      newInputValidityState = hasValidNewName && hasValidNewBasePath;
+      newInputValidityState = hasValidNewModuleName() && hasValidNewBasePath();
 
     } else if (useExistingModuleRadioButton.isSelected()) {
-      Module selectedExistingModule = (Module) existingModuleComboBox.getSelectedItem();
 
-      newInputValidityState =
-          selectedExistingModule != null && selectedExistingModule.getName().equals(moduleName);
+      newInputValidityState = hasValidExistingModule();
 
     } else {
       newInputValidityState = false;
@@ -378,6 +363,49 @@ class ModuleTab {
 
       moduleTabStateListener.moduleStateChanged();
     }
+  }
+
+  /**
+   * Returns whether the given module name matches the module name transmitted by the host.
+   *
+   * @return whether the given module name matches the module name transmitted by the host
+   */
+  private boolean hasValidNewModuleName() {
+    return moduleName.equals(newModuleNameTextField.getText());
+  }
+
+  /**
+   * Returns whether the given path points to a valid (existing) directory.
+   *
+   * @return whether the given path points to a valid (existing) directory
+   */
+  private boolean hasValidNewBasePath() {
+    boolean hasValidNewBasePath;
+
+    try {
+      Path newBasePath = Paths.get(newModuleBasePathTextField.getText());
+      File newBasePathFile = newBasePath.toFile();
+
+      hasValidNewBasePath = newBasePathFile.exists() && newBasePathFile.isDirectory();
+
+    } catch (InvalidPathException | UnsupportedOperationException e) {
+      hasValidNewBasePath = false;
+    }
+
+    return hasValidNewBasePath;
+  }
+
+  /**
+   * Returns whether the module name of the selected module matches the module name transmitted by
+   * the host.
+   *
+   * @return whether the module name of the selected module matches the module name transmitted by
+   *     the host
+   */
+  private boolean hasValidExistingModule() {
+    Module selectedExistingModule = (Module) existingModuleComboBox.getSelectedItem();
+
+    return selectedExistingModule != null && selectedExistingModule.getName().equals(moduleName);
   }
 
   /**
