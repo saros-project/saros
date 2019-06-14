@@ -9,6 +9,7 @@ import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
@@ -32,6 +34,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.jetbrains.annotations.NotNull;
@@ -57,6 +60,18 @@ class ModuleTab {
   private final JRadioButton useExistingModuleRadioButton;
   private final JComboBox<Module> existingModuleComboBox;
 
+  private boolean moduleNameTextFieldValid;
+  private final Border moduleNameTextFieldDefaultBorder;
+  private final Border moduleNameTextFieldErrorBorder;
+
+  private boolean moduleBasePathTextFieldValid;
+  private final Border moduleBasePathTextFieldDefaultBorder;
+  private final Border moduleBasePathTextFieldErrorBorder;
+
+  private boolean existingModuleComboBoxValid;
+  private final Border existingModuleComboBoxDefaultBorder;
+  private final Border existingModuleComboBoxErrorBorder;
+
   private boolean hasValidInput;
 
   /**
@@ -71,10 +86,30 @@ class ModuleTab {
     this.moduleTabPanel = new JPanel();
     this.projectComboBox = new ComboBox<>();
     this.createNewModuleRadioButton = new JBRadioButton();
+    this.useExistingModuleRadioButton = new JBRadioButton();
+
     this.newModuleNameTextField = new JBTextField();
     this.newModuleBasePathTextField = new TextFieldWithBrowseButton();
-    this.useExistingModuleRadioButton = new JBRadioButton();
     this.existingModuleComboBox = new ComboBox<>();
+
+    this.moduleNameTextFieldValid = true;
+    this.moduleNameTextFieldDefaultBorder = newModuleNameTextField.getBorder();
+    this.moduleNameTextFieldErrorBorder =
+        BorderFactory.createCompoundBorder(
+            moduleNameTextFieldDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
+
+    this.moduleBasePathTextFieldValid = true;
+    this.moduleBasePathTextFieldDefaultBorder =
+        newModuleBasePathTextField.getTextField().getBorder();
+    this.moduleBasePathTextFieldErrorBorder =
+        BorderFactory.createCompoundBorder(
+            moduleBasePathTextFieldDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
+
+    this.existingModuleComboBoxValid = true;
+    this.existingModuleComboBoxDefaultBorder = existingModuleComboBox.getBorder();
+    this.existingModuleComboBoxErrorBorder =
+        BorderFactory.createCompoundBorder(
+            existingModuleComboBoxDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
 
     this.hasValidInput = false;
 
@@ -224,6 +259,10 @@ class ModuleTab {
     projectComboBox.setSelectedItem(project);
     updateFieldsForProjectChange(project);
 
+    updateNewModuleNameValidityIndicator();
+    updateNewBasePathValidityIndicator();
+    updateExistingModuleValidityIndicator();
+
     updateInputValidity();
   }
 
@@ -304,26 +343,58 @@ class ModuleTab {
    * when creating a new module as part of the project negotiation.
    */
   private void addCreateNewModuleFieldListeners() {
-    DocumentListener documentListener =
+    DocumentListener moduleNameDocumentListener =
         new DocumentListener() {
           @Override
           public void insertUpdate(DocumentEvent e) {
-            updateInputValidity();
+            updateValidity();
           }
 
           @Override
           public void removeUpdate(DocumentEvent e) {
-            updateInputValidity();
+            updateValidity();
           }
 
           @Override
           public void changedUpdate(DocumentEvent e) {
+            updateValidity();
+          }
+
+          private void updateValidity() {
+            updateNewModuleNameValidityIndicator();
             updateInputValidity();
           }
         };
 
-    newModuleNameTextField.getDocument().addDocumentListener(documentListener);
-    newModuleBasePathTextField.getTextField().getDocument().addDocumentListener(documentListener);
+    newModuleNameTextField.getDocument().addDocumentListener(moduleNameDocumentListener);
+
+    DocumentListener moduleBasePathDocumentListener =
+        new DocumentListener() {
+          @Override
+          public void insertUpdate(DocumentEvent e) {
+            updateValidity();
+          }
+
+          @Override
+          public void removeUpdate(DocumentEvent e) {
+            updateValidity();
+          }
+
+          @Override
+          public void changedUpdate(DocumentEvent e) {
+            updateValidity();
+          }
+
+          private void updateValidity() {
+            updateNewBasePathValidityIndicator();
+            updateInputValidity();
+          }
+        };
+
+    newModuleBasePathTextField
+        .getTextField()
+        .getDocument()
+        .addDocumentListener(moduleBasePathDocumentListener);
   }
 
   /**
@@ -334,6 +405,7 @@ class ModuleTab {
     existingModuleComboBox.addItemListener(
         itemEvent -> {
           if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+            updateExistingModuleValidityIndicator();
             updateInputValidity();
           }
         });
@@ -406,6 +478,93 @@ class ModuleTab {
     Module selectedExistingModule = (Module) existingModuleComboBox.getSelectedItem();
 
     return selectedExistingModule != null && selectedExistingModule.getName().equals(moduleName);
+  }
+
+  /**
+   * Updates whether the field for the new module name is marked as invalid. The new state is based
+   * on the returned value of {@link #hasValidNewModuleName()}.
+   */
+  private void updateNewModuleNameValidityIndicator() {
+    boolean hasValidNewModuleName = hasValidNewModuleName();
+
+    if (hasValidNewModuleName == moduleNameTextFieldValid) {
+      return;
+    }
+
+    moduleNameTextFieldValid = hasValidNewModuleName;
+
+    Border border;
+    String toolTip;
+
+    if (hasValidNewModuleName) {
+      border = moduleNameTextFieldDefaultBorder;
+      toolTip = "";
+
+    } else {
+      border = moduleNameTextFieldErrorBorder;
+      toolTip = Messages.ModuleTab_create_new_module_name_invalid_tooltip;
+    }
+
+    newModuleNameTextField.setBorder(border);
+    newModuleNameTextField.setToolTipText(toolTip);
+  }
+
+  /**
+   * Updates whether the field for the new module base path is marked as invalid. The new state is
+   * based on the returned value of {@link #hasValidNewBasePath()}.
+   */
+  private void updateNewBasePathValidityIndicator() {
+    boolean hasValidNewBasePath = hasValidNewBasePath();
+
+    if (hasValidNewBasePath == moduleBasePathTextFieldValid) {
+      return;
+    }
+
+    moduleBasePathTextFieldValid = hasValidNewBasePath;
+
+    Border border;
+    String toolTip;
+
+    if (hasValidNewBasePath) {
+      border = moduleBasePathTextFieldDefaultBorder;
+      toolTip = "";
+
+    } else {
+      border = moduleBasePathTextFieldErrorBorder;
+      toolTip = Messages.ModuleTab_create_new_module_base_path_invalid_tooltip;
+    }
+
+    newModuleBasePathTextField.getTextField().setBorder(border);
+    newModuleBasePathTextField.getTextField().setToolTipText(toolTip);
+  }
+
+  /**
+   * Updates whether the field to select an existing module is marked as invalid. The new state is
+   * based on the returned value of {@link #hasValidExistingModule()}.
+   */
+  private void updateExistingModuleValidityIndicator() {
+    boolean hasValidExistingModule = hasValidExistingModule();
+
+    if (hasValidExistingModule == existingModuleComboBoxValid) {
+      return;
+    }
+
+    existingModuleComboBoxValid = hasValidExistingModule;
+
+    Border border;
+    String toolTip;
+
+    if (hasValidExistingModule) {
+      border = existingModuleComboBoxDefaultBorder;
+      toolTip = "";
+
+    } else {
+      border = existingModuleComboBoxErrorBorder;
+      toolTip = Messages.ModuleTab_use_existing_module_local_module_invalid_tooltip;
+    }
+
+    existingModuleComboBox.setBorder(border);
+    existingModuleComboBox.setToolTipText(toolTip);
   }
 
   /**
