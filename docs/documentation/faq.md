@@ -19,6 +19,40 @@ make a nice name for an Eclipse plug-in about Pair Programming, where
 driver and observer cycle their roles while revolving around code of
 interest.
 
+### How does Saros compare to other collaborative real-time editing tools?
+
+These tables compare known alternatives to Saros.
+
+In the following we are using these definitions:
+* **Open-Source** - A software using a license contained in the [list of approved licenses of the Open Source Initiative](https://opensource.org/licenses/alphabetical)
+* **Commercial** - It is not possible to use the software for free without limitations.
+* **Freeware** - You can use the software for free, but the code is not published.
+* **Self-hosted** - The possibility to host a corresponding server that manages the connection or also the shared workspaces.
+
+#### Web-based IDEs
+
+|Name         |Category    |Self-hosted |
+|-------------|------------|------------|
+|CodeEnvy     |Commercial  |No          |
+|Cloud9       |Commercial  |No          |
+
+#### Plug-ins
+
+|Name         |IDE                                              |Category    |Self-hosted |
+|-------------|-------------------------------------------------|------------|------------|
+|FlooBits     |Atom, Emacs, IntelliJ IDEA, Neovim, Sublime Text |Commercial  |Yes         |
+|Saros        |Eclipse, IntelliJ IDEA                           |Open-Source |Yes         |
+|Live Share   |Visual Studio (Code)                             |Freeware    |No          |
+|Teletype     |Atom                                             |Open-Source |Yes         |
+
+#### Stand-alone Editors
+
+|Name         |OS                  |Category    |Self-hosted |
+|-------------|--------------------|------------|------------|
+|Gobby        |Win, Linux, Mac OS  |Open-Source |Yes         |
+|SubEthaEdit  |Mac OS              |Open-Source |Yes         |
+
+
 ### How does Saros compare to screen sharing (e.g. VNC)?
 
 **Advantages**:
