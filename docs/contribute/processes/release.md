@@ -2,21 +2,72 @@
 title: Release Process
 ---
 
-The documentation is divided into three parts:
 
-1. When do we release
-2. How do I create the release artifacts
-3. How do I test the release artifacts
-4. How do I release the artifacts
+## When do we release?
 
-## When?
+We publish releases when a relevant set of changes is integrated in the master branch and the team wants to release.
 
-Stable releases happen if a relevant set of changes is integrated in the master branch and the team wants to release.
+## How do I create the release artifacts?
+In the following the task which are required to build all release artifacts are described.
 
-## How to release?
-In the following the technical steps which are required for releasing are described.
+Please make sure before creating the artifacts that **all unit and stf tests are successful.**
 
 ### Eclipse
+
+**Artifacts:**
+* Update Site
+* Drop-in
+
+#### Update Site
+
+* Open an eclipse instance which contains a working [Saros development setup](https://www.saros-project.org/contribute/development-environment.html)
+* Open the project `Saros Update Site`
+* Open the file `site.xml`
+* Make sure that the category `DPP` contains the current feature `saros.feature*`
+* Click on `Build All`
+* The Update Site is created in the `Saros Update Site` project directory
+
+#### Drop-in
+
+* Open an eclipse instance which contains a working [Saros development setup](https://www.saros-project.org/contribute/development-environment.html)
+* Open `File > Export… > Plug-in Development > Deployable features`
+* Choose feature
+* Destination: Directory
+* Choose target directory name: `saros-dropin-<version>`
+* Click Finish
+* In the dropin folder, delete the files `artifacts.jar` and `content.jar`
+* Add the readme: `This is the Saros Eclipse plugin dropin archive. You can install it by unzipping it to eclipse/dropins and restarting Eclipse.`
+* Create a zip file from the folder
+
+### IntelliJ IDEA
+
+**Artifacts:**
+* Plug-in zip
+
+#### Plug-in zip
+
+* Open bash
+* Navigate to the saros repository dir
+* Execute the command `./gradlew sarosIntellij`
+* You find the zip here: `./build/distribution/intellij/saros.inteliij.zip`
+
+## How do I test the artifacts?
+
+As mentioned before you should already executed all unit and stf tests (which has to be successful).
+
+The release artifacts are manually tested with at least one other persion:
+* You have to install the artifact and start a session.
+* During this session you should check (at least) that the basic features are working.
+
+## How do I release the artifacts?
+In the following the technical steps which are required for releasing artifacts are described.
+
+### Eclipse
+
+**Channels:**
+* Update Site
+* Eclipse Marketplace
+* GitHub Releases (See below)
 
 **Attention**: The **Eclipse Marketplace** uses the **Update Site** in order to provide the plug-in.
 Therefore it is not possible to release via the update site without updating the marketplace.
@@ -24,6 +75,9 @@ Therefore it is not possible to release via the update site without updating the
 #### Update Site
 The update site is hosted via GitHub Pages. Therefore you just have to change the content of the repository [update-site-artifacts](https://github.com/saros-project/update-site-artifacts)
 in order to change the update site.
+
+**What is released via this channel?**
+We release the update site (which contains the Eclipse plug-in jars and additional resources) via this channel.
 
 **Login process**
 
@@ -56,6 +110,10 @@ in the marketplace.
 * Submit form with `Save`
 
 ### IntelliJ IDEA
+
+**Channels:**
+* JetBrains Plugin Repository
+* GitHub Releases (See below)
 
 Attention: We are currently releasing the Saros for IntelliJ plug-in via the `alpha` channel of the JetBrains Plugin Repository
 instead of the `stable` channel (which is the default channel).
