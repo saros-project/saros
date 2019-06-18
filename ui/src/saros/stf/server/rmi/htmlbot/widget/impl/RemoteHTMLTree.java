@@ -17,7 +17,7 @@ public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements IRemote
   public void check(String title) throws RemoteException {
     if (isChecked(title) == false) {
       Selector nodeSelector = new Selector("span[title=\"" + title + "\"]");
-      browser.run(String.format("%s[0].click();", nodeSelector.getStatement()));
+      jQueryHelper.clickOnSelection(nodeSelector);
     }
   }
 
@@ -25,7 +25,7 @@ public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements IRemote
   public void uncheck(String title) throws RemoteException {
     if (isChecked(title)) {
       Selector nodeSelector = new Selector("span[title=\"" + title + "\"]");
-      browser.run(String.format("%s[0].click();", nodeSelector.getStatement()));
+      jQueryHelper.clickOnSelection(nodeSelector);
     }
   }
 

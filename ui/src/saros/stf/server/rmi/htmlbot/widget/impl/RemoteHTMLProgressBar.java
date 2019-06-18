@@ -2,7 +2,6 @@ package saros.stf.server.rmi.htmlbot.widget.impl;
 
 import java.rmi.RemoteException;
 import saros.stf.server.HTMLSTFRemoteObject;
-import saros.stf.server.bot.BotUtils;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLProgressBar;
 
 public final class RemoteHTMLProgressBar extends HTMLSTFRemoteObject
@@ -16,14 +15,12 @@ public final class RemoteHTMLProgressBar extends HTMLSTFRemoteObject
 
   @Override
   public int getValue() throws RemoteException {
-    String name = BotUtils.getSelectorName(selector);
-    Object selection = browser.syncRun(String.format("return view.getFieldValue('%s')", name));
+    Object selection = jQueryHelper.getFieldValue(selector);
     return selection != null ? ((Double) selection).intValue() : null;
   }
 
   @Override
   public void setValue(int value) throws RemoteException {
-    String name = BotUtils.getSelectorName(selector);
-    browser.syncRun(String.format("view.setFieldValue('%s',%d)", name, value));
+    jQueryHelper.setFieldValue(selector, value);
   }
 }
