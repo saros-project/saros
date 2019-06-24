@@ -17,9 +17,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.intellij.context.SharedIDEContext;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
@@ -144,7 +146,7 @@ class ContactPopMenu extends JPopupMenu {
       }
 
       JMenuItem moduleItem = new JMenuItem(moduleName);
-      moduleItem.addActionListener(new ShareDirectoryAction(moduleName, wrappedModule));
+      moduleItem.addActionListener(new ShareDirectoryAction(project, moduleName, wrappedModule));
 
       shownModules.add(moduleItem);
     }
@@ -179,10 +181,14 @@ class ContactPopMenu extends JPopupMenu {
 
   /** Action that is executed, when a project is selected for sharing. */
   private class ShareDirectoryAction implements ActionListener {
+    private final Project project;
     private final String moduleName;
     private final IProject module;
 
-    private ShareDirectoryAction(String moduleName, IProject module) {
+    private ShareDirectoryAction(
+        @NotNull Project project, @NotNull String moduleName, @Nullable IProject module) {
+
+      this.project = project;
       this.moduleName = moduleName;
       this.module = module;
     }
@@ -213,7 +219,7 @@ class ContactPopMenu extends JPopupMenu {
       List<JID> contacts = new ArrayList<>();
       contacts.add(user);
 
-      // TODO set the correct project for the session context
+      SharedIDEContext.preregisterProject(project);
       CollaborationUtils.startSession(resources, contacts);
     }
   }
