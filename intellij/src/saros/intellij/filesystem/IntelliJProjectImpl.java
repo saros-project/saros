@@ -25,6 +25,7 @@ import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 
+/** A <code>IntelliJProjectImpl</code> represents a specific module loaded in a specific project. */
 public final class IntelliJProjectImpl extends IntelliJResourceImpl implements IProject {
 
   /*
@@ -39,11 +40,11 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
 
-  // Module names are unique (even among different projects)
+  private final Project project;
+
   private final String moduleName;
 
   private volatile Module module;
-
   private volatile VirtualFile moduleRoot;
 
   /**
@@ -66,6 +67,9 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    */
   public IntelliJProjectImpl(@NotNull final Module module) {
     this.module = module;
+
+    this.project = module.getProject();
+
     this.moduleName = module.getName();
 
     moduleRoot = getModuleContentRoot(module);
@@ -216,8 +220,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    */
   public boolean refreshModule() throws ModuleNotFoundException {
     if (module.isDisposed()) {
-      Project project = module.getProject();
-
       Module newModule = ModuleManager.getInstance(project).findModuleByName(moduleName);
 
       if (newModule == null) {
@@ -523,11 +525,29 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     return null;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This method operates under the assumption that module objects are handled as a singleton
+   * across the IDE lifecycle, i.e. a module will always be represented by a single, unique <code>
+   * Module</code> object.
+   *
+   * @return a hash code value for this object
+   */
   @Override
   public int hashCode() {
-    return moduleName.hashCode();
+    return module.hashCode();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This method operates under the assumption that module objects are handled as a singleton
+   * across the IDE lifecycle, i.e. a module will always be represented by a single, unique <code>
+   * Module</code> object.
+   *
+   * @return whether the given objects is equal to this object
+   */
   @Override
   public boolean equals(final Object obj) {
 
@@ -539,11 +559,11 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     IntelliJProjectImpl other = (IntelliJProjectImpl) obj;
 
-    return moduleName.equals(other.moduleName);
+    return module.equals(other.module);
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " : " + moduleName;
+    return getClass().getSimpleName() + " : " + project + " - " + moduleName;
   }
 }
