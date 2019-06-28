@@ -144,8 +144,13 @@ public class SharedIDEContext implements Disposable {
    */
   @Override
   public void dispose() {
-    applicationEventHandlers.stop();
-    projectEventHandlers.stop();
+    if (applicationEventHandlers != null) {
+      applicationEventHandlers.stop();
+    }
+
+    if (projectEventHandlers != null) {
+      projectEventHandlers.stop();
+    }
 
     preregisteredProject = null;
   }
