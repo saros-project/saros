@@ -137,7 +137,8 @@ public class SharedIDEContext implements Disposable {
   /**
    * {@inheritDoc}
    *
-   * <p>Stops and disposes all registered application- and project-level event handlers.
+   * <p>Stops and disposes all registered application- and project-level event handlers and resets
+   * the preregistered project.
    *
    * @see IEventHandler#dispose()
    */
@@ -145,6 +146,8 @@ public class SharedIDEContext implements Disposable {
   public void dispose() {
     applicationEventHandlers.stop();
     projectEventHandlers.stop();
+
+    preregisteredProject = null;
   }
 
   /**
