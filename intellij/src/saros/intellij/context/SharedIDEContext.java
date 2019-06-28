@@ -36,17 +36,13 @@ public class SharedIDEContext implements Disposable {
 
   public SharedIDEContext(
       ApplicationEventHandlersFactory applicationEventHandlersFactory,
-      ProjectEventHandlersFactory projectEventHandlersFactory,
-      Project project) {
+      ProjectEventHandlersFactory projectEventHandlersFactory) {
 
     this.applicationEventHandlersFactory = applicationEventHandlersFactory;
     this.projectEventHandlersFactory = projectEventHandlersFactory;
 
     if (preregisteredProject != null) {
       startProjectComponents(preregisteredProject);
-    } else {
-      // TODO remove this workaround once the shared project object is correctly initialized
-      startProjectComponents(project);
     }
   }
 

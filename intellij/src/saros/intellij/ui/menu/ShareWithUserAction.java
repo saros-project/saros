@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IResource;
+import saros.intellij.context.SharedIDEContext;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
@@ -46,17 +47,25 @@ public class ShareWithUserAction extends AnAction {
 
   @Override
   public void actionPerformed(AnActionEvent e) {
-    VirtualFile virtFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
-    if (virtFile == null) {
-      return;
+    Project project = e.getProject();
+    if (project == null) {
+      throw new IllegalStateException(
+          "Unable to start session - could not determine project for highlighted resource.");
+    }
+
+    VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+    if (virtualFile == null) {
+      throw new IllegalStateException(
+          "Unable to start session - could not determine virtual file for highlighted resource.");
     }
 
     // We allow only completely shared projects, so no need to check
     // for partially shared ones.
-    List<IResource> resources = Arrays.asList(getModuleFromVirtFile(virtFile, e.getProject()));
+    List<IResource> resources = Arrays.asList(getModuleFromVirtFile(virtualFile, e.getProject()));
 
     List<JID> contacts = Arrays.asList(userJID);
 
+    SharedIDEContext.preregisterProject(project);
     CollaborationUtils.startSession(resources, contacts);
   }
 
