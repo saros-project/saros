@@ -55,7 +55,7 @@ Please make sure before creating the artifacts that **all unit and stf tests are
 
 As mentioned before you should already executed all unit and stf tests (which has to be successful).
 
-The release artifacts are manually tested with at least one other persion:
+The release artifacts are manually tested with at least one other person:
 * You have to install the artifact and start a session.
 * During this session you should check (at least) that the basic features are working.
 
@@ -83,7 +83,7 @@ We release the update site (which contains the Eclipse plug-in jars and addition
 
 * Login with the `saros-infrastructure` user
 
-** Release process**
+**Release process**
 
 * Create a pull request that contains the new update site
 * Merge the pull request
@@ -94,7 +94,7 @@ We release the update site (which contains the Eclipse plug-in jars and addition
 **What is released via this channel?**
 The Saros for Eclipse plug-in is released via this channel, but you don't have to release the artifact explicit via
 this channel, because the Marketplace uses the **Update Site**.
-As long as the infrastructure does not change (as the update site location) just update **Version number** information
+As long as the infrastructure does not change (like the update site location) just update **Version number** information
 in the marketplace.
 
 **Login process**
