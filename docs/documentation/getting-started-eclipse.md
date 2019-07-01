@@ -1,8 +1,8 @@
 ---
-title: Getting Started
+title: Getting Started with Saros/E
 ---
 
-Here you will find a guideline **on how to set up Saros**.
+Here you will find a guideline **on how to set up Saros/E**.
 
 After that you might want to find out **what Saros can do**: Here is the
 complete [feature list](features.md).
