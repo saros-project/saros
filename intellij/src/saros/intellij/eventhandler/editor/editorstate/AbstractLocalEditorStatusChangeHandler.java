@@ -4,8 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
-import saros.intellij.eventhandler.DisableableHandler;
-import saros.repackaged.picocontainer.Startable;
+import saros.intellij.eventhandler.IProjectEventHandler;
 
 /**
  * Abstract class defining the base functionality needed to create and register/unregister a
@@ -15,13 +14,11 @@ import saros.repackaged.picocontainer.Startable;
  * #registerListeners(MessageBusConnection)}, which is called in {@link #subscribe()} with the
  * initialized MessageBusConnection object to register the needed listeners.
  *
- * <p>The handle is enabled and listeners are registered by default. To change this behavior, {@link
- * #start} should be overwritten by the implementation.
+ * <p>The handler is disabled and the listeners are not registered by default.
  *
  * @see MessageBusConnection#subscribe(Topic, Object)
  */
-public abstract class AbstractLocalEditorStatusChangeHandler
-    implements DisableableHandler, Startable {
+public abstract class AbstractLocalEditorStatusChangeHandler implements IProjectEventHandler {
 
   private final Project project;
 
@@ -44,12 +41,18 @@ public abstract class AbstractLocalEditorStatusChangeHandler
   }
 
   @Override
-  public void start() {
+  @NotNull
+  public ProjectEventHandlerType getHandlerType() {
+    return ProjectEventHandlerType.EDITOR_STATUS_CHANGE_HANDLER;
+  }
+
+  @Override
+  public void initialize() {
     setEnabled(true);
   }
 
   @Override
-  public void stop() {
+  public void dispose() {
     disposed = true;
     setEnabled(false);
   }
@@ -111,7 +114,8 @@ public abstract class AbstractLocalEditorStatusChangeHandler
    *
    * @return whether the handler is currently enabled
    */
-  boolean isEnabled() {
+  @Override
+  public boolean isEnabled() {
     return enabled;
   }
 }

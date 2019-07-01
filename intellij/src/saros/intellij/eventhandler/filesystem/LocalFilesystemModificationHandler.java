@@ -38,12 +38,11 @@ import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.eventhandler.DisableableHandler;
+import saros.intellij.eventhandler.IApplicationEventHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.observables.FileReplacementInProgressObservable;
-import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.User;
@@ -51,12 +50,12 @@ import saros.session.User;
 /**
  * Uses a VirtualFileListener to generate and dispatch FileActivities for shared files.
  *
- * <p>The listener is enabled by default when the session context is created.
+ * <p>The handler is disabled and the listener is not registered by default.
  *
  * @see VirtualFileListener
  */
 public class LocalFilesystemModificationHandler extends AbstractActivityProducer
-    implements DisableableHandler, Startable {
+    implements IApplicationEventHandler {
 
   private static final Logger LOG = Logger.getLogger(LocalFilesystemModificationHandler.class);
 
@@ -139,7 +138,13 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       };
 
   @Override
-  public void start() {
+  @NotNull
+  public ApplicationEventHandlerType getHandlerType() {
+    return ApplicationEventHandlerType.LOCAL_FILESYSTEM_MODIFICATION_HANDLER;
+  }
+
+  @Override
+  public void initialize() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> session.addActivityProducer(LocalFilesystemModificationHandler.this),
@@ -149,7 +154,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   }
 
   @Override
-  public void stop() {
+  public void dispose() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> session.removeActivityProducer(LocalFilesystemModificationHandler.this),
@@ -163,8 +168,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * Instantiates a LocalFilesystemModificationHandler object. The handler, including the held
    * filesystem listener, is enabled by default.
    *
-   * @see #start()
-   * @see #stop()
+   * @see #initialize()
+   * @see #dispose()
    */
   public LocalFilesystemModificationHandler(
       EditorManager editorManager,
@@ -924,5 +929,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       localFileSystem.addVirtualFileListener(virtualFileListener);
     }
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
   }
 }

@@ -52,8 +52,6 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
     this.localEditorHandler = localEditorHandler;
     this.sarosSession = sarosSession;
     this.virtualFileConverter = virtualFileConverter;
-
-    setEnabled(true);
   }
 
   /**

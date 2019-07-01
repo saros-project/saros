@@ -31,15 +31,10 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
+import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.eventhandler.editor.document.AbstractLocalDocumentModificationHandler;
-import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
-import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
-import saros.intellij.eventhandler.editor.editorstate.AnnotationUpdater;
-import saros.intellij.eventhandler.editor.editorstate.EditorStatusChangeActivityDispatcher;
-import saros.intellij.eventhandler.editor.editorstate.PreexistingSelectionDispatcher;
+import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
-import saros.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.observables.FileReplacementInProgressObservable;
@@ -440,19 +435,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           selectedEditorStateSnapshotFactory =
               sarosSession.getComponent(SelectedEditorStateSnapshotFactory.class);
 
-          localDocumentModificationHandler =
-              sarosSession.getComponent(LocalDocumentModificationHandler.class);
-          localClosedEditorModificationHandler =
-              sarosSession.getComponent(LocalClosedEditorModificationHandler.class);
-
-          annotationUpdater = sarosSession.getComponent(AnnotationUpdater.class);
-          editorStatusChangeActivityDispatcher =
-              sarosSession.getComponent(EditorStatusChangeActivityDispatcher.class);
-          preexistingSelectionDispatcher =
-              sarosSession.getComponent(PreexistingSelectionDispatcher.class);
-          viewportAdjustmentExecutor = sarosSession.getComponent(ViewportAdjustmentExecutor.class);
-
-          localViewPortChangeHandler = sarosSession.getComponent(LocalViewPortChangeHandler.class);
+          sharedIDEContext = sarosSession.getComponent(SharedIDEContext.class);
         }
 
         /** Drops all held components that were read from the session context. */
@@ -471,15 +454,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           selectedEditorStateSnapshotFactory = null;
 
-          localDocumentModificationHandler = null;
-          localClosedEditorModificationHandler = null;
-
-          annotationUpdater = null;
-          editorStatusChangeActivityDispatcher = null;
-          preexistingSelectionDispatcher = null;
-          viewportAdjustmentExecutor = null;
-
-          localViewPortChangeHandler = null;
+          sharedIDEContext = null;
         }
 
         /** Initializes all local components for the new session. */
@@ -493,8 +468,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           session.addActivityProducer(EditorManager.this);
           session.addActivityConsumer(consumer, Priority.ACTIVE);
-
-          setLocalDocumentModificationHandlersEnabled(true);
 
           // TODO: Test, whether this leads to problems because it is not called
           // from the UI thread.
@@ -511,8 +484,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session.removeListener(sessionListener);
           session.removeActivityProducer(EditorManager.this);
           session.removeActivityConsumer(consumer);
-
-          setLocalDocumentModificationHandlersEnabled(false);
         }
       };
 
@@ -526,18 +497,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private LocalEditorManipulator localEditorManipulator;
   private AnnotationManager annotationManager;
   private SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory;
-
-  /* Event handlers */
-  // document changes
-  private LocalDocumentModificationHandler localDocumentModificationHandler;
-  private LocalClosedEditorModificationHandler localClosedEditorModificationHandler;
-  // editor state changes
-  private AnnotationUpdater annotationUpdater;
-  private EditorStatusChangeActivityDispatcher editorStatusChangeActivityDispatcher;
-  private PreexistingSelectionDispatcher preexistingSelectionDispatcher;
-  private ViewportAdjustmentExecutor viewportAdjustmentExecutor;
-  // viewport changes
-  private LocalViewPortChangeHandler localViewPortChangeHandler;
+  private SharedIDEContext sharedIDEContext;
 
   /* Session state */
   private final EditorPool editorPool = new EditorPool();
@@ -797,52 +757,48 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Enables or disables all editor state change listeners. This is done by registering or
-   * unregistering the held listeners.
+   * Enables or disables all editor state change handlers.
    *
-   * <p>This method does nothing if the given state already matches the current state.
-   *
-   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
-   * @see AnnotationUpdater#setEnabled(boolean)
-   * @see EditorStatusChangeActivityDispatcher#setEnabled(boolean)
-   * @see PreexistingSelectionDispatcher#setEnabled(boolean)
-   * @see ViewportAdjustmentExecutor#setEnabled(boolean)
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handlers
+   * @see SharedIDEContext#setProjectEventHandlersEnabled(ProjectEventHandlerType, boolean)
    */
   void setLocalEditorStatusChangeHandlersEnabled(boolean enabled) {
-    annotationUpdater.setEnabled(enabled);
-    editorStatusChangeActivityDispatcher.setEnabled(enabled);
-    preexistingSelectionDispatcher.setEnabled(enabled);
-    viewportAdjustmentExecutor.setEnabled(enabled);
+    sharedIDEContext.setProjectEventHandlersEnabled(
+        ProjectEventHandlerType.EDITOR_STATUS_CHANGE_HANDLER, enabled);
   }
 
   /**
-   * Enables or disables all viewport change handler. This is not done by disabling the underlying
-   * listener.
+   * Enables or disables all viewport change handlers.
    *
-   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handler
-   * @see LocalViewPortChangeHandler#setEnabled(boolean)
+   * @param enabled <code>true</code> to enable the handler, <code>false</code> disable the handlers
+   * @see SharedIDEContext#setProjectEventHandlersEnabled(ProjectEventHandlerType, boolean)
    */
   void setLocalViewPortChangeHandlersEnabled(boolean enabled) {
-    localViewPortChangeHandler.setEnabled(enabled);
-  }
-
-  boolean isDocumentModificationHandlerEnabled() {
-    return localDocumentModificationHandler.isEnabled();
+    sharedIDEContext.setProjectEventHandlersEnabled(
+        ProjectEventHandlerType.VIEWPORT_CHANGE_HANDLER, enabled);
   }
 
   /**
-   * Enables or disabled all document modification handlers. Enables or disables the handler. This
-   * is done by registering or unregistering the held listener.
+   * Returns whether the document modification handlers are currently enabled.
    *
-   * <p>This method does nothing if the given state already matches the current state.
+   * @return whether the document modification handlers are currently enabled
+   * @see SharedIDEContext#areProjectEventHandlersEnabled(ProjectEventHandlerType)
+   */
+  boolean isDocumentModificationHandlerEnabled() {
+    return sharedIDEContext.areProjectEventHandlersEnabled(
+        ProjectEventHandlerType.DOCUMENT_MODIFICATION_HANDLER);
+  }
+
+  /**
+   * Enables or disabled all document modification handlers.
    *
    * @param enabled <code>true</code> to enable the handlers, <code>false</code> disable the
    *     handlers
-   * @see AbstractLocalDocumentModificationHandler#setEnabled(boolean)
+   * @see SharedIDEContext#setProjectEventHandlersEnabled(ProjectEventHandlerType, boolean)
    */
   void setLocalDocumentModificationHandlersEnabled(boolean enabled) {
-    localDocumentModificationHandler.setEnabled(enabled);
-    localClosedEditorModificationHandler.setEnabled(enabled);
+    sharedIDEContext.setProjectEventHandlersEnabled(
+        ProjectEventHandlerType.DOCUMENT_MODIFICATION_HANDLER, enabled);
   }
 
   /**
@@ -938,7 +894,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     Editor editor = editorPool.getEditor(path);
 
     if (!visibleFilePaths.contains(passedFile.getPath())) {
-      viewportAdjustmentExecutor.queueViewPortChange(
+      ViewportAdjustmentExecutor.queueViewPortChange(
           passedFile.getPath(), editor, range, selection);
 
       return;
