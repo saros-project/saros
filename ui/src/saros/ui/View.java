@@ -1,6 +1,7 @@
 package saros.ui;
 
 import saros.ui.pages.AbstractBrowserPage;
+import saros.ui.pages.AddContactPage;
 import saros.ui.pages.MainPage;
 import saros.ui.pages.ShareProjectPage;
 
@@ -13,7 +14,7 @@ public enum View {
   /** The permanently accessible view of Saros, which provides access to most of its features. */
   MAIN_VIEW(MainPage.class, "main-page", "root"),
   /** The form to add a new contact with */
-  ADD_CONTACT(MainPage.class, "add-contact", "add-contact-form"),
+  ADD_CONTACT(AddContactPage.class, "add-contact", "add-contact-form"),
   /** The session wizard dialog */
   SESSION_WIZARD(ShareProjectPage.class, "start-session-wizard", "session-wizard"),
   /** The dummy page for testing all html components */
