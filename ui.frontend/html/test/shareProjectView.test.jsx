@@ -1,7 +1,6 @@
 import 'jsdom-global/register'
 import { FakeSarosApi, itRendersWithoutExploding, wrapWithContextProvider } from './utils'
 import { mount } from 'enzyme'
-import { spy } from 'sinon'
 import React from 'react'
 import ShareProjectView from '~/components/ShareProjectView'
 import initStores from '~/stores'
@@ -13,7 +12,7 @@ describe('<ShareProjectView />', () => {
   const fakeApi = new FakeSarosApi()
   // Doesn't matter what page we put here
   const stores = initStores('main-page', fakeApi)
-  stores.mainUI = { doShowAddContactView: spy() }
+
   const sessionUI = stores.sessionUI
   stores.core.projectTrees = mockProjectTrees
   // create the Store context and Mount the component

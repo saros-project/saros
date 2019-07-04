@@ -10,7 +10,7 @@ import ShareProjectView from './ShareProjectView'
 
 const viewComponents = {
   [views.MAIN]: MainView,
-  [views.ADD_CONTACT]: AddContactView,
+  [views.ADD_CONTACT_PAGE]: AddContactView,
   [views.SHARE_PROJECT_PAGE]: ShareProjectView,
   [views.CONFIGURATION_WIZARD]: ConfigurationWizardView,
   [views.BASIC_WIDGET_TEST]: BasicWidgetTestView

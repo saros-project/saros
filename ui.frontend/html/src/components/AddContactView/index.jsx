@@ -5,7 +5,7 @@ import React from 'react'
 
 
 export default
-@inject('mainUI')
+@inject('core')
 @observer
 class AddContactView extends React.Component {
   @observable fields = {
@@ -18,7 +18,8 @@ class AddContactView extends React.Component {
   }
 
   @action onClickSubmit = () => {
-    this.props.mainUI.doSubmitAddContact(this.fields.jid, this.fields.displayName)
+    this.props.core.doAddContact(this.fields.jid, this.fields.displayName)
+    this.props.core.doCloseAddContactPage()
   }
 
   @action setFieldValue = (field, value) => {
@@ -57,7 +58,7 @@ class AddContactView extends React.Component {
         </div>
         <div className='form-group'>
           <div className='col-sm-offset-2 col-sm-10'>
-            <button id='cancel-add-contact' onClick={this.props.mainUI.doCancelAddContact} className='cancel-add-contact-btn btn btn-default'>
+            <button id='cancel-add-contact' onClick={this.props.core.doCloseAddContactPage} className='cancel-add-contact-btn btn btn-default'>
               <Text message='action.cancel' />
             </button>
             <button id='add-contact' onClick={this.onClickSubmit} className='submit-add-contact btn btn-primary'>

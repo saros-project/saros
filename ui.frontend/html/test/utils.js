@@ -16,6 +16,8 @@ export class FakeSarosApi {
     this.showShareProjectPage = spy()
     this.closeShareProjectPage = spy()
     this.sendInvitation = spy()
+    this.showAddContactPage = spy()
+    this.closeAddContactPage = spy()
   }
 }
 

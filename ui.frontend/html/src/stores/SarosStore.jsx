@@ -74,6 +74,15 @@ export default class SarosStore {
   }
 
   @action.bound
+  doShowAddContactPage () {
+    this.sarosApi.showAddContactPage()
+  }
+
+  @action.bound
+  doCloseAddContactPage () {
+    this.sarosApi.closeAddContactPage()
+  }
+  @action.bound
   doSendInvitation (projectTrees, contacts) {
     this.sarosApi.sendInvitation(projectTrees, contacts)
   }

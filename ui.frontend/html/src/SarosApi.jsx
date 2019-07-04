@@ -80,6 +80,14 @@ class SarosApi {
     window.__java_closeShareProjectPage()
   }
 
+  showAddContactPage () {
+    window.__java_showAddContactPage()
+  }
+
+  closeAddContactPage () {
+    window.__java_closeAddContactPage()
+  }
+
   sendInvitation (projectTrees, contacts) {
     window.__java_sendInvitation(JSON.stringify(projectTrees), JSON.stringify(contacts))
   }
