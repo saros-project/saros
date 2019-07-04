@@ -1,20 +1,12 @@
-package saros.core.project.internal;
+package saros.intellij.context;
 
-import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.eventhandler.editor.document.LocalClosedEditorModificationHandler;
-import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
-import saros.intellij.eventhandler.editor.editorstate.AnnotationUpdater;
-import saros.intellij.eventhandler.editor.editorstate.EditorStatusChangeActivityDispatcher;
-import saros.intellij.eventhandler.editor.editorstate.PreexistingSelectionDispatcher;
-import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
-import saros.intellij.eventhandler.editor.selection.LocalTextSelectionChangeHandler;
-import saros.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
-import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
+import saros.intellij.eventhandler.ApplicationEventHandlersFactory;
+import saros.intellij.eventhandler.ProjectEventHandlersFactory;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.followmode.FollowModeNotificationDispatcher;
 import saros.intellij.project.SharedResourcesManager;
@@ -29,11 +21,15 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
 
   @Override
   public void createNonCoreComponents(ISarosSession session, MutablePicoContainer container) {
+    // IDE context wrapper
+    container.addComponent(SharedIDEContext.class);
+    container.addComponent(ApplicationEventHandlersFactory.class);
+    container.addComponent(ProjectEventHandlersFactory.class);
+
     // Project interaction
     container.addComponent(ProjectAPI.class);
 
     // Editor interaction
-    container.addComponent(EditorAPI.class);
     container.addComponent(LocalEditorHandler.class);
     container.addComponent(LocalEditorManipulator.class);
     container.addComponent(SelectedEditorStateSnapshotFactory.class);
@@ -46,22 +42,6 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
       container.addComponent(ModuleInitialization.class);
     }
     container.addComponent(SharedResourcesManager.class);
-
-    /* Intellij resource event handlers */
-    // Filesystem modification handlers
-    container.addComponent(LocalFilesystemModificationHandler.class);
-    // Document modification handlers
-    container.addComponent(LocalDocumentModificationHandler.class);
-    container.addComponent(LocalClosedEditorModificationHandler.class);
-    // Editor status change handlers
-    container.addComponent(AnnotationUpdater.class);
-    container.addComponent(EditorStatusChangeActivityDispatcher.class);
-    container.addComponent(PreexistingSelectionDispatcher.class);
-    container.addComponent(ViewportAdjustmentExecutor.class);
-    // Text selection change handlers
-    container.addComponent(LocalTextSelectionChangeHandler.class);
-    // Viewport change handlers
-    container.addComponent(LocalViewPortChangeHandler.class);
 
     // User notifications
     container.addComponent(FollowModeNotificationDispatcher.class);

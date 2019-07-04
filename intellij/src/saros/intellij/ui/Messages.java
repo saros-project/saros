@@ -91,14 +91,18 @@ public class Messages {
 
   public static String Contact_saros_message_conditional;
 
+  public static String ContactPopMenu_root_popup_text;
+  public static String ContactPopMenu_menu_tooltip_share_module;
+  public static String ContactPopMenu_menu_tooltip_project_module;
+  public static String ContactPopMenu_menu_tooltip_invalid_module;
+  public static String ContactPopMenu_menu_tooltip_error_module;
+  public static String ContactPopMenu_menu_entry_error_processing_project;
+  public static String ContactPopMenu_menu_entry_no_modules_found;
+  public static String ContactPopMenu_menu_entry_no_valid_modules_found;
   public static String ContactPopMenu_unsupported_ide_title;
   public static String ContactPopMenu_unsupported_ide_message_condition;
   public static String ContactPopMenu_module_not_found_title;
   public static String ContactPopMenu_module_not_found_message_condition;
-  public static String ContactPopMenu_invalid_module_title;
-  public static String ContactPopMenu_invalid_module_message_condition;
-  public static String ContactPopMenu_error_creating_module_object_title;
-  public static String ContactPopMenu_error_creating_module_object_message;
 
   public static String ShareWithUserAction_description;
 

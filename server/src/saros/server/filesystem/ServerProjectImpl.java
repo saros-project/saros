@@ -1,6 +1,8 @@
 package saros.server.filesystem;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
@@ -74,5 +76,14 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
 
   private IPath getFullMemberPath(IPath memberPath) {
     return getFullPath().append(memberPath);
+  }
+
+  /**
+   * Creates the underlying folder structure for the project
+   *
+   * @throws IOException
+   */
+  public void create() throws IOException {
+    Files.createDirectory(toNioPath());
   }
 }

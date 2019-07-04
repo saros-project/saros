@@ -59,8 +59,6 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
     this.localEditorHandler = localEditorHandler;
     this.sarosSession = sarosSession;
     this.virtualFileConverter = virtualFileConverter;
-
-    setEnabled(true);
   }
 
   /**

@@ -3,19 +3,14 @@ package saros.intellij.editor;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.command.UndoConfirmationPolicy;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import java.awt.Point;
 import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
 import saros.editor.text.LineRange;
-import saros.intellij.filesystem.Filesystem;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.
@@ -24,16 +19,10 @@ import saros.intellij.filesystem.Filesystem;
  */
 public class EditorAPI {
 
-  private Application application;
-  private CommandProcessor commandProcessor;
+  private static final Application application = ApplicationManager.getApplication();
 
-  private Project project;
-
-  /** Creates an EditorAPI with the current Project and initializes Fields. */
-  public EditorAPI(Project project) {
-    this.project = project;
-    this.application = ApplicationManager.getApplication();
-    this.commandProcessor = CommandProcessor.getInstance();
+  private EditorAPI() {
+    // NOP
   }
 
   /**
@@ -50,7 +39,7 @@ public class EditorAPI {
    * @param line the line to scroll to
    * @see LogicalPosition
    */
-  void scrollToViewPortCenter(final Editor editor, final int line) {
+  static void scrollToViewPortCenter(final Editor editor, final int line) {
     application.invokeAndWait(
         () -> {
           LogicalPosition logicalPosition = new LogicalPosition(line, 0);
@@ -72,7 +61,7 @@ public class EditorAPI {
    * @see LogicalPosition
    */
   @NotNull
-  LineRange getLocalViewPortRange(@NotNull Editor editor) {
+  static LineRange getLocalViewPortRange(@NotNull Editor editor) {
     Rectangle visibleAreaRectangle = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
 
     return getLocalViewPortRange(editor, visibleAreaRectangle);
@@ -86,7 +75,7 @@ public class EditorAPI {
    * @return the logical line range of the local viewport for the given editor
    * @see LogicalPosition
    */
-  public LineRange getLocalViewPortRange(
+  public static LineRange getLocalViewPortRange(
       @NotNull Editor editor, @NotNull Rectangle visibleAreaRectangle) {
     int basePos = visibleAreaRectangle.y;
     int endPos = visibleAreaRectangle.y + visibleAreaRectangle.height;
@@ -108,7 +97,7 @@ public class EditorAPI {
    * @return a Pair containing the local selection offset and length for the given editor.
    */
   @NotNull
-  Pair<Integer, Integer> getLocalSelectionOffsets(@NotNull Editor editor) {
+  static Pair<Integer, Integer> getLocalSelectionOffsets(@NotNull Editor editor) {
     int selectionStartOffset = editor.getSelectionModel().getSelectionStart();
     int selectionEndOffset = editor.getSelectionModel().getSelectionEnd();
 
@@ -129,7 +118,7 @@ public class EditorAPI {
    * @see LogicalPosition
    */
   @NotNull
-  LineRange getLineRange(@NotNull Editor editor, int startOffset, int endOffset) {
+  static LineRange getLineRange(@NotNull Editor editor, int startOffset, int endOffset) {
     assert startOffset <= endOffset;
 
     int startLine = editor.offsetToLogicalPosition(startOffset).line;
@@ -138,61 +127,5 @@ public class EditorAPI {
     int rangeLength = endLine - startLine;
 
     return new LineRange(startLine, rangeLength);
-  }
-
-  /**
-   * Inserts the specified text at the specified offset in the document. Line breaks in the inserted
-   * text must be normalized as \n.
-   *
-   * @param document the document to insert the text into
-   * @param offset the offset to insert the text at
-   * @param text the text to insert
-   * @see Document#insertString(int, CharSequence)
-   */
-  void insertText(@NotNull final Document document, final int offset, final String text) {
-
-    Runnable insertCommand =
-        () -> {
-          Runnable insertString = () -> document.insertString(offset, text);
-
-          String commandName = "Saros text insertion at index " + offset + " of \"" + text + "\"";
-
-          commandProcessor.executeCommand(
-              project,
-              insertString,
-              commandName,
-              commandProcessor.getCurrentCommandGroupId(),
-              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-              document);
-        };
-
-    Filesystem.runWriteAction(insertCommand, ModalityState.defaultModalityState());
-  }
-
-  /**
-   * Deletes the specified range of text from the given document.
-   *
-   * @param doc the document to delete text from
-   * @param start the start offset of the range to delete
-   * @param end the end offset of the range to delete
-   * @see Document#deleteString(int, int)
-   */
-  void deleteText(@NotNull final Document doc, final int start, final int end) {
-    Runnable deletionCommand =
-        () -> {
-          Runnable deleteRange = () -> doc.deleteString(start, end);
-
-          String commandName = "Saros text deletion from index " + start + " to " + end;
-
-          commandProcessor.executeCommand(
-              project,
-              deleteRange,
-              commandName,
-              commandProcessor.getCurrentCommandGroupId(),
-              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-              doc);
-        };
-
-    Filesystem.runWriteAction(deletionCommand, ModalityState.defaultModalityState());
   }
 }

@@ -1,14 +1,24 @@
 - title: Installation
-  url: /documentation/installation.html
+  sublinks:
+  - title: Eclipse
+    url: /documentation/installation-eclipse.html
+  - title: IntelliJ
+    url: /documentation/installation-intellij.html
 
 - title: Getting Started
-  url: /documentation/getting-started.html
+  sublinks:
+  - title: Eclipse
+    url: /documentation/getting-started-eclipse.html
+  - title: IntelliJ
+    url: /documentation/getting-started-intellij.html
 
 - title: Setup XMPP Server
   url: /documentation/setup-xmpp.html
 
 - title: Screenshots
-  url: /documentation/screenshots.html
+  sublinks:
+  - title: Eclipse
+    url: /documentation/screenshots-eclipse.html
 
 - title: Host Comic
   url: /documentation/host-comic.html

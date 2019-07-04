@@ -1,8 +1,8 @@
 ---
-title: Screenshots
+title: Screenshots of Saros/E
 ---
 
-Let's gather some impressions of Saros.
+Let's gather some impressions of Saros/E.
 
 ![Saros
 Annotations](images/screenshot_annotated.png)

@@ -6,11 +6,10 @@ import com.intellij.openapi.editor.event.SelectionListener;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.eventhandler.DisableableHandler;
-import saros.repackaged.picocontainer.Startable;
+import saros.intellij.eventhandler.IProjectEventHandler;
 
 /** Dispatches activities for selection changes. */
-public class LocalTextSelectionChangeHandler implements DisableableHandler, Startable {
+public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
 
   private final EditorManager editorManager;
 
@@ -26,8 +25,9 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
   private boolean disposed;
 
   /**
-   * Instantiates a LocalTextSelectionChangeHandler object. The handler is enabled by default and
-   * the contained listener is registered by default.
+   * Instantiates a LocalTextSelectionChangeHandler object.
+   *
+   * <p>The handler is disabled and the listener is not registered by default.
    *
    * @param editorManager the EditorManager instance
    */
@@ -39,12 +39,18 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
   }
 
   @Override
-  public void start() {
+  @NotNull
+  public ProjectEventHandlerType getHandlerType() {
+    return ProjectEventHandlerType.TEXT_SELECTION_CHANGE_HANDLER;
+  }
+
+  @Override
+  public void initialize() {
     setEnabled(true);
   }
 
   @Override
-  public void stop() {
+  public void dispose() {
     disposed = true;
     setEnabled(false);
   }
@@ -86,5 +92,10 @@ public class LocalTextSelectionChangeHandler implements DisableableHandler, Star
 
       this.enabled = true;
     }
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
   }
 }

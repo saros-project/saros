@@ -7,7 +7,6 @@ import saros.communication.connection.NullProxyResolver;
 import saros.context.AbstractContextFactory;
 import saros.context.IContextKeyBindings;
 import saros.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
-import saros.core.project.internal.SarosIntellijSessionContextFactory;
 import saros.core.ui.eventhandler.NegotiationHandler;
 import saros.core.ui.eventhandler.UserStatusChangeHandler;
 import saros.core.ui.eventhandler.XMPPAuthorizationHandler;

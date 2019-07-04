@@ -9,10 +9,9 @@ import saros.synchronize.UISynchronizer;
 import saros.util.StackTrace;
 
 @Component(module = "eclipse")
-// TODO rename to EclipseSWTSynchronizer
-public class SWTSynchronizer implements UISynchronizer {
+public class EclipseSWTSynchronizer implements UISynchronizer {
 
-  private static final Logger LOG = Logger.getLogger(SWTSynchronizer.class);
+  private static final Logger LOG = Logger.getLogger(EclipseSWTSynchronizer.class);
 
   @Override
   public void asyncExec(Runnable runnable) {

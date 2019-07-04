@@ -1,7 +1,7 @@
 package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.session.User;
 
 public abstract class AbstractActivity implements IActivity {
@@ -40,7 +40,7 @@ public abstract class AbstractActivity implements IActivity {
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCode(source);
+    return Objects.hashCode(source);
   }
 
   @Override
@@ -51,7 +51,7 @@ public abstract class AbstractActivity implements IActivity {
 
     AbstractActivity other = (AbstractActivity) obj;
 
-    if (!ObjectUtils.equals(this.source, other.source)) return false;
+    if (!Objects.equals(this.source, other.source)) return false;
 
     return true;
   }

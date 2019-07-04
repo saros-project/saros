@@ -2,7 +2,7 @@ package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import saros.concurrent.jupiter.Timestamp;
 import saros.session.User;
 
@@ -83,7 +83,7 @@ public class ChecksumActivity extends AbstractResourceActivity {
     int result = super.hashCode();
     result = prime * result + (int) (hash ^ (hash >>> 32));
     result = prime * result + (int) (length ^ (length >>> 32));
-    result = prime * result + ObjectUtils.hashCode(jupiterTimestamp);
+    result = prime * result + Objects.hashCode(jupiterTimestamp);
     return result;
   }
 
@@ -97,7 +97,7 @@ public class ChecksumActivity extends AbstractResourceActivity {
 
     if (this.hash != other.hash) return false;
     if (this.length != other.length) return false;
-    if (!ObjectUtils.equals(this.jupiterTimestamp, other.jupiterTimestamp)) return false;
+    if (!Objects.equals(this.jupiterTimestamp, other.jupiterTimestamp)) return false;
 
     return true;
   }

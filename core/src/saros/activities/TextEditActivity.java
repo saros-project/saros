@@ -19,7 +19,7 @@
  */
 package saros.activities;
 
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -97,8 +97,8 @@ public class TextEditActivity extends AbstractResourceActivity {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + offset;
-    result = prime * result + ObjectUtils.hashCode(replacedText);
-    result = prime * result + ObjectUtils.hashCode(text);
+    result = prime * result + Objects.hashCode(replacedText);
+    result = prime * result + Objects.hashCode(text);
     return result;
   }
 
@@ -111,8 +111,8 @@ public class TextEditActivity extends AbstractResourceActivity {
     TextEditActivity other = (TextEditActivity) obj;
 
     if (this.offset != other.offset) return false;
-    if (!ObjectUtils.equals(this.replacedText, other.replacedText)) return false;
-    if (!ObjectUtils.equals(this.text, other.text)) return false;
+    if (!Objects.equals(this.replacedText, other.replacedText)) return false;
+    if (!Objects.equals(this.text, other.text)) return false;
 
     return true;
   }

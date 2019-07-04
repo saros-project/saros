@@ -1,5 +1,5 @@
 ---
-title: Saros/I 0.1.0 Release Notes
+title: Getting Started with Saros/I
 ---
 
 This is the first alpha release of Saros/I, so expect it to be a bit rough around the edges.
@@ -11,17 +11,9 @@ We are currently working on a replacement in the form of an HTML GUI that can be
 
 ## Disclaimer
 
-Saros/I does not include sub-modules when sharing a module (see [module restrictions](#module-restrictions)).
+Saros/I does not include sub-modules when sharing a module (see [Module Restrictions](#module-restrictions)).
 As a consequence, such sub-modules might not be present for all session participants.
 If a participant deletes a shared directory that contains a sub-module in the local setup of another participant, this sub-module will be deleted without any notice.
-
-## Installation
-
-Saros/I 0.1.0 requires
- - `JDK 8` or newer
- - `IntelliJ 2018.2.7` or newer
-
-Saros/I can be installed from the JetBrains plugin repository or from disk. A detailed guide is given [here](../documentation/installation-intellij.md).
 
 ## Features
 
@@ -37,6 +29,81 @@ You can
 - create, delete, and move resources in the shared module
 - interact freely with non-shared resources
 - follow other participants of the session ([follow mode](../documentation/getting-started-eclipse.md#follow-mode))
+
+## How to Use Saros/I
+
+### Adding an XMPP Account
+
+- Choose the Saros window in bottom bar.
+  - If it is not shown, click the "Saros" button in bottom bar or open it by clicking on the square on bottom left and choosing "Saros".
+- In the top bar of the Saros view, choose the "Connect" icon (connected plug icon; the left icon).
+- Choose "Add account..." from the pop-up menu.
+- Enter the fully qualified user name (`USER_NAME@YOUR.DOMIAN`).
+  - If the basic Saros XMPP server is used, the domain would be `@saros-con.imp.fu-berlin.de`.
+- Click OK.
+- Enter your password.
+- Click OK.
+- Enter the XMPP server address (optional).
+  - This option should not be necessary in most cases.
+  - If no server is supposed to be specified, just leave the field empty.
+  - If a server is specified, a port has to be specified as well.
+
+**NOTE:** As mentioned in the section [missing features](#missing-features), Saros/I does currently not support the creation, management or deletion of XMPP accounts.
+As only people on your friends list can be invited to join your Saros session, you will have to create an account and add friends to your friends list through a different client.
+Any XMPP client (including Saros/E) can be used for this purpose.
+
+If you accidentally made a typo while entering your username or password, the created account entry can also only be changed or deleted through Saros/E (or by deleting the account store `~/.saros/config.dat`).
+Saros/E does not permit the deletion of the currently chosen account.
+If you only added one account and would like to remove it, you will have to add a second account (for example with random values) and choose this new account as the default.
+You can then delete the first account, add a new account with the right values, choose it as the correct default and delete the temporary account entry.
+
+
+### Starting a Session - Host
+
+- Choose the Saros window in the bottom bar.
+- Choose the "Connect" icon (connected plug icon; the left icon).
+- Choose an account.
+- Choose the section "Contacts" in the window on the left side of the Saros view.
+- Choose a friend that is online.
+- Right-click the name of that friend. This will open a list of all shareable modules in the current project.
+  - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see "What should work" and "What does not work").
+- Choose the module that is supposed to be shared from the displayed list of modules.
+
+
+### Starting a Session - Client
+
+- Choose the Saros window in the bottom bar.
+- Choose the "Connect" icon (connected plug icon; the left icon).
+- Choose an account.
+- Wait until the host invites you to join their session.
+- After the host invited you, the session negotiation will open.
+- Click "Next". This will open the project negotiation.
+- Choose which local module to use for the session. The automatically chosen option and value should be correct in most cases, so you should not have to change anything.
+  - *To create a new module:* Choose "Create new module" if the shared module is not already present in your local project.
+  - *To use an existing module:* Choose "Use existing module" if a version of the shared module is already present in your local project.
+    - Click on "Browse..." and choose the base directory of the shared module.
+    - The base directory has to have the same name as the shared module.
+    - If the field is left empty, the project negotiation is aborted due to a local error.
+- Click "Next". This will show you the local file changes that will be made during the negotiation. These are the differences between the local version of the module and the version held by the host.
+  - The shown actions are the actions necessary to align the local module with the host module.
+  - Any local differences will be removed during the project negotiation. These adjustments will only be done if the "Finish" button is selected. If the session negotiation is aborted at this stage, no local files are changed.
+- Click "Finish".
+
+
+### Leaving a Session
+
+- Choose the Saros window in the bottom bar.
+- Click on "Leave session" (door icon; the right icon).
+- Select "OK".
+  - If you are the host of the session, the client will subsequently be kicked from the session.
+
+
+### Disconnecting from the XMPP-Server
+
+- Choose the Saros window in the bottom bar.
+- Choose the "Connect" icon (connected plug icon; the left icon).
+- Choose "Disconnect server".
+
 
 ## Restrictions
 
@@ -146,4 +213,3 @@ They are located in `~/.IdeaXXXXXXXX/system/log/` and are named `idea.log` (the 
 Please have a look at the contained timestamps to provide the correct file.
 
 Before attaching any log files, please make sure to redact any private information that you do not wish to make publicly available.
-

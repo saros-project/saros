@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * A FileList is a list of resources -- files and folders -- which belong to the same project.
@@ -238,10 +238,10 @@ public class FileList {
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ObjectUtils.hashCode(files);
+      result = prime * result + Objects.hashCode(files);
       result = prime * result + (isDirectory ? 1231 : 1237);
-      result = prime * result + ObjectUtils.hashCode(metaData);
-      result = prime * result + ObjectUtils.hashCode(path);
+      result = prime * result + Objects.hashCode(metaData);
+      result = prime * result + Objects.hashCode(path);
       return result;
     }
 
@@ -255,9 +255,9 @@ public class FileList {
 
       if (isDirectory != other.isDirectory) return false;
 
-      if (!ObjectUtils.equals(path, other.path)) return false;
-      if (!ObjectUtils.equals(metaData, other.metaData)) return false;
-      if (!ObjectUtils.equals(files, other.files)) return false;
+      if (!Objects.equals(path, other.path)) return false;
+      if (!Objects.equals(metaData, other.metaData)) return false;
+      if (!Objects.equals(files, other.files)) return false;
 
       return true;
     }
@@ -277,7 +277,7 @@ public class FileList {
 
       MetaData other = (MetaData) o;
 
-      if (!ObjectUtils.equals(checksum, other.checksum)) return false;
+      if (!Objects.equals(checksum, other.checksum)) return false;
 
       return true;
     }
