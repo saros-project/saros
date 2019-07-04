@@ -5,15 +5,9 @@ sudo: enabled
 git:
   depth: false
 
-# Override the install default behavior to terminate the build
-# if only markdown files are changed or files within the docs dir
+# Override the install default behavior that calls gradle assemble
 install:
-- |
-    if ! git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '(.md$)|(^docs/)'
-    then
-      echo "Only docs were updated, not running the CI."
-      exit
-    fi
+- true
 
 notifications:
   email:
