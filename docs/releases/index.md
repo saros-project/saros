@@ -2,7 +2,7 @@
 title: Get Saros
 ---
 
-See the [installation documentation](../documentation/installation.md) for more information about prerequisites.
+See the installation documentation for [Eclipse](../documentation/installation-eclipse.md) and [IntelliJ](../documentation/installation-intellij.md) for more information about prerequisites and more detailed installation instructions.
 
 See **latest release notes** about the current release:
 * **Saros for Eclipse (Saros/E)**: [15.0.0](saros-e_15.0.0.md)
@@ -17,6 +17,10 @@ Update site <https://www.saros-project.org/update-site/eclipse>
 ## Eclipse Dropin
 
 Find latest release in [GitHub](https://github.com/saros-project/saros/releases)
+
+## IntelliJ Marketplace
+
+You can install the plugin through the IntelliJ plugin marketplace. This requires the `alpha` release channel. More information can be found [here](../documentation/installation-intellij.md#from-the-plugin-repository).
 
 ## IntelliJ Zip
 

@@ -13,7 +13,7 @@ You need a [development environment](development-environment.md) with **Eclipse 
 
 ### Configuration
 
-* Before you can run the stf tests you need four XMPP accounts. If you want to use our XMPP server you can create accounts as described in the [user documentation](../../documentation/getting-started.html).
+* Before you can run the stf tests you need four XMPP accounts. If you want to use our XMPP server you can create accounts as described in the [user documentation](../documentation/getting-started-eclipse.md).
 * Then you have to create the file `configuration.properties` in directory `saros/test/framework/stf/src/saros/stf/client`.
 * Add the following lines to the config and **replace the placeholders with your credentials** (make sure **every tester has an unique JID**)
 
