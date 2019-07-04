@@ -6,12 +6,12 @@ import BasicWidgetTestView from './BasicWidgetTestView'
 import ConfigurationWizardView from './ConfigurationWizardView'
 import MainView from './MainView'
 import React from 'react'
-import StartSessionWizardView from './StartSessionWizardView'
+import ShareProjectView from './ShareProjectView'
 
 const viewComponents = {
   [views.MAIN]: MainView,
   [views.ADD_CONTACT]: AddContactView,
-  [views.START_SESSION_WIZARD]: StartSessionWizardView,
+  [views.SHARE_PROJECT_PAGE]: ShareProjectView,
   [views.CONFIGURATION_WIZARD]: ConfigurationWizardView,
   [views.BASIC_WIDGET_TEST]: BasicWidgetTestView
 }

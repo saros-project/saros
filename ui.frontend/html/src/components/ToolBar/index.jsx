@@ -17,7 +17,7 @@ const ToolBar = ({core, mainUI}) => (
       <Text message='action.addContact' />
     </Button>
 
-    <Button id='start-session' onClick={core.doShowStartSessionWizard}>
+    <Button id='start-session' onClick={core.doShowShareProjectPage}>
       <Text message='action.startSession' />
     </Button>
   </Navbar>

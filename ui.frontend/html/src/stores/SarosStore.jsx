@@ -64,13 +64,13 @@ export default class SarosStore {
   }
 
   @action.bound
-  doShowStartSessionWizard () {
-    this.sarosApi.showStartSessionWizard()
+  doShowShareProjectPage () {
+    this.sarosApi.showShareProjectPage()
   }
 
   @action.bound
-  doCloseSessionWizard () {
-    this.sarosApi.closeStartSessionWizard()
+  doCloseShareProjectPage () {
+    this.sarosApi.closeShareProjectPage()
   }
 
   @action.bound

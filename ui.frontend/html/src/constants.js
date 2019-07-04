@@ -2,7 +2,7 @@
 const views = {
   MAIN: 'main-page',
   ADD_CONTACT: 'add-contact',
-  START_SESSION_WIZARD: 'start-session-wizard',
+  SHARE_PROJECT_PAGE: 'share-project-page',
   CONFIGURATION_WIZARD: 'configuration-page',
   BASIC_WIDGET_TEST: 'basic-widget-test'
 }

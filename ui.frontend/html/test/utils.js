@@ -13,8 +13,8 @@ export class FakeSarosApi {
     this.renameContact = spy()
     this.deleteContact = spy()
     this.validateJid = stub().returns(true)
-    this.showStartSessionWizard = spy()
-    this.closeStartSessionWizard = spy()
+    this.showShareProjectPage = spy()
+    this.closeShareProjectPage = spy()
     this.sendInvitation = spy()
   }
 }

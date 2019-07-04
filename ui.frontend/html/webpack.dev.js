@@ -48,7 +48,7 @@ module.exports = {
   plugins: [
     // TODO there should be a more elegant way of telling the application which view to show
     createPage(views.MAIN),
-    createPage(views.START_SESSION_WIZARD),
+    createPage(views.SHARE_PROJECT_PAGE),
     createPage(views.CONFIGURATION_WIZARD),
     createPage(views.BASIC_WIDGET_TEST)
   ],

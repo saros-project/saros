@@ -18,9 +18,9 @@ describe('<MainView />', () => {
 
   itRendersWithoutExploding(wrap.find('MainView'))
 
-  it('opens the SessionWizard when the Start Session button is clicked', () => {
+  it('opens the ShareProjectPage when the Start Session button is clicked', () => {
     wrap.find('button#start-session').simulate('click')
-    expect(fakeApi.showStartSessionWizard.calledOnce).to.equal(true)
+    expect(fakeApi.showShareProjectPage.calledOnce).to.equal(true)
   })
 
   it('opens the AddContact View when the Add Contact button is clicked', () => {

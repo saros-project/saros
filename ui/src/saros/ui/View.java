@@ -2,7 +2,7 @@ package saros.ui;
 
 import saros.ui.pages.AbstractBrowserPage;
 import saros.ui.pages.MainPage;
-import saros.ui.pages.SessionWizardPage;
+import saros.ui.pages.ShareProjectPage;
 
 /**
  * This enum make the connection between conceptual View and their technical realization. It allows
@@ -15,7 +15,7 @@ public enum View {
   /** The form to add a new contact with */
   ADD_CONTACT(MainPage.class, "add-contact", "add-contact-form"),
   /** The session wizard dialog */
-  SESSION_WIZARD(SessionWizardPage.class, "start-session-wizard", "session-wizard"),
+  SESSION_WIZARD(ShareProjectPage.class, "start-session-wizard", "session-wizard"),
   /** The dummy page for testing all html components */
   BASIC_WIDGET_TEST(MainPage.class, "basic-widget-test", "basic-widget-test-root");
 

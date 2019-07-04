@@ -72,12 +72,12 @@ class SarosApi {
     return JSON.parse(window.__java_validateJid(jid))
   }
 
-  showStartSessionWizard () {
-    window.__java_showSessionWizard()
+  showShareProjectPage () {
+    window.__java_showShareProjectPage()
   }
 
-  closeStartSessionWizard () {
-    window.__java_closeStartSessionWizard()
+  closeShareProjectPage () {
+    window.__java_closeShareProjectPage()
   }
 
   sendInvitation (projectTrees, contacts) {

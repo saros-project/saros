@@ -13,7 +13,7 @@ public class HTMLUIStrings {
 
   // dialog titles
   public static final String TITLE_MAIN_PAGE = "Main page";
-  public static final String TITLE_START_SESSION_WIZARD = "Share Project";
+  public static final String TITLE_SHARE_PROJECT_PAGE = "Share Project";
   public static final String TITLE_ADD_ACCOUNT_PAGE = "Add Account";
   public static final String TITLE_CONFIGURATION_PAGE = "Configure Saros";
 
