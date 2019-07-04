@@ -5,7 +5,7 @@ import static saros.context.AbstractContextFactory.Component.create;
 import saros.context.AbstractContextFactory;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.ui.browser_functions.AddContact;
-import saros.ui.browser_functions.CloseAccountWizard;
+import saros.ui.browser_functions.CloseAddAccountPage;
 import saros.ui.browser_functions.CloseShareProjectPage;
 import saros.ui.browser_functions.ConnectAccount;
 import saros.ui.browser_functions.DeleteAccount;
@@ -17,14 +17,14 @@ import saros.ui.browser_functions.RenameContact;
 import saros.ui.browser_functions.SaveAccount;
 import saros.ui.browser_functions.SendInvitation;
 import saros.ui.browser_functions.SetActiveAccount;
-import saros.ui.browser_functions.ShowAccountPage;
+import saros.ui.browser_functions.ShowAddAccountPage;
 import saros.ui.browser_functions.ShowShareProjectPage;
 import saros.ui.core_facades.ConnectionFacade;
 import saros.ui.core_facades.RosterFacade;
 import saros.ui.ide_embedding.BrowserCreator;
 import saros.ui.manager.BrowserManager;
 import saros.ui.manager.ProjectListManager;
-import saros.ui.pages.AccountPage;
+import saros.ui.pages.AddAccountPage;
 import saros.ui.pages.ConfigurationPage;
 import saros.ui.pages.MainPage;
 import saros.ui.pages.ShareProjectPage;
@@ -58,7 +58,7 @@ public class HTMLUIContextFactory extends AbstractContextFactory {
     // please use alphabetic order
     add(
         AddContact.class, //
-        CloseAccountWizard.class, //
+        CloseAddAccountPage.class, //
         CloseShareProjectPage.class, //
         ConnectAccount.class, //
         DeleteAccount.class, //
@@ -70,12 +70,12 @@ public class HTMLUIContextFactory extends AbstractContextFactory {
         SaveAccount.class, //
         SendInvitation.class, //
         SetActiveAccount.class, //
-        ShowAccountPage.class, //
+        ShowAddAccountPage.class, //
         ShowShareProjectPage.class);
   }
 
   private void createPages() {
-    add(AccountPage.class, MainPage.class, ShareProjectPage.class, ConfigurationPage.class);
+    add(AddAccountPage.class, MainPage.class, ShareProjectPage.class, ConfigurationPage.class);
   }
 
   private void createRenderer() {
