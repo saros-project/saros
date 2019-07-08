@@ -2,6 +2,7 @@ package saros.session;
 
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.concurrent.management.ConcurrentDocumentServer;
+import saros.concurrent.management.HeartbeatDispatcher;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.concurrent.watchdog.ConsistencyWatchdogHandler;
 import saros.concurrent.watchdog.ConsistencyWatchdogServer;
@@ -40,6 +41,7 @@ public class SarosCoreSessionContextFactory implements ISarosSessionContextFacto
      */
     container.addComponent(ConcurrentDocumentServer.class);
     container.addComponent(ConcurrentDocumentClient.class);
+    container.addComponent(HeartbeatDispatcher.class);
 
     // Session Timeout Handling
     if (session.isHost()) container.addComponent(ServerSessionTimeoutHandler.class);
