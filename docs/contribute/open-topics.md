@@ -27,7 +27,7 @@ She proposed the following approaches (see [the corresponding thesis for more in
 See here for the corresponding [Pull Request](https://github.com/saros-project/saros/pull/527)<br/>
 The main idea is to skip further tests if a basic test already failed.
 
-We did not integrate the pull request, because of:
+We did not integrate the pull request, because:
 * The approach requires to model a dependency relation between tests.
     * The dependency relation model was not compile-save.
     * The dependency relation model was redundant, because it was implemented via a direct relation and the test order within the test suite.
@@ -48,3 +48,24 @@ See here for the corresponding [Pull Request](https://github.com/saros-project/s
 As already implemented for SWT components a new view is introduced which allows to trigger GUI events in the RMI server.
 
 The pull request contains a basic implementation with mostly stubbed methods.
+
+## Java-JavaScript Bridge
+Corresponding Pull Requests:
+Reimplementation of the `ui` classes in kotlin:
+* [Part 1](https://github.com/saros-project/saros/pull/437)
+* [Part 2](https://github.com/saros-project/saros/pull/438)
+* [Part 3](https://github.com/saros-project/saros/pull/436)
+* [Part 4](https://github.com/saros-project/saros/pull/435)
+* [Part 5](https://github.com/saros-project/saros/pull/434)
+* [Part 6](https://github.com/saros-project/saros/pull/433)
+* [Part 7](https://github.com/saros-project/saros/pull/432)
+* [Part 8](https://github.com/saros-project/saros/pull/431)
+* [Part 9](https://github.com/saros-project/saros/pull/430)
+* [Part 10](https://github.com/saros-project/saros/pull/429)
+
+The main idea is to reduce redundancy and complexity during the interaction of Java and JavaScript. Therefore this work compared different approaches (Scala with Scala.js, Kotlin and Fantom) which allow to generate the JavaScript code based on a JVM language. See this [thesis](https://www.inf.fu-berlin.de/inst/ag-se/theses/Paul-Gattringer2018-saros-UI-bridge.pdf) (german only) for more information.
+
+We did not integrate the pull requests, because:
+* The approach introduces a new language and therefore increases the complexity of our project and build process.
+* The savings of redundancy are smaller than expected. Only the redundancy of the model classes can the avoided.
+* The most interesting part (The injection of java functions into javascript and vice versa) is not simplified by the approach.
