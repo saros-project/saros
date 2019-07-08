@@ -15,12 +15,13 @@ import saros.activities.IFileSystemModificationActivity;
 import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
+import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.SelectedEditorStateSnapshot;
 import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
+import saros.intellij.eventhandler.IApplicationEventHandler.ApplicationEventHandlerType;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
@@ -37,7 +38,7 @@ public class SharedResourcesManager implements Startable {
   private static final boolean LOCAL = false;
 
   private final ISarosSession sarosSession;
-  private final LocalFilesystemModificationHandler localFilesystemModificationHandler;
+  private final SharedIDEContext sharedIDEContext;
   private final LocalEditorHandler localEditorHandler;
   private final LocalEditorManipulator localEditorManipulator;
   private final AnnotationManager annotationManager;
@@ -64,14 +65,14 @@ public class SharedResourcesManager implements Startable {
       LocalEditorHandler localEditorHandler,
       LocalEditorManipulator localEditorManipulator,
       AnnotationManager annotationManager,
-      LocalFilesystemModificationHandler localFilesystemModificationHandler,
+      SharedIDEContext sharedIDEContext,
       SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory) {
 
     this.sarosSession = sarosSession;
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
     this.annotationManager = annotationManager;
-    this.localFilesystemModificationHandler = localFilesystemModificationHandler;
+    this.sharedIDEContext = sharedIDEContext;
     this.selectedEditorStateSnapshotFactory = selectedEditorStateSnapshotFactory;
   }
 
@@ -218,7 +219,7 @@ public class SharedResourcesManager implements Startable {
     annotationManager.updateAnnotationPath(oldFile, newFile);
 
     try {
-      localFilesystemModificationHandler.setEnabled(false);
+      setFilesystemModificationHandlerEnabled(false);
 
       localEditorHandler.saveDocument(oldPath);
 
@@ -239,7 +240,7 @@ public class SharedResourcesManager implements Startable {
       oldFile.delete(DELETION_FLAGS);
 
     } finally {
-      localFilesystemModificationHandler.setEnabled(true);
+      setFilesystemModificationHandlerEnabled(true);
     }
 
     // TODO reset the vector time for the old file
@@ -261,14 +262,14 @@ public class SharedResourcesManager implements Startable {
     }
 
     try {
-      localFilesystemModificationHandler.setEnabled(false);
+      setFilesystemModificationHandlerEnabled(false);
 
       localEditorHandler.saveDocument(path);
 
       file.delete(DELETION_FLAGS);
 
     } finally {
-      localFilesystemModificationHandler.setEnabled(true);
+      setFilesystemModificationHandlerEnabled(true);
     }
 
     annotationManager.removeAnnotations(file);
@@ -290,12 +291,12 @@ public class SharedResourcesManager implements Startable {
     InputStream contents = new ByteArrayInputStream(activity.getContent());
 
     try {
-      localFilesystemModificationHandler.setEnabled(false);
+      setFilesystemModificationHandlerEnabled(false);
 
       file.create(contents, FORCE);
 
     } finally {
-      localFilesystemModificationHandler.setEnabled(true);
+      setFilesystemModificationHandlerEnabled(true);
     }
   }
 
@@ -310,12 +311,12 @@ public class SharedResourcesManager implements Startable {
     }
 
     try {
-      localFilesystemModificationHandler.setEnabled(false);
+      setFilesystemModificationHandlerEnabled(false);
 
       folder.create(FORCE, LOCAL);
 
     } finally {
-      localFilesystemModificationHandler.setEnabled(true);
+      setFilesystemModificationHandlerEnabled(true);
     }
   }
 
@@ -341,12 +342,23 @@ public class SharedResourcesManager implements Startable {
     }
 
     try {
-      localFilesystemModificationHandler.setEnabled(false);
+      setFilesystemModificationHandlerEnabled(false);
 
       folder.delete(DELETION_FLAGS);
 
     } finally {
-      localFilesystemModificationHandler.setEnabled(true);
+      setFilesystemModificationHandlerEnabled(true);
     }
+  }
+
+  /**
+   * Enables or disables all filesystem modification handlers.
+   *
+   * @param enabled <code>true</code> to enable the handlers, <code>false</code> to disable the
+   *     handlers
+   */
+  private void setFilesystemModificationHandlerEnabled(boolean enabled) {
+    sharedIDEContext.setApplicationEventHandlersEnabled(
+        ApplicationEventHandlerType.LOCAL_FILESYSTEM_MODIFICATION_HANDLER, enabled);
   }
 }

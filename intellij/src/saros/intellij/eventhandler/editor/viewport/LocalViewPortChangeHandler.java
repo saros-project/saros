@@ -14,11 +14,10 @@ import saros.editor.text.LineRange;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.eventhandler.DisableableHandler;
-import saros.repackaged.picocontainer.Startable;
+import saros.intellij.eventhandler.IProjectEventHandler;
 
 /** Dispatches activities for viewport changes. */
-public class LocalViewPortChangeHandler implements DisableableHandler, Startable {
+public class LocalViewPortChangeHandler implements IProjectEventHandler {
   private static final Logger log = Logger.getLogger(LocalViewPortChangeHandler.class);
 
   private final EditorManager editorManager;
@@ -29,8 +28,9 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
   private boolean disposed;
 
   /**
-   * Instantiates a LocalViewPortChangeHandler object. The handler is enabled by default and the
-   * contained listener is registered by default.
+   * Instantiates a LocalViewPortChangeHandler object.
+   *
+   * <p>The handler is disabled and the contained listener is not registered by default.
    *
    * @param editorManager the EditorManager instance
    */
@@ -42,12 +42,18 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
   }
 
   @Override
-  public void start() {
+  @NotNull
+  public ProjectEventHandlerType getHandlerType() {
+    return ProjectEventHandlerType.VIEWPORT_CHANGE_HANDLER;
+  }
+
+  @Override
+  public void initialize() {
     setEnabled(true);
   }
 
   @Override
-  public void stop() {
+  public void dispose() {
     disposed = true;
     setEnabled(false);
   }
@@ -128,5 +134,10 @@ public class LocalViewPortChangeHandler implements DisableableHandler, Startable
 
       this.enabled = true;
     }
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
   }
 }
