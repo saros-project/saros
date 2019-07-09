@@ -7,4 +7,13 @@ const views = {
   BASIC_WIDGET_TEST: 'basic-widget-test'
 }
 
-module.exports = { views };
+const connectionStates = {
+  INITIALIZING: 'INITIALIZING',
+  NOT_CONNECTED: 'NOT_CONNECTED',
+  CONNECTED: 'CONNECTED',
+  ERROR: 'ERROR',
+  CONNECTING: 'CONNECTING',
+  DISCONNECTING: 'DISCONNECTING'
+}
+
+module.exports = { views, connectionStates };

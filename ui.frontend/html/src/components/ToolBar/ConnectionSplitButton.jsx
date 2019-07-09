@@ -1,6 +1,7 @@
 import { Account } from 'Utils/propTypes'
 import { Dropdown, OverlayTrigger, SplitButton, Tooltip } from 'react-bootstrap'
 import { PropTypes as PM } from 'mobx-react'
+import { connectionStates } from '~/constants'
 import { Text } from 'react-localize'
 import { getJid, noop } from 'Utils'
 
@@ -14,14 +15,13 @@ const ConnectionSplitButtonProps = {
 class ConnectionSplitButton extends React.Component {
   constructor (props) {
     super(props)
-    this.connectionStateMap = {
-      'INITIALIZING': { onClick: this.props.onConnect, messageId: 'action.connect', icon: images.accountDisconnectedIcon },
-      'NOT_CONNECTED': { onClick: this.props.onConnect, messageId: 'action.connect', icon: images.accountDisconnectedIcon },
-      'CONNECTED': { onClick: this.props.onDisconnect, messageId: 'action.disconnect', icon: images.accountConnectedIcon },
-      'ERROR': { onClick: noop, messageId: 'action.connectionError', icon: images.accountConnectionErrorIcon },
-      'CONNECTING': { onClick: noop, messageId: 'action.connecting', icon: images.accountConnectingIcon },
-      'DISCONNECTING': { onClick: noop, messageId: 'action.disconnecting', icon: images.accountDisconnectingIcon }
-    }
+    this.connectionStateMap = {}
+    this.connectionStateMap[connectionStates.INITIALIZING] = { onClick: this.props.onConnect, messageId: 'action.connect', icon: images.accountDisconnectedIcon }
+    this.connectionStateMap[connectionStates.NOT_CONNECTED] = { onClick: this.props.onConnect, messageId: 'action.connect', icon: images.accountDisconnectedIcon }
+    this.connectionStateMap[connectionStates.CONNECTED] = { onClick: this.props.onDisconnect, messageId: 'action.disconnect', icon: images.accountConnectedIcon }
+    this.connectionStateMap[connectionStates.ERROR] = { onClick: noop, messageId: 'action.connectionError', icon: images.accountConnectionErrorIcon }
+    this.connectionStateMap[connectionStates.CONNECTING] = { onClick: noop, messageId: 'action.connecting', icon: images.accountConnectingIcon }
+    this.connectionStateMap[connectionStates.DISCONNECTING] = { onClick: noop, messageId: 'action.disconnecting', icon: images.accountDisconnectingIcon }
   }
 
   render () {
