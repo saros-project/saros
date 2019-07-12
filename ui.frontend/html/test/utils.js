@@ -3,6 +3,8 @@ import { spy, stub } from 'sinon'
 import Localization from 'react-localize'
 import React from 'react'
 import { expect } from 'chai';
+import SarosStore from '~/stores/SarosStore'
+
 
 export class FakeSarosApi {
   constructor () {
@@ -18,9 +20,28 @@ export class FakeSarosApi {
     this.sendInvitation = spy()
     this.showAddContactPage = spy()
     this.closeAddContactPage = spy()
+    this.doChangeActiveAccount = spy()
   }
 }
 
+export class SarosStoreBuilder {
+	constructor() {
+		this.core = new SarosStore()
+		this.core.sarosApi = new FakeSarosApi()
+	}
+
+	withConnectionState(connectionState) {
+		this.core.doUpdateState({ connectionState: connectionState })
+		return this
+  }
+
+	build() {
+		return this.core
+	}
+}	
+
+// Don't use this method if you want to create a shallow wrap in enzyme
+// otherwise the component "element" is not rendered (only the Provider).
 export function wrapWithContextProvider (element, stores) {
   return (
     <Localization messages={{}}>
@@ -37,6 +58,6 @@ export function shouldRender (wrapper) {
 
 export function itRendersWithoutExploding (wrapper) {
   it('renders without exploding', () => {
-    expect(wrapper.length).to.equal(1)
+    shouldRender(wrapper)
   })
 }
