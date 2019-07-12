@@ -1,5 +1,6 @@
 import { action, computed, observable } from 'mobx'
 import { getJid, onlineFirst } from 'Utils'
+import { connectionStates } from '~/constants'
 
 export default class SarosStore {
   @observable state = {
@@ -13,7 +14,7 @@ export default class SarosStore {
       useSASL: false
     },
     contactList: [],
-    connectionState: 'INITIALIZING'
+    connectionState: connectionStates.INITIALIZING
   }
 
   @observable accounts = []
