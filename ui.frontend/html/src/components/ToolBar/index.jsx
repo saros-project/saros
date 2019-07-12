@@ -5,20 +5,17 @@ import { connectionStates } from '~/constants'
 import ConnectionSplitButton from './ConnectionSplitButton'
 import React from 'react'
 
-const ToolBar = ({core, mainUI}) => (
-  <Navbar fixed={"top"}>
-    <ConnectionSplitButton
-      accounts={core.accounts}
-      onConnect={core.doConnect}
-      onDisconnect={core.doDisconnect}
-      connectionState={core.state.connectionState}
-      />
+const isNotConnected = ( connectionState ) => (connectionState != connectionStates.CONNECTED)
 
-    <Button id='add-contact' onClick={core.doShowAddContactPage} disabled={ core.state.connectionState != connectionStates.CONNECTED }>
+const ToolBar = ({ core }) => (
+  <Navbar fixed={"top"}>
+    <ConnectionSplitButton core={ core } />
+
+    <Button id='add-contact' onClick={core.doShowAddContactPage} disabled={ isNotConnected(core.state.connectionState) }>
       <Text message='action.addContact' />
     </Button>
 
-    <Button id='start-session' onClick={core.doShowShareProjectPage} disabled={ core.state.connectionState != connectionStates.CONNECTED }>
+    <Button id='start-session' onClick={core.doShowShareProjectPage} disabled={ isNotConnected(core.state.connectionState) }>
       <Text message='action.startSession' />
     </Button>
   </Navbar>

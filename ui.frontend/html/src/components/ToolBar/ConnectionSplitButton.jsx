@@ -1,6 +1,4 @@
-import { Account } from 'Utils/propTypes'
 import { Dropdown, OverlayTrigger, SplitButton, Tooltip } from 'react-bootstrap'
-import { PropTypes as PM } from 'mobx-react'
 import { connectionStates } from '~/constants'
 import { Text } from 'react-localize'
 import { getJid, noop } from 'Utils'
@@ -8,25 +6,44 @@ import { getJid, noop } from 'Utils'
 import React from 'react'
 import images from '~/images'
 
-const ConnectionSplitButtonProps = {
-  accounts: PM.observableArrayOf(Account).isRequired
-}
+export const EmptyDropdownItem = () => (<Dropdown.Item disabled><Text message='message.noAccountConfigured' /></Dropdown.Item>)
+
+export const DropdownItem = ({ isActive, jid, doChangeActiveAccount }) => (
+  <Dropdown.Item active={isActive} key={jid} eventKey={jid} onClick={isActive ? noop : () => doChangeActiveAccount(jid)}>{jid}</Dropdown.Item>
+)
+
+export const DropdownItems = ({ accounts, activeAccount, doChangeActiveAccount }) => (
+  <div>
+    {accounts.length <= 0 &&
+      <EmptyDropdownItem />
+    }
+    {accounts.map(getJid).sort().map(jid => (
+      <DropdownItem isActive={getJid(activeAccount) == jid} jid={jid} key={jid} doChangeActiveAccount={doChangeActiveAccount} />
+    ))}
+  </div>
+)
 
 class ConnectionSplitButton extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
+    const onConnect = this.props.core.doConnect
+    const onDisconnect = this.props.core.doDisconnect
+
     this.connectionStateMap = {}
-    this.connectionStateMap[connectionStates.INITIALIZING] = { onClick: this.props.onConnect, messageId: 'action.connect', icon: images.accountDisconnectedIcon }
-    this.connectionStateMap[connectionStates.NOT_CONNECTED] = { onClick: this.props.onConnect, messageId: 'action.connect', icon: images.accountDisconnectedIcon }
-    this.connectionStateMap[connectionStates.CONNECTED] = { onClick: this.props.onDisconnect, messageId: 'action.disconnect', icon: images.accountConnectedIcon }
+    this.connectionStateMap[connectionStates.INITIALIZING] = { onClick: onConnect, messageId: 'action.connect', icon: images.accountDisconnectedIcon }
+    this.connectionStateMap[connectionStates.NOT_CONNECTED] = { onClick: onConnect, messageId: 'action.connect', icon: images.accountDisconnectedIcon }
+    this.connectionStateMap[connectionStates.CONNECTED] = { onClick: onDisconnect, messageId: 'action.disconnect', icon: images.accountConnectedIcon }
     this.connectionStateMap[connectionStates.ERROR] = { onClick: noop, messageId: 'action.connectionError', icon: images.accountConnectionErrorIcon }
     this.connectionStateMap[connectionStates.CONNECTING] = { onClick: noop, messageId: 'action.connecting', icon: images.accountConnectingIcon }
     this.connectionStateMap[connectionStates.DISCONNECTING] = { onClick: noop, messageId: 'action.disconnecting', icon: images.accountDisconnectingIcon }
   }
 
-  render () {
-    const { accounts, connectionState } = this.props
-    const { onClick, messageId, icon } = this.connectionStateMap[connectionState]
+
+  render() {
+    const { onClick, messageId, icon } = this.connectionStateMap[this.props.core.state.connectionState]
+    const accounts = this.props.core.accounts
+    const activeAccount = this.props.core.state.activeAccount
+    const doChangeActiveAccount = this.props.core.doChangeActiveAccount
 
     return (
       <OverlayTrigger placement='bottom' overlay={<Tooltip><Text message={messageId} /></Tooltip>}>
@@ -35,18 +52,12 @@ class ConnectionSplitButton extends React.Component {
           title={<img src={icon} />}
           onClick={onClick}>
 
-          {accounts.length <= 0 &&
-            <Dropdown.Item disabled><Text message='message.noAccountConfigured' /></Dropdown.Item>
-          }
-          {accounts.map(getJid).map(jid => (
-            <Dropdown.Item key={jid} eventKey={jid}>{jid}</Dropdown.Item>
-          ))}
+          <DropdownItems accounts={accounts} activeAccount={activeAccount} doChangeActiveAccount={doChangeActiveAccount} />
+
         </SplitButton>
       </OverlayTrigger>
     )
   }
 }
-
-ConnectionSplitButton.propTypes = ConnectionSplitButtonProps
 
 export default ConnectionSplitButton
