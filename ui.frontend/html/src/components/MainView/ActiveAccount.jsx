@@ -1,5 +1,6 @@
 import { Text } from 'react-localize'
 import React from 'react'
+import { getJid } from '../../utils';
 
 export default class ActiveAccount extends React.Component {
   render () {
@@ -8,7 +9,7 @@ export default class ActiveAccount extends React.Component {
     let className = 'activeAccount '
 
     if (activeAccount && activeAccount.username && activeAccount.domain) {
-      accountText = <span>{ activeAccount.username + '@' + activeAccount.domain }</span>
+      accountText = <span>{ getJid(activeAccount) }</span>
       className += 'bg-primary text-white'
     } else {
       accountText = <Text message='message.noAccount' />
