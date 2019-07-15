@@ -1,5 +1,7 @@
 package saros.intellij.ui.views.buttons;
 
+import com.intellij.openapi.ui.JBMenuItem;
+import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.util.ui.UIUtil;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
@@ -106,7 +108,10 @@ public class FollowButton extends ToolbarButton {
   }
 
   private void createMenu() {
-    popupMenu = new JPopupMenu();
+    popupMenu = new JBPopupMenu();
+
+    popupMenu.setForeground(FOREGROUND_COLOR);
+    popupMenu.setBackground(BACKGROUND_COLOR);
 
     menuItemPrefix = "Follow ";
 
@@ -124,7 +129,11 @@ public class FollowButton extends ToolbarButton {
 
     popupMenu.addSeparator();
 
-    JMenuItem leaveItem = new JMenuItem("Leave follow mode");
+    JMenuItem leaveItem = new JBMenuItem("Leave follow mode");
+
+    leaveItem.setForeground(FOREGROUND_COLOR);
+    leaveItem.setBackground(BACKGROUND_COLOR);
+
     leaveItem.addActionListener(e -> followModeAction.execute(null));
     leaveItem.setEnabled(currentFollowModeManager.getFollowedUser() != null);
 
@@ -139,7 +148,10 @@ public class FollowButton extends ToolbarButton {
       userNameShort = userNameShort.substring(0, index);
     }
 
-    JMenuItem menuItem = new JMenuItem(menuItemPrefix + userNameShort);
+    JMenuItem menuItem = new JBMenuItem(menuItemPrefix + userNameShort);
+
+    menuItem.setForeground(FOREGROUND_COLOR);
+    menuItem.setBackground(BACKGROUND_COLOR);
 
     FollowModeManager currentFollowModeManager = followModeManager;
 

@@ -1,6 +1,8 @@
 package saros.intellij.ui.views.buttons;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.JBMenuItem;
+import com.intellij.openapi.ui.JBPopupMenu;
 import java.util.Scanner;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -29,7 +31,7 @@ public class ConnectButton extends ToolbarButton {
   private static final boolean ENABLE_CONFIGURE_ACCOUNTS =
       Boolean.getBoolean("saros.intellij.ENABLE_CONFIGURE_ACCOUNTS");
 
-  private JPopupMenu popupMenu = new JPopupMenu();
+  private final JPopupMenu popupMenu;
   private JMenuItem menuItemAdd;
   private JMenuItem configure;
   private JMenuItem disconnect;
@@ -50,6 +52,11 @@ public class ConnectButton extends ToolbarButton {
 
     disconnectAction = new DisconnectServerAction(project);
     connectAction = new ConnectServerAction(project);
+
+    popupMenu = new JBPopupMenu();
+
+    popupMenu.setForeground(FOREGROUND_COLOR);
+    popupMenu.setBackground(BACKGROUND_COLOR);
 
     configureAccounts = new NotImplementedAction("configure accounts");
 
@@ -99,24 +106,40 @@ public class ConnectButton extends ToolbarButton {
   }
 
   private JMenuItem createMenuItemForUser(final String userName) {
-    JMenuItem accountItem = new JMenuItem(userName);
+    JMenuItem accountItem = new JBMenuItem(userName);
+
+    accountItem.setForeground(FOREGROUND_COLOR);
+    accountItem.setBackground(BACKGROUND_COLOR);
+
     accountItem.addActionListener(actionEvent -> connectAction.executeWithUser(userName));
 
     return accountItem;
   }
 
   private void createDisconnectMenuItem() {
-    disconnect = new JMenuItem("Disconnect server");
+    disconnect = new JBMenuItem("Disconnect server");
+
+    disconnect.setForeground(FOREGROUND_COLOR);
+    disconnect.setBackground(BACKGROUND_COLOR);
+
     disconnect.addActionListener(actionEvent -> disconnectAction.execute());
   }
 
   private void createConfigureAccountMenuItem() {
-    configure = new JMenuItem("Configure accounts...");
+    configure = new JBMenuItem("Configure accounts...");
+
+    configure.setForeground(FOREGROUND_COLOR);
+    configure.setBackground(BACKGROUND_COLOR);
+
     configure.addActionListener(actionEvent -> configureAccounts.execute());
   }
 
   private void createAddAccountMenuItem() {
-    menuItemAdd = new JMenuItem("Add account...");
+    menuItemAdd = new JBMenuItem("Add account...");
+
+    menuItemAdd.setForeground(FOREGROUND_COLOR);
+    menuItemAdd.setBackground(BACKGROUND_COLOR);
+
     menuItemAdd.addActionListener(
         actionEvent -> {
           XMPPAccount account = createNewAccount();
