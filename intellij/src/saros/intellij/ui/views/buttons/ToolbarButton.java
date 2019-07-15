@@ -19,6 +19,8 @@ abstract class ToolbarButton extends JButton {
     setActionCommand(actionCommand);
     setButtonIcon(icon);
     setToolTipText(tooltipText);
+
+    setBorder(BorderFactory.createLineBorder(JBColor.border(), 1, true));
   }
 
   /** calls {@link #setEnabled(boolean)} from the UI thread. */
