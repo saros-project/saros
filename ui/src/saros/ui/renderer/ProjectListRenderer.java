@@ -1,13 +1,13 @@
 /** */
 package saros.ui.renderer;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import saros.HTMLUIContextFactory;
 import saros.HTMLUIStrings;
 import saros.filesystem.IWorkspaceRoot;
 import saros.ui.JavaScriptAPI;
+import saros.ui.browser.IBrowser;
 import saros.ui.manager.ProjectListManager;
 import saros.ui.model.ProjectTree;
 
@@ -36,7 +36,7 @@ public class ProjectListRenderer extends Renderer {
   }
 
   @Override
-  public synchronized void render(IJQueryBrowser browser) {
+  public synchronized void render(IBrowser browser) {
     // The project model creation shouldn't be done for every browser, only
     // the `SarosApi.trigger('updateProjectTrees', json)` needs to be called
     // for each page this renderer is associated with.

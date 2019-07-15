@@ -14,7 +14,6 @@ buildscript {
 dependencies {
   compile project(':saros.core')
 
-  releaseDep files('libs/swt-browser-improved.jar')
   releaseDep 'com.google.code.gson:gson:2.3'
   compile "org.eclipse.swt:org.eclipse.swt.${com.diffplug.common.swt.os.SwtPlatform.getNative()}:4.6"
 

@@ -1,8 +1,8 @@
 package saros.stf.server.rmi.htmlbot.widget.impl;
 
-import de.fu_berlin.inf.ag_se.browser.html.ISelector.Selector;
 import java.rmi.RemoteException;
 import saros.stf.server.HTMLSTFRemoteObject;
+import saros.stf.server.bot.jquery.ISelector.Selector;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLTree;
 
 public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements IRemoteHTMLTree {
@@ -33,7 +33,7 @@ public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements IRemote
   public boolean isChecked(String title) throws RemoteException {
     Selector nodeSelector = new Selector("span[title=\"" + title + "\"]");
     Object checked =
-        browser.syncRun(
+        browser.evaluate(
             String.format(
                 "return %s.prev().hasClass('rc-tree-checkbox-checked')",
                 nodeSelector.getStatement()));

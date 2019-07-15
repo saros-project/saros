@@ -14,11 +14,11 @@ public final class RemoteHTMLButton extends HTMLSTFRemoteObject implements IRemo
 
   @Override
   public void click() throws RemoteException {
-    browser.run(String.format("%s[0].click();", selector.getStatement()));
+    browser.execute(String.format("%s[0].click();", selector.getStatement()));
   }
 
   @Override
   public String text() throws RemoteException {
-    return (String) browser.syncRun("return " + selector.getStatement() + ".text();");
+    return (String) browser.evaluate("return " + selector.getStatement() + ".text();");
   }
 }
