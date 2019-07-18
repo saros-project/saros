@@ -134,7 +134,7 @@ public class FollowButton extends AbstractToolbarButton {
     leaveItem.setForeground(FOREGROUND_COLOR);
     leaveItem.setBackground(BACKGROUND_COLOR);
 
-    leaveItem.addActionListener(e -> followModeAction.execute(null));
+    leaveItem.addActionListener(e -> followModeAction.execute(session, followModeManager, null));
     leaveItem.setEnabled(currentFollowModeManager.getFollowedUser() != null);
 
     popupMenu.add(leaveItem);
@@ -169,7 +169,9 @@ public class FollowButton extends AbstractToolbarButton {
     }
 
     menuItem.setActionCommand(userName);
-    menuItem.addActionListener(e -> followModeAction.execute(e.getActionCommand()));
+    menuItem.addActionListener(
+        e -> followModeAction.execute(session, followModeManager, e.getActionCommand()));
+
     return menuItem;
   }
 
