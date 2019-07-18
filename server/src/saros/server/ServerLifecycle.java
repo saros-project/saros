@@ -55,7 +55,7 @@ public class ServerLifecycle extends AbstractContextLifecycle {
       log.fatal(
           "XMPP credentials are missing! Pass the "
               + "system properties saros.server.jid and"
-              + "de.fu_berln.inf.dpp.server.password to the server");
+              + "saros.server.password to the server");
       stop();
       System.exit(1);
     }
