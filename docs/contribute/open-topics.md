@@ -4,10 +4,10 @@ title: Open Topics
 
 Here you can find:
 * information about topics which are started, but not completed
-* ideas and implementations which are never integrated into the main branch, but might be interesting.
+* ideas and implementations which were never integrated into the main branch, but might be interesting.
 
 Therefore this page can be used for finding open and interesting topics which can be continued.
-Please, let us know (e.g. via Gitter) before you continue a topic so we can share our thoughts and experiences.
+Please, let us know (e.g. via our [Gitter](https://gitter.im/saros-project/saros) or [mailing list](https://groups.google.com/forum/#!forum/saros-devel)) before you continue a topic so we can share our thoughts and experiences.
 
 ## GIT support
 Corresponding Pull Requests:
