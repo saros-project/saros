@@ -16,12 +16,15 @@ public class Messages {
   public static String AddProjectToSessionWizard_module_creation_failed_message_condition;
   public static String AddProjectToSessionWizard_module_already_exists_title;
   public static String AddProjectToSessionWizard_module_already_exists_message_condition;
-  public static String AddProjectToSessionWizard_module_not_found_title;
-  public static String AddProjectToSessionWizard_module_not_found_message_condition;
   public static String AddProjectToSessionWizard_invalid_module_title;
   public static String AddProjectToSessionWizard_invalid_module_message_condition;
   public static String AddProjectToSessionWizard_error_creating_module_object_title;
   public static String AddProjectToSessionWizard_error_creating_module_object_message;
+  public static String AddProjectToSessionWizard_error_reading_module_selection_result_title;
+  public static String AddProjectToSessionWizard_error_reading_module_selection_result_message;
+  public static String AddProjectToSessionWizard_title2;
+  public static String AddProjectToSessionWizard_description;
+  public static String AddProjectToSessionWizard_description_changed_files;
 
   public static String CollaborationUtils_confirm_closing;
   public static String CollaborationUtils_confirm_closing_text;
@@ -53,13 +56,6 @@ public class Messages {
   public static String NegotiationHandler_sharing_project;
   public static String NegotiationHandler_sharing_project_canceled_remotely;
   public static String NegotiationHandler_sharing_project_canceled_remotely_text;
-
-  public static String EnterProjectNamePage_create_new_project;
-  public static String EnterProjectNamePage_project_name;
-  public static String EnterProjectNamePage_title2;
-  public static String EnterProjectNamePage_description;
-  public static String EnterProjectNamePage_description_changed_files;
-  public static String EnterProjectNamePage_use_existing_project;
 
   public static String ShowDescriptionPage_description;
   public static String ShowDescriptionPage_title2;
@@ -130,6 +126,18 @@ public class Messages {
   public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_CLOSED_EDITOR;
   public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_STOPPED;
   public static String FollowModeNotificationDispatcher_end_reason_FOLLOWER_SWITCHES_FOLLOWEE;
+
+  public static String ModuleTab_project_label;
+  public static String ModuleTab_create_new_module;
+  public static String ModuleTab_create_new_module_name;
+  public static String ModuleTab_create_new_module_base_path;
+  public static String ModuleTab_module_base_path_file_chooser_title;
+  public static String ModuleTab_module_base_path_file_chooser_description;
+  public static String ModuleTab_use_existing_module;
+  public static String ModuleTab_use_existing_module_local_module;
+  public static String ModuleTab_create_new_module_name_invalid_tooltip;
+  public static String ModuleTab_create_new_module_base_path_invalid_tooltip;
+  public static String ModuleTab_use_existing_module_local_module_invalid_tooltip;
 
   private Messages() {}
 }

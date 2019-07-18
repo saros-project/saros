@@ -1,5 +1,7 @@
 package saros.intellij.editor;
 
+import saros.intellij.context.SharedIDEContext;
+
 /**
  * Factory class that can be used to create and obtain snapshots of the current selected editor
  * state.
@@ -8,11 +10,12 @@ package saros.intellij.editor;
  */
 public class SelectedEditorStateSnapshotFactory {
 
-  private final ProjectAPI projectAPI;
+  private final SharedIDEContext sharedIDEContext;
   private final EditorManager editorManager;
 
-  public SelectedEditorStateSnapshotFactory(ProjectAPI projectAPI, EditorManager editorManager) {
-    this.projectAPI = projectAPI;
+  public SelectedEditorStateSnapshotFactory(
+      SharedIDEContext sharedIDEContext, EditorManager editorManager) {
+    this.sharedIDEContext = sharedIDEContext;
     this.editorManager = editorManager;
   }
 
@@ -23,6 +26,6 @@ public class SelectedEditorStateSnapshotFactory {
    * @see SelectedEditorStateSnapshot
    */
   public SelectedEditorStateSnapshot capturedState() {
-    return new SelectedEditorStateSnapshot(projectAPI, editorManager);
+    return new SelectedEditorStateSnapshot(sharedIDEContext, editorManager);
   }
 }

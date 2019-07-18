@@ -3,6 +3,7 @@ package saros.intellij.eventhandler.editor.document;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -19,10 +20,10 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
   private static final Logger LOG =
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
 
+  protected final Project project;
   protected final EditorManager editorManager;
 
   private final ISarosSession sarosSession;
-  private final VirtualFileConverter virtualFileConverter;
 
   private boolean enabled;
   private boolean disposed;
@@ -32,17 +33,17 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
    * false as the document listener is only registered to the local IntelliJ instance when {@link
    * #setEnabled(boolean)} is called with <code>true</code>.
    *
+   * @param project the shared project the handler is registered to
    * @param editorManager the EditorManager instance
+   * @param sarosSession the current session instance
    */
   AbstractLocalDocumentModificationHandler(
-      EditorManager editorManager,
-      ISarosSession sarosSession,
-      VirtualFileConverter virtualFileConverter) {
+      Project project, EditorManager editorManager, ISarosSession sarosSession) {
 
+    this.project = project;
     this.editorManager = editorManager;
 
     this.sarosSession = sarosSession;
-    this.virtualFileConverter = virtualFileConverter;
 
     this.enabled = false;
     this.disposed = false;
@@ -104,7 +105,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
    * @return the SPath for the given document or <code>null</code> if no VirtualFile for the
    *     document could be found, the found VirtualFile could not be converted to an SPath or the
    *     resources represented by the given document is not shared
-   * @see VirtualFileConverter#convertToSPath(VirtualFile)
+   * @see VirtualFileConverter#convertToSPath(Project,VirtualFile)
    */
   final SPath getSPath(@NotNull Document document) {
     SPath path = editorManager.getFileForOpenEditor(document);
@@ -127,7 +128,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
       return null;
     }
 
-    path = virtualFileConverter.convertToSPath(virtualFile);
+    path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
     if (path == null || !sarosSession.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {

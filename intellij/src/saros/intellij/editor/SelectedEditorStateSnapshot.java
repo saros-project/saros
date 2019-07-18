@@ -1,5 +1,6 @@
 package saros.intellij.editor;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +9,7 @@ import java.util.ListIterator;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.filesystem.IFile;
+import saros.intellij.context.SharedIDEContext;
 import saros.intellij.filesystem.VirtualFileConverter;
 
 /** Class used to capture and re-apply which editors are currently selected by the user. */
@@ -17,17 +19,17 @@ public class SelectedEditorStateSnapshot {
 
   private final List<VirtualFile> selectedEditors;
 
-  private final ProjectAPI projectAPI;
+  private final SharedIDEContext sharedIDEContext;
   private final EditorManager editorManager;
 
   /**
    * Initializes the object and captures the current selected editor state.
    *
-   * @param projectAPI the ProjectAPI object
+   * @param sharedIDEContext the IDE context of the session
    * @param editorManager the EditorManager object
    */
-  SelectedEditorStateSnapshot(ProjectAPI projectAPI, EditorManager editorManager) {
-    this.projectAPI = projectAPI;
+  SelectedEditorStateSnapshot(SharedIDEContext sharedIDEContext, EditorManager editorManager) {
+    this.sharedIDEContext = sharedIDEContext;
     this.editorManager = editorManager;
 
     this.selectedEditors = new ArrayList<>();
@@ -37,19 +39,23 @@ public class SelectedEditorStateSnapshot {
 
   /** Captures the local selected editor state. */
   private void captureState() {
-    selectedEditors.addAll(Arrays.asList(projectAPI.getSelectedFiles()));
+    Project project = sharedIDEContext.getProject();
+
+    selectedEditors.addAll(Arrays.asList(ProjectAPI.getSelectedFiles(project)));
   }
 
   /** Applies the captured selected editor state to the local IDE. */
   public void applyHeldState() {
     ListIterator<VirtualFile> iterator = selectedEditors.listIterator(selectedEditors.size());
 
+    Project project = sharedIDEContext.getProject();
+
     try {
       editorManager.setLocalEditorStatusChangeHandlersEnabled(false);
       editorManager.setLocalViewPortChangeHandlersEnabled(false);
 
       while (iterator.hasPrevious()) {
-        projectAPI.openEditor(iterator.previous(), true);
+        ProjectAPI.openEditor(project, iterator.previous(), true);
       }
 
     } finally {
