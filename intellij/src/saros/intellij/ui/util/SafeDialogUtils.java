@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.TextRange;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import saros.SarosPluginContext;
@@ -45,6 +46,7 @@ public class SafeDialogUtils {
    * @param message the text displayed as the message of the dialog
    * @param initialValue the initial value contained in the text field of the input dialog
    * @param title the text displayed as the title of the dialog
+   * @param selection the input range that is selected by default
    * @return the <code>String</code> entered by the user or <code>null</code> if the dialog did not
    *     finish with the exit code 0 (it was not closed by pressing the "OK" button)
    * @throws IllegalAWTContextException if the calling thread is currently inside a write safe
@@ -53,7 +55,11 @@ public class SafeDialogUtils {
    * @see com.intellij.openapi.ui.DialogWrapper#OK_EXIT_CODE
    */
   public static String showInputDialog(
-      Project project, final String message, final String initialValue, final String title)
+      Project project,
+      final String message,
+      final String initialValue,
+      final String title,
+      TextRange selection)
       throws IllegalAWTContextException {
 
     if (application.isWriteAccessAllowed()) {
@@ -68,7 +74,13 @@ public class SafeDialogUtils {
         () -> {
           String option =
               Messages.showInputDialog(
-                  project, message, title, Messages.getQuestionIcon(), initialValue, null);
+                  project,
+                  message,
+                  title,
+                  Messages.getQuestionIcon(),
+                  initialValue,
+                  null,
+                  selection);
           if (option != null) {
             response.set(option);
           }
@@ -76,6 +88,19 @@ public class SafeDialogUtils {
         ModalityState.defaultModalityState());
 
     return response.get();
+  }
+
+  /**
+   * Calls {@link #showInputDialog(Project, String, String, String, TextRange)} with <code>
+   * TextRange=null</code>.
+   *
+   * @see #showInputDialog(Project, String, String, String, TextRange)
+   */
+  public static String showInputDialog(
+      Project project, final String message, final String initialValue, final String title)
+      throws IllegalAWTContextException {
+
+    return showInputDialog(project, message, initialValue, title, null);
   }
 
   /**
