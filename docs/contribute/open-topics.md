@@ -3,7 +3,7 @@ title: Open Topics
 ---
 
 Here you can find:
-* information about topics which are started, but not completed
+* information about topics which were started, but not completed
 * ideas and implementations which were never integrated into the main branch, but might be interesting.
 
 Therefore this page can be used for finding open and interesting topics which can be continued.
