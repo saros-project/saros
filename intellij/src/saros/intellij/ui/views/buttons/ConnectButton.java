@@ -3,6 +3,7 @@ package saros.intellij.ui.views.buttons;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
+import java.text.MessageFormat;
 import java.util.Scanner;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -45,7 +46,7 @@ public class ConnectButton extends AbstractToolbarButton {
   @Inject private XMPPAccountStore accountStore;
 
   public ConnectButton(@NotNull Project project) {
-    super(ConnectServerAction.NAME, "Connect", IconManager.CONNECT_ICON);
+    super(ConnectServerAction.NAME, Messages.ConnectButton_tooltip, IconManager.CONNECT_ICON);
     SarosPluginContext.initComponent(this);
 
     this.project = project;
@@ -117,7 +118,7 @@ public class ConnectButton extends AbstractToolbarButton {
   }
 
   private void createDisconnectMenuItem() {
-    disconnect = new JBMenuItem("Disconnect server");
+    disconnect = new JBMenuItem(Messages.ConnectButton_disconnect);
 
     disconnect.setForeground(FOREGROUND_COLOR);
     disconnect.setBackground(BACKGROUND_COLOR);
@@ -126,7 +127,7 @@ public class ConnectButton extends AbstractToolbarButton {
   }
 
   private void createConfigureAccountMenuItem() {
-    configure = new JBMenuItem("Configure accounts...");
+    configure = new JBMenuItem(Messages.ConnectButton_configure_accounts);
 
     configure.setForeground(FOREGROUND_COLOR);
     configure.setBackground(BACKGROUND_COLOR);
@@ -135,7 +136,7 @@ public class ConnectButton extends AbstractToolbarButton {
   }
 
   private void createAddAccountMenuItem() {
-    menuItemAdd = new JBMenuItem("Add account...");
+    menuItemAdd = new JBMenuItem(Messages.ConnectButton_add_account);
 
     menuItemAdd.setForeground(FOREGROUND_COLOR);
     menuItemAdd.setBackground(BACKGROUND_COLOR);
@@ -170,10 +171,7 @@ public class ConnectButton extends AbstractToolbarButton {
     } catch (IllegalAWTContextException e) {
       LOG.error("Account creation failed.", e);
 
-      SafeDialogUtils.showError(
-          project,
-          "There was an error creating the account.\nDetails: " + e.getMessage(),
-          "Account creation failed");
+      showAccountCreationFailedError(e);
     }
   }
 
@@ -189,21 +187,21 @@ public class ConnectButton extends AbstractToolbarButton {
     try {
       userID =
           SafeDialogUtils.showInputDialog(
-              project, "Your User-ID, e.g. user@saros-con.imp.fu-berlin.de", "", "Login");
+              project,
+              Messages.ConnectButton_account_creation_jid_message,
+              Messages.ConnectButton_account_creation_jid_initial_input,
+              Messages.ConnectButton_account_creation_jid_title);
 
     } catch (IllegalAWTContextException e) {
       LOG.error("Account creation failed.", e);
 
-      SafeDialogUtils.showError(
-          project,
-          "There was an error creating the account.\nDetails: " + e.getMessage(),
-          "Account creation failed");
+      showAccountCreationFailedError(e);
 
       return null;
     }
 
     if (userID == null) {
-      LOG.debug("Account creation canceled by user during user id" + " entry.");
+      LOG.debug("Account creation canceled by user during user id entry.");
 
       return null;
     }
@@ -212,9 +210,11 @@ public class ConnectButton extends AbstractToolbarButton {
 
     if (!jid.isValid() || jid.getName().isEmpty()) {
       SafeDialogUtils.showError(
-          project, "Entered user id is not valid.", "Account creation aborted");
+          project,
+          Messages.ConnectButton_account_creation_invalid_jid_message,
+          Messages.ConnectButton_account_creation_invalid_jid_title);
 
-      LOG.debug("Account creation failed as the user did not provide a " + "valid user id.");
+      LOG.debug("Account creation failed as the user did not provide a valid user id.");
 
       return null;
     }
@@ -225,28 +225,32 @@ public class ConnectButton extends AbstractToolbarButton {
     final String password;
 
     try {
-      password = SafeDialogUtils.showPasswordDialog(project, "Password", "Password");
+      password =
+          SafeDialogUtils.showPasswordDialog(
+              project,
+              Messages.ConnectButton_account_creation_password_message,
+              Messages.ConnectButton_account_creation_password_title);
 
     } catch (IllegalAWTContextException e) {
       LOG.error("Account creation failed.", e);
 
-      SafeDialogUtils.showError(
-          project,
-          "There was an error creating the account.\nDetails: " + e.getMessage(),
-          "Account creation failed");
+      showAccountCreationFailedError(e);
 
       return null;
     }
 
     if (password == null) {
-      LOG.debug("Account creation canceled by user during password" + " entry.");
+      LOG.debug("Account creation canceled by user during password entry.");
 
       return null;
 
     } else if (password.isEmpty()) {
-      SafeDialogUtils.showError(project, "No password entered.", "Account creation aborted");
+      SafeDialogUtils.showError(
+          project,
+          Messages.ConnectButton_account_creation_invalid_password_message,
+          Messages.ConnectButton_account_creation_invalid_password_title);
 
-      LOG.debug("Account creation failed as the user did not provide a " + "valid password.");
+      LOG.debug("Account creation failed as the user did not provide a valid password.");
 
       return null;
     }
@@ -258,15 +262,15 @@ public class ConnectButton extends AbstractToolbarButton {
     try {
       server =
           SafeDialogUtils.showInputDialog(
-              project, "XMPP server (optional, not necessary in most cases)", "", "Server");
+              project,
+              Messages.ConnectButton_account_creation_xmpp_server_message,
+              Messages.ConnectButton_account_creation_xmpp_server_initial_input,
+              Messages.ConnectButton_account_creation_xmpp_server_title);
 
     } catch (IllegalAWTContextException e) {
       LOG.error("Account creation failed.", e);
 
-      SafeDialogUtils.showError(
-          project,
-          "There was an error creating the account.\nDetails: " + e.getMessage(),
-          "Account creation failed");
+      showAccountCreationFailedError(e);
 
       return null;
     }
@@ -281,21 +285,22 @@ public class ConnectButton extends AbstractToolbarButton {
 
       try {
         portUserEntry =
-            SafeDialogUtils.showInputDialog(project, "XMPP server port", "", "Server port");
+            SafeDialogUtils.showInputDialog(
+                project,
+                Messages.ConnectButton_account_creation_xmpp_server_port_title,
+                Messages.ConnectButton_account_creation_xmpp_server_port_initial_input,
+                Messages.ConnectButton_account_creation_xmpp_server_port_message);
 
       } catch (IllegalAWTContextException e) {
         LOG.error("Account creation failed.", e);
 
-        SafeDialogUtils.showError(
-            project,
-            "There was an error creating the account.\nDetails: " + e.getMessage(),
-            "Account creation failed");
+        showAccountCreationFailedError(e);
 
         return null;
       }
 
       if (portUserEntry == null) {
-        LOG.debug("Account creation canceled by user during server " + "port entry.");
+        LOG.debug("Account creation canceled by user during server port entry.");
 
         return null;
       }
@@ -311,9 +316,11 @@ public class ConnectButton extends AbstractToolbarButton {
         scanner.close();
 
         SafeDialogUtils.showError(
-            project, "No valid server port " + "entered.", "Account creation aborted");
+            project,
+            Messages.ConnectButton_account_creation_xmpp_server_invalid_port_message,
+            Messages.ConnectButton_account_creation_xmpp_server_invalid_port_title);
 
-        LOG.debug("Account creation failed as the user did not " + "provide a valid server port.");
+        LOG.debug("Account creation failed as the user did not provide a valid server port.");
 
         return null;
       }
@@ -325,12 +332,23 @@ public class ConnectButton extends AbstractToolbarButton {
     } catch (IllegalArgumentException e) {
       LOG.error("Account creation failed", e);
 
-      SafeDialogUtils.showError(
-          project,
-          "There was an error creating the account.\nDetails: " + e.getMessage(),
-          "Account creation failed");
+      showAccountCreationFailedError(e);
 
       return null;
     }
+  }
+
+  /**
+   * Displays an error notification to the user stating that the account creation failed and
+   * displaying the message of the given exception.
+   *
+   * @param e the exception whose message to display
+   */
+  private void showAccountCreationFailedError(Exception e) {
+    SafeDialogUtils.showError(
+        project,
+        MessageFormat.format(
+            Messages.ConnectButton_account_creation_failed_message, e.getMessage()),
+        Messages.ConnectButton_account_creation_failed_title);
   }
 }

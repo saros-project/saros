@@ -8,6 +8,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import saros.editor.FollowModeManager;
 import saros.editor.IFollowModeListener;
+import saros.intellij.ui.Messages;
 import saros.intellij.ui.actions.FollowModeAction;
 import saros.intellij.ui.util.IconManager;
 import saros.session.ISarosSession;
@@ -58,7 +59,7 @@ public class FollowButton extends AbstractSessionToolbarButton {
    * <p>The FollowButton is created as disabled.
    */
   public FollowButton() {
-    super(FollowModeAction.NAME, "Follow", IconManager.FOLLOW_ICON);
+    super(FollowModeAction.NAME, Messages.FollowButton_tooltip, IconManager.FOLLOW_ICON);
 
     followModeAction = new FollowModeAction();
 
@@ -102,7 +103,7 @@ public class FollowButton extends AbstractSessionToolbarButton {
     popupMenu.setForeground(FOREGROUND_COLOR);
     popupMenu.setBackground(BACKGROUND_COLOR);
 
-    menuItemPrefix = "Follow ";
+    menuItemPrefix = Messages.FollowButton_user_entry_prefix;
 
     ISarosSession currentSession = session;
     FollowModeManager currentFollowModeManager = followModeManager;
@@ -118,7 +119,7 @@ public class FollowButton extends AbstractSessionToolbarButton {
 
     popupMenu.addSeparator();
 
-    JMenuItem leaveItem = new JBMenuItem("Leave follow mode");
+    JMenuItem leaveItem = new JBMenuItem(Messages.FollowButton_leave_follow_mode_entry);
 
     leaveItem.setForeground(FOREGROUND_COLOR);
     leaveItem.setBackground(BACKGROUND_COLOR);
@@ -137,7 +138,7 @@ public class FollowButton extends AbstractSessionToolbarButton {
       userNameShort = userNameShort.substring(0, index);
     }
 
-    JMenuItem menuItem = new JBMenuItem(menuItemPrefix + userNameShort);
+    JMenuItem menuItem = new JBMenuItem(menuItemPrefix + " " + userNameShort);
 
     menuItem.setForeground(FOREGROUND_COLOR);
     menuItem.setBackground(BACKGROUND_COLOR);
