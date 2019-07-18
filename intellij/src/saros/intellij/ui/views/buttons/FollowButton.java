@@ -6,22 +6,18 @@ import com.intellij.util.ui.UIUtil;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import saros.SarosPluginContext;
 import saros.editor.FollowModeManager;
 import saros.editor.IFollowModeListener;
 import saros.intellij.ui.actions.FollowModeAction;
 import saros.intellij.ui.util.IconManager;
-import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
-import saros.session.ISarosSessionManager;
-import saros.session.ISessionLifecycleListener;
 import saros.session.ISessionListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
 import saros.ui.util.ModelFormatUtils;
 
 /** Button to follow a user. Displays a PopupMenu containing all session users to choose from. */
-public class FollowButton extends AbstractToolbarButton {
+public class FollowButton extends AbstractSessionToolbarButton {
   private JPopupMenu popupMenu;
   private final FollowModeAction followModeAction;
 
@@ -51,37 +47,7 @@ public class FollowButton extends AbstractToolbarButton {
         }
       };
 
-  @SuppressWarnings("FieldCanBeLocal")
-  private final ISessionLifecycleListener sessionLifecycleListener =
-      new ISessionLifecycleListener() {
-        @Override
-        public void sessionStarted(final ISarosSession session) {
-          FollowButton.this.session = session;
-          FollowButton.this.session.addListener(sessionListener);
-
-          followModeManager = session.getComponent(FollowModeManager.class);
-          followModeManager.addListener(followModeListener);
-
-          updateMenu();
-          setEnabledFromUIThread(true);
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
-          FollowButton.this.session.removeListener(sessionListener);
-          FollowButton.this.session = null;
-
-          followModeManager.removeListener(followModeListener);
-          followModeManager = null;
-
-          updateMenu();
-          setEnabledFromUIThread(false);
-        }
-      };
-
   private String menuItemPrefix;
-
-  @Inject private ISarosSessionManager sessionManager;
 
   private volatile ISarosSession session;
   private volatile FollowModeManager followModeManager;
@@ -93,11 +59,8 @@ public class FollowButton extends AbstractToolbarButton {
    */
   public FollowButton() {
     super(FollowModeAction.NAME, "Follow", IconManager.FOLLOW_ICON);
-    SarosPluginContext.initComponent(this);
 
     followModeAction = new FollowModeAction();
-
-    sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 
     createMenu();
     setEnabled(false);
@@ -105,6 +68,32 @@ public class FollowButton extends AbstractToolbarButton {
     final JButton button = this;
     addActionListener(
         ev -> popupMenu.show(button, 0, button.getBounds().y + button.getBounds().height));
+
+    setInitialState();
+  }
+
+  @Override
+  void sessionStarted(final ISarosSession session) {
+    FollowButton.this.session = session;
+    FollowButton.this.session.addListener(sessionListener);
+
+    followModeManager = session.getComponent(FollowModeManager.class);
+    followModeManager.addListener(followModeListener);
+
+    updateMenu();
+    setEnabledFromUIThread(true);
+  }
+
+  @Override
+  void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
+    FollowButton.this.session.removeListener(sessionListener);
+    FollowButton.this.session = null;
+
+    followModeManager.removeListener(followModeListener);
+    followModeManager = null;
+
+    updateMenu();
+    setEnabledFromUIThread(false);
   }
 
   private void createMenu() {
