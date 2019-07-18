@@ -3,6 +3,7 @@ package saros.intellij.ui.views.buttons;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
+import com.intellij.openapi.util.TextRange;
 import java.text.MessageFormat;
 import java.util.Scanner;
 import javax.swing.JMenuItem;
@@ -190,7 +191,8 @@ public class ConnectButton extends AbstractToolbarButton {
               project,
               Messages.ConnectButton_account_creation_jid_message,
               Messages.ConnectButton_account_creation_jid_initial_input,
-              Messages.ConnectButton_account_creation_jid_title);
+              Messages.ConnectButton_account_creation_jid_title,
+              new TextRange(0, 0));
 
     } catch (IllegalAWTContextException e) {
       LOG.error("Account creation failed.", e);
