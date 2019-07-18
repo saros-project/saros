@@ -14,7 +14,8 @@ public final class RemoteHTMLCheckbox extends HTMLSTFRemoteObject implements IRe
 
   @Override
   public boolean isChecked() throws RemoteException {
-    return (Boolean) jQueryHelper.getFieldValue(selector);
+    Boolean checked = (Boolean) jQueryHelper.getFieldValue(selector);
+    return checked != null && checked;
   }
 
   @Override

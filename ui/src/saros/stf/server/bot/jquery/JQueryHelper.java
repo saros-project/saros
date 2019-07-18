@@ -82,8 +82,10 @@ public class JQueryHelper {
    * @return <code>true</code> if the element defined by the selector exists
    */
   public boolean selectionExists(ISelector selector) {
-    return (Boolean)
-        this.browser.syncRun(String.format("return %s.length > 0;", selector.getStatement()));
+    Boolean result =
+        (Boolean)
+            this.browser.syncRun(String.format("return %s.length > 0;", selector.getStatement()));
+    return result != null && result;
   }
 
   /**

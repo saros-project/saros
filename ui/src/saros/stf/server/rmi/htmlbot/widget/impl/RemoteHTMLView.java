@@ -6,7 +6,6 @@ import de.fu_berlin.inf.ag_se.browser.html.ISelector.IdSelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.Selector;
 import java.rmi.RemoteException;
-import org.apache.log4j.Logger;
 import saros.stf.server.HTMLSTFRemoteObject;
 import saros.stf.server.bot.jquery.JQueryHelper;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLButton;
@@ -24,7 +23,6 @@ import saros.ui.View;
 public class RemoteHTMLView extends HTMLSTFRemoteObject implements IRemoteHTMLView {
 
   private static final RemoteHTMLView INSTANCE = new RemoteHTMLView();
-  private static final Logger log = Logger.getLogger(RemoteHTMLView.class);
 
   public static RemoteHTMLView getInstance() {
     return INSTANCE;
