@@ -221,9 +221,9 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
     StringBuilder sbInconsistentFiles = new StringBuilder();
 
     for (SPath path : paths) {
-      sbInconsistentFiles.append("module: ");
-      sbInconsistentFiles.append(path.getProject().getName());
-      sbInconsistentFiles.append(", file: ");
+      sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_module).append(": ");
+      sbInconsistentFiles.append(path.getProject().getName()).append(", ");
+      sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_file).append(": ");
       sbInconsistentFiles.append(path.getProjectRelativePath().toOSString());
       sbInconsistentFiles.append("\n");
     }
