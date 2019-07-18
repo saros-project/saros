@@ -74,14 +74,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
       new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession newSarosSession) {
-          UIUtil.invokeLaterIfNeeded(
-              new Runnable() {
-                @Override
-                public void run() {
-                  newSarosSession.addListener(sessionListener);
-                  createSessionNode(newSarosSession);
-                }
-              });
+          SessionTreeRootNode.this.sessionStarted(newSarosSession);
         }
 
         @Override
@@ -106,6 +99,22 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
     setUserObject(TREE_TITLE_NO_SESSIONS);
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+  }
+
+  void setInitialState() {
+    ISarosSession session = sessionManager.getSession();
+
+    if (session != null) {
+      sessionStarted(session);
+    }
+  }
+
+  private void sessionStarted(final ISarosSession newSarosSession) {
+    UIUtil.invokeLaterIfNeeded(
+        () -> {
+          newSarosSession.addListener(sessionListener);
+          createSessionNode(newSarosSession);
+        });
   }
 
   private void createSessionNode(ISarosSession newSarosSession) {
