@@ -21,7 +21,7 @@ import saros.session.User;
 import saros.ui.util.ModelFormatUtils;
 
 /** Button to follow a user. Displays a PopupMenu containing all session users to choose from. */
-public class FollowButton extends ToolbarButton {
+public class FollowButton extends AbstractToolbarButton {
   private JPopupMenu popupMenu;
   private final FollowModeAction followModeAction;
 

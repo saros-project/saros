@@ -23,7 +23,7 @@ import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Implementation of connect XMPP/jabber server button */
-public class ConnectButton extends ToolbarButton {
+public class ConnectButton extends AbstractToolbarButton {
   private static final Logger LOG = Logger.getLogger(ConnectButton.class);
 
   private static final String USER_ID_SEPARATOR = "@";

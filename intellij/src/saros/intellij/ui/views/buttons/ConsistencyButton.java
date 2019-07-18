@@ -32,7 +32,7 @@ import saros.session.SessionEndReason;
  *
  * <p>FIXME: Remove awkward session handling together with UI components created with session.
  */
-public class ConsistencyButton extends ToolbarButton {
+public class ConsistencyButton extends AbstractToolbarButton {
   private static final Logger LOG = Logger.getLogger(ConsistencyButton.class);
 
   private boolean previouslyInConsistentState = true;
