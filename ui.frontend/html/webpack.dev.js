@@ -50,7 +50,7 @@ module.exports = {
     createPage(views.MAIN),
     createPage(views.ADD_CONTACT_PAGE),
     createPage(views.SHARE_PROJECT_PAGE),
-    createPage(views.CONFIGURATION_WIZARD),
+    createPage(views.CONFIGURATION_PAGE),
     createPage(views.BASIC_WIDGET_TEST)
   ],
   resolve: {

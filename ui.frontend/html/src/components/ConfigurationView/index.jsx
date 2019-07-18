@@ -31,7 +31,7 @@ const configurationDict = {
 
 export default
 @inject('configurationUI')
-class ConfigurationWizardView extends React.Component {
+class ConfigurationView extends React.Component {
   render() {
     return (
       <Wizard onFinish={noop}>
