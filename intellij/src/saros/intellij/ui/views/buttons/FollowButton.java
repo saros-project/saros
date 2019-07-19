@@ -1,11 +1,13 @@
 package saros.intellij.ui.views.buttons;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.util.ui.UIUtil;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import org.jetbrains.annotations.NotNull;
 import saros.editor.FollowModeManager;
 import saros.editor.IFollowModeListener;
 import saros.intellij.ui.Messages;
@@ -58,8 +60,8 @@ public class FollowButton extends AbstractSessionToolbarButton {
    *
    * <p>The FollowButton is created as disabled.
    */
-  public FollowButton() {
-    super(FollowModeAction.NAME, Messages.FollowButton_tooltip, IconManager.FOLLOW_ICON);
+  public FollowButton(@NotNull Project project) {
+    super(project, FollowModeAction.NAME, Messages.FollowButton_tooltip, IconManager.FOLLOW_ICON);
 
     followModeAction = new FollowModeAction();
 
@@ -71,6 +73,19 @@ public class FollowButton extends AbstractSessionToolbarButton {
         ev -> popupMenu.show(button, 0, button.getBounds().y + button.getBounds().height));
 
     setInitialState();
+  }
+
+  @Override
+  void disposeComponents() {
+    ISarosSession currentSession = session;
+    if (currentSession != null) {
+      currentSession.removeListener(sessionListener);
+    }
+
+    FollowModeManager currentFollowModeManager = followModeManager;
+    if (currentFollowModeManager != null) {
+      currentFollowModeManager.removeListener(followModeListener);
+    }
   }
 
   @Override

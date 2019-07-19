@@ -67,8 +67,6 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
 
   private final ValueChangeListener<Boolean> isConsistencyListener = this::handleConsistencyChange;
 
-  private final Project project;
-
   @Inject private IsInconsistentObservable inconsistentObservable;
 
   private volatile SessionInconsistencyState sessionInconsistencyState;
@@ -76,11 +74,10 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
   /** Creates a Consistency button, adds a sessionListener and disables the button. */
   public ConsistencyButton(@NotNull Project project) {
     super(
+        project,
         ConsistencyAction.NAME,
         Messages.ConsistencyButton_tooltip_functionality,
         IconManager.IN_SYNC_ICON);
-
-    this.project = project;
 
     setSarosSession(sarosSessionManager.getSession());
 
@@ -88,6 +85,11 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
     setEnabled(false);
 
     setInitialState();
+  }
+
+  @Override
+  void disposeComponents() {
+    inconsistentObservable.remove(isConsistencyListener);
   }
 
   @Override

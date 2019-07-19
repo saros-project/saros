@@ -15,6 +15,7 @@ public class LeaveSessionButton extends AbstractSessionToolbarButton {
    */
   public LeaveSessionButton(Project project) {
     super(
+        project,
         LeaveSessionAction.NAME,
         Messages.LeaveSessionButton_tooltip,
         IconManager.LEAVE_SESSION_ICON);
@@ -23,6 +24,11 @@ public class LeaveSessionButton extends AbstractSessionToolbarButton {
     setEnabled(false);
 
     setInitialState();
+  }
+
+  @Override
+  void disposeComponents() {
+    // NOP
   }
 
   @Override

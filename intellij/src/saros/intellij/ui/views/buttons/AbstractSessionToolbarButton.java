@@ -1,6 +1,11 @@
 package saros.intellij.ui.views.buttons;
 
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import javax.swing.ImageIcon;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.SarosPluginContext;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
@@ -15,7 +20,9 @@ import saros.session.SessionEndReason;
  * <p>The class offers methods to react to a session starting or ending and to update the initial
  * state of the button.
  */
-abstract class AbstractSessionToolbarButton extends AbstractToolbarButton {
+abstract class AbstractSessionToolbarButton extends AbstractToolbarButton implements Disposable {
+  protected final Project project;
+
   @Inject protected ISarosSessionManager sarosSessionManager;
 
   @SuppressWarnings("FieldCanBeLocal")
@@ -39,8 +46,17 @@ abstract class AbstractSessionToolbarButton extends AbstractToolbarButton {
    * @see AbstractToolbarButton#AbstractToolbarButton(String, String, ImageIcon)
    * @see SarosPluginContext#initComponent(Object)
    */
-  AbstractSessionToolbarButton(String actionCommand, String tooltipText, ImageIcon icon) {
+  AbstractSessionToolbarButton(
+      @NotNull Project project,
+      @NotNull String actionCommand,
+      @Nullable String tooltipText,
+      @Nullable ImageIcon icon) {
+
     super(actionCommand, tooltipText, icon);
+
+    this.project = project;
+
+    Disposer.register(project, this);
 
     SarosPluginContext.initComponent(this);
 
@@ -61,6 +77,21 @@ abstract class AbstractSessionToolbarButton extends AbstractToolbarButton {
       sessionStarted(session);
     }
   }
+
+  @Override
+  public final void dispose() {
+    sarosSessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
+
+    disposeComponents();
+  }
+
+  /**
+   * Method to dispose components of the button.
+   *
+   * <p>This method is called when the project the button belongs to is disposed. It should drop any
+   * internal state that would prevent the object from being garbage collected.
+   */
+  abstract void disposeComponents();
 
   /**
    * Method to react to the start of a new session.
