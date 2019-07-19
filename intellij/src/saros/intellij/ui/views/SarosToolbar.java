@@ -67,7 +67,7 @@ class SarosToolbar extends JToolBar {
               IconManager.OPEN_PREFERENCES_ICON));
     }
 
-    add(new FollowButton());
+    add(new FollowButton(project));
 
     add(new ConsistencyButton(project));
 
