@@ -16,6 +16,9 @@ import saros.intellij.ui.views.buttons.SimpleButton;
 /**
  * Saros toolbar. Displays several buttons for interacting with Saros.
  *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}.
+ *
  * <p>FIXME: Replace by IDEA toolbar class.
  */
 class SarosToolbar extends JToolBar {

@@ -14,6 +14,7 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import saros.SarosPluginContext;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.views.SarosMainPanelView;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.roster.IRosterListener;
 import saros.net.xmpp.roster.RosterTracker;
@@ -24,6 +25,9 @@ import saros.repackaged.picocontainer.annotations.Inject;
  *
  * <p>It registers as {@link IRosterListener} and keeps the displayed contacts in sync with the
  * server.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}.
  */
 
 /*
