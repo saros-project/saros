@@ -25,7 +25,7 @@ public class SarosMainPanelView extends JPanel {
    */
   public SarosMainPanelView(@NotNull Project project) throws HeadlessException {
     super(new BorderLayout());
-    SessionAndContactsTreeView sarosTree = new SessionAndContactsTreeView();
+    SessionAndContactsTreeView sarosTree = new SessionAndContactsTreeView(project);
     SarosToolbar sarosToolbar = new SarosToolbar(project);
 
     JScrollPane treeScrollPane = new JBScrollPane(sarosTree);
