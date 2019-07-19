@@ -1,5 +1,7 @@
 package saros.intellij.ui.tree;
 
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +31,8 @@ import saros.repackaged.picocontainer.annotations.Inject;
  * the same issue as the Eclipse counterpart, it cannot
  * handle multiple JIDs with different resources
  */
-public class ContactTreeRootNode extends DefaultMutableTreeNode implements IRosterListener {
+public class ContactTreeRootNode extends DefaultMutableTreeNode
+    implements IRosterListener, Disposable {
 
   private static final long serialVersionUID = 1L;
 
@@ -48,6 +51,9 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements IRost
 
   public ContactTreeRootNode(SessionAndContactsTreeView treeView) {
     super(treeView);
+
+    Disposer.register(treeView, this);
+
     SarosPluginContext.initComponent(this);
 
     this.treeView = treeView;
@@ -56,6 +62,11 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements IRost
 
     rosterTracker.addRosterListener(this);
     rosterChanged(rosterTracker.getRoster());
+  }
+
+  @Override
+  public void dispose() {
+    rosterTracker.removeRosterListener(this);
   }
 
   /**
