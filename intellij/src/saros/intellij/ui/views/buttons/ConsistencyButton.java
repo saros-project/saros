@@ -24,8 +24,11 @@ import saros.session.ISarosSession;
 import saros.session.SessionEndReason;
 
 /**
- * Button for triggering a {@link ConsistencyAction}. Displays a different symbol when state is
- * inconsistent or not.
+ * Session button for triggering a {@link ConsistencyAction}. Displays a different symbol when state
+ * is inconsistent or not.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link AbstractSessionToolbarButton}.
  *
  * <p>FIXME: Remove awkward session handling together with UI components created with session.
  */

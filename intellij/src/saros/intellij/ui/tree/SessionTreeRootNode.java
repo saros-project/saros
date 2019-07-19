@@ -13,6 +13,7 @@ import saros.SarosPluginContext;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.views.SarosMainPanelView;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -22,7 +23,12 @@ import saros.session.SessionEndReason;
 import saros.session.User;
 import saros.ui.util.ModelFormatUtils;
 
-/** Session tree root node. */
+/**
+ * Session tree root node.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}.
+ */
 public class SessionTreeRootNode extends DefaultMutableTreeNode implements Disposable {
   public static final String TREE_TITLE = "Session";
   public static final String TREE_TITLE_NO_SESSIONS = "No Session Running";

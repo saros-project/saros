@@ -17,13 +17,19 @@ import org.jivesoftware.smack.Connection;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccountStore;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.views.SarosMainPanelView;
 import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.repackaged.picocontainer.annotations.Inject;
 
-/** Saros tree view for contacts and sessions. */
+/**
+ * Saros tree view for contacts and sessions.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}.
+ */
 public class SessionAndContactsTreeView extends JTree implements Disposable {
 
   private final SessionTreeRootNode sessionTreeRootNode;

@@ -7,6 +7,7 @@ import javax.swing.ImageIcon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.SarosPluginContext;
+import saros.intellij.ui.views.SarosMainPanelView;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -19,6 +20,10 @@ import saros.session.SessionEndReason;
  *
  * <p>The class offers methods to react to a session starting or ending and to update the initial
  * state of the button.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}. This class offers the
+ * method {@link #disposeComponents()} for such a purpose.
  */
 abstract class AbstractSessionToolbarButton extends AbstractToolbarButton implements Disposable {
   protected final Project project;
