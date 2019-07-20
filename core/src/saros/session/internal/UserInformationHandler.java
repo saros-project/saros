@@ -22,6 +22,7 @@ import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
 import saros.preferences.PreferenceStore;
 import saros.repackaged.picocontainer.Startable;
+import saros.session.ColorNegotiationHook;
 import saros.session.ISarosSession;
 import saros.session.User;
 
@@ -293,10 +294,14 @@ public class UserInformationHandler implements Startable {
           continue;
         }
 
-        user = new User(userEntry.jid, false, false, userEntry.colorID, userEntry.favoriteColorID);
+        PreferenceStore preferences = new PreferenceStore();
+        preferences.setValue(ColorNegotiationHook.KEY_INITIAL_COLOR, userEntry.colorID);
+        preferences.setValue(ColorNegotiationHook.KEY_FAV_COLOR, userEntry.favoriteColorID);
+
+        user = new User(userEntry.jid, false, false, preferences);
 
         user.setPermission(userEntry.permission);
-        session.addUser(user, new PreferenceStore());
+        session.addUser(user);
 
       } else if ((userEntry.flags & UserListEntry.USER_REMOVED) != 0) {
         user = session.getUser(userEntry.jid);

@@ -15,8 +15,8 @@ import saros.session.User;
 
 public class ActivityOptimizerTest {
 
-  private final User alice = new User(new JID("alice@junit"), true, true, 0, 0);
-  private final User bob = new User(new JID("bob@junit"), false, false, 0, 0);
+  private final User alice = new User(new JID("alice@junit"), true, true, null);
+  private final User bob = new User(new JID("bob@junit"), false, false, null);
 
   private IPath fooPath;
   private IPath barPath;

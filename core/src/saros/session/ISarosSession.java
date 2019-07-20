@@ -30,7 +30,6 @@ import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
-import saros.preferences.IPreferenceStore;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.User.Permission;
 import saros.synchronize.StopManager;
@@ -102,9 +101,8 @@ public interface ISarosSession {
    * will be noticed about the new user.
    *
    * @param user the user that is to be added
-   * @param preferences the initial properties of the new user
    */
-  public void addUser(User user, IPreferenceStore preferences);
+  public void addUser(User user);
 
   /**
    * Informs all listeners that a user now has Projects and can process {@link IResourceActivity}s.
@@ -177,15 +175,6 @@ public interface ISarosSession {
    *     a JID exists in the session
    */
   public User getUser(JID jid);
-
-  /**
-   * Given a user, this method will return this users session properties.
-   *
-   * @param user the user to get the preferences for
-   * @return Properties of the given user or <code>null</code> if the user is not known to the
-   *     session
-   */
-  public IPreferenceStore getUserProperties(User user);
 
   /**
    * Given a JID (resource qualified or not), will return the resource qualified JID associated with
