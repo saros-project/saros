@@ -15,7 +15,7 @@ public class ActivitiesExtensionProviderTest {
 
   @Test
   public void testNoPrettyPrintInMarshalledObjects() throws Exception {
-    User user = new User(new JID("alice@test"), true, true, 0, 0);
+    User user = new User(new JID("alice@test"), true, true, null);
 
     IActivity activity = new EditorActivity(user, EditorActivity.Type.ACTIVATED, null);
 

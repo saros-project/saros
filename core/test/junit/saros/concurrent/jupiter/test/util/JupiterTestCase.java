@@ -63,6 +63,6 @@ public abstract class JupiterTestCase {
   }
 
   public static User createUser(String name) {
-    return new User(new JID(name + "@jabber.org"), false, true, 0, 0);
+    return new User(new JID(name + "@jabber.org"), false, true, null);
   }
 }

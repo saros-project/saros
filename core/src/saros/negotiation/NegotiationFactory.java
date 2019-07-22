@@ -213,7 +213,7 @@ public final class NegotiationFactory {
       throw new IllegalStateException("User <" + user + "> is not part of the session.");
     }
 
-    String type = session.getUserProperties(user).getString(ProjectNegotiationTypeHook.KEY_TYPE);
+    String type = user.getPreferences().getString(ProjectNegotiationTypeHook.KEY_TYPE);
     if (type.isEmpty()) {
       throw new IllegalArgumentException("Missing TransferType for User: " + user);
     }

@@ -113,7 +113,7 @@ public class FileActivityConsumerTest {
 
   private FileActivity createFileActivity(IFile file, byte[] content) {
     return new FileActivity(
-        new User(new JID("foo@bar"), true, true, 0, 0),
+        new User(new JID("foo@bar"), true, true, null),
         Type.CREATED,
         Purpose.ACTIVITY,
         createPathMockForFile(file),

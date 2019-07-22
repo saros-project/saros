@@ -14,6 +14,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.PreferenceStore;
+import saros.session.ColorNegotiationHook;
 import saros.session.User;
 
 public class ColorIDSetTest {
@@ -27,10 +30,16 @@ public class ColorIDSetTest {
     userList = new ArrayList<User>();
     userMap = new HashMap<String, UserColorID>();
 
-    alice = new User(new JID("alice@saros.org"), false, false, 0, -1);
-    bob = new User(new JID("bob@saros.org"), false, false, 1, -1);
-    carl = new User(new JID("carl@lagerfeld.org"), false, false, 2, -1);
-    dave = new User(new JID("dave@saros.org"), false, false, 0, -1);
+    alice = createUser("alice@saros.org", 0);
+    bob = createUser("bob@saros.org", 1);
+    carl = createUser("carl@lagerfeld.org", 2);
+    dave = createUser("dave@saros.org", 0);
+  }
+
+  private User createUser(String jid, int color) {
+    IPreferenceStore preferences = new PreferenceStore();
+    preferences.setValue(ColorNegotiationHook.KEY_INITIAL_COLOR, color);
+    return new User(new JID(jid), false, false, preferences);
   }
 
   private ColorIDSet createColorIDSet(Collection<User> users) {
