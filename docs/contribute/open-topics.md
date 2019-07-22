@@ -69,3 +69,15 @@ We did not integrate the pull requests, because:
 * The approach introduces a new language and therefore increases the complexity of our project and build process.
 * The savings of redundancy are smaller than expected. Only the redundancy of the model classes can the avoided.
 * The most interesting part (The injection of java functions into javascript and vice versa) is not simplified by the approach.
+
+## Instant Session Start
+
+Goal of this topic is to speed up the initial file sharing process at session starts.
+Instead of waiting for full synchronization, this feature prioritizes files and allows direct access after receiving.
+This main goal has already been achieved, but users are still bound to the read-only mode during project sharing and optimizations are open / onhold for merging.
+More Infos can be found in this [thesis](https://www.inf.fu-berlin.de/inst/ag-se/theses/Moll18-saros-session-start.pdf) (german only).
+
+Currently the author ([@stefaus](https://github.com/stefaus)) of this thesis wants to finish the rest of this work and some patches are already available.
+Nevertheless the topic is on hold mainly because it is mandatory to change the way resources are shared first (from project based to per ressource tracking).
+
+An Overview of the current work state is documented here: [Projectboard: Instant Session Start Feature](https://github.com/saros-project/saros/projects/15) and a broader view at [Projectboard: Session Start Topics](https://github.com/saros-project/saros/projects/18).
