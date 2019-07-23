@@ -53,7 +53,8 @@ class SarosApi {
   }
 
   manageAccounts () {
-    window.__java_showSarosPreferencesWizard()
+    // TODO: Implement this method in Java
+    window.__java_showSarosPreferencesPage()
   }
 
   addContact (jid, displayName) {
