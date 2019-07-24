@@ -283,17 +283,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
                     sendSelectionInformation(localUser, path, editor);
                   });
 
-          Editor activeEditor = ProjectAPI.getActiveEditor(project);
-
-          SPath activeEditorPath;
-
-          if (activeEditor != null) {
-            activeEditorPath = editorPool.getFile(activeEditor.getDocument());
-          } else {
-            activeEditorPath = null;
-          }
-
-          sendEditorOpenInformation(localUser, activeEditorPath);
+          sendActiveEditorInformation(localUser, project);
         }
       };
 
@@ -382,6 +372,30 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
+   * Sends an editor activation activity for the active editor. This should be done after sending
+   * user editor state information about other editors to ensure that the correct editor is still
+   * set as the active editor in the user editor state held by the other participants.
+   *
+   * @param localUser the local user
+   * @param project the shared project
+   * @see ProjectAPI#getActiveEditor(Project)
+   */
+  private void sendActiveEditorInformation(@NotNull User localUser, @NotNull Project project) {
+
+    Editor activeEditor = ProjectAPI.getActiveEditor(project);
+
+    SPath activeEditorPath;
+
+    if (activeEditor != null) {
+      activeEditorPath = editorPool.getFile(activeEditor.getDocument());
+    } else {
+      activeEditorPath = null;
+    }
+
+    sendEditorOpenInformation(localUser, activeEditorPath);
+  }
+
+  /**
    * Adds all currently open editors belonging to the passed project to the pool of open editors.
    *
    * @param project the added project
@@ -446,6 +460,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           sendSelectionInformation(localUser, path, editor);
         });
+
+    sendActiveEditorInformation(localUser, intellijProject);
   }
 
   @SuppressWarnings("FieldCanBeLocal")
