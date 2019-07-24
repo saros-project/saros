@@ -5,11 +5,16 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.FileIndex;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -382,9 +387,19 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @param project the added project
    */
   private void addProjectResources(IProject project) {
-    Project intellijProject = project.adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Module module = project.adaptTo(IntelliJProjectImpl.class).getModule();
+    FileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
+    Project intellijProject = module.getProject();
 
-    VirtualFile[] openFiles = ProjectAPI.getOpenFiles(intellijProject);
+    Set<VirtualFile> openFiles = new HashSet<>();
+
+    for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
+      if (moduleFileIndex.isInContent(openFile)) {
+        openFiles.add(openFile);
+      }
+    }
+
+    Map<SPath, Editor> openFileMapping = new HashMap<>();
 
     SelectedEditorStateSnapshot selectedEditorStateSnapshot =
         selectedEditorStateSnapshotFactory.capturedState();
@@ -394,7 +409,16 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalViewPortChangeHandlersEnabled(false);
 
       for (VirtualFile openFile : openFiles) {
-        localEditorHandler.openEditor(openFile, project, false);
+        Editor editor = localEditorHandler.openEditor(openFile, project, false);
+
+        SPath path = VirtualFileConverter.convertToSPath(intellijProject, openFile);
+
+        if (path == null) {
+          throw new IllegalStateException(
+              "Could not create SPath for resource that is known to be shared: " + openFile);
+        }
+
+        openFileMapping.put(path, editor);
       }
 
     } finally {
@@ -403,6 +427,25 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     }
 
     selectedEditorStateSnapshot.applyHeldState();
+
+    User localUser = session.getLocalUser();
+
+    Set<String> selectedFiles = new HashSet<>();
+
+    for (VirtualFile selectedFile : ProjectAPI.getSelectedFiles(intellijProject)) {
+      if (moduleFileIndex.isInContent(selectedFile)) {
+        selectedFiles.add(selectedFile.getPath());
+      }
+    }
+
+    openFileMapping.forEach(
+        (path, editor) -> {
+          sendEditorOpenInformation(localUser, path);
+
+          sendViewPortInformation(localUser, path, editor, selectedFiles);
+
+          sendSelectionInformation(localUser, path, editor);
+        });
   }
 
   @SuppressWarnings("FieldCanBeLocal")
