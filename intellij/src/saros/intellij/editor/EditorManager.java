@@ -226,7 +226,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void userFinishedProjectNegotiation(User user) {
-          sendAwarenessInformation();
+          sendAwarenessInformation(user);
         }
 
         @Override
@@ -240,16 +240,24 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         /**
-         * Sends awareness information to populate the UserEditorState of the participant that
-         * joined the session.
+         * Sends the awareness information for all open shared editors. This is done to populate the
+         * UserEditorState of the participant that finished the project negotiation.
          *
          * <p>This is done by first sending the needed state for all locally open editors. After the
          * awareness information for all locally open editors (including the active editor) has been
          * transmitted, a second editor activated activity is send for the locally active editor to
          * correctly set the active editor in the remote user editor state for the local user.
+         *
+         * <p>This will not be executed for the user that finished the project negotiation as their
+         * user editor state will be propagated through {@link #resourcesAdded(IProject)} when the
+         * shared resources are initially added.
          */
-        private void sendAwarenessInformation() {
+        private void sendAwarenessInformation(@NotNull User user) {
           User localUser = session.getLocalUser();
+
+          if (localUser.equals(user)) {
+            return;
+          }
 
           Set<String> visibleFilePaths = new HashSet<>();
 
