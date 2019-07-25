@@ -69,6 +69,7 @@ Export-Package: saros;
    saros.invitation,
    saros.net",
  saros.session.internal,
+ saros.session.resources.validation,
  saros.test.util,
  saros.ui;
   uses:="org.eclipse.jface.window,

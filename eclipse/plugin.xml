@@ -455,7 +455,7 @@
    <extension
          id="saros.modelProvider"
          point="org.eclipse.core.resources.modelProviders">
-      <modelProvider class="saros.project.internal.ResourceChangeValidator"/>
+      <modelProvider class="saros.session.resources.validation.ResourceChangeValidator"/>
       <enablement>
          <instanceof value="org.eclipse.core.resources.IResource"/>
       </enablement>
