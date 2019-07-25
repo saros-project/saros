@@ -3,19 +3,17 @@ package saros.intellij;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
-import com.intellij.openapi.project.Project;
 import java.awt.event.KeyEvent;
 import java.io.InputStream;
 import javax.swing.KeyStroke;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
-import org.jetbrains.annotations.NotNull;
 
 /**
- * Component that is initalized when a project is loaded. It initializes the logging, shortcuts and
+ * Component that is initialized when a project is loaded. It initializes the logging, shortcuts and
  * the {@link IntellijProjectLifecycle} singleton.
  */
-public class SarosComponent implements com.intellij.openapi.components.ProjectComponent {
+public class SarosComponent {
 
   /**
    * This is the plugin ID that identifies the saros plugin in the IDEA ecosystem. It is set in
@@ -23,7 +21,7 @@ public class SarosComponent implements com.intellij.openapi.components.ProjectCo
    */
   public static final String PLUGIN_ID = "saros";
 
-  public SarosComponent(final Project project) {
+  public SarosComponent() {
     loadLoggers();
 
     Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
@@ -50,7 +48,7 @@ public class SarosComponent implements com.intellij.openapi.components.ProjectCo
       LogLog.error("could not load saros property file 'saros.properties'", e);
     }
 
-    IntellijProjectLifecycle.getInstance(project).start();
+    IntellijProjectLifecycle.getInstance().start();
   }
 
   public static boolean isSwtBrowserEnabled() {
@@ -72,31 +70,5 @@ public class SarosComponent implements com.intellij.openapi.components.ProjectCo
     } finally {
       Thread.currentThread().setContextClassLoader(contextClassLoader);
     }
-  }
-
-  @Override
-  public void initComponent() {
-    // NOP
-  }
-
-  @Override
-  public void disposeComponent() {
-    // NOP
-  }
-
-  @NotNull
-  @Override
-  public String getComponentName() {
-    return "Saros";
-  }
-
-  @Override
-  public void projectOpened() {
-    // TODO: Update project
-  }
-
-  @Override
-  public void projectClosed() {
-    // TODO: Update project
   }
 }

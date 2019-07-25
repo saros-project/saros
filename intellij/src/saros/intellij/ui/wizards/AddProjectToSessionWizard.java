@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import saros.SarosPluginContext;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
+import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
@@ -75,7 +76,6 @@ import saros.util.ThreadUtils;
  */
 
 //  FIXME: Add facility for more than one project.
-
 public class AddProjectToSessionWizard extends Wizard {
   private static final Logger LOG = Logger.getLogger(AddProjectToSessionWizard.class);
 
@@ -137,6 +137,8 @@ public class AddProjectToSessionWizard extends Wizard {
           }
 
           Project project = moduleSelectionResult.getProject();
+
+          sessionManager.getSession().getComponent(SharedIDEContext.class).setProject(project);
 
           switch (moduleSelectionResult.getLocalRepresentationOption()) {
             case CREATE_NEW_MODULE:

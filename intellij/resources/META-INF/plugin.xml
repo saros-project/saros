@@ -34,15 +34,12 @@
     -->
 
     <application-components>
-        <!-- Add your application components here -->
-    </application-components>
-
-    <project-components>
         <component>
-            <implementation-class>saros.intellij.SarosComponent
+            <implementation-class>
+                saros.intellij.SarosComponent
             </implementation-class>
         </component>
-    </project-components>
+    </application-components>
 
     <actions>
         <group keep-content="true" compact="false" popup="true"

@@ -46,6 +46,40 @@ public class Messages {
   public static String ConsistencyButton_tooltip_functionality;
   public static String ConsistencyButton_tooltip_inconsistency_detected;
   public static String ConsistencyButton_tooltip_no_inconsistency;
+  public static String ConsistencyButton_inconsistent_list_module;
+  public static String ConsistencyButton_inconsistent_list_file;
+
+  public static String FollowButton_tooltip;
+  public static String FollowButton_user_entry_prefix;
+  public static String FollowButton_leave_follow_mode_entry;
+
+  public static String LeaveSessionButton_tooltip;
+
+  public static String ConnectButton_tooltip;
+  public static String ConnectButton_disconnect;
+  public static String ConnectButton_configure_accounts;
+  public static String ConnectButton_add_account;
+  public static String ConnectButton_account_creation_jid_title;
+  public static String ConnectButton_account_creation_jid_initial_input;
+  public static String ConnectButton_account_creation_jid_message;
+  public static String ConnectButton_account_creation_invalid_jid_title;
+  public static String ConnectButton_account_creation_invalid_jid_message;
+  public static String ConnectButton_account_creation_failed_title;
+  public static String ConnectButton_account_creation_failed_message;
+  public static String ConnectButton_account_creation_password_title;
+  public static String ConnectButton_account_creation_password_message;
+  public static String ConnectButton_account_creation_invalid_password_title;
+  public static String ConnectButton_account_creation_invalid_password_message;
+  public static String ConnectButton_account_creation_xmpp_server_title;
+  public static String ConnectButton_account_creation_xmpp_server_initial_input;
+  public static String ConnectButton_account_creation_xmpp_server_message;
+  public static String ConnectButton_account_creation_xmpp_server_port_title;
+  public static String ConnectButton_account_creation_xmpp_server_port_initial_input;
+  public static String ConnectButton_account_creation_xmpp_server_port_message;
+  public static String ConnectButton_account_creation_xmpp_server_invalid_port_title;
+  public static String ConnectButton_account_creation_xmpp_server_invalid_port_message;
+  public static String ConnectButton_connect_to_new_account_title;
+  public static String ConnectButton_connect_to_new_account_message;
 
   public static String NegotiationHandler_canceled_invitation;
   public static String NegotiationHandler_canceled_invitation_text;
@@ -81,9 +115,6 @@ public class Messages {
 
   public static String SubscriptionManager_incoming_subscription_request_title;
   public static String SubscriptionManager_incoming_subscription_request_message;
-
-  public static String ConnectButton_connect_to_new_account_title;
-  public static String ConnectButton_connect_to_new_account_message;
 
   public static String Contact_saros_message_conditional;
 

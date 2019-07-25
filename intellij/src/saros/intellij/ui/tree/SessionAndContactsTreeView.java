@@ -102,6 +102,7 @@ public class SessionAndContactsTreeView extends JTree {
     // show correct initial state
     renderConnectionState(
         connectionService.getConnection(), connectionService.getConnectionState());
+    sessionTreeRootNode.setInitialState();
   }
 
   private void renderConnectionState(Connection connection, ConnectionState state) {
