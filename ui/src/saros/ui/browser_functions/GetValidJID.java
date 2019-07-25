@@ -7,7 +7,7 @@ import saros.ui.model.ValidationResult;
 
 /** Validate if a given string is a valid {@link JID}. */
 public class GetValidJID extends TypedJavascriptFunction {
-
+  // TODO: Rename class to match with JS_NAME
   public static final String JS_NAME = "validateJid";
 
   /**

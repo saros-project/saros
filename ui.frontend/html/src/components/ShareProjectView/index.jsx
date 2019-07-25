@@ -7,11 +7,11 @@ import Wizard, { Step } from '../Wizard'
 
 export default
 @inject('core', 'sessionUI')
-class StartSessionWizardView extends React.Component {
+class ShareProjectView extends React.Component {
   render () {
     const { sessionUI, core } = this.props
     return (
-      <Wizard onFinish={sessionUI.submitSession} onClickCancel={core.doCloseSessionWizard}>
+      <Wizard onFinish={sessionUI.submitSession} onClickCancel={core.doCloseShareProjectPage}>
         <Step title='Choose Files' Component={ChooseFilesStep} />
         <Step title='Choose Contacts' Component={ChooseContactsStep} />
       </Wizard>

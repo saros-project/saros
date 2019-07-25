@@ -16,3 +16,13 @@ sonarqube {
     property 'sonar.projectVersion', '0.1.0.DEVEL'
   }
 }
+
+jar {
+  manifest {
+    attributes 'Main-Class': 'saros.server.SarosServer'
+  }
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+  from ('src/log4j.properties')
+}

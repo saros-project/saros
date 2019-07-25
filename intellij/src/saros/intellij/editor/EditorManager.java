@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -36,6 +37,7 @@ import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
 import saros.intellij.filesystem.Filesystem;
+import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityConsumer;
@@ -251,7 +253,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           Set<String> visibleFilePaths = new HashSet<>();
 
-          for (VirtualFile virtualFile : projectAPI.getSelectedFiles()) {
+          Project project = sharedIDEContext.getProject();
+
+          for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
             visibleFilePaths.add(virtualFile.getPath());
           }
 
@@ -266,7 +270,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
                     sendSelectionInformation(localUser, path, editor);
                   });
 
-          Editor activeEditor = projectAPI.getActiveEditor();
+          Editor activeEditor = ProjectAPI.getActiveEditor(project);
 
           SPath activeEditorPath;
 
@@ -371,7 +375,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @param project the added project
    */
   private void addProjectResources(IProject project) {
-    VirtualFile[] openFiles = projectAPI.getOpenFiles();
+    Project intellijProject = project.adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+
+    VirtualFile[] openFiles = ProjectAPI.getOpenFiles(intellijProject);
 
     SelectedEditorStateSnapshot selectedEditorStateSnapshot =
         selectedEditorStateSnapshotFactory.capturedState();
@@ -425,8 +431,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           userEditorStateManager = session.getComponent(UserEditorStateManager.class);
 
-          projectAPI = sarosSession.getComponent(ProjectAPI.class);
-
           localEditorHandler = sarosSession.getComponent(LocalEditorHandler.class);
           localEditorManipulator = sarosSession.getComponent(LocalEditorManipulator.class);
 
@@ -444,8 +448,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           session = null;
 
           userEditorStateManager = null;
-
-          projectAPI = null;
 
           localEditorHandler = null;
           localEditorManipulator = null;
@@ -492,7 +494,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   /* Session Components */
   private UserEditorStateManager userEditorStateManager;
   private ISarosSession session;
-  private ProjectAPI projectAPI;
   private LocalEditorHandler localEditorHandler;
   private LocalEditorManipulator localEditorManipulator;
   private AnnotationManager annotationManager;
@@ -873,7 +874,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> visibleFilePaths = new HashSet<>();
 
-    for (VirtualFile virtualFile : projectAPI.getSelectedFiles()) {
+    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+
+    for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
       visibleFilePaths.add(virtualFile.getPath());
     }
 

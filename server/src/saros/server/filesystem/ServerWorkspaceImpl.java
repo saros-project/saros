@@ -23,12 +23,16 @@ public class ServerWorkspaceImpl implements IWorkspace {
     this.location = location;
   }
 
+  /** @deprecated See {@link IWorkspace}. */
   @Override
+  @Deprecated
   public IPath getLocation() {
     return location;
   }
 
+  /** @deprecated See {@link IWorkspace}. */
   @Override
+  @Deprecated
   public IProject getProject(String name) {
     return new ServerProjectImpl(this, name);
   }

@@ -4,7 +4,7 @@ import saros.HTMLUIContextFactory;
 import saros.HTMLUIStrings;
 
 /** Represents the wizard to manage accounts. */
-public class AccountPage extends AbstractBrowserPage {
+public class AddAccountPage extends AbstractBrowserPage {
   // TODO: NOT USED AT THE MOMENT! Create HTML page and open it in the
   // main-page.html by calling "__java_showAccountPage();".
 
@@ -15,7 +15,7 @@ public class AccountPage extends AbstractBrowserPage {
    *
    * @see HTMLUIContextFactory
    */
-  public AccountPage() {
+  public AddAccountPage() {
     super(HTML_DOC_NAME, HTMLUIStrings.TITLE_ADD_ACCOUNT_PAGE);
     // No renderer used, so let renderers list be empty
   }

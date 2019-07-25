@@ -48,8 +48,8 @@ public class SessionNegotiationTest {
   private static final JID ALICE = new JID("alice@test/Saros");
   private static final JID BOB = new JID("bob@test/Saros");
 
-  private static final User HOST = new User(ALICE, true, true, 0, 0);
-  private static final User INVITEE = new User(BOB, true, true, 0, 0);
+  private static final User HOST = new User(ALICE, true, true, null);
+  private static final User INVITEE = new User(BOB, true, true, null);
 
   private volatile Thread aliceNegotiationThread;
   private volatile Thread bobNegotiationThread;
@@ -110,7 +110,7 @@ public class SessionNegotiationTest {
 
     aliceSession = createNiceMock(ISarosSession.class);
 
-    aliceSession.addUser(eq(INVITEE), anyObject(IPreferenceStore.class));
+    aliceSession.addUser(eq(INVITEE));
     expectLastCall().once();
 
     bobSession = createNiceMock(ISarosSession.class);

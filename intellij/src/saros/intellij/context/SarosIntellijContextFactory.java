@@ -1,6 +1,5 @@
 package saros.intellij.context;
 
-import com.intellij.openapi.project.Project;
 import java.util.Arrays;
 import saros.communication.connection.IProxyResolver;
 import saros.communication.connection.NullProxyResolver;
@@ -80,19 +79,12 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
     };
   }
 
-  private Project project;
-
-  public SarosIntellijContextFactory(Project project) {
-    this.project = project;
-  }
-
   @Override
   public void createComponents(MutablePicoContainer container) {
 
     // Saros Core PathIntl Support
     container.addComponent(IPathFactory.class, new PathFactory());
 
-    container.addComponent(Project.class, project);
     container.addComponent(IWorkspace.class, IntelliJWorkspaceImpl.class);
 
     for (Component component : Arrays.asList(getContextComponents())) {

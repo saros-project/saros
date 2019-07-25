@@ -53,7 +53,8 @@ class SarosApi {
   }
 
   manageAccounts () {
-    window.__java_showSarosPreferencesWizard()
+    // TODO: Implement this method in Java
+    window.__java_showSarosPreferencesPage()
   }
 
   addContact (jid, displayName) {
@@ -72,12 +73,20 @@ class SarosApi {
     return JSON.parse(window.__java_validateJid(jid))
   }
 
-  showStartSessionWizard () {
-    window.__java_showSessionWizard()
+  showShareProjectPage () {
+    window.__java_showShareProjectPage()
   }
 
-  closeStartSessionWizard () {
-    window.__java_closeStartSessionWizard()
+  closeShareProjectPage () {
+    window.__java_closeShareProjectPage()
+  }
+
+  showAddContactPage () {
+    window.__java_showAddContactPage()
+  }
+
+  closeAddContactPage () {
+    window.__java_closeAddContactPage()
   }
 
   sendInvitation (projectTrees, contacts) {

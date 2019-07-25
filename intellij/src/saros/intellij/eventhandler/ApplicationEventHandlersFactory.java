@@ -6,10 +6,8 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
-import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
-import saros.intellij.filesystem.VirtualFileConverter;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 
@@ -19,27 +17,21 @@ public class ApplicationEventHandlersFactory {
   private final EditorManager editorManager;
   private final ISarosSession sarosSession;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
-  private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
-  private final VirtualFileConverter virtualFileConverter;
 
   public ApplicationEventHandlersFactory(
       EditorManager editorManager,
       ISarosSession sarosSession,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
-      ProjectAPI projectAPI,
       AnnotationManager annotationManager,
-      LocalEditorHandler localEditorHandler,
-      VirtualFileConverter virtualFileConverter) {
+      LocalEditorHandler localEditorHandler) {
 
     this.editorManager = editorManager;
     this.sarosSession = sarosSession;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
-    this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
-    this.virtualFileConverter = virtualFileConverter;
   }
 
   /**
@@ -71,14 +63,12 @@ public class ApplicationEventHandlersFactory {
      */
     applicationEventHandlers.add(
         new LocalFilesystemModificationHandler(
+            project,
             editorManager,
             sarosSession,
             fileReplacementInProgressObservable,
-            projectAPI,
             annotationManager,
-            project,
-            localEditorHandler,
-            virtualFileConverter));
+            localEditorHandler));
 
     return new ApplicationEventHandlers(applicationEventHandlers);
   }

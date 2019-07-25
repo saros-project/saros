@@ -24,7 +24,7 @@ public class SarosIntellijContextFactoryTest extends AbstractContextTest {
 
   @Test
   public void testCreateComponents() {
-    IContextFactory factory = new SarosIntellijContextFactory(project);
+    IContextFactory factory = new SarosIntellijContextFactory();
 
     factory.createComponents(container);
     container.start();

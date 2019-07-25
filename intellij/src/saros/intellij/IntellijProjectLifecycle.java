@@ -1,6 +1,5 @@
 package saros.intellij;
 
-import com.intellij.openapi.project.Project;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,28 +25,24 @@ public class IntellijProjectLifecycle extends AbstractContextLifecycle {
   private static IntellijProjectLifecycle instance;
 
   /**
-   * Creates a new IntellijProjectLifecycle singleton instance from a project.
+   * Returns the current intellij project lifecycle instance. The returned instance is singleton. If
+   * no instance is present, a new instance is instantiated.
    *
-   * @param project
-   * @return
+   * @return the current intellij project lifecycle instance
    */
-  public static synchronized IntellijProjectLifecycle getInstance(Project project) {
-    instance = new IntellijProjectLifecycle(project);
+  public static synchronized IntellijProjectLifecycle getInstance() {
+    if (instance == null) {
+      instance = new IntellijProjectLifecycle();
+    }
 
     return instance;
-  }
-
-  private Project project;
-
-  private IntellijProjectLifecycle(Project project) {
-    this.project = project;
   }
 
   @Override
   protected Collection<IContextFactory> additionalContextFactories() {
     List<IContextFactory> nonCoreFactories = new ArrayList<>();
 
-    nonCoreFactories.add(new SarosIntellijContextFactory(project));
+    nonCoreFactories.add(new SarosIntellijContextFactory());
 
     if (SarosComponent.isSwtBrowserEnabled()) {
       SwtLibLoader.loadSwtLib();

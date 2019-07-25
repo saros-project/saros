@@ -4,7 +4,7 @@ import javax.swing.ImageIcon;
 import saros.intellij.ui.actions.AbstractSarosAction;
 
 /** Simple button used to create actions that just call {@link AbstractSarosAction#execute()}. */
-public class SimpleButton extends ToolbarButton {
+public class SimpleButton extends AbstractToolbarButton {
   private AbstractSarosAction action;
 
   /** Creates a button that executes action.execute() when clicked. */

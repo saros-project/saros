@@ -1,25 +1,8 @@
-/*
- * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
- * (c) Riad Djemili - 2006
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 1, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- */
 package saros.session;
 
 import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.PreferenceStore;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse instance for the use in one
@@ -44,27 +27,24 @@ public class User {
     READONLY_ACCESS
   }
 
-  private final boolean isHost;
-
-  private final boolean isLocal;
-
   private final JID jid;
-
-  private volatile int colorID;
-
-  private final int favoriteColorID;
+  private final boolean isHost;
+  private final boolean isLocal;
+  private final IPreferenceStore preferences;
 
   private volatile Permission permission = Permission.WRITE_ACCESS;
-
   private volatile boolean isInSession;
 
-  public User(JID jid, boolean isHost, boolean isLocal, int colorID, int favoriteColorID) {
-
+  public User(JID jid, boolean isHost, boolean isLocal, IPreferenceStore preferences) {
     this.jid = jid;
     this.isHost = isHost;
     this.isLocal = isLocal;
-    this.colorID = colorID;
-    this.favoriteColorID = favoriteColorID;
+
+    if (preferences == null) {
+      this.preferences = new PreferenceStore();
+    } else {
+      this.preferences = preferences;
+    }
   }
 
   /**
@@ -153,11 +133,11 @@ public class User {
   }
 
   public int getColorID() {
-    return colorID;
+    return preferences.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
   }
 
   public int getFavoriteColorID() {
-    return favoriteColorID;
+    return preferences.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
   }
 
   /**
@@ -186,19 +166,12 @@ public class User {
     return !isHost();
   }
 
-  /**
-   * FOR INTERNAL USE ONLY
-   *
-   * @param colorID
-   * @deprecated this must only be called by the component that handles color changes
-   */
-  @Deprecated
-  public void setColorID(int colorID) {
-    this.colorID = colorID;
-  }
-
   /** FOR INTERNAL USE ONLY */
   public void setInSession(boolean isInSession) {
     this.isInSession = isInSession;
+  }
+
+  public IPreferenceStore getPreferences() {
+    return preferences;
   }
 }

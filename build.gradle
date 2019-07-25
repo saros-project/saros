@@ -204,10 +204,14 @@ task sarosStf(type: Copy, dependsOn: ['sarosEclipse', 'saros.stf:jar']) {
 
 task sarosServer(type: Copy, dependsOn: [
   ':saros.core:test',
-  ':saros.server:test'
+  ':saros.server:test',
+  ':saros.server:jar'
   ]) {
   group 'Delivery'
   description 'Builds and tests all modules required by the Saros Server'
+
+  from project(':saros.server').jar
+  into 'build/distribution/server'
 }
 
 task sarosIntellij(type: Copy, dependsOn: [

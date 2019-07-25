@@ -27,7 +27,7 @@ public class SarosIntellijContextTest extends AbstractContextTest {
   public void createComponentsWithoutSWT() {
     List<IContextFactory> factories = new ArrayList<>();
 
-    factories.add(new SarosIntellijContextFactory(project));
+    factories.add(new SarosIntellijContextFactory());
     factories.add(new CoreContextFactory());
 
     for (IContextFactory factory : factories) {
@@ -43,7 +43,7 @@ public class SarosIntellijContextTest extends AbstractContextTest {
   public void createComponentsWithSWT() {
     List<IContextFactory> factories = new ArrayList<>();
 
-    factories.add(new SarosIntellijContextFactory(project));
+    factories.add(new SarosIntellijContextFactory());
     factories.add(new CoreContextFactory());
     factories.add(new HTMLUIContextFactory());
 

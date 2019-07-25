@@ -4,7 +4,6 @@ import static saros.intellij.test.IntellijMocker.mockStaticGetInstance;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.module.ModuleTypeManager;
-import com.intellij.openapi.project.Project;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -19,7 +18,6 @@ import saros.test.mocks.ContextMocker;
 public class AbstractContextTest {
 
   MutablePicoContainer container;
-  Project project;
 
   @Before
   public void setup() {
@@ -28,10 +26,6 @@ public class AbstractContextTest {
     // mock IntelliJ dependencies
     mockStaticGetInstance(PropertiesComponent.class, null);
     mockStaticGetInstance(ModuleTypeManager.class, null);
-
-    project = EasyMock.createNiceMock(Project.class);
-
-    EasyMock.replay(project);
 
     // mock IntelliJ dependent calls to get current IDE and plugin version
     PowerMock.mockStaticPartial(

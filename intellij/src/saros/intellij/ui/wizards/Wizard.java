@@ -194,7 +194,7 @@ public abstract class Wizard extends JDialog {
   }
 
   /**
-   * Method used for changing the next page, for decision pages like the SelectProjectPage.
+   * Method used for changing the next page for decision pages.
    *
    * @param page
    */
@@ -202,7 +202,7 @@ public abstract class Wizard extends JDialog {
     wizardPageModel.setNextPage(page);
   }
 
-  public void enableNextButtion() {
+  public void enableNextButton() {
     navigationPanel.enableNextButton();
   }
 
