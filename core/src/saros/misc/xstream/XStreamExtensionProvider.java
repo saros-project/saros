@@ -21,10 +21,12 @@ package saros.misc.xstream;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.converters.basic.BooleanConverter;
+import com.thoughtworks.xstream.converters.basic.StringConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -221,7 +223,9 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
   public static class XStreamPacketExtension<T> implements PacketExtension {
 
     /** Necessary for Smack */
-    @XStreamAsAttribute protected String xmlns;
+    @XStreamConverter(StringConverter.class)
+    @XStreamAsAttribute
+    protected String xmlns;
 
     protected T payload;
 
