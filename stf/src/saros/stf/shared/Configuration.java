@@ -12,7 +12,7 @@ import java.util.ResourceBundle;
 public class Configuration {
 
   private static final String[] BUNDLE_NAMES = {
-    "saros.project.messages",
+    "saros.session.resources.validation.messages",
     "saros.feedback.messages",
     "saros.ui.messages",
     "saros.stf.shared.configuration"
