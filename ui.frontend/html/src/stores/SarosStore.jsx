@@ -64,15 +64,24 @@ export default class SarosStore {
   }
 
   @action.bound
-  doShowStartSessionWizard () {
-    this.sarosApi.showStartSessionWizard()
+  doShowShareProjectPage () {
+    this.sarosApi.showShareProjectPage()
   }
 
   @action.bound
-  doCloseSessionWizard () {
-    this.sarosApi.closeStartSessionWizard()
+  doCloseShareProjectPage () {
+    this.sarosApi.closeShareProjectPage()
   }
 
+  @action.bound
+  doShowAddContactPage () {
+    this.sarosApi.showAddContactPage()
+  }
+
+  @action.bound
+  doCloseAddContactPage () {
+    this.sarosApi.closeAddContactPage()
+  }
   @action.bound
   doSendInvitation (projectTrees, contacts) {
     this.sarosApi.sendInvitation(projectTrees, contacts)

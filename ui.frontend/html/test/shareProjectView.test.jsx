@@ -1,25 +1,24 @@
 import 'jsdom-global/register'
 import { FakeSarosApi, itRendersWithoutExploding, wrapWithContextProvider } from './utils'
 import { mount } from 'enzyme'
-import { spy } from 'sinon'
 import React from 'react'
-import StartSessionWizardView from '~/components/StartSessionWizardView'
+import ShareProjectView from '~/components/ShareProjectView'
 import initStores from '~/stores'
 import mockProjectTrees from './projectTrees.json'
 import { expect } from 'chai'
 
-describe('<StartSessionWizardView />', () => {
+describe('<ShareProjectView />', () => {
   // We wire our stores up with the fake saros api
   const fakeApi = new FakeSarosApi()
   // Doesn't matter what page we put here
   const stores = initStores('main-page', fakeApi)
-  stores.mainUI = { doShowAddContactView: spy() }
+
   const sessionUI = stores.sessionUI
   stores.core.projectTrees = mockProjectTrees
   // create the Store context and Mount the component
-  const wrap = mount(wrapWithContextProvider(<StartSessionWizardView />, stores))
+  const wrap = mount(wrapWithContextProvider(<ShareProjectView />, stores))
 
-  itRendersWithoutExploding(wrap.find('StartSessionWizardView'))
+  itRendersWithoutExploding(wrap.find('ShareProjectView'))
 
   describe('<ChooseFilesStep />', () => {
     const chooseFilesWrap = wrap.find('ChooseFilesStep')
