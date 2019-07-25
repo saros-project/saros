@@ -20,7 +20,7 @@ import saros.util.NamedThreadFactory;
  */
 public class HeartbeatDispatcher extends AbstractActivityProducer implements Startable {
   private ScheduledThreadPoolExecutor heartbeatScheduledExecutor;
-  private final ISarosSession sarosSession;
+  private final ISarosSession session;
   private final UISynchronizer uiSynchronizer;
   private final JupiterClient jupiter;
 
@@ -28,13 +28,14 @@ public class HeartbeatDispatcher extends AbstractActivityProducer implements Sta
       ISarosSession sarosSession,
       UISynchronizer uiSynchronizer,
       ConcurrentDocumentClient cdClient) {
-    this.sarosSession = sarosSession;
+    this.session = sarosSession;
     this.uiSynchronizer = uiSynchronizer;
     this.jupiter = cdClient.getJupiterClient();
   }
 
   @Override
   public void start() {
+    session.addActivityProducer(this);
     heartbeatScheduledExecutor =
         new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("JupiterHeartbeat"));
     // Schedule the heartbeat once per minute, this should be absolutely
@@ -48,6 +49,7 @@ public class HeartbeatDispatcher extends AbstractActivityProducer implements Sta
 
   private void dispatchHeartbeats() {
     // clientDocs should only be accessed by the main thread
+    // FIXME syncExec not asyncExec
     uiSynchronizer.asyncExec(
         () ->
             jupiter
@@ -56,13 +58,15 @@ public class HeartbeatDispatcher extends AbstractActivityProducer implements Sta
                     (path, jupiter) -> {
                       JupiterActivity heartbeat =
                           jupiter.generateJupiterActivity(
-                              new NoOperation(), sarosSession.getLocalUser(), path);
+                              new NoOperation(), session.getLocalUser(), path);
                       fireActivity(heartbeat);
                     }));
   }
 
   @Override
   public void stop() {
+    session.removeActivityProducer(this);
     heartbeatScheduledExecutor.shutdown();
+    // FIXME wait here until everything is finished
   }
 }
