@@ -6,12 +6,8 @@ import de.fu_berlin.inf.ag_se.browser.html.ISelector.IdSelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector.Selector;
 import java.rmi.RemoteException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import org.apache.log4j.Logger;
 import saros.stf.server.HTMLSTFRemoteObject;
-import saros.stf.server.bot.BotPreferences;
+import saros.stf.server.bot.jquery.JQueryHelper;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLButton;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLCheckbox;
 import saros.stf.server.rmi.htmlbot.widget.IRemoteHTMLInputField;
@@ -27,7 +23,6 @@ import saros.ui.View;
 public class RemoteHTMLView extends HTMLSTFRemoteObject implements IRemoteHTMLView {
 
   private static final RemoteHTMLView INSTANCE = new RemoteHTMLView();
-  private static final Logger log = Logger.getLogger(RemoteHTMLView.class);
 
   public static RemoteHTMLView getInstance() {
     return INSTANCE;
@@ -179,19 +174,6 @@ public class RemoteHTMLView extends HTMLSTFRemoteObject implements IRemoteHTMLVi
   }
 
   private boolean exists(ISelector selector) {
-    boolean foundIt = false;
-    try {
-      foundIt =
-          getBrowser()
-              .containsElement(selector)
-              .get(BotPreferences.SHORT_TIMEOUT, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    } catch (ExecutionException e) {
-      log.error("could not determine whether element exists", e);
-    } catch (TimeoutException e) {
-      log.error("could not determine whether element exists", e);
-    }
-    return foundIt;
+    return new JQueryHelper(getBrowser()).selectionExists(selector);
   }
 }
