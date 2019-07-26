@@ -64,7 +64,6 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
     return new Component[] {
       // Core Managers
       Component.create(IEditorManager.class, EditorManager.class),
-      Component.create(saros.preferences.Preferences.class, EclipsePreferences.class),
       Component.create(SessionViewOpener.class),
       Component.create(UndoManager.class),
       Component.create(ISarosSessionContextFactory.class, SarosEclipseSessionContextFactory.class),
@@ -131,15 +130,30 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
         BindKey.bindKey(String.class, IContextKeyBindings.PlatformVersion.class),
         Platform.getBundle("org.eclipse.core.runtime").getVersion().toString());
 
-    // for core logic and extended Eclipse session components
+    final org.eclipse.jface.preference.IPreferenceStore instanceScopePreferenceStore =
+        saros.getPreferenceStore();
+
     container.addComponent(
-        IPreferenceStore.class, new EclipsePreferenceStoreAdapter(saros.getPreferenceStore()));
+        IPreferenceStore.class, new EclipsePreferenceStoreAdapter(instanceScopePreferenceStore));
+
+    /* FIXME the class states that it should be the global preferences, however it does not have method to write preferences and so it is fine for now to use the instance scope */
+    //    container.addComponent(
+    //        saros.preferences.Preferences.class,
+    //        new ScopedPreferenceStore(ConfigurationScope.INSTANCE, Saros.PLUGIN_ID));
+
+    container.addComponent(
+        saros.preferences.Preferences.class, new EclipsePreferences(instanceScopePreferenceStore));
 
     // TODO remove
     // for plain Eclipse components like preference pages etc.
     container.addComponent(
-        org.eclipse.jface.preference.IPreferenceStore.class, saros.getPreferenceStore());
+        org.eclipse.jface.preference.IPreferenceStore.class, instanceScopePreferenceStore);
 
+    /* FIXME either use Preferences or IPreferencestore (e.g ScopedPreferenceStore which access Preferences) but NOT both at the same time.
+     * This is currently a madness, we have a Preferences core class that actually does not do anything but is just a convenience class,
+     * then we have a PreferenceStore and OSGi Preferences here which are only used by the Feedback Component which is disabled anyways !!!!
+     * The STF also has the ability to return this instance however it is not used anywhere in the framework.
+     */
     container.addComponent(Preferences.class, saros.getGlobalPreferences());
   }
 }
