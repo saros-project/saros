@@ -2,7 +2,7 @@ package saros.intellij.ui.util;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,7 +97,7 @@ public class UIProjectUtils {
 
     Promise<DataContext> promisedDataContext =
         DataManager.getInstance().getDataContextFromFocusAsync();
-    Promise<Project> promisedProject = promisedDataContext.then(DataKeys.PROJECT::getData);
+    Promise<Project> promisedProject = promisedDataContext.then(LangDataKeys.PROJECT::getData);
 
     promisedProject.onProcessed(projectRunner::run);
   }
