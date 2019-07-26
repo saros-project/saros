@@ -1,72 +1,106 @@
 package saros.concurrent.management;
 
+import java.util.Map.Entry;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
 import saros.activities.JupiterActivity;
+import saros.activities.SPath;
+import saros.concurrent.jupiter.Algorithm;
+import saros.concurrent.jupiter.internal.Jupiter;
 import saros.concurrent.jupiter.internal.text.NoOperation;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
+import saros.session.User;
 import saros.synchronize.UISynchronizer;
 import saros.util.NamedThreadFactory;
 
 /**
- * This class sends periodically JupiterOperations to ack other clients Activities.
+ * This class generates and sends periodically Jupiter-NoOperations to acknowledge operations.
  *
- * <p>This fixes a logical memory leak, that is present in the Jupiter-implementation, if a client
- * does not participate in the session actively (usually Saros/S). This causes other clients to hold
- * JupiterActivities indefinitely to be able to merge them at all times. Sending 'NoOperation's
- * fixes this issue by acking received activities though the operation's vectorTime.
+ * <p>See
+ * https://www.researchgate.net/publication/220876978_High-Latency_Low-Bandwidth_Windowing_in_the_Jupiter_Collaboration_System
+ *
+ * <p>Some fine points: In our system, messages must be saved until they are acknowledged by the
+ * other party, since they may be needed in order to fix up incoming messages. Normally, these
+ * acknowledgments are piggy-backed on traffic going the other way. However, it is possible for the
+ * traffic to a window to be one-sided (e.g., for a status display window being periodically
+ * updated). Therefore, each side must periodically generate explicit acknowledgments (i.e. no-op
+ * messages) to prevent the outgoing queues from growing forever.
  */
 public class HeartbeatDispatcher extends AbstractActivityProducer implements Startable {
-  private ScheduledThreadPoolExecutor heartbeatScheduledExecutor;
+
+  private static final Logger log = Logger.getLogger(HeartbeatDispatcher.class);
+
   private final ISarosSession session;
   private final UISynchronizer uiSynchronizer;
-  private final JupiterClient jupiter;
+  private final JupiterClient jupiterClient;
+
+  private ScheduledThreadPoolExecutor heartbeatScheduledExecutor;
 
   public HeartbeatDispatcher(
-      ISarosSession sarosSession,
-      UISynchronizer uiSynchronizer,
-      ConcurrentDocumentClient cdClient) {
-    this.session = sarosSession;
+      final ISarosSession session,
+      final UISynchronizer uiSynchronizer,
+      final ConcurrentDocumentClient documentClient) {
+
+    this.session = session;
     this.uiSynchronizer = uiSynchronizer;
-    this.jupiter = cdClient.getJupiterClient();
+    this.jupiterClient = documentClient.getJupiterClient();
   }
 
   @Override
   public void start() {
+
     session.addActivityProducer(this);
+
     heartbeatScheduledExecutor =
         new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("JupiterHeartbeat"));
-    // Schedule the heartbeat once per minute, this should be absolutely
-    // sufficient.
-    // NOTE: This might even be to frequent for a lot of open documents, but
-    // that likely
-    // causes other performance problems anyway.
+
+    /* Schedule the heart-beat once per minute, this should be absolutely sufficient.
+     * NOTE: This might even be to frequent for a lot of open documents, but
+     * that likely causes other performance problems anyway.
+     * Suggestion: store a map of the documents. Invoke the heart-beat more frequently but only fire heart-beats for a subset of documents so
+     * that we do not produce too much traffic at once.
+     * E.G: We have 50 documents, on the first interval fire changes for the first 10 documents.
+     * On the next interval fire changes for the next 10 documents on so on.
+     */
+
+    // client documents should only be accessed by the main thread
     heartbeatScheduledExecutor.scheduleWithFixedDelay(
-        this::dispatchHeartbeats, 1, 1, TimeUnit.MINUTES);
+        () -> uiSynchronizer.syncExec(this::dispatchHeartbeats), 1, 1, TimeUnit.MINUTES);
   }
 
   private void dispatchHeartbeats() {
-    // clientDocs should only be accessed by the main thread
-    // FIXME syncExec not asyncExec
-    uiSynchronizer.asyncExec(
-        () ->
-            jupiter
-                .getClientDocs()
-                .forEach(
-                    (path, jupiter) -> {
-                      JupiterActivity heartbeat =
-                          jupiter.generateJupiterActivity(
-                              new NoOperation(), session.getLocalUser(), path);
-                      fireActivity(heartbeat);
-                    }));
+
+    assert uiSynchronizer.isUIThread() : "invalid thread access";
+
+    final User localUser = session.getLocalUser();
+
+    for (Entry<SPath, Jupiter> entry : jupiterClient.getClientDocs().entrySet()) {
+
+      final SPath path = entry.getKey();
+      final Algorithm jupiterAlgorithm = entry.getValue();
+
+      final JupiterActivity heartbeat =
+          jupiterAlgorithm.generateJupiterActivity(new NoOperation(), localUser, path);
+
+      fireActivity(heartbeat);
+    }
   }
 
   @Override
   public void stop() {
     session.removeActivityProducer(this);
     heartbeatScheduledExecutor.shutdown();
-    // FIXME wait here until everything is finished
+
+    try {
+      if (!heartbeatScheduledExecutor.awaitTermination(10, TimeUnit.SECONDS))
+        log.error(heartbeatScheduledExecutor + " is still running");
+
+    } catch (InterruptedException e) {
+      log.warn("interrupted while waiting for " + heartbeatScheduledExecutor + " to terminate", e);
+      Thread.currentThread().interrupt();
+    }
   }
 }
