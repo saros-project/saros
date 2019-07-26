@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.log4j.Logger;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.ProgressEvent;
@@ -19,6 +20,8 @@ public class SWTBrowser implements IBrowser {
     LOADING,
     COMPLETE
   }
+
+  private static final Logger log = Logger.getLogger(SWTBrowser.class);
 
   private final Browser browser;
   private ReadyState state = ReadyState.LOADING;
@@ -42,10 +45,14 @@ public class SWTBrowser implements IBrowser {
     browser = new Browser(parent, style);
 
     browser.addDisposeListener(
-        (DisposeEvent e) -> {
+        (DisposeEvent event) -> {
           synchronized (runOnDisposalList) {
             for (Runnable runnable : runOnDisposalList) {
-              runnable.run();
+              try {
+                runnable.run();
+              } catch (RuntimeException exception) {
+                log.error("error running on disposal: " + exception.getMessage(), exception);
+              }
             }
           }
         });
@@ -53,7 +60,7 @@ public class SWTBrowser implements IBrowser {
 
   @Override
   public boolean setFocus() {
-    return this.syncExec(
+    return syncExec(
         () -> {
           return browser.setFocus();
         });
@@ -61,12 +68,12 @@ public class SWTBrowser implements IBrowser {
 
   @Override
   public void setSize(final int width, final int height) {
-    this.syncExec(() -> browser.setSize(width, height));
+    syncExec(() -> browser.setSize(width, height));
   }
 
   @Override
   public String getUrl() {
-    return this.syncExec(
+    return syncExec(
         () -> {
           return browser.getUrl();
         });
@@ -74,22 +81,23 @@ public class SWTBrowser implements IBrowser {
 
   @Override
   public boolean loadUrl(final String url, final int timeout) {
-    browser.getShell().open();
+    syncExec(() -> browser.getShell().open());
 
-    this.state = ReadyState.LOADING;
-    browser.addProgressListener(readyStateListener);
-
-    this.syncExec(
+    state = ReadyState.LOADING;
+    syncExec(
         () -> {
+          browser.addProgressListener(readyStateListener);
           browser.setUrl(url);
         });
+
     boolean successful = waitForPageLoaded(timeout);
 
-    browser.removeProgressListener(readyStateListener);
+    syncExec(() -> browser.removeProgressListener(readyStateListener));
 
     return successful;
   }
 
+  /** This method waits as long as defined in <code>timeout</code> */
   private boolean waitForPageLoaded(final int timeout) {
     AtomicBoolean waiting = new AtomicBoolean(true);
     Display display = browser.getDisplay();
@@ -103,37 +111,35 @@ public class SWTBrowser implements IBrowser {
             display.wake();
           }
         };
+    syncExec(() -> display.timerExec(timeout, wakeUpTimeout));
 
-    display.timerExec(timeout, wakeUpTimeout);
-
-    this.syncExec(
+    syncExec(
         () -> {
           while (waiting.get() && state != ReadyState.COMPLETE) {
             if (!display.readAndDispatch()) display.sleep();
           }
         });
 
-    return this.state == ReadyState.COMPLETE;
+    return state == ReadyState.COMPLETE;
   }
 
   @Override
   public void loadHtml(final String html) {
-    this.syncExec(() -> browser.setText(html));
+    syncExec(() -> browser.setText(html));
   }
 
   @Override
   public Object evaluate(final String jsCode) {
-    return this.syncExec(
+    return syncExec(
         () -> {
           Object rv = browser.evaluate(jsCode);
-          System.out.println(rv);
           return rv;
         });
   }
 
   @Override
   public boolean execute(String jsCode) {
-    return this.syncExec(
+    return syncExec(
         () -> {
           return browser.execute(jsCode);
         });
@@ -141,7 +147,7 @@ public class SWTBrowser implements IBrowser {
 
   @Override
   public void addBrowserFunction(final AbstractJavascriptFunction function) {
-    this.syncExec(
+    syncExec(
         () -> {
           BrowserFunction swtFunction =
               new BrowserFunction(browser, function.getName()) {
@@ -162,6 +168,8 @@ public class SWTBrowser implements IBrowser {
   private <V> V syncExec(final NoCheckedExceptionCallable<V> callable) {
     final AtomicReference<V> r = new AtomicReference<V>();
     final AtomicReference<RuntimeException> exception = new AtomicReference<RuntimeException>();
+    final AtomicReference<Error> error = new AtomicReference<Error>();
+
     browser
         .getDisplay()
         .syncExec(
@@ -170,30 +178,23 @@ public class SWTBrowser implements IBrowser {
                 r.set(callable.call());
               } catch (RuntimeException e) {
                 exception.set(e);
+              } catch (Error e) {
+                error.set(e);
               }
             });
 
-    if (exception.get() != null) {
-      throw exception.get();
-    }
+    if (exception.get() != null) throw exception.get();
+
+    if (error.get() != null) throw error.get();
+
     return r.get();
   }
 
   private void syncExec(final Runnable runnable) {
-    final AtomicReference<RuntimeException> exception = new AtomicReference<RuntimeException>();
-    browser
-        .getDisplay()
-        .syncExec(
-            () -> {
-              try {
-                runnable.run();
-              } catch (RuntimeException e) {
-                exception.set(e);
-              }
-            });
-
-    if (exception.get() != null) {
-      throw exception.get();
-    }
+    syncExec(
+        () -> {
+          runnable.run();
+          return null;
+        });
   }
 }

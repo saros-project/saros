@@ -58,6 +58,7 @@ public interface IBrowser {
    * Execute a JavaScript code without a return value.
    *
    * @param jsCode the JavaScript code that has to be executed
+   * @return true if the execution was successful
    */
   public boolean execute(final String jsCode);
 
