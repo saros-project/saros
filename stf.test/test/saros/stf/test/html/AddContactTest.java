@@ -4,7 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
-import static saros.ui.View.ADD_CONTACT;
+import static saros.ui.View.ADD_CONTACT_VIEW;
 import static saros.ui.View.MAIN_VIEW;
 
 import java.util.List;
@@ -35,11 +35,11 @@ public class AddContactTest extends StfHtmlTestCase {
 
     // open contact form
     ALICE.htmlBot().view(MAIN_VIEW).button("add-contact").click();
-    assertTrue(ALICE.htmlBot().view(ADD_CONTACT).isOpen());
+    assertTrue(ALICE.htmlBot().view(ADD_CONTACT_VIEW).isOpen());
 
     // add bob as contact
-    ALICE.htmlBot().view(ADD_CONTACT).inputField("jid").enter(BOB.getBaseJid());
-    ALICE.htmlBot().view(ADD_CONTACT).button("add-contact").click();
+    ALICE.htmlBot().view(ADD_CONTACT_VIEW).inputField("jid").enter(BOB.getBaseJid());
+    ALICE.htmlBot().view(ADD_CONTACT_VIEW).button("add-contact").click();
     assertTrue("Main View did not open", ALICE.htmlBot().view(MAIN_VIEW).isOpen());
 
     // confirm
