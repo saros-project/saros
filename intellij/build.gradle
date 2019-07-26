@@ -5,7 +5,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.8"
+    classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.9"
   }
 }
 
@@ -71,7 +71,7 @@ intellij {
   if (intellijHome) {
     localPath = intellijHome
   } else {
-    version = 'IC-2019.1.2'
+    version = 'IC-2019.2'
   }
 
   // don't overwrite the version compatibility defined in the plugin.xml
