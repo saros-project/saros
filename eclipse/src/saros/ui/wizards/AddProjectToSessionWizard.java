@@ -7,10 +7,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -31,6 +34,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -79,11 +83,15 @@ public class AddProjectToSessionWizard extends Wizard {
 
   private boolean isExceptionCancel;
 
+  private final ResourceMappingStorage mappingStorage;
+
   @Inject private IChecksumCache checksumCache;
 
   @Inject private IConnectionManager connectionManager;
 
   @Inject private Preferences preferences;
+
+  @Inject private IPreferenceStore preferenceStore;
 
   @Inject private ISarosSessionManager sessionManager;
 
@@ -124,6 +132,8 @@ public class AddProjectToSessionWizard extends Wizard {
 
     SarosPluginContext.initComponent(this);
 
+    this.mappingStorage = new ResourceMappingStorage(preferenceStore);
+
     this.negotiation = negotiation;
     this.peer = negotiation.getPeer();
 
@@ -152,9 +162,16 @@ public class AddProjectToSessionWizard extends Wizard {
 
     if (session == null) return;
 
+    final Map<String, String> lastProjectNameMapping = mappingStorage.getMapping(peer);
+
     namePage =
         new EnterProjectNamePage(
-            session, connectionManager, preferences, peer, negotiation.getProjectNegotiationData());
+            session,
+            connectionManager,
+            preferences,
+            peer,
+            negotiation.getProjectNegotiationData(),
+            lastProjectNameMapping);
 
     addPage(namePage);
   }
@@ -215,6 +232,8 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     if (!confirmOverwritingResources(modifiedResources)) return false;
+
+    storeCurrentProjectNameMapping(peer);
 
     triggerProjectNegotiation(targetProjectMapping, openEditors);
 
@@ -666,6 +685,110 @@ public class AddProjectToSessionWizard extends Wizard {
 
     if (proceed) {
       for (IEditorPart editor : dirtyEditors) editor.doSave(new NullProgressMonitor());
+    }
+  }
+
+  private void storeCurrentProjectNameMapping(final JID jid) {
+    Map<String, String> currentProjectNameMapping = new HashMap<>();
+
+    for (final ProjectNegotiationData data : negotiation.getProjectNegotiationData()) {
+      final String projectID = data.getProjectID();
+      currentProjectNameMapping.put(
+          data.getProjectName(), namePage.getTargetProjectName(projectID));
+    }
+
+    mappingStorage.updateMapping(jid, currentProjectNameMapping);
+  }
+
+  private static final class ResourceMappingStorage {
+    private static final String RESOURCE_MAPPING_STORE_PREFIX = "resource.mapping.storage.";
+
+    private static final CharSequence DELIMITER = ":";
+
+    private static final CharSequence ESCAPE_CHARACTER = "\\";
+
+    private static final CharSequence ESCAPE_SEQUENCE =
+        ESCAPE_CHARACTER.toString() + DELIMITER.toString();
+
+    private static final Pattern SPLIT_PATTERN =
+        Pattern.compile(
+            "(?<!"
+                + Pattern.quote(ESCAPE_CHARACTER.toString())
+                + ")"
+                + Pattern.quote(DELIMITER.toString()));
+
+    private final IPreferenceStore store;
+
+    public ResourceMappingStorage(final IPreferenceStore store) {
+      this.store = store;
+    }
+
+    public Map<String, String> getMapping(final JID jid) {
+      final Map<String, String> result = new HashMap<>();
+
+      final String mapping = store.getString(RESOURCE_MAPPING_STORE_PREFIX + jid.getBase());
+
+      if (mapping.isEmpty()) return result;
+
+      final String[] names = SPLIT_PATTERN.split(mapping);
+
+      for (int i = 0; i < names.length - 1; i += 2) {
+        if (names[i].isEmpty() || names[i + 1].isEmpty()) continue;
+
+        result.put(unescape(names[i]), unescape(names[i + 1]));
+      }
+
+      return result;
+    }
+
+    public void updateMapping(final JID jid, final Map<String, String> resourceNameMapping) {
+
+      final Map<String, String> lastResourceNameMapping = getMapping(jid);
+
+      final Set<String> resourceNameDestinations = new HashSet<>(resourceNameMapping.values());
+
+      /*
+       * Remove existing mappings to avoid following problem:
+       * 1. We add A->A, B->B, C->C
+       * 2. Afterwards  A->A, B->C
+       * 3. When we now lookup A,B,C we will get A->A, B->C, C->C which is an invalid mapping
+       *
+       * In other words, ensure that the mapping is injective.
+       */
+
+      final Iterator<Entry<String, String>> it = lastResourceNameMapping.entrySet().iterator();
+
+      while (it.hasNext()) {
+
+        final Entry<String, String> entry = it.next();
+
+        if (resourceNameDestinations.contains(entry.getValue())) it.remove();
+      }
+
+      lastResourceNameMapping.putAll(resourceNameMapping);
+
+      if (lastResourceNameMapping.isEmpty()) return;
+
+      final StringBuilder builder = new StringBuilder();
+
+      for (final Entry<String, String> entry : lastResourceNameMapping.entrySet()) {
+        builder.append(escape(entry.getKey()));
+        builder.append(DELIMITER);
+        builder.append(escape(entry.getValue()));
+        builder.append(DELIMITER);
+      }
+
+      builder.setLength(builder.length() - DELIMITER.length());
+
+      store.setValue(RESOURCE_MAPPING_STORE_PREFIX + jid.getBase(), builder.toString());
+    }
+
+    private static String escape(final String value) {
+      return value.replace(DELIMITER, ESCAPE_SEQUENCE);
+    }
+
+    private static String unescape(final String value) {
+      return value.replace(ESCAPE_SEQUENCE, DELIMITER);
     }
   }
 }
