@@ -51,6 +51,7 @@ import saros.net.PacketCollector;
 import saros.net.internal.BinaryXMPPExtension;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.preferences.EclipsePreferenceConstants;
 import saros.preferences.EclipsePreferences;
 import saros.preferences.PreferenceStore;
 import saros.project.internal.SarosEclipseSessionContextFactory;
@@ -278,6 +279,10 @@ public class SarosSessionTest {
     final IPreferenceStore store = EclipseMocker.initPreferenceStore(container);
 
     final Preferences preferences = EclipseMocker.initPreferences();
+
+    // triggers SWTUtils if not disabled and causes issues
+    preferences.putInt(
+        EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED, FeedbackManager.FEEDBACK_DISABLED);
 
     // Init Feedback
     FeedbackPreferences.setPreferences(preferences);

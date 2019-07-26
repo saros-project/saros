@@ -18,6 +18,7 @@ import saros.editor.FollowModeManager;
 import saros.net.IConnectionManager;
 import saros.net.internal.DataTransferManager;
 import saros.net.xmpp.JID;
+import saros.preferences.EclipsePreferenceConstants;
 import saros.repackaged.picocontainer.BindKey;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.repackaged.picocontainer.PicoBuilder;
@@ -105,6 +106,10 @@ public class StatisticCollectorTest {
 
     IPreferenceStore store = EclipseMocker.initPreferenceStore(container);
     Preferences preferences = EclipseMocker.initPreferences();
+
+    // triggers SWTUtils if not disabled and causes issues
+    preferences.putInt(
+        EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED, FeedbackManager.FEEDBACK_DISABLED);
 
     EclipseMocker.mockSarosWithPreferences(container, store, preferences);
 

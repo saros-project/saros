@@ -166,7 +166,7 @@ public class Saros extends AbstractUIPlugin {
   public synchronized Preferences getGlobalPreferences() {
     // TODO Singleton-Pattern code smell: ConfigPrefs should be a @component
     if (globalPreferences == null) {
-      globalPreferences = new ConfigurationScope().getNode(PLUGIN_ID);
+      globalPreferences = ConfigurationScope.INSTANCE.getNode(PLUGIN_ID);
     }
     return globalPreferences;
   }
