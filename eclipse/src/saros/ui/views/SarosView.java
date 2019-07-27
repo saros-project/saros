@@ -54,6 +54,7 @@ import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
 import saros.ui.BalloonNotification;
+import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.actions.ChangeColorAction;
 import saros.ui.actions.ChangeWriteAccessAction;
@@ -73,6 +74,7 @@ import saros.ui.actions.RenameContactAction;
 import saros.ui.actions.RequestSessionInviteAction;
 import saros.ui.actions.SendFileAction;
 import saros.ui.actions.SkypeAction;
+import saros.ui.menuContributions.StartSessionWithProjects;
 import saros.ui.model.roster.RosterEntryElement;
 import saros.ui.sounds.SoundPlayer;
 import saros.ui.sounds.Sounds;
@@ -432,6 +434,17 @@ public class SarosView extends ViewPart {
                 SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
             if (contacts.size() == 0) return;
 
+            if (sarosSessionManager.getSession() == null) {
+              MenuManager shareProjectSubMenu =
+                  new MenuManager(
+                      "Share Project(s)...",
+                      ImageManager.ELCL_SESSION__DESCRIPTOR,
+                      "Share_Project");
+
+              shareProjectSubMenu.add(new StartSessionWithProjects());
+              // TODO it seems it not that trivial to add tooltips to these entries
+              manager.add(shareProjectSubMenu);
+            }
             /*
              * disabled because feature does not work properly(current
              * version 14.1.31)

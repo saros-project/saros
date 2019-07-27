@@ -1002,6 +1002,7 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?before=menustart">
+         <!-- See SarosView, the context menu is created manually 
          <command
                commandId="saros.ui.commands.ShareResource"
                disabledIcon="icons/dlcl16/spacer.png"
@@ -1023,6 +1024,7 @@
                </and>
             </visibleWhen>
          </command>
+         -->
          <command
                commandId="saros.ui.commands.SessionAddSelectedContacts"
                disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
