@@ -78,8 +78,13 @@ public class ImageManager {
       getImage("icons/elcl16/contact_add_tsk.png"); // $NON-NLS-1$
   public static final Image DLCL_CONTACT_ADD =
       getImage("icons/dlcl16/contact_add_tsk.png"); // $NON-NLS-1$
+
   public static final Image ELCL_SESSION = getImage("icons/elcl16/session_tsk.png"); // $NON-NLS-1$
+  public static final ImageDescriptor ELCL_SESSION__DESCRIPTOR =
+      getImageDescriptor("icons/elcl16/session_tsk.png"); // $NON-NLS-1$
+
   public static final Image DLCL_SESSION = getImage("icons/dlcl16/session_tsk.png"); // $NON-NLS-1$
+
   public static final Image ELCL_SESSION_LEAVE =
       getImage("icons/elcl16/session_leave_tsk.png"); // $NON-NLS-1$
   public static final Image DLCL_SESSION_LEAVE =
