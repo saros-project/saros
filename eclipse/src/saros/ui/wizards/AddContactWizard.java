@@ -6,7 +6,6 @@ import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.jivesoftware.smack.Connection;
@@ -34,7 +33,6 @@ public class AddContactWizard extends Wizard {
   private static final Logger log = Logger.getLogger(AddContactWizard.class);
 
   public static final String TITLE = Messages.AddContactWizard_title;
-  public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_CONTACT;
 
   @Inject protected XMPPConnectionService connectionService;
 
@@ -71,7 +69,7 @@ public class AddContactWizard extends Wizard {
   public AddContactWizard() {
     SarosPluginContext.initComponent(this);
     setWindowTitle(TITLE);
-    setDefaultPageImageDescriptor(IMAGE);
+    setDefaultPageImageDescriptor(ImageManager.getImageDescriptor(ImageManager.WIZBAN_ADD_CONTACT));
     setNeedsProgressMonitor(true);
   }
 

@@ -1,6 +1,5 @@
 package saros.ui.wizards;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccount;
@@ -18,7 +17,6 @@ import saros.ui.wizards.pages.EditXMPPAccountWizardPage;
  */
 public class EditXMPPAccountWizard extends Wizard {
   public static final String TITLE = Messages.EditXMPPAccountWizard_title;
-  public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_EDIT_XMPP_ACCOUNT;
 
   @Inject XMPPAccountStore xmppAccountStore;
   XMPPAccount account;
@@ -30,7 +28,8 @@ public class EditXMPPAccountWizard extends Wizard {
 
     SarosPluginContext.initComponent(this);
     this.setWindowTitle(TITLE);
-    this.setDefaultPageImageDescriptor(IMAGE);
+    this.setDefaultPageImageDescriptor(
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_EDIT_XMPP_ACCOUNT));
 
     this.setNeedsProgressMonitor(false);
 

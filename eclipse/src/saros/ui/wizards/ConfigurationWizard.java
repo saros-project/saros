@@ -37,7 +37,8 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
     SarosPluginContext.initComponent(this);
 
     setWindowTitle("Saros Configuration");
-    setDefaultPageImageDescriptor(ImageManager.WIZBAN_CONFIGURATION);
+    setDefaultPageImageDescriptor(
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_CONFIGURATION));
     colorChooserWizardPage.setTitle(Messages.ChangeColorWizardPage_configuration_mode_title);
 
     colorChooserWizardPage.setDescription(

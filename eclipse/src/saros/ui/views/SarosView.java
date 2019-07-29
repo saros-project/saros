@@ -438,7 +438,7 @@ public class SarosView extends ViewPart {
               MenuManager shareProjectSubMenu =
                   new MenuManager(
                       "Share Project(s)...",
-                      ImageManager.ELCL_SESSION__DESCRIPTOR,
+                      ImageManager.getImageDescriptor(ImageManager.ELCL_SESSION),
                       "Share_Project");
 
               shareProjectSubMenu.add(new StartSessionWithProjects());

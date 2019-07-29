@@ -18,20 +18,19 @@ public class OpenPreferencesAction extends Action {
 
     setId(ACTION_ID);
     setToolTipText(Messages.OpenPreferencesAction_tooltip);
-    setImageDescriptor(ImageManager.ELCL_OPEN_PREFERENCES);
+    setImageDescriptor(ImageManager.getImageDescriptor(ImageManager.ELCL_PREFERENCES_OPEN));
     setEnabled(true);
   }
 
   @Override
   public void run() {
     IHandlerService service =
-        (IHandlerService)
-            PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow()
-                .getActivePage()
-                .getActivePart()
-                .getSite()
-                .getService(IHandlerService.class);
+        PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow()
+            .getActivePage()
+            .getActivePart()
+            .getSite()
+            .getService(IHandlerService.class);
     try {
       service.executeCommand(
           "saros.ui.commands.OpenSarosPreferences", //$NON-NLS-1$
