@@ -1,7 +1,6 @@
 package saros.ui.wizards;
 
 import java.util.List;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
 import saros.net.xmpp.JID;
 import saros.ui.ImageManager;
@@ -16,14 +15,14 @@ import saros.ui.wizards.pages.ContactSelectionWizardPage;
  */
 public class AddContactsToSessionWizard extends Wizard {
   public static final String TITLE = Messages.SessionAddContactsWizard_title;
-  public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SESSION_ADD_CONTACTS;
 
   private final ContactSelectionWizardPage contactSelectionWizardPage =
       new ContactSelectionWizardPage();
 
   public AddContactsToSessionWizard() {
     setWindowTitle(TITLE);
-    setDefaultPageImageDescriptor(IMAGE);
+    setDefaultPageImageDescriptor(
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_SESSION_ADD_CONTACTS));
     setHelpAvailable(false);
   }
 

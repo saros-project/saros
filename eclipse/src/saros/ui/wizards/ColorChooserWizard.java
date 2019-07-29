@@ -13,7 +13,8 @@ public class ColorChooserWizard extends Wizard {
     setWindowTitle(Messages.ChangeColorWizard_title);
     setHelpAvailable(false);
     setNeedsProgressMonitor(false);
-    setDefaultPageImageDescriptor(ImageManager.WIZBAN_CONFIGURATION);
+    setDefaultPageImageDescriptor(
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_CONFIGURATION));
 
     colorChooserWizardPage.setTitle(Messages.ChangeColorWizardPage_title);
     colorChooserWizardPage.setDescription(Messages.ChangeColorWizardPage_description);

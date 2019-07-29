@@ -62,7 +62,8 @@ public class CreateXMPPAccountWizard extends Wizard {
     SarosPluginContext.initComponent(this);
 
     setWindowTitle(Messages.CreateXMPPAccountWizard_title);
-    setDefaultPageImageDescriptor(ImageManager.WIZBAN_CREATE_XMPP_ACCOUNT);
+    setDefaultPageImageDescriptor(
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_CREATE_XMPP_ACCOUNT));
 
     this.createXMPPAccountPage = new CreateXMPPAccountWizardPage(showUseNowButton);
     setNeedsProgressMonitor(true);

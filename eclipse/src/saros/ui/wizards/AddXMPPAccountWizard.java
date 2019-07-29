@@ -39,7 +39,8 @@ public class AddXMPPAccountWizard extends Wizard {
     setWindowTitle(Messages.AddXMPPAccountWizard_title);
     setHelpAvailable(false);
     setNeedsProgressMonitor(false);
-    setDefaultPageImageDescriptor(ImageManager.WIZBAN_CONFIGURATION);
+    setDefaultPageImageDescriptor(
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_CONFIGURATION));
   }
 
   @Override
