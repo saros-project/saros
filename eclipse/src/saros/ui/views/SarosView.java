@@ -445,11 +445,8 @@ public class SarosView extends ViewPart {
               // TODO it seems it not that trivial to add tooltips to these entries
               manager.add(shareProjectSubMenu);
             }
-            /*
-             * disabled because feature does not work properly(current
-             * version 14.1.31)
-             */
-            // manager.add(getAction(SkypeAction.class));
+
+            manager.add(getAction(SkypeAction.ACTION_ID));
 
             // TODO: Currently only Saros/S is known to have a working JoinSessionRequestHandler,
             //       remove this once the situation changes / change this to it's own feature.
