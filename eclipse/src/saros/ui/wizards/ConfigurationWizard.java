@@ -1,26 +1,36 @@
 package saros.ui.wizards;
 
 import org.bitlet.weupnp.GatewayDevice;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.wizard.Wizard;
 import saros.SarosPluginContext;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
 import saros.editor.colorstorage.UserColorID;
 import saros.feedback.ErrorLogManager;
 import saros.feedback.FeedbackManager;
 import saros.feedback.StatisticManagerConfiguration;
+import saros.net.xmpp.JID;
 import saros.preferences.PreferenceConstants;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
+import saros.ui.util.XMPPConnectionSupport;
 import saros.ui.wizards.pages.ColorChooserWizardPage;
 import saros.ui.wizards.pages.ConfigurationSettingsWizardPage;
 import saros.ui.wizards.pages.ConfigurationSummaryWizardPage;
+import saros.ui.wizards.pages.EnterXMPPAccountWizardPage;
 
 /**
  * A wizard to configure Saros (XMPP account, network settings, statistic submission).
  *
  * @author bkahlert
  */
-public class ConfigurationWizard extends AddXMPPAccountWizard {
+public class ConfigurationWizard extends Wizard {
+
+  private final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage =
+      new EnterXMPPAccountWizardPage();
 
   private final ConfigurationSettingsWizardPage configurationSettingsWizardPage =
       new ConfigurationSettingsWizardPage();
@@ -33,12 +43,17 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
   @Inject private IPreferenceStore preferences;
 
+  @Inject private XMPPAccountStore accountStore;
+
   public ConfigurationWizard() {
     SarosPluginContext.initComponent(this);
 
     setWindowTitle("Saros Configuration");
+    setHelpAvailable(false);
+    setNeedsProgressMonitor(false);
     setDefaultPageImageDescriptor(
         ImageManager.getImageDescriptor(ImageManager.WIZBAN_CONFIGURATION));
+
     colorChooserWizardPage.setTitle(Messages.ChangeColorWizardPage_configuration_mode_title);
 
     colorChooserWizardPage.setDescription(
@@ -47,7 +62,7 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
   @Override
   public void addPages() {
-    super.addPages();
+    addPage(enterXMPPAccountWizardPage);
     addPage(configurationSettingsWizardPage);
     addPage(colorChooserWizardPage);
     addPage(configurationSummaryWizardPage);
@@ -56,12 +71,39 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
   @Override
   public boolean performFinish() {
     setConfiguration();
-    return super.performFinish();
+
+    final XMPPAccount accountToConnect;
+
+    if (!enterXMPPAccountWizardPage.isExistingAccount()) {
+      accountToConnect = addXMPPAccount();
+    } else accountToConnect = null;
+
+    assert accountStore.getActiveAccount() != null;
+
+    if (preferences.getBoolean(PreferenceConstants.AUTO_CONNECT)) {
+      getShell()
+          .getDisplay()
+          .asyncExec(
+              () -> XMPPConnectionSupport.getInstance().connect(accountToConnect, true, false));
+    }
+
+    return true;
   }
 
   @Override
   public boolean canFinish() {
     return getContainer().getCurrentPage() == configurationSummaryWizardPage;
+  }
+
+  @Override
+  public boolean performCancel() {
+
+    if (!enterXMPPAccountWizardPage.isExistingAccount()) return true;
+
+    return MessageDialog.openQuestion(
+        getShell(),
+        Messages.AddXMPPAccountWizard_account_created,
+        Messages.AddXMPPAccountWizard_account_created_text);
   }
 
   /**
@@ -99,5 +141,27 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     if (gatewayDevice != null)
       preferences.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, gatewayDevice.getUSN());
+  }
+
+  /** Adds the {@link EnterXMPPAccountWizardPage}'s account data to the {@link XMPPAccountStore}. */
+  private XMPPAccount addXMPPAccount() {
+
+    JID jid = enterXMPPAccountWizardPage.getJID();
+
+    String username = jid.getName();
+    String password = enterXMPPAccountWizardPage.getPassword();
+    String domain = jid.getDomain().toLowerCase();
+    String server = enterXMPPAccountWizardPage.getServer();
+
+    int port;
+
+    if (enterXMPPAccountWizardPage.getPort().length() != 0)
+      port = Integer.valueOf(enterXMPPAccountWizardPage.getPort());
+    else port = 0;
+
+    boolean useTLS = enterXMPPAccountWizardPage.isUsingTLS();
+    boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
+
+    return accountStore.createAccount(username, password, domain, server, port, useTLS, useSASL);
   }
 }

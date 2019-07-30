@@ -8,7 +8,6 @@ import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
-import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.annotations.Component;
 import saros.communication.connection.ConnectionHandler;
@@ -19,7 +18,7 @@ import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.commandHandlers.GettingStartedHandler;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.ViewUtils;
-import saros.util.ThreadUtils;
+import saros.ui.util.XMPPConnectionSupport;
 
 /**
  * An instance of this class is instantiated when Eclipse starts, after the Saros plugin has been
@@ -89,18 +88,7 @@ public class StartupSaros implements IStartup {
 
         if (!preferences.isAutoConnecting() || xmppAccountStore.isEmpty()) return;
 
-        final XMPPAccount account = xmppAccountStore.getActiveAccount();
-
-        ThreadUtils.runSafeAsync(
-            "dpp-connect-auto",
-            LOG,
-            new Runnable() {
-              @Override
-              public void run() {
-                // avoid error popups
-                connectionHandler.connect(account, true);
-              }
-            });
+        SWTUtils.runSafeSWTAsync(LOG, () -> XMPPConnectionSupport.getInstance().connect(true));
       }
     }
   }

@@ -1,6 +1,5 @@
 package saros.ui.actions;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -21,10 +20,9 @@ import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSessionManager;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
-import saros.ui.util.DialogUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.WizardUtils;
-import saros.util.ThreadUtils;
+import saros.ui.util.XMPPConnectionSupport;
 
 /**
  * In addition to the connect/disconnect action, this allows the user to switch between accounts. At
@@ -43,8 +41,6 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
   @Inject private ConnectionHandler connectionHandler;
 
   @Inject private ISarosSessionManager sarosSessionManager;
-
-  private final AtomicBoolean running = new AtomicBoolean();
 
   private boolean isConnectionError;
 
@@ -75,11 +71,16 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
     updateStatus(connectionHandler.getConnectionState());
   }
 
-  // user clicks on Button
   @Override
   public void run() {
-    if (connectionHandler.isConnected()) disconnect();
-    else connect(accountService.isEmpty() ? null : accountService.getActiveAccount());
+
+    if (connectionHandler.isConnected()) {
+      XMPPConnectionSupport.getInstance().disconnect();
+    } else {
+      XMPPConnectionSupport.getInstance()
+          .connect(
+              accountService.isEmpty() ? null : accountService.getActiveAccount(), true, false);
+    }
   }
 
   @Override
@@ -120,19 +121,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
         new Action(Messages.ChangeXMPPAccountAction_configure_account) {
           @Override
           public void run() {
-            IHandlerService service =
-                (IHandlerService)
-                    PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .getActivePart()
-                        .getSite()
-                        .getService(IHandlerService.class);
-            try {
-              service.executeCommand("saros.ui.commands.OpenSarosPreferences", null);
-            } catch (Exception e) {
-              LOG.debug("Could execute command", e);
-            }
+            openPreferences();
           }
         });
     return accountMenu;
@@ -148,76 +137,11 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
 
           @Override
           public void run() {
-            connectWithThisAccount(account);
+            XMPPConnectionSupport.getInstance().connect(account, true, false);
           }
         };
+
     addActionToMenu(accountMenu, action);
-  }
-
-  private void connectWithThisAccount(final XMPPAccount account) {
-
-    if (sarosSessionManager.getSession() == null) {
-      connect(account);
-      return;
-    }
-
-    SWTUtils.runSafeSWTAsync(
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            boolean proceed =
-                DialogUtils.openQuestionMessageDialog(
-                    SWTUtils.getShell(),
-                    "Disconnecting from the current Saros Session",
-                    "Connecting with a different account will disconnect you from your current Saros session. Do you wish to continue ?");
-
-            if (proceed) connect(account);
-          }
-        });
-  }
-
-  private void connect(final XMPPAccount account) {
-    // remember this account for the next connection attempt
-    if (account != null) accountService.setAccountActive(account);
-
-    ThreadUtils.runSafeAsync(
-        "dpp-connect-manual",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              if (running.getAndSet(true)) {
-                LOG.info("User clicked too fast, running already a connect or disconnect.");
-                return;
-              }
-              connectionHandler.connect(account, false);
-            } finally {
-              running.set(false);
-            }
-          }
-        });
-  }
-
-  private void disconnect() {
-    ThreadUtils.runSafeAsync(
-        "dpp-disconnect-manual",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              if (running.getAndSet(true)) {
-                LOG.info("User clicked too fast, running already a connect or disconnect.");
-                return;
-              }
-              connectionHandler.disconnect();
-            } finally {
-              running.set(false);
-            }
-          }
-        });
   }
 
   private void addActionToMenu(Menu parent, Action action) {
@@ -269,6 +193,21 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
 
     } catch (RuntimeException e) {
       LOG.error("Internal error in ChangeXMPPAccountAction:", e);
+    }
+  }
+
+  private void openPreferences() {
+    IHandlerService service =
+        PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow()
+            .getActivePage()
+            .getActivePart()
+            .getSite()
+            .getService(IHandlerService.class);
+    try {
+      service.executeCommand("saros.ui.commands.OpenSarosPreferences", null);
+    } catch (Exception e) {
+      LOG.debug("Could execute command", e);
     }
   }
 }

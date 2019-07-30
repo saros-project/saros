@@ -16,9 +16,9 @@ import saros.net.util.XMPPUtils;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
-import saros.ui.util.DialogUtils;
+import saros.ui.util.SWTUtils;
+import saros.ui.util.XMPPConnectionSupport;
 import saros.ui.wizards.pages.CreateXMPPAccountWizardPage;
-import saros.util.ThreadUtils;
 
 /**
  * @JTourBusStop 4, The Interface Tour:
@@ -142,30 +142,9 @@ public class CreateXMPPAccountWizard extends Wizard {
         accountStore.createAccount(
             cachedUsername, cachedPassword, cachedServer.toLowerCase(), "", 0, true, true);
 
-    // reconnect if user wishes
-    if (createXMPPAccountPage.useNow()) {
-      boolean reconnect = true;
-      if (connectionHandler.isConnected()) {
-        reconnect =
-            DialogUtils.openQuestionMessageDialog(
-                getShell(),
-                Messages.CreateXMPPAccountWizard_already_connected,
-                Messages.CreateXMPPAccountWizard_already_connected_text);
-      }
-
-      if (reconnect) {
-        accountStore.setAccountActive(createdXMPPAccount);
-        ThreadUtils.runSafeAsync(
-            "dpp-connect-demand",
-            log,
-            new Runnable() {
-              @Override
-              public void run() {
-                connectionHandler.connect(createdXMPPAccount, false);
-              }
-            });
-      }
-    }
+    if (createXMPPAccountPage.useNow())
+      SWTUtils.runSafeSWTAsync(
+          log, () -> XMPPConnectionSupport.getInstance().connect(createdXMPPAccount, true, false));
 
     return true;
   }
