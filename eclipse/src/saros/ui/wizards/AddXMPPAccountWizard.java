@@ -1,36 +1,25 @@
 package saros.ui.wizards;
 
-import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
-import saros.communication.connection.ConnectionHandler;
 import saros.net.xmpp.JID;
-import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.wizards.pages.EnterXMPPAccountWizardPage;
-import saros.util.ThreadUtils;
 
 /**
  * A wizard that allows to enter an existing {@link XMPPAccount} or to create new one.
  *
  * @author bkahlert
  */
-public class AddXMPPAccountWizard extends Wizard {
-
-  private static final Logger LOG = Logger.getLogger(AddXMPPAccountWizard.class);
-
-  @Inject private Preferences preferences;
+public final class AddXMPPAccountWizard extends Wizard {
 
   @Inject private XMPPAccountStore accountStore;
 
-  @Inject private ConnectionHandler connectionHandler;
-
-  protected final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage =
+  private final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage =
       new EnterXMPPAccountWizardPage();
 
   public AddXMPPAccountWizard() {
@@ -40,7 +29,7 @@ public class AddXMPPAccountWizard extends Wizard {
     setHelpAvailable(false);
     setNeedsProgressMonitor(false);
     setDefaultPageImageDescriptor(
-        ImageManager.getImageDescriptor(ImageManager.WIZBAN_CONFIGURATION));
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_CREATE_XMPP_ACCOUNT));
   }
 
   @Override
@@ -50,24 +39,8 @@ public class AddXMPPAccountWizard extends Wizard {
 
   @Override
   public boolean performFinish() {
-    if (!enterXMPPAccountWizardPage.isExistingAccount()) addXMPPAccount();
-
-    assert accountStore.getActiveAccount() != null;
-
-    if (preferences.isAutoConnecting()) autoConnectXMPPAccount();
-
+    addXMPPAccount();
     return true;
-  }
-
-  @Override
-  public boolean performCancel() {
-
-    if (!enterXMPPAccountWizardPage.isExistingAccount()) return true;
-
-    return MessageDialog.openQuestion(
-        getShell(),
-        Messages.AddXMPPAccountWizard_account_created,
-        Messages.AddXMPPAccountWizard_account_created_text);
   }
 
   /** Adds the {@link EnterXMPPAccountWizardPage}'s account data to the {@link XMPPAccountStore}. */
@@ -90,17 +63,5 @@ public class AddXMPPAccountWizard extends Wizard {
     boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
 
     accountStore.createAccount(username, password, domain, server, port, useTLS, useSASL);
-  }
-
-  private void autoConnectXMPPAccount() {
-    ThreadUtils.runSafeAsync(
-        "dpp-connect-demand",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            connectionHandler.connect(accountStore.getActiveAccount(), false);
-          }
-        });
   }
 }

@@ -45,6 +45,7 @@ import saros.ui.eventhandler.SessionStatusRequestHandler;
 import saros.ui.eventhandler.SessionViewOpener;
 import saros.ui.eventhandler.UserStatusChangeHandler;
 import saros.ui.eventhandler.XMPPAuthorizationHandler;
+import saros.ui.util.XMPPConnectionSupport;
 
 /**
  * Factory used for creating the Saros context when running as Eclipse plugin.
@@ -106,7 +107,9 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
           IRemoteProgressIndicatorFactory.class, EclipseRemoteProgressIndicatorFactoryImpl.class),
       Component.create(MUCNegotiationManager.class),
       Component.create(SkypeManager.class),
-      Component.create(AwarenessInformationCollector.class)
+      Component.create(AwarenessInformationCollector.class),
+      // Central connect/disconnect access point for the UI
+      Component.create(XMPPConnectionSupport.class)
     };
   }
 
