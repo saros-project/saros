@@ -1,9 +1,6 @@
 package saros.ui.wizards.pages;
 
-import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -14,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
@@ -23,11 +18,16 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.IDialogPage;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import saros.negotiation.ProjectNegotiationData;
@@ -38,7 +38,6 @@ import saros.session.ISarosSession;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.SWTUtils;
-import saros.ui.views.SarosView;
 import saros.ui.widgets.wizard.ProjectOptionComposite;
 import saros.ui.widgets.wizard.events.ProjectNameChangedEvent;
 import saros.ui.widgets.wizard.events.ProjectOptionListener;
@@ -62,8 +61,6 @@ public class EnterProjectNamePage extends WizardPage {
   private IConnectionManager connectionManager;
 
   private Preferences preferences;
-
-  private boolean flashState;
 
   private final Set<String> unsupportedCharsets = new HashSet<String>();
 
@@ -108,12 +105,7 @@ public class EnterProjectNamePage extends WizardPage {
 
   @Override
   public void performHelp() {
-    try {
-      Desktop.getDesktop().browse(URI.create(Messages.EnterProjectNamePage_saros_url));
-    } catch (IOException e) {
-      SarosView.showNotification(
-          Messages.EnterProjectNamePage_faq, Messages.EnterProjectNamePage_error_browser_open);
-    }
+    SWTUtils.openExternalBrowser(Messages.EnterProjectNamePage_saros_url);
   }
 
   @Override
@@ -401,7 +393,8 @@ public class EnterProjectNamePage extends WizardPage {
   /** get transfer mode and set header information of the wizard. */
   private void updateConnectionStatus() {
 
-    switch (connectionManager.getTransferMode(this.peer)) {
+    // FIXME we are using Smack for File transfer so we might end up with other transfer modes
+    switch (connectionManager.getTransferMode(ISarosSession.SESSION_CONNECTION_ID, peer)) {
       case SOCKS5_MEDIATED:
         if (preferences.isLocalSOCKS5ProxyEnabled())
           setDescription(Messages.EnterProjectNamePage_description_socks5proxy);
@@ -410,71 +403,30 @@ public class EnterProjectNamePage extends WizardPage {
         break;
 
       case SOCKS5_DIRECT:
-        setDescription(Messages.EnterProjectNamePage_description_direct_filetranfser);
-        setImageDescriptor(ImageManager.getImageDescriptor("icons/wizban/socks5.png"));
-        break;
-
+        // all is fine
       case NONE:
         // lost data connection
         break;
 
       case IBB:
-        String speedInfo = "";
-
         if (preferences.forceIBBTransport()) {
-          setDescription(
-              MessageFormat.format(
-                  Messages.EnterProjectNamePage_direct_filetransfer_deactivated, speedInfo));
+          setDescription(Messages.EnterProjectNamePage_direct_filetransfer_deactivated);
         } else {
-          setDescription(
-              MessageFormat.format(
-                  Messages.EnterProjectNamePage_direct_filetransfer_nan, speedInfo));
+          setDescription(Messages.EnterProjectNamePage_direct_filetransfer_nan);
         }
-        startIBBLogoFlash();
+
+        new FlashTask(
+                this,
+                1000,
+                ImageManager.getImage("icons/wizban/ibb.png"),
+                ImageManager.getImage("icons/wizban/ibbFaded.png"))
+            .run();
+
         break;
       default:
         setDescription(Messages.EnterProjectNamePage_unknown_transport_method);
         break;
     }
-  }
-
-  /**
-   * Starts and maintains a timer that will flash two IBB logos to make the user aware of the
-   * warning.
-   */
-  private void startIBBLogoFlash() {
-
-    final Timer timer = new Timer();
-
-    timer.schedule(
-        new TimerTask() {
-
-          @Override
-          public void run() {
-            SWTUtils.runSafeSWTSync(
-                log,
-                new Runnable() {
-
-                  @Override
-                  public void run() {
-
-                    if (EnterProjectNamePage.this.getControl().isDisposed()) {
-                      timer.cancel();
-                      return;
-                    }
-
-                    flashState = !flashState;
-                    if (flashState)
-                      setImageDescriptor(ImageManager.getImageDescriptor("icons/wizban/ibb.png"));
-                    else
-                      setImageDescriptor(
-                          ImageManager.getImageDescriptor("icons/wizban/ibbFaded.png"));
-                  }
-                });
-          }
-        },
-        0,
-        1000);
   }
 
   /**
@@ -560,5 +512,38 @@ public class EnterProjectNamePage extends WizardPage {
     }
 
     return missingCharsets;
+  }
+
+  private static class FlashTask implements Runnable {
+
+    private final ImageDescriptor[] states;
+    private final Display display;
+    private final Control control;
+    private final IDialogPage page;
+    private final int delay;
+
+    int state = 0;
+
+    public FlashTask(final IDialogPage page, final int delay, final Image... images) {
+      this.page = page;
+      this.delay = delay;
+
+      control = page.getControl();
+      display = page.getControl().getDisplay();
+      states = new ImageDescriptor[images.length];
+
+      for (int i = 0; i < states.length; i++)
+        states[i] = ImageDescriptor.createFromImage(images[i]);
+    }
+
+    @Override
+    public void run() {
+      if (display.isDisposed() || control.isDisposed()) return;
+
+      state %= states.length;
+
+      page.setImageDescriptor(states[state++]);
+      display.timerExec(delay, this);
+    }
   }
 }

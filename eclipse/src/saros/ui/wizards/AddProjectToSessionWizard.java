@@ -59,6 +59,7 @@ import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
+import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.DialogUtils;
 import saros.ui.util.SWTUtils;
@@ -129,7 +130,8 @@ public class AddProjectToSessionWizard extends Wizard {
     setWindowTitle(Messages.AddProjectToSessionWizard_title);
     setHelpAvailable(true);
     setNeedsProgressMonitor(true);
-
+    setDefaultPageImageDescriptor(
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_SESSION_ADD_PROJECTS));
     /* holds if the wizard close is because of an exception or not */
     isExceptionCancel = false;
   }
