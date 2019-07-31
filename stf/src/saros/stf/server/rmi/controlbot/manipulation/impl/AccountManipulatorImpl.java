@@ -43,7 +43,7 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
 
     XMPPAccount activeAccount = accountStore.getActiveAccount();
 
-    if (accountStore.exists(username, domain, "", 0)) return;
+    if (accountStore.existsAccount(username, domain, "", 0)) return;
 
     XMPPAccount defaultAccount =
         accountStore.createAccount(username, password, domain, "", 0, true, true);
@@ -60,7 +60,7 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
 
     XMPPAccountStore accountStore = getXmppAccountStore();
 
-    if (accountStore.exists(username, domain, "", 0)) {
+    if (accountStore.existsAccount(username, domain, "", 0)) {
       LOG.debug(
           "account with username '" + username + "' and domain '" + domain + "' already exists");
       return;

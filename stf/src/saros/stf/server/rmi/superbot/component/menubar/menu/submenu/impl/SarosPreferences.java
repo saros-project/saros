@@ -353,7 +353,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
   }
 
   private boolean isAccountExistNoGUI(JID jid) {
-    return getXmppAccountStore().exists(jid.getName(), jid.getDomain(), "", 0);
+    return getXmppAccountStore().existsAccount(jid.getName(), jid.getDomain(), "", 0);
   }
 
   @Override

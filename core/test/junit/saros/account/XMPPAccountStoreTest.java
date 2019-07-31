@@ -69,9 +69,9 @@ public class XMPPAccountStoreTest {
 
     assertEquals(configuredAccounts.size(), store.getAllAccounts().size());
 
-    assertTrue(store.exists("activeAccount", "activedomain", "activeserver", 3));
-    assertTrue(store.exists("anotherAccount1", "anotherdomain1", "anotherserver1", 1));
-    assertTrue(store.exists("anotherAccount2", "anotherdomain2", "anotherserver2", 2));
+    assertTrue(store.existsAccount("activeAccount", "activedomain", "activeserver", 3));
+    assertTrue(store.existsAccount("anotherAccount1", "anotherdomain1", "anotherserver1", 1));
+    assertTrue(store.existsAccount("anotherAccount2", "anotherdomain2", "anotherserver2", 2));
 
     assertEquals("activeAccount", store.getActiveAccount().getUsername());
   }
@@ -158,10 +158,11 @@ public class XMPPAccountStoreTest {
     assertEquals(1, store.getAllAccounts().size());
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void testDeleteActiveAccount() {
+  @Test
+  public void deleteDefaultAccount() {
     store.createAccount("a", "a", "a", "a", 1, true, true);
-    store.deleteAccount(store.getActiveAccount());
+    store.deleteAccount(store.getDefaultAccount());
+    assertNull(store.getDefaultAccount());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -265,11 +266,11 @@ public class XMPPAccountStoreTest {
   public void testAccountexists() {
     store.createAccount("alice", "alice", "b", "b", 1, true, true);
 
-    assertTrue(store.exists("alice", "b", "b", 1));
-    assertFalse(store.exists("Alice", "b", "b", 1));
-    assertFalse(store.exists("alice", "a", "b", 1));
-    assertFalse(store.exists("alice", "b", "a", 1));
-    assertFalse(store.exists("alice", "b", "b", 5));
+    assertTrue(store.existsAccount("alice", "b", "b", 1));
+    assertFalse(store.existsAccount("Alice", "b", "b", 1));
+    assertFalse(store.existsAccount("alice", "a", "b", 1));
+    assertFalse(store.existsAccount("alice", "b", "a", 1));
+    assertFalse(store.existsAccount("alice", "b", "b", 5));
   }
 
   @Test
@@ -299,6 +300,61 @@ public class XMPPAccountStoreTest {
         true);
 
     assertEquals(another, account);
+  }
+
+  @Test
+  public void testChangeAccountAfterDeserialization() throws IOException {
+
+    File tmpAccountFile = tmpFolder.newFile("saros_account.dat");
+
+    store.setAccountFile(tmpAccountFile, null);
+
+    store.createAccount("alice", "alice", "b", "b", 1, true, true);
+
+    store = new XMPPAccountStore();
+    store.setAccountFile(tmpAccountFile, null);
+
+    XMPPAccount defaultAccount = store.getDefaultAccount();
+
+    XMPPAccount another = store.getAllAccounts().get(0);
+
+    store.changeAccountData(
+        another,
+        another.getUsername(),
+        another.getPassword(),
+        another.getDomain(),
+        "",
+        0,
+        true,
+        true);
+
+    assertEquals(another, defaultAccount);
+  }
+
+  @Test
+  public void testSetDefaultToNullAndThenDeserializeAgain() throws IOException {
+    File tmpAccountFile = tmpFolder.newFile("saros_account.dat");
+
+    XMPPAccount defaultAccount;
+
+    store.setAccountFile(tmpAccountFile, null);
+
+    assertEquals(0, store.getAllAccounts().size());
+    // this is the default one
+    defaultAccount = store.createAccount("alice", "alice", "b", "b", 1, true, true);
+    store.createAccount("bob", "bob", "b", "b", 1, true, true);
+
+    assertEquals(defaultAccount, store.getDefaultAccount());
+    store.setDefaultAccount(null);
+
+    store = new XMPPAccountStore();
+    store.setAccountFile(tmpAccountFile, null);
+
+    defaultAccount = store.getDefaultAccount();
+
+    assertNull(defaultAccount);
+
+    assertEquals(2, store.getAllAccounts().size());
   }
 
   @Test
