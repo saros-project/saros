@@ -38,7 +38,7 @@ public class SetActiveAccount extends TypedJavascriptFunction {
   @BrowserFunction
   public void setActiveAccount(XMPPAccount account) {
     try {
-      accountStore.setAccountActive(account);
+      accountStore.setDefaultAccount(account);
     } catch (IllegalArgumentException e) {
       LOG.error("Couldn't activate account " + account.toString() + ". Error:" + e.getMessage(), e);
       JavaScriptAPI.showError(browser, HTMLUIStrings.ERR_ACCOUNT_SET_ACTIVE_FAILED);
