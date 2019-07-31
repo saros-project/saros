@@ -29,7 +29,7 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
 
     for (XMPPAccount account : accountStore.getAllAccounts()) {
 
-      if (account.equals(accountStore.getActiveAccount())) continue;
+      if (account.equals(accountStore.getDefaultAccount())) continue;
 
       LOG.debug("deleting account: " + account);
 
@@ -40,19 +40,6 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
       accountStore.createAccount(username, password, domain, "", 0, true, true);
       return;
     }
-
-    XMPPAccount activeAccount = accountStore.getActiveAccount();
-
-    if (accountStore.existsAccount(username, domain, "", 0)) return;
-
-    XMPPAccount defaultAccount =
-        accountStore.createAccount(username, password, domain, "", 0, true, true);
-
-    LOG.debug("activating account: " + defaultAccount);
-    accountStore.setAccountActive(defaultAccount);
-
-    LOG.debug("deleting account: " + activeAccount);
-    accountStore.deleteAccount(activeAccount);
   }
 
   @Override
@@ -75,27 +62,13 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
 
     final XMPPAccountStore accountStore = getXmppAccountStore();
 
-    XMPPAccount activeAccount = null;
+    final XMPPAccount accountToSetAsDefault = accountStore.getAccount(username, domain);
 
-    try {
-      activeAccount = accountStore.getActiveAccount();
-    } catch (IllegalStateException e) {
-      // ignore
-    }
+    if (accountToSetAsDefault == null)
+      throw new IllegalArgumentException(
+          "an account with username '" + username + "' and domain '" + domain + "' does not exist");
 
-    for (XMPPAccount account : accountStore.getAllAccounts()) {
-      if (account.getUsername().equals(username) && account.getDomain().equals(domain)) {
-
-        if (!account.equals(activeAccount)) {
-          LOG.debug("activating account: " + account);
-          accountStore.setAccountActive(account);
-        } else {
-          LOG.debug("account is already activated: " + account);
-        }
-
-        return !account.equals(activeAccount);
-      }
-    }
+    accountStore.setDefaultAccount(accountToSetAsDefault);
 
     throw new IllegalArgumentException(
         "an account with username '" + username + "' and domain '" + domain + "' does not exist");

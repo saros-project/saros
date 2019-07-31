@@ -72,19 +72,18 @@ public class ConfigurationWizard extends Wizard {
   public boolean performFinish() {
     setConfiguration();
 
-    final XMPPAccount accountToConnect;
+    final XMPPAccount accountToConnect = addOrGetXMPPAccount();
 
-    if (!enterXMPPAccountWizardPage.isExistingAccount()) {
-      accountToConnect = addXMPPAccount();
-    } else accountToConnect = null;
+    assert (accountToConnect != null);
 
-    assert accountStore.getActiveAccount() != null;
+    /* it is possible to finish the wizard multiple times
+     * (also it makes no sense) so ensure the behavior is always the same.
+     */
+
+    accountStore.setDefaultAccount(accountToConnect);
 
     if (preferences.getBoolean(PreferenceConstants.AUTO_CONNECT)) {
-      getShell()
-          .getDisplay()
-          .asyncExec(
-              () -> XMPPConnectionSupport.getInstance().connect(accountToConnect, true, false));
+      getShell().getDisplay().asyncExec(() -> XMPPConnectionSupport.getInstance().connect(false));
     }
 
     return true;
@@ -144,8 +143,9 @@ public class ConfigurationWizard extends Wizard {
   }
 
   /** Adds the {@link EnterXMPPAccountWizardPage}'s account data to the {@link XMPPAccountStore}. */
-  private XMPPAccount addXMPPAccount() {
+  private XMPPAccount addOrGetXMPPAccount() {
 
+    boolean isExistingAccount = enterXMPPAccountWizardPage.isExistingAccount();
     JID jid = enterXMPPAccountWizardPage.getJID();
 
     String username = jid.getName();
@@ -162,6 +162,9 @@ public class ConfigurationWizard extends Wizard {
     boolean useTLS = enterXMPPAccountWizardPage.isUsingTLS();
     boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
 
-    return accountStore.createAccount(username, password, domain, server, port, useTLS, useSASL);
+    if (isExistingAccount)
+      return accountStore.createAccount(username, password, domain, server, port, useTLS, useSASL);
+
+    return accountStore.getAccount(username, domain, server, port);
   }
 }

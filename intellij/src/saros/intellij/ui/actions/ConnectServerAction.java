@@ -9,6 +9,7 @@ import saros.SarosPluginContext;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
+import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Connects to XMPP/Jabber server with given account or active account */
@@ -34,15 +35,22 @@ public class ConnectServerAction extends AbstractSarosAction {
 
   /** Connects with the given user. */
   public void executeWithUser(String user) {
-    XMPPAccount account = accountStore.findAccount(user);
-    accountStore.setAccountActive(account);
+    JID jid = new JID(user);
+    XMPPAccount account = accountStore.getAccount(jid.getName(), jid.getDomain());
+
+    if (account == null) return;
+
+    accountStore.setDefaultAccount(account);
     connectAccount(account);
   }
 
   /** Connects with active account from the {@link XMPPAccountStore}. */
   @Override
   public void execute() {
-    XMPPAccount account = accountStore.getActiveAccount();
+    XMPPAccount account = accountStore.getDefaultAccount();
+
+    if (account == null) return;
+
     connectAccount(account);
   }
 
