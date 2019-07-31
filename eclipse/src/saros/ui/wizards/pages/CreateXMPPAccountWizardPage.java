@@ -231,7 +231,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
 
   private void updatePageCompletion() {
 
-    boolean accountExists = accountStore.exists(getUsername(), getServer(), "", 0);
+    boolean accountExists = accountStore.existsAccount(getUsername(), getServer(), "", 0);
 
     boolean isUsernameEmpty = getUsername().length() == 0;
 
