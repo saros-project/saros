@@ -129,17 +129,18 @@ public class XMPPConnectionSupport {
 
     final XMPPAccount accountToConnect;
 
-    if (account == null && !store.isEmpty()) accountToConnect = store.getActiveAccount();
-    else if (account != null) accountToConnect = account;
-    else accountToConnect = null;
+    if (account == null) accountToConnect = store.getDefaultAccount();
+    else accountToConnect = account;
 
-    /*
-     * some magic, if we connect with null we will trigger an exception that is processed by
-     * the ConnectingFailureHandler which in turn will open the ConfigurationWizard
-     */
-    if (setAsDefault && accountToConnect != null) {
-      store.setAccountActive(accountToConnect);
+    if (accountToConnect == null) {
+      log.warn(
+          "unable to establish a connection - no account was provided and no default account could be found");
+
+      isConnecting = false;
+      return;
     }
+
+    if (setAsDefault) store.setDefaultAccount(accountToConnect);
 
     final boolean disconnectFirst = mustDisconnect;
 

@@ -31,7 +31,7 @@ public class ConnectionFacade {
    * @param account representing an XMPP account
    */
   public void connect(XMPPAccount account) {
-    accountStore.setAccountActive(account);
+    accountStore.setDefaultAccount(account);
     connectionHandler.connect(account, false);
   }
 

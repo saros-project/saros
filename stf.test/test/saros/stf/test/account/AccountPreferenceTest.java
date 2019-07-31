@@ -125,8 +125,8 @@ public class AccountPreferenceTest extends StfTestCase {
 
     shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).select(ALICE.getBaseJid());
 
-    assertFalse(
-        "remove account button must no be enabled when the active account is already selected",
+    assertTrue(
+        "remove account button must be enabled when the active account is already selected",
         shell
             .bot()
             .buttonInGroup(BUTTON_REMOVE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)

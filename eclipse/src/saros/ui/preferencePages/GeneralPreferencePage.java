@@ -144,13 +144,16 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
 
           private void handleEvent() {
 
+            XMPPAccount selectedAccount = getSelectedAccount();
+
+            if (selectedAccount == null) return;
+
             activateAccountButton.setEnabled(true);
             removeAccountButton.setEnabled(true);
             editAccountButton.setEnabled(true);
 
-            if (getSelectedAccount().equals(accountStore.getActiveAccount())) {
+            if (getSelectedAccount().equals(accountStore.getDefaultAccount())) {
               activateAccountButton.setEnabled(false);
-              removeAccountButton.setEnabled(false);
             }
           }
         });
@@ -206,11 +209,11 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
   }
 
   private void updateInfoLabel() {
-    if (!accountStore.isEmpty())
-      infoLabel.setText(
-          Messages.GeneralPreferencePage_active
-              + createHumanDisplayAbleName(accountStore.getActiveAccount()));
-    else infoLabel.setText("");
+    final XMPPAccount defaultAccount = accountStore.getDefaultAccount();
+
+    if (defaultAccount != null)
+      infoLabel.setText("Default account: " + createHumanDisplayAbleName(defaultAccount));
+    else infoLabel.setText("Default account: none");
   }
 
   private String createHumanDisplayAbleName(XMPPAccount account) {
@@ -276,6 +279,8 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
                   activateAccountButton.setEnabled(false);
                   removeAccountButton.setEnabled(false);
                   editAccountButton.setEnabled(false);
+
+                  updateInfoLabel();
                   updateList();
                 }
               }
@@ -292,10 +297,9 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
             new Listener() {
               @Override
               public void handleEvent(Event event) {
-                accountStore.setAccountActive(getSelectedAccount());
+                accountStore.setDefaultAccount(getSelectedAccount());
                 updateInfoLabel();
                 activateAccountButton.setEnabled(false);
-                removeAccountButton.setEnabled(false);
                 MessageDialog.openInformation(
                     GeneralPreferencePage.this.getShell(),
                     Messages.GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_TITLE,

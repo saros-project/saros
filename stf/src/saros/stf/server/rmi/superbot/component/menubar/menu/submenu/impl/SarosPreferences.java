@@ -342,14 +342,12 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
   }
 
   private boolean isAccountActiveNoGUI(JID jid) {
-    XMPPAccount account = null;
-    try {
-      account = getXmppAccountStore().getActiveAccount();
-      return account.getUsername().equals(jid.getName())
-          && account.getDomain().equals(jid.getDomain());
-    } catch (IllegalStateException e) {
-      return false;
-    }
+    final XMPPAccount account = getXmppAccountStore().getDefaultAccount();
+
+    if (account == null) return false;
+
+    return account.getUsername().equals(jid.getName())
+        && account.getDomain().equals(jid.getDomain());
   }
 
   private boolean isAccountExistNoGUI(JID jid) {
