@@ -136,8 +136,7 @@ public final class XMPPAccount implements Serializable {
         + ", TLS: "
         + useTLS
         + ", SASL: "
-        + useSASL
-        + " : ";
+        + useSASL;
   }
 
   @Override

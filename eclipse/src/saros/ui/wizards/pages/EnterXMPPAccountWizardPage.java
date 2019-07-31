@@ -205,7 +205,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
      */
     if ((isJIDValid && isPasswordValid && isServerValid && isPortValid))
       accountExists =
-          accountStore.exists(getJID().getName(), getJID().getDomain(), getServer(), port);
+          accountStore.existsAccount(getJID().getName(), getJID().getDomain(), getServer(), port);
 
     if (!isJIDValid && wasJIDValid) {
       errorMessage = Messages.jid_format_errorMessage;
