@@ -62,11 +62,3 @@ task testJar(type: Jar) {
 artifacts {
   testing testJar
 }
-
-sonarqube {
-  properties {
-    property 'sonar.projectName', 'Saros/Core'
-    property 'sonar.projectDescription', 'Saros core business logic and utilities'
-    property 'sonar.projectVersion', '0.1.0.DEVEL'
-  }
-}
