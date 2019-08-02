@@ -2,13 +2,12 @@ package saros.ui.eventhandler;
 
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.XMPPError;
 import saros.account.XMPPAccount;
-import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectingFailureCallback;
-import saros.ui.util.DialogUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.WizardUtils;
 import saros.ui.util.XMPPConnectionSupport;
@@ -19,66 +18,62 @@ import saros.ui.util.XMPPConnectionSupport;
  */
 public class ConnectingFailureHandler implements IConnectingFailureCallback {
 
-  private static final Logger LOG = Logger.getLogger(ConnectingFailureHandler.class);
+  private static final Logger log = Logger.getLogger(ConnectingFailureHandler.class);
 
   private final ConnectionHandler connectionHandler;
-  private final XMPPAccountStore accountStore;
 
   private boolean isHandling;
 
-  public ConnectingFailureHandler(
-      final ConnectionHandler connectionHandler, final XMPPAccountStore accountStore) {
+  public ConnectingFailureHandler(final ConnectionHandler connectionHandler) {
     this.connectionHandler = connectionHandler;
     this.connectionHandler.setCallback(this);
-    this.accountStore = accountStore;
   }
 
   @Override
   public void connectingFailed(final Exception exception) {
-    SWTUtils.runSafeSWTAsync(LOG, () -> handleConnectionFailed(exception));
+    SWTUtils.runSafeSWTAsync(log, () -> handleConnectionFailed(exception));
   }
 
   private void handleConnectionFailed(Exception exception) {
 
-    // account store is empty
-    if (exception == null) {
-      // Wizard will perform a connection attempt if it is finished
-      SWTUtils.runSafeSWTAsync(LOG, () -> WizardUtils.openSarosConfigurationWizard());
-      return;
-    }
-
-    // avoid mass dialog popups
-    if (isHandling) return;
-
     try {
+
+      // avoid mass dialog popups
+      if (isHandling) return;
+
       isHandling = true;
 
       if (!(exception instanceof XMPPException)) {
-
-        DialogUtils.popUpFailureMessage(
+        MessageDialog.openError(
+            SWTUtils.getShell(),
             "Connecting Error",
             MessageFormat.format(
-                "Could not connect to XMPP server. Unexpected error: {0}", exception.getMessage()),
-            false);
-
+                "Could not connect to XMPP server. Unexpected error: {0}", exception.getMessage()));
         return;
       }
 
-      if (DialogUtils.popUpYesNoQuestion(
-          "Connecting Error",
-          generateHumanReadableErrorMessage((XMPPException) exception),
-          false)) {
+      final XMPPAccount accountUsedForConnecting =
+          XMPPConnectionSupport.getInstance().getCurrentXMPPAccount();
 
-        /* FIXME the active/default account might not always be the account that is currently used for connecting */
-        final XMPPAccount accountUsedDuringConnection = accountStore.getDefaultAccount();
-
-        if (WizardUtils.openEditXMPPAccountWizard(accountUsedDuringConnection) == null) return;
-
-        final XMPPAccount account = accountStore.getDefaultAccount();
-
-        SWTUtils.runSafeSWTAsync(
-            LOG, () -> XMPPConnectionSupport.getInstance().connect(account, false));
+      // should not happen
+      if (accountUsedForConnecting == null) {
+        log.warn(
+            "could not found the account that was used for establishing the connection - "
+                + "this can happen if connections are not established through class: "
+                + XMPPConnectionSupport.class.getSimpleName());
+        return;
       }
+
+      final String errorMessesage = generateHumanReadableErrorMessage((XMPPException) exception);
+
+      final boolean editAccountAndConnectAgain =
+          MessageDialog.openQuestion(SWTUtils.getShell(), "Connecting Error", errorMessesage);
+
+      if (!editAccountAndConnectAgain) return;
+
+      if (WizardUtils.openEditXMPPAccountWizard(accountUsedForConnecting) == null) return;
+
+      XMPPConnectionSupport.getInstance().connect(accountUsedForConnecting, false);
 
     } finally {
       isHandling = false;

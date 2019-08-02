@@ -31,6 +31,8 @@ public class XMPPConnectionSupport {
   private volatile boolean isConnecting = false;
   private volatile boolean isDisconnecting = false;
 
+  private XMPPAccount currentXmppAccount;
+
   public XMPPConnectionSupport(
       final XMPPAccountStore store,
       final ConnectionHandler connectionHandler,
@@ -39,6 +41,17 @@ public class XMPPConnectionSupport {
     this.connectionHandler = connectionHandler;
     this.sessionManager = sessionManager;
     instance = this;
+  }
+
+  /**
+   * Returns the current XMPP account that was used for establishing a connection.
+   *
+   * @return the current XMPP account or <code>null</code>
+   */
+  public XMPPAccount getCurrentXMPPAccount() {
+    if (Display.getCurrent() == null) throw new SWTException(SWT.ERROR_THREAD_INVALID_ACCESS);
+
+    return currentXmppAccount;
   }
 
   /**
@@ -154,6 +167,8 @@ public class XMPPConnectionSupport {
     }
 
     if (setAsDefault) store.setDefaultAccount(accountToConnect);
+
+    currentXmppAccount = accountToConnect;
 
     final boolean disconnectFirst = mustDisconnect;
 
