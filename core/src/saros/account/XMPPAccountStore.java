@@ -30,7 +30,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import saros.annotations.Component;
-import saros.net.xmpp.JID;
 
 /**
  * The XMPPAccountStore is responsible for administering XMPP account credentials. All data will
@@ -328,28 +327,6 @@ public final class XMPPAccountStore {
   }
 
   /**
-   * Makes the given account active.
-   *
-   * @param account the account to activate
-   * @throws IllegalArgumentException if the account is not found in the store
-   * @deprecated Will be removed soon, do not use
-   */
-  @Deprecated
-  public void setAccountActive(XMPPAccount account) {
-    synchronized (this) {
-      if (!accounts.contains(account))
-        throw new IllegalArgumentException(
-            "account '" + account + "' is not in the current account store");
-
-      defaultAccount = account;
-
-      saveAccounts();
-    }
-
-    notifyActiveAccountListeners();
-  }
-
-  /**
    * Deletes an account from the store. If this was the default account the default account is set
    * to <code>null</code>.
    *
@@ -492,27 +469,6 @@ public final class XMPPAccountStore {
   }
 
   /**
-   * Returns the current active account.
-   *
-   * @return the active account
-   * @throws IllegalStateException if the account store is empty
-   * @deprecated Will be removed soon, do not use
-   */
-  @Deprecated
-  public synchronized XMPPAccount getActiveAccount() {
-    if (defaultAccount != null) return defaultAccount;
-
-    if (accounts.isEmpty()) throw new IllegalStateException("the account store is empty");
-
-    // backward compatibility for now, just pick one
-    setAccountActive(accounts.iterator().next());
-
-    assert defaultAccount != null;
-
-    return defaultAccount;
-  }
-
-  /**
    * Returns if the account store is currently empty
    *
    * @return <code>true</code> if the account store is empty, <code>false</code> otherwise
@@ -577,33 +533,6 @@ public final class XMPPAccountStore {
         .findFirst()
         .filter(a -> matchesAccount(a, username, domain, server, port))
         .orElse(null);
-  }
-
-  /**
-   * Searches for an account in the account store.
-   *
-   * @param jidString the jid of the user as string
-   * @return the matching XMPP account or null in case of no match
-   * @throws NullPointerException if jidString is null
-   * @deprecated Will be removed soon, do not use
-   */
-  @Deprecated
-  public XMPPAccount findAccount(String jidString) {
-    if (jidString == null) {
-      throw new NullPointerException("Null argument 'jidString'");
-    }
-    JID jid = new JID(jidString);
-    String username = jid.getName();
-    String domain = jid.getDomain();
-
-    for (XMPPAccount account : getAllAccounts()) {
-      if (domain.equalsIgnoreCase(account.getDomain())
-          && username.equalsIgnoreCase(account.getUsername())) {
-        return account;
-      }
-    }
-
-    return null;
   }
 
   /**
@@ -759,7 +688,8 @@ public final class XMPPAccountStore {
   private static boolean matchesAnyServer(
       final XMPPAccount account, final String username, final String domain) {
 
-    return account.getUsername().equals(username) && account.getDomain().equalsIgnoreCase(domain);
+    return account.getUsername().equalsIgnoreCase(username)
+        && account.getDomain().equalsIgnoreCase(domain);
   }
 
   private static boolean matchesAccount(
@@ -769,7 +699,7 @@ public final class XMPPAccountStore {
       final String server,
       final int port) {
 
-    return account.getUsername().equals(username)
+    return account.getUsername().equalsIgnoreCase(username)
         && account.getDomain().equalsIgnoreCase(domain)
         && account.getServer().equalsIgnoreCase(server)
         && account.getPort() == port;
