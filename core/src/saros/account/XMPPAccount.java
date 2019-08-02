@@ -51,6 +51,9 @@ public final class XMPPAccount implements Serializable {
     if (!domain.toLowerCase().equals(domain))
       throw new IllegalArgumentException("domain url must be in lower case letters");
 
+    // FIXME see https://tools.ietf.org/html/rfc6122#section-2 - the localpart/username is also
+    // case-insensitive
+
     if (port < 0 || port >= 65536) throw new IllegalArgumentException("port number is not valid");
 
     if ((server.trim().length() != 0 && port == 0) || (server.trim().length() == 0 && port != 0))
