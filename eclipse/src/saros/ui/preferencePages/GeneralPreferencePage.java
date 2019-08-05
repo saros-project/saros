@@ -211,9 +211,11 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
   private void updateInfoLabel() {
     final XMPPAccount defaultAccount = accountStore.getDefaultAccount();
 
+    final String prefix = Messages.GeneralPreferencePage_active;
+
     if (defaultAccount != null)
-      infoLabel.setText("Default account: " + createHumanDisplayAbleName(defaultAccount));
-    else infoLabel.setText("Default account: none");
+      infoLabel.setText(prefix + createHumanDisplayAbleName(defaultAccount));
+    else infoLabel.setText(prefix + "none");
   }
 
   private String createHumanDisplayAbleName(XMPPAccount account) {
