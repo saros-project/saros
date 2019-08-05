@@ -17,7 +17,6 @@ import static saros.stf.shared.Constants.MENU_SAROS;
 import static saros.stf.shared.Constants.SHELL_CREATE_XMPP_JABBER_ACCOUNT;
 
 import java.rmi.RemoteException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,20 +34,19 @@ public class SarosPreferencesTest extends StfTestCase {
   @Before
   public void beforeEveryTest() throws Exception {
     closeAllShells();
-  }
-
-  @After
-  public void afterEveryTest() throws Exception {
-    resetDefaultAccount();
+    ALICE.controlBot().getAccountManipulator().deleteAllAccounts();
   }
 
   @Test(expected = RuntimeException.class)
-  public void createExistedAccountWithMenuSarosCreateAccount() throws RemoteException {
+  public void createAlreadyExistingAccountWithMenuSarosCreateAccount() throws RemoteException {
+    addDefaultAccount();
     ALICE.superBot().menuBar().saros().createAccount(ALICE.getJID(), Constants.PASSWORD);
   }
 
   @Test
   public void createAccountWhichAlreadyExisted() throws Exception {
+    addDefaultAccount();
+
     ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
 
     ALICE.remoteBot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
@@ -86,36 +84,49 @@ public class SarosPreferencesTest extends StfTestCase {
   }
 
   @Test
-  public void addAndActivateAcount() throws RemoteException {
+  public void addAccountAndSetToDefault() throws RemoteException {
+    addDefaultAccount();
+
     assertFalse(
         ALICE.superBot().menuBar().saros().preferences().existsAccount(Constants.JID_TO_ADD));
+
     ALICE
         .superBot()
         .menuBar()
         .saros()
         .preferences()
         .addAccount(Constants.JID_TO_ADD, Constants.PASSWORD);
+
     assertTrue(
         ALICE.superBot().menuBar().saros().preferences().existsAccount(Constants.JID_TO_ADD));
+
     assertTrue(ALICE.superBot().menuBar().saros().preferences().isAccountActive(ALICE.getJID()));
+
     assertFalse(
         ALICE.superBot().menuBar().saros().preferences().isAccountActive(Constants.JID_TO_ADD));
+
     ALICE.superBot().menuBar().saros().preferences().activateAccount(Constants.JID_TO_ADD);
+
     assertTrue(
         ALICE.superBot().menuBar().saros().preferences().isAccountActive(Constants.JID_TO_ADD));
+
     assertFalse(ALICE.superBot().menuBar().saros().preferences().isAccountActive(ALICE.getJID()));
   }
 
   @Test
   public void editAccount() throws RemoteException {
+    addDefaultAccount();
+
     assertTrue(ALICE.superBot().menuBar().saros().preferences().existsAccount(ALICE.getJID()));
     assertTrue(ALICE.superBot().menuBar().saros().preferences().isAccountActive(ALICE.getJID()));
+
     ALICE
         .superBot()
         .menuBar()
         .saros()
         .preferences()
         .editAccount(ALICE.getJID(), Constants.NEW_XMPP_JABBER_ID, Constants.PASSWORD);
+
     assertFalse(ALICE.superBot().menuBar().saros().preferences().existsAccount(ALICE.getJID()));
     assertFalse(ALICE.superBot().menuBar().saros().preferences().isAccountActive(ALICE.getJID()));
     assertTrue(
@@ -124,14 +135,18 @@ public class SarosPreferencesTest extends StfTestCase {
         ALICE.superBot().menuBar().saros().preferences().isAccountActive(Constants.JID_TO_CHANGE));
   }
 
-  @Test(expected = RuntimeException.class)
-  public void deleteActiveAccount() throws RemoteException {
+  @Test
+  public void deleteDefaultAccount() throws RemoteException {
+    addDefaultAccount();
+
     assertTrue(ALICE.superBot().menuBar().saros().preferences().existsAccount(ALICE.getJID()));
     ALICE.superBot().menuBar().saros().preferences().removeAccount(ALICE.getJID());
   }
 
   @Test
-  public void deleteInactiveAccount() throws RemoteException {
+  public void deleteNonDefaultAccount() throws RemoteException {
+    addDefaultAccount();
+
     assertFalse(
         ALICE.superBot().menuBar().saros().preferences().existsAccount(Constants.JID_TO_ADD));
     ALICE
@@ -140,10 +155,18 @@ public class SarosPreferencesTest extends StfTestCase {
         .saros()
         .preferences()
         .addAccount(Constants.JID_TO_ADD, Constants.PASSWORD);
+
     assertTrue(
         ALICE.superBot().menuBar().saros().preferences().existsAccount(Constants.JID_TO_ADD));
     ALICE.superBot().menuBar().saros().preferences().removeAccount(Constants.JID_TO_ADD);
     assertFalse(
         ALICE.superBot().menuBar().saros().preferences().existsAccount(Constants.JID_TO_ADD));
+  }
+
+  private void addDefaultAccount() throws RemoteException {
+    ALICE
+        .controlBot()
+        .getAccountManipulator()
+        .addAccount(ALICE.getJID().getName(), Constants.PASSWORD, ALICE.getJID().getDomain());
   }
 }
