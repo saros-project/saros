@@ -64,15 +64,17 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
         return;
       }
 
-      /* FIXME the active/default account is not always the account that is currently used for connecting */
       if (DialogUtils.popUpYesNoQuestion(
           "Connecting Error",
           generateHumanReadableErrorMessage((XMPPException) exception),
           false)) {
 
-        if (WizardUtils.openEditXMPPAccountWizard(accountStore.getActiveAccount()) == null) return;
+        /* FIXME the active/default account might not always be the account that is currently used for connecting */
+        final XMPPAccount accountUsedDuringConnection = accountStore.getDefaultAccount();
 
-        final XMPPAccount account = accountStore.getActiveAccount();
+        if (WizardUtils.openEditXMPPAccountWizard(accountUsedDuringConnection) == null) return;
+
+        final XMPPAccount account = accountStore.getDefaultAccount();
 
         SWTUtils.runSafeSWTAsync(
             LOG, () -> XMPPConnectionSupport.getInstance().connect(account, false));

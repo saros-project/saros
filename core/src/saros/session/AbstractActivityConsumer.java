@@ -1,6 +1,5 @@
 package saros.session;
 
-import saros.activities.AbstractActivityReceiver;
 import saros.activities.IActivity;
 import saros.activities.IActivityReceiver;
 import saros.activities.TextSelectionActivity;
@@ -54,8 +53,7 @@ import saros.activities.TextSelectionActivity;
  * };
  * </pre>
  */
-public abstract class AbstractActivityConsumer extends AbstractActivityReceiver
-    implements IActivityConsumer {
+public abstract class AbstractActivityConsumer implements IActivityReceiver, IActivityConsumer {
 
   /**
    * @JTourBusStop 11, Activity sending, The second dispatch:

@@ -26,13 +26,23 @@ public class EclipsePreferenceInitializer extends AbstractPreferenceInitializer 
   @Override
   public void initializeDefaultPreferences() {
     LOG.info("initializing preference default values");
-    setPreferences(new DefaultScope().getNode(Saros.PLUGIN_ID));
+    setPreferences(DefaultScope.INSTANCE.getNode(Saros.PLUGIN_ID));
   }
 
+  /**
+   * Do not call. Should only be used for testing purposes.
+   *
+   * @param preferences
+   */
   public static void setPreferences(Preferences preferences) {
     setPreferences(new OSGiPreferencesAccessAdapter(preferences));
   }
 
+  /**
+   * Do not call. Should only be used for testing purposes.
+   *
+   * @param preferenceStore
+   */
   public static void setPreferences(IPreferenceStore preferenceStore) {
     setPreferences(new IPreferenceStoreAccessAdapter(preferenceStore));
   }
@@ -145,22 +155,22 @@ public class EclipsePreferenceInitializer extends AbstractPreferenceInitializer 
 
     @Override
     public void setDefault(String key, int value) {
-      preferenceStore.setValue(key, value);
+      preferenceStore.setDefault(key, value);
     }
 
     @Override
     public void setDefault(String key, long value) {
-      preferenceStore.setValue(key, value);
+      preferenceStore.setDefault(key, value);
     }
 
     @Override
     public void setDefault(String key, boolean value) {
-      preferenceStore.setValue(key, value);
+      preferenceStore.setDefault(key, value);
     }
 
     @Override
     public void setDefault(String key, String value) {
-      preferenceStore.setValue(key, value);
+      preferenceStore.setDefault(key, value);
     }
   }
 

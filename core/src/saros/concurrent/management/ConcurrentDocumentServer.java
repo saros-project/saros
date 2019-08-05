@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.log4j.Logger;
-import saros.activities.AbstractActivityReceiver;
 import saros.activities.ChecksumActivity;
 import saros.activities.FileActivity;
 import saros.activities.IActivity;
@@ -77,7 +76,7 @@ public class ConcurrentDocumentServer implements Startable {
   }
 
   private final IActivityReceiver hostReceiver =
-      new AbstractActivityReceiver() {
+      new IActivityReceiver() {
         @Override
         public void receive(final FileActivity activity) {
           if (activity.getType() == FileActivity.Type.REMOVED) {
