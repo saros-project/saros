@@ -45,14 +45,18 @@ public class BalloonNotification {
    *
    * <p>The window will be hidden automatically after the value specified in the timeout expires
    *
+   * <p><b>Note:</b> The balloon window is always anchored to the given control at position (0,0).
+   * Specifying the balloon window anchor is relative to this point.
+   *
    * <p>TODO wrap the contents so the balloon notification does not expand across two screens for a
    * long text. OR even better: do not show long notifications. users tend to ignore them anyway!
    *
    * @param control the control, next to where the widget will appear
+   * @param anchor the anchor of the balloon window
    * @param title the title of the balloon
    * @param text the text to display as contents
    */
-  public static void showNotification(Control control, String title, String text) {
+  public static void showNotification(Control control, int anchor, String title, String text) {
 
     if (control != null && control.isDisposed()) {
       control = null;
@@ -73,7 +77,7 @@ public class BalloonNotification {
         new BalloonWindow(
             control != null ? control.getShell() : null, SWT.NO_FOCUS | SWT.TOOL | SWT.TITLE);
 
-    window.setAnchor(SWT.LEFT | SWT.BOTTOM);
+    window.setAnchor(anchor);
     windows.add(window);
     /*
      * Note: if you add SWT.CLOSE to the style of the BalloonWindow, it will
