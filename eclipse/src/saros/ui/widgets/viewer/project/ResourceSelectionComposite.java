@@ -212,20 +212,22 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
                       if (savedSelectionPresetsCombo.getItemCount() == 0) {
                         SarosView.showNotification(
                             "No stored selections yet",
-                            "You do not have any stored selections yet. Make a selection in the tree above, enter a name here, and press 'Save' to save a selection for easy reusing",
+                            "You do not have any stored selections yet.\n"
+                                + "Make a selection in the tree above and enter a name here.\n"
+                                + "Then press 'Save' to save a selection for easy reuse.",
                             savedSelectionPresetsCombo);
                       } else {
                         SarosView.showNotification(
                             "Error while restoring a selection",
-                            "Could not restore a selection because there is none with the name you entered",
+                            "Could not restore a selection because there is none with the name you entered.",
                             savedSelectionPresetsCombo);
                       }
 
                     } else {
                       SarosView.showNotification(
                           "Selection was restored",
-                          "Your saved selection was successfully restored",
-                          checkboxTreeViewer.getControl());
+                          "Your saved selection was successfully restored.",
+                          savedSelectionPresetsCombo);
                     }
                   }
                 });
@@ -250,7 +252,7 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
             if (theName.isEmpty()) {
               SarosView.showNotification(
                   "Name missing",
-                  "Please enter a name for the selection first to save it",
+                  "Please enter a name for the selection first to save it.",
                   savedSelectionPresetsCombo);
               return;
             }
@@ -269,11 +271,12 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
             savedSelectionPresetsCombo.setItems(
                 selectionNames.toArray(new String[selectionNames.size()]));
             savedSelectionPresetsCombo.setText(theName);
+
             SarosView.showNotification(
                 "Selection was remembered",
                 "The current selection was remembered with name '"
                     + theName
-                    + "'. You can restore this selection from now on for a quick session startup, even with complicated partial sharing.",
+                    + "'.\nYou can restore this selection from now on for a quick session startup.",
                 savedSelectionPresetsCombo);
           }
         });
@@ -314,7 +317,7 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
             savedSelectionPresetsCombo.setText("");
             SarosView.showNotification(
                 "Selection was removed",
-                "The selection with name '" + theName + "' was removed",
+                "The selection with name '" + theName + "' was removed.",
                 savedSelectionPresetsCombo);
           }
         });

@@ -73,6 +73,7 @@ public class BalloonNotification {
         new BalloonWindow(
             control != null ? control.getShell() : null, SWT.NO_FOCUS | SWT.TOOL | SWT.TITLE);
 
+    window.setAnchor(SWT.LEFT | SWT.BOTTOM);
     windows.add(window);
     /*
      * Note: if you add SWT.CLOSE to the style of the BalloonWindow, it will
