@@ -10,64 +10,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
-import saros.annotations.Component;
 import saros.net.upnp.IUPnPAccess;
 import saros.net.upnp.IUPnPService;
 import saros.repackaged.picocontainer.Disposable;
+import saros.util.NamedThreadFactory;
 
-/*
- *  Class for performing UPnP functions (using the weupnp library) and managing the mapping state.
+/**
+ * Class for performing UPnP functions (using the weupnp library) and managing the mapping state.
  */
-@Component(module = "net")
-public class UPnPServiceImpl implements IUPnPService, Disposable {
+public final class UPnPServiceImpl implements IUPnPService, Disposable {
 
   private static final Logger LOG = Logger.getLogger(UPnPServiceImpl.class);
 
-  private final Map<GatewayDevice, Map<String, Set<Integer>>> currentMappedPorts =
-      new HashMap<GatewayDevice, Map<String, Set<Integer>>>();
+  private final Map<GatewayDevice, Map<String, Set<Integer>>> currentMappedPorts = new HashMap<>();
 
-  /*
-   * srossbach: I have never encountered an UPNP gateway device that support
-   * lease durations
-   */
-  /** Default lease duration is 12 hours. Is changed if router doesn't accept lease duration. */
-  private static final int MAPPINGLEASEDURATION = 12 * 60 * 60;
+  private final List<PortMappingRefreshTask> portMappingRefreshTasks = new ArrayList<>();
+
+  /** Default lease duration for a port mapping. */
+  private static final int LEASE_DURATION = 12 * 60 * 60;
 
   private final IUPnPAccess upnpAccess;
-
-  private Timer mappingRefreshTimer;
 
   private AtomicReference<List<GatewayDevice>> discoveredGateways =
       new AtomicReference<List<GatewayDevice>>();
 
-  private class MappingRefreshTask extends TimerTask {
-    private final GatewayDevice device;
-    private final int port;
-    private final String protocol;
-    private final String description;
-
-    public MappingRefreshTask(
-        final GatewayDevice device,
-        final int port,
-        final String protocol,
-        final String description) {
-      this.device = device;
-      this.port = port;
-      this.protocol = protocol;
-      this.description = description;
-    }
-
-    @Override
-    public void run() {
-      createPortMapping(device, port, protocol, description);
-    }
-  }
+  private final ScheduledExecutorService portMappingRefreshScheduler =
+      Executors.newSingleThreadScheduledExecutor(
+          new NamedThreadFactory("dpp-upnp-portmapping-refresher"));
 
   public UPnPServiceImpl(final IUPnPAccess upnpAccess) {
     this.upnpAccess = upnpAccess;
@@ -82,11 +61,24 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
     boolean successfullyMapped = false;
     boolean isPersistentMapping = false;
 
+    final String deviceName = getDeviceName(device);
+
+    LOG.debug(
+        deviceName
+            + " - creating port mapping... - port="
+            + port
+            + ", protocol="
+            + protocol
+            + ", description="
+            + description);
+
     try {
 
-      PortMappingEntry portMapping = upnpAccess.getSpecificPortMappingEntry(device, port, protocol);
+      final PortMappingEntry portMapping =
+          upnpAccess.getSpecificPortMappingEntry(device, port, protocol);
 
-      if (portMapping != null && !description.equals(portMapping.getPortMappingDescription()))
+      if (portMapping != null
+          && !arePortMappingDescriptionsEqual(description, portMapping.getPortMappingDescription()))
         throw new IOException(
             "port is already mapped by another application: "
                 + portMapping.getPortMappingDescription());
@@ -96,9 +88,9 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
        * ensure that the timer is canceled)
        */
       if (isMapped(device, port, protocol) && !deletePortMapping(device, port, protocol))
-        throw new IOException("failed to removed previous port mapping");
+        throw new IOException("failed to remove existing port mapping");
 
-      InetAddress localAddress = device.getLocalAddress();
+      final InetAddress localAddress = device.getLocalAddress();
 
       int errorcode =
           upnpAccess.addPortMapping(
@@ -108,7 +100,10 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
               localAddress.getHostAddress(),
               protocol,
               description,
-              MAPPINGLEASEDURATION);
+              LEASE_DURATION);
+
+      if (errorcode == 725)
+        LOG.debug(deviceName + " - does not support lease duration for port mappings");
 
       // in case mapping with lease duration fails, try without
       if (errorcode != 0) {
@@ -125,8 +120,7 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
       }
 
       if (errorcode != 0) {
-        throw new IOException(
-            "device " + device.getFriendlyName() + " replied with error code=" + errorcode);
+        throw new IOException("port mapping request replied with error code:" + errorcode);
         // Not the right place to put user information to
         // if (errorcode == 403) {
         // SarosView
@@ -143,7 +137,7 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
       successfullyMapped = true;
 
     } catch (Exception e) {
-      LOG.error("creating port mapping failed: " + e.getMessage(), e);
+      LOG.error(deviceName + " - failed to create port mapping: " + e.getMessage(), e);
       successfullyMapped = false;
     }
 
@@ -170,47 +164,110 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
      * duration
      */
     if (!isPersistentMapping) {
-      assert mappingRefreshTimer == null;
+      LOG.debug(deviceName + " - scheduling port mapping lease timer refresh");
 
-      mappingRefreshTimer = new Timer();
+      final PortMappingRefreshTask task =
+          new PortMappingRefreshTask(device, port, protocol, description);
 
-      mappingRefreshTimer.schedule(
-          new MappingRefreshTask(device, port, protocol, description), MAPPINGLEASEDURATION * 1000);
+      final Future<?> future =
+          portMappingRefreshScheduler.scheduleAtFixedRate(
+              task, LEASE_DURATION, LEASE_DURATION, TimeUnit.SECONDS);
+
+      task.setFuture(future);
+      portMappingRefreshTasks.add(task);
     }
 
+    LOG.debug(
+        deviceName
+            + " - sucessfully created port mapping - port="
+            + port
+            + ", protocol:"
+            + protocol);
     return true;
   }
 
   @Override
-  public boolean deletePortMapping(
+  public synchronized boolean deletePortMapping(
       final GatewayDevice device, final int port, final String protocol) {
+
+    final String deviceName = getDeviceName(device);
 
     if (!isMapped(device, port, protocol)) return false;
 
-    try {
+    LOG.debug(deviceName + " - deleting port mapping... - port=" + port + ", protocol=" + protocol);
 
-      boolean success = upnpAccess.deletePortMapping(device, port, protocol) == 0;
+    final PortMappingRefreshTask task =
+        portMappingRefreshTasks
+            .stream()
+            .filter(t -> t.device.equals(device) && t.protocol.equals(protocol) && t.port == port)
+            .findFirst()
+            .orElse(null);
 
-      if (!success) return false;
+    if (task != null) {
+      final Future<?> future = task.getFuture();
 
-      // Stop the remap timer
-      if (mappingRefreshTimer != null) {
-        mappingRefreshTimer.cancel();
-        mappingRefreshTimer = null;
+      LOG.debug(
+          deviceName
+              + " - canceling port mapping refresh task.. - port="
+              + port
+              + ", protocol="
+              + protocol);
+
+      future.cancel(false);
+
+      if (!future.isCancelled()) {
+        try {
+          future.get(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+          LOG.warn(
+              deviceName + " - interrupted while waiting for port mapping refresh task to finish");
+          Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+          LOG.error(
+              deviceName + " - unexpected error waiting for port mapping refresh task finish", e);
+        } catch (TimeoutException e) {
+          LOG.warn(
+              deviceName + " - timed out while waiting for port mapping refresh task to finsih");
+        }
       }
 
-      currentMappedPorts.get(device).get(protocol).remove(port);
+      if (future.isDone())
+        LOG.debug(
+            deviceName
+                + " - canceled port mapping refresh task - port="
+                + port
+                + ", protocol="
+                + protocol);
+    }
 
-      return true;
+    portMappingRefreshTasks.remove(task);
+
+    int errorcode = 0;
+
+    try {
+      errorcode = upnpAccess.deletePortMapping(device, port, protocol);
+
+      if (errorcode != 0)
+        throw new IOException("port mapping delete request replied with error code:" + errorcode);
 
     } catch (Exception e) {
-      LOG.error("removing port mapping failed: " + e.getMessage(), e);
+      LOG.error(deviceName + " - failed to remove port mapping: " + e.getMessage(), e);
+      // TODO re-add mapping refresh task
+      return false;
     }
-    return false;
+
+    currentMappedPorts.get(device).get(protocol).remove(port);
+
+    LOG.debug(
+        deviceName
+            + " - sucessfully deleted port mapping - port="
+            + port
+            + ", protocol="
+            + protocol);
+
+    return true;
   }
 
-  // TODO this may could take a few seconds and may cause hanging if a GUI
-  // thread accesses other methods in the meantime
   @Override
   public List<GatewayDevice> getGateways(boolean forceRefresh) {
 
@@ -244,7 +301,7 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
   }
 
   @Override
-  public boolean isMapped(GatewayDevice device, int port, String protocol) {
+  public synchronized boolean isMapped(GatewayDevice device, int port, String protocol) {
     final Map<String, Set<Integer>> mappedPortsForDevice = currentMappedPorts.get(device);
 
     if (mappedPortsForDevice == null) return false;
@@ -285,7 +342,7 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
 
   @Override
   public synchronized void dispose() {
-    LOG.debug("deleting existing port mappings");
+    LOG.debug("deleting all existing port mappings..");
 
     for (Entry<GatewayDevice, Map<String, Set<Integer>>> mappedPortsEntry :
         currentMappedPorts.entrySet()) {
@@ -301,6 +358,92 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
 
         for (int port : mappedPorts) deletePortMapping(device, port, protocol);
       }
+    }
+
+    portMappingRefreshScheduler.shutdown();
+  }
+
+  private void refreshPortMapping(
+      final GatewayDevice device, final int port, final String protocol, final String description) {
+    final String deviceName = getDeviceName(device);
+
+    LOG.debug(deviceName + " - refreshing port mapping - port=" + port + ", protocol=" + protocol);
+
+    try {
+      final InetAddress localAddress = device.getLocalAddress();
+
+      int errorcode =
+          upnpAccess.addPortMapping(
+              device,
+              port,
+              port,
+              localAddress.getHostAddress(),
+              protocol,
+              description,
+              LEASE_DURATION);
+
+      if (errorcode != 0)
+        throw new IOException("port mapping request replied with error code:" + errorcode);
+
+    } catch (Exception e) {
+      LOG.error(deviceName + " - failed to refresh port mapping: " + e.getMessage(), e);
+    }
+  }
+
+  private static boolean arePortMappingDescriptionsEqual(final String a, final String b) {
+    if (a == null && b == null) return true;
+
+    if (a == null || b == null) return true;
+
+    if (a.equals(b)) return true;
+
+    // for an unknown reason the FritzBox likes to replace spaces with points
+
+    return a.replace(' ', '.').equals(b.replace(' ', '.'));
+  }
+
+  private static String getDeviceName(final GatewayDevice device) {
+    String result = device.getFriendlyName();
+
+    if (result == null || result.trim().isEmpty()) result = device.getModelName();
+
+    if (result == null || result.trim().isEmpty()) result = device.getUSN();
+
+    if (result == null || result.trim().isEmpty()) result = "Unknown Device";
+
+    return result;
+  }
+
+  private class PortMappingRefreshTask implements Runnable {
+    private final GatewayDevice device;
+    private final int port;
+    private final String protocol;
+    private final String description;
+
+    private Future<?> future;
+
+    private PortMappingRefreshTask(
+        final GatewayDevice device,
+        final int port,
+        final String protocol,
+        final String description) {
+      this.device = device;
+      this.port = port;
+      this.protocol = protocol;
+      this.description = description;
+    }
+
+    @Override
+    public void run() {
+      refreshPortMapping(device, port, protocol, description);
+    }
+
+    private void setFuture(final Future<?> future) {
+      this.future = future;
+    }
+
+    private Future<?> getFuture() {
+      return future;
     }
   }
 

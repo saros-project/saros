@@ -49,9 +49,8 @@ jar {
 }
 
 
-// Avoid issue GH issue #98
 tasks.withType(Test) {
-  enableAssertions = false
+  enableAssertions = true
 }
 
 task testJar(type: Jar) {

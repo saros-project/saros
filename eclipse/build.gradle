@@ -67,7 +67,7 @@ dependencies {
 }
 
 tasks.withType(Test) {
-  enableAssertions = false
+  enableAssertions = true
 }
 
 compileJava.dependsOn rootProject.mavenizeP2Repository
