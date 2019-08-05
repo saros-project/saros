@@ -87,7 +87,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
         .bot()
         .waitUntil(Conditions.shellCloses(activateAccountConfirmationShell));
 
-    assert shell.bot().label("Active: " + jid.getBase()).isVisible();
+    assert shell.bot().label(LABEL_ACTIVE_ACCOUNT_PREFIX + jid.getBase()).isVisible();
 
     shell.bot().button(APPLY).click();
     shell.bot().button(OK).click();
@@ -112,9 +112,6 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
 
     if (!isAccountExistNoGUI(jid)) return;
 
-    if (isAccountActiveNoGUI(jid))
-      throw new RuntimeException("it is not allowed to remove an active account");
-
     SWTBotShell shell = preCondition();
     shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).select(jid.getBase());
 
@@ -134,7 +131,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
       shell.bot().button(APPLY).click();
       shell.bot().button(OK).click();
       shell.bot().waitUntil(Conditions.shellCloses(shell));
-    } else throw new RuntimeException("it is not allowed to remove an active account");
+    } else throw new RuntimeException("button to delete an account is not enabled");
   }
 
   @Override
