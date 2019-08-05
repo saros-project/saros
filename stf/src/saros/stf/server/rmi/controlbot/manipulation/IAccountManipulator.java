@@ -45,4 +45,11 @@ public interface IAccountManipulator extends Remote {
    * @throws RemoteException if the account does not exist in the current {@link XMPPAccountStore}
    */
   public boolean activateAccount(String username, String domain) throws RemoteException;
+
+  /**
+   * Deletes all accounts.
+   *
+   * @throws RemoteException
+   */
+  public void deleteAllAccounts() throws RemoteException;
 }
