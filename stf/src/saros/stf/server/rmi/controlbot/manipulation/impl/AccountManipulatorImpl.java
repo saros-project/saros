@@ -68,9 +68,10 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
       throw new IllegalArgumentException(
           "an account with username '" + username + "' and domain '" + domain + "' does not exist");
 
+    final XMPPAccount defaultAccount = accountStore.getDefaultAccount();
+
     accountStore.setDefaultAccount(accountToSetAsDefault);
 
-    throw new IllegalArgumentException(
-        "an account with username '" + username + "' and domain '" + domain + "' does not exist");
+    return !accountToSetAsDefault.equals(defaultAccount);
   }
 }
