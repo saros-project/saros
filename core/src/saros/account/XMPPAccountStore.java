@@ -558,8 +558,8 @@ public final class XMPPAccountStore {
   public XMPPAccount getAccount(final String username, final String domain) {
     return getAllAccounts()
         .stream()
-        .findFirst()
         .filter(a -> matchesAnyServer(a, username, domain))
+        .findFirst()
         .orElse(null);
   }
 
@@ -576,8 +576,8 @@ public final class XMPPAccountStore {
       final String username, final String domain, final String server, final int port) {
     return getAllAccounts()
         .stream()
-        .findFirst()
         .filter(a -> matchesAccount(a, username, domain, server, port))
+        .findFirst()
         .orElse(null);
   }
 
