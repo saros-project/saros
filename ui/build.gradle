@@ -49,12 +49,3 @@ task testJar(type: Jar) {
 artifacts {
   testing testJar
 }
-
-sonarqube {
-  properties {
-    property 'sonar.projectName', 'Saros/UI'
-    property 'sonar.projectDescription', 'Common Saros User Interface (Java part)'
-    property 'sonar.projectVersion', '0.1.0.DEVEL'
-    property 'sonar.exclusions', '**/HTMLUIStrings.java'
-  }
-}

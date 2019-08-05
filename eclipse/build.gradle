@@ -112,15 +112,3 @@ compileJava.dependsOn rootProject.mavenizeP2Repository
 artifacts {
   testing testJar
 }
-
-sonarqube {
-  properties {
-    property 'sonar.projectName', 'Saros/Eclipse'
-    property 'sonar.projectDescription', 'Saros plugin for the Eclipse IDE'
-    property 'sonar.projectVersion', '14.11.28.DEVEL'
-    property 'sonar.exclusion', '**/Messages.java'
-    // necessary to avoid the scanning of stf
-    property 'sonar.sources', 'src'
-    property 'sonar.tests', 'test/junit, test/stf'
-  }
-}

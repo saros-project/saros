@@ -5,11 +5,16 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.FileIndex;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -226,7 +231,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         @Override
         public void userFinishedProjectNegotiation(User user) {
-          sendAwarenessInformation();
+          sendAwarenessInformation(user);
         }
 
         @Override
@@ -240,16 +245,24 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         /**
-         * Sends awareness information to populate the UserEditorState of the participant that
-         * joined the session.
+         * Sends the awareness information for all open shared editors. This is done to populate the
+         * UserEditorState of the participant that finished the project negotiation.
          *
          * <p>This is done by first sending the needed state for all locally open editors. After the
          * awareness information for all locally open editors (including the active editor) has been
          * transmitted, a second editor activated activity is send for the locally active editor to
          * correctly set the active editor in the remote user editor state for the local user.
+         *
+         * <p>This will not be executed for the user that finished the project negotiation as their
+         * user editor state will be propagated through {@link #resourcesAdded(IProject)} when the
+         * shared resources are initially added.
          */
-        private void sendAwarenessInformation() {
+        private void sendAwarenessInformation(@NotNull User user) {
           User localUser = session.getLocalUser();
+
+          if (localUser.equals(user)) {
+            return;
+          }
 
           Set<String> visibleFilePaths = new HashSet<>();
 
@@ -270,67 +283,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
                     sendSelectionInformation(localUser, path, editor);
                   });
 
-          Editor activeEditor = ProjectAPI.getActiveEditor(project);
-
-          SPath activeEditorPath;
-
-          if (activeEditor != null) {
-            activeEditorPath = editorPool.getFile(activeEditor.getDocument());
-          } else {
-            activeEditorPath = null;
-          }
-
-          sendEditorOpenInformation(localUser, activeEditorPath);
-        }
-
-        private void sendEditorOpenInformation(@NotNull User user, @Nullable SPath path) {
-          EditorActivity activateEditor =
-              new EditorActivity(user, EditorActivity.Type.ACTIVATED, path);
-
-          fireActivity(activateEditor);
-        }
-
-        /**
-         * Sends the viewport information for the given editor if it is currently visible.
-         *
-         * @param user the local user
-         * @param path the path of the editor
-         * @param editor the editor to send the viewport for
-         * @param visibleFilePaths the paths of all currently visible editors
-         */
-        private void sendViewPortInformation(
-            @NotNull User user,
-            @NotNull SPath path,
-            @NotNull Editor editor,
-            @NotNull Set<String> visibleFilePaths) {
-
-          VirtualFile fileForEditor = DocumentAPI.getVirtualFile(editor.getDocument());
-
-          if (fileForEditor == null) {
-            LOG.warn(
-                "Encountered editor without valid virtual file representation - path held in editor pool: "
-                    + path);
-
-            return;
-          }
-
-          if (!visibleFilePaths.contains(fileForEditor.getPath())) {
-            LOG.debug(
-                "Ignoring "
-                    + path
-                    + " while sending viewport awareness information as the editor is not currently visible.");
-
-            return;
-          }
-
-          LineRange localViewPort = EditorAPI.getLocalViewPortRange(editor);
-          int viewPortStartLine = localViewPort.getStartLine();
-          int viewPortLength = localViewPort.getNumberOfLines();
-
-          ViewportActivity setViewPort =
-              new ViewportActivity(user, viewPortStartLine, viewPortLength, path);
-
-          fireActivity(setViewPort);
+          sendActiveEditorInformation(localUser, project);
         }
       };
 
@@ -356,6 +309,55 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     sendSelectionInformation(localUser, path, editor);
   }
 
+  private void sendEditorOpenInformation(@NotNull User user, @Nullable SPath path) {
+    EditorActivity activateEditor = new EditorActivity(user, EditorActivity.Type.ACTIVATED, path);
+
+    fireActivity(activateEditor);
+  }
+
+  /**
+   * Sends the viewport information for the given editor if it is currently visible.
+   *
+   * @param user the local user
+   * @param path the path of the editor
+   * @param editor the editor to send the viewport for
+   * @param visibleFilePaths the paths of all currently visible editors
+   */
+  private void sendViewPortInformation(
+      @NotNull User user,
+      @NotNull SPath path,
+      @NotNull Editor editor,
+      @NotNull Set<String> visibleFilePaths) {
+
+    VirtualFile fileForEditor = DocumentAPI.getVirtualFile(editor.getDocument());
+
+    if (fileForEditor == null) {
+      LOG.warn(
+          "Encountered editor without valid virtual file representation - path held in editor pool: "
+              + path);
+
+      return;
+    }
+
+    if (!visibleFilePaths.contains(fileForEditor.getPath())) {
+      LOG.debug(
+          "Ignoring "
+              + path
+              + " while sending viewport awareness information as the editor is not currently visible.");
+
+      return;
+    }
+
+    LineRange localViewPort = EditorAPI.getLocalViewPortRange(editor);
+    int viewPortStartLine = localViewPort.getStartLine();
+    int viewPortLength = localViewPort.getNumberOfLines();
+
+    ViewportActivity setViewPort =
+        new ViewportActivity(user, viewPortStartLine, viewPortLength, path);
+
+    fireActivity(setViewPort);
+  }
+
   private void sendSelectionInformation(
       @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
 
@@ -370,14 +372,48 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
+   * Sends an editor activation activity for the active editor. This should be done after sending
+   * user editor state information about other editors to ensure that the correct editor is still
+   * set as the active editor in the user editor state held by the other participants.
+   *
+   * @param localUser the local user
+   * @param project the shared project
+   * @see ProjectAPI#getActiveEditor(Project)
+   */
+  private void sendActiveEditorInformation(@NotNull User localUser, @NotNull Project project) {
+
+    Editor activeEditor = ProjectAPI.getActiveEditor(project);
+
+    SPath activeEditorPath;
+
+    if (activeEditor != null) {
+      activeEditorPath = editorPool.getFile(activeEditor.getDocument());
+    } else {
+      activeEditorPath = null;
+    }
+
+    sendEditorOpenInformation(localUser, activeEditorPath);
+  }
+
+  /**
    * Adds all currently open editors belonging to the passed project to the pool of open editors.
    *
    * @param project the added project
    */
   private void addProjectResources(IProject project) {
-    Project intellijProject = project.adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Module module = project.adaptTo(IntelliJProjectImpl.class).getModule();
+    FileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
+    Project intellijProject = module.getProject();
 
-    VirtualFile[] openFiles = ProjectAPI.getOpenFiles(intellijProject);
+    Set<VirtualFile> openFiles = new HashSet<>();
+
+    for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
+      if (moduleFileIndex.isInContent(openFile)) {
+        openFiles.add(openFile);
+      }
+    }
+
+    Map<SPath, Editor> openFileMapping = new HashMap<>();
 
     SelectedEditorStateSnapshot selectedEditorStateSnapshot =
         selectedEditorStateSnapshotFactory.capturedState();
@@ -387,7 +423,16 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalViewPortChangeHandlersEnabled(false);
 
       for (VirtualFile openFile : openFiles) {
-        localEditorHandler.openEditor(openFile, project, false);
+        Editor editor = localEditorHandler.openEditor(openFile, project, false);
+
+        SPath path = VirtualFileConverter.convertToSPath(intellijProject, openFile);
+
+        if (path == null) {
+          throw new IllegalStateException(
+              "Could not create SPath for resource that is known to be shared: " + openFile);
+        }
+
+        openFileMapping.put(path, editor);
       }
 
     } finally {
@@ -396,6 +441,27 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     }
 
     selectedEditorStateSnapshot.applyHeldState();
+
+    User localUser = session.getLocalUser();
+
+    Set<String> selectedFiles = new HashSet<>();
+
+    for (VirtualFile selectedFile : ProjectAPI.getSelectedFiles(intellijProject)) {
+      if (moduleFileIndex.isInContent(selectedFile)) {
+        selectedFiles.add(selectedFile.getPath());
+      }
+    }
+
+    openFileMapping.forEach(
+        (path, editor) -> {
+          sendEditorOpenInformation(localUser, path);
+
+          sendViewPortInformation(localUser, path, editor, selectedFiles);
+
+          sendSelectionInformation(localUser, path, editor);
+        });
+
+    sendActiveEditorInformation(localUser, intellijProject);
   }
 
   @SuppressWarnings("FieldCanBeLocal")

@@ -59,11 +59,3 @@ sourceSets {
   main.java.srcDirs =  ['src', 'ext-src']
   test.java.srcDir 'test'
 }
-
-sonarqube {
-  properties {
-    property 'sonar.projectName', 'Saros/Whiteboard'
-    property 'sonar.projectDescription', 'Saros Whiteboard plugin for Eclipse IDE'
-    property 'sonar.projectVersion', '14.11.28.DEVEL'
-  }
-}

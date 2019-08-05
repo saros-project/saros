@@ -6,8 +6,6 @@ import org.apache.log4j.Logger;
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -15,7 +13,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -34,7 +31,6 @@ import saros.ui.util.LayoutUtils;
 import saros.ui.util.LinkListener;
 import saros.ui.util.SWTUtils;
 import saros.ui.widgets.IllustratedComposite;
-import saros.ui.widgets.decoration.EmptyText;
 import saros.util.ThreadUtils;
 
 /**
@@ -68,7 +64,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
   protected Button autoConnectButton;
   protected Button skypeUsageButton;
-  protected EmptyText skypeUsernameText;
+  protected Text skypeUsernameText;
 
   protected Button statisticSubmissionButton;
   protected Button errorLogSubmissionButton;
@@ -91,7 +87,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     setInitialValues();
     populateGatewayCombo();
     hookListeners();
-    updateSkypeUsernameEnablement();
     updateGatewaysComboEnablement();
     updatePageCompletion();
   }
@@ -175,14 +170,12 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     Composite skypeUsageComposite = new Composite(skypeComposite, SWT.NONE);
     skypeUsageComposite.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     skypeUsageComposite.setLayout(LayoutUtils.createGridLayout(2, false, 0, 5));
+
     this.skypeUsageButton = new Button(skypeUsageComposite, SWT.CHECK);
     this.skypeUsageButton.setText(saros.ui.Messages.ConfigurationSettingsWizardPage_yes_use);
 
-    Text skypeUsernameText = new Text(skypeComposite, SWT.BORDER);
-    skypeUsernameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    this.skypeUsernameText =
-        new EmptyText(
-            skypeUsernameText, saros.ui.Messages.ConfigurationSettingsWizardPage_skype_username);
+    this.skypeUsernameText = new Text(skypeComposite, SWT.BORDER);
+    this.skypeUsernameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     return leftColumn;
   }
@@ -274,34 +267,18 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
-            updateSkypeUsernameEnablement();
+            skypeUsernameText.setEnabled(skypeUsageButton.getSelection());
+            if (skypeUsageButton.getSelection()) skypeUsernameText.setFocus();
           }
         });
 
-    this.skypeUsernameText
-        .getControl()
-        .addFocusListener(
-            new FocusAdapter() {
-              @Override
-              public void focusLost(FocusEvent e) {
-                if (skypeUsernameText.getText().isEmpty()) {
-                  skypeUsageButton.setSelection(false);
-                  updateSkypeUsernameEnablement();
-                }
-              }
-            });
+    Listener listener = e -> updatePageCompletion();
 
-    Listener listener =
-        new Listener() {
-          @Override
-          public void handleEvent(Event event) {
-            updatePageCompletion();
-          }
-        };
     this.autoConnectButton.addListener(SWT.Selection, listener);
     this.setupPortmappingButton.addListener(SWT.Selection, listener);
     this.skypeUsageButton.addListener(SWT.Selection, listener);
-    this.skypeUsernameText.getControl().addListener(SWT.Modify, listener);
+    this.skypeUsernameText.addListener(SWT.Modify, listener);
+
     if (FeedbackManager.isFeedbackFeatureRequired()) {
       this.statisticSubmissionButton.addListener(SWT.Selection, listener);
       this.errorLogSubmissionButton.addListener(SWT.Selection, listener);
@@ -310,13 +287,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
   protected void updateGatewaysComboEnablement() {
     gatewaysCombo.setEnabled(setupPortmappingButton.getSelection());
-  }
-
-  protected void updateSkypeUsernameEnablement() {
-    boolean selected = skypeUsageButton.getSelection();
-    skypeUsernameText.setEnabled(selected);
-    if (selected) skypeUsernameText.setFocus();
-    else skypeUsageButton.setFocus();
   }
 
   /** Populates the gateway combo box with discovered gateways. */
@@ -355,15 +325,12 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
   }
 
   protected void updatePageCompletion() {
+    if (skypeUsageButton.getSelection() && skypeUsernameText.getText().trim().isEmpty()) {
+      setPageComplete(false);
+      return;
+    }
+
     setPageComplete(true);
-  }
-
-  @Override
-  public void setVisible(boolean visible) {
-    super.setVisible(visible);
-    if (!visible) return;
-
-    updateSkypeUsernameEnablement();
   }
 
   /*

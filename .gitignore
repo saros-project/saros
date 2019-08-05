@@ -6,7 +6,6 @@ bin_test/
 /.idea/inspectionProfiles/
 /.idea/copyright/
 /.idea/dictionaries/
-/.idea/sonarlint/
 /.idea/libraries/
 /.idea/modules.xml
 **/*.iml

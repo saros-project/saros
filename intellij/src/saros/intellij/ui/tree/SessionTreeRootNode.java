@@ -1,5 +1,7 @@
 package saros.intellij.ui.tree;
 
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import saros.SarosPluginContext;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.views.SarosMainPanelView;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -20,8 +23,13 @@ import saros.session.SessionEndReason;
 import saros.session.User;
 import saros.ui.util.ModelFormatUtils;
 
-/** Session tree root node. */
-public class SessionTreeRootNode extends DefaultMutableTreeNode {
+/**
+ * Session tree root node.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}.
+ */
+public class SessionTreeRootNode extends DefaultMutableTreeNode implements Disposable {
   public static final String TREE_TITLE = "Session";
   public static final String TREE_TITLE_NO_SESSIONS = "No Session Running";
 
@@ -33,6 +41,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
   private final DefaultTreeModel treeModel;
 
   @Inject private ISarosSessionManager sessionManager;
+
+  private volatile ISarosSession session;
 
   private final ISessionListener sessionListener =
       new ISessionListener() {
@@ -86,6 +96,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
                 public void run() {
                   oldSarosSession.removeListener(sessionListener);
                   removeSessionNode(oldSarosSession);
+
+                  session = null;
                 }
               });
         }
@@ -93,12 +105,26 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
 
   public SessionTreeRootNode(SessionAndContactsTreeView treeView) {
     super(treeView);
+
+    Disposer.register(treeView, this);
+
     SarosPluginContext.initComponent(this);
     this.treeView = treeView;
     treeModel = (DefaultTreeModel) this.treeView.getModel();
     setUserObject(TREE_TITLE_NO_SESSIONS);
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+  }
+
+  @Override
+  public void dispose() {
+    sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
+
+    ISarosSession currentSession = session;
+
+    if (currentSession != null) {
+      currentSession.removeListener(sessionListener);
+    }
   }
 
   void setInitialState() {
@@ -110,6 +136,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
   }
 
   private void sessionStarted(final ISarosSession newSarosSession) {
+    session = newSarosSession;
+
     UIUtil.invokeLaterIfNeeded(
         () -> {
           newSarosSession.addListener(sessionListener);
