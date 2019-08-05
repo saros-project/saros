@@ -1,6 +1,7 @@
 package saros.stf.server.rmi.controlbot.manipulation.impl;
 
 import java.rmi.RemoteException;
+import java.util.List;
 import org.apache.log4j.Logger;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
@@ -73,5 +74,15 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
     accountStore.setDefaultAccount(accountToSetAsDefault);
 
     return !accountToSetAsDefault.equals(defaultAccount);
+  }
+
+  @Override
+  public void deleteAllAccounts() throws RemoteException {
+
+    final XMPPAccountStore accountStore = getXmppAccountStore();
+
+    final List<XMPPAccount> accounts = accountStore.getAllAccounts();
+
+    for (final XMPPAccount account : accounts) accountStore.deleteAccount(account);
   }
 }
