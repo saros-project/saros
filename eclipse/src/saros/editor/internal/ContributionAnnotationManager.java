@@ -1,23 +1,23 @@
 package saros.editor.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import saros.editor.EditorManager;
 import saros.editor.annotations.ContributionAnnotation;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.session.ISarosSession;
@@ -35,17 +35,30 @@ import saros.ui.util.SWTUtils;
  *
  * <p>This class takes care of managing the annotations for session participants which involves
  * adding, removing, and splitting of Annotations.
- *
- * <p>TODO Move responsibilities from {@link EditorManager} to here
  */
+// <p>TODO Move responsibilities from EditorManager to here
 public class ContributionAnnotationManager {
+
+  private static final class History {
+    private final LinkedList<HistoryEntry> entries = new LinkedList<>();
+    private int currentInsertStamp = 0;
+  }
+
+  private static final class HistoryEntry {
+    private ContributionAnnotation annotation;
+    private int insertStamp;
+
+    private HistoryEntry(final ContributionAnnotation annotation, final int insertStamp) {
+      this.annotation = annotation;
+      this.insertStamp = insertStamp;
+    }
+  }
 
   private static final Logger log = Logger.getLogger(ContributionAnnotationManager.class);
 
   static final int MAX_HISTORY_LENGTH = 20;
 
-  private final Map<User, LinkedList<ContributionAnnotation>> sourceToHistory =
-      new HashMap<User, LinkedList<ContributionAnnotation>>();
+  private final Map<User, History> sourceToHistory = new HashMap<>();
 
   private final ISarosSession sarosSession;
 
@@ -53,15 +66,13 @@ public class ContributionAnnotationManager {
 
   private boolean contribtionAnnotationsEnabled;
 
+  private final AnnotationModelHelper annotationModelHelper = new AnnotationModelHelper();
+
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
         public void userLeft(User user) {
-          /*
-           * Just remove the annotations from the history. They are removed by
-           * the EditorManager from the editors.
-           */
-          sourceToHistory.remove(user);
+          removeAnnotationsForUser(user);
         }
       };
 
@@ -90,12 +101,14 @@ public class ContributionAnnotationManager {
 
   public ContributionAnnotationManager(
       ISarosSession sarosSession, IPreferenceStore preferenceStore) {
+
     this.sarosSession = sarosSession;
     this.preferenceStore = preferenceStore;
     this.preferenceStore.addPropertyChangeListener(propertyChangeListener);
     this.sarosSession.addListener(sessionListener);
+
     contribtionAnnotationsEnabled =
-        this.preferenceStore.getBoolean(EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
+        preferenceStore.getBoolean(EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
   }
 
   /**
@@ -107,7 +120,6 @@ public class ContributionAnnotationManager {
    * @param length length of the annotation.
    * @param source of the annotation.
    */
-  @SuppressWarnings("unchecked")
   public void insertAnnotation(IAnnotationModel model, int offset, int length, User source) {
 
     if (!contribtionAnnotationsEnabled) return;
@@ -131,27 +143,19 @@ public class ContributionAnnotationManager {
   }
 
   /**
-   * Splits the contribution annotation at given position, so that the following text change won't
+   * Splits the contribution annotation at given position, so that a following text change will not
    * expand the annotation. This needs to be called before the text is changed.
    *
-   * @param model to search for annotations to split.
-   * @param offset at which annotations should be splitted.
+   * @param model to search for annotations to split
+   * @param offset at which annotations should be split
    */
-  /*
-   * FIXME that method is broken, it does not honor the history, i.e Alice
-   * insert text ranges a, b, c, d ... now we split a into a0, a1 and as a
-   * result a0 and a1 are now the newest entries instead the oldest
-   *
-   * See also https://github.com/saros-project/saros/issues/32 that includes
-   * also another defect which is part of this behavior
-   */
-  @SuppressWarnings("unchecked")
   public void splitAnnotation(final IAnnotationModel model, final int offset) {
 
     if (!contribtionAnnotationsEnabled) return;
 
     final List<ContributionAnnotation> annotationsToRemove =
         new ArrayList<ContributionAnnotation>();
+
     final Map<ContributionAnnotation, Position> annotationsToAdd =
         new HashMap<ContributionAnnotation, Position>();
 
@@ -168,24 +172,23 @@ public class ContributionAnnotationManager {
 
       if ((offset > pos.offset) && (offset < pos.offset + pos.length)) {
 
-        Position before = new Position(pos.offset, offset - pos.offset);
+        final Position before = new Position(pos.offset, offset - pos.offset);
 
-        Position after = new Position(offset, pos.length - (offset - pos.offset));
+        final Position after = new Position(offset, pos.length - (offset - pos.offset));
 
         annotationsToRemove.add(contributionAnnotation);
 
-        annotationsToAdd.put(new ContributionAnnotation(source, model), before);
+        final ContributionAnnotation beforeAnnotation = new ContributionAnnotation(source, model);
+        final ContributionAnnotation afterAnnotation = new ContributionAnnotation(source, model);
 
-        annotationsToAdd.put(new ContributionAnnotation(source, model), after);
+        annotationsToAdd.put(beforeAnnotation, before);
+        annotationsToAdd.put(afterAnnotation, after);
+
+        replaceInHistory(contributionAnnotation, beforeAnnotation, afterAnnotation);
       }
     }
 
-    for (final ContributionAnnotation annotation : annotationsToRemove)
-      removeFromHistory(annotation);
-
-    for (final Entry<ContributionAnnotation, Position> entry : annotationsToAdd.entrySet()) {
-      addContributionAnnotation(entry.getKey(), entry.getValue());
-    }
+    annotationModelHelper.replaceAnnotationsInModel(model, annotationsToRemove, annotationsToAdd);
   }
 
   /**
@@ -193,8 +196,8 @@ public class ContributionAnnotationManager {
    *
    * @param model the annotation model that should be refreshed
    */
-  @SuppressWarnings("unchecked")
   public void refreshAnnotations(IAnnotationModel model) {
+
     List<Annotation> annotationsToRemove = new ArrayList<Annotation>();
     Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
 
@@ -218,6 +221,7 @@ public class ContributionAnnotationManager {
        * color id of the user has not changed
        */
       annotationsToRemove.add(annotation);
+
       ContributionAnnotation annotationToAdd =
           new ContributionAnnotation(((ContributionAnnotation) annotation).getSource(), model);
 
@@ -228,88 +232,108 @@ public class ContributionAnnotationManager {
 
     if (annotationsToRemove.isEmpty()) return;
 
-    if (model instanceof IAnnotationModelExtension) {
-      ((IAnnotationModelExtension) model)
-          .replaceAnnotations(annotationsToRemove.toArray(new Annotation[0]), annotationsToAdd);
-
-      return;
-    }
-
-    for (Annotation annotation : annotationsToRemove) model.removeAnnotation(annotation);
-
-    for (Map.Entry<Annotation, Position> entry : annotationsToAdd.entrySet())
-      model.addAnnotation(entry.getKey(), entry.getValue());
+    annotationModelHelper.replaceAnnotationsInModel(model, annotationsToRemove, annotationsToAdd);
   }
 
   public void dispose() {
     sarosSession.removeListener(sessionListener);
     preferenceStore.removePropertyChangeListener(propertyChangeListener);
-    sourceToHistory.clear();
+    removeAllAnnotations();
   }
 
-  /**
-   * Get the history of contribution annotations of the given user.
-   *
-   * @param source source of the user who's history we want.
-   * @return the history of source.
-   */
-  private Queue<ContributionAnnotation> getHistory(User source) {
-    LinkedList<ContributionAnnotation> result = sourceToHistory.get(source);
-    if (result == null) {
-      result = new LinkedList<ContributionAnnotation>();
-      sourceToHistory.put(source, result);
-    }
-    return result;
+  /** Get the history of the given user. If no history is available a new one is created. */
+  private History getHistory(final User user) {
+    return sourceToHistory.computeIfAbsent(user, u -> new History());
   }
 
   /**
    * Add a contribution annotation to the annotation model and store it into the history of the
    * associated user. Old entries are removed from the history and the annotation model.
    */
-  private void addContributionAnnotation(ContributionAnnotation annotation, Position position) {
+  private void addContributionAnnotation(
+      final ContributionAnnotation annotation, final Position position) {
 
-    annotation.getModel().addAnnotation(annotation, position);
+    final History history = getHistory(annotation.getSource());
 
-    Queue<ContributionAnnotation> history = getHistory(annotation.getSource());
-    history.add(annotation);
-    while (history.size() > MAX_HISTORY_LENGTH) {
-      ContributionAnnotation oldAnnotation = history.remove();
-      oldAnnotation.getModel().removeAnnotation(oldAnnotation);
-    }
-  }
+    final List<HistoryEntry> removedEntries = removeHistoryEntries(history);
 
-  /**
-   * Removes an annotation from the user's history and the annotation model.
-   *
-   * @param annotation
-   */
-  private void removeFromHistory(ContributionAnnotation annotation) {
-    getHistory(annotation.getSource()).remove(annotation);
-    annotation.getModel().removeAnnotation(annotation);
-  }
+    final HistoryEntry newEntry = new HistoryEntry(annotation, history.currentInsertStamp);
 
-  /**
-   * Replaces an existing annotation in the current history with a new annotation.
-   *
-   * @param oldAnnotation
-   * @param newAnnotation
-   */
-  private void replaceInHistory(
-      ContributionAnnotation oldAnnotation, ContributionAnnotation newAnnotation) {
-    assert oldAnnotation.getSource().equals(newAnnotation.getSource());
+    history.currentInsertStamp = (history.currentInsertStamp + 1) % MAX_HISTORY_LENGTH;
 
-    LinkedList<ContributionAnnotation> list = sourceToHistory.get(oldAnnotation.getSource());
+    history.entries.add(newEntry);
 
-    if (list == null) {
-      log.warn("a annotation history for user " + oldAnnotation.getSource() + " does not exists");
-
+    if (removedEntries.isEmpty()) {
+      annotation.getModel().addAnnotation(annotation, position);
       return;
     }
 
-    for (ListIterator<ContributionAnnotation> it = list.listIterator(); it.hasNext(); ) {
-      ContributionAnnotation annotation = it.next();
-      if (annotation.equals(oldAnnotation)) {
-        it.set(newAnnotation);
+    // TODO OPTIMIZE it is usually 2 annotations after the queue is full
+    annotation.getModel().addAnnotation(annotation, position);
+
+    for (final HistoryEntry entry : removedEntries)
+      entry.annotation.getModel().removeAnnotation(entry.annotation);
+  }
+
+  /**
+   * Removes entries from the history based on the history current insert stamp. This method <b>DOES
+   * NOT</b> alter the annotation model the removed annotations in the history belong to!
+   */
+  private List<HistoryEntry> removeHistoryEntries(final History history) {
+
+    final List<HistoryEntry> removedEntries = new ArrayList<>();
+
+    final int insertStampToRemove = history.currentInsertStamp;
+
+    /* the logic assumes that the entry order does not change during lifetime
+     * i.e if we have a history of size 4 the list must look like this regarding the insert stamps
+     * 0 0 0 1 2 3 3 3 0 1 1 1 2 2 2 2 3 0 1 1 1 1 1 2 3 ... and so on
+     */
+
+    final Iterator<HistoryEntry> it = history.entries.iterator();
+
+    while (it.hasNext()) {
+      final HistoryEntry entry = it.next();
+
+      if (entry.insertStamp != insertStampToRemove) break;
+
+      removedEntries.add(entry);
+      it.remove();
+    }
+
+    return removedEntries;
+  }
+
+  /**
+   * Replaces an existing annotation in the current history with new annotations. This method
+   * <b>DOES NOT</b> alter the annotation model!
+   */
+  private void replaceInHistory(
+      final ContributionAnnotation oldAnnotation, final ContributionAnnotation... newAnnotations) {
+
+    final User user = oldAnnotation.getSource();
+
+    final History history = getHistory(user);
+
+    /* update the history entry, e.g we want to modify annotation D
+     * pre: A, B, C, D, E, F, G
+     * post: A, B, C, D_0, D_1, ..., D_N, E, F, G
+     *
+     */
+    for (final ListIterator<HistoryEntry> lit = history.entries.listIterator(); lit.hasNext(); ) {
+
+      final HistoryEntry entry = lit.next();
+
+      if (entry.annotation.equals(oldAnnotation)) {
+
+        // see JavaDoc remove must be called BEFORE add
+        lit.remove();
+
+        for (int i = 0; i < newAnnotations.length; i++) {
+          assert oldAnnotation.getSource().equals(newAnnotations[i].getSource());
+          lit.add(new HistoryEntry(newAnnotations[i], entry.insertStamp));
+        }
+
         return;
       }
     }
@@ -321,8 +345,48 @@ public class ContributionAnnotationManager {
             + oldAnnotation.getSource());
   }
 
+  /**
+   * Removes all annotations from all annotation models that are currently stored in the history of
+   * all users.
+   */
   private void removeAllAnnotations() {
-    for (Queue<ContributionAnnotation> queue : sourceToHistory.values())
-      while (!queue.isEmpty()) removeFromHistory(queue.peek());
+    removeFromHistoryAndAnnotationModel(sourceToHistory.values());
+  }
+
+  /**
+   * Removes all annotations from all annotation models that are currently stored in the history for
+   * the given user. The entries of the history are removed as well.
+   */
+  private void removeAnnotationsForUser(final User user) {
+    final History history = sourceToHistory.get(user);
+
+    if (history != null) removeFromHistoryAndAnnotationModel(Collections.singletonList(history));
+  }
+
+  /**
+   * Removes all annotations from all annotation models of the given histories. The entries of the
+   * histories are removed as well.
+   */
+  private void removeFromHistoryAndAnnotationModel(final Collection<History> histories) {
+
+    final Set<IAnnotationModel> annotationModels = new HashSet<>();
+    final Set<User> users = new HashSet<>();
+
+    for (final History history : histories) {
+      while (!history.entries.isEmpty()) {
+
+        final HistoryEntry entry = history.entries.poll();
+
+        annotationModels.add(entry.annotation.getModel());
+        users.add(entry.annotation.getSource());
+      }
+    }
+
+    for (final IAnnotationModel annotationModel : annotationModels)
+      annotationModelHelper.removeAnnotationsFromModel(
+          annotationModel,
+          (a) ->
+              a instanceof ContributionAnnotation
+                  && users.contains(((ContributionAnnotation) (a)).getSource()));
   }
 }

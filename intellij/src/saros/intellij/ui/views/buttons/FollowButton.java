@@ -1,11 +1,13 @@
 package saros.intellij.ui.views.buttons;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.util.ui.UIUtil;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import org.jetbrains.annotations.NotNull;
 import saros.editor.FollowModeManager;
 import saros.editor.IFollowModeListener;
 import saros.intellij.ui.Messages;
@@ -17,7 +19,12 @@ import saros.session.SessionEndReason;
 import saros.session.User;
 import saros.ui.util.ModelFormatUtils;
 
-/** Button to follow a user. Displays a PopupMenu containing all session users to choose from. */
+/**
+ * Button to follow a user. Displays a PopupMenu containing all session users to choose from.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link AbstractSessionToolbarButton}.
+ */
 public class FollowButton extends AbstractSessionToolbarButton {
   private JPopupMenu popupMenu;
   private final FollowModeAction followModeAction;
@@ -53,13 +60,9 @@ public class FollowButton extends AbstractSessionToolbarButton {
   private volatile ISarosSession session;
   private volatile FollowModeManager followModeManager;
 
-  /**
-   * Creates a Follow button with a JPopupMenu, registers session listeners and editor listeners.
-   *
-   * <p>The FollowButton is created as disabled.
-   */
-  public FollowButton() {
-    super(FollowModeAction.NAME, Messages.FollowButton_tooltip, IconManager.FOLLOW_ICON);
+  /** Session button to follow other participants or leave the follow mode. */
+  public FollowButton(@NotNull Project project) {
+    super(project, FollowModeAction.NAME, Messages.FollowButton_tooltip, IconManager.FOLLOW_ICON);
 
     followModeAction = new FollowModeAction();
 
@@ -71,6 +74,19 @@ public class FollowButton extends AbstractSessionToolbarButton {
         ev -> popupMenu.show(button, 0, button.getBounds().y + button.getBounds().height));
 
     setInitialState();
+  }
+
+  @Override
+  void disposeComponents() {
+    ISarosSession currentSession = session;
+    if (currentSession != null) {
+      currentSession.removeListener(sessionListener);
+    }
+
+    FollowModeManager currentFollowModeManager = followModeManager;
+    if (currentFollowModeManager != null) {
+      currentFollowModeManager.removeListener(followModeListener);
+    }
   }
 
   @Override

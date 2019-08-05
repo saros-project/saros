@@ -7,6 +7,12 @@ import saros.intellij.ui.util.IconManager;
 import saros.session.ISarosSession;
 import saros.session.SessionEndReason;
 
+/**
+ * Session button to leave the current session.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link AbstractSessionToolbarButton}.
+ */
 public class LeaveSessionButton extends AbstractSessionToolbarButton {
   /**
    * Creates a LeaveSessionButton and registers the sessionListener.
@@ -15,6 +21,7 @@ public class LeaveSessionButton extends AbstractSessionToolbarButton {
    */
   public LeaveSessionButton(Project project) {
     super(
+        project,
         LeaveSessionAction.NAME,
         Messages.LeaveSessionButton_tooltip,
         IconManager.LEAVE_SESSION_ICON);
@@ -23,6 +30,11 @@ public class LeaveSessionButton extends AbstractSessionToolbarButton {
     setEnabled(false);
 
     setInitialState();
+  }
+
+  @Override
+  void disposeComponents() {
+    // NOP
   }
 
   @Override

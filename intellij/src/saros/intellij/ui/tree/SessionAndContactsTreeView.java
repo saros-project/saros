@@ -1,5 +1,8 @@
 package saros.intellij.ui.tree;
 
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import javax.swing.JTree;
@@ -9,18 +12,25 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import org.jetbrains.annotations.NotNull;
 import org.jivesoftware.smack.Connection;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccountStore;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.views.SarosMainPanelView;
 import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.repackaged.picocontainer.annotations.Inject;
 
-/** Saros tree view for contacts and sessions. */
-public class SessionAndContactsTreeView extends JTree {
+/**
+ * Saros tree view for contacts and sessions.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}.
+ */
+public class SessionAndContactsTreeView extends JTree implements Disposable {
 
   private final SessionTreeRootNode sessionTreeRootNode;
   private final ContactTreeRootNode contactTreeRootNode;
@@ -83,8 +93,11 @@ public class SessionAndContactsTreeView extends JTree {
         }
       };
 
-  public SessionAndContactsTreeView() {
+  public SessionAndContactsTreeView(@NotNull Project project) {
     super(new SarosTreeRootNode());
+
+    Disposer.register(project, this);
+
     SarosPluginContext.initComponent(this);
 
     sessionTreeRootNode = new SessionTreeRootNode(this);
@@ -103,6 +116,11 @@ public class SessionAndContactsTreeView extends JTree {
     renderConnectionState(
         connectionService.getConnection(), connectionService.getConnectionState());
     sessionTreeRootNode.setInitialState();
+  }
+
+  @Override
+  public void dispose() {
+    connectionService.removeListener(connectionStateListener);
   }
 
   private void renderConnectionState(Connection connection, ConnectionState state) {
