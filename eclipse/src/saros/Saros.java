@@ -3,12 +3,17 @@ package saros;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.swt.SWTException;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
@@ -40,9 +45,24 @@ public class Saros extends AbstractUIPlugin {
 
   private static final String VERSION_COMPATIBILITY_PROPERTY_FILE = "version.comp"; // $NON-NLS-1$
 
+  private final IWorkbenchListener workbenchShutdownListener =
+      new IWorkbenchListener() {
+
+        @Override
+        public void postShutdown(final IWorkbench workbench) {
+          stopLifeCycle();
+        }
+
+        @Override
+        public boolean preShutdown(final IWorkbench workbench, final boolean forced) {
+          return true;
+        }
+      };
+
   private static boolean isInitialized;
 
   private EclipsePluginLifecycle lifecycle;
+  private boolean isLifecycleStarted = false;
 
   /**
    * @JTourBusStop 2, Some Basics:
@@ -111,33 +131,27 @@ public class Saros extends AbstractUIPlugin {
 
     lifecycle.start();
 
+    isLifecycleStarted = true;
+
     initVersionCompatibilityChart(
         VERSION_COMPATIBILITY_PROPERTY_FILE,
         lifecycle.getSarosContext().getComponent(VersionManager.class));
 
+    getWorkbench().addWorkbenchListener(workbenchShutdownListener);
     isInitialized = true;
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
 
+    log.info("Stopping Saros " + getBundle().getVersion());
+
     saveGlobalPreferences();
 
+    getWorkbench().removeWorkbenchListener(workbenchShutdownListener);
+
     try {
-      Thread shutdownThread =
-          ThreadUtils.runSafeAsync(
-              "dpp-shutdown",
-              log,
-              new Runnable() { //$NON-NLS-1$
-                @Override
-                public void run() {
-                  lifecycle.stop();
-                }
-              });
-
-      shutdownThread.join(10000);
-      if (shutdownThread.isAlive()) log.error("could not shutdown Saros gracefully");
-
+      stopLifeCycle();
     } finally {
       super.stop(context);
     }
@@ -191,6 +205,79 @@ public class Saros extends AbstractUIPlugin {
   public static boolean useHtmlGui() {
     // TODO store constant string elsewhere
     return Platform.getBundle("saros.ui") != null && Boolean.getBoolean("saros.swtbrowser");
+  }
+
+  /** Stops the Saros Eclipse life cycle. */
+  private void stopLifeCycle() {
+
+    log.debug("stopping lifecycle...");
+
+    if (!isLifecycleStarted) {
+      log.debug("lifecycle is already stopped");
+      return;
+    }
+
+    isLifecycleStarted = false;
+
+    final AtomicBoolean isLifeCycleStopped = new AtomicBoolean(false);
+    final AtomicBoolean isTimeout = new AtomicBoolean(false);
+
+    final Display display = Display.getCurrent();
+
+    final Thread shutdownThread =
+        ThreadUtils.runSafeAsync(
+            "dpp-shutdown", //$NON-NLS-1$
+            log,
+            () -> {
+              try {
+                lifecycle.stop();
+              } finally {
+                isLifeCycleStopped.set(true);
+
+                if (display != null) {
+                  try {
+                    display.wake();
+                  } catch (SWTException ignore) {
+                    // NOP
+                  }
+                }
+              }
+            });
+
+    int threadTimeout = 10000;
+
+    // must run the event loop or stopping the lifecycle will timeout
+    if (display != null && !display.isDisposed()) {
+
+      display.timerExec(
+          threadTimeout,
+          () -> {
+            isTimeout.set(true);
+            display.wake();
+          });
+
+      while (!isLifeCycleStopped.get() && !isTimeout.get()) {
+        if (!display.readAndDispatch()) display.sleep();
+      }
+
+      if (!isLifeCycleStopped.get()) threadTimeout = 1;
+
+      /*
+       *  fall through to log an error or wait until the thread terminated
+       *  even it already signal that the life cycle was stopped
+       */
+    }
+
+    try {
+      shutdownThread.join(threadTimeout);
+    } catch (InterruptedException e) {
+      log.warn("interrupted while waiting for the current lifecycle to stop");
+      Thread.currentThread().interrupt();
+    }
+
+    if (shutdownThread.isAlive()) log.error("timeout while stopping lifecycle");
+
+    log.debug("lifecycle stopped");
   }
 
   private void setupLoggers() {
