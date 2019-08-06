@@ -30,7 +30,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import saros.filesystem.IReferencePointManager;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.negotiation.ProjectNegotiationData;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
@@ -68,18 +68,22 @@ public class EnterProjectNamePage extends WizardPage {
 
   private final Set<String> unsupportedCharsets = new HashSet<String>();
 
+  private final EclipseReferencePointManager eclipseReferencePointManager;
+
   public EnterProjectNamePage(
       ISarosSession session,
       IConnectionManager connectionManager,
       Preferences preferences,
       JID peer,
-      List<ProjectNegotiationData> projectNegotiationData) {
+      List<ProjectNegotiationData> projectNegotiationData,
+      EclipseReferencePointManager eclipseReferencePointManager) {
 
     super(Messages.EnterProjectNamePage_title);
     this.session = session;
     this.connectionManager = connectionManager;
     this.preferences = preferences;
     this.peer = peer;
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
 
     remoteProjectMapping = new HashMap<String, String>();
 
@@ -349,9 +353,6 @@ public class EnterProjectNamePage extends WizardPage {
 
     final Set<String> reservedProjectNames = new HashSet<String>();
 
-    IReferencePointManager referencePointManager =
-        session.getComponent(IReferencePointManager.class);
-
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
       String referencePointID = entry.getKey();
@@ -360,10 +361,11 @@ public class EnterProjectNamePage extends WizardPage {
       saros.filesystem.IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
       if (referencePoint == null) continue;
+      IProject project = eclipseReferencePointManager.getProject(referencePoint);
 
-      projectOptionComposite.setProjectName(true, referencePointManager.getName(referencePoint));
+      projectOptionComposite.setProjectName(true, project.getName());
       projectOptionComposite.setEnabled(false);
-      reservedProjectNames.add(referencePointManager.getName(referencePoint));
+      reservedProjectNames.add(project.getName());
     }
 
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
