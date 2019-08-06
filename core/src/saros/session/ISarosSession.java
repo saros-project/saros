@@ -152,6 +152,23 @@ public interface ISarosSession {
   public void removeListener(ISessionListener listener);
 
   /**
+   * Enables or disables the execution of received activities for the given project. If the
+   * execution is disabled, activities for resources of the given projects will be dropped without
+   * being applied.
+   *
+   * <p>This method can be used to disable the execution of received activities for projects that
+   * are no longer available (i.e. are no longer part of the session or are no longer
+   * present/accessible locally).
+   *
+   * @param project the shared project to enable or disable the activity execution for
+   * @param enabled <code>true</code> to enable or <code>false</code> to disable the activity
+   *     execution
+   */
+  default void setActivityExecution(IProject project, boolean enabled) {
+    // NOP
+  }
+
+  /**
    * @return the shared projects associated with this session, never <code>null</code> but may be
    *     empty
    */
