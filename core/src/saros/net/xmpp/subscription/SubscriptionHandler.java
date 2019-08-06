@@ -113,14 +113,15 @@ public class SubscriptionHandler {
    * the server or we would create an infinite loop
    */
   private void processPresence(Presence presence) {
-
     if (presence.getFrom() == null) return;
+
+    JID jid = new JID(presence.getFrom());
 
     switch (presence.getType()) {
       case error:
         String message =
             MessageFormat.format(
-                "received error presence package from " + "{0}, condition: {1}, message: {2}",
+                "received error presence package from {0}, condition: {1}, message: {2}",
                 presence.getFrom(),
                 presence.getError().getCondition(),
                 presence.getError().getMessage());
@@ -128,23 +129,24 @@ public class SubscriptionHandler {
         return;
 
       case subscribed:
-        LOG.debug("contact subscribed to us: " + presence.getFrom());
+        LOG.debug("contact subscribed to us: " + jid);
         break;
 
       case unsubscribed:
-        LOG.debug("contact unsubscribed from us: " + presence.getFrom());
+        LOG.debug("contact unsubscribed from us: " + jid);
+        notifySubscriptionCanceled(jid);
         break;
 
       case subscribe:
-        LOG.debug("contact requests to subscribe to us: " + presence.getFrom());
-
-        notifySubscriptionReceived(new JID(presence.getFrom()));
+        LOG.debug("contact requests to subscribe to us: " + jid);
+        notifySubscriptionReceived(jid);
         break;
 
       case unsubscribe:
-        LOG.debug("contact requests to unsubscribe from us: " + presence.getFrom());
-        removeSubscription(new JID(presence.getFrom()));
+        LOG.debug("contact requests to unsubscribe from us: " + jid);
+        removeSubscription(jid);
         break;
+
       default:
         // do nothing
     }
@@ -229,5 +231,11 @@ public class SubscriptionHandler {
   private void notifySubscriptionReceived(final JID jid) {
     for (SubscriptionListener subscriptionManagerListener : subscriptionListeners)
       subscriptionManagerListener.subscriptionRequestReceived(jid);
+  }
+
+  /** Notify all {@link SubscriptionListener}s about an removed subscription. */
+  private void notifySubscriptionCanceled(JID jid) {
+    for (SubscriptionListener subscriptionManagerListener : subscriptionListeners)
+      subscriptionManagerListener.subscriptionCanceled(jid);
   }
 }
