@@ -157,7 +157,12 @@ public class AddProjectToSessionWizard extends Wizard {
 
     namePage =
         new EnterProjectNamePage(
-            session, connectionManager, preferences, peer, negotiation.getProjectNegotiationData());
+            session,
+            connectionManager,
+            preferences,
+            peer,
+            negotiation.getProjectNegotiationData(),
+            eclipseReferencePointManager);
 
     addPage(namePage);
   }
