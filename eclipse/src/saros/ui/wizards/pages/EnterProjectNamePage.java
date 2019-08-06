@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import saros.filesystem.IReferencePointManager;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.negotiation.ProjectNegotiationData;
 import saros.net.IConnectionManager;
 import saros.net.xmpp.JID;
@@ -74,19 +74,23 @@ public class EnterProjectNamePage extends WizardPage {
 
   private final Set<String> unsupportedCharsets = new HashSet<String>();
 
+  private final EclipseReferencePointManager eclipseReferencePointManager;
+
   public EnterProjectNamePage(
       ISarosSession session,
       IConnectionManager connectionManager,
       Preferences preferences,
       JID peer,
       List<ProjectNegotiationData> projectNegotiationData,
-      Map<String, String> desiredRemoteToLocalProjectNameMapping) {
+      Map<String, String> desiredRemoteToLocalProjectNameMapping,
+      EclipseReferencePointManager eclipseReferencePointManager) {
 
     super(Messages.EnterProjectNamePage_title);
     this.session = session;
     this.connectionManager = connectionManager;
     this.preferences = preferences;
     this.peer = peer;
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
 
     this.desiredRemoteToLocalProjectNameMapping =
         desiredRemoteToLocalProjectNameMapping != null
@@ -376,9 +380,6 @@ public class EnterProjectNamePage extends WizardPage {
 
     final Set<String> reservedProjectNames = new HashSet<String>();
 
-    // force pre-selection of already shared projects
-    IReferencePointManager referencePointManager =
-        session.getComponent(IReferencePointManager.class);
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
       String referencePointID = entry.getKey();
@@ -387,10 +388,12 @@ public class EnterProjectNamePage extends WizardPage {
       saros.filesystem.IReferencePoint referencePoint = session.getReferencePoint(referencePointID);
 
       if (referencePoint == null) continue;
+      IProject project = eclipseReferencePointManager.getProject(referencePoint);
 
-      projectOptionComposite.setProjectName(referencePointManager.getName(referencePoint), true);
+      projectOptionComposite.setProjectName(project.getName(), true);
+
       projectOptionComposite.setEnabled(false);
-      reservedProjectNames.add(referencePointManager.getName(referencePoint));
+      reservedProjectNames.add(project.getName());
     }
 
     // try to assign local names for the remaining remote projects

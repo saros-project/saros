@@ -19,7 +19,7 @@ import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
-import saros.filesystem.IReferencePointManager;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.Startable;
@@ -87,18 +87,15 @@ public class SharedResourcesManager extends AbstractActivityProducer
   /** map that holds the current open or closed state for every shared project */
   private final Map<IProject, Boolean> projectStates = new HashMap<IProject, Boolean>();
 
+  private final EclipseReferencePointManager eclipseReferencePointManager;
+
   private final ISessionListener sessionListener =
       new ISessionListener() {
 
         @Override
         public void projectAdded(saros.filesystem.IReferencePoint referencePoint) {
           synchronized (projectStates) {
-            IReferencePointManager referencePointManager =
-                sarosSession.getComponent(IReferencePointManager.class);
-            IProject eclipseProject =
-                (IProject)
-                    ResourceAdapterFactory.convertBack(
-                        referencePointManager.getProject(referencePoint));
+            IProject eclipseProject = eclipseReferencePointManager.getProject(referencePoint);
             projectStates.put(eclipseProject, eclipseProject.isOpen());
           }
         }
@@ -106,12 +103,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         @Override
         public void projectRemoved(saros.filesystem.IReferencePoint referencePoint) {
           synchronized (projectStates) {
-            IReferencePointManager referencePointManager =
-                sarosSession.getComponent(IReferencePointManager.class);
-            IProject eclipseProject =
-                (IProject)
-                    ResourceAdapterFactory.convertBack(
-                        referencePointManager.getProject(referencePoint));
+            IProject eclipseProject = eclipseReferencePointManager.getProject(referencePoint);
             projectStates.remove(eclipseProject);
           }
         }
@@ -147,10 +139,14 @@ public class SharedResourcesManager extends AbstractActivityProducer
   }
 
   public SharedResourcesManager(
-      ISarosSession sarosSession, EditorManager editorManager, StopManager stopManager) {
+      ISarosSession sarosSession,
+      EditorManager editorManager,
+      StopManager stopManager,
+      EclipseReferencePointManager eclipseReferencePointManager) {
     this.sarosSession = sarosSession;
     this.stopManager = stopManager;
     this.projectDeltaVisitor = new ProjectDeltaVisitor(sarosSession, editorManager);
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
   }
 
   /** This method is called from Eclipse when changes to resource are detected */
