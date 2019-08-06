@@ -1,9 +1,9 @@
 package saros.ui.browser_functions;
 
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import saros.HTMLUIContextFactory;
 import saros.repackaged.picocontainer.Startable;
 import saros.repackaged.picocontainer.annotations.Inject;
+import saros.ui.browser.AbstractJavascriptFunction;
 import saros.ui.ide_embedding.BrowserCreator;
 
 /**
@@ -12,7 +12,8 @@ import saros.ui.ide_embedding.BrowserCreator;
  * to the {@link BrowserCreator}, i.e. they will be injected to any created browser widget and can
  * be called from the JavaScript context.
  */
-abstract class SelfRegisteringJavascriptFunction extends JavascriptFunction implements Startable {
+abstract class SelfRegisteringJavascriptFunction extends AbstractJavascriptFunction
+    implements Startable {
 
   @Inject private BrowserCreator browserCreator;
 

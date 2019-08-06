@@ -1,6 +1,5 @@
 package saros.ui.renderer;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
@@ -15,6 +14,7 @@ import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.ui.JavaScriptAPI;
+import saros.ui.browser.IBrowser;
 import saros.ui.core_facades.RosterFacade;
 import saros.ui.core_facades.RosterFacade.RosterChangeListener;
 import saros.ui.model.Contact;
@@ -85,7 +85,7 @@ public class StateRenderer extends Renderer {
   }
 
   @Override
-  public synchronized void render(IJQueryBrowser browser) {
+  public synchronized void render(IBrowser browser) {
     JavaScriptAPI.updateState(browser, this.state);
   }
 }

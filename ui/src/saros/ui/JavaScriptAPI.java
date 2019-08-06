@@ -2,10 +2,10 @@ package saros.ui;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import de.fu_berlin.inf.ag_se.browser.IBrowser;
 import java.util.List;
 import org.apache.log4j.Logger;
 import saros.account.XMPPAccount;
+import saros.ui.browser.IBrowser;
 import saros.ui.model.ProjectTree;
 import saros.ui.model.State;
 
@@ -80,7 +80,7 @@ public class JavaScriptAPI {
    * @param parameters the parameters for this event.
    */
   private static void triggerEvent(IBrowser browser, String javaScriptEvent, String parameters) {
-    browser.run("SarosApi.trigger('" + javaScriptEvent + "', " + parameters + ");");
+    browser.execute("SarosApi.trigger('" + javaScriptEvent + "', " + parameters + ");");
   }
 
   /**

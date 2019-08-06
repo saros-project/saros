@@ -15,7 +15,6 @@ public final class RemoteHTMLInputField extends HTMLSTFRemoteObject
 
   @Override
   public void enter(String text) throws RemoteException {
-    browser.val(selector, text);
     jQueryHelper.setFieldValue(selector, text);
   }
 

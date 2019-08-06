@@ -1,8 +1,8 @@
 package saros.ui.renderer;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import java.util.ArrayList;
 import java.util.List;
+import saros.ui.browser.IBrowser;
 import saros.ui.model.State;
 
 /**
@@ -30,18 +30,18 @@ import saros.ui.model.State;
  */
 public abstract class Renderer {
 
-  private List<IJQueryBrowser> browserList = new ArrayList<IJQueryBrowser>();
+  private List<IBrowser> browserList = new ArrayList<IBrowser>();
 
   /**
    * Renders the current state managed by the renderer in the given browser.
    *
    * @param browser the browser to be rendered
    */
-  public abstract void render(IJQueryBrowser browser);
+  public abstract void render(IBrowser browser);
 
   /** Renders the current state managed by the renderer for each browser. */
   public synchronized void render() {
-    for (IJQueryBrowser browser : browserList) {
+    for (IBrowser browser : browserList) {
       this.render(browser);
     }
   }
@@ -51,7 +51,7 @@ public abstract class Renderer {
    *
    * @param browser the browser to be added
    */
-  public synchronized void addBrowser(IJQueryBrowser browser) {
+  public synchronized void addBrowser(IBrowser browser) {
     this.browserList.add(browser);
     render(browser);
   }
@@ -62,7 +62,7 @@ public abstract class Renderer {
    *
    * @param browser the browser to be removed
    */
-  public synchronized void removeBrowser(IJQueryBrowser browser) {
+  public synchronized void removeBrowser(IBrowser browser) {
     browserList.remove(browser);
   }
 }

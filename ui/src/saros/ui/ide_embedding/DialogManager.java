@@ -1,10 +1,10 @@
 package saros.ui.ide_embedding;
 
-import de.fu_berlin.inf.ag_se.browser.IBrowser;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import saros.synchronize.UISynchronizer;
+import saros.ui.browser.IBrowser;
 import saros.ui.pages.AbstractBrowserPage;
 import saros.ui.pages.IBrowserPage;
 

@@ -1,6 +1,5 @@
 package saros.ui.renderer;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import java.util.ArrayList;
 import java.util.List;
 import saros.HTMLUIContextFactory;
@@ -8,6 +7,7 @@ import saros.account.IAccountStoreListener;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.ui.JavaScriptAPI;
+import saros.ui.browser.IBrowser;
 
 /** This class is responsible for sending the account list to the HTML UI. */
 public class AccountRenderer extends Renderer {
@@ -38,7 +38,7 @@ public class AccountRenderer extends Renderer {
   }
 
   @Override
-  public synchronized void render(IJQueryBrowser browser) {
+  public synchronized void render(IBrowser browser) {
     JavaScriptAPI.updateAccounts(browser, accounts);
   }
 }

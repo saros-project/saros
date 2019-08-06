@@ -1,6 +1,5 @@
 package saros.intellij.ui.swt_browser;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import java.awt.Canvas;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -10,6 +9,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import saros.SarosPluginContext;
 import saros.repackaged.picocontainer.annotations.Inject;
+import saros.ui.browser.IBrowser;
 import saros.ui.ide_embedding.BrowserCreator;
 import saros.ui.pages.IBrowserPage;
 
@@ -21,7 +21,7 @@ import saros.ui.pages.IBrowserPage;
 class SwtBrowserCanvas extends Canvas {
 
   private final IBrowserPage startPage;
-  private IJQueryBrowser browser;
+  private IBrowser browser;
 
   @Inject private BrowserCreator browserCreator;
 
@@ -50,14 +50,17 @@ class SwtBrowserCanvas extends Canvas {
   }
 
   /** This methods creates a SWT shell and browser in this Canvas. */
-  private IJQueryBrowser createBrowser() {
+  private IBrowser createBrowser() {
     Shell shell = SWT_AWT.new_Shell(Display.getCurrent(), this);
 
-    IJQueryBrowser browser = browserCreator.createBrowser(shell, SWT.NONE, startPage);
+    IBrowser browser = browserCreator.createBrowser(shell, SWT.NONE, startPage);
 
-    /* Ideally the size of browser and shell gets set via a resize listener.
+    /*
+     * Ideally the size of browser and shell gets set via a resize listener.
      * This does not work when the tool window is re-openend as no size
-     * change event is fired. The if clause below sets the size for this case */
+     * change event is fired. The if clause below sets the size for this
+     * case
+     */
     if (getHeight() > 0 && getWidth() > 0) {
       shell.setSize(getWidth(), getHeight());
       browser.setSize(getWidth(), getHeight());

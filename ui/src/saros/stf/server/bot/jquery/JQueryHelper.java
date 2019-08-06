@@ -1,19 +1,18 @@
 package saros.stf.server.bot.jquery;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.ag_se.browser.html.ISelector;
-import de.fu_berlin.inf.ag_se.browser.html.ISelector.NameSelector;
 import java.util.ArrayList;
 import java.util.List;
+import saros.stf.server.bot.jquery.ISelector.NameSelector;
+import saros.ui.browser.IBrowser;
 
 /**
  * The helper class is used in order to execute jquery commands in the HTML GUI browser during
  * testing.
  */
 public class JQueryHelper {
-  private final IJQueryBrowser browser;
+  private final IBrowser browser;
 
-  public JQueryHelper(IJQueryBrowser browser) {
+  public JQueryHelper(IBrowser browser) {
     this.browser = browser;
   }
 
@@ -23,7 +22,7 @@ public class JQueryHelper {
    * @param selector selector that defines the clickable element
    */
   public void clickOnSelection(ISelector selector) {
-    this.browser.run(String.format("%s[0].click()", selector.getStatement()));
+    this.browser.execute(String.format("%s[0].click()", selector.getStatement()));
   }
 
   /**
@@ -34,7 +33,7 @@ public class JQueryHelper {
    */
   public String getTextOfSelection(ISelector selector) {
     return (String)
-        this.browser.syncRun(String.format("return %s.text()", selector.getStatement()));
+        this.browser.evaluate(String.format("return %s.text()", selector.getStatement()));
   }
 
   /**
@@ -44,7 +43,7 @@ public class JQueryHelper {
    * @param text new text which is set
    */
   public void setTextOfSelection(ISelector selector, String text) {
-    this.browser.syncRun(String.format("%s.text('%s')", selector.getStatement(), text));
+    this.browser.evaluate(String.format("%s.text('%s')", selector.getStatement(), text));
   }
 
   /**
@@ -55,7 +54,7 @@ public class JQueryHelper {
    */
   public Object getFieldValue(ISelector selector) {
     final String name = this.getSelectorName(selector);
-    return this.browser.syncRun(String.format("return view.getFieldValue('%s')", name));
+    return this.browser.evaluate(String.format("return view.getFieldValue('%s')", name));
   }
 
   /**
@@ -71,7 +70,7 @@ public class JQueryHelper {
     if (value instanceof String) serializedValue = String.format("'%s'", (String) value);
     else serializedValue = value.toString();
 
-    this.browser.syncRun(
+    this.browser.evaluate(
         String.format("return view.getFieldValue('%s', %s)", name, serializedValue));
   }
 
@@ -82,10 +81,8 @@ public class JQueryHelper {
    * @return <code>true</code> if the element defined by the selector exists
    */
   public boolean selectionExists(ISelector selector) {
-    Boolean result =
-        (Boolean)
-            this.browser.syncRun(String.format("return %s.length > 0;", selector.getStatement()));
-    return result != null && result;
+    return (Boolean)
+        this.browser.evaluate(String.format("return %s.length > 0;", selector.getStatement()));
   }
 
   /**
@@ -146,7 +143,7 @@ public class JQueryHelper {
    */
   private List<String> getListItems(String code) {
 
-    Object[] objects = (Object[]) this.browser.syncRun(code);
+    Object[] objects = (Object[]) this.browser.evaluate(code);
 
     List<String> strings = new ArrayList<String>();
     for (Object o : objects) {

@@ -1,5 +1,6 @@
 package saros.ui.browser;
 
+// Adopted from https://github.com/ag-se/swt-browser-improved
 public abstract class AbstractJavascriptFunction {
 
   protected IBrowser browser;

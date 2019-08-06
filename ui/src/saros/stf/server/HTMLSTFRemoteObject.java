@@ -1,9 +1,9 @@
 package saros.stf.server;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import saros.context.IContainerContext;
+import saros.stf.server.bot.jquery.ISelector;
 import saros.stf.server.bot.jquery.JQueryHelper;
+import saros.ui.browser.IBrowser;
 import saros.ui.manager.BrowserManager;
 
 /**
@@ -15,7 +15,7 @@ public abstract class HTMLSTFRemoteObject {
   private static IContainerContext context;
 
   protected JQueryHelper jQueryHelper;
-  protected IJQueryBrowser browser;
+  protected IBrowser browser;
   protected ISelector selector;
 
   /**
@@ -40,7 +40,7 @@ public abstract class HTMLSTFRemoteObject {
     return getContext().getComponent(BrowserManager.class);
   }
 
-  public void setBrowser(IJQueryBrowser browser) {
+  public void setBrowser(IBrowser browser) {
     this.browser = browser;
     this.jQueryHelper = new JQueryHelper(browser);
   }
