@@ -3,79 +3,55 @@ package saros.ui.model.roster;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.easymock.EasyMock;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.packet.Presence;
+import org.eclipse.jface.viewers.StyledString;
 import org.junit.Before;
 import org.junit.Test;
-import saros.net.xmpp.JID;
 
 public class RosterComparatorTest {
 
-  private List<String> jids = new ArrayList<String>();
+  /** JID and Online Status */
+  private Map<String, Boolean> jids = new HashMap<>();
 
   @Before
   public void fillJids() {
     jids.clear();
-    jids.add("alice@foo.com");
-    jids.add("bob@foo.com");
-    jids.add("carl@foo.com");
-    jids.add("dave@foo.com");
-    jids.add("edna@foo.com");
+    jids.put("alice@foo.com", false);
+    jids.put("bob@foo.com", false);
+    jids.put("carl@foo.com", true);
+    jids.put("dave@foo.com", true);
+    jids.put("edna@foo.com", false);
   }
 
   @Test
   public void testRosterSort() {
-
-    Roster mockRoster = EasyMock.createMock(Roster.class);
-
-    EasyMock.expect(mockRoster.getEntry(EasyMock.isA(String.class))).andStubReturn(null);
-
-    EasyMock.expect(mockRoster.getPresence("alice@foo.com"))
-        .andStubReturn(new Presence(Presence.Type.unavailable));
-
-    EasyMock.expect(mockRoster.getPresence("bob@foo.com"))
-        .andStubReturn(new Presence(Presence.Type.unavailable));
-
-    EasyMock.expect(mockRoster.getPresence("carl@foo.com"))
-        .andStubReturn(new Presence(Presence.Type.available));
-
-    EasyMock.expect(mockRoster.getPresence("dave@foo.com"))
-        .andStubReturn(new Presence(Presence.Type.available));
-
-    EasyMock.expect(mockRoster.getPresence("edna@foo.com"))
-        .andStubReturn(new Presence(Presence.Type.unavailable));
-
-    EasyMock.replay(mockRoster);
-
     RosterComparator comperator = new RosterComparator();
 
-    RosterEntryElement[] elements = createAll(mockRoster, jids);
+    RosterEntryElement[] elements = createAll(jids);
 
     comperator.sort(null, elements);
 
-    EasyMock.verify(mockRoster);
-
-    assertEquals("carl@foo.com", elements[0].getJID().getBase());
-
-    assertEquals("dave@foo.com", elements[1].getJID().getBase());
-
-    assertEquals("alice@foo.com", elements[2].getJID().getBase());
-
-    assertEquals("bob@foo.com", elements[3].getJID().getBase());
-
-    assertEquals("edna@foo.com", elements[4].getJID().getBase());
+    assertEquals("carl@foo.com", elements[0].getStyledText().toString());
+    assertEquals("dave@foo.com", elements[1].getStyledText().toString());
+    assertEquals("alice@foo.com", elements[2].getStyledText().toString());
+    assertEquals("bob@foo.com", elements[3].getStyledText().toString());
+    assertEquals("edna@foo.com", elements[4].getStyledText().toString());
   }
 
-  private RosterEntryElement[] createAll(Roster roster, Collection<String> addresses) {
+  private RosterEntryElement[] createAll(Map<String, Boolean> addresses) {
     List<RosterEntryElement> rosterEntryElements = new ArrayList<RosterEntryElement>();
-    for (Iterator<String> iterator = addresses.iterator(); iterator.hasNext(); ) {
-      String address = iterator.next();
-      rosterEntryElements.add(new RosterEntryElement(roster, new JID(address), true));
-    }
+    addresses.forEach(
+        (address, status) -> {
+          RosterEntryElement entry = EasyMock.createNiceMock(RosterEntryElement.class);
+          EasyMock.expect(entry.getStyledText()).andStubReturn(new StyledString(address));
+          EasyMock.expect(entry.isOnline()).andStubReturn(status);
+          EasyMock.replay(entry);
+
+          rosterEntryElements.add(entry);
+        });
     return rosterEntryElements.toArray(new RosterEntryElement[0]);
   }
 }
