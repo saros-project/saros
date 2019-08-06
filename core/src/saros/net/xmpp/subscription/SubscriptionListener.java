@@ -9,5 +9,16 @@ public interface SubscriptionListener {
    *
    * @param jid the {@linkplain JID} of the contact who requested subscription
    */
-  public void subscriptionRequestReceived(JID jid);
+  public default void subscriptionRequestReceived(JID jid) {
+    // NOP
+  }
+
+  /**
+   * Gets called whenever an subscription cancel was received.
+   *
+   * @param jid the {@linkplain JID} of the contact who canceled the subscription
+   */
+  public default void subscriptionCanceled(JID jid) {
+    // NOP
+  }
 }
