@@ -81,8 +81,11 @@ public class SkypeAction extends Action implements Disposable {
 
     if (skypeName == null || SkypeManager.isEchoService(skypeName)) return;
 
-    final URLHyperlink link =
-        new URLHyperlink(new Region(0, 0), SkypeManager.getAudioCallUrl(skypeName));
+    final String uri = SkypeManager.getAudioCallUri(skypeName);
+
+    if (uri == null) return;
+
+    final URLHyperlink link = new URLHyperlink(new Region(0, 0), uri);
 
     link.open();
   }

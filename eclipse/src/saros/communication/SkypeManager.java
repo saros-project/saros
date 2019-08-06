@@ -2,6 +2,8 @@ package saros.communication;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -236,22 +238,37 @@ public class SkypeManager implements IConnectionListener {
 
   // https://docs.microsoft.com/en-us/skype-sdk/skypeuris/skypeuriapireference
 
-  // TODO check if the URL must already be encoded the HyperLink JFace JavaDoc is not very helpful
-
-  public static String getCharCallUrl(final String skypeName) {
-    return "skype:" + skypeName + "?chat";
+  public static String getChatCallUri(final String skypeName) {
+    final String encoded = urlEncode(skypeName);
+    return encoded == null ? null : "skype:" + encoded + "?chat";
   }
 
-  public static String getAudioCallUrl(final String skypeName) {
-    return "skype:" + skypeName;
+  public static String getAudioCallUri(final String skypeName) {
+    final String encoded = urlEncode(skypeName);
+    return encoded == null ? null : "skype:" + encoded;
   }
 
-  public static String getVideoCallUrl(final String skypeName) {
-    return "skype:" + skypeName + "call&video=true";
+  public static String getVideoCallUri(final String skypeName) {
+    final String encoded = urlEncode(skypeName);
+    return encoded == null ? null : "skype:" + encoded + "?call&video=true";
   }
 
   public static boolean isEchoService(final String skypeName) {
     return "echo123".equalsIgnoreCase(skypeName);
+  }
+
+  private static String urlEncode(final String value) {
+
+    String result = null;
+
+    try {
+      result = URLEncoder.encode(value, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+
+      log.warn("failed to url encode data:" + value, e);
+    }
+
+    return result;
   }
 
   private static Boolean isAvailable = null;
