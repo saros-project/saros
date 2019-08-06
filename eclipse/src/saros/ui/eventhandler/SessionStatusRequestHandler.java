@@ -2,13 +2,14 @@ package saros.ui.eventhandler;
 
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import saros.communication.extensions.SessionStatusRequestExtension;
 import saros.communication.extensions.SessionStatusResponseExtension;
+import saros.filesystem.EclipseReferencePointManager;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.IReferencePointManager;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
@@ -28,6 +29,8 @@ public final class SessionStatusRequestHandler {
   private final ITransmitter transmitter;
 
   private final IPreferenceStore preferenceStore;
+
+  private final EclipseReferencePointManager eclipseReferencePointManager;
 
   private final PacketListener statusRequestListener =
       new PacketListener() {
@@ -50,11 +53,13 @@ public final class SessionStatusRequestHandler {
       ISarosSessionManager sessionManager,
       ITransmitter transmitter,
       IReceiver receiver,
-      IPreferenceStore preferenceStore) {
+      IPreferenceStore preferenceStore,
+      EclipseReferencePointManager eclipseReferencePointManager) {
     this.sessionManager = sessionManager;
     this.transmitter = transmitter;
     this.receiver = receiver;
     this.preferenceStore = preferenceStore;
+    this.eclipseReferencePointManager = eclipseReferencePointManager;
 
     if (Boolean.getBoolean("saros.server.SUPPORTED")) {
       this.receiver.addPacketListener(
@@ -83,15 +88,16 @@ public final class SessionStatusRequestHandler {
   private String getSessionDescription(ISarosSession session) {
     String description = "Projects: ";
 
-    IReferencePointManager referencePointManager =
-        session.getComponent(IReferencePointManager.class);
-
     Set<IReferencePoint> referencePoints = session.getReferencePoints();
     int i = 0;
     int numOfReferencePoints = referencePoints.size();
 
+    IProject project;
+
     for (IReferencePoint referencePoint : referencePoints) {
-      description += referencePointManager.getName(referencePoint);
+      project = eclipseReferencePointManager.getProject(referencePoint);
+
+      description += project.getName();
 
       if (!session.isCompletelyShared(referencePoint)) description += " (partial)";
 

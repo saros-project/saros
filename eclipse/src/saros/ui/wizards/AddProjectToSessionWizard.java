@@ -176,7 +176,8 @@ public class AddProjectToSessionWizard extends Wizard {
             preferences,
             peer,
             negotiation.getProjectNegotiationData(),
-            lastProjectNameMapping);
+            lastProjectNameMapping,
+            eclipseReferencePointManager);
 
     addPage(namePage);
   }
