@@ -52,7 +52,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
   private final Map<Integer, Integer> usedColorIDs = new HashMap<Integer, Integer>();
 
   /**
-   * @JTourBusStop 7, Creating a new Activity type, Waiting for incoming activities:
+   * @JTourBusStop 6, Creating a new Activity type, Waiting for incoming activities:
    *
    * <p>All you have to do on the receiver's side, is to create a new IActivityReceiver (or amend an
    * existing one), provide it with an receive() method of your newly created flavor, and react on
@@ -144,7 +144,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
       }
     }
     /**
-     * @JTourBusStop 8, Creating a new Activity type, Arming your consumer:
+     * @JTourBusStop 7, Creating a new Activity type, Arming your consumer:
      *
      * <p>To ensure your newly created consumer actually receives incoming activities, you need to
      * register it on the session. That's it :)
@@ -179,7 +179,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
   public void changeColorID(int colorID) {
 
     /**
-     * @JTourBusStop 6, Creating a new Activity type, Create activity instances of your new type:
+     * @JTourBusStop 5, Creating a new Activity type, Create activity instances of your new type:
      *
      * <p>Now you are prepared to make use of your new activity type: Find a place in the business
      * logic where to react on the events you want to send as an Activity to the other session

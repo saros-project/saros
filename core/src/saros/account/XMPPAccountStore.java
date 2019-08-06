@@ -13,12 +13,12 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -57,7 +57,7 @@ public final class XMPPAccountStore {
       new CopyOnWriteArrayList<IAccountStoreListener>();
 
   private Set<XMPPAccount> accounts;
-  private XMPPAccount activeAccount;
+  private XMPPAccount defaultAccount;
 
   private File accountFile;
   private String secretKey;
@@ -94,9 +94,8 @@ public final class XMPPAccountStore {
   }
 
   private void notifyActiveAccountListeners() {
-    XMPPAccount active = !isEmpty() ? getActiveAccount() : null;
     for (IAccountStoreListener listener : listeners) {
-      listener.activeAccountChanged(active);
+      listener.activeAccountChanged(defaultAccount);
     }
   }
 
@@ -121,6 +120,7 @@ public final class XMPPAccountStore {
       if (secretKey == null) secretKey = DEFAULT_SECRET_KEY;
 
       accounts = new HashSet<XMPPAccount>();
+      defaultAccount = null;
 
       if (accountFile != null) {
         File parent = accountFile.getParentFile();
@@ -138,7 +138,6 @@ public final class XMPPAccountStore {
     notifyActiveAccountListeners();
   }
 
-  @SuppressWarnings("unchecked")
   private synchronized void loadAccounts() {
 
     if (accountFile == null || !accountFile.exists()) return;
@@ -166,7 +165,10 @@ public final class XMPPAccountStore {
                   new ByteArrayInputStream(Crypto.decrypt(encryptedAccountData, secretKey)));
 
       accounts = new HashSet<>(accountData.configuredAccounts);
-      activeAccount = accountData.configuredAccounts.get(accountData.activeAccountIndex);
+      defaultAccount = null;
+
+      if (accountData.activeAccountIndex != -1)
+        defaultAccount = accountData.configuredAccounts.get(accountData.activeAccountIndex);
 
     } catch (RuntimeException e) {
       LOG.error("internal error while loading account data", e);
@@ -177,13 +179,6 @@ public final class XMPPAccountStore {
     } finally {
       IOUtils.closeQuietly(dataIn);
     }
-
-    /*
-     * remove us first and re add us, otherwise the active account object is
-     * not in the set and the wrong object will be updated
-     */
-    accounts.remove(activeAccount);
-    accounts.add(activeAccount);
 
     LOG.debug("loaded " + accounts.size() + " account(s)");
   }
@@ -211,8 +206,11 @@ public final class XMPPAccountStore {
       dataOut = new FileOutputStream(accountFile);
       // use a pair in order to create a artificial xml root node
       ArrayList<XMPPAccount> accountsToSave = new ArrayList<>(accounts);
-      int activeAccountIndex = accountsToSave.indexOf(activeAccount);
-      xStream.toXML(new AccountStoreInformation(activeAccountIndex, accountsToSave), out);
+
+      int defaultAccountIndex =
+          defaultAccount == null ? -1 : accountsToSave.indexOf(defaultAccount);
+
+      xStream.toXML(new AccountStoreInformation(defaultAccountIndex, accountsToSave), out);
 
       byte[] encryptedAccountData = Crypto.encrypt(out.toByteArray(), secretKey);
 
@@ -245,31 +243,10 @@ public final class XMPPAccountStore {
    * @return
    */
   public synchronized List<XMPPAccount> getAllAccounts() {
-    List<XMPPAccount> accounts = new ArrayList<XMPPAccount>(this.accounts);
-
-    Comparator<XMPPAccount> comparator =
-        new Comparator<XMPPAccount>() {
-
-          @Override
-          public int compare(XMPPAccount a, XMPPAccount b) {
-            int c = a.getUsername().compareToIgnoreCase(b.getUsername());
-
-            if (c != 0) return c;
-
-            c = a.getDomain().compareToIgnoreCase(b.getDomain());
-
-            if (c != 0) return c;
-
-            c = a.getServer().compareToIgnoreCase(b.getServer());
-
-            if (c != 0) return c;
-
-            return Integer.valueOf(a.getPort()).compareTo(Integer.valueOf(b.getPort()));
-          }
-        };
-
-    Collections.sort(accounts, comparator);
-    return accounts;
+    return accounts
+        .stream()
+        .sorted(XMPPAccountStore::compare)
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
@@ -294,13 +271,12 @@ public final class XMPPAccountStore {
    *
    * @return
    */
-  public synchronized List<String> getDomains() {
-    List<String> domains = new ArrayList<String>();
-    for (XMPPAccount account : accounts) {
-      String domain = account.getDomain();
-      if (!domains.contains(domain)) domains.add(domain);
-    }
-    return domains;
+  public List<String> getDomains() {
+    final Set<String> domains = new HashSet<String>();
+
+    for (final XMPPAccount account : getAllAccounts()) domains.add(account.getDomain());
+
+    return new ArrayList<String>(domains);
   }
 
   /**
@@ -318,35 +294,33 @@ public final class XMPPAccountStore {
    * the server list contains
    *
    * <ul>
-   *   <li>jabber.org
    *   <li>googlemail.com
-   *   <li>saros-con.imp.fu-berlin.de
    * </ul>
    *
    * @return
    */
   public synchronized List<String> getServers() {
-    List<String> servers = new ArrayList<String>();
-    for (XMPPAccount account : accounts) {
-      String server = account.getServer();
-      if (!servers.contains(server)) servers.add(server);
-    }
-    return servers;
+
+    final Set<String> servers = new HashSet<String>();
+
+    for (final XMPPAccount account : getAllAccounts()) servers.add(account.getServer());
+
+    return new ArrayList<String>(servers);
   }
 
   /**
-   * Makes the given account active.
+   * Sets the given account as the default one.
    *
-   * @param account the account to activate
+   * @param account the account to set as default or <code>null</code>
    * @throws IllegalArgumentException if the account is not found in the store
    */
-  public void setAccountActive(XMPPAccount account) {
+  public void setDefaultAccount(final XMPPAccount account) {
     synchronized (this) {
-      if (!accounts.contains(account))
+      if (account != null && !accounts.contains(account))
         throw new IllegalArgumentException(
             "account '" + account + "' is not in the current account store");
 
-      activeAccount = account;
+      defaultAccount = account;
 
       saveAccounts();
     }
@@ -355,32 +329,52 @@ public final class XMPPAccountStore {
   }
 
   /**
-   * Deletes an account.
+   * Makes the given account active.
    *
-   * @param account the account to delete
+   * @param account the account to activate
    * @throws IllegalArgumentException if the account is not found in the store
-   * @throws IllegalStateException if the account is active
+   * @deprecated Will be removed soon. Use {@link #setDefaultAccount(XMPPAccount)} instead.
    */
-  public void deleteAccount(XMPPAccount account) {
+  @Deprecated
+  public void setAccountActive(XMPPAccount account) {
     synchronized (this) {
       if (!accounts.contains(account))
         throw new IllegalArgumentException(
             "account '" + account + "' is not in the current account store");
 
-      if (this.activeAccount == account)
-        throw new IllegalStateException(
-            "account '" + account + "' is active and cannot be deleted");
+      defaultAccount = account;
 
-      accounts.remove(account);
+      saveAccounts();
+    }
+
+    notifyActiveAccountListeners();
+  }
+
+  /**
+   * Deletes an account from the store. If this was the default account the default account is set
+   * to <code>null</code>.
+   *
+   * @param account the account to delete
+   * @throws IllegalArgumentException if the account is not found in the store
+   */
+  public void deleteAccount(final XMPPAccount account) {
+    synchronized (this) {
+      if (!accounts.remove(account))
+        throw new IllegalArgumentException(
+            "account '" + account + "' is not in the current account store");
+
+      if (Objects.equals(defaultAccount, account)) defaultAccount = null;
 
       saveAccounts();
     }
 
     notifyAccountStoreListeners();
+    if (defaultAccount == null) notifyActiveAccountListeners();
   }
 
   /**
-   * Creates an account. The account will automatically become active if the account store is empty.
+   * Creates an account. The account will automatically become the default if the account store is
+   * empty.
    *
    * @param username the user name of the new account as lower case string
    * @param password the password of the new account.
@@ -406,21 +400,22 @@ public final class XMPPAccountStore {
       boolean useTLS,
       boolean useSASL) {
 
-    XMPPAccount newAccount =
+    final XMPPAccount newAccount =
         new XMPPAccount(username, password, domain, server, port, useTLS, useSASL);
 
     synchronized (this) {
       if (accounts.contains(newAccount))
-        throw new IllegalArgumentException("account already exists");
+        throw new IllegalArgumentException("account " + newAccount + " already exists");
 
-      if (accounts.isEmpty()) this.activeAccount = newAccount;
+      if (accounts.isEmpty()) defaultAccount = newAccount;
 
-      this.accounts.add(newAccount);
+      accounts.add(newAccount);
 
       saveAccounts();
     }
 
     notifyAccountStoreListeners();
+    if (Objects.equals(defaultAccount, newAccount)) notifyActiveAccountListeners();
 
     return newAccount;
   }
@@ -490,15 +485,33 @@ public final class XMPPAccountStore {
   }
 
   /**
+   * Returns the current default account.
+   *
+   * @return the default account or <code>null</code> if the default account is not set
+   */
+  public synchronized XMPPAccount getDefaultAccount() {
+    return defaultAccount;
+  }
+
+  /**
    * Returns the current active account.
    *
    * @return the active account
    * @throws IllegalStateException if the account store is empty
+   * @deprecated Will be removed soon. Use {@link #getDefaultAccount()} instead.
    */
+  @Deprecated
   public synchronized XMPPAccount getActiveAccount() {
-    if (activeAccount == null) throw new IllegalStateException("the account store is empty");
+    if (defaultAccount != null) return defaultAccount;
 
-    return activeAccount;
+    if (accounts.isEmpty()) throw new IllegalStateException("the account store is empty");
+
+    // backward compatibility for now, just pick one
+    setAccountActive(accounts.iterator().next());
+
+    assert defaultAccount != null;
+
+    return defaultAccount;
   }
 
   /**
@@ -512,29 +525,60 @@ public final class XMPPAccountStore {
 
   /**
    * Checks if the an account with the given arguments exists in the account
-   * store
+   * store.
    *
    * @param username
    *            the username
    * @param domain
    *            the domain name of the server
    * @param server
-   *            the server ip / name
+   *            the server address / name
    * @param port
    *            the port of the server
    * @return <code>true if such an account exists, <code>false</code>
    *         otherwise
    */
-  public synchronized boolean exists(String username, String domain, String server, int port) {
-    for (XMPPAccount a : getAllAccounts()) {
-      if (a.getServer().equalsIgnoreCase(server)
-          && a.getDomain().equalsIgnoreCase(domain)
-          && a.getUsername().equals(username)
-          && a.getPort() == port) {
-        return true;
-      }
-    }
-    return false;
+  public synchronized boolean existsAccount(
+      String username, String domain, String server, int port) {
+    return getAllAccounts()
+        .stream()
+        .anyMatch(a -> matchesAccount(a, username, domain, server, port));
+  }
+
+  /**
+   * Returns the account for the given username and domain.
+   *
+   * <p><b>Note:</b> If the store contains multiple accounts for the given username and domain (e.g
+   * with different server address / name entries) the first account that matches will be returned.
+   *
+   * @param username the username to lookup
+   * @param domain the domain to lookup
+   * @return the account or <code>null</code> if the account does not exist
+   */
+  public XMPPAccount getAccount(final String username, final String domain) {
+    return getAllAccounts()
+        .stream()
+        .findFirst()
+        .filter(a -> matchesAnyServer(a, username, domain))
+        .orElse(null);
+  }
+
+  /**
+   * Returns the account for the given username, domain, server address / name, and port.
+   *
+   * @param username the username to lookup
+   * @param domain the domain to lookup
+   * @param server the server/address to lookup
+   * @param port the port to lookup
+   * @return the account or <code>null</code> if the account does not exist
+   */
+  public XMPPAccount getAccount(
+      final String username, final String domain, final String server, final int port) {
+    return getAllAccounts()
+        .stream()
+        .findFirst()
+        .filter(a -> matchesAccount(a, username, domain, server, port))
+        .orElse(null);
   }
 
   /**
@@ -543,7 +587,9 @@ public final class XMPPAccountStore {
    * @param jidString the jid of the user as string
    * @return the matching XMPP account or null in case of no match
    * @throws NullPointerException if jidString is null
+   * @deprecated Will be removed soon. Use {@link #getAccount(String, String)} instead.
    */
+  @Deprecated
   public XMPPAccount findAccount(String jidString) {
     if (jidString == null) {
       throw new NullPointerException("Null argument 'jidString'");
@@ -694,5 +740,40 @@ public final class XMPPAccountStore {
 
       return data;
     }
+  }
+
+  private static int compare(final XMPPAccount a, XMPPAccount b) {
+    int c = a.getUsername().compareToIgnoreCase(b.getUsername());
+
+    if (c != 0) return c;
+
+    c = a.getDomain().compareToIgnoreCase(b.getDomain());
+
+    if (c != 0) return c;
+
+    c = a.getServer().compareToIgnoreCase(b.getServer());
+
+    if (c != 0) return c;
+
+    return Integer.valueOf(a.getPort()).compareTo(Integer.valueOf(b.getPort()));
+  }
+
+  private static boolean matchesAnyServer(
+      final XMPPAccount account, final String username, final String domain) {
+
+    return account.getUsername().equals(username) && account.getDomain().equalsIgnoreCase(domain);
+  }
+
+  private static boolean matchesAccount(
+      final XMPPAccount account,
+      final String username,
+      final String domain,
+      final String server,
+      final int port) {
+
+    return account.getUsername().equals(username)
+        && account.getDomain().equalsIgnoreCase(domain)
+        && account.getServer().equalsIgnoreCase(server)
+        && account.getPort() == port;
   }
 }

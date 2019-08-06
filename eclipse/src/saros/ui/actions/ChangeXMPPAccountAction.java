@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -74,12 +75,23 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
   @Override
   public void run() {
 
+    final XMPPAccount defaultAccount = accountService.getDefaultAccount();
+    final boolean isEmpty = accountService.isEmpty();
+
+    if (defaultAccount == null || isEmpty) {
+      if (!MessageDialog.openQuestion(
+          SWTUtils.getShell(),
+          "Default account missing",
+          "A default account has not been set yet. Do you want set a default account?")) return;
+
+      SWTUtils.runSafeSWTAsync(LOG, this::openPreferences);
+      return;
+    }
+
     if (connectionHandler.isConnected()) {
       XMPPConnectionSupport.getInstance().disconnect();
     } else {
-      XMPPConnectionSupport.getInstance()
-          .connect(
-              accountService.isEmpty() ? null : accountService.getActiveAccount(), true, false);
+      XMPPConnectionSupport.getInstance().connect(accountService.getDefaultAccount(), true, false);
     }
   }
 
@@ -97,12 +109,16 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
   public Menu getMenu(Control parent) {
     accountMenu = new Menu(parent);
 
-    XMPPAccount activeAccount = null;
+    XMPPAccount defaultAccount = null;
 
-    if (connectionHandler.isConnected()) activeAccount = accountService.getActiveAccount();
+    /* FIXME obtain the current JID and the discard the entry.
+     * This logic here only works because we set the account that should connect to be the default one.
+     * If the user is interested in such a behavior is another question.
+     */
+    if (connectionHandler.isConnected()) defaultAccount = accountService.getDefaultAccount();
 
     for (XMPPAccount account : accountService.getAllAccounts()) {
-      if (!account.equals(activeAccount)) addMenuItem(account);
+      if (!account.equals(defaultAccount)) addMenuItem(account);
     }
 
     new MenuItem(accountMenu, SWT.SEPARATOR);

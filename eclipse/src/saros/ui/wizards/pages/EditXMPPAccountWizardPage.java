@@ -150,7 +150,7 @@ public class EditXMPPAccountWizardPage extends WizardPage {
      */
     if ((isJIDValid && isPasswordValid && isServerValid && isPortValid))
       accountExists =
-          accountStore.exists(getJID().getName(), getJID().getDomain(), getServer(), port);
+          accountStore.existsAccount(getJID().getName(), getJID().getDomain(), getServer(), port);
 
     // allow password modification
     if (accountExists != null

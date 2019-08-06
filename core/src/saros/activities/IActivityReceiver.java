@@ -19,39 +19,75 @@ public interface IActivityReceiver {
    */
 
   /** */
-  void receive(ChangeColorActivity changeColorActivity);
+  default void receive(ChangeColorActivity changeColorActivity) {
+    /*NOP*/
+  }
 
-  void receive(ChecksumActivity checksumActivity);
+  default void receive(ChecksumActivity checksumActivity) {
+    /*NOP*/
+  }
 
-  void receive(ChecksumErrorActivity checksumErrorActivity);
+  default void receive(ChecksumErrorActivity checksumErrorActivity) {
+    /*NOP*/
+  }
 
-  void receive(EditorActivity editorActivity);
+  default void receive(EditorActivity editorActivity) {
+    /*NOP*/
+  }
 
-  void receive(FileActivity fileActivity);
+  default void receive(FileActivity fileActivity) {
+    /*NOP*/
+  }
 
-  void receive(FolderCreatedActivity folderCreatedActivity);
+  default void receive(FolderCreatedActivity folderCreatedActivity) {
+    /*NOP*/
+  }
 
-  void receive(FolderDeletedActivity folderDeletedActivity);
+  default void receive(FolderDeletedActivity folderDeletedActivity) {
+    /*NOP*/
+  }
 
-  void receive(FolderMovedActivity folderMovedActivity);
+  default void receive(FolderMovedActivity folderMovedActivity) {
+    /*NOP*/
+  }
 
-  void receive(JupiterActivity jupiterActivity);
+  default void receive(JupiterActivity jupiterActivity) {
+    /*NOP*/
+  }
 
-  void receive(NOPActivity nopActivity);
+  default void receive(NOPActivity nopActivity) {
+    /*NOP*/
+  }
 
-  void receive(PermissionActivity permissionActivity);
+  default void receive(PermissionActivity permissionActivity) {
+    /*NOP*/
+  }
 
-  void receive(ProgressActivity progressActivity);
+  default void receive(ProgressActivity progressActivity) {
+    /*NOP*/
+  }
 
-  void receive(StartFollowingActivity startFollowingActivity);
+  default void receive(StartFollowingActivity startFollowingActivity) {
+    /*NOP*/
+  }
 
-  void receive(StopActivity stopActivity);
+  default void receive(StopActivity stopActivity) {
+    /*NOP*/
+  }
 
-  void receive(StopFollowingActivity stopFollowingActivity);
+  default void receive(StopFollowingActivity stopFollowingActivity) {
+    /*NOP*/
+  }
 
-  void receive(TextEditActivity textEditActivity);
+  default void receive(TextEditActivity textEditActivity) {
+    /*NOP*/
+  }
 
-  void receive(TextSelectionActivity textSelectionActivity);
+  default void receive(TextSelectionActivity textSelectionActivity) {
+    /*NOP*/
+  }
 
-  void receive(ViewportActivity viewportActivity);
+  default void receive(ViewportActivity viewportActivity) {
+    /*NOP*/
+  }
 }

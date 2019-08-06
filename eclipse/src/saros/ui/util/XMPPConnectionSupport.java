@@ -31,6 +31,8 @@ public class XMPPConnectionSupport {
   private volatile boolean isConnecting = false;
   private volatile boolean isDisconnecting = false;
 
+  private XMPPAccount currentXmppAccount;
+
   public XMPPConnectionSupport(
       final XMPPAccountStore store,
       final ConnectionHandler connectionHandler,
@@ -42,7 +44,22 @@ public class XMPPConnectionSupport {
   }
 
   /**
-   * Connects with the current active / default account.
+   * Returns the current XMPP account that was used for establishing a connection.
+   *
+   * @return the current XMPP account or <code>null</code>
+   */
+  public XMPPAccount getCurrentXMPPAccount() {
+    if (Display.getCurrent() == null) throw new SWTException(SWT.ERROR_THREAD_INVALID_ACCESS);
+
+    return currentXmppAccount;
+  }
+
+  /**
+   * Connects with the default account.
+   *
+   * <p><b>Note:</b> If no default account is available this method silently returns regardless if
+   * <code>
+   * failSilently</code> is set to <code>false</code> !
    *
    * @param failSilently if <code>true</code> suppresses any further error handling
    */
@@ -51,8 +68,13 @@ public class XMPPConnectionSupport {
   }
 
   /**
-   * Connects with given account. If the given account is <code>null<code> the active / default one will be used.
-   * @param account the account to use
+   * Connects with given account.
+   *
+   * <p><b>Note:</b> If the default account should be used an no default account is available this
+   * method silently returns regardless if <code>
+   * failSilently</code> is set to <code>false</code> !
+   *
+   * @param account the account to use or <code>null</code> to use the default one
    * @param failSilently if <code>true</code> suppresses any further error handling
    */
   public void connect(final XMPPAccount account, boolean failSilently) {
@@ -60,8 +82,13 @@ public class XMPPConnectionSupport {
   }
 
   /**
-   * Connects with given account. If the given account is <code>null<code> the active / default one will be used.
-   * @param account the account to use
+   * Connects with given account.
+   *
+   * <p><b>Note:</b> If the default account should be used an no default account is available this
+   * method silently returns regardless if <code>
+   * failSilently</code> is set to <code>false</code> !
+   *
+   * @param account account the account to use or <code>null</code> to use the default one
    * @param setAsDefault if <code>true</code> the account is set as the default one
    * @param failSilently if <code>true</code> suppresses any further error handling
    */
@@ -129,17 +156,19 @@ public class XMPPConnectionSupport {
 
     final XMPPAccount accountToConnect;
 
-    if (account == null && !store.isEmpty()) accountToConnect = store.getActiveAccount();
-    else if (account != null) accountToConnect = account;
-    else accountToConnect = null;
+    accountToConnect = account != null ? account : store.getDefaultAccount();
 
-    /*
-     * some magic, if we connect with null we will trigger an exception that is processed by
-     * the ConnectingFailureHandler which in turn will open the ConfigurationWizard
-     */
-    if (setAsDefault && accountToConnect != null) {
-      store.setAccountActive(accountToConnect);
+    if (accountToConnect == null) {
+      log.warn(
+          "unable to establish a connection - no account was provided and no default account could be found");
+
+      isConnecting = false;
+      return;
     }
+
+    if (setAsDefault) store.setDefaultAccount(accountToConnect);
+
+    currentXmppAccount = accountToConnect;
 
     final boolean disconnectFirst = mustDisconnect;
 

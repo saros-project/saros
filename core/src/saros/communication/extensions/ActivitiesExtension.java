@@ -103,7 +103,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
   }
 
   /**
-   * @JTourBusStop 5, Creating a new Activity type, XStream registration:
+   * @JTourBusStop 4, Creating a new Activity type, XStream registration:
    *
    * <p>We use the XStream library to convert handy Java objects to easy-to-send XML string and vice
    * versa. To beautify this XML output, we make use of annotations (such as XStreamAlias or
