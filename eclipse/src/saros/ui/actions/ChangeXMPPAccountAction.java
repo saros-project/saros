@@ -1,5 +1,6 @@
 package saros.ui.actions;
 
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -12,11 +13,13 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import saros.SarosPluginContext;
+import saros.account.IAccountStoreListener;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
 import saros.net.ConnectionState;
+import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSessionManager;
 import saros.ui.ImageManager;
@@ -26,8 +29,7 @@ import saros.ui.util.WizardUtils;
 import saros.ui.util.XMPPConnectionSupport;
 
 /**
- * In addition to the connect/disconnect action, this allows the user to switch between accounts. At
- * the moment, it is implemented by a drop-down in the RosterView.
+ * In addition to the connect/disconnect action, this allows the user to switch between accounts.
  */
 public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Disposable {
 
@@ -45,6 +47,8 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
 
   private boolean isConnectionError;
 
+  private boolean defaultAccountChanged;
+
   private final IConnectionStateListener connectionStateListener =
       new IConnectionStateListener() {
         @Override
@@ -61,6 +65,14 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
         }
       };
 
+  private final IAccountStoreListener accountStoreListener =
+      new IAccountStoreListener() {
+        @Override
+        public void activeAccountChanged(final XMPPAccount activeAccount) {
+          defaultAccountChanged = true;
+        }
+      };
+
   public ChangeXMPPAccountAction() {
     SarosPluginContext.initComponent(this);
 
@@ -70,15 +82,29 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
     connectionHandler.addConnectionStateListener(connectionStateListener);
     setMenuCreator(this);
     updateStatus(connectionHandler.getConnectionState());
+
+    accountService.addListener(accountStoreListener);
   }
 
   @Override
   public void run() {
 
+    if (connectionHandler.isConnected()) {
+      XMPPConnectionSupport.getInstance().disconnect();
+      return;
+    }
+
+    final XMPPAccount lastUsedAccount = XMPPConnectionSupport.getInstance().getCurrentXMPPAccount();
+
+    final List<XMPPAccount> accounts = accountService.getAllAccounts();
+
+    final boolean exists = accounts.indexOf(lastUsedAccount) != -1;
+
     final XMPPAccount defaultAccount = accountService.getDefaultAccount();
+
     final boolean isEmpty = accountService.isEmpty();
 
-    if (defaultAccount == null || isEmpty) {
+    if (!exists && (defaultAccount == null || isEmpty)) {
       if (!MessageDialog.openQuestion(
           SWTUtils.getShell(),
           "Default account missing",
@@ -88,16 +114,22 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
       return;
     }
 
-    if (connectionHandler.isConnected()) {
-      XMPPConnectionSupport.getInstance().disconnect();
+    final XMPPAccount accountToConnect;
+
+    if (defaultAccountChanged || !exists) {
+      defaultAccountChanged = false;
+      accountToConnect = defaultAccount;
     } else {
-      XMPPConnectionSupport.getInstance().connect(accountService.getDefaultAccount(), true, false);
+      accountToConnect = lastUsedAccount;
     }
+
+    XMPPConnectionSupport.getInstance().connect(accountToConnect, false, false);
   }
 
   @Override
   public void dispose() {
     connectionHandler.removeConnectionStateListener(connectionStateListener);
+    accountService.removeListener(accountStoreListener);
   }
 
   @Override
@@ -109,17 +141,26 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
   public Menu getMenu(Control parent) {
     accountMenu = new Menu(parent);
 
-    XMPPAccount defaultAccount = null;
+    final List<XMPPAccount> accounts = accountService.getAllAccounts();
 
-    /* FIXME obtain the current JID and the discard the entry.
-     * This logic here only works because we set the account that should connect to be the default one.
-     * If the user is interested in such a behavior is another question.
-     */
-    if (connectionHandler.isConnected()) defaultAccount = accountService.getDefaultAccount();
+    final String connectionId = connectionHandler.getConnectionID();
 
-    for (XMPPAccount account : accountService.getAllAccounts()) {
-      if (!account.equals(defaultAccount)) addMenuItem(account);
+    if (connectionHandler.isConnected() && connectionId != null) {
+
+      final JID jid = new JID(connectionId);
+
+      /*
+       *  TODO this may filter out too much but this situation is somewhat rare (multiple accounts
+       *  with same name and domain but different server
+       */
+
+      accounts.removeIf(
+          a ->
+              a.getUsername().equalsIgnoreCase(jid.getName())
+                  && a.getDomain().equalsIgnoreCase(jid.getDomain()));
     }
+
+    accounts.forEach(this::addMenuItem);
 
     new MenuItem(accountMenu, SWT.SEPARATOR);
 
@@ -153,7 +194,8 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
 
           @Override
           public void run() {
-            XMPPConnectionSupport.getInstance().connect(account, true, false);
+            defaultAccountChanged = false;
+            XMPPConnectionSupport.getInstance().connect(account, false, false);
           }
         };
 
