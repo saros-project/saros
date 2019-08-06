@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import saros.activities.FileActivity;
@@ -38,6 +39,7 @@ import saros.activities.IActivity;
 import saros.activities.IFileSystemModificationActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.NOPActivity;
+import saros.activities.SPath;
 import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
 import saros.concurrent.management.ConcurrentDocumentClient;
@@ -98,6 +100,8 @@ public final class SarosSession implements ISarosSession {
 
   private final CopyOnWriteArrayList<IActivityProducer> activityProducers =
       new CopyOnWriteArrayList<IActivityProducer>();
+
+  private final Set<IProject> filteredProjects = new CopyOnWriteArraySet<>();
 
   private final List<IActivityConsumer> activeActivityConsumers =
       new CopyOnWriteArrayList<IActivityConsumer>();
@@ -164,6 +168,17 @@ public final class SarosSession implements ISarosSession {
 
         @Override
         public void execute(IActivity activity) {
+          // Filters out resource activities for projects whose activity execution is disabled
+          if (activity instanceof IResourceActivity) {
+            SPath path = ((IResourceActivity) activity).getPath();
+
+            if (path != null && filteredProjects.contains(path.getProject())) {
+              log.debug("Dropped activity for resource of filtered project: " + activity);
+
+              return;
+            }
+          }
+
           /**
            * @JTourBusStop 10, Activity sending, Local Execution, first dispatch:
            *
@@ -557,6 +572,17 @@ public final class SarosSession implements ISarosSession {
   @Override
   public void removeListener(ISessionListener listener) {
     listenerDispatch.remove(listener);
+  }
+
+  @Override
+  public void setActivityExecution(IProject project, boolean enabled) {
+    if (project != null) {
+      if (!enabled) {
+        filteredProjects.add(project);
+      } else {
+        filteredProjects.remove(project);
+      }
+    }
   }
 
   @Override
