@@ -1,21 +1,18 @@
 package saros.ui.model.roster;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterGroup;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.contact.XMPPContact;
 
 /**
- * Provides adapters for {@link Roster} entities which are provided by {@link
- * RosterContentProvider}.
+ * Provides adapters for contact entities which are provided by {@link RosterContentProvider}.
  *
- * <p>E.g. let's you adapt {@link RosterGroupElement} to {@link RosterGroup} with
+ * <p>E.g. let's you adapt {@link RosterEntryElement} to {@link JID} with
  *
  * <pre>
- * RosterGroup rosterGroup = (RosterGroup) rosterGroupElement.getAdapter(RosterGroup.class);
+ * JID jid = rosterEntryElement.getAdapter(JID.class)
  *
- * if (rosterGroup != null)
+ * if (jid != null)
  *     return true;
  * else
  *     return false;
@@ -31,20 +28,14 @@ public class RosterAdapterFactory implements IAdapterFactory {
 
   @Override
   public Class<?>[] getAdapterList() {
-    return new Class[] {RosterGroup.class, RosterEntry.class, JID.class};
+    return new Class[] {XMPPContact.class, JID.class};
   }
 
   @Override
   public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
-    if (adaptableObject instanceof RosterGroupElement) {
-      if (adapterType == RosterGroup.class) {
-        return adapterType.cast(((RosterGroupElement) adaptableObject).getRosterGroup().getClass());
-      }
-    }
-
     if (adaptableObject instanceof RosterEntryElement) {
-      if (adapterType == RosterEntry.class)
-        return adapterType.cast(((RosterEntryElement) adaptableObject).getRosterEntry());
+      if (adapterType == XMPPContact.class)
+        return adapterType.cast(((RosterEntryElement) adaptableObject).getContact());
       if (adapterType == JID.class)
         return adapterType.cast(((RosterEntryElement) adaptableObject).getJID());
     }

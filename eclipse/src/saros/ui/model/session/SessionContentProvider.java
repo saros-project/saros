@@ -1,14 +1,8 @@
 package saros.ui.model.session;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import org.eclipse.jface.viewers.Viewer;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterGroup;
-import org.jivesoftware.smack.RosterListener;
-import org.jivesoftware.smack.packet.Presence;
 import saros.SarosPluginContext;
 import saros.activities.SPath;
 import saros.awareness.AwarenessInformationCollector;
@@ -16,7 +10,8 @@ import saros.editor.EditorManager;
 import saros.editor.FollowModeManager;
 import saros.editor.IFollowModeListener;
 import saros.editor.ISharedEditorListener;
-import saros.net.xmpp.roster.IRosterListener;
+import saros.net.xmpp.contact.IContactsUpdate;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISessionListener;
@@ -37,7 +32,7 @@ public class SessionContentProvider extends TreeContentProvider {
   private HeaderElement sessionHeaderElement;
   private HeaderElement contentHeaderElement;
 
-  private Roster currentRoster;
+  private XMPPContactsService currentContactsService;
   private ISarosSession currentSession;
 
   @Inject private EditorManager editorManager;
@@ -101,20 +96,8 @@ public class SessionContentProvider extends TreeContentProvider {
       };
 
   // TODO call update and not refresh
-  private final RosterListener rosterListener =
-      new IRosterListener() {
-        // update nicknames
-        @Override
-        public void entriesUpdated(Collection<String> addresses) {
-          ViewerUtils.refresh(viewer, true);
-        }
-
-        // update away icons
-        @Override
-        public void presenceChanged(Presence presence) {
-          ViewerUtils.refresh(viewer, true);
-        }
-      };
+  private final IContactsUpdate contactsUpdate =
+      (contact, type) -> ViewerUtils.refresh(viewer, true);
 
   /*
    * as we have a filter installed that will hide contacts from the contact
@@ -171,9 +154,10 @@ public class SessionContentProvider extends TreeContentProvider {
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     this.viewer = viewer;
 
-    final Roster oldRoster = getRoster(oldInput);
+    final XMPPContactsService oldContactsService = getContactsService(oldInput);
 
-    final Roster newRoster = currentRoster = getRoster(newInput);
+    final XMPPContactsService newContactsService =
+        currentContactsService = getContactsService(newInput);
 
     final ISarosSession oldSession = getSession(oldInput);
 
@@ -184,7 +168,7 @@ public class SessionContentProvider extends TreeContentProvider {
     if (additionalContentProvider != null)
       additionalContentProvider.inputChanged(viewer, getContent(oldInput), getContent(newInput));
 
-    if (oldRoster != null) oldRoster.removeRosterListener(rosterListener);
+    if (oldContactsService != null) oldContactsService.removeListener(contactsUpdate);
 
     if (oldSession != null) oldSession.removeListener(sessionListener);
 
@@ -194,7 +178,7 @@ public class SessionContentProvider extends TreeContentProvider {
 
     createHeaders((SessionInput) newInput);
 
-    if (newRoster != null) newRoster.addRosterListener(rosterListener);
+    if (newContactsService != null) newContactsService.addListener(contactsUpdate);
 
     if (newSession != null) {
       newSession.addListener(sessionListener);
@@ -225,7 +209,7 @@ public class SessionContentProvider extends TreeContentProvider {
           new RosterHeaderElement(
               viewer.getControl().getFont(),
               (RosterContentProvider) additionalContentProvider,
-              (Roster) input.getCustomContent());
+              currentContactsService);
     }
   }
 
@@ -233,7 +217,7 @@ public class SessionContentProvider extends TreeContentProvider {
   public void dispose() {
     if (currentSession != null) currentSession.removeListener(sessionListener);
 
-    if (currentRoster != null) currentRoster.removeRosterListener(rosterListener);
+    if (currentContactsService != null) currentContactsService.removeListener(contactsUpdate);
 
     editorManager.removeSharedEditorListener(sharedEditorListener);
 
@@ -245,15 +229,16 @@ public class SessionContentProvider extends TreeContentProvider {
 
     /* ENSURE GC */
     currentSession = null;
-    currentRoster = null;
+    currentContactsService = null;
     editorManager = null;
     additionalContentProvider = null;
     followModeManager = null;
   }
 
   /**
-   * Returns {@link RosterGroup}s followed by {@link RosterEntry}s which don't belong to any {@link
-   * RosterGroup}.
+   * Returns the {@link SessionHeaderElement session overview} followed by the {@link
+   * RosterHeaderElement contact list} for the current session or an empty array if no session is
+   * available.
    */
   @Override
   public Object[] getElements(Object inputElement) {
@@ -276,12 +261,13 @@ public class SessionContentProvider extends TreeContentProvider {
     return ((SessionInput) input).getSession();
   }
 
-  private Roster getRoster(Object input) {
+  private XMPPContactsService getContactsService(Object input) {
     if (!(input instanceof SessionInput)) return null;
 
-    Object roster = ((SessionInput) input).getCustomContent();
+    Object contactsService = ((SessionInput) input).getCustomContent();
 
-    if (roster instanceof Roster) return (Roster) roster;
+    if (contactsService instanceof XMPPContactsService)
+      return (XMPPContactsService) contactsService;
 
     return null;
   }
