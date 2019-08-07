@@ -1432,17 +1432,10 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="saros.ui.model.roster.RosterGroupElement"
-            class="saros.ui.model.roster.RosterAdapterFactory">
-         <adapter
-               type="org.jivesoftware.smack.RosterGroup">
-         </adapter>
-      </factory>
-      <factory
             adaptableType="saros.ui.model.roster.RosterEntryElement"
             class="saros.ui.model.roster.RosterAdapterFactory">
          <adapter
-               type="org.jivesoftware.smack.RosterEntry">
+               type="saros.net.xmpp.contact.XMPPContact">
          </adapter>
          <adapter
                type="saros.net.xmpp.JID">
