@@ -27,15 +27,8 @@ public class SarosColorsPage implements ColorSettingsPage {
   /** List of descriptors for colors that can be selected by users. */
   private static final List<AttributesDescriptor> COLOR_ATTRIBUTE_DESCRIPTORS;
   /** List of descriptors for colors not specific to Saros users. */
-  private static final List<AttributesDescriptor> ADDITIONAL_ATTRIBUTE_DESCRIPTORS =
-      ImmutableList.of(
-          new AttributesDescriptor(
-              Messages.ColorPreferences_default_user_text_selection_attribute_display_name,
-              ColorManager.DEFAULT_COLOR_KEYS.getSelectionColorKey()),
-          new AttributesDescriptor(
-              Messages.ColorPreferences_default_user_text_contribution_attribute_display_name,
-              ColorManager.DEFAULT_COLOR_KEYS.getContributionColorKey()));
-
+  private static final List<AttributesDescriptor> ADDITIONAL_ATTRIBUTE_DESCRIPTORS;
+  /** Maps specific tags to the possible text attribute keys. Used for the demo text. */
   private static final Map<String, TextAttributesKey> HIGHLIGHT_MAP;
 
   static {
@@ -54,6 +47,17 @@ public class SarosColorsPage implements ColorSettingsPage {
               colorKeys.getContributionColorKey()));
     }
     COLOR_ATTRIBUTE_DESCRIPTORS = builder.build();
+  }
+
+  static {
+    ADDITIONAL_ATTRIBUTE_DESCRIPTORS =
+        ImmutableList.of(
+            new AttributesDescriptor(
+                Messages.ColorPreferences_default_user_text_selection_attribute_display_name,
+                ColorManager.DEFAULT_COLOR_KEYS.getSelectionColorKey()),
+            new AttributesDescriptor(
+                Messages.ColorPreferences_default_user_text_contribution_attribute_display_name,
+                ColorManager.DEFAULT_COLOR_KEYS.getContributionColorKey()));
   }
 
   static {
