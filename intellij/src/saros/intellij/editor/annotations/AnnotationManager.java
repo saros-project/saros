@@ -509,6 +509,51 @@ public class AnnotationManager implements Disposable {
   }
 
   /**
+   * Reloads all annotations in all held annotation stores.
+   *
+   * <p>This method should be used to react to changes in the IDE theme, which could cause the
+   * appearance (e.g. color) of the annotation to change.
+   */
+  public void reloadAnnotations() {
+    reloadAnnotations(selectionAnnotationStore);
+
+    reloadAnnotations(contributionAnnotationQueue);
+  }
+
+  /**
+   * Reloads all annotations in the passed annotation store.
+   *
+   * <p>This is done by first updating the store annotations to ensure that the new local
+   * representations span the correct area of text. Then, for each annotation, the local
+   * representation is removed and re-added.
+   *
+   * @param annotationStore the annotation store whose annotations to reload
+   * @param <E> the annotation type
+   * @see AbstractEditorAnnotation#updateBoundaries()
+   * @see #removeRangeHighlighter(AbstractEditorAnnotation)
+   * @see AbstractEditorAnnotation#removeLocalRepresentation()
+   * @see #addLocalRepresentationToAnnotation(AbstractEditorAnnotation, Editor)
+   */
+  private <E extends AbstractEditorAnnotation> void reloadAnnotations(
+      @NotNull AnnotationStore<E> annotationStore) {
+
+    for (E annotation : annotationStore.getAnnotations()) {
+      Editor editor = annotation.getEditor();
+
+      if (editor == null) {
+        continue;
+      }
+
+      annotation.updateBoundaries();
+
+      removeRangeHighlighter(annotation);
+      annotation.removeLocalRepresentation();
+
+      addLocalRepresentationToAnnotation(annotation, editor);
+    }
+  }
+
+  /**
    * Removes all annotations belonging to the given user from all annotation stores and from all
    * open editors.
    *
