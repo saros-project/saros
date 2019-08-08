@@ -8,6 +8,8 @@ import org.apache.log4j.Logger;
 public class IconManager {
   public static final Logger LOG = Logger.getLogger(IconManager.class);
 
+  public static final ImageIcon SAROS_ICON = getIcon("/icons/saros/saros_misc.png", "Saros Icon");
+
   public static final ImageIcon SESSIONS_ICON =
       getIcon("/icons/famfamfam/session_tsk.png", "sessions");
   public static final ImageIcon CONTACT_ONLINE_ICON =

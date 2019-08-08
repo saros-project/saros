@@ -8,7 +8,6 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
-import com.intellij.util.PlatformIcons;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import saros.intellij.editor.colorstorage.ColorManager;
 import saros.intellij.editor.colorstorage.ColorManager.IdentifiableColorKeys;
 import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.IconManager;
 
 /** IntelliJ color scheme preferences for Saros specific colors. */
 public class SarosColorsPage implements ColorSettingsPage {
@@ -73,7 +73,7 @@ public class SarosColorsPage implements ColorSettingsPage {
   @Nullable
   @Override
   public Icon getIcon() {
-    return PlatformIcons.CUSTOM_FILE_ICON;
+    return IconManager.SAROS_ICON;
   }
 
   @NotNull
