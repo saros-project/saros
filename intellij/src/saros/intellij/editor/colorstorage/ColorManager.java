@@ -35,15 +35,16 @@ public final class ColorManager {
    */
   private static final String CONTRIBUTION_KEY_PREFIX = "SAROS_TEXT_CONTRIBUTION_";
 
+  /** Number of supported users. */
+  private static final int USER_COUNT = 5;
+
+  /** Color keys for the default colors. Used if no color keys are available for a given id. */
+  public static final ColorKeys DEFAULT_COLOR_KEYS = new DefaultColorKeys();
   /**
    * List of keys for supported colors. A user can select one of these colors by referencing the
    * {@link IdentifiableColorKeys#getId()}.
    */
   public static final List<IdentifiableColorKeys> COLOR_KEYS;
-  /** Color keys for the default colors. These are used if no */
-  public static final ColorKeys DEFAULT_COLOR_KEYS = new DefaultColorKeys();
-  /** Number of supported users. */
-  private static final int USER_COUNT = 5;
 
   static {
     final ImmutableList.Builder<IdentifiableColorKeys> builder = ImmutableList.builder();
