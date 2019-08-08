@@ -175,7 +175,10 @@ public class Messages {
   public static String ColorPreferences_text_contribution_attribute_display_name;
   public static String ColorPreferences_default_user_text_selection_attribute_display_name;
   public static String ColorPreferences_default_user_text_contribution_attribute_display_name;
-  public static String ColorPreferences_user_example_text;
+  public static String ColorPreferences_default_user_description;
+  public static String ColorPreferences_user_description;
+  public static String ColorPreferences_user_example_text_contribution;
+  public static String ColorPreferences_user_example_text_selection;
 
   private Messages() {}
 }
