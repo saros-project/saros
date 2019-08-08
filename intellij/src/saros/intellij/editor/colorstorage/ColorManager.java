@@ -14,6 +14,28 @@ import org.jetbrains.annotations.NotNull;
 public final class ColorManager {
 
   /**
+   * Key for the default selection color field. This value must match the option name for the
+   * default selection color used in the color config files located in {@link colorSchemes}.
+   */
+  private static final String DEFAULT_SELECTION_KEY = "SAROS_DEFAULT_TEXT_SELECTION";
+  /**
+   * Key for the default contribution color field. This value must match the option name for the
+   * default contribution color used in the color config files located in {@link colorSchemes}.
+   */
+  private static final String DEFAULT_CONTRIBUTION_KEY = "SAROS_DEFAULT_TEXT_CONTRIBUTION";
+  /**
+   * Prefix for the user selection color field. This value must match the prefix of the option names
+   * for the user selection color used in the color config files located in {@link colorSchemes}.
+   */
+  private static final String SELECTION_KEY_PREFIX = "SAROS_TEXT_SELECTION_";
+  /**
+   * Prefix for the user contribution color field. This value must match the prefix of the option
+   * names for the user contribution color used in the color config files located in {@link
+   * colorSchemes}.
+   */
+  private static final String CONTRIBUTION_KEY_PREFIX = "SAROS_TEXT_CONTRIBUTION_";
+
+  /**
    * List of keys for supported colors. A user can select one of these colors by referencing the
    * {@link IdentifiableColorKeys#getId()}.
    */
@@ -85,13 +107,15 @@ public final class ColorManager {
     @NotNull private final TextAttributesKey contributionColorKey;
 
     private IdentifiableColorKeys(final int id) {
-      final String selectionKeyName = "SAROS_TEXT_SELECTION_" + id;
-      final String contributionKeyName = "SAROS_TEXT_CONTRIBUTION_" + id;
+      this.id = id;
+
+      final String selectionKeyName = SELECTION_KEY_PREFIX + id;
+      final String contributionKeyName = CONTRIBUTION_KEY_PREFIX + id;
+
       this.selectionColorKey =
           TextAttributesKey.createTextAttributesKey(selectionKeyName, HighlighterColors.TEXT);
       this.contributionColorKey =
           TextAttributesKey.createTextAttributesKey(contributionKeyName, HighlighterColors.TEXT);
-      this.id = id;
     }
 
     @NotNull
@@ -124,11 +148,9 @@ public final class ColorManager {
   private static final class DefaultColorKeys implements ColorKeys {
 
     private static final TextAttributesKey DEFAULT_SELECTION_COLOR_KEY =
-        TextAttributesKey.createTextAttributesKey(
-            "SAROS_DEFAULT_TEXT_SELECTION", HighlighterColors.TEXT);
+        TextAttributesKey.createTextAttributesKey(DEFAULT_SELECTION_KEY, HighlighterColors.TEXT);
     private static final TextAttributesKey DEFAULT_CONTRIBUTION_COLOR_KEY =
-        TextAttributesKey.createTextAttributesKey(
-            "SAROS_DEFAULT_TEXT_CONTRIBUTION", HighlighterColors.TEXT);
+        TextAttributesKey.createTextAttributesKey(DEFAULT_CONTRIBUTION_KEY, HighlighterColors.TEXT);
 
     @NotNull
     @Override
