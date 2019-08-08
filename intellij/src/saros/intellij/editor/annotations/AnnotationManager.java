@@ -386,56 +386,57 @@ public class AnnotationManager implements Disposable {
    */
   public void applyStoredAnnotations(@NotNull IFile file, @NotNull Editor editor) {
 
-    addLocalRepresentationToAnnotations(selectionAnnotationStore.getAnnotations(file), editor);
+    selectionAnnotationStore
+        .getAnnotations(file)
+        .forEach(annotation -> addLocalRepresentationToAnnotation(annotation, editor));
 
-    addLocalRepresentationToAnnotations(contributionAnnotationQueue.getAnnotations(file), editor);
+    contributionAnnotationQueue
+        .getAnnotations(file)
+        .forEach(annotation -> addLocalRepresentationToAnnotation(annotation, editor));
   }
 
   /**
-   * Creates RangeHighlighters for the given annotations and adds the given editor and the matching
-   * created RangeHighlighters to each given annotation.
+   * Creates RangeHighlighters for the given annotation and adds the given editor and the matching
+   * created RangeHighlighters to the given annotation.
    *
-   * @param annotations the annotations to add a local representation to
+   * @param annotation the annotation to add a local representation to
    * @param editor the editor to create RangeHighlighters in
    * @param <E> the annotation type
    * @see #addRangeHighlighter(User, int, int, Editor, AnnotationType, IFile)
    */
-  private <E extends AbstractEditorAnnotation> void addLocalRepresentationToAnnotations(
-      @NotNull List<E> annotations, @NotNull Editor editor) {
+  private <E extends AbstractEditorAnnotation> void addLocalRepresentationToAnnotation(
+      @NotNull E annotation, @NotNull Editor editor) {
 
-    annotations.forEach(
-        annotation -> {
-          AnnotationType annotationType;
+    AnnotationType annotationType;
 
-          if (annotation instanceof SelectionAnnotation) {
-            annotationType = AnnotationType.SELECTION_ANNOTATION;
+    if (annotation instanceof SelectionAnnotation) {
+      annotationType = AnnotationType.SELECTION_ANNOTATION;
 
-          } else if (annotation instanceof ContributionAnnotation) {
-            annotationType = AnnotationType.CONTRIBUTION_ANNOTATION;
+    } else if (annotation instanceof ContributionAnnotation) {
+      annotationType = AnnotationType.CONTRIBUTION_ANNOTATION;
 
-          } else {
-            throw new IllegalArgumentException("Unknown annotation type " + annotation.getClass());
+    } else {
+      throw new IllegalArgumentException("Unknown annotation type " + annotation.getClass());
+    }
+
+    User user = annotation.getUser();
+    List<AnnotationRange> annotationRanges = annotation.getAnnotationRanges();
+
+    annotation.addEditor(editor);
+
+    IFile file = annotation.getFile();
+
+    annotationRanges.forEach(
+        annotationRange -> {
+          int start = annotationRange.getStart();
+          int end = annotationRange.getEnd();
+
+          RangeHighlighter rangeHighlighter =
+              addRangeHighlighter(user, start, end, editor, annotationType, file);
+
+          if (rangeHighlighter != null) {
+            annotationRange.addRangeHighlighter(rangeHighlighter);
           }
-
-          User user = annotation.getUser();
-          List<AnnotationRange> annotationRanges = annotation.getAnnotationRanges();
-
-          annotation.addEditor(editor);
-
-          IFile file = annotation.getFile();
-
-          annotationRanges.forEach(
-              annotationRange -> {
-                int start = annotationRange.getStart();
-                int end = annotationRange.getEnd();
-
-                RangeHighlighter rangeHighlighter =
-                    addRangeHighlighter(user, start, end, editor, annotationType, file);
-
-                if (rangeHighlighter != null) {
-                  annotationRange.addRangeHighlighter(rangeHighlighter);
-                }
-              });
         });
   }
 
