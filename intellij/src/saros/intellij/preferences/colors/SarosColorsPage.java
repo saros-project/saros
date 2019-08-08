@@ -87,12 +87,57 @@ public class SarosColorsPage implements ColorSettingsPage {
   @Override
   public String getDemoText() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(MessageFormat.format(Messages.ColorPreferences_user_example_text, ""));
+
+    sb.append(createDemoTextForColorKey(null));
+
+    sb.append(System.lineSeparator()).append(System.lineSeparator());
+
     for (IdentifiableColorKeys identifiableColorKeys : ColorManager.COLOR_KEYS) {
-      sb.append(
-          MessageFormat.format(
-              Messages.ColorPreferences_user_example_text, identifiableColorKeys.getId()));
+
+      sb.append(createDemoTextForColorKey(identifiableColorKeys));
+
+      sb.append(System.lineSeparator()).append(System.lineSeparator());
     }
+
+    sb.setLength(sb.length() - 2);
+
+    return sb.toString();
+  }
+
+  /**
+   * Creates the demo text for the user represented by the given identifiable color keys.
+   *
+   * @param identifiableColorKeys the identifiable color keys or <code>null</code> for the default
+   *     user
+   * @return the demo text for the given identifiable color keys
+   */
+  @NotNull
+  private String createDemoTextForColorKey(@Nullable IdentifiableColorKeys identifiableColorKeys) {
+    StringBuilder sb = new StringBuilder();
+
+    String userID;
+    String usedDescription;
+
+    if (identifiableColorKeys == null) {
+      userID = "";
+      usedDescription = Messages.ColorPreferences_default_user_description;
+    } else {
+      userID = Integer.toString(identifiableColorKeys.getId());
+
+      int shownID = (identifiableColorKeys.getId() + 1);
+      usedDescription = MessageFormat.format(Messages.ColorPreferences_user_description, shownID);
+    }
+
+    sb.append(
+        MessageFormat.format(
+            Messages.ColorPreferences_user_example_text_contribution, userID, usedDescription));
+
+    sb.append(System.lineSeparator());
+
+    sb.append(
+        MessageFormat.format(
+            Messages.ColorPreferences_user_example_text_selection, userID, usedDescription));
+
     return sb.toString();
   }
 
