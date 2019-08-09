@@ -22,8 +22,11 @@ import saros.intellij.editor.colorstorage.ColorManager.IdentifiableColorKeys;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 
-/** IntelliJ color scheme preferences for Saros specific colors. */
-public class SarosColorsPage implements ColorSettingsPage {
+/**
+ * IntelliJ color scheme preferences for Saros-specific colors. This page can be used by the user to
+ * specify how annotations will be displayed locally.
+ */
+public class LocalSarosAnnotationColorsPage implements ColorSettingsPage {
 
   /** List of descriptors for colors that can be selected by users. */
   private static final List<AttributesDescriptor> COLOR_ATTRIBUTE_DESCRIPTORS;
