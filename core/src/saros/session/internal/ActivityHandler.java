@@ -34,6 +34,8 @@ public final class ActivityHandler implements Startable {
 
   private static final Logger LOG = Logger.getLogger(ActivityHandler.class);
 
+  private static final List<IActivity> POISON_PILL = new ArrayList<>();
+
   /** join timeout when stopping this component */
   private static final long TIMEOUT = 10000;
 
@@ -82,7 +84,9 @@ public final class ActivityHandler implements Startable {
         public void run() {
           LOG.debug("activity dispatcher started");
 
-          while (!Thread.currentThread().isInterrupted()) {
+          boolean isPoisoned = false;
+
+          while (!Thread.currentThread().isInterrupted() && !isPoisoned) {
             pendingActivities.clear();
             activitiesToExecute.clear();
 
@@ -94,8 +98,14 @@ public final class ActivityHandler implements Startable {
 
             dispatchQueue.drainTo(pendingActivities);
 
-            for (final List<IActivity> activities : pendingActivities)
+            for (final List<IActivity> activities : pendingActivities) {
+              if (activities == POISON_PILL) { // NOPMD - object reference comparison needed
+                isPoisoned = true;
+                break;
+              }
+
               activitiesToExecute.addAll(activities);
+            }
 
             dispatchAndExecuteActivities(activitiesToExecute);
           }
@@ -246,7 +256,8 @@ public final class ActivityHandler implements Startable {
   public void stop() {
     if (DISPATCH_MODE == DISPATCH_MODE_ASYNC) return;
 
-    dispatchThread.interrupt();
+    dispatchQueue.add(POISON_PILL);
+
     try {
       dispatchThread.join(TIMEOUT);
     } catch (InterruptedException e) {
