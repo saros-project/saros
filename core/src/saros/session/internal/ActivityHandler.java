@@ -99,7 +99,7 @@ public final class ActivityHandler implements Startable {
             dispatchQueue.drainTo(pendingActivities);
 
             for (final List<IActivity> activities : pendingActivities) {
-              if (activities == POISON_PILL) {
+              if (activities == POISON_PILL) { // NOPMD - object reference comparison needed
                 isPoisoned = true;
                 break;
               }
