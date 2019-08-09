@@ -1,7 +1,5 @@
 package saros.intellij.preferences.colors;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.PlainSyntaxHighlighter;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
@@ -9,7 +7,10 @@ import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -31,47 +32,64 @@ public class SarosColorsPage implements ColorSettingsPage {
   /** Maps specific tags to the possible text attribute keys. Used for the demo text. */
   private static final Map<String, TextAttributesKey> HIGHLIGHT_MAP;
 
+  /* Initialize COLOR_ATTRIBUTE_DESCRIPTORS */
   static {
-    final ImmutableList.Builder<AttributesDescriptor> builder = ImmutableList.builder();
+    List<AttributesDescriptor> attributesDescriptors = new ArrayList<>();
+
     for (IdentifiableColorKeys colorKeys : ColorManager.COLOR_KEYS) {
       final int userDisplayID = colorKeys.getId() + 1;
-      builder.add(
+
+      attributesDescriptors.add(
           new AttributesDescriptor(
               MessageFormat.format(
                   Messages.ColorPreferences_text_selection_attribute_display_name, userDisplayID),
-              colorKeys.getSelectionColorKey()),
+              colorKeys.getSelectionColorKey()));
+
+      attributesDescriptors.add(
           new AttributesDescriptor(
               MessageFormat.format(
                   Messages.ColorPreferences_text_contribution_attribute_display_name,
                   userDisplayID),
               colorKeys.getContributionColorKey()));
     }
-    COLOR_ATTRIBUTE_DESCRIPTORS = builder.build();
+
+    COLOR_ATTRIBUTE_DESCRIPTORS = Collections.unmodifiableList(attributesDescriptors);
   }
 
+  /* Initialize ADDITIONAL_ATTRIBUTE_DESCRIPTORS */
   static {
-    ADDITIONAL_ATTRIBUTE_DESCRIPTORS =
-        ImmutableList.of(
-            new AttributesDescriptor(
-                Messages.ColorPreferences_default_user_text_selection_attribute_display_name,
-                ColorManager.DEFAULT_COLOR_KEYS.getSelectionColorKey()),
-            new AttributesDescriptor(
-                Messages.ColorPreferences_default_user_text_contribution_attribute_display_name,
-                ColorManager.DEFAULT_COLOR_KEYS.getContributionColorKey()));
+    List<AttributesDescriptor> attributesDescriptors = new ArrayList<>();
+
+    attributesDescriptors.add(
+        new AttributesDescriptor(
+            Messages.ColorPreferences_default_user_text_selection_attribute_display_name,
+            ColorManager.DEFAULT_COLOR_KEYS.getSelectionColorKey()));
+
+    attributesDescriptors.add(
+        new AttributesDescriptor(
+            Messages.ColorPreferences_default_user_text_contribution_attribute_display_name,
+            ColorManager.DEFAULT_COLOR_KEYS.getContributionColorKey()));
+
+    ADDITIONAL_ATTRIBUTE_DESCRIPTORS = Collections.unmodifiableList(attributesDescriptors);
   }
 
+  /* Initialize HIGHLIGHT_MAP */
   static {
-    final ImmutableMap.Builder<String, TextAttributesKey> builder = ImmutableMap.builder();
+    Map<String, TextAttributesKey> textAttributesKeyMap = new HashMap<>();
+
+    textAttributesKeyMap.put("sel", ColorManager.DEFAULT_COLOR_KEYS.getSelectionColorKey());
+    textAttributesKeyMap.put("contrib", ColorManager.DEFAULT_COLOR_KEYS.getContributionColorKey());
+
     for (IdentifiableColorKeys identifiableColorKeys : ColorManager.COLOR_KEYS) {
-      builder.put(
+      textAttributesKeyMap.put(
           "sel" + identifiableColorKeys.getId(), identifiableColorKeys.getSelectionColorKey());
-      builder.put(
+
+      textAttributesKeyMap.put(
           "contrib" + identifiableColorKeys.getId(),
           identifiableColorKeys.getContributionColorKey());
     }
-    builder.put("sel", ColorManager.DEFAULT_COLOR_KEYS.getSelectionColorKey());
-    builder.put("contrib", ColorManager.DEFAULT_COLOR_KEYS.getContributionColorKey());
-    HIGHLIGHT_MAP = builder.build();
+
+    HIGHLIGHT_MAP = Collections.unmodifiableMap(textAttributesKeyMap);
   }
 
   @Nullable

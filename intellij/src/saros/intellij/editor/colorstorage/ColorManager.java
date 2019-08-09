@@ -1,9 +1,10 @@
 package saros.intellij.editor.colorstorage;
 
-import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,12 +47,14 @@ public final class ColorManager {
    */
   public static final List<IdentifiableColorKeys> COLOR_KEYS;
 
+  /* Initialize COLOR_KEYS */
   static {
-    final ImmutableList.Builder<IdentifiableColorKeys> builder = ImmutableList.builder();
+    List<IdentifiableColorKeys> colorKeys = new ArrayList<>();
+
     for (int i = 0; i < USER_COUNT; i++) {
-      builder.add(new IdentifiableColorKeys(i));
+      colorKeys.add(new IdentifiableColorKeys(i));
     }
-    COLOR_KEYS = builder.build();
+    COLOR_KEYS = Collections.unmodifiableList(colorKeys);
   }
 
   private ColorManager() {}
