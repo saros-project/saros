@@ -2,8 +2,10 @@ package saros.editor.annotations;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
@@ -53,6 +55,9 @@ public abstract class SarosAnnotation extends Annotation {
   /**
    * Shorthand for <code>getUserColor(user.getColorID())</code>.
    *
+   * <p><b>Important notice:</b> Every returned color instance allocates OS resources that need to
+   * be disposed with {@link Color#dispose()}!
+   *
    * @see #getUserColor(int)
    */
   public static Color getUserColor(User user) {
@@ -73,31 +78,48 @@ public abstract class SarosAnnotation extends Annotation {
   }
 
   /**
-   * Returns the color that corresponds to a user.
+   * Returns the color for the given annotation type and user color id.
    *
+   *<p>E.g: <code>getColor("saros.annotations.viewport", 2)
    * <p><b>Important notice:</b> Every returned color instance allocates OS resources that need to
    * be disposed with {@link Color#dispose()}!
    *
-   * @param type
-   * @param colorID
+   * @see Annotation#getType()
+   * @param type annotation type as defined in the plugin.xml
+   * @param colorId the color id
    * @return the corresponding color or a default one if no color is stored
    */
-  protected static Color getColor(String type, int colorID) {
+  public static Color getColor(final String type, final int colorId) {
 
-    type = getNumberedType(type, colorID);
+    final String typeToLookup = getNumberedType(type, colorId);
 
-    AnnotationPreferenceLookup lookup = EditorsUI.getAnnotationPreferenceLookup();
-
-    AnnotationPreference ap = lookup.getAnnotationPreference(type);
+    final AnnotationPreference ap =
+        EditorsUI.getAnnotationPreferenceLookup().getAnnotationPreference(typeToLookup);
 
     if (ap == null)
-      throw new RuntimeException(
-          "could not read color value of annotation '" + type + "' because it does not exists");
+      throw new IllegalArgumentException(
+          "could not read color value of annotation '"
+              + typeToLookup
+              + "' because it does not exists");
 
-    return new Color(Display.getDefault(), ap.getColorPreferenceValue());
+    RGB rgb =
+        PreferenceConverter.getColor(EditorsUI.getPreferenceStore(), ap.getColorPreferenceKey());
+
+    if (rgb == PreferenceConverter.COLOR_DEFAULT_DEFAULT) { // NOPMD
+      rgb = ap.getColorPreferenceValue();
+    }
+
+    if (rgb == null)
+      throw new IllegalArgumentException(
+          "annotation '" + typeToLookup + "' does not have a default color");
+
+    return new Color(Display.getDefault(), rgb);
   }
 
-  /** Loads the colors from the plugin.xml and overwrites possible errors in the PreferenceStore */
+  /**
+   * Loads the default colors from the plugin.xml and overwrites possible errors in the EditorsUI
+   * preference store.
+   */
   public static void resetColors() {
 
     log.debug("resetting annotation colors");

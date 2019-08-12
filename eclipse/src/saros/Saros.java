@@ -14,7 +14,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 import saros.annotations.Component;
-import saros.editor.annotations.SarosAnnotation;
 import saros.util.ThreadUtils;
 import saros.versioning.VersionManager;
 
@@ -117,12 +116,6 @@ public class Saros extends AbstractUIPlugin {
         lifecycle.getSarosContext().getComponent(VersionManager.class));
 
     isInitialized = true;
-
-    /*
-     * If other colors than the ones we support are set in the
-     * PreferenceStore, overwrite them
-     */
-    SarosAnnotation.resetColors();
   }
 
   @Override
