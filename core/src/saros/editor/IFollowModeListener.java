@@ -2,6 +2,7 @@ package saros.editor;
 
 import saros.session.User;
 
+/** Listener interface for monitoring local and remote following states. */
 public interface IFollowModeListener {
   /** Reasons why the FollowMode stopped */
   enum Reason {
@@ -27,7 +28,23 @@ public interface IFollowModeListener {
     FOLLOWER_SWITCHES_FOLLOWEE
   }
 
-  public void stoppedFollowing(Reason reason);
+  /** Gets called when the <b>local</b> user starts following another session user. */
+  public default void startedFollowing(User target) {
+    // NOP
+  }
 
-  public void startedFollowing(User target);
+  /** Gets called when the <b>local</b> user stops following another session user. */
+  public default void stoppedFollowing(Reason reason) {
+    // NOP;
+  }
+
+  /** Gets called when a <b>remote</b> user starts following another session user. */
+  public default void startedFollowing(final User follower, final User followee) {
+    // NOP;
+  }
+
+  /** Gets called when a <b>remote</b> user stops following another session user. */
+  public default void stoppedFollowing(final User follower) {
+    // NOP
+  }
 }
