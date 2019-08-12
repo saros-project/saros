@@ -48,8 +48,6 @@ public class SarosEclipseSessionContextFactory extends SarosCoreSessionContextFa
       container.addComponent(ErrorLogManager.class);
       container.addComponent(FeedbackManager.class);
     }
-    // Other
-    container.addComponent(FollowingActivitiesManager.class);
 
     // file activity related
     container.addComponent(SharedResourcesManager.class);

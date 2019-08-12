@@ -1,58 +1,41 @@
 package saros.awareness;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import saros.editor.EditorManager;
+import saros.editor.FollowModeManager;
 import saros.editor.remote.UserEditorStateManager;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
+import saros.session.ISessionLifecycleListener;
 import saros.session.User;
 
 /**
  * Singleton that provides methods to collect and retrieve awareness information for session
  * participants (who is following who, which file is currently opened, etc.)
- *
- * <p>All methods provided by the interface are <b>not</b> thread safe.
- *
- * @author waldmann
  */
 public class AwarenessInformationCollector {
 
   private final EditorManager editorManager;
-  private final ISarosSessionManager sessionManager;
 
-  /** Who is following who in the session? */
-  private final Map<User, User> followModes = new ConcurrentHashMap<User, User>();
+  private volatile FollowModeManager followModeManager;
+
+  private final ISessionLifecycleListener sessionLifeCyclelistener =
+      new ISessionLifecycleListener() {
+        @Override
+        public void sessionStarted(final ISarosSession session) {
+          followModeManager = session.getComponent(FollowModeManager.class);
+        }
+
+        @Override
+        public void sessionEnding(final ISarosSession session) {
+          followModeManager = null;
+        }
+      };
 
   public AwarenessInformationCollector(
       ISarosSessionManager sessionManager, final EditorManager editorManager) {
 
-    this.sessionManager = sessionManager;
+    sessionManager.addSessionLifecycleListener(sessionLifeCyclelistener);
     this.editorManager = editorManager;
-  }
-
-  /**
-   * Make sure to call this, when a session ends, or when a session starts to avoid having outdated
-   * information
-   */
-  public void flushFollowModes() {
-    followModes.clear();
-  }
-
-  /**
-   * Remember that "user" is following "target" in the currently running session.
-   *
-   * @param user
-   * @param target
-   */
-  public void setUserFollowing(User user, User target) {
-    assert user != null;
-    assert !(user.equals(target));
-
-    followModes.remove(user);
-
-    if (target != null) // null is not allowed in CHM
-    followModes.put(user, target);
   }
 
   /**
@@ -65,21 +48,11 @@ public class AwarenessInformationCollector {
   public User getFollowedUser(User user) {
     assert user != null;
 
-    final ISarosSession session = sessionManager.getSession();
+    final FollowModeManager currentFollowModeManager = followModeManager;
 
-    // should not be called outside of a running session
-    if (session == null) return null;
+    if (currentFollowModeManager == null) return null;
 
-    final User followee = followModes.get(user);
-
-    if (followee == null) return null;
-
-    /*
-     * FIXME this should not be done here, it should be the responsibility
-     * of the class that calls setUserFollowing to correctly clear this map
-     * entries !
-     */
-    return session.getUser(followee.getJID());
+    return currentFollowModeManager.getFollowModeStates().getFollowee(user);
   }
 
   /**

@@ -17,8 +17,6 @@ import saros.editor.FollowModeManager;
 import saros.editor.IFollowModeListener;
 import saros.editor.ISharedEditorListener;
 import saros.net.xmpp.roster.IRosterListener;
-import saros.project.internal.FollowingActivitiesManager;
-import saros.project.internal.IFollowModeChangesListener;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISessionListener;
@@ -54,19 +52,6 @@ public class SessionContentProvider extends TreeContentProvider {
     editorManager.addSharedEditorListener(sharedEditorListener);
   }
 
-  private FollowingActivitiesManager followingTracker;
-
-  private final IFollowModeChangesListener remoteFollowModeChanges =
-      new IFollowModeChangesListener() {
-
-        @Override
-        public void followModeChanged() {
-          ViewerUtils.refresh(viewer, true);
-          // FIXME expand the sessionHeaderElement not the whole viewer
-          ViewerUtils.expandAll(viewer);
-        }
-      };
-
   private FollowModeManager followModeManager;
 
   private final IFollowModeListener localFollowModeChanges =
@@ -80,6 +65,20 @@ public class SessionContentProvider extends TreeContentProvider {
         @Override
         public void startedFollowing(User target) {
           ViewerUtils.update(viewer, new UserElement(target, editorManager, collector), null);
+        }
+
+        @Override
+        public void stoppedFollowing(User follower) {
+          ViewerUtils.refresh(viewer, true);
+          // FIXME expand the sessionHeaderElement not the whole viewer
+          ViewerUtils.expandAll(viewer);
+        }
+
+        @Override
+        public void startedFollowing(User follower, User followee) {
+          ViewerUtils.refresh(viewer, true);
+          // FIXME expand the sessionHeaderElement not the whole viewer
+          ViewerUtils.expandAll(viewer);
         }
       };
 
@@ -180,8 +179,6 @@ public class SessionContentProvider extends TreeContentProvider {
 
     final ISarosSession newSession = currentSession = getSession(newInput);
 
-    if (followingTracker != null) followingTracker.removeListener(remoteFollowModeChanges);
-
     if (followModeManager != null) followModeManager.removeListener(localFollowModeChanges);
 
     if (additionalContentProvider != null)
@@ -201,10 +198,6 @@ public class SessionContentProvider extends TreeContentProvider {
 
     if (newSession != null) {
       newSession.addListener(sessionListener);
-
-      followingTracker = newSession.getComponent(FollowingActivitiesManager.class);
-
-      if (followingTracker != null) followingTracker.addListener(remoteFollowModeChanges);
 
       followModeManager = newSession.getComponent(FollowModeManager.class);
 
@@ -244,8 +237,6 @@ public class SessionContentProvider extends TreeContentProvider {
 
     editorManager.removeSharedEditorListener(sharedEditorListener);
 
-    if (followingTracker != null) followingTracker.removeListener(remoteFollowModeChanges);
-
     if (followModeManager != null) followModeManager.removeListener(localFollowModeChanges);
 
     if (additionalContentProvider != null) additionalContentProvider.dispose();
@@ -257,7 +248,6 @@ public class SessionContentProvider extends TreeContentProvider {
     currentRoster = null;
     editorManager = null;
     additionalContentProvider = null;
-    followingTracker = null;
     followModeManager = null;
   }
 
