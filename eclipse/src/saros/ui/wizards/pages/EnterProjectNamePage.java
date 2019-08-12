@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -39,11 +41,13 @@ import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.SWTUtils;
 import saros.ui.widgets.wizard.ProjectOptionComposite;
-import saros.ui.widgets.wizard.events.ProjectNameChangedEvent;
 import saros.ui.widgets.wizard.events.ProjectOptionListener;
 
 /** A wizard page that allows to enter the new project name or to choose to overwrite a project. */
 public class EnterProjectNamePage extends WizardPage {
+
+  private static final Pattern PROJECT_NAME_PROPOSAL_PATTERN =
+      Pattern.compile("(?<name>.*) \\((?<number>\\d+)\\)$");
 
   private final JID peer;
 
@@ -171,8 +175,31 @@ public class EnterProjectNamePage extends WizardPage {
       composite.addProjectOptionListener(
           new ProjectOptionListener() {
             @Override
-            public void projectNameChanged(ProjectNameChangedEvent event) {
-              updatePageComplete(event.projectID);
+            public void projectNameChanged(ProjectOptionComposite composite) {
+              updatePageComplete(composite.getRemoteProjectID());
+            }
+
+            @Override
+            public void projectOptionChanged(ProjectOptionComposite composite) {
+              if (composite.useExistingProject()) return;
+
+              if (!composite.getProjectName().isEmpty()) return;
+
+              final List<String> reservedNames = new ArrayList<>();
+
+              for (ProjectOptionComposite c : projectOptionComposites.values()) {
+                if (c.getProjectName().isEmpty()) continue;
+
+                reservedNames.add(c.getProjectName());
+              }
+
+              final String remoteProjectName =
+                  remoteProjectIdToNameMapping.get(composite.getRemoteProjectID());
+
+              final String proposal =
+                  findProjectNameProposal(remoteProjectName, reservedNames.toArray(new String[0]));
+
+              composite.setProjectName(proposal, false);
             }
           });
     }
@@ -502,36 +529,28 @@ public class EnterProjectNamePage extends WizardPage {
    */
   String findProjectNameProposal(String projectName, String... reservedProjectNames) {
 
-    int idx;
+    int idx = 2;
 
-    for (idx = projectName.length() - 1;
-        idx >= 0 && Character.isDigit(projectName.charAt(idx));
-        idx--) {
-      // NOP
-    }
+    Matcher matcher = PROJECT_NAME_PROPOSAL_PATTERN.matcher(projectName);
 
-    String newProjectName;
-
-    if (idx < 0) newProjectName = "";
-    else newProjectName = projectName.substring(0, idx + 1);
-
-    if (idx == projectName.length() - 1) idx = 2;
-    else {
+    if (matcher.matches()) {
       try {
-        idx = Integer.valueOf(projectName.substring(idx + 1));
+        idx = Integer.parseInt(matcher.group("number"));
+        projectName = matcher.group("name");
+
       } catch (NumberFormatException e) {
-        idx = 2;
+        // IGNORE
       }
     }
 
-    projectName = newProjectName;
+    String nextProjectName = projectName;
 
-    while (!projectNameIsUnique(projectName, reservedProjectNames)) {
-      projectName = newProjectName + idx;
+    while (!projectNameIsUnique(nextProjectName, reservedProjectNames)) {
+      nextProjectName = projectName + " " + "(" + idx + ")";
       idx++;
     }
 
-    return projectName;
+    return nextProjectName;
   }
 
   /** Returns all charsets from a given set that are not available on the current JVM. */
