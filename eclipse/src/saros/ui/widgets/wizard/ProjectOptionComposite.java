@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import saros.ui.Messages;
-import saros.ui.widgets.wizard.events.ProjectNameChangedEvent;
 import saros.ui.widgets.wizard.events.ProjectOptionListener;
 
 public class ProjectOptionComposite extends Composite {
@@ -114,10 +113,12 @@ public class ProjectOptionComposite extends Composite {
     if (useExistingProject) {
       newProjectRadioButton.setSelection(false);
       existingProjectRadioButton.setSelection(true);
+      existingProjectNameText.setFocus();
       existingProjectNameText.setText(name);
     } else {
       newProjectRadioButton.setSelection(true);
       existingProjectRadioButton.setSelection(false);
+      newProjectNameText.setFocus();
       newProjectNameText.setText(name);
     }
 
@@ -143,13 +144,14 @@ public class ProjectOptionComposite extends Composite {
           @Override
           public void widgetSelected(SelectionEvent e) {
             updateEnablement(newProjectRadioButton);
+            newProjectNameText.setFocus();
             fireProjectNameChanged();
+            fireProjectOptionChanged();
           }
 
           @Override
           public void widgetDefaultSelected(SelectionEvent e) {
-            updateEnablement(newProjectRadioButton);
-            fireProjectNameChanged();
+            widgetSelected(e);
           }
         });
 
@@ -186,13 +188,14 @@ public class ProjectOptionComposite extends Composite {
           @Override
           public void widgetSelected(SelectionEvent e) {
             updateEnablement(existingProjectRadioButton);
+            existingProjectNameText.setFocus();
             fireProjectNameChanged();
+            fireProjectOptionChanged();
           }
 
           @Override
           public void widgetDefaultSelected(SelectionEvent e) {
-            updateEnablement(existingProjectRadioButton);
-            fireProjectNameChanged();
+            widgetSelected(e);
           }
         });
 
@@ -251,10 +254,10 @@ public class ProjectOptionComposite extends Composite {
   }
 
   private void fireProjectNameChanged() {
+    for (ProjectOptionListener listener : listeners) listener.projectNameChanged(this);
+  }
 
-    final ProjectNameChangedEvent eventToFire =
-        new ProjectNameChangedEvent(getRemoteProjectID(), getProjectName());
-
-    for (ProjectOptionListener listener : listeners) listener.projectNameChanged(eventToFire);
+  private void fireProjectOptionChanged() {
+    for (ProjectOptionListener listener : listeners) listener.projectOptionChanged(this);
   }
 }
