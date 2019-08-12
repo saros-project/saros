@@ -76,6 +76,7 @@ import saros.ui.actions.RenameContactAction;
 import saros.ui.actions.RequestSessionInviteAction;
 import saros.ui.actions.SendFileAction;
 import saros.ui.actions.SkypeAction;
+import saros.ui.expressions.ContactPropertyTester;
 import saros.ui.menuContributions.StartSessionWithProjects;
 import saros.ui.model.roster.RosterEntryElement;
 import saros.ui.sounds.SoundPlayer;
@@ -456,7 +457,13 @@ public class SarosView extends ViewPart {
                 SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
             if (contacts.size() == 0) return;
 
-            if (sarosSessionManager.getSession() == null) {
+            final JID jid = contacts.get(0);
+
+            // FIXME dirty hack
+            final ContactPropertyTester tester = new ContactPropertyTester();
+            final boolean isOnline = tester.test(jid, "isOnline", null, null);
+
+            if (sarosSessionManager.getSession() == null && isOnline) {
               MenuManager shareProjectSubMenu =
                   new MenuManager(
                       "Share Project(s)...",
@@ -466,19 +473,19 @@ public class SarosView extends ViewPart {
               shareProjectSubMenu.add(new StartSessionWithProjects());
               // TODO it seems it not that trivial to add tooltips to these entries
               manager.add(shareProjectSubMenu);
+              manager.add(new Separator());
             }
-
-            manager.add(getAction(SkypeAction.ACTION_ID));
 
             // TODO: Currently only Saros/S is known to have a working JoinSessionRequestHandler,
             //       remove this once the situation changes / change this to it's own feature.
             Boolean isServer =
-                discoveryManager.isFeatureSupported(
-                    contacts.get(0), SarosConstants.NAMESPACE_SERVER);
+                discoveryManager.isFeatureSupported(jid, SarosConstants.NAMESPACE_SERVER);
             if (contacts.size() == 1 && isServer != null && isServer) {
               manager.add(getAction(RequestSessionInviteAction.ACTION_ID));
+              manager.add(new Separator());
             }
-            manager.add(new Separator());
+
+            manager.add(getAction(SkypeAction.ACTION_ID));
             manager.add(getAction(OpenChatAction.ACTION_ID));
             manager.add(getAction(SendFileAction.ACTION_ID));
             manager.add(getAction(RenameContactAction.ACTION_ID));

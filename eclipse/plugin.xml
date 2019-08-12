@@ -1040,10 +1040,13 @@
                         definitionId="saros.ui.definitions.isSarosSessionRunning">
                   </reference>
                   <reference
+                        definitionId="saros.ui.definitions.isSarosSessionHost">
+                  </reference>
+                  <reference
                         definitionId="saros.ui.definitions.contactsSelected">
                   </reference>
                   <reference
-                        definitionId="saros.ui.definitions.isSarosSessionHost">
+                        definitionId="saros.ui.definitions.contactsOnline">
                   </reference>
                </and>
             </visibleWhen>
@@ -1188,6 +1191,28 @@
                type="saros.net.xmpp.JID">
          </adapt>
       </definition>
+      <definition
+      		id="saros.ui.definitions.isContactOnline">
+         <adapt
+               type="saros.net.xmpp.JID">
+            <test
+                  property="saros.isOnline">
+            </test>
+         </adapt>
+      </definition>
+            <definition
+            id="saros.ui.definitions.contactsOnline">
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <reference
+                     definitionId="saros.ui.definitions.isContactOnline">
+               </reference>
+            </iterate>
+         </with>
+      </definition>      
       <definition
             id="saros.ui.definitions.contactsSelected">
          <with
@@ -1380,7 +1405,7 @@
             class="saros.ui.expressions.ContactPropertyTester"
             id="saros.ui.expressions.ContactPropertyTester"
             namespace="saros"
-            properties="isInSarosSession"
+            properties="isInSarosSession,isOnline"
             type="saros.net.xmpp.JID">
       </propertyTester>
       <propertyTester
