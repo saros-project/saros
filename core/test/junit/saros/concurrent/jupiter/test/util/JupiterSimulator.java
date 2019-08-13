@@ -5,8 +5,8 @@ import static org.easymock.EasyMock.replay;
 
 import java.util.LinkedList;
 import java.util.List;
-import junit.framework.Assert;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import saros.activities.JupiterActivity;
 import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
