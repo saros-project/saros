@@ -37,6 +37,6 @@ public final class RemoteHTMLTree extends HTMLSTFRemoteObject implements IRemote
             String.format(
                 "return %s.prev().hasClass('rc-tree-checkbox-checked')",
                 nodeSelector.getStatement()));
-    return checked != null ? (Boolean) checked : null;
+    return checked instanceof Boolean ? ((Boolean) checked).booleanValue() : false;
   }
 }
