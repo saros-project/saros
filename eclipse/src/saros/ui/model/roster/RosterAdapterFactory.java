@@ -30,24 +30,23 @@ import saros.net.xmpp.JID;
 public class RosterAdapterFactory implements IAdapterFactory {
 
   @Override
-  @SuppressWarnings("rawtypes")
-  public Class[] getAdapterList() {
+  public Class<?>[] getAdapterList() {
     return new Class[] {RosterGroup.class, RosterEntry.class, JID.class};
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
-  public Object getAdapter(Object adaptableObject, Class adapterType) {
+  public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
     if (adaptableObject instanceof RosterGroupElement) {
       if (adapterType == RosterGroup.class) {
-        return ((RosterGroupElement) adaptableObject).getRosterGroup();
+        return adapterType.cast(((RosterGroupElement) adaptableObject).getRosterGroup().getClass());
       }
     }
 
     if (adaptableObject instanceof RosterEntryElement) {
       if (adapterType == RosterEntry.class)
-        return ((RosterEntryElement) adaptableObject).getRosterEntry();
-      if (adapterType == JID.class) return ((RosterEntryElement) adaptableObject).getJID();
+        return adapterType.cast(((RosterEntryElement) adaptableObject).getRosterEntry());
+      if (adapterType == JID.class)
+        return adapterType.cast(((RosterEntryElement) adaptableObject).getJID());
     }
 
     return null;
