@@ -32,8 +32,7 @@ public class SarosWhiteboardView extends StfRemoteObject implements ISarosWhiteb
   public ISarosWhiteboardView setView(SWTBotView view, SWTWorkbenchBot bot) {
     this.view = new SWTBotGefView(view.getReference(), bot);
     this.viewer = this.view.getSWTBotGefViewer();
-    this.zoomManager =
-        (ZoomManager) this.view.getReference().getView(true).getAdapter(ZoomManager.class);
+    this.zoomManager = this.view.getReference().getView(true).getAdapter(ZoomManager.class);
     return this;
   }
 

@@ -451,7 +451,7 @@ public class EditorAPI {
 
   private static void setEditorActionState(final IEditorPart editorPart, final boolean enabled) {
 
-    final ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
+    final ITextEditor editor = editorPart.getAdapter(ITextEditor.class);
 
     if (editor == null) return;
 

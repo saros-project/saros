@@ -321,7 +321,6 @@ public class RemoteBotEditor extends StfRemoteObject implements IRemoteBotEditor
 
                 if (model == null) return selectionRange;
 
-                @SuppressWarnings("unchecked")
                 Iterator<Annotation> annotationIterator = model.getAnnotationIterator();
 
                 while (annotationIterator.hasNext()) {
