@@ -14,7 +14,8 @@ import saros.ui.model.State;
  * provides a list of functions that reflects and abstracts the actual JS API. For example updating
  * a data model in the "JavaScriptWorld" or show an error in the fronted using the browser.
  *
- * <p>All provided functions are using the {@link IBrowser#run(String)} method to invoke JavaScript.
+ * <p>All provided functions are using the {@link IBrowser#execute(String)} method to invoke
+ * JavaScript.
  *
  * <p>Changes in the Java-->JavaScript API should be reflected and encapsulated here.
  */

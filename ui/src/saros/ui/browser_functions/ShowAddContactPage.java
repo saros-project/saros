@@ -17,7 +17,7 @@ public class ShowAddContactPage extends TypedJavascriptFunction {
    * Created by PicoContainer
    *
    * @param dialogManager
-   * @param accountPage
+   * @param addContactPage
    * @see HTMLUIContextFactory
    */
   public ShowAddContactPage(DialogManager dialogManager, AddContactPage addContactPage) {

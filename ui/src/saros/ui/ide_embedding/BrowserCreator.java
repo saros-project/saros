@@ -16,7 +16,7 @@ import saros.ui.pages.IBrowserPage;
  * IDE-specific resource location however by using the correct instance of {@link
  * IUIResourceLocator} which is injected by PicoContainer.
  *
- * <p>During the creation of a {@link IJQueryBrowser} all {@link JavascriptFunction}s that are
+ * <p>During the creation of a {@link SWTBrowser} all {@link AbstractJavascriptFunction}s that are
  * registered in the {@link HTMLUIContextFactory} are injected into this browser instance.
  */
 public class BrowserCreator {
@@ -41,8 +41,8 @@ public class BrowserCreator {
   }
 
   /**
-   * Adds a function to the set of {@link JavascriptFunction} that will be injected to any new
-   * {@link IJQueryBrowser browser} instance created with {@link #createBrowser(Composite, int,
+   * Adds a function to the set of {@link AbstractJavascriptFunction} that will be injected to any
+   * new {@link SWTBrowser browser} instance created with {@link #createBrowser(Composite, int,
    * IBrowserPage) createBrowser()}. This does not affect already created browser instances.
    */
   public void addBrowserFunction(AbstractJavascriptFunction function) {
