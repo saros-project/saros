@@ -48,7 +48,7 @@ public class FileContentNotifierBridge
         if ((delta.getKind() == IResourceDelta.CHANGED)
             && (delta.getFlags() == IResourceDelta.MARKERS)) continue;
 
-        final IFile file = (IFile) delta.getResource().getAdapter(IFile.class);
+        final IFile file = delta.getResource().getAdapter(IFile.class);
 
         for (IFileContentChangedListener listener : fileContentChangedListeners)
           listener.fileContentChanged(ResourceAdapterFactory.create(file));

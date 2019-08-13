@@ -60,7 +60,6 @@ public class ArrayUtils {
    * @return all objects that were adapted or <code>null</code> if the object array is <code>null
    *     </code>
    */
-  @SuppressWarnings("unchecked")
   public static <T> List<T> getAdaptableObjects(
       Object[] objects, Class<? extends T> clazz, IAdapterManager adapterManager) {
 
@@ -69,7 +68,7 @@ public class ArrayUtils {
     Set<T> adaptableObjects = new HashSet<T>(objects.length);
 
     for (Object object : objects) {
-      T adaptedObject = (T) adapterManager.getAdapter(object, clazz);
+      T adaptedObject = adapterManager.getAdapter(object, clazz);
 
       if (adaptedObject != null && !adaptableObjects.contains(adaptedObject)) {
         adaptableObjects.add(adaptedObject);

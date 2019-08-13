@@ -191,7 +191,6 @@ public class ContextMenuHelper {
 
                 Menu menu = control.getMenu();
                 for (String text : texts) {
-                  @SuppressWarnings("unchecked")
                   Matcher<?> matcher = allOf(instanceOf(MenuItem.class), withMnemonicRegex(text));
                   menuItem = show(menu, matcher);
 

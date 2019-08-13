@@ -94,7 +94,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
           checkStateProvider.setChecked(event.getElement(), event.getChecked());
 
           // Fire selection event
-          JID jid = (JID) Platform.getAdapterManager().getAdapter(event.getElement(), JID.class);
+          JID jid = Platform.getAdapterManager().getAdapter(event.getElement(), JID.class);
           if (jid != null) notifyContactSelectionChanged(jid, event.getChecked());
         }
       };
@@ -235,7 +235,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
     List<JID> contacts = new ArrayList<JID>();
 
     for (Object element : getViewer().getCheckedElements()) {
-      JID contact = (JID) ((ITreeElement) element).getAdapter(JID.class);
+      JID contact = ((ITreeElement) element).getAdapter(JID.class);
       if (contact != null) contacts.add(contact);
     }
     return contacts;
@@ -249,7 +249,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
   public List<JID> getSelectedContactsWithSarosSupport() {
     List<JID> contacts = new ArrayList<JID>();
     for (Object element : getViewer().getCheckedElements()) {
-      JID contact = (JID) ((ITreeElement) element).getAdapter(JID.class);
+      JID contact = ((ITreeElement) element).getAdapter(JID.class);
       boolean isSarosSupported =
           element instanceof RosterEntryElement
               && ((RosterEntryElement) element).isSarosSupported();

@@ -60,7 +60,7 @@ public class UserInteractionListener extends MouseAdapter {
 
     if (treeItem == null) return;
 
-    User user = (User) Platform.getAdapterManager().getAdapter(treeItem.getData(), User.class);
+    User user = Platform.getAdapterManager().getAdapter(treeItem.getData(), User.class);
 
     if (user == null || user.isLocal()) return;
 
