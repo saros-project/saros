@@ -7,10 +7,11 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.junit.After;
@@ -21,76 +22,30 @@ import saros.activities.NOPActivity;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
+import saros.session.ISarosSession;
 import saros.session.User;
 import saros.test.fakes.net.FakeConnectionFactory;
 import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
-import saros.test.stubs.SarosSessionStub;
 
 public class ActivitySequencerTest {
-
-  private static class SequencerSessionStub extends SarosSessionStub {
-
-    private List<IActivity> receivedActivities = new ArrayList<IActivity>();
-
-    private Set<User> users = new HashSet<User>();
-
-    private User localUser;
-
-    private String id;
-
-    public void setLocalUser(User localUser) {
-      this.localUser = localUser;
-      users.add(localUser);
-    }
-
-    public void setID(String id) {
-      this.id = id;
-    }
-
-    /*
-     * can rename to something else, does not need override addUser if
-     * needed
-     */
-    @Override
-    public void addUser(User user) {
-      users.add(user);
-    }
-
-    @Override
-    public User getUser(JID jid) {
-      for (User user : users) if (user.getJID().equals(jid)) return user;
-
-      return null;
-    }
-
-    @Override
-    public User getLocalUser() {
-      return localUser;
-    }
-
-    @Override
-    public synchronized void exec(List<IActivity> activities) {
-      receivedActivities.addAll(activities);
-    }
-
-    @Override
-    public String getID() {
-      return id == null ? "0815" : id;
-    }
-
-    public synchronized List<IActivity> getReceivedActivities() {
-      return new ArrayList<IActivity>(receivedActivities);
-    }
-  }
 
   private static final JID ALICE_JID = new JID("alice@test/Saros");
   private static final JID BOB_JID = new JID("bob@test/Saros");
 
-  private SequencerSessionStub sessionStubAlice;
-  private SequencerSessionStub sessionStubBob;
+  private final AtomicReference<String> aliceSessionId = new AtomicReference<>();
+  private final AtomicReference<String> bobSessionId = new AtomicReference<>();
 
-  private User aliceUser;
-  private User bobUser;
+  private final User aliceUser = new User(ALICE_JID, true, true, null);
+  private final User bobUser = new User(BOB_JID, false, true, null);
+
+  private final User bobUserInAliceSession = new User(BOB_JID, false, false, null);
+  private final User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
+
+  private List<IActivity> aliceReceivedActivitiesBuffer;
+  private List<IActivity> bobReceivedActivitiesBuffer;
+
+  private ISarosSession sessionStubAlice;
+  private ISarosSession sessionStubBob;
 
   private ITransmitter aliceTransmitter;
   private ITransmitter bobTransmitter;
@@ -103,14 +58,19 @@ public class ActivitySequencerTest {
 
   @Before
   public void setUp() {
-    sessionStubAlice = new SequencerSessionStub();
-    sessionStubBob = new SequencerSessionStub();
 
-    aliceUser = new User(ALICE_JID, true, true, null);
-    bobUser = new User(BOB_JID, false, true, null);
+    aliceSessionId.set("0815");
+    bobSessionId.set("0815");
 
-    sessionStubAlice.setLocalUser(aliceUser);
-    sessionStubBob.setLocalUser(bobUser);
+    aliceReceivedActivitiesBuffer = Collections.synchronizedList(new ArrayList<>());
+    bobReceivedActivitiesBuffer = Collections.synchronizedList(new ArrayList<>());
+
+    sessionStubAlice =
+        createSessionMock(
+            aliceUser, bobUserInAliceSession, aliceSessionId, aliceReceivedActivitiesBuffer);
+    sessionStubBob =
+        createSessionMock(
+            bobUser, aliceUserInBobSession, bobSessionId, bobReceivedActivitiesBuffer);
 
     FakeConnectionFactoryResult result =
         FakeConnectionFactory.createConnections(ALICE_JID, BOB_JID).withStrictJIDLookup().get();
@@ -196,8 +156,6 @@ public class ActivitySequencerTest {
 
     aliceSequencer.start();
 
-    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
-
     aliceSequencer.registerUser(bobUserInAliceSession);
 
     assertTrue("Bob is not registered", aliceSequencer.isUserRegistered(bobUser));
@@ -223,12 +181,6 @@ public class ActivitySequencerTest {
     aliceSequencer.start();
     bobSequencer.start();
 
-    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
-    User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
-
-    sessionStubAlice.addUser(bobUserInAliceSession);
-    sessionStubBob.addUser(aliceUserInBobSession);
-
     aliceSequencer.registerUser(bobUserInAliceSession);
     bobSequencer.registerUser(aliceUserInBobSession);
 
@@ -239,12 +191,10 @@ public class ActivitySequencerTest {
 
     aliceSequencer.flush(bobUserInAliceSession);
 
-    List<IActivity> receivedActivities = sessionStubBob.getReceivedActivities();
-
-    assertEquals("not all activies received", activityCount, receivedActivities.size());
+    assertEquals("not all activies received", activityCount, bobReceivedActivitiesBuffer.size());
 
     for (int i = 0; i < activityCount; i++) {
-      NOPActivity activity = (NOPActivity) receivedActivities.get(i);
+      NOPActivity activity = (NOPActivity) bobReceivedActivitiesBuffer.get(i);
       assertEquals("activity is out of order", i, activity.getID());
     }
   }
@@ -259,12 +209,6 @@ public class ActivitySequencerTest {
     aliceSequencer.start();
     bobSequencer.start();
 
-    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
-    User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
-
-    sessionStubAlice.addUser(bobUserInAliceSession);
-    sessionStubBob.addUser(aliceUserInBobSession);
-
     bobSequencer.registerUser(aliceUserInBobSession);
 
     aliceSequencer.sendActivity(
@@ -273,12 +217,10 @@ public class ActivitySequencerTest {
 
     aliceSequencer.flush(bobUserInAliceSession);
 
-    List<IActivity> receivedActivities = sessionStubBob.getReceivedActivities();
-
     assertEquals(
         "received activies although the user is not registered on sender side",
         0,
-        receivedActivities.size());
+        bobReceivedActivitiesBuffer.size());
   }
 
   @Test(timeout = 30000)
@@ -291,12 +233,6 @@ public class ActivitySequencerTest {
     aliceSequencer.start();
     bobSequencer.start();
 
-    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
-    User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
-
-    sessionStubAlice.addUser(bobUserInAliceSession);
-    sessionStubBob.addUser(aliceUserInBobSession);
-
     aliceSequencer.registerUser(bobUserInAliceSession);
 
     aliceSequencer.sendActivity(
@@ -305,12 +241,10 @@ public class ActivitySequencerTest {
 
     aliceSequencer.flush(bobUserInAliceSession);
 
-    List<IActivity> receivedActivities = sessionStubBob.getReceivedActivities();
-
     assertEquals(
         "received activies although the user is not registered on receiver side",
         0,
-        receivedActivities.size());
+        bobReceivedActivitiesBuffer.size());
   }
 
   @Test(timeout = 30000)
@@ -318,17 +252,11 @@ public class ActivitySequencerTest {
 
     aliceSequencer = new ActivitySequencer(sessionStubAlice, aliceTransmitter, aliceReceiver, null);
 
-    sessionStubBob.setID("4711");
+    bobSessionId.set("4711");
     bobSequencer = new ActivitySequencer(sessionStubBob, bobTransmitter, bobReceiver, null);
 
     aliceSequencer.start();
     bobSequencer.start();
-
-    User bobUserInAliceSession = new User(BOB_JID, false, false, null);
-    User aliceUserInBobSession = new User(ALICE_JID, true, false, null);
-
-    sessionStubAlice.addUser(bobUserInAliceSession);
-    sessionStubBob.addUser(aliceUserInBobSession);
 
     aliceSequencer.registerUser(bobUserInAliceSession);
     bobSequencer.registerUser(aliceUserInBobSession);
@@ -339,11 +267,35 @@ public class ActivitySequencerTest {
 
     aliceSequencer.flush(bobUserInAliceSession);
 
-    List<IActivity> receivedActivities = sessionStubBob.getReceivedActivities();
-
     assertEquals(
         "received activies although the session id is different on local and remote side",
         0,
-        receivedActivities.size());
+        bobReceivedActivitiesBuffer.size());
+  }
+
+  private static ISarosSession createSessionMock(
+      final User host,
+      final User client,
+      final AtomicReference<String> sessionId,
+      final List<IActivity> receivedActivitiesBuffer) {
+
+    final ISarosSession session = EasyMock.createMock(ISarosSession.class);
+
+    EasyMock.expect(session.getID()).andAnswer(() -> sessionId.get()).anyTimes();
+
+    EasyMock.expect(session.getLocalUser()).andStubReturn(host);
+
+    EasyMock.expect(session.getUsers()).andStubReturn(Arrays.asList(host, client));
+
+    final Capture<List<IActivity>> capture = Capture.newInstance();
+
+    session.exec(EasyMock.capture(capture));
+
+    EasyMock.expectLastCall()
+        .andAnswer(() -> receivedActivitiesBuffer.addAll(capture.getValue()))
+        .anyTimes();
+
+    EasyMock.replay(session);
+    return session;
   }
 }

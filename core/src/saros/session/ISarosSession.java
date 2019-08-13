@@ -164,9 +164,7 @@ public interface ISarosSession {
    * @param enabled <code>true</code> to enable or <code>false</code> to disable the activity
    *     execution
    */
-  default void setActivityExecution(IProject project, boolean enabled) {
-    // NOP
-  }
+  public void setActivityExecution(IProject project, boolean enabled);
 
   /**
    * @return the shared projects associated with this session, never <code>null</code> but may be
