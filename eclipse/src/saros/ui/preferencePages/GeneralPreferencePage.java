@@ -93,7 +93,7 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     layoutParent();
     createAccountsGroup();
     createAutomaticConnectField(parent);
-    createConcurrentUndoField(parent);
+    // createConcurrentUndoField(parent);
   }
 
   /*
