@@ -4,10 +4,10 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.ui.JBInsets;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -115,7 +115,7 @@ public abstract class Wizard extends JDialog {
 
     getContentPane().add(headerPanel, BorderLayout.NORTH);
 
-    cardPanel.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
+    cardPanel.setBorder(new EmptyBorder(new JBInsets(5, 10, 5, 10)));
     cardPanel.setVisible(true);
 
     getContentPane().add(cardPanel, BorderLayout.CENTER);
