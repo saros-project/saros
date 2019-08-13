@@ -10,7 +10,6 @@ import saros.communication.SkypeManager;
 import saros.communication.chat.muc.negotiation.MUCNegotiationManager;
 import saros.communication.connection.IProxyResolver;
 import saros.communication.connection.Socks5ProxyResolver;
-import saros.concurrent.undo.UndoManager;
 import saros.context.AbstractContextFactory;
 import saros.context.IContextKeyBindings;
 import saros.editor.EditorManager;
@@ -66,7 +65,9 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
       // Core Managers
       Component.create(IEditorManager.class, EditorManager.class),
       Component.create(SessionViewOpener.class),
-      Component.create(UndoManager.class),
+      // disabled, https://github.com/saros-project/saros/issues/60
+      // do not forget to enable the option in the GeneralPreferencePage once it is fixed
+      // Component.create(UndoManager.class),
       Component.create(ISarosSessionContextFactory.class, SarosEclipseSessionContextFactory.class),
 
       // UI handlers
