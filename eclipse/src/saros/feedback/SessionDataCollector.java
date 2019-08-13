@@ -55,7 +55,7 @@ public class SessionDataCollector extends AbstractStatisticCollector {
 
   /**
    * A pseudonym set by the user in the preferences to identify himself. This can be used to track
-   * the randomly generated {@link StatisticManager##getUserID()} to a "real" person if the user
+   * the randomly generated {@link StatisticManager#getUserID()} to a "real" person if the user
    * chooses to do so.
    *
    * @since 9.9.11
