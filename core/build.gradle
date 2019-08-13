@@ -48,11 +48,6 @@ jar {
   }
 }
 
-
-tasks.withType(Test) {
-  enableAssertions = true
-}
-
 task testJar(type: Jar) {
   classifier = 'tests'
   from sourceSets.test.output
