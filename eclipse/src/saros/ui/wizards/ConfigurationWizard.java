@@ -59,7 +59,7 @@ public class ConfigurationWizard extends Wizard {
                   composite,
                   SWT.BORDER,
                   SWT.ICON_INFORMATION,
-                  Messages.EnterXMPPAccountWizardPage_info_already_created_account);
+                  Messages.ConfigurationWizard_info_already_created_account);
 
           noteComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
           noteComposite.setSpacing(8);
@@ -137,8 +137,8 @@ public class ConfigurationWizard extends Wizard {
 
     return MessageDialog.openQuestion(
         getShell(),
-        Messages.AddXMPPAccountWizard_account_created,
-        Messages.AddXMPPAccountWizard_account_created_text);
+        Messages.ConfigurationWizard_account_created,
+        Messages.ConfigurationWizard_account_created_text);
   }
 
   /**

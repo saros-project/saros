@@ -29,8 +29,10 @@ public class Messages extends NLS {
   public static String AddProjectToSessionWizard_unsaved_changes_dialog_text;
   public static String AddProjectToSessionWizard_unsaved_changes_dialog_more;
 
-  public static String AddXMPPAccountWizard_account_created;
-  public static String AddXMPPAccountWizard_account_created_text;
+  public static String ConfigurationWizard_account_created;
+  public static String ConfigurationWizard_account_created_text;
+  public static String ConfigurationWizard_info_already_created_account;
+
   public static String AddXMPPAccountWizard_title;
 
   public static String AdvancedPreferencePage_description;
@@ -170,7 +172,6 @@ public class Messages extends NLS {
   public static String EnterProjectNamePage_use_existing_project;
 
   public static String EnterXMPPAccountWizardPage_description;
-  public static String EnterXMPPAccountWizardPage_info_already_created_account;
   public static String EnterXMPPAccountWizardPage_title;
   public static String ErrorMessageDialog_error_plugin;
   public static String ErrorMessageDialog_error_unspecified;
