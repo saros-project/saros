@@ -42,12 +42,6 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
   }
 
   @Override
-  public void followModeChanged(User target, boolean isFollowed) {
-    for (ISharedEditorListener listener : editorListeners)
-      listener.followModeChanged(target, isFollowed);
-  }
-
-  @Override
   public void textEdited(TextEditActivity textEdit) {
     for (ISharedEditorListener listener : editorListeners) listener.textEdited(textEdit);
   }
