@@ -192,7 +192,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
     for (Entry<RosterEntryElement, Boolean> entryElement : checkStatesChanges.entrySet()) {
       RosterEntryElement rosterEntryElement = entryElement.getKey();
       boolean checked = checkStatesChanges.get(rosterEntryElement);
-      notifyContactSelectionChanged((JID) rosterEntryElement.getAdapter(JID.class), checked);
+      notifyContactSelectionChanged(rosterEntryElement.getAdapter(JID.class), checked);
     }
   }
 
