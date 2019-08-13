@@ -9,8 +9,8 @@
  * module is used to keep track of all operations made by the user for undo/redo purposes.
  *
  * <ul>
- *   <li>the {@link OperationHistory} of the user's own operations is stored
- *   <li>the {@link UndoManager} only works during a running Saros session
+ *   <li>the {@link saros.concurrent.undo.OperationHistory} of the user's own operations is stored
+ *   <li>the {@link saros.concurrent.undo.UndoManager} only works during a running Saros session
  * </ul>
  */
 package saros.concurrent.undo;
