@@ -37,8 +37,7 @@ import saros.ui.widgets.decoration.JIDCombo;
  */
 public class AddContactWizardPage extends WizardPage {
   public static final String TITLE = "Add Contact";
-  public static final String DESCRIPTION =
-      "Enter the Jabber Identifier of the contact you want to add.";
+  public static final String DESCRIPTION = "Enter the JID of the contact you want to add.";
 
   @Inject protected XMPPConnectionService connectionService;
 
@@ -130,7 +129,8 @@ public class AddContactWizardPage extends WizardPage {
     JID ownJid = connectionService.getJID();
     JID foreignJid = getContact();
 
-    if (foreignJid.isValid()
+    if (!foreignJid.getName().trim().isEmpty()
+        && foreignJid.isValid()
         && !foreignJid.equals(ownJid)
         && !foreignJid.isResourceQualifiedJID()) {
       /*
