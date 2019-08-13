@@ -839,6 +839,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     }
 
     SPath editorPath = EditorAPI.getEditorPath(editorPart);
+
+    if (editorPath.equals(locallyActiveEditor)) {
+      LOG.debug(
+          "ignoring partActivated event for editor path "
+              + editorPath
+              + " because it is already active");
+      return;
+    }
+
     TextSelection selection = EditorAPI.getSelection(editorPart);
 
     // Set (and thus send) in this order:
