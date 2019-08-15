@@ -107,6 +107,9 @@ abstract class AbstractEditorAnnotation {
   /**
    * Removes the <code>Editor</code> and <code>RangeHighlighter</code> from the annotation.
    *
+   * <p><b>NOTE:</b> This does not remove the annotation from the editor. This has to be done
+   * explicitly through the {@link AnnotationManager}.
+   *
    * <p>This method should be used to remove the local representation of the annotation when the
    * editor for the corresponding file is closed.
    */
