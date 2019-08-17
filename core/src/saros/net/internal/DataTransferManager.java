@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -210,115 +209,24 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     transferListeners.remove(listener);
   }
 
-  public void sendData(
-      final String connectionID, final TransferDescription description, final byte[] data)
-      throws IOException {
-
-    final JID connectionJID = currentLocalJID;
-
-    if (connectionJID == null) throw new IOException("not connected to a XMPP server");
-
-    final IByteStreamConnection connection =
-        getCurrentConnection(connectionID, description.getRecipient());
-
-    if (connection == null)
-      throw new IOException(
-          "not connected to "
-              + description.getRecipient()
-              + " [connection identifier="
-              + connectionID
-              + "]");
-
-    description.setSender(connectionJID);
-
-    if (LOG.isTraceEnabled())
-      LOG.trace(
-          "send "
-              + description
-              + ", data len="
-              + data.length
-              + " byte(s), connection="
-              + connection);
-
-    sendInternal(connectionID, connection, description, data);
-  }
-
-  /**
-   * @deprecated establishes connections on demand
-   * @param transferDescription
-   * @param payload
-   * @throws IOException
-   */
-  @Deprecated
-  public void sendData(TransferDescription transferDescription, byte[] payload) throws IOException {
-
-    JID connectionJID = currentLocalJID;
-
-    if (connectionJID == null) throw new IOException("not connected to a XMPP server");
-
-    if (LOG.isTraceEnabled())
-      LOG.trace(
-          "sending data ... from " + connectionJID + " to " + transferDescription.getRecipient());
-
-    JID recipient = transferDescription.getRecipient();
-    transferDescription.setSender(connectionJID);
-
-    sendInternal(
-        DEFAULT_CONNECTION_ID,
-        connectInternal(DEFAULT_CONNECTION_ID, recipient),
-        transferDescription,
-        payload);
-  }
-
-  private void sendInternal(
-      final String connectionID,
-      final IByteStreamConnection connection,
-      final TransferDescription description,
-      byte[] payload)
-      throws IOException {
-
-    boolean sendPacket = true;
-
-    for (IPacketInterceptor packetInterceptor : packetInterceptors)
-      sendPacket &= packetInterceptor.sendPacket(connectionID, description, payload);
-
-    if (!sendPacket) return;
-
-    long sizeUncompressed = payload.length;
-
-    if (description.compressContent()) payload = deflate(payload);
-
-    final long transferStartTime = System.currentTimeMillis();
-
-    try {
-      connection.send(description, payload);
-    } catch (IOException e) {
-      LOG.error(
-          "failed to send " + description + ", connection=" + connection + ":" + e.getMessage(), e);
-      throw e;
-    }
-
-    notifyDataSent(
-        connection.getMode(),
-        payload.length,
-        sizeUncompressed,
-        System.currentTimeMillis() - transferStartTime);
-  }
-
   /** @deprecated */
   @Override
   @Deprecated
-  public void connect(JID peer) throws IOException {
-    connect(DEFAULT_CONNECTION_ID, peer);
+  public IByteStreamConnection connect(JID peer) throws IOException {
+    return connect(DEFAULT_CONNECTION_ID, peer);
   }
 
   @Override
-  public void connect(String connectionID, JID peer) throws IOException {
+  public IByteStreamConnection connect(String connectionID, JID peer) throws IOException {
     if (connectionID == null) throw new NullPointerException("connectionID is null");
 
     if (peer == null) throw new NullPointerException("peer is null");
 
-    connectInternal(connectionID, peer);
+    return connectInternal(connectionID, peer);
+  }
+
+  public IByteStreamConnection getConnection(final String connectionId, final JID peer) {
+    return getCurrentConnection(connectionId, peer);
   }
 
   /**
@@ -574,21 +482,6 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     return connectionIdentifier + ":" + mode + ":" + jid.toString();
   }
 
-  private void notifyDataSent(
-      final StreamMode mode,
-      final long sizeCompressed,
-      final long sizeUncompressed,
-      final long duration) {
-
-    for (final ITransferListener listener : transferListeners) {
-      try {
-        listener.sent(mode, sizeCompressed, sizeUncompressed, duration);
-      } catch (RuntimeException e) {
-        LOG.error("invoking sent() on listener: " + listener + " failed", e);
-      }
-    }
-  }
-
   private void notifyDataReceived(
       final StreamMode mode,
       final long sizeCompressed,
@@ -602,24 +495,6 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
         LOG.error("invoking received() on listener: " + listener + " failed", e);
       }
     }
-  }
-
-  private static byte[] deflate(byte[] input) {
-
-    Deflater compressor = new Deflater(Deflater.DEFLATED);
-    compressor.setInput(input);
-    compressor.finish();
-
-    ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
-
-    byte[] buf = new byte[CHUNKSIZE];
-
-    while (!compressor.finished()) {
-      int count = compressor.deflate(buf);
-      bos.write(buf, 0, count);
-    }
-
-    return bos.toByteArray();
   }
 
   private static byte[] inflate(byte[] input) throws IOException {

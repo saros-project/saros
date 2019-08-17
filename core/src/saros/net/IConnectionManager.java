@@ -27,9 +27,9 @@ public interface IConnectionManager {
 
   /** @deprecated */
   @Deprecated
-  public void connect(JID peer) throws IOException;
+  public IByteStreamConnection connect(JID peer) throws IOException;
 
-  public void connect(String connectionID, JID peer) throws IOException;
+  public IByteStreamConnection connect(String connectionID, JID peer) throws IOException;
 
   /**
    * @deprecated Disconnects {@link IByteStreamConnection} with the specified peer

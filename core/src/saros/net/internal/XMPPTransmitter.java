@@ -19,7 +19,10 @@
  */
 package saros.net.internal;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.zip.Deflater;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.Message;
@@ -27,7 +30,10 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import saros.annotations.Component;
 import saros.net.ConnectionState;
+import saros.net.IPacketInterceptor;
+import saros.net.ITransferListener;
 import saros.net.ITransmitter;
+import saros.net.stream.StreamMode;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
@@ -45,9 +51,19 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
   private static final int PACKET_EXTENSION_COMPRESS_THRESHOLD =
       Integer.getInteger("saros.net.transmitter.PACKET_EXTENSION_COMPRESS_THRESHOLD", 32);
 
+  private static final int CHUNKSIZE = 16 * 1024;
+
   private final DataTransferManager dataManager;
 
   private Connection connection;
+
+  private final CopyOnWriteArrayList<ITransferListener> transferListeners =
+      new CopyOnWriteArrayList<>();
+
+  private final CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors =
+      new CopyOnWriteArrayList<>();
+
+  private volatile JID localJid;
 
   public XMPPTransmitter(DataTransferManager dataManager, XMPPConnectionService connectionService) {
     connectionService.addListener(this);
@@ -62,26 +78,38 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
   @Override
   public void send(String connectionID, JID recipient, PacketExtension extension)
       throws IOException {
+
+    final JID currentLocalJid = localJid;
+
+    if (currentLocalJid == null) throw new IOException("not connected to a XMPP server");
+
+    IByteStreamConnection connection = dataManager.getConnection(connectionID, recipient);
+
+    if (connectionID != null && connection == null)
+      throw new IOException(
+          "not connected to " + recipient + " [connection identifier=" + connectionID + "]");
+
+    if (connection == null) connection = dataManager.connect(recipient);
+
     /*
      * The TransferDescription can be created out of the session, the name
      * and namespace of the packet extension and standard values and thus
      * transparent to users of this method.
      */
-    TransferDescription transferDescription =
+    final TransferDescription transferDescription =
         TransferDescription.newDescription()
+            .setSender(currentLocalJid)
             .setRecipient(recipient)
-            // .setSender(set by DataTransferManager)
             .setElementName(extension.getElementName())
             .setNamespace(extension.getNamespace());
 
     byte[] data = extension.toXML().getBytes("UTF-8");
 
-    if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD)
+    if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD) {
       transferDescription.setCompressContent(true);
+    }
 
-    // recipient is included in the transfer description
-    if (connectionID == null) dataManager.sendData(transferDescription, data);
-    else dataManager.sendData(connectionID, transferDescription, data);
+    sendPacketExtension(connection, transferDescription, data);
   }
 
   @Override
@@ -111,13 +139,24 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
   }
 
-  /**
-   * Determines if the connection can be used. Helper method for error handling.
-   *
-   * @return false if the connection can be used, true otherwise.
-   */
-  private synchronized boolean isConnectionInvalid() {
-    return connection == null || !connection.isConnected();
+  @Override
+  public void addTransferListener(final ITransferListener listener) {
+    transferListeners.addIfAbsent(listener);
+  }
+
+  @Override
+  public void removeTransferListener(final ITransferListener listener) {
+    transferListeners.remove(listener);
+  }
+
+  @Override
+  public void addPacketInterceptor(final IPacketInterceptor interceptor) {
+    packetInterceptors.addIfAbsent(interceptor);
+  }
+
+  @Override
+  public void removePacketInterceptor(final IPacketInterceptor interceptor) {
+    packetInterceptors.remove(interceptor);
   }
 
   @Override
@@ -127,12 +166,100 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
       case CONNECTING:
         this.connection = connection;
         break;
+      case CONNECTED:
+        localJid = new JID(connection.getUser());
+        break;
       case ERROR:
       case NOT_CONNECTED:
         this.connection = null;
+        localJid = null;
         break;
       default:
         break; // NOP
     }
+  }
+
+  /**
+   * Determines if the connection can be used. Helper method for error handling.
+   *
+   * @return false if the connection can be used, true otherwise.
+   */
+  private synchronized boolean isConnectionInvalid() {
+    return connection == null || !connection.isConnected();
+  }
+
+  private void sendPacketExtension(
+      final IByteStreamConnection connection, final TransferDescription description, byte[] payload)
+      throws IOException {
+
+    boolean sendPacket = true;
+
+    final String connectionId = connection.getConnectionID();
+    for (IPacketInterceptor packetInterceptor : packetInterceptors)
+      sendPacket &= packetInterceptor.sendPacket(connectionId, description, payload);
+
+    if (!sendPacket) return;
+
+    if (log.isTraceEnabled())
+      log.trace(
+          "send "
+              + description
+              + ", data len="
+              + payload.length
+              + " byte(s), connection="
+              + connection);
+
+    long sizeUncompressed = payload.length;
+
+    if (description.compressContent()) payload = deflate(payload);
+
+    final long transferStartTime = System.currentTimeMillis();
+
+    try {
+      connection.send(description, payload);
+    } catch (IOException e) {
+      log.error(
+          "failed to send " + description + ", connection=" + connection + ":" + e.getMessage(), e);
+      throw e;
+    }
+
+    notifyDataSent(
+        connection.getMode(),
+        payload.length,
+        sizeUncompressed,
+        System.currentTimeMillis() - transferStartTime);
+  }
+
+  private void notifyDataSent(
+      final StreamMode mode,
+      final long sizeCompressed,
+      final long sizeUncompressed,
+      final long duration) {
+
+    for (final ITransferListener listener : transferListeners) {
+      try {
+        listener.sent(mode, sizeCompressed, sizeUncompressed, duration);
+      } catch (RuntimeException e) {
+        log.error("invoking sent() on listener: " + listener + " failed", e);
+      }
+    }
+  }
+
+  private static byte[] deflate(byte[] input) {
+
+    Deflater compressor = new Deflater(Deflater.DEFLATED);
+    compressor.setInput(input);
+    compressor.finish();
+
+    ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
+
+    byte[] buf = new byte[CHUNKSIZE];
+
+    while (!compressor.finished()) {
+      int count = compressor.deflate(buf);
+      bos.write(buf, 0, count);
+    }
+
+    return bos.toByteArray();
   }
 }
