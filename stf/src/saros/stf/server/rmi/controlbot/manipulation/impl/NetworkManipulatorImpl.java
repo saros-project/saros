@@ -18,6 +18,7 @@ import saros.net.IPacketInterceptor;
 import saros.net.internal.BinaryXMPPExtension;
 import saros.net.internal.IByteStreamConnection;
 import saros.net.internal.TransferDescription;
+import saros.net.internal.XMPPReceiver;
 import saros.net.xmpp.JID;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityListener;
@@ -169,7 +170,8 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
   private NetworkManipulatorImpl() {
     this.getSessionManager().addSessionLifecycleListener(this);
-    getDataTransferManager().addPacketInterceptor(sessionPacketInterceptor);
+    this.getReceiver().addPacketInterceptor(sessionPacketInterceptor);
+    this.getTransmitter().addPacketInterceptor(sessionPacketInterceptor);
   }
 
   @Override
@@ -274,7 +276,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
         LOG.trace("dispatching blocked packet: " + object);
 
-        getDataTransferManager().addIncomingTransferObject(object);
+        ((XMPPReceiver) getReceiver()).receive(object);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }

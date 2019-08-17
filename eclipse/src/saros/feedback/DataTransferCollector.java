@@ -4,8 +4,9 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import saros.annotations.Component;
-import saros.net.IConnectionManager;
+import saros.net.IReceiver;
 import saros.net.ITransferListener;
+import saros.net.ITransmitter;
 import saros.net.stream.StreamMode;
 import saros.session.ISarosSession;
 
@@ -40,7 +41,8 @@ public class DataTransferCollector extends AbstractStatisticCollector {
   private final Map<StreamMode, TransferStatisticHolder> statistic =
       new EnumMap<StreamMode, TransferStatisticHolder>(StreamMode.class);
 
-  private final IConnectionManager connectionManager;
+  private final IReceiver receiver;
+  private final ITransmitter transmitter;
 
   private final ITransferListener dataTransferlistener =
       new ITransferListener() {
@@ -82,9 +84,11 @@ public class DataTransferCollector extends AbstractStatisticCollector {
   public DataTransferCollector(
       StatisticManager statisticManager,
       ISarosSession session,
-      IConnectionManager connectionManager) {
+      IReceiver receiver,
+      ITransmitter transmitter) {
     super(statisticManager, session);
-    this.connectionManager = connectionManager;
+    this.receiver = receiver;
+    this.transmitter = transmitter;
   }
 
   @Override
@@ -102,12 +106,14 @@ public class DataTransferCollector extends AbstractStatisticCollector {
 
   @Override
   protected void doOnSessionStart(ISarosSession sarosSession) {
-    connectionManager.addTransferListener(dataTransferlistener);
+    receiver.addTransferListener(dataTransferlistener);
+    transmitter.addTransferListener(dataTransferlistener);
   }
 
   @Override
   protected void doOnSessionEnd(ISarosSession sarosSession) {
-    connectionManager.removeTransferListener(dataTransferlistener);
+    receiver.removeTransferListener(dataTransferlistener);
+    transmitter.removeTransferListener(dataTransferlistener);
   }
 
   private void storeTransferStatisticForMode(

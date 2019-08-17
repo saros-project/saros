@@ -62,7 +62,7 @@ public class BinaryChannelConnectionTest {
     }
   }
 
-  private abstract static class StreamConnectionListener implements IByteStreamConnectionListener {
+  private static class StreamConnectionListener implements IByteStreamConnectionListener {
 
     @Override
     public void connectionClosed(String connectionIdentifier, IByteStreamConnection connection) {
@@ -75,9 +75,6 @@ public class BinaryChannelConnectionTest {
         String connectionIdentifier, IByteStreamConnection connection, boolean incomingRequest) {
       // NOP
     }
-
-    @Override
-    public abstract void receive(BinaryXMPPExtension extension);
   }
 
   private final JID aliceJID = new JID("alice@baumeister.de");
@@ -118,12 +115,7 @@ public class BinaryChannelConnectionTest {
             "junit",
             aliceStream,
             StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener() {
-              @Override
-              public void receive(final BinaryXMPPExtension extension) {
-                // NOP
-              }
-            });
+            new StreamConnectionListener());
 
     BinaryChannelConnection bob =
         new BinaryChannelConnection(
@@ -132,13 +124,13 @@ public class BinaryChannelConnectionTest {
             "junit",
             bobStream,
             StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener() {
-              @Override
-              public void receive(final BinaryXMPPExtension extension) {
-                extensions.add(extension);
-                received.countDown();
-              }
-            });
+            new StreamConnectionListener());
+
+    bob.setBinaryXMPPExtensionReceiver(
+        (e) -> {
+          extensions.add(e);
+          received.countDown();
+        });
 
     alice.initialize();
     bob.initialize();
@@ -199,12 +191,7 @@ public class BinaryChannelConnectionTest {
             "junit",
             aliceStream,
             StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener() {
-              @Override
-              public void receive(final BinaryXMPPExtension extension) {
-                // NOP
-              }
-            });
+            new StreamConnectionListener());
 
     BinaryChannelConnection bob =
         new BinaryChannelConnection(
@@ -213,13 +200,13 @@ public class BinaryChannelConnectionTest {
             "junit",
             bobStream,
             StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener() {
-              @Override
-              public void receive(final BinaryXMPPExtension extension) {
-                receivedBytes = extension.getPayload();
-                received.countDown();
-              }
-            });
+            new StreamConnectionListener());
+
+    bob.setBinaryXMPPExtensionReceiver(
+        (e) -> {
+          receivedBytes = e.getPayload();
+          received.countDown();
+        });
 
     alice.initialize();
     bob.initialize();
@@ -269,12 +256,7 @@ public class BinaryChannelConnectionTest {
             "junit",
             aliceStream,
             StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener() {
-              @Override
-              public void receive(final BinaryXMPPExtension extension) {
-                // NOP
-              }
-            });
+            new StreamConnectionListener());
 
     BinaryChannelConnection bob =
         new BinaryChannelConnection(
@@ -283,14 +265,13 @@ public class BinaryChannelConnectionTest {
             "junit",
             bobStream,
             StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener() {
-              @Override
-              public void receive(final BinaryXMPPExtension extension) {
-                receivedBytes = extension.getPayload();
-                received.countDown();
-              }
-            });
+            new StreamConnectionListener());
 
+    bob.setBinaryXMPPExtensionReceiver(
+        (e) -> {
+          receivedBytes = e.getPayload();
+          received.countDown();
+        });
     alice.initialize();
     bob.initialize();
 

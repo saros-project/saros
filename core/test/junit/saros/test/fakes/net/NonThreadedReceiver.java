@@ -9,7 +9,6 @@ import org.jivesoftware.smack.packet.Packet;
 import saros.net.IReceiver;
 import saros.net.PacketCollector;
 import saros.net.PacketCollector.CancelHook;
-import saros.net.internal.BinaryXMPPExtension;
 
 class NonThreadedReceiver implements IReceiver {
 
@@ -52,10 +51,5 @@ class NonThreadedReceiver implements IReceiver {
     addPacketListener(collector, filter);
 
     return collector;
-  }
-
-  @Override
-  public void processBinaryXMPPExtension(final BinaryXMPPExtension extension) {
-    throw new UnsupportedOperationException();
   }
 }

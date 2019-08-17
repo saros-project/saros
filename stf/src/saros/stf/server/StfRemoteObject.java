@@ -8,6 +8,8 @@ import saros.context.IContainerContext;
 import saros.editor.EditorManager;
 import saros.editor.FollowModeManager;
 import saros.net.IConnectionManager;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
 import saros.net.internal.DataTransferManager;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.session.ISarosSession;
@@ -37,6 +39,14 @@ public abstract class StfRemoteObject implements Constants {
 
   protected DataTransferManager getDataTransferManager() {
     return (DataTransferManager) context.getComponent(IConnectionManager.class);
+  }
+
+  protected IReceiver getReceiver() {
+    return context.getComponent(IReceiver.class);
+  }
+
+  protected ITransmitter getTransmitter() {
+    return context.getComponent(ITransmitter.class);
   }
 
   /** @return is <code>null</code> if there is no running session */

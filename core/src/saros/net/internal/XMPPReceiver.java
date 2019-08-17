@@ -1,10 +1,15 @@
 package saros.net.internal;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketListener;
@@ -19,21 +24,32 @@ import org.xmlpull.v1.XmlPullParser;
 import saros.annotations.Component;
 import saros.net.ConnectionState;
 import saros.net.DispatchThreadContext;
+import saros.net.IPacketInterceptor;
 import saros.net.IReceiver;
+import saros.net.ITransferListener;
 import saros.net.PacketCollector;
 import saros.net.PacketCollector.CancelHook;
+import saros.net.stream.StreamMode;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.XMPPConnectionService;
 
 @Component(module = "net")
-public class XMPPReceiver implements IReceiver {
+public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
 
   private static final Logger LOG = Logger.getLogger(XMPPReceiver.class);
 
+  private static final int CHUNKSIZE = 16 * 1024;
+
   private final DispatchThreadContext dispatchThreadContext;
 
-  private Map<PacketListener, PacketFilter> listeners =
+  private final Map<PacketListener, PacketFilter> listeners =
       Collections.synchronizedMap(new HashMap<PacketListener, PacketFilter>());
+
+  private final CopyOnWriteArrayList<ITransferListener> transferListeners =
+      new CopyOnWriteArrayList<>();
+
+  private final CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors =
+      new CopyOnWriteArrayList<>();
 
   private XmlPullParser parser;
 
@@ -65,12 +81,24 @@ public class XMPPReceiver implements IReceiver {
       };
 
   public XMPPReceiver(
-      DispatchThreadContext dispatchThreadContext, XMPPConnectionService connectionService) {
+      DispatchThreadContext dispatchThreadContext,
+      XMPPConnectionService connectionService,
+      DataTransferManager dataTransferManager) {
 
     this.dispatchThreadContext = dispatchThreadContext;
     this.parser = new MXParser();
 
     connectionService.addListener(connectionListener);
+    dataTransferManager.addConnectionListener(
+        new IByteStreamConnectionListener() {
+          @Override
+          public void connectionChanged(
+              final String connectionId,
+              final IByteStreamConnection connection,
+              final boolean incomingRequest) {
+            connection.setBinaryXMPPExtensionReceiver(XMPPReceiver.this);
+          }
+        });
   }
 
   @Override
@@ -81,6 +109,26 @@ public class XMPPReceiver implements IReceiver {
   @Override
   public void removePacketListener(PacketListener listener) {
     listeners.remove(listener);
+  }
+
+  @Override
+  public void addTransferListener(final ITransferListener listener) {
+    transferListeners.addIfAbsent(listener);
+  }
+
+  @Override
+  public void removeTransferListener(final ITransferListener listener) {
+    transferListeners.remove(listener);
+  }
+
+  @Override
+  public void addPacketInterceptor(final IPacketInterceptor interceptor) {
+    packetInterceptors.addIfAbsent(interceptor);
+  }
+
+  @Override
+  public void removePacketInterceptor(final IPacketInterceptor interceptor) {
+    packetInterceptors.remove(interceptor);
   }
 
   @Override
@@ -111,8 +159,7 @@ public class XMPPReceiver implements IReceiver {
   }
 
   @Override
-  public void processBinaryXMPPExtension(final BinaryXMPPExtension extension) {
-
+  public void receive(BinaryXMPPExtension extension) {
     dispatchThreadContext.executeAsDispatch(
         new Runnable() {
 
@@ -154,9 +201,48 @@ public class XMPPReceiver implements IReceiver {
    * <p>This method is <b>not</b> thread safe and <b>must not</b> accessed by multiple threads
    * concurrently.
    */
-  private Packet convertBinaryXMPPExtension(BinaryXMPPExtension transferObject) {
+  private Packet convertBinaryXMPPExtension(BinaryXMPPExtension extension) {
 
-    TransferDescription description = transferObject.getTransferDescription();
+    boolean dispatchPacket = true;
+
+    for (IPacketInterceptor packetInterceptor : packetInterceptors)
+      dispatchPacket &= packetInterceptor.receivedPacket(extension);
+
+    if (!dispatchPacket) return null;
+
+    if (LOG.isTraceEnabled())
+      LOG.trace(
+          "received binary XMPP extension: "
+              + extension.getTransferDescription()
+              + ", size: "
+              + extension.getCompressedSize()
+              + ", RX time: "
+              + extension.getTransferDuration()
+              + " ms ["
+              + extension.getTransferMode()
+              + "]");
+
+    if (extension.getTransferDescription().compressContent()) {
+      byte[] payload = extension.getPayload();
+      long compressedPayloadLength = payload.length;
+
+      try {
+        payload = inflate(payload);
+      } catch (IOException e) {
+        LOG.error("could not decompress extension payload", e);
+        return null;
+      }
+
+      extension.setPayload(compressedPayloadLength, payload);
+    }
+
+    notifyDataReceived(
+        extension.getTransferMode(),
+        extension.getCompressedSize(),
+        extension.getUncompressedSize(),
+        extension.getTransferDuration());
+
+    TransferDescription description = extension.getTransferDescription();
 
     String name = description.getElementName();
     String namespace = description.getNamespace();
@@ -176,16 +262,16 @@ public class XMPPReceiver implements IReceiver {
       return null;
     }
 
-    PacketExtension extension = null;
+    PacketExtension packetExtension = null;
 
     try {
-      parser.setInput(new ByteArrayInputStream(transferObject.getPayload()), "UTF-8");
+      parser.setInput(new ByteArrayInputStream(extension.getPayload()), "UTF-8");
       /*
        * We have to skip the empty start tag because Smack expects a
        * parser that already has started parsing.
        */
       parser.next();
-      extension = provider.parseExtension(parser);
+      packetExtension = provider.parseExtension(parser);
     } catch (Exception e) {
       LOG.error("could not deserialize transfer object payload: " + e.getMessage(), e);
 
@@ -198,8 +284,44 @@ public class XMPPReceiver implements IReceiver {
     packet.setPacketID(Packet.ID_NOT_AVAILABLE);
     packet.setFrom(description.getSender().toString());
     packet.setTo(description.getRecipient().toString());
-    packet.addExtension(extension);
+    packet.addExtension(packetExtension);
 
     return packet;
+  }
+
+  private void notifyDataReceived(
+      final StreamMode mode,
+      final long sizeCompressed,
+      final long sizeUncompressed,
+      final long duration) {
+
+    for (final ITransferListener listener : transferListeners) {
+      try {
+        listener.received(mode, sizeCompressed, sizeUncompressed, duration);
+      } catch (RuntimeException e) {
+        LOG.error("invoking received() on listener: " + listener + " failed", e);
+      }
+    }
+  }
+
+  private static byte[] inflate(byte[] input) throws IOException {
+
+    ByteArrayOutputStream bos;
+    Inflater decompressor = new Inflater();
+
+    decompressor.setInput(input, 0, input.length);
+    bos = new ByteArrayOutputStream(input.length);
+
+    byte[] buf = new byte[CHUNKSIZE];
+
+    try {
+      while (!decompressor.finished()) {
+        int count = decompressor.inflate(buf);
+        bos.write(buf, 0, count);
+      }
+      return bos.toByteArray();
+    } catch (DataFormatException e) {
+      throw new IOException("failed to inflate data", e);
+    }
   }
 }
