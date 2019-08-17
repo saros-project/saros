@@ -3,7 +3,6 @@ package saros.net;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
-import saros.net.internal.BinaryXMPPExtension;
 
 public interface IReceiver {
 
@@ -51,9 +50,6 @@ public interface IReceiver {
    * @see PacketCollector#cancel()
    */
   public PacketCollector createCollector(PacketFilter filter);
-
-  /** FOR INTERNAL USE */
-  public void processBinaryXMPPExtension(BinaryXMPPExtension extension);
 
   public default void addTransferListener(ITransferListener listener) {
     // NOP

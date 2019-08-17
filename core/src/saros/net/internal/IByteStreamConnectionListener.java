@@ -3,19 +3,12 @@ package saros.net.internal;
 /**
  * Listener interface used by IStreamService and IBytestreamConnection to notify about established
  * or changed connections and incoming XMPP extensions.
- *
- * @author jurke
  */
 public interface IByteStreamConnectionListener {
 
-  /**
-   * Gets called when a {@linkplain BinaryXMPPExtension} was received.
-   *
-   * @param extension
-   */
-  public void receive(final BinaryXMPPExtension extension);
-
-  public void connectionClosed(String connectionID, IByteStreamConnection connection);
+  public default void connectionClosed(String connectionID, IByteStreamConnection connection) {
+    // NOP;
+  }
 
   /**
    * Gets called when a connection change is detected. The {@linkplain IByteStreamConnection
@@ -27,6 +20,8 @@ public interface IByteStreamConnectionListener {
    * @param incomingRequest <code>true</code> if the connection was a result of a remote connect
    *     request, <code>false</code> if the connect request was initiated on the local side
    */
-  public void connectionChanged(
-      String connectionID, IByteStreamConnection connection, boolean incomingRequest);
+  public default void connectionChanged(
+      String connectionID, IByteStreamConnection connection, boolean incomingRequest) {
+    // NOP;
+  }
 }

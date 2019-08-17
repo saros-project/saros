@@ -15,8 +15,8 @@ import org.osgi.service.prefs.Preferences;
 import saros.context.IContextKeyBindings;
 import saros.editor.EditorManager;
 import saros.editor.FollowModeManager;
-import saros.net.IConnectionManager;
-import saros.net.internal.DataTransferManager;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.repackaged.picocontainer.BindKey;
@@ -115,7 +115,8 @@ public class StatisticCollectorTest {
 
     FeedbackPreferences.setPreferences(preferences);
 
-    addMockedComponent(IConnectionManager.class, DataTransferManager.class);
+    addMockedComponent(IReceiver.class, IReceiver.class);
+    addMockedComponent(ITransmitter.class, ITransmitter.class);
 
     // Components we want to create
     container.addComponent(StatisticManager.class);
