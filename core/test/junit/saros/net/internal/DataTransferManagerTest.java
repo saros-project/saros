@@ -2,7 +2,9 @@ package saros.net.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -342,8 +344,7 @@ public class DataTransferManagerTest {
         dtm.getTransferMode(new JID("nothing@all")));
   }
 
-  @Test(expected = IOException.class)
-  public void testSendOnInvalidConnectionIdentifierWithNoConnection() throws Exception {
+  public void testGetConnectionOnInvalidConnectionIdentifierWithNoConnection() throws Exception {
     IStreamService mainTransport = new Transport(StreamMode.SOCKS5_DIRECT);
 
     DataTransferManager dtm =
@@ -353,13 +354,10 @@ public class DataTransferManagerTest {
 
     TransferDescription description = TransferDescription.newDescription();
 
-    description.setRecipient(new JID("foo@bar.com"));
-
-    dtm.sendData("foo", description, new byte[0]);
+    assertNull(dtm.getConnection("foo", new JID("foo@bar.com")));
   }
 
-  @Test(expected = IOException.class)
-  public void testSendOnInvalidConnectionIdentifier() throws Exception {
+  public void testGetConnectionOnInvalidConnectionIdentifier() throws Exception {
     IStreamService mainTransport = new Transport(StreamMode.SOCKS5_DIRECT);
 
     DataTransferManager dtm =
@@ -367,17 +365,12 @@ public class DataTransferManagerTest {
 
     connectionListener.getValue().connectionStateChanged(connectionMock, ConnectionState.CONNECTED);
 
-    TransferDescription description = TransferDescription.newDescription();
-
     dtm.connect("bar", new JID("foo@bar.com"));
-
-    description.setRecipient(new JID("foo@bar.com"));
-
-    dtm.sendData("foo", description, new byte[0]);
+    assertNull(dtm.getConnection("foo", new JID("foo@bar.com")));
   }
 
   @Test
-  public void testSendOnValidConnectionIdentifier() throws Exception {
+  public void testGetConnectionOnValidConnectionIdentifier() throws Exception {
     Transport mainTransport = new Transport(StreamMode.SOCKS5_DIRECT);
 
     DataTransferManager dtm =
@@ -385,13 +378,9 @@ public class DataTransferManagerTest {
 
     connectionListener.getValue().connectionStateChanged(connectionMock, ConnectionState.CONNECTED);
 
-    TransferDescription description = TransferDescription.newDescription();
-
     dtm.connect("foo", new JID("foo@bar.com"));
 
-    description.setRecipient(new JID("foo@bar.com"));
-
-    dtm.sendData("foo", description, new byte[0]);
+    assertNotNull(dtm.getConnection("foo", new JID("foo@bar.com")));
   }
 
   @Test(timeout = 30000)
@@ -555,7 +544,7 @@ public class DataTransferManagerTest {
 
     description.setRecipient(new JID("foo@bar.com"));
 
-    dtm.sendData(description, new byte[0]);
+    dtm.getConnection(null, new JID("foo@bar.com")).send(description, new byte[0]);
 
     assertEquals(
         "wrong connection was chosen",

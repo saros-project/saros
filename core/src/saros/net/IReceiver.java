@@ -54,4 +54,20 @@ public interface IReceiver {
 
   /** FOR INTERNAL USE */
   public void processBinaryXMPPExtension(BinaryXMPPExtension extension);
+
+  public default void addTransferListener(ITransferListener listener) {
+    // NOP
+  }
+
+  public default void removeTransferListener(ITransferListener listener) {
+    // NOP
+  }
+
+  public default void addPacketInterceptor(IPacketInterceptor interceptor) {
+    // NOP
+  }
+
+  public default void removePacketInterceptor(IPacketInterceptor interceptor) {
+    // NOP
+  }
 }

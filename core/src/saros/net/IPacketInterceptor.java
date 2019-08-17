@@ -1,17 +1,16 @@
 package saros.net;
 
 import saros.net.internal.BinaryXMPPExtension;
-import saros.net.internal.DataTransferManager;
 import saros.net.internal.TransferDescription;
 
 /**
  * An interface for intercepting packages that are about to send or dispatched via the {@link
- * DataTransferManager}
+ * ITransmitter} and {@link IReceiver}
  */
 public interface IPacketInterceptor {
 
   /**
-   * This method is called before the {@link DataTransferManager} is dispatching the packet.
+   * This method is called before the {@link IReceiver} is dispatching the packet.
    *
    * @param extension
    * @return <code>true</code> if the packet should be dispatched, <code>false</code> if the packet
@@ -20,7 +19,7 @@ public interface IPacketInterceptor {
   public boolean receivedPacket(BinaryXMPPExtension extension);
 
   /**
-   * This method is called before the {@link DataTransferManager} is sending the packet.
+   * This method is called before the {@link ITransmitter} is sending the packet.
    *
    * @param connectID
    * @param description
