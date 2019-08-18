@@ -2,13 +2,17 @@ package saros.net.stream;
 
 import java.io.IOException;
 import org.jivesoftware.smack.Connection;
-import saros.net.internal.IByteStreamConnection;
-import saros.net.internal.IByteStreamConnectionListener;
 import saros.net.xmpp.JID;
 
 /**
  * This interface is used to define various services (probably only XEP 65 SOCKS5, XEP 47 in-band
  * bytestreams) that offer the possibility to establish network connections/sessions.
+ *
+ * <p>Implementations notes: You can expect that {@link #initialize} and {@link #uninitialize} are
+ * not called concurrently. You must expect that both methods are called concurrently while calling
+ * {@link #connect}.
+ *
+ * <p>It is safe to return valid {@link ByteStream streams} during unitialization.
  */
 public interface IStreamService {
 
@@ -16,7 +20,7 @@ public interface IStreamService {
   public static final char SESSION_ID_DELIMITER = ':';
 
   /**
-   * Establishes a {@link IByteStreamConnection connection} to the given JID.
+   * Establishes a {@link ByteStream connection} to the given JID.
    *
    * @param connectionID an ID used to identify this stream(session)
    * @param remoteAddress a <b>resource qualified</b> JID to connect to
@@ -26,7 +30,7 @@ public interface IStreamService {
    * @throws IOException if no connection could be established
    * @throws InterruptedException if the stream establishment was interrupted
    */
-  public IByteStreamConnection connect(String connectionID, JID remoteAddress)
+  public ByteStream connect(String connectionID, JID remoteAddress)
       throws IOException, InterruptedException;
 
   /**
@@ -36,7 +40,7 @@ public interface IStreamService {
    * @param connection
    * @param listener
    */
-  public void initialize(Connection connection, IByteStreamConnectionListener listener);
+  public void initialize(Connection connection, IStreamServiceListener listener);
 
   /**
    * Un-initializes the service. After un-initialization the service is not able to establish

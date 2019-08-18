@@ -30,7 +30,7 @@ import saros.net.xmpp.JID;
  * @author coezbek
  * @author srossbach
  */
-public class BinaryChannelConnection implements IByteStreamConnection {
+public class BinaryChannelConnection implements IPacketConnection {
 
   private static final Logger LOG = Logger.getLogger(BinaryChannelConnection.class);
 
@@ -49,13 +49,14 @@ public class BinaryChannelConnection implements IByteStreamConnection {
   /** Max size of data chunks */
   private static final int CHUNKSIZE = 32 * 1024 - 1;
 
-  private IByteStreamConnectionListener listener;
   private ReceiverThread receiveThread;
 
   private final JID remoteAddress;
   private final JID localAddress;
 
   private final String connectionID;
+
+  private final IConnectionClosedCallback callback;
 
   private IDPool idPool = new IDPool();
 
@@ -64,6 +65,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
   private Map<Integer, ByteArrayOutputStream> pendingFragmentedPackets =
       new HashMap<Integer, ByteArrayOutputStream>();
+
   private Map<Integer, BinaryXMPPExtension> pendingXMPPExtensions =
       new HashMap<Integer, BinaryXMPPExtension>();
 
@@ -111,24 +113,16 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
   private IBinaryXMPPExtensionReceiver receiver;
 
-  public BinaryChannelConnection(
-      JID localAddress,
-      JID remoteAddress,
-      String connectionID,
-      ByteStream stream,
-      StreamMode mode,
-      IByteStreamConnectionListener listener)
-      throws IOException {
-    this.listener = listener;
-    this.localAddress = localAddress;
-    this.remoteAddress = remoteAddress;
-    this.connectionID = connectionID;
-    this.stream = stream;
-    this.stream.setReadTimeout(0); // keep connection alive
-    this.mode = mode;
+  public BinaryChannelConnection(ByteStream stream, IConnectionClosedCallback callback) {
+    this.callback = callback;
+    // FIXME
+    this.localAddress = (JID) stream.getLocalAddress();
+    // FIXME
+    this.remoteAddress = (JID) stream.getRemoteAddress();
 
-    outputStream = new DataOutputStream(new BufferedOutputStream(stream.getOutputStream()));
-    inputStream = new DataInputStream(new BufferedInputStream(stream.getInputStream()));
+    this.connectionID = stream.getId();
+    this.mode = stream.getMode();
+    this.stream = stream;
   }
 
   @Override
@@ -138,14 +132,17 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     this.receiver = receiver;
   }
 
-  @Override
-  public synchronized void initialize() {
+  public synchronized void initialize() throws IOException {
     if (initialized) return;
 
     /*
      * it is ok to start the receiver a bit later because the data will be
      * already buffered by SMACK or the OS
      */
+    stream.setReadTimeout(0); // keep connection alive
+    outputStream = new DataOutputStream(new BufferedOutputStream(stream.getOutputStream()));
+    inputStream = new DataInputStream(new BufferedInputStream(stream.getInputStream()));
+
     receiveThread = new ReceiverThread();
     receiveThread.setName("BinaryChannel-" + remoteAddress.getName());
     receiveThread.start();
@@ -154,13 +151,23 @@ public class BinaryChannelConnection implements IByteStreamConnection {
   }
 
   @Override
-  public String getConnectionID() {
-    return connectionID;
+  public Object getLocalAddress() {
+    return localAddress;
   }
 
   @Override
-  public synchronized boolean isConnected() {
-    return connected;
+  public JID getRemoteAddress() {
+    return remoteAddress;
+  }
+
+  @Override
+  public StreamMode getMode() {
+    return mode;
+  }
+
+  @Override
+  public String getId() {
+    return connectionID;
   }
 
   @Override
@@ -192,17 +199,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
       }
     }
 
-    listener.connectionClosed(connectionID, this);
-  }
-
-  @Override
-  public StreamMode getMode() {
-    return mode;
-  }
-
-  @Override
-  public JID getRemoteAddress() {
-    return remoteAddress;
+    if (callback != null) callback.connectionClosed(this);
   }
 
   @Override
@@ -436,6 +433,10 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     throw new InterruptedIOException("interrupted while reading stream data");
   }
 
+  private synchronized boolean isConnected() {
+    return connected;
+  }
+
   private synchronized void sendData(int fragmentId, byte[] data, int offset, int length)
       throws IOException {
 
@@ -485,7 +486,15 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
   @Override
   public String toString() {
-    return "[mode=" + getMode() + ", id=" + connectionID + "]" + " " + remoteAddress;
+    return "PacketConnection [id="
+        + getId()
+        + ", mode="
+        + getMode()
+        + ", localAddress="
+        + getLocalAddress()
+        + ", remoteAddress="
+        + getRemoteAddress()
+        + "]";
   }
 
   static class IDPool {

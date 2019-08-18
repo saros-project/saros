@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -13,32 +14,26 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
-import saros.annotations.Component;
 import saros.context.IContextKeyBindings.IBBStreamService;
 import saros.context.IContextKeyBindings.Socks5StreamService;
 import saros.net.ConnectionState;
 import saros.net.IConnectionManager;
+import saros.net.IStreamConnection;
+import saros.net.IStreamConnectionListener;
+import saros.net.stream.ByteStream;
 import saros.net.stream.IStreamService;
+import saros.net.stream.IStreamServiceListener;
 import saros.net.stream.StreamMode;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.repackaged.picocontainer.annotations.Nullable;
 
-/**
- * This class is responsible for handling all transfers of binary data. It maintains a map of
- * established connections and tries to reuse them.
- *
- * @author srossbach
- * @author coezbek
- * @author jurke
- */
-@Component(module = "net")
 public class DataTransferManager implements IConnectionListener, IConnectionManager {
 
   private static final Logger LOG = Logger.getLogger(DataTransferManager.class);
 
-  private static final String DEFAULT_CONNECTION_ID = "default";
+  private static final String STREAM_SUFFIX = "-stream";
 
   private static final String IN = "in";
 
@@ -56,83 +51,47 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
 
   private final Lock connectLock = new ReentrantLock();
 
-  private final ConnectionPool connectionPool = new ConnectionPool();
+  private final ConnectionPool packetConnectionPool = new ConnectionPool("packet");
+  private final ConnectionPool streamConnectionPool = new ConnectionPool("stream");
 
   private final Set<String> currentOutgoingConnectionEstablishments = new HashSet<String>();
 
   private final List<IStreamService> streamServices = new CopyOnWriteArrayList<IStreamService>();
 
-  private final CopyOnWriteArrayList<IByteStreamConnectionListener> connectionListeners =
+  private final CopyOnWriteArrayList<IPacketConnectionListener> packetConnectionListeners =
       new CopyOnWriteArrayList<>();
 
-  private final IByteStreamConnectionListener byteStreamConnectionListener =
-      new IByteStreamConnectionListener() {
+  private final CopyOnWriteArrayList<IStreamConnectionListener> streamConnectionListeners =
+      new CopyOnWriteArrayList<>();
+
+  private final IStreamServiceListener streamServiceListener =
+      new IStreamServiceListener() {
 
         @Override
-        public void connectionChanged(
-            final String connectionId,
-            final IByteStreamConnection connection,
-            final boolean incomingRequest) {
+        public void connectionEstablished(final ByteStream byteStream) {
 
-          // FIXME init first, than add to pool and finally start the receiver
-          // thread !
-
-          final String id =
-              toConnectionIDToken(
-                  connectionId, incomingRequest ? IN : OUT, connection.getRemoteAddress());
-
-          /// TODO we currently have to announce not initialized connections otherwise the IReceiver
-          // will miss updates
-
-          notfiyconnectionChanged(id, connection, incomingRequest);
-
-          LOG.debug(
-              "bytestream connection changed "
-                  + connection
-                  + ", inc="
-                  + incomingRequest
-                  + ", pool id="
-                  + id
-                  + "]");
-
-          /*
-           * this may return the current connection if the pool is closed so
-           * close it anyway
-           */
-          final IByteStreamConnection current = connectionPool.add(id, connection);
-
-          if (current != null) {
-            current.close();
-            if (current == connection) {
-              LOG.warn(
-                  "closed connection [pool id="
-                      + id
-                      + "]: "
-                      + current
-                      + " , no connections are currently allowed");
-
-              return;
+          try {
+            if (byteStream.getId().endsWith(STREAM_SUFFIX)) {
+              createAndAnnounceStreamConnection(byteStream, true);
             } else {
-              LOG.warn(
-                  "existing connection [pool id="
-                      + id
-                      + "] "
-                      + current
-                      + " was replaced with connection "
-                      + connection);
+              createAndAnnouncePacketConnection(byteStream, true);
             }
+          } catch (IOException e) {
+            LOG.error("failed to accept byte stream: " + byteStream, e);
           }
-
-          connection.initialize();
-        }
-
-        @Override
-        public void connectionClosed(
-            final String connectionId, final IByteStreamConnection connection) {
-          closeConnection(connectionId, connection.getRemoteAddress());
-          notfiyConnectionClosed(connectionId, connection);
         }
       };
+
+  private final IConnectionClosedCallback packetConnectionClosedCallback =
+      (connection) -> closeConnection(connection.getId(), connection.getRemoteAddress());
+
+  private final IConnectionClosedCallback localStreamConnectionClosedCallback =
+      (connection) ->
+          closeStreamConnection(connection.getId(), connection.getRemoteAddress(), false);
+
+  private final IConnectionClosedCallback remoteStreamConnectionClosedCallback =
+      (connection) ->
+          closeStreamConnection(connection.getId(), connection.getRemoteAddress(), true);
 
   public DataTransferManager(
       XMPPConnectionService connectionService,
@@ -146,45 +105,56 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     connectionService.addListener(this);
   }
 
-  /** @deprecated */
   @Override
-  @Deprecated
-  public IByteStreamConnection connect(JID peer) throws IOException {
-    return connect(DEFAULT_CONNECTION_ID, peer);
+  public IStreamConnection connectStream(final String id, Object address) throws IOException {
+    Objects.requireNonNull(id, "id is null");
+    Objects.requireNonNull(address, "address is null");
+
+    return (IStreamConnection) connectInternal(id, (JID) address, true);
   }
 
   @Override
-  public IByteStreamConnection connect(String connectionID, JID peer) throws IOException {
-    if (connectionID == null) throw new NullPointerException("connectionID is null");
+  public void connect(final String id, Object address) throws IOException {
+    Objects.requireNonNull(id, "id is null");
+    Objects.requireNonNull(address, "address is null");
 
-    if (peer == null) throw new NullPointerException("peer is null");
+    if (id.endsWith(STREAM_SUFFIX))
+      throw new IllegalArgumentException(
+          "connection id " + id + " must not end with " + STREAM_SUFFIX);
 
-    return connectInternal(connectionID, peer);
-  }
-
-  public IByteStreamConnection getConnection(final String connectionId, final JID peer) {
-    return getCurrentConnection(connectionId, peer);
+    connectInternal(id, (JID) address, false);
   }
 
   /**
-   * @deprecated Disconnects {@link IByteStreamConnection} with the specified peer
-   * @param peer {@link JID} of the peer to disconnect the {@link IByteStreamConnection}
+   * Returns the current packet connection for the remote side. If the local side is connected to
+   * the remote side as well as the remote side is connected to the local side the local to remote
+   * connection will be returned.
+   *
+   * @param id identifier for the connection to retrieve
+   * @param address address of the remote side
+   * @return the connection to the remote side or <code>null</code> if no connection exists
    */
-  @Override
-  @Deprecated
-  public boolean closeConnection(JID peer) {
-    return closeConnection(DEFAULT_CONNECTION_ID, peer);
+  public IPacketConnection getPacketConnection(final String id, final Object address) {
+
+    IPacketConnection connection;
+
+    connection =
+        (IPacketConnection) packetConnectionPool.get(toConnectionIdToken(id, OUT, address));
+
+    if (connection != null) return connection;
+
+    return (IPacketConnection) packetConnectionPool.get(toConnectionIdToken(id, IN, address));
   }
 
   @Override
-  public boolean closeConnection(String connectionIdentifier, JID peer) {
+  public boolean closeConnection(final String id, final Object address) {
 
-    final String outID = toConnectionIDToken(connectionIdentifier, OUT, peer);
+    final String outID = toConnectionIdToken(id, OUT, address);
 
-    final String inID = toConnectionIDToken(connectionIdentifier, IN, peer);
+    final String inID = toConnectionIdToken(id, IN, address);
 
-    final IByteStreamConnection out = connectionPool.remove(outID);
-    final IByteStreamConnection in = connectionPool.remove(inID);
+    final IConnection out = packetConnectionPool.remove(outID);
+    final IConnection in = packetConnectionPool.remove(inID);
 
     boolean closed = false;
 
@@ -213,38 +183,44 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     setStreamServices();
   }
 
-  /** @deprecated */
   @Override
-  @Deprecated
-  public StreamMode getTransferMode(JID jid) {
-    return getTransferMode(null, jid);
-  }
-
-  @Override
-  public StreamMode getTransferMode(String connectionID, JID jid) {
-    IByteStreamConnection connection = getCurrentConnection(connectionID, jid);
+  public StreamMode getTransferMode(String connectionID, Object address) {
+    IConnection connection = getPacketConnection(connectionID, address);
     return connection == null ? StreamMode.NONE : connection.getMode();
   }
 
-  public void addConnectionListener(final IByteStreamConnectionListener listener) {
-    connectionListeners.addIfAbsent(listener);
+  public void addPacketConnectionListener(final IPacketConnectionListener listener) {
+    packetConnectionListeners.addIfAbsent(listener);
   }
 
-  public void removeConnectionListener(final IByteStreamConnectionListener listener) {
-    connectionListeners.remove(listener);
+  public void removePacketConnectionListener(final IPacketConnectionListener listener) {
+    packetConnectionListeners.remove(listener);
   }
 
-  private IByteStreamConnection connectInternal(String connectionID, JID peer) throws IOException {
+  @Override
+  public void addStreamConnectionListener(final IStreamConnectionListener listener) {
+    streamConnectionListeners.addIfAbsent(listener);
+  }
 
-    IByteStreamConnection connection = null;
+  @Override
+  public void removeStreamConnectionListener(final IStreamConnectionListener listener) {
+    streamConnectionListeners.remove(listener);
+  }
 
-    final String connectionIDToken = toConnectionIDToken(connectionID, OUT, peer);
+  private IConnection connectInternal(
+      final String id, final JID address, final boolean isPlainStream) throws IOException {
+
+    IConnection connection = null;
+
+    final String internalStreamId = isPlainStream ? id + STREAM_SUFFIX : id;
+
+    final String connectionIdToken = toConnectionIdToken(internalStreamId, OUT, address);
 
     synchronized (currentOutgoingConnectionEstablishments) {
-      if (!currentOutgoingConnectionEstablishments.contains(connectionIDToken)) {
-        connection = getCurrentConnection(connectionID, peer);
+      if (!currentOutgoingConnectionEstablishments.contains(connectionIdToken)) {
+        connection = getPacketConnection(id, address);
 
-        if (connection == null) currentOutgoingConnectionEstablishments.add(connectionIDToken);
+        if (connection == null) currentOutgoingConnectionEstablishments.add(connectionIdToken);
       }
 
       if (connection != null) return connection;
@@ -254,7 +230,15 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
 
     try {
 
-      connection = getCurrentConnection(connectionID, peer);
+      if (isPlainStream) {
+        connection = getLocalStreamConnection(id, address);
+
+        if (connection != null)
+          throw new IOException(
+              "a stream connection with id " + id + " is already established: " + connection);
+      }
+
+      connection = getPacketConnection(id, address);
 
       if (connection != null) return connection;
 
@@ -265,53 +249,55 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
       final ArrayList<IStreamService> currentStreamServices =
           new ArrayList<IStreamService>(streamServices);
 
+      ByteStream byteStream = null;
+
       for (IStreamService streamService : currentStreamServices) {
         LOG.info(
             "establishing connection to "
-                + peer
+                + address
                 + " from "
                 + connectionJID
                 + " using stream service "
                 + streamService);
         try {
-          connection = streamService.connect(connectionID, peer);
+          byteStream = streamService.connect(internalStreamId, address);
           break;
         } catch (IOException e) {
-          LOG.warn("failed to connect to " + peer + " using stream service: " + streamService, e);
+          LOG.warn(
+              "failed to connect to " + address + " using stream service: " + streamService, e);
         } catch (InterruptedException e) {
           LOG.warn(
               "interrupted while connecting to "
-                  + peer
+                  + address
                   + " using stream service: "
                   + streamService);
           IOException io =
-              new InterruptedIOException("connection establishment to " + peer + " aborted");
+              new InterruptedIOException("connection establishment to " + address + " aborted");
           io.initCause(e);
           throw io;
         } catch (Exception e) {
           LOG.error(
               "failed to connect to "
-                  + peer
+                  + address
                   + " due to an internal error in stream service: "
                   + streamService,
               e);
         }
       }
 
-      if (connection != null) {
-        byteStreamConnectionListener.connectionChanged(connectionID, connection, false);
-
-        return connection;
+      if (byteStream != null) {
+        if (isPlainStream) return createAndAnnounceStreamConnection(byteStream, false);
+        else return createAndAnnouncePacketConnection(byteStream, false);
       }
 
       throw new IOException(
           "could not connect to "
-              + peer
+              + address
               + ", exhausted all available stream services: "
               + currentStreamServices);
     } finally {
       synchronized (currentOutgoingConnectionEstablishments) {
-        currentOutgoingConnectionEstablishments.remove(connectionIDToken);
+        currentOutgoingConnectionEstablishments.remove(connectionIdToken);
       }
       connectLock.unlock();
     }
@@ -344,10 +330,10 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     xmppConnection = connection;
     currentLocalJID = new JID(connection.getUser());
 
-    connectionPool.open();
+    packetConnectionPool.open();
 
     for (IStreamService streamService : streamServices)
-      streamService.initialize(xmppConnection, byteStreamConnectionListener);
+      streamService.initialize(xmppConnection, streamServiceListener);
   }
 
   private void disposeConnection() {
@@ -368,7 +354,8 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
       if (acquired) connectLock.unlock();
     }
 
-    connectionPool.close();
+    packetConnectionPool.close();
+    streamConnectionPool.close();
     xmppConnection = null;
   }
 
@@ -378,57 +365,130 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     else if (this.xmppConnection != null) disposeConnection();
   }
 
+  private IStreamConnection getLocalStreamConnection(final String id, final Object address) {
+    return (IStreamConnection) streamConnectionPool.get(toConnectionIdToken(id, OUT, address));
+  }
+
+  private void closeStreamConnection(
+      final String id, final Object address, final boolean isRemote) {
+
+    final String poolId = toConnectionIdToken(id, isRemote ? IN : OUT, address);
+
+    final IConnection connection = streamConnectionPool.remove(poolId);
+
+    if (connection != null) {
+      connection.close();
+      LOG.debug("closed connection [pool id=" + poolId + "]: " + connection);
+    }
+  }
+
+  private IConnection createAndAnnouncePacketConnection(
+      final ByteStream byteStream, final boolean isIncoming) throws IOException {
+    final BinaryChannelConnection connection =
+        new BinaryChannelConnection(byteStream, packetConnectionClosedCallback);
+
+    // FIXME init first, than add to pool
+    addConnectionToPool(packetConnectionPool, connection, isIncoming);
+
+    for (final IPacketConnectionListener listener : packetConnectionListeners) {
+      try {
+        listener.connectionEstablished(connection);
+      } catch (RuntimeException e) {
+        LOG.error("invoking connectionEstablished() on listener: " + listener + " failed", e);
+      }
+    }
+
+    try {
+      connection.initialize();
+    } catch (IOException e) {
+      LOG.error("failed to initialize connection [inc=" + isIncoming + "] : " + connection);
+      connection.close();
+      packetConnectionPool.remove(connection.getId());
+
+      throw e;
+    }
+
+    return connection;
+  }
+
+  private IConnection createAndAnnounceStreamConnection(
+      final ByteStream byteStream, final boolean isRemote) throws IOException {
+
+    final String id = getIdFromIdWithStreamSuffix(byteStream.getId());
+
+    final StreamConnection connection =
+        new StreamConnection(
+            id,
+            byteStream,
+            isRemote ? remoteStreamConnectionClosedCallback : localStreamConnectionClosedCallback);
+
+    addConnectionToPool(streamConnectionPool, connection, isRemote);
+
+    if (!isRemote) return connection;
+
+    boolean accepted = false;
+
+    for (final IStreamConnectionListener listener : streamConnectionListeners) {
+      try {
+        accepted |= listener.connectionEstablished(connection);
+        if (accepted) break;
+      } catch (RuntimeException e) {
+        LOG.error("invoking connectionEstablished() on listener: " + listener + " failed", e);
+      }
+    }
+
+    if (!accepted) closeConnection(connection.getId(), connection.getRemoteAddress());
+
+    throw new IOException("no listener accepted the connection: " + connection);
+  }
+
   /**
-   * Returns the current connection for the remote side. If the local side is connected to the
-   * remote side as well as the remote side is connected to the local side the local to remote
-   * connection will be returned.
+   * Adds the given connection to the given pool.
    *
-   * @param connectionID identifier for the connection to retrieve or <code>null</code> to retrieve
-   *     the default one
-   * @param jid JID of the remote side
-   * @return the connection to the remote side or <code>null</code> if no connection exists
+   * @throws IOException if the pool is closed
    */
-  private IByteStreamConnection getCurrentConnection(String connectionID, JID jid) {
+  private static IConnection addConnectionToPool(
+      final ConnectionPool pool, final IConnection connection, final boolean isRemote)
+      throws IOException {
 
-    IByteStreamConnection connection;
+    final String id =
+        toConnectionIdToken(connection.getId(), isRemote ? IN : OUT, connection.getRemoteAddress());
 
-    connection = connectionPool.get(toConnectionIDToken(connectionID, OUT, jid));
+    LOG.debug(
+        "adding connection "
+            + connection
+            + " [isRemote="
+            + isRemote
+            + "] to connection pool "
+            + pool
+            + " with pool id="
+            + id);
 
-    if (connection != null) return connection;
+    /*
+     * this may return the current connection if the pool is closed so
+     * close it anyway
+     */
+    final IConnection current = pool.add(id, connection);
 
-    return connectionPool.get(toConnectionIDToken(connectionID, IN, jid));
-  }
-
-  private static String toConnectionIDToken(String connectionIdentifier, String mode, JID jid) {
-
-    if (connectionIdentifier == null) connectionIdentifier = DEFAULT_CONNECTION_ID;
-
-    return connectionIdentifier + ":" + mode + ":" + jid.toString();
-  }
-
-  private void notfiyConnectionClosed(
-      final String connectionId, final IByteStreamConnection connection) {
-
-    for (final IByteStreamConnectionListener listener : connectionListeners) {
-      try {
-        listener.connectionClosed(connectionId, connection);
-      } catch (RuntimeException e) {
-        LOG.error("invoking connectionClosed() on listener: " + listener + " failed", e);
+    if (current != null) {
+      current.close();
+      if (current == connection) {
+        throw new IOException("connection pool " + pool + " is closed");
+      } else {
+        LOG.warn("replaced connection " + connection + " in connection pool " + pool);
       }
     }
+
+    return connection;
   }
 
-  private void notfiyconnectionChanged(
-      final String connectionId,
-      final IByteStreamConnection connection,
-      final boolean incomingRequest) {
+  private static String toConnectionIdToken(
+      String connectionIdentifier, String mode, Object address) {
 
-    for (final IByteStreamConnectionListener listener : connectionListeners) {
-      try {
-        listener.connectionChanged(connectionId, connection, incomingRequest);
-      } catch (RuntimeException e) {
-        LOG.error("invoking connectionChanged() on listener: " + listener + " failed", e);
-      }
-    }
+    return connectionIdentifier + ":" + mode + ":" + address;
+  }
+
+  private static String getIdFromIdWithStreamSuffix(final String id) {
+    return id.endsWith(STREAM_SUFFIX) ? id.substring(0, id.length() - STREAM_SUFFIX.length()) : id;
   }
 }

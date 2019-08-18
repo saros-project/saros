@@ -1,37 +1,35 @@
-/*
- * DPP - Serious Distributed Pair Programming (c) Freie Universität Berlin -
- * Fachbereich Mathematik und Informatik - 2006 (c) Riad Djemili - 2006
- *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 1, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- * Ave, Cambridge, MA 02139, USA.
- */
-
 package saros.net;
 
 import java.io.IOException;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
-import saros.annotations.Component;
 import saros.net.xmpp.JID;
 
 /**
- * A humble interface that is responsible for network functionality. The idea behind this interface
- * is to only encapsulates the least possible amount of functionality - the one that can't be easily
- * tested.
+ * Interface for sending packets to remote addresses. In general this interface offers two
+ * possibilities for sending packets.
  *
- * @author rdjemili
+ * <ol>
+ *   <li>Either sending packets using the default network environment by calling {@link
+ *       #sendPacket(Packet)} or {@link #sendPacketExtension(JID, PacketExtension)}.
+ *   <li>Using {@link #send(String, JID, PacketExtension)} using a specific connection that must
+ *       first be established by calling {@link IConnectionManager#connect(String, Object)}.
+ * </ol>
+ *
+ * The second option should always be used as default option when sending packets frequently and
+ * over a longer time span to an already known address.
+ *
+ * <p><b>Implementation notes</b>: Implementation should consider to support connection ID's through
+ * the {@link IConnectionManager}. If this is not possible the implementation <b>must</b> ensure
+ * that connection lost is properly detected, i.e sending packets to a server which may route the
+ * packets at a later time without getting an acknowledgement if the packet has been received is a
+ * <b>violation</b> of the contract.
+ *
+ * @see IConnectionManager
  */
-@Component(module = "net")
+/*
+ * TODO ensure we use IQ packets so the server must return an error. Afterwards we can change the contract of this interface.
+ */
 public interface ITransmitter {
 
   /**
@@ -63,13 +61,14 @@ public interface ITransmitter {
   public void send(JID recipient, PacketExtension extension) throws IOException;
 
   /**
-   * Sends the given {@link PacketExtension} to the given {@link JID} using a direct stream
-   * connection. The connection must be already established to the recipient with the given id.
+   * Sends the given {@link PacketExtension} to the given {@link JID} using the given connection ID.
+   * A connection with the given connection id must already been established.
    *
-   * @param connectionID the id of the connection
+   * @param connectionID the ID of the connection
    * @param recipient the recipient of the extension
    * @param extension the extension to send
    * @throws IOException if an I/O error occurs
+   * @see IConnectionManager#connect(String, Object)
    */
   public void send(String connectionID, JID recipient, PacketExtension extension)
       throws IOException;
