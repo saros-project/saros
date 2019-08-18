@@ -19,7 +19,7 @@ public class ConnectionPoolTest {
   @Test
   public void testAddAndRemoveOnClosedPool() {
 
-    final IByteStreamConnection connection = EasyMock.createNiceMock(IByteStreamConnection.class);
+    final IConnection connection = EasyMock.createNiceMock(IConnection.class);
 
     EasyMock.replay(connection);
 
@@ -31,9 +31,9 @@ public class ConnectionPoolTest {
   @Test
   public void testAddAndRemoveOnOpenedPool() {
 
-    final IByteStreamConnection connection0 = EasyMock.createNiceMock(IByteStreamConnection.class);
+    final IConnection connection0 = EasyMock.createNiceMock(IConnection.class);
 
-    final IByteStreamConnection connection1 = EasyMock.createNiceMock(IByteStreamConnection.class);
+    final IConnection connection1 = EasyMock.createNiceMock(IConnection.class);
 
     EasyMock.replay(connection0, connection1);
 
@@ -55,7 +55,7 @@ public class ConnectionPoolTest {
   @Test
   public void testGet() {
 
-    final IByteStreamConnection connection = EasyMock.createNiceMock(IByteStreamConnection.class);
+    final IConnection connection = EasyMock.createNiceMock(IConnection.class);
 
     EasyMock.replay(connection);
 
@@ -76,9 +76,9 @@ public class ConnectionPoolTest {
   @Test
   public void testPoolClose() {
 
-    final IByteStreamConnection connection0 = EasyMock.createNiceMock(IByteStreamConnection.class);
+    final IConnection connection0 = EasyMock.createNiceMock(IConnection.class);
 
-    final IByteStreamConnection connection1 = EasyMock.createNiceMock(IByteStreamConnection.class);
+    final IConnection connection1 = EasyMock.createNiceMock(IConnection.class);
 
     connection0.close();
     EasyMock.expectLastCall().once();

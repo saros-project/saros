@@ -15,8 +15,7 @@ final class ConnectionPool {
 
   private boolean isOpen;
 
-  private final Map<String, IByteStreamConnection> pool =
-      new HashMap<String, IByteStreamConnection>();
+  private final Map<String, IConnection> pool = new HashMap<>();
 
   /**
    * Opens the connection pool. After the connection pool is opened connections can be added,
@@ -31,19 +30,19 @@ final class ConnectionPool {
    */
   public void close() {
 
-    final Map<String, IByteStreamConnection> currentPoolCopy;
+    final Map<String, IConnection> currentPoolCopy;
 
     synchronized (this) {
       if (!isOpen) return;
 
       isOpen = false;
-      currentPoolCopy = new HashMap<String, IByteStreamConnection>(pool);
+      currentPoolCopy = new HashMap<>(pool);
       pool.clear();
     }
 
-    for (Entry<String, IByteStreamConnection> entry : currentPoolCopy.entrySet()) {
+    for (Entry<String, IConnection> entry : currentPoolCopy.entrySet()) {
       final String id = entry.getKey();
-      final IByteStreamConnection connection = entry.getValue();
+      final IConnection connection = entry.getValue();
       connection.close();
 
       LOG.debug("closed connection [id=" + id + "]: " + connection);
@@ -57,7 +56,7 @@ final class ConnectionPool {
    * @return the connection associated with the id or <code>null</code> if no such connection exists
    *     or the pool is closed
    */
-  public synchronized IByteStreamConnection get(final String id) {
+  public synchronized IConnection get(final String id) {
     return pool.get(id);
   }
 
@@ -70,8 +69,7 @@ final class ConnectionPool {
    *     that was already added with the given id or <code>null</code> if no connection was added
    *     with the given id
    */
-  public synchronized IByteStreamConnection add(
-      final String id, final IByteStreamConnection connection) {
+  public synchronized IConnection add(final String id, final IConnection connection) {
 
     if (!isOpen) return connection;
 
@@ -85,7 +83,7 @@ final class ConnectionPool {
    * @return the connection associated with the id or <code>null</code> if no such connection exists
    *     or the pool is closed
    */
-  public synchronized IByteStreamConnection remove(final String id) {
+  public synchronized IConnection remove(final String id) {
     if (!isOpen) return null;
 
     return pool.remove(id);

@@ -89,13 +89,10 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
     this.parser = new MXParser();
 
     connectionService.addListener(connectionListener);
-    dataTransferManager.addConnectionListener(
-        new IByteStreamConnectionListener() {
+    dataTransferManager.addPacketConnectionListener(
+        new IPacketConnectionListener() {
           @Override
-          public void connectionChanged(
-              final String connectionId,
-              final IByteStreamConnection connection,
-              final boolean incomingRequest) {
+          public void connectionEstablished(final IPacketConnection connection) {
             connection.setBinaryXMPPExtensionReceiver(XMPPReceiver.this);
           }
         });

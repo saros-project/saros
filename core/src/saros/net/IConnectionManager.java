@@ -1,7 +1,7 @@
 package saros.net;
 
 import java.io.IOException;
-import saros.net.internal.IByteStreamConnection;
+import saros.net.internal.IConnection;
 import saros.net.stream.StreamMode;
 import saros.net.xmpp.JID;
 
@@ -21,24 +21,29 @@ public interface IConnectionManager {
    */
   public void setServices(int serviceMask);
 
+  public void addStreamConnectionListener(final IStreamConnectionListener listener);
+
+  public void removeStreamConnectionListener(final IStreamConnectionListener listener);
+
+  public IStreamConnection connectStream(String id, Object address) throws IOException;
   /** @deprecated */
   @Deprecated
-  public IByteStreamConnection connect(JID peer) throws IOException;
+  public IConnection connect(Object address) throws IOException;
 
-  public IByteStreamConnection connect(String connectionID, JID peer) throws IOException;
+  public IConnection connect(String connectionID, Object address) throws IOException;
 
   /**
-   * @deprecated Disconnects {@link IByteStreamConnection} with the specified peer
-   * @param peer {@link JID} of the peer to disconnect the {@link IByteStreamConnection}
+   * @deprecated Disconnects with the specified address
+   * @param address
    */
   @Deprecated
-  public boolean closeConnection(JID peer);
+  public boolean closeConnection(Object address);
 
-  public boolean closeConnection(String connectionIdentifier, JID peer);
+  public boolean closeConnection(String connectionIdentifier, Object address);
 
   /** @deprecated */
   @Deprecated
   public StreamMode getTransferMode(JID jid);
 
-  public StreamMode getTransferMode(String connectionID, JID jid);
+  public StreamMode getTransferMode(String connectionID, Object address);
 }

@@ -1,27 +1,17 @@
-package saros.net.stream;
+package saros.net;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import saros.net.internal.IConnection;
 
-// TODO JavaDoc
-public interface ByteStream {
+public interface IStreamConnection extends IConnection {
 
   public InputStream getInputStream() throws IOException;
 
   public OutputStream getOutputStream() throws IOException;
 
-  public void close() throws IOException;
-
   public int getReadTimeout() throws IOException;
 
   public void setReadTimeout(int timeout) throws IOException;
-
-  public Object getLocalAddress();
-
-  public Object getRemoteAddress();
-
-  public StreamMode getMode();
-
-  public String getId();
 }

@@ -83,13 +83,17 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     if (currentLocalJid == null) throw new IOException("not connected to a XMPP server");
 
-    IByteStreamConnection connection = dataManager.getConnection(connectionID, recipient);
+    IConnection connection = dataManager.getConnection(connectionID, recipient);
 
     if (connectionID != null && connection == null)
       throw new IOException(
           "not connected to " + recipient + " [connection identifier=" + connectionID + "]");
 
     if (connection == null) connection = dataManager.connect(recipient);
+
+    if (!(connection instanceof IPacketConnection))
+      throw new IOException(
+          "connection id '" + connectionID + "' references not a packet connection");
 
     /*
      * The TransferDescription can be created out of the session, the name
@@ -109,7 +113,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
       transferDescription.setCompressContent(true);
     }
 
-    sendPacketExtension(connection, transferDescription, data);
+    sendPacketExtension((IPacketConnection) connection, transferDescription, data);
   }
 
   @Override
@@ -189,12 +193,12 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
   }
 
   private void sendPacketExtension(
-      final IByteStreamConnection connection, final TransferDescription description, byte[] payload)
+      final IPacketConnection connection, final TransferDescription description, byte[] payload)
       throws IOException {
 
     boolean sendPacket = true;
 
-    final String connectionId = connection.getConnectionID();
+    final String connectionId = connection.getId();
     for (IPacketInterceptor packetInterceptor : packetInterceptors)
       sendPacket &= packetInterceptor.sendPacket(connectionId, description, payload);
 
