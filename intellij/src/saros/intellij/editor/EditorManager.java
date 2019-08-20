@@ -423,14 +423,19 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       setLocalViewPortChangeHandlersEnabled(false);
 
       for (VirtualFile openFile : openFiles) {
-        Editor editor = localEditorHandler.openEditor(openFile, project, false);
-
         SPath path = VirtualFileConverter.convertToSPath(intellijProject, openFile);
 
         if (path == null) {
           throw new IllegalStateException(
               "Could not create SPath for resource that is known to be shared: " + openFile);
+
+        } else if (path.getResource().isDerived()) {
+          LOG.debug("Skipping editor for derived open file " + path);
+
+          continue;
         }
+
+        Editor editor = localEditorHandler.openEditor(openFile, project, false);
 
         openFileMapping.put(path, editor);
       }
