@@ -25,6 +25,12 @@ public class Messages {
   public static String AddProjectToSessionWizard_title2;
   public static String AddProjectToSessionWizard_description;
   public static String AddProjectToSessionWizard_description_changed_files;
+  public static String AddProjectToSessionWizard_no_module_type_received_title;
+  public static String AddProjectToSessionWizard_no_module_type_received_message;
+  public static String AddProjectToSessionWizard_no_session_title;
+  public static String AddProjectToSessionWizard_no_session_message;
+  public static String AddProjectToSessionWizard_context_teardown_title;
+  public static String AddProjectToSessionWizard_context_teardown_message;
 
   public static String CollaborationUtils_confirm_closing;
   public static String CollaborationUtils_confirm_closing_text;
