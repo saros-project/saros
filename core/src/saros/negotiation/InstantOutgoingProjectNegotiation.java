@@ -71,8 +71,9 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       final IChecksumCache checksumCache, //
       final XMPPConnectionService connectionService, //
       final ITransmitter transmitter, //
-      final IReceiver receiver) //
-      {
+      final IReceiver receiver, //
+      final AdditionalProjectDataFactory additionalProjectDataFactory //
+      ) {
     super(
         peer,
         projects,
@@ -83,7 +84,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
         checksumCache,
         connectionService,
         transmitter,
-        receiver);
+        receiver,
+        additionalProjectDataFactory);
   }
 
   @Override
