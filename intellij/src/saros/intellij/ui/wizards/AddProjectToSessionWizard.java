@@ -444,9 +444,6 @@ public class AddProjectToSessionWizard extends Wizard {
                 modifiableModuleModel.commit();
                 targetProject.save();
 
-                ModifiableRootModel modifiableRootModel =
-                    ModuleRootManager.getInstance(module).getModifiableModel();
-
                 VirtualFile moduleFile = module.getModuleFile();
 
                 if (moduleFile == null) {
@@ -461,9 +458,18 @@ public class AddProjectToSessionWizard extends Wizard {
                       "Could not  find base directory for module " + module + ".");
                 }
 
-                modifiableRootModel.addContentEntry(moduleRoot);
+                ModifiableRootModel modifiableRootModel =
+                    ModuleRootManager.getInstance(module).getModifiableModel();
 
-                modifiableRootModel.commit();
+                try {
+                  modifiableRootModel.addContentEntry(moduleRoot);
+                  modifiableRootModel.commit();
+
+                } finally {
+                  if (!modifiableRootModel.isDisposed()) {
+                    modifiableRootModel.dispose();
+                  }
+                }
 
                 return module;
               }
