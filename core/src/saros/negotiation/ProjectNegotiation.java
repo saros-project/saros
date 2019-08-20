@@ -61,6 +61,8 @@ public abstract class ProjectNegotiation extends Negotiation {
    */
   protected FileTransferManager fileTransferManager;
 
+  protected static final int BUFFER_SIZE = 32 * 1024;
+
   public ProjectNegotiation(
       final String id,
       final JID peer,

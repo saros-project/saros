@@ -1,12 +1,15 @@
 package saros.negotiation;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import saros.SarosPluginContext;
 import saros.editor.IEditorManager;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.OperationCanceledException;
@@ -18,10 +21,14 @@ import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
 import saros.negotiation.NegotiationTools.CancelOption;
+import saros.net.IConnectionManager;
 import saros.net.IReceiver;
+import saros.net.IStreamConnection;
+import saros.net.IStreamConnectionListener;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.User;
@@ -35,6 +42,33 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
   private static final Logger LOG = Logger.getLogger(ArchiveOutgoingProjectNegotiation.class);
   private File zipArchive = null;
+
+  // TODO move to factory
+  @Inject private IConnectionManager connectionManager;
+
+  private IStreamConnection connection;
+
+  private boolean awaitConnection = true;
+
+  private final IStreamConnectionListener streamConnectionListener =
+      new IStreamConnectionListener() {
+
+        @Override
+        public boolean streamConnectionEstablished(String id, IStreamConnection connection) {
+
+          synchronized (ArchiveOutgoingProjectNegotiation.this) {
+            if (!awaitConnection) return false;
+
+            if (!(TRANSFER_ID_PREFIX + getID()).equals(id)) return false;
+
+            ArchiveOutgoingProjectNegotiation.this.connection = connection;
+
+            ArchiveOutgoingProjectNegotiation.this.notifyAll();
+          }
+
+          return true;
+        }
+      };
 
   public ArchiveOutgoingProjectNegotiation( //
       final JID peer, //
@@ -59,6 +93,9 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
         connectionService,
         transmitter,
         receiver);
+
+    // FIXME remove
+    SarosPluginContext.initComponent(this);
   }
 
   @Override
@@ -66,6 +103,8 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     if (fileTransferManager == null)
       // FIXME: the logic will try to send this to the remote contact
       throw new IOException("not connected to a XMPP server");
+
+    connectionManager.addStreamConnectionListener(streamConnectionListener);
   }
 
   @Override
@@ -113,6 +152,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   protected void cleanup(IProgressMonitor monitor) {
     if (zipArchive != null && !zipArchive.delete())
       LOG.warn("could not delete archive file: " + zipArchive.getAbsolutePath());
+    connectionManager.addStreamConnectionListener(streamConnectionListener);
     super.cleanup(monitor);
   }
 
@@ -200,19 +240,60 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       File archive, JID remoteContact, String transferID, IProgressMonitor monitor)
       throws SarosCancellationException, IOException {
 
-    LOG.debug(this + " : sending archive");
+    LOG.debug(this + " : waiting for remote connection");
     monitor.beginTask("Sending archive file...", 100);
 
-    assert fileTransferManager != null;
+    final long timeout = 60 * 1000;
+
+    long currentTime = System.currentTimeMillis();
+
+    synchronized (this) {
+      while (System.currentTimeMillis() - currentTime < timeout) {
+        if (connection != null) break;
+
+        if (monitor.isCanceled()) {
+          awaitConnection = false;
+          checkCancellation(CancelOption.NOTIFY_PEER);
+        }
+
+        try {
+          wait(1000);
+        } catch (InterruptedException e) {
+          awaitConnection = false;
+          Thread.currentThread().interrupt();
+          this.localCancel("Negotiation got internally interrupted.", CancelOption.NOTIFY_PEER);
+          break;
+        }
+      }
+
+      awaitConnection = false;
+    }
+
+    assert connection != null;
+
+    DataOutputStream out = null;
+    InputStream in = null;
 
     try {
-      OutgoingFileTransfer transfer =
-          fileTransferManager.createOutgoingFileTransfer(remoteContact.toString());
 
-      transfer.sendFile(archive, transferID);
-      monitorFileTransfer(transfer, monitor);
-    } catch (XMPPException e) {
-      throw new IOException(e.getMessage(), e);
+      in = new FileInputStream(archive);
+
+      long fileSize = archive.length();
+
+      out = new DataOutputStream(connection.getOutputStream());
+
+      out.writeLong(fileSize);
+      final byte buffer[] = new byte[BUFFER_SIZE];
+
+      int read = 0;
+
+      while ((read = in.read(buffer)) != -1) {
+        out.write(buffer, 0, read);
+        checkCancellation(CancelOption.NOTIFY_PEER);
+      }
+    } finally {
+      connection.close();
+      IOUtils.closeQuietly(in);
     }
 
     monitor.done();
