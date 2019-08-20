@@ -1,14 +1,17 @@
 package saros.negotiation;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
+import saros.SarosPluginContext;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
@@ -18,11 +21,14 @@ import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.SubProgressMonitor;
 import saros.negotiation.NegotiationTools.CancelOption;
+import saros.net.IConnectionManager;
 import saros.net.IReceiver;
+import saros.net.IStreamConnection;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.observables.FileReplacementInProgressObservable;
+import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.util.CoreUtils;
@@ -34,6 +40,9 @@ import saros.util.CoreUtils;
 public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNegotiation {
 
   private static final Logger LOG = Logger.getLogger(ArchiveIncomingProjectNegotiation.class);
+
+  // TODO move to factory
+  @Inject private IConnectionManager connectionManager;
 
   public ArchiveIncomingProjectNegotiation(
       final JID peer, //
@@ -60,6 +69,9 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
         connectionService,
         transmitter,
         receiver);
+
+    // FIXME remove
+    SarosPluginContext.initComponent(this);
   }
 
   @Override
@@ -73,22 +85,20 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
     // the host do not send an archive if we do not need any files
     if (filesMissing) {
-      receiveAndUnpackArchive(projectMapping, transferListener, monitor);
+      receiveAndUnpackArchive(projectMapping, monitor);
     }
   }
 
   /** Receives the archive with all missing files and unpacks it. */
   private void receiveAndUnpackArchive(
-      final Map<String, IProject> localProjectMapping,
-      final TransferListener archiveTransferListener,
-      final IProgressMonitor monitor)
+      final Map<String, IProject> localProjectMapping, final IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     // waiting for the big archive to come in
 
     monitor.beginTask(null, 100);
 
-    File archiveFile = receiveArchive(archiveTransferListener, new SubProgressMonitor(monitor, 50));
+    File archiveFile = receiveArchive(new SubProgressMonitor(monitor, 50));
 
     /*
      * FIXME at this point it makes no sense to report the cancellation to
@@ -146,37 +156,63 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
     // TODO: now add the checksums into the cache
   }
 
-  private File receiveArchive(TransferListener archiveTransferListener, IProgressMonitor monitor)
+  private File receiveArchive(IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     monitor.beginTask("Receiving archive file...", 100);
-    LOG.debug("waiting for incoming archive stream request");
+    LOG.debug("connecting to " + getPeer() + " to receive archive file");
 
-    monitor.subTask("Host is compressing project files. Waiting for the archive file...");
+    monitor.subTask("Connecting to " + getPeer().getName() + "...");
 
-    awaitTransferRequest();
-
-    monitor.subTask("Receiving archive file...");
-
-    LOG.debug(this + " : receiving archive");
-
-    IncomingFileTransfer transfer = archiveTransferListener.getRequest().accept();
+    IStreamConnection connection =
+        connectionManager.connectStream(TRANSFER_ID_PREFIX + getID(), getPeer());
 
     File archiveFile = File.createTempFile("saros_archive_" + System.currentTimeMillis(), null);
+
+    OutputStream out = null;
 
     boolean transferFailed = true;
 
     try {
-      transfer.recieveFile(archiveFile);
 
-      monitorFileTransfer(transfer, monitor);
+      out = new FileOutputStream(archiveFile);
+
+      connection.setReadTimeout(60 * 60 * 1000);
+      monitor.subTask("Host is compressing project files. Waiting for the archive file...");
+
+      DataInputStream dis = new DataInputStream(connection.getInputStream());
+
+      long remainingDataSize = dis.readLong();
+
+      monitor.subTask("Receiving archive file...");
+
+      LOG.debug(this + " : receiving archive");
+
+      final byte buffer[] = new byte[BUFFER_SIZE];
+
+      while (remainingDataSize > 0) {
+        int read = dis.read(buffer);
+
+        if (read == -1) break;
+
+        out.write(buffer, 0, read);
+        remainingDataSize -= read;
+
+        checkCancellation(CancelOption.NOTIFY_PEER);
+      }
+
+      if (remainingDataSize > 0)
+        localCancel(
+            "The receiving of the archive file was not successful.", CancelOption.NOTIFY_PEER);
+
       transferFailed = false;
-    } catch (XMPPException e) {
-      throw new IOException(e.getMessage(), e.getCause());
     } finally {
       if (transferFailed && !archiveFile.delete()) {
         LOG.warn("Could not clean up archive file " + archiveFile.getAbsolutePath());
       }
+
+      IOUtils.closeQuietly(out);
+      connection.close();
     }
 
     monitor.done();
