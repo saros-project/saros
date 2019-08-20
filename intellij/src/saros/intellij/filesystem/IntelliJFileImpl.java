@@ -100,6 +100,12 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
   @Override
   public boolean isDerived() {
+    VirtualFile file = project.findVirtualFile(path);
+
+    if (file != null && file.equals(project.getModule().getModuleFile())) {
+      return true;
+    }
+
     return !exists();
   }
 

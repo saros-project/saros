@@ -36,6 +36,8 @@ import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.negotiation.ModuleConfigurationInitializer;
+import saros.intellij.negotiation.ModuleConfigurationProvider;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.intellij.ui.widgets.progress.ProgessMonitorAdapter;
@@ -177,15 +179,32 @@ public class AddProjectToSessionWizard extends Wizard {
          * @param project the project to create the module in
          * @param moduleName the name for the new module
          * @param moduleBasePath the base path for the new module
-         * @see AddProjectToSessionWizard#createModuleStub(String, Path, Project)
+         * @see AddProjectToSessionWizard#createBaseModule(String, String, Path, Project)
          */
         private void doNewModule(
             @NotNull Project project, @NotNull String moduleName, @NotNull Path moduleBasePath) {
 
+          Map<String, String> moduleParameters =
+              negotiation.getProjectNegotiationData(remoteProjectID).getAdditionalProjectData();
+
+          String moduleType = moduleParameters.get(ModuleConfigurationProvider.MODULE_TYPE_KEY);
+
+          if (moduleType == null) {
+            LOG.error("Aborted module creation as no module type was received.");
+
+            cancelNegotiation("Failed to create shared module");
+
+            NotificationPanel.showError(
+                Messages.AddProjectToSessionWizard_no_module_type_received_message,
+                Messages.AddProjectToSessionWizard_no_module_type_received_title);
+
+            return;
+          }
+
           Module module;
 
           try {
-            module = createModuleStub(moduleName, moduleBasePath, project);
+            module = createBaseModule(moduleName, moduleType, moduleBasePath, project);
 
           } catch (IOException e) {
             LOG.error("Could not create the shared module " + moduleName + ".", e);
@@ -220,6 +239,39 @@ public class AddProjectToSessionWizard extends Wizard {
 
             return;
           }
+
+          ISarosSession session = sessionManager.getSession();
+
+          if (session == null) {
+            LOG.error("Encountered project negotiation without running session");
+
+            cancelNegotiation("No running session");
+
+            NotificationPanel.showError(
+                Messages.AddProjectToSessionWizard_no_session_message,
+                Messages.AddProjectToSessionWizard_no_session_title);
+
+            return;
+          }
+
+          ModuleConfigurationInitializer moduleConfigurationInitializer =
+              session.getComponent(ModuleConfigurationInitializer.class);
+
+          if (moduleConfigurationInitializer == null) {
+            LOG.error(
+                "Could not obtain class from session context - "
+                    + ModuleConfigurationInitializer.class.getSimpleName());
+
+            cancelNegotiation("Failed to create shared module");
+
+            NotificationPanel.showError(
+                Messages.AddProjectToSessionWizard_context_teardown_message,
+                Messages.AddProjectToSessionWizard_context_teardown_title);
+
+            return;
+          }
+
+          moduleConfigurationInitializer.enqueueModuleConfigurationChange(module, moduleParameters);
 
           IProject sharedProject = new IntelliJProjectImpl(module);
 
@@ -339,25 +391,31 @@ public class AddProjectToSessionWizard extends Wizard {
   }
 
   /**
-   * Creates an empty stub module with the given name and given base path in the given project.
+   * Creates an empty base module with the given name, base path, and module type in the given
+   * project.
    *
-   * <p>The created module has the module type {@link IntelliJProjectImpl#RELOAD_STUB_MODULE_TYPE}
-   * which allows us to easily identify it as stub.
+   * <p>The created module does not contain any further configuration. The needed configuration
+   * options will be added through {@link ModuleConfigurationInitializer}.
    *
    * @param moduleName name of the module
+   * @param moduleType the type of the module
    * @param targetBasePath the base path of the created module
    * @param targetProject the project to create the module in
-   * @return a stub <code>Module</code> object with the given name
-   * @throws FileNotFoundException if the base directory of the current project, the base directory
-   *     of the created module, or the module file of the created module could not be found in the
-   *     local filesystem
+   * @return a <code>Module</code> object with the given parameters
+   * @throws ModuleWithNameAlreadyExists if a module with the given name already exists in the given
+   *     project
+   * @throws FileNotFoundException if the base directory or module file of the created module could
+   *     not be found in the local filesystem
    * @throws IOException if the creation of the module did not return a valid <code>Module</code>
    *     object
    */
   @NotNull
-  private Module createModuleStub(
-      @NotNull String moduleName, @NotNull Path targetBasePath, @NotNull Project targetProject)
-      throws IOException, ModuleWithNameAlreadyExists {
+  private Module createBaseModule(
+      @NotNull String moduleName,
+      @NotNull String moduleType,
+      @NotNull Path targetBasePath,
+      @NotNull Project targetProject)
+      throws FileNotFoundException, IOException, ModuleWithNameAlreadyExists {
 
     for (Module module : ModuleManager.getInstance(targetProject).getModules()) {
       if (moduleName.equals(module.getName()))
@@ -381,8 +439,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     ModuleManager.getInstance(targetProject).getModifiableModel();
 
                 Module module =
-                    modifiableModuleModel.newModule(
-                        moduleFilePath.toString(), IntelliJProjectImpl.RELOAD_STUB_MODULE_TYPE);
+                    modifiableModuleModel.newModule(moduleFilePath.toString(), moduleType);
 
                 modifiableModuleModel.commit();
                 targetProject.save();
