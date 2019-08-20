@@ -1,7 +1,6 @@
 package saros.intellij.filesystem;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -16,7 +15,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.exceptions.ModuleNotFoundException;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
@@ -27,25 +25,14 @@ import saros.intellij.project.filesystem.IntelliJPathImpl;
 
 /** A <code>IntelliJProjectImpl</code> represents a specific module loaded in a specific project. */
 public final class IntelliJProjectImpl extends IntelliJResourceImpl implements IProject {
-
-  /*
-   * Used to identify module stubs that were created during the project
-   * negotiation and have to be reloaded after the correct module file was
-   * transferred by the host.
-   *
-   * Used in AddProjectToSessionWizard#createModuleStub(String) and
-   * ModuleInitialization.ModuleReloader#run()
-   */
-  public static final String RELOAD_STUB_MODULE_TYPE = "SAROS_RELOAD_STUB_MODULE";
-
   private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
 
   private final Project project;
 
   private final String moduleName;
 
-  private volatile Module module;
-  private volatile VirtualFile moduleRoot;
+  private final Module module;
+  private final VirtualFile moduleRoot;
 
   /**
    * Creates a core compatible {@link IProject project} using the given IntelliJ module.
@@ -204,47 +191,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   }
 
   /**
-   * This method can be used to refresh the held <code>Module</code> object in case the module was
-   * reloaded.
-   *
-   * <p><b>Note:</b> This method should only be needed in special cases as we can not guarantee a
-   * graceful handling of a disposed module object. Any classes or methods still holding a reference
-   * to the old module object could lead to a failure of the related logic as operations on disposed
-   * modules will result in an exception.
-   *
-   * @return <code>true</code> if the held <code>Module</code> has the status disposed and is
-   *     replaced with a new <code>Module</code> object with the same name, <code>false</code>
-   *     otherwise
-   * @throws ModuleNotFoundException if the old <code>Module</code> object is disposed but no new
-   *     module with the same name could be found
-   */
-  public boolean refreshModule() throws ModuleNotFoundException {
-    if (module.isDisposed()) {
-      Module newModule = ModuleManager.getInstance(project).findModuleByName(moduleName);
-
-      if (newModule == null) {
-
-        throw new ModuleNotFoundException(
-            "The module "
-                + moduleName
-                + " could not be refreshed as no module with the same name could be found in the "
-                + "current project "
-                + project);
-      }
-
-      module = newModule;
-
-      moduleRoot = getModuleContentRoot(module);
-      checkIfContentRootLocatedBelowProjectRoot(module, moduleRoot);
-      checkIfModuleFileLocatedInContentRoot(module, moduleRoot);
-
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
    * Returns whether the resource for the given path exists.
    *
    * <p><b>Note:</b> A derived resource is treated as being nonexistent.
@@ -285,7 +231,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
               : new IntelliJFileImpl(this, childPath));
     }
 
-    return result.toArray(new IResource[result.size()]);
+    return result.toArray(new IResource[0]);
   }
 
   @NotNull
