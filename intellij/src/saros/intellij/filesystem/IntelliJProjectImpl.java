@@ -46,11 +46,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    * objects for modules with fewer or more than one content root can not be created.
    *
    * @param module an IntelliJ <i>module</i>
-   * @throws IllegalArgumentException if the given module does not have exactly one content root,
-   *     the content root is not located under the project root or the module file is not located in
-   *     the base directory of the content root
-   * @throws IllegalStateException if the project base dir, the module file or the directory
-   *     containing the module file could not be found
+   * @throws IllegalArgumentException if the given module does not have exactly one content root
    */
   public IntelliJProjectImpl(@NotNull final Module module) {
     this.module = module;
@@ -60,9 +56,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     this.moduleName = module.getName();
 
     moduleRoot = getModuleContentRoot(module);
-
-    checkIfContentRootLocatedBelowProjectRoot(module, moduleRoot);
-    checkIfModuleFileLocatedInContentRoot(module, moduleRoot);
   }
 
   /**
@@ -96,88 +89,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     }
 
     return contentRoots[0];
-  }
-
-  /**
-   * Checks whether the given content root is located under the project root.
-   *
-   * <p>This method is used to enforce the current restriction concerning the module structure.
-   *
-   * @param module the module to check the structure for
-   * @param moduleRoot the content root of the given module
-   * @throws IllegalArgumentException if the given content root is not located under the project
-   *     root
-   * @throws IllegalStateException if the project basedir could not be found
-   */
-  private static void checkIfContentRootLocatedBelowProjectRoot(
-      @NotNull Module module, @NotNull VirtualFile moduleRoot) {
-
-    Project project = module.getProject();
-
-    VirtualFile projectRoot = project.getBaseDir();
-
-    if (projectRoot == null) {
-      throw new IllegalStateException(
-          "The base dir for the project " + project + " could not be found.");
-    }
-
-    Path moduleRootPath = Paths.get(moduleRoot.getPath());
-    Path projectRootPath = Paths.get(projectRoot.getPath());
-
-    if (moduleRoot.equals(projectRoot) || !moduleRootPath.startsWith(projectRootPath)) {
-
-      throw new IllegalArgumentException(
-          "The content root "
-              + moduleRoot
-              + " of the module "
-              + module
-              + " is not located under the project root "
-              + projectRoot
-              + ".");
-    }
-  }
-
-  /**
-   * Checks whether the module file is located in the base directory of the given content root.
-   *
-   * <p>This method is used to enforce the current restriction concerning the module structure.
-   *
-   * @param module the module to check the structure for
-   * @param moduleRoot the content root of the given module
-   * @throws IllegalArgumentException if the module file is not located in the base directory of
-   *     given content root
-   * @throws IllegalStateException if the module file or the directory containing the module file
-   *     could not be found
-   */
-  private static void checkIfModuleFileLocatedInContentRoot(
-      @NotNull Module module, @NotNull VirtualFile moduleRoot) {
-
-    VirtualFile moduleFile = module.getModuleFile();
-
-    if (moduleFile == null) {
-      throw new IllegalStateException(
-          "The module file for the module " + module + " could not be found.");
-    }
-
-    VirtualFile moduleFileParent = moduleFile.getParent();
-
-    if (moduleFileParent == null) {
-      throw new IllegalStateException(
-          "The parent directory of the module file for the module "
-              + module
-              + " could not be found.");
-    }
-
-    if (!moduleRoot.equals(moduleFileParent)) {
-      throw new IllegalArgumentException(
-          "The module file "
-              + moduleFile
-              + " for the module "
-              + module
-              + " is not located in the base directory of the content root "
-              + moduleRoot
-              + ".");
-    }
   }
 
   /**
