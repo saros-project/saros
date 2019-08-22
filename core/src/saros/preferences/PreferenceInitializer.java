@@ -29,7 +29,7 @@ public class PreferenceInitializer {
     store.setDefault(PreferenceConstants.LOCAL_SOCKS5_PROXY_CANDIDATES, "");
     store.setDefault(PreferenceConstants.FORCE_IBB_CONNECTIONS, false);
 
-    store.setDefault(PreferenceConstants.STUN, "stunserver.org");
+    store.setDefault(PreferenceConstants.STUN, "");
     store.setDefault(PreferenceConstants.STUN_PORT, 0);
     store.setDefault(PreferenceConstants.CONCURRENT_UNDO, false);
 
