@@ -192,20 +192,6 @@ class ContactPopMenu extends JPopupMenu {
         invalidModuleEntry.setToolTipText(Messages.ContactPopMenu_menu_tooltip_invalid_module);
 
         nonCompliantModules.add(invalidModuleEntry);
-
-      } catch (IllegalStateException exception) {
-        LOG.warn(
-            "Ignoring module "
-                + fullModuleName
-                + " as an error "
-                + "occurred while trying to create an IProject object.",
-            exception);
-
-        JMenuItem invalidModuleEntry = new JMenuItem(moduleName);
-        invalidModuleEntry.setEnabled(false);
-        invalidModuleEntry.setToolTipText(Messages.ContactPopMenu_menu_tooltip_error_module);
-
-        nonCompliantModules.add(invalidModuleEntry);
       }
     }
 

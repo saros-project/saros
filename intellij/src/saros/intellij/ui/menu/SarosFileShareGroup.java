@@ -103,15 +103,6 @@ public class SarosFileShareGroup extends ActionGroup {
       }
 
       return false;
-
-    } catch (IllegalStateException exception) {
-      LOG.warn(
-          "Ignoring module "
-              + moduleName
-              + " as an error occurred while trying to create an IProject object.",
-          exception);
-
-      return false;
     }
 
     return true;

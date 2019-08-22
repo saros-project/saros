@@ -69,7 +69,7 @@ public class ProjectClosedHandler implements Disposable {
             try {
               wrappedModule = new IntelliJProjectImpl(module);
 
-            } catch (IllegalArgumentException | IllegalStateException exception) {
+            } catch (IllegalStateException exception) {
               continue;
             }
 

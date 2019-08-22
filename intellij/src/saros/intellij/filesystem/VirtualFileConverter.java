@@ -82,17 +82,6 @@ public class VirtualFileConverter {
       }
 
       return null;
-
-    } catch (IllegalStateException e) {
-      log.warn(
-          "Could not convert VirtualFile "
-              + virtualFile
-              + " as the creation of an IProject object for its module "
-              + module
-              + " failed.",
-          e);
-
-      return null;
     }
   }
 
