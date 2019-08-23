@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -18,7 +17,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccountStore;
@@ -62,7 +60,6 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
     SarosPluginContext.initComponent(this);
     setTitle(TITLE);
     setDescription(DESCRIPTION);
-
     this.showUseNowButton = showUseNowButton;
   }
 
@@ -81,20 +78,6 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
     hookListeners();
 
     setPageComplete(false);
-  }
-
-  @Override
-  public void performHelp() {
-    Shell shell = new Shell(getShell());
-    shell.setText("Saros XMPP Accounts");
-    shell.setLayout(new GridLayout());
-    shell.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-    Browser browser = new Browser(shell, SWT.NONE);
-    browser.setUrl("http://www.saros-project.org/setupXMPP");
-    browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-    shell.open();
   }
 
   @Override

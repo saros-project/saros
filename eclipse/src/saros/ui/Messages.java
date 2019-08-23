@@ -156,7 +156,6 @@ public class Messages extends NLS {
   public static String EnterProjectNamePage_description_socks5proxy;
   public static String EnterProjectNamePage_direct_filetransfer_deactivated;
   public static String EnterProjectNamePage_direct_filetransfer_nan;
-  public static String EnterProjectNamePage_error_browser_open;
   public static String EnterProjectNamePage_error_projectname_exists;
   public static String EnterProjectNamePage_error_projectname_in_use;
   public static String EnterProjectNamePage_error_wrong_name;

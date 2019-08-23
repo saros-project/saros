@@ -11,7 +11,8 @@ public class GettingStartedHandler extends AbstractHandler {
   public Object execute(ExecutionEvent event) throws ExecutionException {
 
     SWTUtils.openInternalBrowser(
-        "https://www.saros-project.org/documentation/getting-started.html", "Welcome to Saros");
+        "https://www.saros-project.org/documentation/getting-started-eclipse.html",
+        "Welcome to Saros");
 
     return null;
   }

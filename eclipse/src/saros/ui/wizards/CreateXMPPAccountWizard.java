@@ -65,9 +65,8 @@ public class CreateXMPPAccountWizard extends Wizard {
     setDefaultPageImageDescriptor(
         ImageManager.getImageDescriptor(ImageManager.WIZBAN_CREATE_XMPP_ACCOUNT));
 
-    this.createXMPPAccountPage = new CreateXMPPAccountWizardPage(showUseNowButton);
+    createXMPPAccountPage = new CreateXMPPAccountWizardPage(showUseNowButton);
     setNeedsProgressMonitor(true);
-    setHelpAvailable(true);
   }
 
   @Override
@@ -210,7 +209,10 @@ public class CreateXMPPAccountWizard extends Wizard {
     if (error.getCode() == 409) message = "The XMPP account already exists.";
     else
       message =
-          "An unknown error occurred. Please register on "
+          (error.getCode() != 503
+                  ? "An unknown error occurred."
+                  : "No In-Band Registration available.")
+              + " Please register on "
               + ("saros-con.imp.fu-berlin.de".equals(server)
                   ? ("our website:" + " https://saros-con.imp.fu-berlin.de:5280/register/")
                   : "the provider's website.");
