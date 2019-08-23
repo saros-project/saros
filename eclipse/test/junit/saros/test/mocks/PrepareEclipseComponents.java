@@ -2,9 +2,11 @@ package saros.test.mocks;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.swt.widgets.Display;
 import org.powermock.core.spi.PowerMockPolicy;
 import org.powermock.mockpolicies.MockPolicyClassLoadingSettings;
 import org.powermock.mockpolicies.MockPolicyInterceptionSettings;
+import saros.ui.util.SWTUtils;
 
 /**
  * This policy can be used to avoid reiterating Eclipse components that need to be prepared by
@@ -24,13 +26,18 @@ public class PrepareEclipseComponents implements PowerMockPolicy {
   @Override
   public void applyClassLoadingPolicy(MockPolicyClassLoadingSettings settings) {
     // Add more final classes here, if need be
-    String[] classes = {ResourcesPlugin.class.getName(), Platform.class.getName()};
+    String[] classes = {
+      Display.class.getName(),
+      SWTUtils.class.getName(),
+      ResourcesPlugin.class.getName(),
+      Platform.class.getName()
+    };
 
     settings.addFullyQualifiedNamesOfClassesToLoadByMockClassloader(classes);
   }
 
   @Override
   public void applyInterceptionPolicy(MockPolicyInterceptionSettings settings) {
-    //
+    // NOP
   }
 }

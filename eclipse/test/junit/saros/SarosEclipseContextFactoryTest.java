@@ -37,6 +37,7 @@ public class SarosEclipseContextFactoryTest {
     // mock Eclipse dependencies
     EclipseMocker.mockResourcesPlugin();
     EclipseMocker.mockPlatform();
+    EclipseMocker.mockSWTDisplay();
   }
 
   @Test

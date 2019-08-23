@@ -34,7 +34,7 @@ public class SarosEclipseContextTest {
     // mock Eclipse dependencies
     EclipseMocker.mockResourcesPlugin();
     EclipseMocker.mockPlatform();
-
+    EclipseMocker.mockSWTDisplay();
     // mock Saros environment
     saros = EclipseMocker.mockSaros();
 
