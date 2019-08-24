@@ -23,7 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.JpsElement;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
+import saros.filesystem.IReferencePointManager;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.SafeDialogUtils;
@@ -47,8 +48,8 @@ public class ModuleConfigurationInitializer implements Startable {
       new ISessionListener() {
 
         @Override
-        public void resourcesAdded(IProject project) {
-          applyModuleConfiguration(project);
+        public void resourcesAdded(IReferencePoint referencePoint) {
+          applyModuleConfiguration(referencePoint);
         }
       };
 
@@ -91,10 +92,16 @@ public class ModuleConfigurationInitializer implements Startable {
    * Updates the shared module with the queued module options. Does nothing if no such options are
    * found in the held queue.
    *
-   * @param wrappedModule the <code>IProject</code> representing the shared module
+   * @param referencePoint the <code>IReferencePoint</code> representing the shared module
    */
-  private void applyModuleConfiguration(@NotNull IProject wrappedModule) {
-    Module module = wrappedModule.adaptTo(IntelliJProjectImpl.class).getModule();
+  private void applyModuleConfiguration(@NotNull IReferencePoint referencePoint) {
+    IReferencePointManager referencePointManger =
+        session.getComponent(IReferencePointManager.class);
+    Module module =
+        referencePointManger
+            .getProject(referencePoint)
+            .adaptTo(IntelliJProjectImpl.class)
+            .getModule();
 
     ModuleConfiguration moduleConfiguration = queuedModuleOptions.remove(module);
 
