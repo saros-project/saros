@@ -84,6 +84,11 @@ public class SarosSessionStub implements ISarosSession {
   }
 
   @Override
+  public boolean isShared(IReferencePoint referencePoint) {
+    throw new RuntimeException("Unexpected call to Stub");
+  }
+
+  @Override
   public String getReferencePointID(IReferencePoint referencePoint) {
     throw new RuntimeException("Unexpected call to Stub");
   }
