@@ -1032,6 +1032,11 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
+  public boolean isShared(IReferencePoint referencePoint) {
+    return sharedReferencePointMapper.isShared(referencePoint);
+  }
+
+  @Override
   public void removeReferencePointMapping(String referencePointID, IReferencePoint referencePoint) {
     if (sharedReferencePointMapper.getReferencePoint(referencePointID) != null) {
       sharedReferencePointMapper.removeReferencePoint(referencePointID);

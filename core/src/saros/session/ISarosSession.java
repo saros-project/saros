@@ -175,6 +175,12 @@ public interface ISarosSession {
   public Set<IReferencePoint> getReferencePoints();
 
   /**
+   * @return <code>true</code> if the given {@link IReferencePoint resource} is currently shared in
+   *     this session, <code>false</code> otherwise
+   */
+  public boolean isShared(IReferencePoint referencePoint);
+
+  /**
    * FOR INTERNAL USE ONLY !
    *
    * @deprecated only the session manager should be able to call this
