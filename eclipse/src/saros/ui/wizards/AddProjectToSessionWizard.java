@@ -555,8 +555,7 @@ public class AddProjectToSessionWizard extends Wizard {
       final String projectID = entry.getKey();
       final IProject project = entry.getValue();
 
-      final saros.filesystem.IProject adaptedProject =
-          ResourceAdapterFactory.create(entry.getValue());
+      final IReferencePoint referencePoint = EclipseReferencePointManager.create(project);
 
       fillReferencePointManager(session, project);
 
@@ -564,7 +563,7 @@ public class AddProjectToSessionWizard extends Wizard {
        * do not refresh already partially shared projects as this may
        * trigger resource change events
        */
-      if (!session.isShared(adaptedProject)) project.refreshLocal(IResource.DEPTH_INFINITE, null);
+      if (!session.isShared(referencePoint)) project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
       final FileList localFileList;
 
@@ -580,7 +579,7 @@ public class AddProjectToSessionWizard extends Wizard {
         localFileList =
             FileListFactory.createFileList(
                 referencePointManager,
-                adaptedProject.getReferencePoint(),
+                referencePoint,
                 null,
                 checksumCache,
                 ProgressMonitorAdapterFactory.convert(
