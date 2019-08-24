@@ -467,21 +467,7 @@ public class CollaborationUtils {
 
     for (Entry<IProject, List<IResource>> entry : data.entrySet())
       result.put(
-          ResourceAdapterFactory.create(entry.getKey()).getReferencePoint(),
-          ResourceAdapterFactory.convertTo(entry.getValue()));
-
-    return result;
-  }
-
-  private static Map<saros.filesystem.IProject, List<saros.filesystem.IResource>>
-      convertToProjectResourceMapping(Map<IProject, List<IResource>> data) {
-
-    Map<saros.filesystem.IProject, List<saros.filesystem.IResource>> result =
-        new HashMap<saros.filesystem.IProject, List<saros.filesystem.IResource>>();
-
-    for (Entry<IProject, List<IResource>> entry : data.entrySet())
-      result.put(
-          ResourceAdapterFactory.create(entry.getKey()),
+          EclipseReferencePointManager.create(entry.getKey()),
           ResourceAdapterFactory.convertTo(entry.getValue()));
 
     return result;
