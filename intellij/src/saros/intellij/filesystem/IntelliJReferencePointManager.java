@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
+import saros.activities.SPath;
 import saros.filesystem.IPath;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IResource;
@@ -124,6 +125,18 @@ public class IntelliJReferencePointManager {
     Module module = getModule(referencePoint);
 
     return FilesystemUtils.findVirtualFile(module, referencePointRelativePath);
+  }
+
+  /**
+   * Returns the {@link VirtualFile} resource represented by given {@link SPath} Saros Path.
+   *
+   * @param sPath to th virtualFile outgoing from the reference point in sPath
+   * @return the virtualFile represented by sPath
+   * @exception IllegalArgumentException if for {@link IReferencePoint} reference point doesn't
+   *     exists a module, which is contained in sPath
+   */
+  public VirtualFile getResource(@NotNull SPath sPath) {
+    return getResource(sPath.getReferencePoint(), sPath.getProjectRelativePath());
   }
 
   /**
