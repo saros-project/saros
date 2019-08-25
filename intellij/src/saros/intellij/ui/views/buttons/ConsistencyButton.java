@@ -13,6 +13,7 @@ import saros.activities.SPath;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.concurrent.watchdog.IsInconsistentObservable;
 import saros.filesystem.IResource;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.actions.ConsistencyAction;
 import saros.intellij.ui.util.DialogUtils;
@@ -71,6 +72,8 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
   private final ValueChangeListener<Boolean> isConsistencyListener = this::handleConsistencyChange;
 
   @Inject private IsInconsistentObservable inconsistentObservable;
+
+  @Inject private IntelliJReferencePointManager intelliJReferencePointManager;
 
   private volatile SessionInconsistencyState sessionInconsistencyState;
 
@@ -228,7 +231,9 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
 
     for (SPath path : paths) {
       sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_module).append(": ");
-      sbInconsistentFiles.append(path.getProject().getName()).append(", ");
+      sbInconsistentFiles
+          .append(intelliJReferencePointManager.getModule(path.getReferencePoint()).getName())
+          .append(", ");
       sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_file).append(": ");
       sbInconsistentFiles.append(path.getProjectRelativePath().toOSString());
       sbInconsistentFiles.append("\n");

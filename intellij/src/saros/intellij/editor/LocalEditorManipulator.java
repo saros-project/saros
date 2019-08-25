@@ -18,6 +18,7 @@ import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
@@ -31,6 +32,7 @@ public class LocalEditorManipulator {
 
   private final AnnotationManager annotationManager;
   private final ISarosSession sarosSession;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
   private EditorPool editorPool;
@@ -40,11 +42,13 @@ public class LocalEditorManipulator {
   public LocalEditorManipulator(
       AnnotationManager annotationManager,
       EditorManager editorManager,
-      ISarosSession sarosSession) {
+      ISarosSession sarosSession,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.annotationManager = annotationManager;
     this.manager = editorManager;
     this.sarosSession = sarosSession;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     this.editorPool = manager.getEditorPool();
   }
@@ -319,7 +323,10 @@ public class LocalEditorManipulator {
 
     int documentLength = document.getTextLength();
 
-    IFile file = path.getFile();
+    IFile file =
+        intelliJReferencePointManager.getSarosFile(
+            path.getReferencePoint(), path.getProjectRelativePath());
+
     annotationManager.removeAnnotations(file);
 
     String text;

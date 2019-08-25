@@ -11,6 +11,7 @@ import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.annotations.AnnotationManager;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
@@ -23,6 +24,7 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
   private final ISarosSession sarosSession;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -49,13 +51,15 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       Project project,
       AnnotationManager annotationManager,
       LocalEditorHandler localEditorHandler,
-      ISarosSession sarosSession) {
+      ISarosSession sarosSession,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     super(project);
 
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
     this.sarosSession = sarosSession;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   /**
@@ -74,7 +78,9 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       return;
     }
 
-    IFile file = sPath.getFile();
+    IFile file =
+        intelliJReferencePointManager.getSarosFile(
+            sPath.getReferencePoint(), sPath.getProjectRelativePath());
 
     if (sarosSession.isShared(file)) {
       annotationManager.applyStoredAnnotations(file, editor);
@@ -94,7 +100,9 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       return;
     }
 
-    IFile file = sPath.getFile();
+    IFile file =
+        intelliJReferencePointManager.getSarosFile(
+            sPath.getReferencePoint(), sPath.getProjectRelativePath());
 
     if (sarosSession.isShared(file)) {
       annotationManager.updateAnnotationStore(file);

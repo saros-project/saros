@@ -159,10 +159,11 @@ public class SharedResourcesManager implements Startable {
 
     try {
       if (type == FileActivity.Type.CREATED) {
+
         IFile file =
-            (IFile)
-                intelliJReferencePointManager.getSarosResource(
-                    path.getReferencePoint(), path.getProjectRelativePath());
+            intelliJReferencePointManager.getSarosFile(
+                path.getReferencePoint(), path.getProjectRelativePath());
+
         if (file.exists()) {
           localEditorManipulator.handleContentRecovery(
               path, activity.getContent(), activity.getEncoding(), activity.getSource());
@@ -199,13 +200,12 @@ public class SharedResourcesManager implements Startable {
     SPath newPath = activity.getPath();
 
     IFile oldFile =
-        (IFile)
-            intelliJReferencePointManager.getSarosResource(
-                oldPath.getReferencePoint(), oldPath.getProjectRelativePath());
+        intelliJReferencePointManager.getSarosFile(
+            oldPath.getReferencePoint(), oldPath.getProjectRelativePath());
+
     IFile newFile =
-        (IFile)
-            intelliJReferencePointManager.getSarosResource(
-                newPath.getReferencePoint(), newPath.getProjectRelativePath());
+        intelliJReferencePointManager.getSarosFile(
+            newPath.getReferencePoint(), newPath.getProjectRelativePath());
 
     if (!oldFile.exists()) {
       LOG.warn(
@@ -263,10 +263,10 @@ public class SharedResourcesManager implements Startable {
   private void handleFileDeletion(@NotNull FileActivity activity) throws IOException {
 
     SPath path = activity.getPath();
+
     IFile file =
-        (IFile)
-            intelliJReferencePointManager.getSarosResource(
-                path.getReferencePoint(), path.getProjectRelativePath());
+        intelliJReferencePointManager.getSarosFile(
+            path.getReferencePoint(), path.getProjectRelativePath());
 
     if (!file.exists()) {
       LOG.warn("Could not delete file " + file + " as it does not exist.");
@@ -297,10 +297,10 @@ public class SharedResourcesManager implements Startable {
   private void handleFileCreation(@NotNull FileActivity activity) throws IOException {
 
     SPath sPath = activity.getPath();
+
     IFile file =
-        (IFile)
-            intelliJReferencePointManager.getSarosResource(
-                sPath.getReferencePoint(), sPath.getProjectRelativePath());
+        intelliJReferencePointManager.getSarosFile(
+            sPath.getReferencePoint(), sPath.getProjectRelativePath());
 
     if (file.exists()) {
       LOG.warn("Could not create file " + file + " as it already exists.");

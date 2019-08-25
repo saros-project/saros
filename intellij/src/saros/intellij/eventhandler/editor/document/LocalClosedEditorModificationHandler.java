@@ -10,6 +10,7 @@ import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.session.ISarosSession;
 
 /**
@@ -20,6 +21,7 @@ import saros.session.ISarosSession;
  */
 public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentModificationHandler {
   private final AnnotationManager annotationManager;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private final DocumentListener documentListener =
       new DocumentListener() {
@@ -33,11 +35,13 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
       Project project,
       EditorManager editorManager,
       ISarosSession sarosSession,
-      AnnotationManager annotationManager) {
+      AnnotationManager annotationManager,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     super(project, editorManager, sarosSession);
 
     this.annotationManager = annotationManager;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   /**
@@ -62,7 +66,10 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
     String replacedText = event.getOldFragment().toString();
 
     if (!ProjectAPI.isOpen(project, document)) {
-      IFile file = path.getFile();
+
+      IFile file =
+          intelliJReferencePointManager.getSarosFile(
+              path.getReferencePoint(), path.getProjectRelativePath());
 
       int replacedTextLength = replacedText.length();
       if (replacedTextLength > 0) {

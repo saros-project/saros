@@ -17,6 +17,7 @@ import saros.intellij.eventhandler.editor.editorstate.PreexistingSelectionDispat
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
 import saros.intellij.eventhandler.editor.selection.LocalTextSelectionChangeHandler;
 import saros.intellij.eventhandler.editor.viewport.LocalViewPortChangeHandler;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.session.ISarosSession;
 
 /** Factory to instantiate {@link ProjectEventHandlers} objects. */
@@ -27,19 +28,22 @@ public class ProjectEventHandlersFactory {
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
   private final LocalEditorManipulator localEditorManipulator;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   public ProjectEventHandlersFactory(
       EditorManager editorManager,
       ISarosSession sarosSession,
       AnnotationManager annotationManager,
       LocalEditorHandler localEditorHandler,
-      LocalEditorManipulator localEditorManipulator) {
+      LocalEditorManipulator localEditorManipulator,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.editorManager = editorManager;
     this.sarosSession = sarosSession;
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   /**
@@ -62,7 +66,11 @@ public class ProjectEventHandlersFactory {
      */
     projectEventHandlers.add(
         new LocalClosedEditorModificationHandler(
-            project, editorManager, sarosSession, annotationManager));
+            project,
+            editorManager,
+            sarosSession,
+            annotationManager,
+            intelliJReferencePointManager));
 
     projectEventHandlers.add(
         new LocalDocumentModificationHandler(project, editorManager, sarosSession));
@@ -71,7 +79,12 @@ public class ProjectEventHandlersFactory {
      * editor state change handlers
      */
     projectEventHandlers.add(
-        new AnnotationUpdater(project, annotationManager, localEditorHandler, sarosSession));
+        new AnnotationUpdater(
+            project,
+            annotationManager,
+            localEditorHandler,
+            sarosSession,
+            intelliJReferencePointManager));
 
     projectEventHandlers.add(new EditorStatusChangeActivityDispatcher(project, localEditorHandler));
 

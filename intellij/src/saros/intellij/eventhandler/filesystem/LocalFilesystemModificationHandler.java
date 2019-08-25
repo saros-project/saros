@@ -35,6 +35,7 @@ import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
@@ -45,6 +46,7 @@ import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import saros.intellij.filesystem.Filesystem;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.observables.FileReplacementInProgressObservable;
@@ -72,6 +74,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private boolean enabled;
   private boolean disposed;
@@ -181,7 +184,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       ISarosSession session,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       AnnotationManager annotationManager,
-      LocalEditorHandler localEditorHandler) {
+      LocalEditorHandler localEditorHandler,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.project = project;
 
@@ -190,6 +194,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     this.enabled = false;
     this.disposed = false;
@@ -1046,7 +1051,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private void cleanUpDeletedFileState(@NotNull SPath deletedFilePath) {
     editorManager.removeAllEditorsForPath(deletedFilePath);
 
-    annotationManager.removeAnnotations(deletedFilePath.getFile());
+    IFile file =
+        intelliJReferencePointManager.getSarosFile(
+            deletedFilePath.getReferencePoint(), deletedFilePath.getProjectRelativePath());
+
+    annotationManager.removeAnnotations(file);
   }
 
   /**
@@ -1058,7 +1067,14 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private void updateMovedFileState(@NotNull SPath oldFilePath, @NotNull SPath newFilePath) {
     editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
 
-    annotationManager.updateAnnotationPath(oldFilePath.getFile(), newFilePath.getFile());
+    IFile oldFile =
+        intelliJReferencePointManager.getSarosFile(
+            oldFilePath.getReferencePoint(), oldFilePath.getProjectRelativePath());
+    IFile newFile =
+        intelliJReferencePointManager.getSarosFile(
+            newFilePath.getReferencePoint(), newFilePath.getProjectRelativePath());
+
+    annotationManager.updateAnnotationPath(oldFile, newFile);
   }
 
   /**
