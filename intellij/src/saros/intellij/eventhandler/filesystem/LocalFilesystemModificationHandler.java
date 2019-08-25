@@ -32,7 +32,9 @@ import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.filesystem.IPath;
+import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
@@ -40,6 +42,8 @@ import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
+import saros.intellij.filesystem.IntelliJFileImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.observables.FileReplacementInProgressObservable;
@@ -67,6 +71,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private boolean enabled;
   private boolean disposed;
@@ -176,7 +181,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       ISarosSession session,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       AnnotationManager annotationManager,
-      LocalEditorHandler localEditorHandler) {
+      LocalEditorHandler localEditorHandler,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.project = project;
 
@@ -190,6 +196,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     this.disposed = false;
 
     this.localFileSystem = LocalFileSystem.getInstance();
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   /**
@@ -369,6 +376,12 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     SPath path = VirtualFileConverter.convertToSPath(project, deletedVirtualFile);
 
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
+
+    IFile file = resource.adaptTo(IntelliJFileImpl.class);
+
     if (path == null || !session.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource deletion: " + deletedVirtualFile);
@@ -393,7 +406,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       editorManager.removeAllEditorsForPath(path);
 
-      annotationManager.removeAnnotations(path.getFile());
+      annotationManager.removeAnnotations(file);
     }
 
     dispatchActivity(activity);
@@ -617,11 +630,18 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     SPath oldFilePath = VirtualFileConverter.convertToSPath(project, oldFile);
     SPath newParentPath = VirtualFileConverter.convertToSPath(project, newBaseParent);
 
+    IResource oldResource =
+        intelliJReferencePointManager.getSarosResource(
+            oldFilePath.getReferencePoint(), oldFilePath.getProjectRelativePath());
+
+    IResource newParentResource =
+        intelliJReferencePointManager.getSarosResource(
+            newParentPath.getReferencePoint(), newParentPath.getProjectRelativePath());
+
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldFilePath != null && session.isShared(oldFilePath.getResource());
-    boolean newPathIsShared =
-        newParentPath != null && session.isShared(newParentPath.getResource());
+    boolean oldPathIsShared = oldFilePath != null && session.isShared(oldResource);
+    boolean newPathIsShared = newParentPath != null && session.isShared(newParentResource);
 
     boolean fileIsOpen = ProjectAPI.isOpen(project, oldFile);
 
@@ -662,7 +682,13 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
 
-      annotationManager.updateAnnotationPath(oldFilePath.getFile(), newFilePath.getFile());
+      IResource newFileResource =
+          intelliJReferencePointManager.getSarosResource(
+              newFilePath.getReferencePoint(), newFilePath.getProjectRelativePath());
+
+      annotationManager.updateAnnotationPath(
+          oldResource.adaptTo(IntelliJFileImpl.class),
+          newFileResource.adaptTo(IntelliJFileImpl.class));
 
     } else if (newPathIsShared) {
       // moved file into shared module
@@ -697,7 +723,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       editorManager.removeAllEditorsForPath(oldFilePath);
 
-      annotationManager.removeAnnotations(oldFilePath.getFile());
+      annotationManager.removeAnnotations(oldResource.adaptTo(IntelliJFileImpl.class));
 
     } else {
       // neither source nor destination are shared

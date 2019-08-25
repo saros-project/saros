@@ -39,12 +39,15 @@ import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
+import saros.filesystem.IResource;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
 import saros.intellij.filesystem.Filesystem;
+import saros.intellij.filesystem.IntelliJFileImpl;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityConsumer;
@@ -131,6 +134,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return;
           }
 
+          IResource resource =
+              intelliJReferencePointManager.getSarosResource(
+                  path.getReferencePoint(), path.getProjectRelativePath());
+
+          IFile file = resource.adaptTo(IntelliJFileImpl.class);
+
           LOG.debug(path + " text edit activity received " + editorActivity);
 
           User user = editorActivity.getSource();
@@ -139,7 +148,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           localEditorManipulator.applyTextOperations(path, operation);
 
-          adjustAnnotationsAfterEdit(user, path.getFile(), editorPool.getEditor(path), operation);
+          adjustAnnotationsAfterEdit(user, file, editorPool.getEditor(path), operation);
 
           editorListenerDispatch.textEdited(editorActivity);
         }
@@ -198,7 +207,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return;
           }
 
-          IFile file = path.getFile();
+          IResource resource =
+              intelliJReferencePointManager.getSarosResource(
+                  path.getReferencePoint(), path.getProjectRelativePath());
+
+          IFile file = resource.adaptTo(IntelliJFileImpl.class);
 
           LOG.debug("Text selection activity received: " + path + ", " + selection);
 
@@ -259,8 +272,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
          * correctly set the active editor in the remote user editor state for the local user.
          *
          * <p>This will not be executed for the user that finished the project negotiation as their
-         * user editor state will be propagated through {@link #resourcesAdded(IProject)} when the
-         * shared resources are initially added.
+         * user editor state will be propagated through {@link #resourcesAdded(IReferencePoint)}
+         * when the shared resources are initially added.
          */
         private void sendAwarenessInformation(@NotNull User user) {
           User localUser = session.getLocalUser();
@@ -581,6 +594,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   private final SharedEditorListenerDispatch editorListenerDispatch =
       new SharedEditorListenerDispatch();
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private boolean hasWriteAccess;
   // FIXME why is this never assigned? Either assign or remove flag
@@ -588,10 +602,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   public EditorManager(
       ISarosSessionManager sessionManager,
-      FileReplacementInProgressObservable fileReplacementInProgressObservable) {
+      FileReplacementInProgressObservable fileReplacementInProgressObservable,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   @Override

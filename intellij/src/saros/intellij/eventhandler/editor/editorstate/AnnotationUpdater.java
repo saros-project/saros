@@ -9,8 +9,11 @@ import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.filesystem.IFile;
+import saros.filesystem.IResource;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.annotations.AnnotationManager;
+import saros.intellij.filesystem.IntelliJFileImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
@@ -23,6 +26,7 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
   private final ISarosSession sarosSession;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -49,13 +53,15 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       Project project,
       AnnotationManager annotationManager,
       LocalEditorHandler localEditorHandler,
-      ISarosSession sarosSession) {
+      ISarosSession sarosSession,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     super(project);
 
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
     this.sarosSession = sarosSession;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   /**
@@ -74,7 +80,11 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       return;
     }
 
-    IFile file = sPath.getFile();
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            sPath.getReferencePoint(), sPath.getProjectRelativePath());
+
+    IFile file = resource.adaptTo(IntelliJFileImpl.class);
 
     if (sarosSession.isShared(file)) {
       annotationManager.applyStoredAnnotations(file, editor);
@@ -94,7 +104,11 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
       return;
     }
 
-    IFile file = sPath.getFile();
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            sPath.getReferencePoint(), sPath.getProjectRelativePath());
+
+    IFile file = resource.adaptTo(IntelliJFileImpl.class);
 
     if (sarosSession.isShared(file)) {
       annotationManager.updateAnnotationStore(file);

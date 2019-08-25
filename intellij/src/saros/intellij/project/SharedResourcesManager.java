@@ -23,6 +23,7 @@ import saros.intellij.editor.SelectedEditorStateSnapshot;
 import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler.ApplicationEventHandlerType;
+import saros.intellij.filesystem.IntelliJFileImpl;
 import saros.intellij.filesystem.IntelliJFolderImpl;
 import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.repackaged.picocontainer.Startable;
@@ -161,10 +162,12 @@ public class SharedResourcesManager implements Startable {
 
     try {
       if (type == FileActivity.Type.CREATED) {
-        IFile file =
-            (IFile)
-                intelliJReferencePointManager.getSarosResource(
-                    path.getReferencePoint(), path.getProjectRelativePath());
+        IResource resource =
+            intelliJReferencePointManager.getSarosResource(
+                path.getReferencePoint(), path.getProjectRelativePath());
+
+        IFile file = resource.adaptTo(IntelliJFileImpl.class);
+
         if (file.exists()) {
           localEditorManipulator.handleContentRecovery(
               path, activity.getContent(), activity.getEncoding(), activity.getSource());
@@ -200,14 +203,17 @@ public class SharedResourcesManager implements Startable {
     SPath oldPath = activity.getOldPath();
     SPath newPath = activity.getPath();
 
-    IFile oldFile =
-        (IFile)
-            intelliJReferencePointManager.getSarosResource(
-                oldPath.getReferencePoint(), oldPath.getProjectRelativePath());
-    IFile newFile =
-        (IFile)
-            intelliJReferencePointManager.getSarosResource(
-                newPath.getReferencePoint(), newPath.getProjectRelativePath());
+    IResource oldResource =
+        intelliJReferencePointManager.getSarosResource(
+            oldPath.getReferencePoint(), oldPath.getProjectRelativePath());
+
+    IFile oldFile = oldResource.adaptTo(IntelliJFileImpl.class);
+
+    IResource newResource =
+        intelliJReferencePointManager.getSarosResource(
+            newPath.getReferencePoint(), newPath.getProjectRelativePath());
+
+    IFile newFile = newResource.adaptTo(IntelliJFileImpl.class);
 
     if (!oldFile.exists()) {
       LOG.warn(
@@ -265,10 +271,11 @@ public class SharedResourcesManager implements Startable {
   private void handleFileDeletion(@NotNull FileActivity activity) throws IOException {
 
     SPath path = activity.getPath();
-    IFile file =
-        (IFile)
-            intelliJReferencePointManager.getSarosResource(
-                path.getReferencePoint(), path.getProjectRelativePath());
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
+
+    IFile file = resource.adaptTo(IntelliJFileImpl.class);
 
     if (!file.exists()) {
       LOG.warn("Could not delete file " + file + " as it does not exist.");
@@ -299,10 +306,12 @@ public class SharedResourcesManager implements Startable {
   private void handleFileCreation(@NotNull FileActivity activity) throws IOException {
 
     SPath sPath = activity.getPath();
-    IFile file =
-        (IFile)
-            intelliJReferencePointManager.getSarosResource(
-                sPath.getReferencePoint(), sPath.getProjectRelativePath());
+
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            sPath.getReferencePoint(), sPath.getProjectRelativePath());
+
+    IFile file = resource.adaptTo(IntelliJFileImpl.class);
 
     if (file.exists()) {
       LOG.warn("Could not create file " + file + " as it already exists.");
