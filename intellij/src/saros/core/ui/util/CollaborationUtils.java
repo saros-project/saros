@@ -28,6 +28,7 @@ import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.intellij.SarosComponent;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.runtime.UIMonitoredJob;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.DialogUtils;
@@ -53,6 +54,7 @@ public class CollaborationUtils {
   private static final Logger LOG = Logger.getLogger(CollaborationUtils.class);
 
   @Inject private static ISarosSessionManager sessionManager;
+  @Inject private static IntelliJReferencePointManager intelliJReferencePointManager;
 
   static {
     SarosPluginContext.initComponent(new CollaborationUtils());
@@ -527,5 +529,10 @@ public class CollaborationUtils {
   private static void fillReferencePointManager(
       IReferencePointManager referencePointManager, Set<IProject> projects) {
     referencePointManager.putSetOfProjects(projects);
+
+    for (IProject project : projects) {
+      intelliJReferencePointManager.putIfAbsent(
+          project.getReferencePoint(), project.adaptTo(IntelliJProjectImpl.class).getModule());
+    }
   }
 }

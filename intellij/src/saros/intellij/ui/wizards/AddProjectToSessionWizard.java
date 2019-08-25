@@ -39,6 +39,7 @@ import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.negotiation.ModuleConfiguration;
 import saros.intellij.negotiation.ModuleConfigurationInitializer;
 import saros.intellij.ui.Messages;
@@ -101,6 +102,7 @@ public class AddProjectToSessionWizard extends Wizard {
   @Inject private IChecksumCache checksumCache;
 
   @Inject private ISarosSessionManager sessionManager;
+  @Inject private IntelliJReferencePointManager intelliJReferencePointManager;
 
   private final SelectLocalModuleRepresentationPage selectLocalModuleRepresentationPage;
   private final TextAreaPage fileListPage;
@@ -802,5 +804,7 @@ public class AddProjectToSessionWizard extends Wizard {
   private void fillReferencePointManager(
       IReferencePointManager referencePointManager, IProject project) {
     referencePointManager.putIfAbsent(project.getReferencePoint(), project);
+    intelliJReferencePointManager.putIfAbsent(
+        project.getReferencePoint(), project.adaptTo(IntelliJProjectImpl.class).getModule());
   }
 }
