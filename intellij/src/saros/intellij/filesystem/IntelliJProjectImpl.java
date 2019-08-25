@@ -54,7 +54,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     moduleRoot = getModuleContentRoot(module);
 
-    this.referencePoint = new ReferencePointImpl(getFullPath());
+    this.referencePoint =
+        new ReferencePointImpl(IntelliJPathImpl.fromString(module.getModuleFilePath()));
   }
 
   /**
