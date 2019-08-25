@@ -22,6 +22,7 @@ import saros.intellij.editor.SelectedEditorStateSnapshot;
 import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler.ApplicationEventHandlerType;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
@@ -43,6 +44,7 @@ public class SharedResourcesManager implements Startable {
   private final LocalEditorManipulator localEditorManipulator;
   private final AnnotationManager annotationManager;
   private final SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   @Override
   public void start() {
@@ -66,7 +68,8 @@ public class SharedResourcesManager implements Startable {
       LocalEditorManipulator localEditorManipulator,
       AnnotationManager annotationManager,
       SharedIDEContext sharedIDEContext,
-      SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory) {
+      SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.sarosSession = sarosSession;
     this.localEditorHandler = localEditorHandler;
@@ -74,6 +77,7 @@ public class SharedResourcesManager implements Startable {
     this.annotationManager = annotationManager;
     this.sharedIDEContext = sharedIDEContext;
     this.selectedEditorStateSnapshotFactory = selectedEditorStateSnapshotFactory;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   private final IActivityConsumer consumer =
@@ -155,7 +159,11 @@ public class SharedResourcesManager implements Startable {
 
     try {
       if (type == FileActivity.Type.CREATED) {
-        if (path.getFile().exists()) {
+        IFile file =
+            (IFile)
+                intelliJReferencePointManager.getSarosResource(
+                    path.getReferencePoint(), path.getProjectRelativePath());
+        if (file.exists()) {
           localEditorManipulator.handleContentRecovery(
               path, activity.getContent(), activity.getEncoding(), activity.getSource());
 
@@ -190,8 +198,14 @@ public class SharedResourcesManager implements Startable {
     SPath oldPath = activity.getOldPath();
     SPath newPath = activity.getPath();
 
-    IFile oldFile = oldPath.getFile();
-    IFile newFile = newPath.getFile();
+    IFile oldFile =
+        (IFile)
+            intelliJReferencePointManager.getSarosResource(
+                oldPath.getReferencePoint(), oldPath.getProjectRelativePath());
+    IFile newFile =
+        (IFile)
+            intelliJReferencePointManager.getSarosResource(
+                newPath.getReferencePoint(), newPath.getProjectRelativePath());
 
     if (!oldFile.exists()) {
       LOG.warn(
@@ -249,7 +263,10 @@ public class SharedResourcesManager implements Startable {
   private void handleFileDeletion(@NotNull FileActivity activity) throws IOException {
 
     SPath path = activity.getPath();
-    IFile file = path.getFile();
+    IFile file =
+        (IFile)
+            intelliJReferencePointManager.getSarosResource(
+                path.getReferencePoint(), path.getProjectRelativePath());
 
     if (!file.exists()) {
       LOG.warn("Could not delete file " + file + " as it does not exist.");
@@ -279,8 +296,11 @@ public class SharedResourcesManager implements Startable {
 
   private void handleFileCreation(@NotNull FileActivity activity) throws IOException {
 
-    SPath path = activity.getPath();
-    IFile file = path.getFile();
+    SPath sPath = activity.getPath();
+    IFile file =
+        (IFile)
+            intelliJReferencePointManager.getSarosResource(
+                sPath.getReferencePoint(), sPath.getProjectRelativePath());
 
     if (file.exists()) {
       LOG.warn("Could not create file " + file + " as it already exists.");
@@ -302,7 +322,11 @@ public class SharedResourcesManager implements Startable {
 
   private void handleFolderCreation(@NotNull FolderCreatedActivity activity) throws IOException {
 
-    IFolder folder = activity.getPath().getFolder();
+    SPath sPath = activity.getPath();
+
+    IFolder folder =
+        intelliJReferencePointManager.getSarosFolder(
+            sPath.getReferencePoint(), sPath.getProjectRelativePath());
 
     if (folder.exists()) {
       LOG.warn("Could not create folder " + folder + " as it already exist.");
@@ -332,8 +356,11 @@ public class SharedResourcesManager implements Startable {
    */
   // TODO deal with children that are not part of the current session (submodules)
   private void handleFolderDeletion(@NotNull FolderDeletedActivity activity) throws IOException {
+    SPath sPath = activity.getPath();
 
-    IFolder folder = activity.getPath().getFolder();
+    IFolder folder =
+        intelliJReferencePointManager.getSarosFolder(
+            sPath.getReferencePoint(), sPath.getProjectRelativePath());
 
     if (!folder.exists()) {
       LOG.warn("Could not delete folder " + folder + " as it does not exist.");
