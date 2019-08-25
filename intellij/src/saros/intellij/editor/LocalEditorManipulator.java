@@ -19,7 +19,6 @@ import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.filesystem.IntelliJReferencePointManager;
-import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.session.ISarosSession;
@@ -71,7 +70,7 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+    VirtualFile virtualFile = intelliJReferencePointManager.getResource(path);
 
     if (virtualFile == null || !virtualFile.exists()) {
       LOG.warn(
@@ -105,7 +104,7 @@ public class LocalEditorManipulator {
 
     LOG.debug("Removed editor for path " + path + " from EditorPool");
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+    VirtualFile virtualFile = intelliJReferencePointManager.getResource(path);
 
     if (virtualFile == null || !virtualFile.exists()) {
       LOG.warn(
@@ -143,7 +142,7 @@ public class LocalEditorManipulator {
      * editorPool so we have to create it temporarily here.
      */
     if (doc == null) {
-      VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+      VirtualFile virtualFile = intelliJReferencePointManager.getResource(path);
 
       if (virtualFile == null || !virtualFile.exists()) {
         LOG.warn(
@@ -299,7 +298,7 @@ public class LocalEditorManipulator {
    * @see Document
    */
   public void handleContentRecovery(SPath path, byte[] content, String encoding, User source) {
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+    VirtualFile virtualFile = intelliJReferencePointManager.getResource(path);
     if (virtualFile == null) {
       LOG.warn(
           "Could not recover file content of "

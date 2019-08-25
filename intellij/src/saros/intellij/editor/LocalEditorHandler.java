@@ -11,6 +11,7 @@ import saros.activities.SPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
@@ -24,14 +25,18 @@ public class LocalEditorHandler {
 
   private final EditorManager manager;
   private final ISarosSession sarosSession;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
   private final EditorPool editorPool;
 
-  public LocalEditorHandler(EditorManager editorManager, ISarosSession sarosSession) {
+  public LocalEditorHandler(
+      EditorManager editorManager,
+      ISarosSession sarosSession,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
     this.manager = editorManager;
     this.sarosSession = sarosSession;
-
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
     this.editorPool = manager.getEditorPool();
   }
 
@@ -177,7 +182,7 @@ public class LocalEditorHandler {
     Document document = editorPool.getDocument(path);
 
     if (document == null) {
-      VirtualFile file = VirtualFileConverter.convertToVirtualFile(path);
+      VirtualFile file = intelliJReferencePointManager.getResource(path);
 
       if (file == null || !file.exists()) {
         LOG.warn("Failed to save document for " + path + " - could not get a valid VirtualFile");
