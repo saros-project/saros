@@ -36,8 +36,8 @@ import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.negotiation.ModuleConfiguration;
 import saros.intellij.negotiation.ModuleConfigurationInitializer;
-import saros.intellij.negotiation.ModuleConfigurationProvider;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.intellij.ui.widgets.progress.ProgessMonitorAdapter;
@@ -187,7 +187,10 @@ public class AddProjectToSessionWizard extends Wizard {
           Map<String, String> moduleParameters =
               negotiation.getProjectNegotiationData(remoteProjectID).getAdditionalProjectData();
 
-          String moduleType = moduleParameters.get(ModuleConfigurationProvider.MODULE_TYPE_KEY);
+          ModuleConfiguration moduleConfiguration =
+              new ModuleConfiguration(moduleParameters, false);
+
+          String moduleType = moduleConfiguration.getModuleType();
 
           if (moduleType == null) {
             LOG.error("Aborted module creation as no module type was received.");
@@ -240,38 +243,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
           }
 
-          ISarosSession session = sessionManager.getSession();
-
-          if (session == null) {
-            LOG.error("Encountered project negotiation without running session");
-
-            cancelNegotiation("No running session");
-
-            NotificationPanel.showError(
-                Messages.AddProjectToSessionWizard_no_session_message,
-                Messages.AddProjectToSessionWizard_no_session_title);
-
-            return;
-          }
-
-          ModuleConfigurationInitializer moduleConfigurationInitializer =
-              session.getComponent(ModuleConfigurationInitializer.class);
-
-          if (moduleConfigurationInitializer == null) {
-            LOG.error(
-                "Could not obtain class from session context - "
-                    + ModuleConfigurationInitializer.class.getSimpleName());
-
-            cancelNegotiation("Failed to create shared module");
-
-            NotificationPanel.showError(
-                Messages.AddProjectToSessionWizard_context_teardown_message,
-                Messages.AddProjectToSessionWizard_context_teardown_title);
-
-            return;
-          }
-
-          moduleConfigurationInitializer.enqueueModuleConfigurationChange(module, moduleParameters);
+          queueModuleConfigurationChange(module, moduleConfiguration);
 
           IProject sharedProject = new IntelliJProjectImpl(module);
 
@@ -310,11 +282,64 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
           }
 
+          Map<String, String> moduleParameters =
+              negotiation.getProjectNegotiationData(remoteProjectID).getAdditionalProjectData();
+
+          ModuleConfiguration moduleConfiguration = new ModuleConfiguration(moduleParameters, true);
+
+          /*
+           * TODO move to finish of FilesChangedPage iff back button is configured to function as
+           *  the module might change in that case
+           */
+          queueModuleConfigurationChange(existingModule, moduleConfiguration);
+
           localProjects.put(remoteProjectID, sharedProject);
 
           prepareFilesChangedPage(localProjects);
 
           setTopPanelText(Messages.AddProjectToSessionWizard_description_changed_files);
+        }
+
+        /**
+         * Adds the given module configuration to the {@link ModuleConfigurationInitializer}.
+         *
+         * <p>Cancels the negotiation if the session or session context is no longer valid.
+         *
+         * @param module the module the configuration belongs to
+         * @param moduleConfiguration the module configuration
+         */
+        private void queueModuleConfigurationChange(
+            @NotNull Module module, @NotNull ModuleConfiguration moduleConfiguration) {
+
+          ISarosSession session = sessionManager.getSession();
+
+          if (session == null) {
+            LOG.error("Encountered project negotiation without running session");
+
+            NotificationPanel.showError(
+                Messages.AddProjectToSessionWizard_no_session_message,
+                Messages.AddProjectToSessionWizard_no_session_title);
+
+            return;
+          }
+
+          ModuleConfigurationInitializer moduleConfigurationInitializer =
+              session.getComponent(ModuleConfigurationInitializer.class);
+
+          if (moduleConfigurationInitializer == null) {
+            LOG.error(
+                "Could not obtain class from session context - "
+                    + ModuleConfigurationInitializer.class.getSimpleName());
+
+            NotificationPanel.showError(
+                Messages.AddProjectToSessionWizard_context_teardown_message,
+                Messages.AddProjectToSessionWizard_context_teardown_title);
+
+            return;
+          }
+
+          moduleConfigurationInitializer.enqueueModuleConfigurationChange(
+              module, moduleConfiguration);
         }
 
         /**
