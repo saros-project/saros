@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.TextRange;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import saros.SarosPluginContext;
 import saros.exceptions.IllegalAWTContextException;
 
@@ -192,5 +193,35 @@ public class SafeDialogUtils {
         ModalityState.defaultModalityState());
 
     return response.get();
+  }
+
+  /**
+   * Shows a non-blocking yes/no dialog. The passed <code>runnable</code> can be used to run code
+   * after the dialog is finished. However, it is <b>only</b> run if the user finishes the dialog
+   * with the option {@link Messages#YES}.
+   *
+   * @param project the project used as a reference to generate and position the dialog
+   * @param message the text displayed as the message of the dialog
+   * @param title the text displayed as the title of the dialog
+   * @param runAfter the runnable to execute if the user chooses {@link Messages#YES}
+   */
+  public static void showYesNoDialog(
+      @NotNull Project project,
+      @NotNull String message,
+      @NotNull String title,
+      @NotNull Runnable runAfter) {
+
+    LOG.info("Showing non-blocking yes/no dialog: " + title + " - " + message);
+
+    application.invokeLater(
+        () -> {
+          int option =
+              Messages.showYesNoDialog(project, message, title, Messages.getQuestionIcon());
+
+          if (option == Messages.YES) {
+            runAfter.run();
+          }
+        },
+        ModalityState.defaultModalityState());
   }
 }
