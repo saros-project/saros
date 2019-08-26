@@ -190,11 +190,16 @@ public class ModuleConfigurationProvider implements ProjectDataProvider {
    * the key values defined in this class.
    *
    * @param options string containing a number of options
-   * @return a list of all options contained in the passed string
+   * @return a list of all options contained in the passed string or <code>null</code> if the passed
+   *     option string is <code>null</code>
    * @see ProjectNegotiationData#getAdditionalProjectData()
    */
-  @NotNull
-  public static String[] split(@NotNull String options) {
+  @Nullable
+  public static String[] split(@Nullable String options) {
+    if (options == null) {
+      return null;
+    }
+
     String[] splitOptions = SPLIT_PATTERN.split(options);
 
     for (int i = 0; i < splitOptions.length; i++) {

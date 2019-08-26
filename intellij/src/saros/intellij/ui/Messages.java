@@ -183,5 +183,8 @@ public class Messages {
   public static String ColorPreferences_user_example_text_contribution;
   public static String ColorPreferences_user_example_text_selection;
 
+  public static String ModuleConfigurationInitializer_override_module_config_title;
+  public static String ModuleConfigurationInitializer_override_module_config_message;
+
   private Messages() {}
 }

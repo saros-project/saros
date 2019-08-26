@@ -5,19 +5,28 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
+import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.JpsElement;
-import org.jetbrains.jps.model.java.JavaResourceRootType;
-import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 import saros.filesystem.IProject;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.ui.Messages;
+import saros.intellij.ui.util.SafeDialogUtils;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 import saros.session.ISessionListener;
@@ -32,7 +41,7 @@ public class ModuleConfigurationInitializer implements Startable {
 
   private final ISarosSession session;
 
-  private final Map<Module, Map<String, String>> queuedModuleOptions;
+  private final Map<Module, ModuleConfiguration> queuedModuleOptions;
 
   private final ISessionListener sessionListener =
       new ISessionListener() {
@@ -64,12 +73,18 @@ public class ModuleConfigurationInitializer implements Startable {
    * the passed options to be applied to the module once it is officially added to the session.
    *
    * @param module the module to apply the options to
-   * @param configurationOptions the configuration options to apply to the module
+   * @param moduleConfiguration the configuration options to apply to the module
    */
   public void enqueueModuleConfigurationChange(
-      @NotNull Module module, @NotNull Map<String, String> configurationOptions) {
+      @NotNull Module module, @NotNull ModuleConfiguration moduleConfiguration) {
 
-    queuedModuleOptions.put(module, configurationOptions);
+    log.debug(
+        "Queued module config for module "
+            + module
+            + " - existing? "
+            + moduleConfiguration.isExistingModule());
+
+    queuedModuleOptions.put(module, moduleConfiguration);
   }
 
   /**
@@ -81,17 +96,146 @@ public class ModuleConfigurationInitializer implements Startable {
   private void applyModuleConfiguration(@NotNull IProject wrappedModule) {
     Module module = wrappedModule.adaptTo(IntelliJProjectImpl.class).getModule();
 
-    Map<String, String> configurationOptions = queuedModuleOptions.remove(module);
+    ModuleConfiguration moduleConfiguration = queuedModuleOptions.remove(module);
 
-    if (configurationOptions == null) {
+    if (moduleConfiguration == null) {
       log.debug("Skipped module root model adjustment as not options were found - " + module);
 
       return;
     }
 
-    ModuleRootModificationUtil.updateModel(
-        module,
-        modifiableRootModel -> applyModuleConfiguration(modifiableRootModel, configurationOptions));
+    if (!moduleConfiguration.isExistingModule()) {
+      ModuleRootModificationUtil.updateModel(
+          module,
+          modifiableRootModel ->
+              applyModuleConfiguration(modifiableRootModel, moduleConfiguration));
+
+      return;
+    }
+
+    ContentEntry[] contentEntries = ModuleRootManager.getInstance(module).getContentEntries();
+
+    if (contentEntries.length != 1) {
+      log.error("Encountered shared module with multiple content roots - " + module);
+
+      return;
+    }
+
+    ContentEntry contentEntry = contentEntries[0];
+
+    if (!configurationDiffers(contentEntry, moduleConfiguration.getRootPaths())) {
+      return;
+    }
+
+    Runnable changeModuleConfiguration =
+        () ->
+            ModuleRootModificationUtil.updateModel(
+                module,
+                modifiableRootModel -> {
+                  resetModuleConfiguration(modifiableRootModel);
+                  applyModuleConfiguration(modifiableRootModel, moduleConfiguration);
+                });
+
+    SafeDialogUtils.showYesNoDialog(
+        module.getProject(),
+        Messages.ModuleConfigurationInitializer_override_module_config_message,
+        Messages.ModuleConfigurationInitializer_override_module_config_title,
+        changeModuleConfiguration);
+  }
+
+  /**
+   * Returns whether the content entry source root configuration matches the passed configuration.
+   *
+   * @param contentEntry the content entry to check
+   * @param rootPaths the root paths received from the host
+   * @return <code>true</code> if the root paths of the passed content entry match the paths
+   *     received from the host, <code>false</code> otherwise
+   */
+  private boolean configurationDiffers(
+      @NotNull ContentEntry contentEntry,
+      @NotNull Map<JpsModuleSourceRootType<? extends JpsElement>, String[]> rootPaths) {
+
+    for (Entry<JpsModuleSourceRootType<? extends JpsElement>, String[]> entry :
+        rootPaths.entrySet()) {
+
+      JpsModuleSourceRootType<? extends JpsElement> type = entry.getKey();
+      String[] paths = entry.getValue();
+
+      Set<String> remoteRoots;
+      if (paths != null) {
+        remoteRoots = Arrays.stream(paths).collect(Collectors.toSet());
+      } else {
+        remoteRoots = Collections.emptySet();
+      }
+
+      String contentEntryPath = contentEntry.getUrl();
+
+      Set<String> localRoots =
+          contentEntry
+              .getSourceFolders(type)
+              .stream()
+              .map(SourceFolder::getUrl)
+              .map(sourcePath -> relativize(contentEntryPath, sourcePath))
+              .collect(Collectors.toSet());
+
+      if (!remoteRoots.equals(localRoots)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Relativizes the given source path against the given base path.
+   *
+   * @param base the base path
+   * @param path the path to the source location
+   * @return the relative path from the base path to the given source location
+   */
+  @NotNull
+  private String relativize(@NotNull String base, @NotNull String path) {
+    assert path.startsWith(base)
+        : "Encountered path that is not located below the given base directory";
+
+    Path basePath = Paths.get(base);
+    Path childPath = Paths.get(path);
+
+    Path relativePath = basePath.relativize(childPath);
+
+    return relativePath.toString();
+  }
+
+  /**
+   * Removes all source roots from he given root model.
+   *
+   * @param modifiableRootModel the root model to modify
+   */
+  private void resetModuleConfiguration(@NotNull ModifiableRootModel modifiableRootModel) {
+    log.debug("Resetting module configuration for module " + modifiableRootModel.getModule());
+
+    Module module = modifiableRootModel.getModule();
+
+    ContentEntry[] contentEntries = modifiableRootModel.getContentEntries();
+
+    if (contentEntries.length != 1) {
+      log.error("Encountered shared module with multiple content roots - " + module);
+
+      return;
+    }
+
+    ContentEntry contentEntry = contentEntries[0];
+
+    VirtualFile contentEntryFile = contentEntry.getFile();
+
+    if (contentEntryFile == null) {
+      log.error(
+          "Content root for shared module does not have a valid local representation - " + module);
+
+      return;
+    }
+
+    Arrays.stream(contentEntry.getSourceFolders()).forEach(contentEntry::removeSourceFolder);
   }
 
   /**
@@ -101,23 +245,17 @@ public class ModuleConfigurationInitializer implements Startable {
    * <p>The available options are defined through keys in {@link ModuleConfigurationProvider}.
    *
    * @param modifiableRootModel the modifiable root model of the module
-   * @param configurationOptions the configuration options for the module
+   * @param moduleConfiguration the configuration options for the module
    */
   private void applyModuleConfiguration(
       @NotNull ModifiableRootModel modifiableRootModel,
-      @NotNull Map<String, String> configurationOptions) {
+      @NotNull ModuleConfiguration moduleConfiguration) {
+
+    log.debug("Applying module configuration for module " + modifiableRootModel.getModule());
 
     Module module = modifiableRootModel.getModule();
 
-    ContentEntry[] contentEntries = modifiableRootModel.getContentEntries();
-
-    if (contentEntries.length != 1) {
-      log.error("Encountered shared module with multiple content roots - " + module);
-    }
-
-    ContentEntry contentEntry = contentEntries[0];
-
-    String sdkName = configurationOptions.get(ModuleConfigurationProvider.SDK_KEY);
+    String sdkName = moduleConfiguration.getSdkName();
 
     if (sdkName != null) {
       Sdk sdk;
@@ -132,42 +270,28 @@ public class ModuleConfigurationInitializer implements Startable {
           "Did not receive any SDK configuration data. This should not be possible and could be an indication for a version mismatch.");
     }
 
-    VirtualFile contentRoot = contentEntry.getFile();
+    ContentEntry[] contentEntries = modifiableRootModel.getContentEntries();
 
-    if (contentRoot == null) {
+    if (contentEntries.length != 1) {
+      log.error("Encountered shared module with multiple content roots - " + module);
+
+      return;
+    }
+
+    ContentEntry contentEntry = contentEntries[0];
+
+    VirtualFile contentEntryFile = contentEntry.getFile();
+
+    if (contentEntryFile == null) {
       log.error(
           "Content root for shared module does not have a valid local representation - " + module);
 
       return;
     }
 
-    addRoot(
-        module,
-        contentEntry,
-        contentRoot,
-        JavaSourceRootType.SOURCE,
-        configurationOptions.get(ModuleConfigurationProvider.SOURCE_ROOTS_KEY));
-
-    addRoot(
-        module,
-        contentEntry,
-        contentRoot,
-        JavaSourceRootType.TEST_SOURCE,
-        configurationOptions.get(ModuleConfigurationProvider.TEST_SOURCE_ROOTS_KEY));
-
-    addRoot(
-        module,
-        contentEntry,
-        contentRoot,
-        JavaResourceRootType.RESOURCE,
-        configurationOptions.get(ModuleConfigurationProvider.RESOURCE_ROOTS_KEY));
-
-    addRoot(
-        module,
-        contentEntry,
-        contentRoot,
-        JavaResourceRootType.TEST_RESOURCE,
-        configurationOptions.get(ModuleConfigurationProvider.TEST_RESOURCE_ROOTS_KEY));
+    moduleConfiguration
+        .getRootPaths()
+        .forEach((type, paths) -> addRoot(module, contentEntry, contentEntryFile, type, paths));
   }
 
   /**
@@ -190,15 +314,13 @@ public class ModuleConfigurationInitializer implements Startable {
       @NotNull ContentEntry contentEntry,
       @NotNull VirtualFile contentEntryFile,
       @NotNull JpsModuleSourceRootType<T> rootType,
-      @Nullable String relativeSourceRootPaths) {
+      @Nullable String[] relativeSourceRootPaths) {
 
     if (relativeSourceRootPaths == null) {
       return;
     }
 
-    String[] relativeSourcePaths = ModuleConfigurationProvider.split(relativeSourceRootPaths);
-
-    for (String relativeSourcePath : relativeSourcePaths) {
+    for (String relativeSourcePath : relativeSourceRootPaths) {
       VirtualFile sourceRoot = contentEntryFile.findFileByRelativePath(relativeSourcePath);
 
       if (sourceRoot != null) {
