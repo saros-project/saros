@@ -15,9 +15,11 @@ import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
+import org.eclipse.ui.texteditor.ITextEditor;
 import saros.activities.SPath;
 import saros.editor.internal.EditorAPI;
 import saros.filesystem.ResourceAdapterFactory;
@@ -121,6 +123,8 @@ final class EditorPool {
       LOG.warn("editor part does not use a file storage: " + editorPart);
       return;
     }
+
+    findAndLogDocumentProviderIssues(editorPart);
 
     /*
      * Connecting causes Conversion of Delimiters which trigger Selection
@@ -309,5 +313,37 @@ final class EditorPool {
    */
   public void setDocumentListenerEnabled(final boolean enabled) {
     documentListener.setEnabled(enabled);
+  }
+
+  private static void findAndLogDocumentProviderIssues(final IEditorPart editorPart) {
+
+    final IDocumentProvider defaultDocumentProvider =
+        EditorAPI.getDocumentProvider(editorPart.getEditorInput());
+
+    if (!(defaultDocumentProvider instanceof TextFileDocumentProvider)) {
+      LOG.warn(
+          "The default document provider "
+              + defaultDocumentProvider
+              + " for editor with title '"
+              + editorPart.getTitle()
+              + "' might not support shared access. It is likely that the editor content is not properly synchronized!");
+
+      return;
+    }
+
+    final ITextEditor textEditor = editorPart.getAdapter(ITextEditor.class);
+
+    if (textEditor == null) return;
+
+    final IDocumentProvider editorDocumentProvider = textEditor.getDocumentProvider();
+
+    if (!(editorDocumentProvider instanceof TextFileDocumentProvider)) {
+      LOG.warn(
+          "The document provider "
+              + editorDocumentProvider
+              + " for editor with title '"
+              + editorPart.getTitle()
+              + "' might not support shared access. It is likely that the editor content is not properly synchronized!");
+    }
   }
 }
