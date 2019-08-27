@@ -115,6 +115,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
 
     setEnabledFromUIThread(false);
     setToolTipText(Messages.ConsistencyButton_tooltip_functionality);
+    setButtonIcon(IconManager.IN_SYNC_ICON);
   }
 
   private class SessionInconsistencyState {
