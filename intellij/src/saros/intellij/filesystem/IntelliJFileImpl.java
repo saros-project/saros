@@ -17,6 +17,7 @@ import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.intellij.editor.ProjectAPI;
 
 public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
 
@@ -100,13 +101,17 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
   @Override
   public boolean isDerived() {
-    VirtualFile file = project.findVirtualFile(path);
+    VirtualFile virtualFile = project.findVirtualFile(path);
 
-    if (file != null && file.equals(project.getModule().getModuleFile())) {
+    if (virtualFile == null) {
       return true;
     }
 
-    return !exists();
+    boolean isExcluded = ProjectAPI.isExcluded(project.getModule().getProject(), virtualFile);
+
+    boolean isModuleFile = virtualFile.equals(project.getModule().getModuleFile());
+
+    return !exists() || isExcluded || isModuleFile;
   }
 
   @Override

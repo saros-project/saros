@@ -17,6 +17,7 @@ import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.intellij.editor.ProjectAPI;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 
 public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder {
@@ -154,7 +155,15 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
 
   @Override
   public boolean isDerived() {
-    return !exists();
+    VirtualFile virtualFile = project.findVirtualFile(path);
+
+    if (virtualFile == null) {
+      return true;
+    }
+
+    boolean isExcluded = ProjectAPI.isExcluded(project.getModule().getProject(), virtualFile);
+
+    return !exists() || isExcluded;
   }
 
   @Override
