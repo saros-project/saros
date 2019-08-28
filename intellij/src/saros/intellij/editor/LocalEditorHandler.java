@@ -62,7 +62,10 @@ public class LocalEditorHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
-    if (path == null || !sarosSession.isShared(path.getResource())) {
+    if (path == null
+        || !sarosSession.isShared(
+            intelliJReferencePointManager.getSarosResource(
+                path.getReferencePoint(), path.getProjectRelativePath()))) {
       LOG.debug(
           "Ignored open editor request for file "
               + virtualFile
@@ -124,12 +127,16 @@ public class LocalEditorHandler {
   private Editor openEditor(
       @NotNull VirtualFile virtualFile, @NotNull SPath path, boolean activate) {
 
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
+
     if (!virtualFile.exists()) {
       LOG.debug("Could not open Editor for file " + virtualFile + " as it does not exist");
 
       return null;
 
-    } else if (!sarosSession.isShared(path.getResource())) {
+    } else if (!sarosSession.isShared(resource)) {
       LOG.debug("Ignored open editor request for file " + virtualFile + " as it is not shared");
 
       return null;
@@ -156,7 +163,10 @@ public class LocalEditorHandler {
   public void closeEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
     SPath path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
-    if (path != null && sarosSession.isShared(path.getResource())) {
+    if (path != null
+        && sarosSession.isShared(
+            intelliJReferencePointManager.getSarosResource(
+                path.getReferencePoint(), path.getProjectRelativePath()))) {
       editorPool.removeEditor(path);
       manager.generateEditorClosed(path);
     }
@@ -224,7 +234,10 @@ public class LocalEditorHandler {
 
     SPath path = VirtualFileConverter.convertToSPath(project, file);
 
-    if (path != null && sarosSession.isShared(path.getResource())) {
+    if (path != null
+        && sarosSession.isShared(
+            intelliJReferencePointManager.getSarosResource(
+                path.getReferencePoint(), path.getProjectRelativePath()))) {
       manager.generateEditorActivated(path);
     }
   }

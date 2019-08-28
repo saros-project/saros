@@ -246,7 +246,9 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
     StringBuilder sb = new StringBuilder();
 
     for (SPath path : paths) {
-      IResource resource = path.getResource();
+      IResource resource =
+          intelliJReferencePointManager.getSarosResource(
+              path.getReferencePoint(), path.getProjectRelativePath());
 
       if (resource == null) {
         LOG.warn("Inconsistent resource " + path + " could not be " + "found.");

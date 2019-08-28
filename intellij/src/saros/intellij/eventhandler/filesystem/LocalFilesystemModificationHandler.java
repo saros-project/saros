@@ -464,7 +464,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private void generateFileDeletionActivity(VirtualFile deletedFile) {
     SPath path = VirtualFileConverter.convertToSPath(project, deletedFile);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (path == null
+        || !session.isShared(
+            intelliJReferencePointManager.getSarosResource(
+                path.getReferencePoint(), path.getProjectRelativePath()))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared file deletion: " + deletedFile);
       }
@@ -969,7 +972,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       return false;
     }
 
-    IResource resource = path.getResource();
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
 
     if (resource == null) {
       return false;

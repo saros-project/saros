@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.session.ISarosSession;
 
 /**
@@ -26,9 +27,12 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
       };
 
   public LocalDocumentModificationHandler(
-      Project project, EditorManager editorManager, ISarosSession sarosSession) {
+      Project project,
+      EditorManager editorManager,
+      ISarosSession sarosSession,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
-    super(project, editorManager, sarosSession);
+    super(project, editorManager, sarosSession, intelliJReferencePointManager);
   }
 
   /**

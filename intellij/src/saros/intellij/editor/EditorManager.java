@@ -39,6 +39,7 @@ import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
+import saros.filesystem.IResource;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
@@ -441,7 +442,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           throw new IllegalStateException(
               "Could not create SPath for resource that is known to be shared: " + openFile);
 
-        } else if (path.getResource().isIgnored()) {
+        } else if (intelliJReferencePointManager
+            .getSarosResource(path.getReferencePoint(), path.getProjectRelativePath())
+            .isIgnored()) {
           LOG.debug("Skipping editor for ignored open file " + path);
 
           continue;
@@ -694,7 +697,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *     <code>null</code> if the local user has no editor open.
    */
   void generateEditorActivated(SPath path) {
-    if (path == null || session.isShared(path.getResource())) {
+    if (path == null
+        || session.isShared(
+            intelliJReferencePointManager.getSarosResource(
+                path.getReferencePoint(), path.getProjectRelativePath()))) {
       editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.ACTIVATED, path));
@@ -709,7 +715,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * EditorListenerDispatcher.
    */
   void generateEditorClosed(@NotNull SPath path) {
-    if (session.isShared(path.getResource())) {
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
+    if (session.isShared(resource)) {
       editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));

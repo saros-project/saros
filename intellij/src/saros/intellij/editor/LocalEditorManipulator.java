@@ -64,7 +64,10 @@ public class LocalEditorManipulator {
    *     not shared
    */
   public Editor openEditor(@NotNull SPath path, boolean activate) {
-    if (!sarosSession.isShared(path.getResource())) {
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
+    if (!sarosSession.isShared(resource)) {
       LOG.warn("Ignored open editor request for path " + path + " as it is not shared");
 
       return null;

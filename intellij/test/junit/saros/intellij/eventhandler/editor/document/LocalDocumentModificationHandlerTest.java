@@ -29,7 +29,7 @@ public class LocalDocumentModificationHandlerTest {
   public void before() {
     mockEditorFactory();
     localDocumentModificationHandler =
-        new LocalDocumentModificationHandler(null, dummyEditorManager(), null);
+        new LocalDocumentModificationHandler(null, dummyEditorManager(), null, null);
     listening = false;
   }
 

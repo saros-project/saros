@@ -73,7 +73,8 @@ public class ProjectEventHandlersFactory {
             intelliJReferencePointManager));
 
     projectEventHandlers.add(
-        new LocalDocumentModificationHandler(project, editorManager, sarosSession));
+        new LocalDocumentModificationHandler(
+            project, editorManager, sarosSession, intelliJReferencePointManager));
 
     /*
      * editor state change handlers
@@ -90,7 +91,11 @@ public class ProjectEventHandlersFactory {
 
     projectEventHandlers.add(
         new PreexistingSelectionDispatcher(
-            project, editorManager, localEditorHandler, sarosSession));
+            project,
+            editorManager,
+            localEditorHandler,
+            sarosSession,
+            intelliJReferencePointManager));
 
     projectEventHandlers.add(new ViewportAdjustmentExecutor(project, localEditorManipulator));
 
