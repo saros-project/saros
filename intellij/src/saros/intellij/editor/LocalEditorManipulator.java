@@ -16,8 +16,8 @@ import saros.editor.IEditorManager;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
+import saros.filesystem.IResource;
 import saros.intellij.editor.annotations.AnnotationManager;
-import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
@@ -85,7 +85,8 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project =
+        intelliJReferencePointManager.getModule(path.getReferencePoint()).getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -119,7 +120,8 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project =
+        intelliJReferencePointManager.getModule(path.getReferencePoint()).getProject();
 
     if (ProjectAPI.isOpen(project, virtualFile)) {
       ProjectAPI.closeEditor(project, virtualFile);
@@ -136,7 +138,8 @@ public class LocalEditorManipulator {
    * @param operations the operations to apply to the document
    */
   void applyTextOperations(SPath path, Operation operations) {
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project =
+        intelliJReferencePointManager.getModule(path.getReferencePoint()).getProject();
 
     Document doc = editorPool.getDocument(path);
 
@@ -311,7 +314,8 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project =
+        intelliJReferencePointManager.getModule(path.getReferencePoint()).getProject();
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {

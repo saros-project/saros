@@ -8,7 +8,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
-import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.IProjectEventHandler;
@@ -137,11 +136,10 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
 
     path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
-    IResource resource =
-        intelliJReferencePointManager.getSarosResource(
-            path.getReferencePoint(), path.getProjectRelativePath());
-
-    if (path == null || !sarosSession.isShared(resource)) {
+    if (path == null
+        || !sarosSession.isShared(
+            intelliJReferencePointManager.getSarosResource(
+                path.getReferencePoint(), path.getProjectRelativePath()))) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring Event for document " + document + " - document is not shared");
       }
