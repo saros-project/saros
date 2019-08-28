@@ -133,7 +133,7 @@ public class IntelliJReferencePointManager {
    * @param sPath to th virtualFile outgoing from the reference point in sPath
    * @return the virtualFile represented by sPath
    * @exception IllegalArgumentException if for {@link IReferencePoint} reference point doesn't
-   *     exists a module, which is contained in sPath
+   *     exists a module which is contained in sPath
    */
   public VirtualFile getResource(@NotNull SPath sPath) {
     return getResource(sPath.getReferencePoint(), sPath.getProjectRelativePath());

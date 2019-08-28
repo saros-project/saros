@@ -8,8 +8,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
+import saros.filesystem.IResource;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
@@ -27,6 +29,7 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
   private final EditorManager editorManager;
   private final LocalEditorHandler localEditorHandler;
   private final ISarosSession sarosSession;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   private final FileEditorManagerListener fileEditorManagerListener =
       new FileEditorManagerListener() {
@@ -42,13 +45,15 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
       Project project,
       EditorManager editorManager,
       LocalEditorHandler localEditorHandler,
-      ISarosSession sarosSession) {
+      ISarosSession sarosSession,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     super(project);
 
     this.editorManager = editorManager;
     this.localEditorHandler = localEditorHandler;
     this.sarosSession = sarosSession;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   /**
@@ -63,7 +68,11 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
 
     SPath sPath = VirtualFileConverter.convertToSPath(project, virtualFile);
 
-    if (sPath != null && sarosSession.isShared(sPath.getResource()) && editor != null) {
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            sPath.getReferencePoint(), sPath.getProjectRelativePath());
+
+    if (sPath != null && sarosSession.isShared(resource) && editor != null) {
       editorManager.sendExistingSelection(sPath, editor);
     }
   }

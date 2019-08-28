@@ -40,7 +40,7 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
       AnnotationManager annotationManager,
       IntelliJReferencePointManager intelliJReferencePointManager) {
 
-    super(project, editorManager, sarosSession);
+    super(project, editorManager, sarosSession, intelliJReferencePointManager);
 
     this.annotationManager = annotationManager;
     this.intelliJReferencePointManager = intelliJReferencePointManager;

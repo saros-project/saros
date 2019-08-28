@@ -447,7 +447,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           throw new IllegalStateException(
               "Could not create SPath for resource that is known to be shared: " + openFile);
 
-        } else if (path.getResource().isDerived()) {
+        } else if (intelliJReferencePointManager
+            .getSarosResource(path.getReferencePoint(), path.getProjectRelativePath())
+            .isDerived()) {
           LOG.debug("Skipping editor for derived open file " + path);
 
           continue;
@@ -700,7 +702,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *     <code>null</code> if the local user has no editor open.
    */
   void generateEditorActivated(SPath path) {
-    if (path == null || session.isShared(path.getResource())) {
+    if (path == null
+        || session.isShared(
+            intelliJReferencePointManager.getSarosResource(
+                path.getReferencePoint(), path.getProjectRelativePath()))) {
       editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.ACTIVATED, path));
@@ -715,7 +720,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * EditorListenerDispatcher.
    */
   void generateEditorClosed(@NotNull SPath path) {
-    if (session.isShared(path.getResource())) {
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
+    if (session.isShared(resource)) {
       editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));

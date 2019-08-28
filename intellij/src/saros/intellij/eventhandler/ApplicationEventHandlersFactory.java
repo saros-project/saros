@@ -8,6 +8,7 @@ import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.filesystem.LocalFilesystemModificationHandler;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 
@@ -19,19 +20,22 @@ public class ApplicationEventHandlersFactory {
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
   private final AnnotationManager annotationManager;
   private final LocalEditorHandler localEditorHandler;
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
 
   public ApplicationEventHandlersFactory(
       EditorManager editorManager,
       ISarosSession sarosSession,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       AnnotationManager annotationManager,
-      LocalEditorHandler localEditorHandler) {
+      LocalEditorHandler localEditorHandler,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.editorManager = editorManager;
     this.sarosSession = sarosSession;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.annotationManager = annotationManager;
     this.localEditorHandler = localEditorHandler;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
   }
 
   /**
@@ -68,7 +72,8 @@ public class ApplicationEventHandlersFactory {
             sarosSession,
             fileReplacementInProgressObservable,
             annotationManager,
-            localEditorHandler));
+            localEditorHandler,
+            intelliJReferencePointManager));
 
     return new ApplicationEventHandlers(applicationEventHandlers);
   }

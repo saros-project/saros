@@ -8,9 +8,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
+import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.IProjectEventHandler;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
@@ -22,7 +24,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
 
   protected final Project project;
   protected final EditorManager editorManager;
-
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
   private final ISarosSession sarosSession;
 
   private boolean enabled;
@@ -36,14 +38,19 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
    * @param project the shared project the handler is registered to
    * @param editorManager the EditorManager instance
    * @param sarosSession the current session instance
+   * @param intelliJReferencePointManager the IntelliJReferencePointManager instance
    */
   AbstractLocalDocumentModificationHandler(
-      Project project, EditorManager editorManager, ISarosSession sarosSession) {
+      Project project,
+      EditorManager editorManager,
+      ISarosSession sarosSession,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
 
     this.project = project;
     this.editorManager = editorManager;
 
     this.sarosSession = sarosSession;
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     this.enabled = false;
     this.disposed = false;
@@ -130,7 +137,11 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
 
     path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
-    if (path == null || !sarosSession.isShared(path.getResource())) {
+    IResource resource =
+        intelliJReferencePointManager.getSarosResource(
+            path.getReferencePoint(), path.getProjectRelativePath());
+
+    if (path == null || !sarosSession.isShared(resource)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring Event for document " + document + " - document is not shared");
       }
