@@ -203,7 +203,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     Module fileModule =
         ProjectFileIndexFacade.getInstance(module.getProject()).getModuleForFile(file);
 
-    if (fileModule == null || !module.getName().equals(fileModule.getName())) {
+    if (!module.equals(fileModule)) {
       return null;
     }
 
