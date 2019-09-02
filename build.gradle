@@ -34,6 +34,17 @@ mavenize {
   }
 }
 
+// Adjust Intellij module configuration for all sub-projects
+configure(subprojects) {projectToConf->
+  apply plugin: 'idea'
+
+  idea{
+    module{
+      excludeDirs += [file("bin"), file("lib"), file("libs")]
+    }
+  }
+}
+
 
 ext.projectsToConfigure = subprojects - project(':saros.picocontainer')
 // Configurations that are specific to all subprojects
