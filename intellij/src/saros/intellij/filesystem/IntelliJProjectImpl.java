@@ -29,8 +29,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   private final Project project;
 
-  private final String moduleName;
-
   private final Module module;
   private final VirtualFile moduleRoot;
 
@@ -52,8 +50,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     this.module = module;
 
     this.project = module.getProject();
-
-    this.moduleName = module.getName();
 
     moduleRoot = getModuleContentRoot(module);
   }
@@ -172,7 +168,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   @NotNull
   @Override
   public String getName() {
-    return moduleName;
+    return module.getName();
   }
 
   @Nullable
@@ -207,7 +203,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     Module fileModule =
         ProjectFileIndexFacade.getInstance(module.getProject()).getModuleForFile(file);
 
-    if (fileModule == null || !moduleName.equals(fileModule.getName())) {
+    if (fileModule == null || !module.getName().equals(fileModule.getName())) {
       return null;
     }
 
@@ -421,6 +417,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " : " + project + " - " + moduleName;
+    return getClass().getSimpleName() + " : " + project + " - " + module;
   }
 }
