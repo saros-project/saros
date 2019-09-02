@@ -438,18 +438,53 @@ class ModuleTab {
   }
 
   /**
-   * Returns whether the given module name matches the module name transmitted by the host.
+   * Returns whether the entered module name is valid for the selected project.
    *
-   * @return whether the given module name matches the module name transmitted by the host
+   * <p>A module name is seen as valid if it
+   *
+   * <ul>
+   *   <li>is not empty,
+   *   <li>is a valid path,
+   *   <li>only contains a single path element, and
+   *   <li>does not match any existing module name in the chosen project.
+   * </ul>
+   *
+   * @return whether the entered module name is valid for the selected project
+   * @see Paths#get(String, String...)
+   */
+  /*
+   * TODO check for other separators? Intellij also sees '\' as a separator on unix but this is not
+   *  detected by the Java Unix path implementation
    */
   private boolean hasValidNewModuleName() {
-    return moduleName.equals(newModuleNameTextField.getText());
+    String enteredName = newModuleNameTextField.getText();
+    if (enteredName.isEmpty()) {
+      return false;
+    }
+
+    try {
+      Path path = Paths.get(enteredName);
+      if (path.getNameCount() != 1) {
+        return false;
+      }
+    } catch (InvalidPathException e) {
+      return false;
+    }
+
+    Project project = (Project) projectComboBox.getSelectedItem();
+
+    if (project == null) {
+      return false;
+    }
+
+    return Arrays.stream(ModuleManager.getInstance(project).getModules())
+        .noneMatch(module -> module.getName().equals(enteredName));
   }
 
   /**
-   * Returns whether the given path points to a valid (existing) directory.
+   * Returns whether the entered path points to a valid (existing) directory.
    *
-   * @return whether the given path points to a valid (existing) directory
+   * @return whether the entered path points to a valid (existing) directory
    */
   private boolean hasValidNewBasePath() {
     boolean hasValidNewBasePath;
@@ -468,16 +503,15 @@ class ModuleTab {
   }
 
   /**
-   * Returns whether the module name of the selected module matches the module name transmitted by
-   * the host.
+   * Returns whether a valid existing module is chosen.
    *
-   * @return whether the module name of the selected module matches the module name transmitted by
-   *     the host
+   * @return whether a valid existing module is chosen
+   * @see Module#isDisposed()
    */
   private boolean hasValidExistingModule() {
     Module selectedExistingModule = (Module) existingModuleComboBox.getSelectedItem();
 
-    return selectedExistingModule != null && selectedExistingModule.getName().equals(moduleName);
+    return selectedExistingModule != null && !selectedExistingModule.isDisposed();
   }
 
   /**
