@@ -60,15 +60,15 @@ class ModuleTab {
   private final JRadioButton useExistingModuleRadioButton;
   private final JComboBox<Module> existingModuleComboBox;
 
-  private boolean moduleNameTextFieldValid;
+  private boolean moduleNameTextFieldShownAsValid;
   private final Border moduleNameTextFieldDefaultBorder;
   private final Border moduleNameTextFieldErrorBorder;
 
-  private boolean moduleBasePathTextFieldValid;
+  private boolean moduleBasePathTextFieldShownAsValid;
   private final Border moduleBasePathTextFieldDefaultBorder;
   private final Border moduleBasePathTextFieldErrorBorder;
 
-  private boolean existingModuleComboBoxValid;
+  private boolean existingModuleComboBoxShownAsValid;
   private final Border existingModuleComboBoxDefaultBorder;
   private final Border existingModuleComboBoxErrorBorder;
 
@@ -92,20 +92,20 @@ class ModuleTab {
     this.newModuleBasePathTextField = new TextFieldWithBrowseButton();
     this.existingModuleComboBox = new ComboBox<>();
 
-    this.moduleNameTextFieldValid = true;
+    this.moduleNameTextFieldShownAsValid = true;
     this.moduleNameTextFieldDefaultBorder = newModuleNameTextField.getBorder();
     this.moduleNameTextFieldErrorBorder =
         BorderFactory.createCompoundBorder(
             moduleNameTextFieldDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
 
-    this.moduleBasePathTextFieldValid = true;
+    this.moduleBasePathTextFieldShownAsValid = true;
     this.moduleBasePathTextFieldDefaultBorder =
         newModuleBasePathTextField.getTextField().getBorder();
     this.moduleBasePathTextFieldErrorBorder =
         BorderFactory.createCompoundBorder(
             moduleBasePathTextFieldDefaultBorder, BorderFactory.createLineBorder(JBColor.RED));
 
-    this.existingModuleComboBoxValid = true;
+    this.existingModuleComboBoxShownAsValid = true;
     this.existingModuleComboBoxDefaultBorder = existingModuleComboBox.getBorder();
     this.existingModuleComboBoxErrorBorder =
         BorderFactory.createCompoundBorder(
@@ -175,6 +175,10 @@ class ModuleTab {
             default:
               throw new IllegalStateException("Encountered unknown radio button selection.");
           }
+
+          updateNewModuleNameValidityIndicator();
+          updateNewBasePathValidityIndicator();
+          updateExistingModuleValidityIndicator();
 
           updateInputValidity();
         };
@@ -519,18 +523,18 @@ class ModuleTab {
    * on the returned value of {@link #hasValidNewModuleName()}.
    */
   private void updateNewModuleNameValidityIndicator() {
-    boolean hasValidNewModuleName = hasValidNewModuleName();
+    boolean showFieldAsValid = hasValidNewModuleName() || !createNewModuleRadioButton.isSelected();
 
-    if (hasValidNewModuleName == moduleNameTextFieldValid) {
+    if (showFieldAsValid == moduleNameTextFieldShownAsValid) {
       return;
     }
 
-    moduleNameTextFieldValid = hasValidNewModuleName;
+    moduleNameTextFieldShownAsValid = showFieldAsValid;
 
     Border border;
     String toolTip;
 
-    if (hasValidNewModuleName) {
+    if (showFieldAsValid) {
       border = moduleNameTextFieldDefaultBorder;
       toolTip = "";
 
@@ -548,18 +552,18 @@ class ModuleTab {
    * based on the returned value of {@link #hasValidNewBasePath()}.
    */
   private void updateNewBasePathValidityIndicator() {
-    boolean hasValidNewBasePath = hasValidNewBasePath();
+    boolean showFieldAsValid = hasValidNewBasePath() || !createNewModuleRadioButton.isSelected();
 
-    if (hasValidNewBasePath == moduleBasePathTextFieldValid) {
+    if (showFieldAsValid == moduleBasePathTextFieldShownAsValid) {
       return;
     }
 
-    moduleBasePathTextFieldValid = hasValidNewBasePath;
+    moduleBasePathTextFieldShownAsValid = showFieldAsValid;
 
     Border border;
     String toolTip;
 
-    if (hasValidNewBasePath) {
+    if (showFieldAsValid) {
       border = moduleBasePathTextFieldDefaultBorder;
       toolTip = "";
 
@@ -577,18 +581,19 @@ class ModuleTab {
    * based on the returned value of {@link #hasValidExistingModule()}.
    */
   private void updateExistingModuleValidityIndicator() {
-    boolean hasValidExistingModule = hasValidExistingModule();
+    boolean showFieldAsValid =
+        hasValidExistingModule() || !useExistingModuleRadioButton.isSelected();
 
-    if (hasValidExistingModule == existingModuleComboBoxValid) {
+    if (showFieldAsValid == existingModuleComboBoxShownAsValid) {
       return;
     }
 
-    existingModuleComboBoxValid = hasValidExistingModule;
+    existingModuleComboBoxShownAsValid = showFieldAsValid;
 
     Border border;
     String toolTip;
 
-    if (hasValidExistingModule) {
+    if (showFieldAsValid) {
       border = existingModuleComboBoxDefaultBorder;
       toolTip = "";
 
