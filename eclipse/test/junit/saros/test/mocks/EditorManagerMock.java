@@ -1,5 +1,6 @@
 package saros.test.mocks;
 
+import java.util.Collections;
 import java.util.List;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -33,6 +34,8 @@ public class EditorManagerMock {
               }
             })
         .anyTimes();
+
+    EasyMock.expect(editorManager.getOpenEditors()).andStubReturn(Collections.emptySet());
     EasyMock.replay(editorManager);
     return editorManager;
   }
