@@ -71,7 +71,7 @@ intellij {
   if (intellijHome) {
     localPath = intellijHome
   } else {
-    version = 'IC-2019.2'
+    version = 'IC-2019.2.1'
   }
 
   // don't overwrite the version compatibility defined in the plugin.xml
