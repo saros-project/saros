@@ -8,9 +8,7 @@
   url: /documentation/setup-xmpp.html
 
 - title: Screenshots
-  sublinks:
-  - title: Eclipse
-    url: /documentation/screenshots-eclipse.html
+  url: /documentation/screenshots.html?tab=eclipse
 
 - title: Host Comic
   url: /documentation/host-comic.html

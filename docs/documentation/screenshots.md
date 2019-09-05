@@ -1,6 +1,8 @@
 ---
-title: Screenshots of Saros/E
+title: Screenshots
 ---
+
+{% capture eclipse %}
 
 Let's gather some impressions of Saros/E.
 
@@ -45,3 +47,13 @@ your ideas with other users.**
 10. The menu bar of the whiteboard with the functions of undo,
     selecting, copy, pasting, deleting and resizing of
     the sketch-surface.
+
+{% endcapture %}
+
+{% capture intellij %}
+
+As Saros/I is still in its early alpha stages and the UI is still actively being changed, we haven't gotten around to create this page yet.
+
+{% endcapture %}
+
+{% include ide-tabs.html eclipse=eclipse intellij=intellij %}
