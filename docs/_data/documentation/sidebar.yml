@@ -1,9 +1,5 @@
 - title: Installation
-  sublinks:
-  - title: Eclipse
-    url: /documentation/installation-eclipse.html
-  - title: IntelliJ
-    url: /documentation/installation-intellij.html
+  url: /documentation/installation.html?tab=eclipse
 
 - title: Getting Started
   url: /documentation/getting-started.html?tab=eclipse
