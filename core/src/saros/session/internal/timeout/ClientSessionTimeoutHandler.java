@@ -115,7 +115,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
         pingPacketListener, PingExtension.PROVIDER.getPacketFilter(currentSessionID));
 
     workerThread =
-        ThreadUtils.runSafeAsync("dpp-client-network-watchdog", LOG, clientSessionTimeoutWatchdog);
+        ThreadUtils.runSafeAsync("client-network-watchdog", LOG, clientSessionTimeoutWatchdog);
   }
 
   @Override

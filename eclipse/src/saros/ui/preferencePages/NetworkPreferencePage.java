@@ -486,7 +486,7 @@ public final class NetworkPreferencePage extends PreferencePage
     gatewayInfo.setVisible(true);
 
     ThreadUtils.runSafeAsync(
-        "dpp-upnp-resolver-cfg",
+        "upnp-resolver-cfg",
         null,
         new Runnable() {
 

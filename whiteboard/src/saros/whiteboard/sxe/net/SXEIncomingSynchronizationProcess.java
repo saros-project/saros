@@ -47,7 +47,7 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
      * incoming messages, deadlock)
      */
     ThreadUtils.runSafeAsync(
-        "dpp-wb-sync-inc",
+        "wb-sync-inc",
         log,
         new Runnable() {
 

@@ -201,7 +201,7 @@ public final class StopManager extends AbstractActivityProducer implements Start
     for (final User user : users) {
       threads.add(
           ThreadUtils.runSafeAsync(
-              "dpp-stop-" + user + "-" + cause,
+              "stop-" + user + "-" + cause,
               log,
               new Runnable() {
                 @Override

@@ -158,7 +158,7 @@ public class JoinSessionWizard extends Wizard {
     if (isAutoCancel) return true;
 
     ThreadUtils.runSafeAsync(
-        "dpp-isn-cancel",
+        "isn-cancel",
         LOG,
         new Runnable() {
           @Override

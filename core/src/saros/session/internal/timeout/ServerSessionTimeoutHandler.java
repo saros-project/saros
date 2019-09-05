@@ -165,7 +165,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
     session.addListener(sessionListener);
 
     workerThread =
-        ThreadUtils.runSafeAsync("dpp-server-network-watchdog", LOG, serverSessionTimeoutWatchdog);
+        ThreadUtils.runSafeAsync("server-network-watchdog", LOG, serverSessionTimeoutWatchdog);
   }
 
   @Override

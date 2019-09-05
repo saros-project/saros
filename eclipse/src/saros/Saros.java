@@ -226,7 +226,7 @@ public class Saros extends AbstractUIPlugin {
 
     final Thread shutdownThread =
         ThreadUtils.runSafeAsync(
-            "dpp-shutdown", //$NON-NLS-1$
+            "shutdown", //$NON-NLS-1$
             log,
             () -> {
               try {

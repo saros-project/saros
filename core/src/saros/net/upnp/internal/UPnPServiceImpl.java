@@ -46,7 +46,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
 
   private final ScheduledExecutorService portMappingRefreshScheduler =
       Executors.newSingleThreadScheduledExecutor(
-          new NamedThreadFactory("dpp-upnp-portmapping-refresher"));
+          new NamedThreadFactory("upnp-portmapping-refresher"));
 
   public UPnPServiceImpl(final IUPnPAccess upnpAccess) {
     this.upnpAccess = upnpAccess;

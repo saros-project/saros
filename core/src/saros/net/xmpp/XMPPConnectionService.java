@@ -187,7 +187,7 @@ public class XMPPConnectionService {
      */
 
     ThreadUtils.runSafeAsync(
-        "dpp-upnp-resolver",
+        "upnp-resolver",
         LOG,
         new Runnable() {
           @Override
@@ -430,7 +430,7 @@ public class XMPPConnectionService {
      */
     if (stunService != null && stunServer != null) {
       ThreadUtils.runSafeAsync(
-          "dpp-stun-discovery",
+          "stun-discovery",
           LOG,
           new Runnable() {
             @Override
@@ -449,7 +449,7 @@ public class XMPPConnectionService {
     if (gatewayDeviceID != null && upnpService != null) {
       final String gatewayDeviceIDToFind = gatewayDeviceID;
       ThreadUtils.runSafeAsync(
-          "dpp-upnp-portmapping",
+          "upnp-portmapping",
           LOG,
           new Runnable() {
             @Override

@@ -106,7 +106,7 @@ public class LeaveAndKickHandler implements Startable {
      * will time out as we block the packet receiving thread here.
      */
     ThreadUtils.runSafeAsync(
-        "dpp-remove-" + user,
+        "remove-" + user,
         LOG,
         new Runnable() {
           @Override
@@ -118,7 +118,7 @@ public class LeaveAndKickHandler implements Startable {
 
   private void stopSession(final User user, final SessionEndReason reason) {
     ThreadUtils.runSafeAsync(
-        "dpp-stop-host",
+        "stop-host",
         LOG,
         new Runnable() {
           @Override
