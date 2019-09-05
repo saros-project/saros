@@ -298,7 +298,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
     // do not block during discovery
     ThreadUtils.runSafeAsync(
-        "dpp-upnp-resolver-cfg",
+        "upnp-resolver-cfg",
         null,
         new Runnable() {
 
