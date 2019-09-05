@@ -6,11 +6,7 @@
     url: /documentation/installation-intellij.html
 
 - title: Getting Started
-  sublinks:
-  - title: Eclipse
-    url: /documentation/getting-started-eclipse.html
-  - title: IntelliJ
-    url: /documentation/getting-started-intellij.html
+  url: /documentation/getting-started.html?tab=eclipse
 
 - title: Setup XMPP Server
   url: /documentation/setup-xmpp.html
