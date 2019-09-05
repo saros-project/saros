@@ -27,8 +27,8 @@ public class NamedThreadFactoryTest {
     Thread t1 = factory.newThread(dummy);
     Thread t2 = factory.newThread(dummy);
 
-    assertEquals("0", t1.getName());
-    assertEquals("1", t2.getName());
+    assertEquals(ThreadUtils.THREAD_PREFIX + "0", t1.getName());
+    assertEquals(ThreadUtils.THREAD_PREFIX + "1", t2.getName());
   }
 
   @Test
@@ -39,7 +39,7 @@ public class NamedThreadFactoryTest {
     Thread t1 = factory.newThread(dummy);
     Thread t2 = factory.newThread(dummy);
 
-    assertEquals(name + "0", t1.getName());
-    assertEquals(name + "1", t2.getName());
+    assertEquals(ThreadUtils.THREAD_PREFIX + name + "0", t1.getName());
+    assertEquals(ThreadUtils.THREAD_PREFIX + name + "1", t2.getName());
   }
 }
