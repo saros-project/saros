@@ -2,16 +2,15 @@ package saros.util;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /** Thread Factory which assigns a given name + consecutive number to created threads if desired. */
 public final class NamedThreadFactory implements ThreadFactory {
 
-  private ThreadFactory defaultFactory = Executors.defaultThreadFactory();
-
-  private int count = 0;
+  private final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
 
   private final String name;
-  private final boolean suffix;
+  private final AtomicInteger suffixCounter;
 
   /**
    * Creates a new {@link ThreadFactory} that will assign created threads the given name including a
@@ -35,22 +34,19 @@ public final class NamedThreadFactory implements ThreadFactory {
   public NamedThreadFactory(String name, boolean suffix) {
     if (name == null) throw new NullPointerException("name is null");
 
-    this.name = name;
-    this.suffix = suffix;
+    this.name = ThreadUtils.THREAD_PREFIX + name;
+    suffixCounter = suffix ? new AtomicInteger() : null;
   }
 
   @Override
   public Thread newThread(Runnable r) {
-
     Thread result = defaultFactory.newThread(r);
 
-    String threadName = name;
-
-    synchronized (this) {
-      if (suffix) threadName = threadName.concat(String.valueOf(count++));
+    if (suffixCounter == null) {
+      result.setName(name);
+    } else {
+      result.setName(name + suffixCounter.getAndIncrement());
     }
-
-    result.setName(threadName);
 
     return result;
   }
