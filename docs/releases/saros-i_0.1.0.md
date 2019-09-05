@@ -36,7 +36,7 @@ You can
 - work on shared resources
 - create, delete, and move resources in the shared module
 - interact freely with non-shared resources
-- follow other participants of the session ([follow mode](../documentation/getting-started-eclipse.md#follow-mode))
+- follow other participants of the session ([follow mode](../documentation/features.md#follow-mode))
 
 ## Restrictions
 

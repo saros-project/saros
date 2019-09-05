@@ -6,7 +6,7 @@ title: Development Process
 
 Our development workflow bases on the standard [GitHub fork workflow](https://guides.github.com/activities/forking/).
 
-Before a pull request is merged, it will have to pass out [review process](review.html).
+Before a pull request is merged, it will have to pass out [review process](review.md).
 
 ## Pull request structure
 
