@@ -21,7 +21,7 @@ Saros/I 0.1.0 requires
  - `JDK 8` or newer
  - `IntelliJ 2018.2.7` or newer
 
-Saros/I can be installed from the JetBrains plugin repository or from disk. A detailed guide is given [here](../documentation/installation-intellij.md).
+Saros/I can be installed from the JetBrains plugin repository or from disk. A detailed guide is given [here](../documentation/installation.html?tab=intellij).
 
 ## Features
 
