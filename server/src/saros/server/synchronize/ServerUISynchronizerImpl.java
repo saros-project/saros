@@ -28,7 +28,7 @@ public class ServerUISynchronizerImpl implements UISynchronizer {
             new ThreadFactory() {
               @Override
               public Thread newThread(Runnable r) {
-                virtualUIThread = new Thread(r, "dpp-srv-exec-context");
+                virtualUIThread = new Thread(r, "srv-exec-context");
                 return virtualUIThread;
               }
             });

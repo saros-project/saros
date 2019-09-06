@@ -32,7 +32,7 @@ public class SoundPlayer {
     }
 
     ThreadUtils.runSafeAsync(
-        "dpp-sound",
+        "sound",
         log,
         new Runnable() {
           @Override

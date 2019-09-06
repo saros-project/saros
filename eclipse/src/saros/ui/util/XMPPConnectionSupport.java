@@ -173,7 +173,7 @@ public class XMPPConnectionSupport {
     final boolean disconnectFirst = mustDisconnect;
 
     ThreadUtils.runSafeAsync(
-        "dpp-connect-xmpp",
+        "connect-xmpp",
         log,
         () -> {
           if (disconnectFirst) connectionHandler.disconnect();
@@ -194,7 +194,7 @@ public class XMPPConnectionSupport {
     isDisconnecting = true;
 
     ThreadUtils.runSafeAsync(
-        "dpp-disconnect-xmpp",
+        "disconnect-xmpp",
         log,
         () -> {
           try {
