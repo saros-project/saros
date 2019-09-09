@@ -1,0 +1,26 @@
+<!-- Uses the method selectTabs defined in ide-tabs.js -->
+<div class="shadow" markdown="0">
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link eclipse active" onclick="selectTabs( 'eclipse' );" id="eclipse-tab" data-toggle="tab" href="#">
+                <img alt="Eclipse logo" src="{{ '/assets/images/logo/eclipse-logo.png' | relative_url }}" /> Eclipse
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link intellij" onclick="selectTabs( 'intellij' );" id="intellij-tab" data-toggle="tab" href="#">
+                <img alt="IntelliJ logo" src="{{ '/assets/images/logo/intellij-logo.png' | relative_url }}" /> IntelliJ
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content border rounded-bottom border-top-0">
+        <div class="tab-pane fade px-2 mb-2 eclipse active show" role="tabpanel">
+            {{ include.eclipse | markdownify }}
+        </div>
+
+        <div class="tab-pane fade px-2 mb-2 intellij" role="tabpanel">
+            {{ include.intellij | markdownify }}
+        </div>
+    </div>
+</div>
