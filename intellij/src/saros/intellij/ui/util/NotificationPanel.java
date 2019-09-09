@@ -7,7 +7,6 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import org.apache.log4j.Logger;
 import saros.SarosPluginContext;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -48,15 +47,16 @@ public class NotificationPanel {
   private static void showNotification(
       NotificationType notificationType, String message, String title) {
 
-    Project project = projectUtils.getSharedProject();
+    projectUtils.runWithProject(
+        (project) -> {
+          LOG.info("Showing notification - " + notificationType + ": " + title + " - " + message);
 
-    LOG.info("Showing notification - " + notificationType + ": " + title + " - " + message);
-
-    final Notification notification =
-        GROUP_DISPLAY_ID_INFO.createNotification(
-            title, message, notificationType, URL_OPENING_LISTENER);
-    ApplicationManager.getApplication()
-        .invokeLater(() -> Notifications.Bus.notify(notification, project));
+          final Notification notification =
+              GROUP_DISPLAY_ID_INFO.createNotification(
+                  title, message, notificationType, URL_OPENING_LISTENER);
+          ApplicationManager.getApplication()
+              .invokeLater(() -> Notifications.Bus.notify(notification, project));
+        });
   }
 
   /**
