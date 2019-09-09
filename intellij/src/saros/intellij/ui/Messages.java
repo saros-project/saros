@@ -29,6 +29,13 @@ public class Messages {
   public static String AddProjectToSessionWizard_no_session_message;
   public static String AddProjectToSessionWizard_context_teardown_title;
   public static String AddProjectToSessionWizard_context_teardown_message;
+  public static String AddProjectToSessionWizard_negotiation_progress_title;
+  public static String AddProjectToSessionWizard_negotiation_error_title;
+  public static String AddProjectToSessionWizard_negotiation_error_message;
+  public static String AddProjectToSessionWizard_negotiation_successful_title;
+  public static String AddProjectToSessionWizard_negotiation_successful_message;
+  public static String AddProjectToSessionWizard_negotiation_aborted_title;
+  public static String AddProjectToSessionWizard_negotiation_aborted_message;
 
   public static String CollaborationUtils_confirm_closing_title;
   public static String CollaborationUtils_confirm_closing_message;

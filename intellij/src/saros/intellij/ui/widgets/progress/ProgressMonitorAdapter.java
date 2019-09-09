@@ -6,7 +6,7 @@ import saros.monitoring.IProgressMonitor;
 /**
  * Adapter class for {@link ProgressIndicator} objects to be used as an {@link IProgressMonitor}.
  */
-public final class ProgessMonitorAdapter implements IProgressMonitor {
+public final class ProgressMonitorAdapter implements IProgressMonitor {
 
   private final ProgressIndicator delegate;
 
@@ -17,8 +17,8 @@ public final class ProgessMonitorAdapter implements IProgressMonitor {
 
   private int percentCompleted = 0;
 
-  public ProgessMonitorAdapter(final ProgressIndicator progessIndicator) {
-    delegate = progessIndicator;
+  public ProgressMonitorAdapter(final ProgressIndicator progressIndicator) {
+    delegate = progressIndicator;
   }
 
   @Override
@@ -66,7 +66,7 @@ public final class ProgessMonitorAdapter implements IProgressMonitor {
   public void setCanceled(final boolean canceled) {
     isCanceled = canceled;
 
-    // TODO there is no way to uncancel the progress
+    // TODO there is no way to un-cancel the progress
     if (canceled) delegate.cancel();
   }
 
