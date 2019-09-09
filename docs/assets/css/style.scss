@@ -163,8 +163,24 @@ h6 {
   }
 }
 
+@media (max-width: 640px) {
+  #media-links-nav {
+    display: none !important;
+  }
+
+  #nav-widescreen-content {
+    display: none !important;
+  }
+}
+
+@media (min-width: 640px) {
+  #nav-mobile-content {
+    display: none !important;
+  }
+}
+
 .main-content, .sidenav, .toc-bar {
-  top: 40px;
+  margin-top: 40px;
 }
 
 .sidenav, .toc-bar {
@@ -211,7 +227,7 @@ h6 {
 /* Multiversion tabs */
 
 // Avoid gap between border of tab and content
-.tab-content h1:first-of-type {
+.tab-content :first-child {
   margin-top: 0px;
   padding-top: 10px;
 }
