@@ -85,15 +85,17 @@ public class Messages {
   public static String ConnectButton_connect_to_new_account_title;
   public static String ConnectButton_connect_to_new_account_message;
 
-  public static String NegotiationHandler_canceled_invitation;
-  public static String NegotiationHandler_canceled_invitation_text;
-  public static String NegotiationHandler_error_during_invitation;
-  public static String NegotiationHandler_error_during_invitation_text;
-  public static String NegotiationHandler_inviting_user;
-  public static String NegotiationHandler_project_sharing_canceled_text;
+  public static String NegotiationHandler_session_local_error_title;
+  public static String NegotiationHandler_session_local_error_message;
+  public static String NegotiationHandler_session_remote_cancel_title;
+  public static String NegotiationHandler_session_remote_cancel_message;
+  public static String NegotiationHandler_session_remote_error_title;
+  public static String NegotiationHandler_session_remote_error_message;
+  public static String NegotiationHandler_session_processing;
+  public static String NegotiationHandler_project_sharing_canceled_message;
   public static String NegotiationHandler_sharing_project;
-  public static String NegotiationHandler_sharing_project_canceled_remotely;
-  public static String NegotiationHandler_sharing_project_canceled_remotely_text;
+  public static String NegotiationHandler_sharing_project_canceled_remotely_title;
+  public static String NegotiationHandler_sharing_project_canceled_remotely_message;
 
   public static String ShowDescriptionPage_description;
   public static String ShowDescriptionPage_title2;
