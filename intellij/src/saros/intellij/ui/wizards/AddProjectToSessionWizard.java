@@ -15,7 +15,6 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ui.UIUtil;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.io.FileNotFoundException;
@@ -40,7 +39,7 @@ import saros.intellij.negotiation.ModuleConfigurationInitializer;
 import saros.intellij.runtime.FilesystemRunner;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
-import saros.intellij.ui.widgets.progress.ProgessMonitorAdapter;
+import saros.intellij.ui.widgets.progress.ProgressMonitorAdapter;
 import saros.intellij.ui.wizards.pages.HeaderPanel;
 import saros.intellij.ui.wizards.pages.PageActionListener;
 import saros.intellij.ui.wizards.pages.TextAreaPage;
@@ -575,22 +574,16 @@ public class AddProjectToSessionWizard extends Wizard {
             + (type.equals(NegotiationTools.CancelLocation.LOCAL)
                 ? "locally "
                 : "remotely by " + peer);
-    UIUtil.invokeLaterIfNeeded(
-        new Runnable() {
-          @Override
-          public void run() {
 
-            /*
-             *  if we already triggered the negotiation the message will
-             *  be displayed in the trigger logic, so do not popup another dialog here
-             */
-            if (!triggered)
-              NotificationPanel.showInformation(
-                  message + (errorMsg != null ? "\n\n" + errorMsg : ""), message);
+    /*
+     *  if we already triggered the negotiation the message will
+     *  be displayed in the trigger logic, so do not popup another dialog here
+     */
+    if (!triggered)
+      NotificationPanel.showInformation(
+          message + (errorMsg != null ? "\n\n" + errorMsg : ""), message);
 
-            close();
-          }
-        });
+    close();
   }
 
   /**
@@ -608,31 +601,32 @@ public class AddProjectToSessionWizard extends Wizard {
     ProgressManager.getInstance()
         .run(
             new Task.Backgroundable(
-                project, "Sharing project...", true, PerformInBackgroundOption.DEAF) {
+                project,
+                Messages.AddProjectToSessionWizard_negotiation_progress_title,
+                true,
+                PerformInBackgroundOption.DEAF) {
 
               @Override
-              public void run(ProgressIndicator indicator) {
+              public void run(@NotNull ProgressIndicator indicator) {
                 final ProjectNegotiation.Status status =
-                    negotiation.run(localProjects, new ProgessMonitorAdapter(indicator));
+                    negotiation.run(localProjects, new ProgressMonitorAdapter(indicator));
 
                 indicator.stop();
 
-                UIUtil.invokeLaterIfNeeded(
-                    new Runnable() {
-                      @Override
-                      public void run() {
-                        if (status == ProjectNegotiation.Status.ERROR) {
-                          NotificationPanel.showError(
-                              "Error during project negotiation",
-                              "The project could not be shared: " + negotiation.getErrorMessage());
-                        } else if (status == ProjectNegotiation.Status.OK) {
-                          NotificationPanel.showInformation(
-                              "Project shared", "Project successfully shared");
-                        } else
-                          NotificationPanel.showError(
-                              "Project negotiation aborted", "Project negotiation was canceled");
-                      }
-                    });
+                if (status == ProjectNegotiation.Status.ERROR) {
+                  NotificationPanel.showError(
+                      MessageFormat.format(
+                          Messages.AddProjectToSessionWizard_negotiation_error_message,
+                          negotiation.getErrorMessage()),
+                      Messages.AddProjectToSessionWizard_negotiation_error_title);
+                } else if (status == ProjectNegotiation.Status.OK) {
+                  NotificationPanel.showInformation(
+                      Messages.AddProjectToSessionWizard_negotiation_successful_message,
+                      Messages.AddProjectToSessionWizard_negotiation_successful_title);
+                } else
+                  NotificationPanel.showError(
+                      Messages.AddProjectToSessionWizard_negotiation_aborted_message,
+                      Messages.AddProjectToSessionWizard_negotiation_aborted_title);
               }
             });
 
