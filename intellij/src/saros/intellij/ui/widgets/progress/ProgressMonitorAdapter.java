@@ -1,12 +1,15 @@
 package saros.intellij.ui.widgets.progress;
 
 import com.intellij.openapi.progress.ProgressIndicator;
+import org.apache.log4j.Logger;
 import saros.monitoring.IProgressMonitor;
 
 /**
  * Adapter class for {@link ProgressIndicator} objects to be used as an {@link IProgressMonitor}.
  */
 public final class ProgressMonitorAdapter implements IProgressMonitor {
+
+  private static final Logger log = Logger.getLogger(ProgressMonitorAdapter.class);
 
   private final ProgressIndicator delegate;
 
@@ -62,12 +65,29 @@ public final class ProgressMonitorAdapter implements IProgressMonitor {
     delegate.setFraction(fraction);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p><b>Note:</b> This used Intellij implementation does not allow to un-cancel a progress
+   * monitor. Calls with <code>canceled=false</code> do not have any affect.
+   *
+   * @param canceled <code>true</code> to cancel the progress monitor, <code>false</code> for a NOP
+   */
   @Override
   public void setCanceled(final boolean canceled) {
-    isCanceled = canceled;
+    if (!canceled) {
+      if (isCanceled) {
+        log.warn("Tried to un-cancel progress monitor. This is not supported!");
+      }
 
-    // TODO there is no way to un-cancel the progress
-    if (canceled) delegate.cancel();
+      return;
+    }
+
+    isCanceled = true;
+
+    if (!delegate.isCanceled()) {
+      delegate.cancel();
+    }
   }
 
   @Override
