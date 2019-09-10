@@ -299,7 +299,7 @@ You can
 - add existing XMPP-accounts
 - start a session with another person
   - Sessions in Saros/I are currently limited to two participants (host and one client)
-- share exactly one module through Saros; the shared module must meet the restrictions set [here](#module-restrictions)
+- share exactly one module through Saros; the shared module must meet the restrictions described [here](#module-restrictions)
 - transfer the initial content of the module shared by the host to all participating clients
 - work on shared resources
 - create, delete, and move resources in the shared module
