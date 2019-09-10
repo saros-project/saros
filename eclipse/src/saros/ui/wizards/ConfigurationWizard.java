@@ -198,9 +198,8 @@ public class ConfigurationWizard extends Wizard {
     boolean useTLS = enterXMPPAccountWizardPage.isUsingTLS();
     boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
 
-    if (isExistingAccount)
-      return accountStore.createAccount(username, password, domain, server, port, useTLS, useSASL);
+    if (isExistingAccount) return accountStore.getAccount(username, domain, server, port);
 
-    return accountStore.getAccount(username, domain, server, port);
+    return accountStore.createAccount(username, password, domain, server, port, useTLS, useSASL);
   }
 }

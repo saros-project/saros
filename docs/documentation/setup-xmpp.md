@@ -59,4 +59,4 @@ See [https://www.ejabberd.im](https://www.ejabberd.im/).
     Transfer Settings. (Should be the default value but it had to be
     disabled for Saros in the past.)
 
-![](images/openfire_settings_02.png)
+![](images/openfire_settings_02.png){:class="img-fluid"}

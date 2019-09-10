@@ -14,6 +14,44 @@ please follow these guidelines:
 * Keep the documentation **short and clear** (e.g. by using lists)
 * Avoid new nested link structures and link lists
 
+## Write IDE specific documentation
+Use the following tags if you want to embed an IDE specific part into a documentation or want to provide IDE specific versions of a page.
+
+**Markdown:**
+```markdown
+{{ "{% capture eclipse " }}%}
+## Eclipse content here
+Eclipse content here
+{{ "{% endcapture " }}%}
+{{ "{% capture intellij " }}%}
+## Intellij content here
+Intellij content here
+{{ "{% endcapture " }}%}
+{{ "{% include ide-tabs.html eclipse=eclipse intellij=intellij " }}%}
+```
+**Rendered Markdown:**
+{% capture eclipse %}
+## Eclipse content here
+Eclipse content here
+{% endcapture %}
+{% capture intellij %}
+## Intellij content here
+Intellij content here
+{% endcapture %}
+{% include ide-tabs.html eclipse=eclipse intellij=intellij %}
+
+
+**Attention:** The major disadvantage of this solution is that we use [jekyll liquid tags](https://jekyllrb.com/docs/liquid/).
+Therefore the content of the documentation could break the documentation build! This happens if you have typo in your tags or forgot something etc.
+If you want to make sure that the documentation works, compile the documentation (see below for more information).
+
+## Reference IDE specific documentation
+
+You can reference the IDE specific version of a page via an url parameter `tab=<ide>` (e.g. `<url>?tab=intellij` or `<url>?tab=eclipse`).
+Example:
+* [Intellij content of this page](?tab=intellij)
+* [Eclipse content of this page](?tab=eclipse)
+
 ## Compile GitHub Pages
 ### Compile and show via docker
 The whole environment described below is already available in the docker image `starefossen/github-pages`. Use the following

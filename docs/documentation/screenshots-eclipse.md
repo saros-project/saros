@@ -5,7 +5,7 @@ title: Screenshots of Saros/E
 Let's gather some impressions of Saros/E.
 
 ![Saros
-Annotations](images/screenshot_annotated.png)
+Annotations](images/screenshot_annotated.png){:class="img-fluid"}
 
 **There are several features that enable you to remain aware of what
 your collaborators are doing.**
@@ -29,7 +29,7 @@ your collaborators are doing.**
 ------------------------------------------------------------------------
 
 ![Saros
-Whiteboard](images/screenshot_whiteboard.png)
+Whiteboard](images/screenshot_whiteboard.png){:class="img-fluid"}
 
 **There is the whiteboard feature that allows you to sketch and share
 your ideas with other users.**
