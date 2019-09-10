@@ -99,7 +99,7 @@ Want to know more about the Saros host role? Check out our comic
 
 #### Additional information:
 
--   If you accept an invitation and decide to synchronie the incoming
+-   If you accept an invitation and decide to synchronize the incoming
     project with your own copy, Saros will automatically add, change, or
     delete all files as necessary.
 -   Saros will share all files which are not marked as *derived* by
@@ -277,18 +277,19 @@ doing:
 
 {% capture intellij %}
 
-This is the first alpha release of Saros/I, so expect it to be a bit rough around the edges.
-There are still some [restrictions](#restrictions) that apply to the usage and some basic [features are still missing](#missing-features).
-This release is not compatible with any other Saros plugin/version (like Saros/E).
+**This page contains information partially specific to the current release `0.2.0`.<br>
+For information on previous releases, you can have a look at the corresponding [release notes](../releases/index.html/index.html).**
 
-The GUI used in Saros/I is only a placeholder providing the minimal, necessary functionality.
-We are currently working on a replacement in the form of an HTML GUI that can be used across all Saros versions.
+The development of the Saros/I plugin is still in the alpha stages, so expect it to be a bit rough around the edges.
+There are still some [restrictions](#restrictions) that apply to the usage and some basic [features are still missing](#missing-features).
 
 ## Disclaimer
 
 Saros/I does not include sub-modules when sharing a module (see [Module Restrictions](#module-restrictions)).
 As a consequence, such sub-modules might not be present for all session participants.
 If a participant deletes a shared directory that contains a sub-module in the local setup of another participant, this sub-module will be deleted without any notice.
+
+Furthermore, there are still some known bugs in the current release. Please have a look at the section [Known Bugs](#known-bugs).
 
 ## Features
 
@@ -305,13 +306,27 @@ You can
 - interact freely with non-shared resources
 - follow other participants of the session ([follow mode](features.md#follow-mode))
 
+
+### Sharing Complex Modules
+
+Even though Saros offers the option to create the module on the client side as part of the session, this should only be used for relatively simple modules.
+For more complex modules, it is advised to share the module structure some other way (e.g. a VCS) before starting a session. Saros currently does not set up things like libraries or module dependencies, meaning the would have to be configured by hand.
+
+## Compatibility
+
+The current release `0.2.0` is not compatible with the previous Saros/I release (`0.1.0`) or other Saros plugins (like Saros/E).
+
+
 ## How to Use Saros/I
+
+Most interactions with the Saros session logic (like starting or ending a session) can be done through the Saros tool window.
+This window is attached to the bottom right of the IDE by default.
+It is marked with the title "Saros" and the Saros icon (![saros icon](images/icons-i/saros.png)).
+All actions described in the following sections take place in this tool window.
 
 ### Adding an XMPP Account
 
-- Choose the Saros window in bottom bar.
-  - If it is not shown, click the "Saros" button in bottom bar or open it by clicking on the square on bottom left and choosing "Saros".
-- In the top bar of the Saros view, choose the "Connect" icon (connected plug icon; the left icon).
+- In the top bar of the Saros view, click the "Connect" button (![connect icon](images/icons-i/connect.png)).
 - Choose "Add account..." from the pop-up menu.
 - Enter the fully qualified user name (`USER_NAME@YOUR.DOMIAN`).
   - If the basic Saros XMPP server is used, the domain would be `@saros-con.imp.fu-berlin.de`.
@@ -335,48 +350,78 @@ You can then delete the first account, add a new account with the right values, 
 
 ### Starting a Session - Host
 
-- Choose the Saros window in the bottom bar.
-- Choose the "Connect" icon (connected plug icon; the left icon).
+- Click the "Connect" button (![connect icon](images/icons-i/connect.png)).
 - Choose an account.
 - Choose the section "Contacts" in the window on the left side of the Saros view.
 - Choose a friend that is online.
-- Right-click the name of that friend. This will open a list of all shareable modules in the current project.
-  - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see "What should work" and "What does not work").
+- Right-click the name of that friend. This will open a list of all open projects. Each project contains a list of its shareable modules.
+  - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](#module-restrictions)).
 - Choose the module that is supposed to be shared from the displayed list of modules.
 
+- Alternatively, select a module in the project view and right-click it.
+- Select "Share With..." from the options (or use the keyboard-shortcut 's').
+- Select a user from the list (or use their number as the keyboard-shortcut).
 
 ### Starting a Session - Client
 
-- Choose the Saros window in the bottom bar.
-- Choose the "Connect" icon (connected plug icon; the left icon).
+- Click the "Connect" button (![connect icon](images/icons-i/connect.png)).
 - Choose an account.
 - Wait until the host invites you to join their session.
 - After the host invited you, the session negotiation will open.
 - Click "Next". This will open the project negotiation.
-- Choose which local module to use for the session. The automatically chosen option and value should be correct in most cases, so you should not have to change anything.
-  - *To create a new module:* Choose "Create new module" if the shared module is not already present in your local project.
-  - *To use an existing module:* Choose "Use existing module" if a version of the shared module is already present in your local project.
-    - Click on "Browse..." and choose the base directory of the shared module.
-    - The base directory has to have the same name as the shared module.
-    - If the field is left empty, the project negotiation is aborted due to a local error.
-- Click "Next". This will show you the local file changes that will be made during the negotiation. These are the differences between the local version of the module and the version held by the host.
-  - The shown actions are the actions necessary to align the local module with the host module.
-  - Any local differences will be removed during the project negotiation. These adjustments will only be done if the "Finish" button is selected. If the session negotiation is aborted at this stage, no local files are changed.
+- Choose which project to use. This can be done through the drop-down menu at the top of the dialog.
+- Choose how to represent the shared module locally. You can either choose an existing module or create a new one
+  - *To create a new module:* Choose "Create new module"
+    - Specify a module name (must not already exist in the shared project).
+    - Specify the module base path.
+  - *To use an existing module:* Choose "Use existing module"
+    - Select a module from the drop-down menu.
+- Click "Next".
+  - If an existing local module was chosen, a list of local file changes that will be made during the negotiation will be shown. These are the differences between the local version of the module and the version held by the host. The shown actions are the actions necessary to align the local module with the host module.
+  - **Warning:** Any local differences will be removed during the project negotiation. These adjustments will only be done if the "Finish" button is selected. If the project negotiation is aborted at this stage, no local files are changed.
 - Click "Finish".
 
+### Changing user colors
+
+- Open the IntelliJ settings and navigate to `"Editor" > "Color Scheme" > "Saros"`.
+- Select the color scheme to change the colors for.
+- Expand the user whose colors to change.
+  - Currently, Saros internally has the concept of 5 user colors. These will be assigned to the session participants when a session is started. This means that the other user in a two-user-session will not necessarily have the user color 1.
+- Choose the annotation type to change the color for.
+- Adjust the way the annotation is displayed using the options on the right.
+  - These changes will be previewed in the frame on the bottom.
+
+### Following Another Participant
+
+- Click the "Follow" button (![follow icon](images/icons-i/follow.png)).
+- Select the user to follow from the list and click the entry.
+
+- Alternatively, select another participant in the list of session participants in the session view (on the left) and right-click their name.
+- Click the option "Follow participant".
+
+### Leaving the Follow Mode
+- Click the "Follow" button (![follow icon](images/icons-i/follow.png)).
+- Click the option "Leave follow mode".
+
+### Resolving a Desynchronization
+By default, the synchronization button (![synchronization button off](images/icons-i/in_sync.png)) is disabled.
+If Saros detects that the local content has become out of sync with the host (i.e. differs in any way), it will notify the user and enable the synchronization button (![synchronization button on](images/icons-i/out_sync.png)).
+To resolve the desynchronization:
+
+- Click the "Synchronization" button (![synchronization button on](images/icons-i/out_sync.png)). This will open the recovery dialog.
+- Click "Yes".
+  - **WARNING** As stated in the dialog, this will replace the content of the affected file(s) with the content of the corresponding file(s) on the host's side.
+  This might override recent changes to the local files. To avoid data-loss, consider making a backup of the affected files/changes before executing the synchronization recovery.
 
 ### Leaving a Session
 
-- Choose the Saros window in the bottom bar.
-- Click on "Leave session" (door icon; the right icon).
+- Click on the "Leave session" button (![leave session icon](images/icons-i/leave_session.png)).
 - Select "OK".
-  - If you are the host of the session, the client will subsequently be kicked from the session.
-
+  - If you are the host of the session, this will cause the session to end, kicking all other participants.
 
 ### Disconnecting from the XMPP-Server
 
-- Choose the Saros window in the bottom bar.
-- Choose the "Connect" icon (connected plug icon; the left icon).
+- Click on the "Connect" button (![connect icon](images/icons-i/connect.png)).
 - Choose "Disconnect server".
 
 
@@ -384,44 +429,12 @@ You can then delete the first account, add a new account with the right values, 
 
 Some of the implemented features are still subject to some restrictions:
 
-### Working with Multiple Projects
-
-Saros/I works with multiple projects open but does not allow the user to actively choose which project to use. By default, the first opened project will be used by Saros.
-As the current solution is only a workaround while a complete fix is implemented, we would advise against opening multiple projects when working with Saros.
-
-If you are still determined to work with multiple projects open, please have a look at the details of the workaround to understand its restrictions, how to share a module of a specific project and how to recover from a headless state.
-
-<details>
-
-With the current workaround introduced in [PR #417](https://github.com/saros-project/saros/pull/417), Saros/I always holds a reference to a specific IntelliJ project.
-Only modules of this project can be shared.
-
-The held project is determined on runtime as follows:
-- Initially, the first opened IntelliJ project is used.
-- Whenever a new project is opened, Saros checks if the held project object is still valid (if the project represented by the object is still open).
-If the object is no longer valid, it will be replaced with the newly opened project.
-As a result, you can now only share modules of the newly opened project.
-
-If you only have one project open at a time or always open the project you want to share modules of first, this restriction should not be a noticeable.
-
-If you want to change the shareable project, you will have to close the currently shareable project and then open the project you want to share modules of.
-If you have a hard time figuring out which project is currently selected as shareable, you can resort to closing all open projects before opening the project to share.
-
-The functionality described above still leaves the possibility of entering a headless state:
-If you close the currently shareable project and then don't open a new project, Saros is left in a headless state where it does not have a valid reference to a project.
-Trying to start a session in this state will lead to exceptions. This headless state can be resolved by opening a new project.
-
-</details>
-
 ### Module Restrictions
 
 You can currently only share a single module. A module has to adhere to the following restrictions to be shareable through Saros:
 
 - The module must have exactly one content root.
-- The module must be located under the project content root.
-- The module file of the module must be located in the base directory of the content root.
 - The module must not be a project module.
-- The module file for the module must not contain absolute paths (or paths in general that can't be resolved by other participants, like network drives).
 
 Sharing a module will only share resources belonging to that module, not resources belonging to sub-module located inside a content root of the module.
 Creating such a sub-module during a session will lead to an inconsistent state that can not be resolved by Saros.
@@ -432,6 +445,11 @@ To share a newly created module, you will have to have saved your project at lea
 This is necessary as the module file for a new module is only written to disk the first time the module is saved.
 
 You can check if the module file was written to disk by looking at the base directory of the module. It should contain a `*.iml` file with the same name as the module.
+
+
+### Excluded resources are not ignored
+
+Saros/I does not currently ignore excluded resources. Instead, such resources will also be shared with the other participants.
 
 ### Number of Participants
 
@@ -445,12 +463,11 @@ As this is only the first alpha release, there are still a lot of main features 
 - Multi-user sessions
 - Sharing multiple modules
 - Sharing whole projects
-- Selecting where to create modules when starting a Saros session
 - Display viewport annotations
 - Display file awareness annotations
 - Display cursor annotation
 - Display user color in Saros view
-- Adjustable Saros settings (like user colors, etc.)
+- Adjustable Saros settings (besides colors)
 - Creation, management or deletion of XMPP accounts
 
 ### Missing Secondary Features
@@ -462,15 +479,14 @@ These are features that are part of the functionality provided by Saros/E but ar
 - Whiteboard
 - Chat
 
-(Both the chat and the whiteboard will be available in Saros/i with the introduction of the new HTML GUI.)
-
 ## Known Bugs
 
 There are some bugs in the alpha version of Saros/I that we are already aware of and that are going to be fixed in a later release. Some notable bugs are mentioned here. For a full overview, you can have a look at our [issue tracker](https://github.com/saros-project/saros/issues?q=is%3Aissue+label%3A%22Area%3A+IntelliJ%22+label%3A%22Type%3A+Bug%22+is%3Aopen).
 
 - [#116](https://github.com/saros-project/saros/issues/116) - The position of local text selection is not updated correctly for closed files when text edits are received through Saros.
-- [#223](https://github.com/saros-project/saros/issues/223) - Deleting and then re-creating a file with the same name (or moving a file and then moving it back, etc.) causes the session to de-synchronize irreparably, requiring a session restart.
-
+- [#223](https://github.com/saros-project/saros/issues/223) - Deleting and then re-creating a file with the same name (or moving a file and then moving it back, etc.) causes the session to desynchronize irreparably, requiring a session restart.
+- [#683](https://github.com/saros-project/saros/issues/683) - Creating a file with an unknown file extension (or without a file extension) leads to a session desynchronization. Opening the file on the other side, choosing a file type, and then running the recovery might repair the session, but the state could also be irreparable, requiring a session restart.
+- [#684](https://github.com/saros-project/saros/issues/683) - Renaming the content root of the shared module leads to the content being deleted for all other participants.
 
 ### Report a Bug
 
