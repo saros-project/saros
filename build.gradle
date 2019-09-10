@@ -10,7 +10,7 @@ buildscript
 
 plugins {
   id "de.monkeyworks.buildmonkey.mavenizer.MavenizerPlugin" version "0.4.2"
-  id 'com.gradle.build-scan' version '2.0.2'
+  id 'com.gradle.build-scan' version '2.4.1'
 }
 
 // avoid that the buildmonkey plugin triggers verbose ant logging
