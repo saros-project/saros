@@ -47,15 +47,6 @@ public interface IResource {
 
   public int getType();
 
-  /**
-   * Equivalent to the Eclipse call <code>IResource#isDerived(checkAncestors ?
-   * IResource#CHECK_ANCESTORS : IResource#NONE)</code>
-   *
-   * @param checkAncestors
-   * @return
-   */
-  public boolean isDerived(boolean checkAncestors);
-
   public boolean isDerived();
 
   /** Equivalent to the Eclipse call <code>IResource#delete(updateFlags, null)</code> */

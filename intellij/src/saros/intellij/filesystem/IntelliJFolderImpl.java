@@ -148,11 +148,6 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   }
 
   @Override
-  public boolean isDerived(final boolean checkAncestors) {
-    return isDerived();
-  }
-
-  @Override
   public boolean isDerived() {
     return !exists();
   }
