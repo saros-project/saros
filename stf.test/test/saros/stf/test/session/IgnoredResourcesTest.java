@@ -11,7 +11,7 @@ import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants;
 
-public class DerivedResourcesTest extends StfTestCase {
+public class IgnoredResourcesTest extends StfTestCase {
 
   @BeforeClass
   public static void selectTesters() throws Exception {
@@ -25,7 +25,7 @@ public class DerivedResourcesTest extends StfTestCase {
   @Test
   @Ignore(
       "Does not work under *NIX because the context menu does not contain the Buidl Project option")
-  public void testDerivedResourcesMustNotMarkedAsSharedInAFullSharedProject() throws Exception {
+  public void testIgnoredResourcesMustNotMarkedAsSharedInAFullSharedProject() throws Exception {
 
     Util.setUpSessionWithJavaProjectAndClass("Foo", "bar", "Foo", ALICE, BOB);
 

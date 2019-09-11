@@ -6,7 +6,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
   CreatingNewFileTest.class,
-  DerivedResourcesTest.class,
+  IgnoredResourcesTest.class,
   EditFileThatIsNotOpenOnRemoteSideTest.class,
   EditFileThatIsNotOpenOnRemoteSideTest.class,
   EstablishSessionWithDifferentTransportModesTest.class,

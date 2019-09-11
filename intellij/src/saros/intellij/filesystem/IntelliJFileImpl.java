@@ -35,10 +35,11 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   /**
    * Returns whether this file exists.
    *
-   * <p><b>Note:</b> A derived file is treated as being nonexistent.
+   * <p><b>Note:</b> An ignored file is treated as being nonexistent.
    *
-   * @return <code>true</code> if the resource exists, is a file, and is not derived, <code>false
+   * @return <code>true</code> if the resource exists, is a file, and is not ignored, <code>false
    *     </code> otherwise
+   * @see #isIgnored()
    */
   @Override
   public boolean exists() {
@@ -94,7 +95,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   }
 
   @Override
-  public boolean isDerived() {
+  public boolean isIgnored() {
     VirtualFile file = project.findVirtualFile(path);
 
     if (file != null && file.equals(project.getModule().getModuleFile())) {
@@ -117,7 +118,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
             if (file == null)
               throw new FileNotFoundException(
-                  IntelliJFileImpl.this + " does not exist or is derived");
+                  IntelliJFileImpl.this + " does not exist or is ignored");
 
             if (file.isDirectory()) throw new IOException(this + " is not a file");
 
@@ -159,7 +160,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
     final VirtualFile file = project.findVirtualFile(path);
 
-    if (file == null) throw new FileNotFoundException(this + " does not exist or is " + "derived");
+    if (file == null) throw new FileNotFoundException(this + " does not exist or is ignored");
 
     return file.getInputStream();
   }
@@ -187,7 +188,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
             final VirtualFile file = project.findVirtualFile(path);
 
             if (file == null) {
-              String exceptionText = IntelliJFileImpl.this + " does not exist or is derived";
+              String exceptionText = IntelliJFileImpl.this + " does not exist or is ignored";
 
               if (force) exceptionText += ", force option is not supported";
 
@@ -244,7 +245,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
             if (parentFile == null)
               throw new FileNotFoundException(
                   parent
-                      + " does not exist or is derived, cannot create file "
+                      + " does not exist or is ignored, cannot create file "
                       + IntelliJFileImpl.this);
 
             final VirtualFile file = parentFile.findChild(getName());

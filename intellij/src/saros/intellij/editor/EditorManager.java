@@ -429,8 +429,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           throw new IllegalStateException(
               "Could not create SPath for resource that is known to be shared: " + openFile);
 
-        } else if (path.getResource().isDerived()) {
-          LOG.debug("Skipping editor for derived open file " + path);
+        } else if (path.getResource().isIgnored()) {
+          LOG.debug("Skipping editor for ignored open file " + path);
 
           continue;
         }

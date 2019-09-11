@@ -76,7 +76,7 @@ public abstract class ServerResourceImpl implements IResource {
   }
 
   @Override
-  public boolean isDerived() {
+  public boolean isIgnored() {
     return false;
   }
 

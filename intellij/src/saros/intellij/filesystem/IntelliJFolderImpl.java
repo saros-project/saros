@@ -44,7 +44,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
     final VirtualFile folder = project.findVirtualFile(path);
 
     if (folder == null || !folder.exists())
-      throw new FileNotFoundException(this + " does not exist or is " + "derived");
+      throw new FileNotFoundException(this + " does not exist or is ignored");
 
     if (!folder.isDirectory()) throw new IOException(this + " is a file");
 
@@ -89,10 +89,11 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   /**
    * Returns whether this folder exists.
    *
-   * <p><b>Note:</b> A derived folder is treated as being nonexistent.
+   * <p><b>Note:</b> An ignored folder is treated as being nonexistent.
    *
-   * @return <code>true</code> if the resource exists, is a folder, and is not derived, <code>false
+   * @return <code>true</code> if the resource exists, is a folder, and is not ignored, <code>false
    *     </code> otherwise
+   * @see #isIgnored()
    */
   @Override
   public boolean exists() {
@@ -148,7 +149,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   }
 
   @Override
-  public boolean isDerived() {
+  public boolean isIgnored() {
     return !exists();
   }
 
@@ -165,7 +166,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
 
             if (file == null)
               throw new FileNotFoundException(
-                  IntelliJFolderImpl.this + " does not exist or is derived");
+                  IntelliJFolderImpl.this + " does not exist or is ignored");
 
             if (!file.isDirectory()) throw new IOException(this + " is not a folder");
 
@@ -221,7 +222,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
             if (parentFile == null)
               throw new FileNotFoundException(
                   parent
-                      + " does not exist or is derived, cannot create folder "
+                      + " does not exist or is ignored, cannot create folder "
                       + IntelliJFolderImpl.this);
 
             final VirtualFile file = parentFile.findChild(getName());
