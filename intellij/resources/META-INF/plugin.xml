@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin url="https://www.saros-project.org">
 
     <name>Saros</name>
 
@@ -10,16 +10,24 @@
 
     <change-notes>
         <![CDATA[
-        This is the first alpha version of Saros for IntelliJ. Use at your own risk.
+        - Made plugin project-independent
+        - Removed module name restrictions
+        - Removed module location restrictions
+        - Removed module file location restrictions
+        - Improved module sharing logic
+        - Improved negotiation UI
+        - Added custom color support
+        - Improved IDE color scheme support
+        - Minor bug fixes
         <br><br>
-        Detailed release notes can be found at
-        <a href="https://www.saros-project.org/releases/saros-i_0.1.0.html">
-            https://www.saros-project.org/releases/saros-i_0.1.0.html
+        More detailed information on the release can be found on our website:
+        <a href="https://www.saros-project.org/releases/">
+            https://www.saros-project.org/releases/
         </a>
         ]]>
     </change-notes>
 
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 
     <vendor url="https://www.saros-project.org" email="saros-devel@googlegroups.com">
         Saros Project
