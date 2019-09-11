@@ -149,11 +149,6 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   }
 
   @Override
-  public boolean isIgnored() {
-    return !exists();
-  }
-
-  @Override
   public void delete(final int updateFlags) throws IOException {
 
     Filesystem.runWriteAction(
