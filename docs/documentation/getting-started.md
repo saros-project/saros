@@ -386,7 +386,7 @@ You can then delete the first account, add a new account with the right values, 
 - Open the IntelliJ settings and navigate to `"Editor" > "Color Scheme" > "Saros"`.
 - Select the color scheme to change the colors for.
 - Expand the user whose colors to change.
-  - Currently, Saros internally has the concept of 5 user colors. These will be assigned to the session participants when a session is started. This means that the other user in a two-user-session will not necessarily have the user color 1.
+  - Currently, Saros internally has the concept of 5 user colors that will be used locally. These will be negotiated and assigned to the session participants when a session is started. As a consequence, the other user in a two-user-session will not necessarily have the user color 1.
 - Choose the annotation type to change the color for.
 - Adjust the way the annotation is displayed using the options on the right.
   - These changes will be previewed in the frame on the bottom.
