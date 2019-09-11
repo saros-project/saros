@@ -94,11 +94,6 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   }
 
   @Override
-  public boolean isDerived(final boolean checkAncestors) {
-    return isDerived();
-  }
-
-  @Override
   public boolean isDerived() {
     VirtualFile file = project.findVirtualFile(path);
 

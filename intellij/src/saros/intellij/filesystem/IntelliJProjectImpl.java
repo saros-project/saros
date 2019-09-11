@@ -230,11 +230,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   }
 
   @Override
-  public boolean isDerived(final boolean checkAncestors) {
-    return false;
-  }
-
-  @Override
   public boolean isDerived() {
     return false;
   }
