@@ -32,7 +32,6 @@ import saros.net.xmpp.JID;
  * Contact pop-up menu for selecting a project and module to share. Opened when right-clicking on a
  * contact.
  */
-// TODO remove the project module check once project module can be shared
 class ContactPopMenu extends JPopupMenu {
 
   private static final Logger LOG = Logger.getLogger(ContactPopMenu.class);
@@ -109,15 +108,6 @@ class ContactPopMenu extends JPopupMenu {
       projectMenu.add(noModulesFoundMenuItem);
     }
 
-    // Show project module as non-sharable
-    projectMenu.addSeparator();
-
-    JMenuItem projectItem = new JMenuItem(project.getName());
-    projectItem.setEnabled(false);
-    projectItem.setToolTipText(Messages.ContactPopMenu_menu_tooltip_project_module);
-
-    projectMenu.add(projectItem);
-
     // Show non-compliant modules as non-sharable
     if (!nonCompliantModules.isEmpty()) {
       projectMenu.addSeparator();
@@ -166,11 +156,6 @@ class ContactPopMenu extends JPopupMenu {
     for (Module module : moduleManager.getModules()) {
       String moduleName = module.getName();
       String fullModuleName = project.getName() + File.separator + moduleName;
-
-      // Skips project module
-      if (project.getName().equalsIgnoreCase(moduleName)) {
-        continue;
-      }
 
       try {
         IProject wrappedModule = new IntelliJProjectImpl(module);
