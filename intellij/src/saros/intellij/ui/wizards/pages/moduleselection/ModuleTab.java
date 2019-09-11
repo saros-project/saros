@@ -298,8 +298,6 @@ class ModuleTab {
     Module preselectedModule = null;
 
     for (Module module : modules) {
-      if (module.getName().equals(project.getName())) continue;
-
       existingModuleComboBox.addItem(module);
 
       if (module.getName().equals(moduleName)) {
