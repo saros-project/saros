@@ -108,7 +108,8 @@ public class VirtualFileConverter {
    *
    * @param path the SPath representing the resource to get a VirtualFile for
    * @return a VirtualFile for the given resource or <code>null</code> if the given resource does
-   *     not exists in the VFS snapshot, is derived, or belongs to a sub-module
+   *     not exists in the VFS snapshot, is ignored, or belongs to a sub-module
+   * @see IntelliJResourceImpl#isIgnored()
    */
   @Nullable
   public static VirtualFile convertToVirtualFile(@NotNull SPath path) {
@@ -127,7 +128,8 @@ public class VirtualFileConverter {
    *
    * @param resource the resource to get a VirtualFile for
    * @return a VirtualFile for the given resource or <code>null</code> if the given resource does
-   *     not exists in the VFS snapshot, is derived, or belongs to a sub-module
+   *     not exists in the VFS snapshot, is ignored, or belongs to a sub-module
+   * @see IntelliJResourceImpl#isIgnored()
    */
   @Nullable
   public static VirtualFile convertToVirtualFile(@NotNull IResource resource) {

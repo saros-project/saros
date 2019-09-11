@@ -148,7 +148,7 @@ public class FileListTest {
     EasyMock.expect(fileMock.getProject()).andStubReturn(project);
     EasyMock.expect(fileMock.getProjectRelativePath()).andStubReturn(relativePath);
 
-    EasyMock.expect(fileMock.isDerived()).andStubReturn(false);
+    EasyMock.expect(fileMock.isIgnored()).andStubReturn(false);
     EasyMock.expect(fileMock.exists()).andStubReturn(true);
     EasyMock.expect(fileMock.getType()).andStubReturn(IResource.FILE);
 
@@ -195,7 +195,7 @@ public class FileListTest {
     EasyMock.expect(folderMock.getProject()).andStubReturn(project);
     EasyMock.expect(folderMock.getProjectRelativePath()).andStubReturn(relativePath);
 
-    EasyMock.expect(folderMock.isDerived()).andStubReturn(false);
+    EasyMock.expect(folderMock.isIgnored()).andStubReturn(false);
     EasyMock.expect(folderMock.exists()).andStubReturn(true);
     EasyMock.expect(folderMock.getType()).andStubReturn(IResource.FOLDER);
 

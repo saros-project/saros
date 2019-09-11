@@ -100,10 +100,11 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   /**
    * Returns whether the resource for the given path exists.
    *
-   * <p><b>Note:</b> A derived resource is treated as being nonexistent.
+   * <p><b>Note:</b> An ignored resource is treated as being nonexistent.
    *
-   * @return <code>true</code> if the resource exists and is not derived, <code>false</code>
+   * @return <code>true</code> if the resource exists and is not ignored, <code>false</code>
    *     otherwise
+   * @see #isIgnored()
    */
   @Override
   public boolean exists(final IPath path) {
@@ -230,7 +231,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   }
 
   @Override
-  public boolean isDerived() {
+  public boolean isIgnored() {
     return false;
   }
 
@@ -349,12 +350,13 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   /**
    * Returns the virtual file for the given path belonging to this module.
    *
-   * <p><b>Note:</b> This method can not return files for derived resources or resources belonging
+   * <p><b>Note:</b> This method can not return files for ignored resources or resources belonging
    * to a sub-module.
    *
    * @param path relative path to the file
    * @return the virtual file or <code>null</code> if it does not exists in the VFS snapshot, is
-   *     derived, belongs to a sub-module, or the given path is absolute.
+   *     ignored, belongs to a sub-module, or the given path is absolute.
+   * @see #isIgnored()
    */
   @Nullable
   public VirtualFile findVirtualFile(final IPath path) {

@@ -119,8 +119,8 @@ public class ServerResourceImplTest extends EasyMockSupport {
   }
 
   @Test
-  public void isNeverDerived() throws Exception {
-    assertFalse(resource.isDerived());
+  public void isNeverIgnored() throws Exception {
+    assertFalse(resource.isIgnored());
   }
 
   @Test
