@@ -246,7 +246,7 @@ public class SharedProjectMapperTest {
 
     IResource resourceMock = EasyMock.createNiceMock(IResource.class);
     EasyMock.expect(resourceMock.getProject()).andStubReturn(projectMock);
-    EasyMock.expect(resourceMock.isDerived(true)).andReturn(true);
+    EasyMock.expect(resourceMock.isDerived()).andReturn(true);
 
     EasyMock.replay(resourceMock);
 
