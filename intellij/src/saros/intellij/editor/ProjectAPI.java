@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import saros.intellij.filesystem.Filesystem;
@@ -105,5 +106,17 @@ public class ProjectAPI {
   @NotNull
   private static FileEditorManager getFileEditorManager(@NotNull Project project) {
     return FileEditorManager.getInstance(project);
+  }
+
+  /**
+   * Returns whether the given virtual file is seen as excluded for the given project.
+   *
+   * @param project the project to check for
+   * @param virtualFile the virtual file to check
+   * @return whether the given virtual file is seen as excluded for the given project
+   * @see ProjectFileIndex#isExcluded(VirtualFile)
+   */
+  public static boolean isExcluded(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+    return ProjectFileIndex.getInstance(project).isExcluded(virtualFile);
   }
 }

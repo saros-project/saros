@@ -95,17 +95,6 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   }
 
   @Override
-  public boolean isIgnored() {
-    VirtualFile file = project.findVirtualFile(path);
-
-    if (file != null && file.equals(project.getModule().getModuleFile())) {
-      return true;
-    }
-
-    return !exists();
-  }
-
-  @Override
   public void delete(final int updateFlags) throws IOException {
 
     Filesystem.runWriteAction(
