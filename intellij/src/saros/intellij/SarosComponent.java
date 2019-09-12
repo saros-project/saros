@@ -51,10 +51,6 @@ public class SarosComponent {
     IntellijApplicationLifecycle.getInstance().start();
   }
 
-  public static boolean isSwtBrowserEnabled() {
-    return Boolean.getBoolean("saros.swtbrowser");
-  }
-
   private void loadLoggers() {
     final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 

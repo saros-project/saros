@@ -61,11 +61,6 @@
                     anchor="bottom" secondary="true"
                     factoryClass="saros.intellij.ui.SarosToolWindowFactory"/>
 
-        <toolWindow id="Swt Browser" icon="/icons/saros/saros_misc.png"
-                    anchor="bottom" secondary="true"
-                    factoryClass="saros.intellij.ui.swt_browser.SwtToolWindowFactory"
-                    conditionClass="saros.intellij.ui.swt_browser.BrowserCondition"/>
-
         <colorSettingsPage id="saros"
                            implementation="saros.intellij.preferences.colors.LocalSarosAnnotationColorsPage" />
         <additionalTextAttributes scheme="Default" file="/colorSchemes/SarosDefault.xml" />

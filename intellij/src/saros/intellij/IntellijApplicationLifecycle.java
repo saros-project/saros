@@ -3,11 +3,9 @@ package saros.intellij;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import saros.HTMLUIContextFactory;
 import saros.context.AbstractContextLifecycle;
 import saros.context.IContextFactory;
 import saros.intellij.context.SarosIntellijContextFactory;
-import saros.intellij.ui.swt_browser.SwtLibLoader;
 
 /**
  * Extends {@link AbstractContextLifecycle} for the Intellij plug-in. It contains additional
@@ -38,11 +36,6 @@ public class IntellijApplicationLifecycle extends AbstractContextLifecycle {
     List<IContextFactory> nonCoreFactories = new ArrayList<>();
 
     nonCoreFactories.add(new SarosIntellijContextFactory());
-
-    if (SarosComponent.isSwtBrowserEnabled()) {
-      SwtLibLoader.loadSwtLib();
-      nonCoreFactories.add(new HTMLUIContextFactory());
-    }
 
     return nonCoreFactories;
   }
