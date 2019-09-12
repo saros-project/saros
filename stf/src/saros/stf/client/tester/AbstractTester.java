@@ -3,8 +3,6 @@ package saros.stf.client.tester;
 import java.rmi.RemoteException;
 import saros.net.xmpp.JID;
 import saros.stf.server.rmi.controlbot.IControlBot;
-import saros.stf.server.rmi.htmlbot.IHTMLBot;
-import saros.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
 import saros.stf.server.rmi.remotebot.IRemoteBot;
 import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import saros.stf.server.rmi.superbot.ISuperBot;
@@ -59,22 +57,4 @@ public interface AbstractTester {
    * @throws RemoteException
    */
   public IControlBot controlBot() throws RemoteException;
-
-  /**
-   * @return <code>true</code> iff the remote Saros instance has enabled and exposed its HTML GUI
-   */
-  public boolean usesHtmlGui();
-
-  /**
-   * @return the {@link IHTMLWorkbenchBot}, which gives control over the IDE-specific GUI part that
-   *     contains the main view of the HTML GUI
-   * @throws RemoteException
-   */
-  public IHTMLWorkbenchBot htmlViewBot() throws RemoteException;
-
-  /**
-   * @return the {@link IHTMLBot}, which gives control over the HTML GUI itself
-   * @throws RemoteException
-   */
-  public IHTMLBot htmlBot() throws RemoteException;
 }

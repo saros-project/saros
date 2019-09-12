@@ -16,7 +16,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core;resolution:=optional,
  org.eclipse.jdt.launching;resolution:=optional,
  saros.core,
- saros.ui,
  saros.eclipse,
  org.junit
 Bundle-ClassPath: .,
