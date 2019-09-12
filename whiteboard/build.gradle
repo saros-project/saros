@@ -37,6 +37,7 @@ dependencies {
       exclude group: 'javax.jms', module: 'jms'
     }
   releaseDep 'com.google.code.gson:gson:2.8.5'
+  compile configurations.releaseDep
   testCompile configurations.testConfig
 }
 
