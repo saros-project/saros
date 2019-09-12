@@ -50,10 +50,8 @@ manifestDependencies {
 dependencies {
     compile junitVersion
     compile project(':saros.core')
-    compile project(':saros.ui')
     compile project(':saros.eclipse')
 
-    compile project(path: ':saros.ui', configuration: 'testing')
     compile project(path: ':saros.eclipse', configuration: 'testing')
 
     releaseDep fileTree(dir: 'libs', include: '*.jar', exclude: '*source*.jar')

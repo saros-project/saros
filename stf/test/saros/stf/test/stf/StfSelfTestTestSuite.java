@@ -13,7 +13,6 @@ import org.junit.runners.Suite;
   saros.stf.test.stf.menubar.TestSuite.class,
   saros.stf.test.stf.keyboard.KeyboardLayoutTest.class,
   saros.stf.test.stf.view.explorer.TestSuite.class,
-  saros.stf.test.stf.view.html.TestSuite.class,
   saros.stf.test.stf.view.sarosview.TestSuite.class,
   saros.stf.test.stf.view.sarosview.content.TestSuite.class
 })

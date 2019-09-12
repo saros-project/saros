@@ -8,8 +8,6 @@ import java.rmi.registry.Registry;
 import org.apache.log4j.Logger;
 import saros.net.xmpp.JID;
 import saros.stf.server.rmi.controlbot.IControlBot;
-import saros.stf.server.rmi.htmlbot.IHTMLBot;
-import saros.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
 import saros.stf.server.rmi.remotebot.IRemoteBot;
 import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import saros.stf.server.rmi.superbot.ISuperBot;
@@ -26,8 +24,6 @@ class RealTester implements AbstractTester {
   private IRemoteWorkbenchBot bot;
   private ISuperBot superBot;
   private IControlBot controlBot;
-  private IHTMLWorkbenchBot htmlViewBot;
-  private IHTMLBot htmlBot;
 
   private JID jid;
   private String password;
@@ -41,16 +37,6 @@ class RealTester implements AbstractTester {
     bot = (IRemoteWorkbenchBot) registry.lookup("workbenchBot");
     superBot = (ISuperBot) registry.lookup("superBot");
     controlBot = (IControlBot) registry.lookup("controlBot");
-
-    // TODO Don't handle this situation with exceptions
-    try {
-      htmlViewBot = (IHTMLWorkbenchBot) registry.lookup("htmlViewBot");
-      htmlBot = (IHTMLBot) registry.lookup("htmlBot");
-    } catch (NotBoundException e) {
-      log.info(
-          "Did not find bots for controlling HTML GUI. "
-              + "Make sure to enable the HTML GUI if you want to test it.");
-    }
   }
 
   @Override
@@ -88,21 +74,6 @@ class RealTester implements AbstractTester {
   @Override
   public IControlBot controlBot() throws RemoteException {
     return controlBot;
-  }
-
-  @Override
-  public boolean usesHtmlGui() {
-    return htmlViewBot != null && htmlBot != null;
-  }
-
-  @Override
-  public IHTMLWorkbenchBot htmlViewBot() throws RemoteException {
-    return htmlViewBot;
-  }
-
-  @Override
-  public IHTMLBot htmlBot() throws RemoteException {
-    return htmlBot;
   }
 
   @Override
