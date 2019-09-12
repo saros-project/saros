@@ -13,8 +13,6 @@ apply plugin: 'org.jetbrains.intellij'
 
 dependencies {
   compile project(':saros.core')
-  compile project(':saros.ui')
-  compile project(path: ':saros.ui', configuration: 'testing')
 
   compile 'org.easytesting:fest-assert:1.2'
   compile 'org.easytesting:fest-reflect:1.2'

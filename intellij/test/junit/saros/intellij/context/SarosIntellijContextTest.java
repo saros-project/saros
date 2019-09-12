@@ -5,7 +5,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import saros.HTMLUIContextFactory;
 import saros.context.CoreContextFactory;
 import saros.context.IContainerContext;
 import saros.context.IContextFactory;
@@ -45,7 +44,6 @@ public class SarosIntellijContextTest extends AbstractContextTest {
 
     factories.add(new SarosIntellijContextFactory());
     factories.add(new CoreContextFactory());
-    factories.add(new HTMLUIContextFactory());
 
     for (IContextFactory factory : factories) {
       factory.createComponents(container);
