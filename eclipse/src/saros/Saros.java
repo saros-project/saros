@@ -196,17 +196,6 @@ public class Saros extends AbstractUIPlugin {
     }
   }
 
-  /**
-   * Feature toggle for displaying Saros in a web browser in an additional view. Also checks if
-   * required bundle is present.
-   *
-   * @return <code>true</code> iff the feature is enabled and the UI bundle is present.
-   */
-  public static boolean useHtmlGui() {
-    // TODO store constant string elsewhere
-    return Platform.getBundle("saros.ui") != null && Boolean.getBoolean("saros.swtbrowser");
-  }
-
   /** Stops the Saros Eclipse life cycle. */
   private void stopLifeCycle() {
 
@@ -263,8 +252,8 @@ public class Saros extends AbstractUIPlugin {
       if (!isLifeCycleStopped.get()) threadTimeout = 1;
 
       /*
-       *  fall through to log an error or wait until the thread terminated
-       *  even it already signal that the life cycle was stopped
+       * fall through to log an error or wait until the thread terminated
+       * even it already signal that the life cycle was stopped
        */
     }
 

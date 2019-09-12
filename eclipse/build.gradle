@@ -58,10 +58,8 @@ manifestDependencies {
 
 dependencies {
   compile project(':saros.core')
-  compile project(':saros.ui')
 
   compile project(path: ':saros.core', configuration: 'testing')
-  compile project(path: ':saros.ui', configuration: 'testing')
 
   testImplementation configurations.testConfig
 }
