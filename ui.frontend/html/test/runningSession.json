@@ -1,7 +1,0 @@
-{
-  "members": [
-    {  "openedFile": "somefile.txt", "jid": "random@randomhost", "displayName": "randomuser", "isHost": true },
-    {  "openedFile": "someotherfile.txt", "jid": "random2@randomhost", "displayName": "random2user" },
-    {  "openedFile": null, "jid": "random3@randomhost", "displayName": "random3user" }
-  ]
-}
