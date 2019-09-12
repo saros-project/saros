@@ -162,14 +162,12 @@ task cleanGenerateLibAll {
     project(':saros.whiteboard').file('lib').deleteDir()
     project(':saros.stf').file('lib').deleteDir()
     project(':saros.stf.test').file('lib').deleteDir()
-    project(':saros.ui').file('lib').deleteDir()
   }
 }
 
 // generate all lib dirs in order to run stf tests
 task generateLibAll(dependsOn:['cleanGenerateLibAll',
                                ':saros.core:generateLib',
-                               ':saros.ui:generateLib',
                                ':saros.eclipse:generateLib',
                                ':saros.stf:generateLib',
                                ':saros.stf.test:generateLib',
@@ -179,7 +177,6 @@ task sarosEclipse(type: Copy, dependsOn: [
   'mavenizeP2Repository',
   ':saros.picocontainer:test',
   ':saros.core:test',
-  ':saros.ui:test',
   ':saros.eclipse:test',
   ':saros.eclipse:jar',
   ':saros.whiteboard:test',
@@ -189,7 +186,6 @@ task sarosEclipse(type: Copy, dependsOn: [
   description 'Builds and tests all modules required by Saros for Eclipse'
 
   from project(':saros.core').jar
-  from project(':saros.ui').jar
   from project(':saros.eclipse').jar
   from project(':saros.whiteboard').jar
   into 'build/distribution/eclipse'
@@ -215,7 +211,6 @@ task sarosServer(type: Copy, dependsOn: [
 task sarosIntellij(type: Copy, dependsOn: [
   ':saros.picocontainer:test',
   ':saros.core:test',
-  ':saros.ui:test',
   ':saros.intellij:test',
   ':saros.intellij:buildPlugin'
   ]) {
