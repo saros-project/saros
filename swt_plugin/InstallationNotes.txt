@@ -1,6 +1,0 @@
-To install this plugin please copy the whole folder 'saros.swt_plugin'
-into your IntelliJ plugin directory.
-For more information about where this directory is,
-see https://www.jetbrains.com/idea/help/project-and-ide-settings.html
-
-This is the only supported way at this stage of the development.
