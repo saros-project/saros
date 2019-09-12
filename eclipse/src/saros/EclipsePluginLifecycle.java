@@ -10,7 +10,6 @@ import saros.context.IContextFactory;
 import saros.feedback.FeedbackPreferences;
 import saros.session.SarosSessionManager;
 import saros.session.SessionEndReason;
-import saros.ui.browser.EclipseHTMLUIContextFactory;
 
 /**
  * Extends the {@link AbstractContextLifecycle} for an Eclipse plug-in. It contains additional
@@ -44,11 +43,6 @@ public class EclipsePluginLifecycle extends AbstractContextLifecycle {
     List<IContextFactory> nonCoreFactories = new ArrayList<IContextFactory>();
 
     nonCoreFactories.add(new SarosEclipseContextFactory(saros));
-
-    if (Saros.useHtmlGui()) {
-      nonCoreFactories.add(new HTMLUIContextFactory());
-      nonCoreFactories.add(new EclipseHTMLUIContextFactory());
-    }
 
     return nonCoreFactories;
   }
