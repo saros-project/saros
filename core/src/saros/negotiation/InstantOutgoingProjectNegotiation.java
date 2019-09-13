@@ -13,7 +13,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
@@ -141,17 +140,12 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     String message = "Sending files to " + getPeer().getName() + "...";
     monitor.beginTask(message, transferList.size());
 
-    /* use piped stream to communicate with transfer thread */
-    PipedInputStream in = new PipedInputStream();
-    OutputStream out = new PipedOutputStream(in);
-
     String userID = getPeer().toString();
-    OutgoingFileTransfer transfer;
-    transfer = fileTransferManager.createOutgoingFileTransfer(userID);
+    OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(userID);
 
-    try {
-      OutgoingStreamProtocol osp;
-      osp = new OutgoingStreamProtocol(out, projects, monitor);
+    try (PipedInputStream in = new PipedInputStream();
+        OutputStream out = new PipedOutputStream(in);
+        OutgoingStreamProtocol osp = new OutgoingStreamProtocol(out, projects, monitor)) {
 
       /* id in description needed to bypass SendFileAction handler */
       String streamName = TRANSFER_ID_PREFIX + getID();
@@ -161,10 +155,6 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
       sendProjectConfigFiles(osp);
       sendRemainingPreferOpenedFirst(osp);
-
-      osp.close();
-    } finally {
-      IOUtils.closeQuietly(out);
     }
 
     monitor.done();
