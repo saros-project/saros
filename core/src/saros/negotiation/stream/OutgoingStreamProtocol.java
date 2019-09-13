@@ -14,7 +14,7 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.ProjectSharingData;
 
 /** Implements Stream creation in {@link AbstractStreamProtocol} format. */
-public class OutgoingStreamProtocol extends AbstractStreamProtocol {
+public class OutgoingStreamProtocol extends AbstractStreamProtocol implements AutoCloseable {
 
   private static final Logger log = Logger.getLogger(OutgoingStreamProtocol.class);
 
@@ -49,9 +49,7 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
 
     writeHeader(file, fileHandle.getSize());
 
-    InputStream fileIn = null;
-    try {
-      fileIn = fileHandle.getContents();
+    try (InputStream fileIn = fileHandle.getContents()) {
       int readBytes = 0;
       /* buffer the file content and send to stream */
       while (readBytes != -1) {
@@ -62,15 +60,8 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
           throw new LocalCancellationException(
               "transmission was canceled", CancelOption.NOTIFY_PEER);
       }
-    } catch (IOException e) {
-      IOUtils.closeQuietly(out);
-      throw e;
-    } catch (LocalCancellationException e) {
-      IOUtils.closeQuietly(out);
-      throw e;
-    } finally {
-      IOUtils.closeQuietly(fileIn);
     }
+
     monitor.worked(1);
   }
 
@@ -89,6 +80,7 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
    *
    * @throws IOException if stream operation fails
    */
+  @Override
   public void close() throws IOException {
     try {
       out.writeUTF("");
