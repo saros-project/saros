@@ -25,6 +25,7 @@ import saros.server.console.ShareCommand;
 import saros.server.dummies.NullRemoteProgressIndicatorFactory;
 import saros.server.filesystem.ServerPathFactoryImpl;
 import saros.server.filesystem.ServerPathImpl;
+import saros.server.filesystem.ServerReferencePointManager;
 import saros.server.filesystem.ServerWorkspaceImpl;
 import saros.server.net.ServerFeatureAdvertiser;
 import saros.server.net.SubscriptionAuthorizer;
@@ -76,6 +77,7 @@ public class ServerContextFactory extends AbstractContextFactory {
     c.addComponent(IRemoteProgressIndicatorFactory.class, NullRemoteProgressIndicatorFactory.class);
 
     c.addComponent(UISynchronizer.class, ServerUISynchronizerImpl.class);
+    c.addComponent(ServerReferencePointManager.class);
   }
 
   /*

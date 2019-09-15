@@ -1,16 +1,20 @@
 package saros.server.console;
 
 import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.server.filesystem.ServerProjectImpl;
+import saros.server.filesystem.ServerReferencePointManager;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 
@@ -18,11 +22,16 @@ public class ShareCommand extends ConsoleCommand {
   private static final Logger log = Logger.getLogger(ShareCommand.class);
   private final ISarosSessionManager sessionManager;
   private final IWorkspace workspace;
+  private final ServerReferencePointManager serverReferencePointManager;
 
   public ShareCommand(
-      ISarosSessionManager sessionManager, IWorkspace workspace, ServerConsole console) {
+      ISarosSessionManager sessionManager,
+      IWorkspace workspace,
+      ServerConsole console,
+      ServerReferencePointManager serverReferencePointManager) {
     this.sessionManager = sessionManager;
     this.workspace = workspace;
+    this.serverReferencePointManager = serverReferencePointManager;
     console.registerCommand(this);
   }
 
@@ -50,7 +59,8 @@ public class ShareCommand extends ConsoleCommand {
       for (String path : args) {
         try {
           IProject project = new ServerProjectImpl(this.workspace, path);
-          fillReferencePointManager(session, project);
+          fillCoreReferencePointManager(session, project);
+          fillServerReferencePointManager(workspace.getLocation(), path);
           referencePoints.put(project.getReferencePoint(), null);
         } catch (Exception e) {
           log.error(path + " could not be added to the session", e);
@@ -62,9 +72,15 @@ public class ShareCommand extends ConsoleCommand {
     }
   }
 
-  private void fillReferencePointManager(ISarosSession session, IProject project) {
+  private void fillCoreReferencePointManager(ISarosSession session, IProject project) {
     IReferencePointManager referencePointManager =
         session.getComponent(IReferencePointManager.class);
     referencePointManager.putIfAbsent(project.getReferencePoint(), project);
+  }
+
+  private void fillServerReferencePointManager(IPath rootPath, String relPathToDirectory) {
+    Path path = Paths.get(rootPath.toString(), relPathToDirectory);
+
+    serverReferencePointManager.putIfAbsent(path);
   }
 }
