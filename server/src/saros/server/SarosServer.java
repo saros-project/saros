@@ -60,7 +60,6 @@ public class SarosServer {
 
     if (ServerConfig.isInteractive()) {
       server.lifecycle.getSarosContext().getComponent(ServerConsole.class).run();
-      server.stop();
       System.exit(0);
     }
   }
