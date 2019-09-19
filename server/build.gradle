@@ -17,4 +17,5 @@ jar {
     configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
   }
   from ('src/log4j.properties')
+  exclude '**/*.jar'
 }
