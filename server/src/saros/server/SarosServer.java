@@ -8,7 +8,7 @@ import saros.server.console.ServerConsole;
 /** The entry point for the Saros server. */
 public class SarosServer {
 
-  private static final Logger LOG = Logger.getLogger(SarosServer.class);
+  private static final Logger log = Logger.getLogger(SarosServer.class);
   private static final String LOGGING_CONFIG_FILE = "/log4j.properties";
 
   private ServerLifecycle lifecycle;
@@ -28,11 +28,13 @@ public class SarosServer {
     // Logging
     URL log4jProperties = SarosServer.class.getResource(LOGGING_CONFIG_FILE);
     PropertyConfigurator.configure(log4jProperties);
+    log.info("Starting server...");
 
     lifecycle.start();
   }
 
   public void stop() {
+    log.info("Stopping server...");
     lifecycle.stop();
   }
 
@@ -50,12 +52,10 @@ public class SarosServer {
                 new Runnable() {
                   @Override
                   public void run() {
-                    LOG.info("Stopping server...");
                     server.stop();
                   }
                 }));
 
-    LOG.info("Starting server...");
     server.start();
 
     if (ServerConfig.isInteractive()) {
