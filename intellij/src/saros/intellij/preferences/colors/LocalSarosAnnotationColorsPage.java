@@ -35,6 +35,9 @@ public class LocalSarosAnnotationColorsPage implements ColorSettingsPage {
   /** Maps specific tags to the possible text attribute keys. Used for the demo text. */
   private static final Map<String, TextAttributesKey> HIGHLIGHT_MAP;
 
+  /** Line separator to use for the text. Intellij IDEA always requires UNIX line separators. */
+  private static final String LINE_SEPARATOR = "\n";
+
   /* Initialize COLOR_ATTRIBUTE_DESCRIPTORS */
   static {
     List<AttributesDescriptor> attributesDescriptors = new ArrayList<>();
@@ -115,13 +118,13 @@ public class LocalSarosAnnotationColorsPage implements ColorSettingsPage {
 
     sb.append(createDemoTextForColorKey(null));
 
-    sb.append(System.lineSeparator()).append(System.lineSeparator());
+    sb.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
 
     for (IdentifiableColorKeys identifiableColorKeys : ColorManager.COLOR_KEYS) {
 
       sb.append(createDemoTextForColorKey(identifiableColorKeys));
 
-      sb.append(System.lineSeparator()).append(System.lineSeparator());
+      sb.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
     }
 
     sb.setLength(sb.length() - 2);
@@ -157,7 +160,7 @@ public class LocalSarosAnnotationColorsPage implements ColorSettingsPage {
         MessageFormat.format(
             Messages.ColorPreferences_user_example_text_contribution, userID, usedDescription));
 
-    sb.append(System.lineSeparator());
+    sb.append(LINE_SEPARATOR);
 
     sb.append(
         MessageFormat.format(
