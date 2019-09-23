@@ -11,25 +11,19 @@
     <change-notes>
         <![CDATA[
         <ul>
-            <li>Made plugin project-independent</li>
-            <li>Removed module name restrictions</li>
-            <li>Removed module location restrictions</li>
-            <li>Removed module file location restrictions</li>
-            <li>Improved module sharing logic</li>
-            <li>Improved negotiation UI</li>
-            <li>Added custom color support</li>
-            <li>Improved IDE color scheme support</li>
-            <li>Minor bug fixes</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/issues/696">#696</a> - Color settings page not loading for Windows users</li>
+            <li>Allow project module to be shared</li>
+            <li>Honor excluded resources</li>
         </ul>
-        <br><br>
-        More detailed information on the release can be found on our website:
-        <a href="https://www.saros-project.org/releases/">
-            https://www.saros-project.org/releases/
-        </a>
+        <br>
+        This list only refers to changes included in the latest release.
+        For the change history, you can have a look at JetBrains plugin site or
+        <a href="https://www.saros-project.org/releases/">our release page</a>,
+        which also contains a more detailed version of the release notes.
         ]]>
     </change-notes>
 
-    <version>0.2.0</version>
+    <version>0.2.1</version>
 
     <vendor url="https://www.saros-project.org" email="saros-devel@googlegroups.com">
         Saros Project
