@@ -31,6 +31,8 @@ The server will need some kind of permission system to allow a remote user to ma
 
 One server currently represents only one session. To lift this short-coming a Super-Server could be developed, that starts a new session-server on demand. This would also play nicely with the idea of an admin-user, as the user requesting the session could automatically be configured to be the first admin.
 
+This concept could prove to be very memory inefficient, as a new process and JVM would be started for each session. The overhead this brings needs to be evaluated to decide, how this should exactly be implemented. If the additional memory requirements are not overshadowed by Saros overall memory usage, an in-process solution could prove to be more reasonable.
+
 #### Challenges
 
 - It is not clear, how this can be represented in the XMPP-Protocol. The Super-Server would be logged with an XMPP-ID to setup the initial communication, but each session-server would need to be dynamically assigned a new JID or the same JID. New JIDs would need some kind of configuration and cooperation with the XMPP-Server. Re-using the same JID is currently not tested with Saros and might cause other unpredictable issues.
