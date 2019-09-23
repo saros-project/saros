@@ -6,7 +6,7 @@ See the installation documentation for [Eclipse](../documentation/installation.h
 
 See **latest release notes** about the current release:
 * **Saros for Eclipse (Saros/E)**: [15.0.0](saros-e_15.0.0.md)
-* **Saros for IntelliJ (Saros/I)**: [0.2.0](saros-i_0.2.0.md)
+* **Saros for IntelliJ (Saros/I)**: [0.2.1](saros-i_0.2.1.md)
 
 ## Eclipse Update Site
 
