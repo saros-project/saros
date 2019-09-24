@@ -277,7 +277,7 @@ doing:
 
 {% capture intellij %}
 
-**This page contains information partially specific to the current release `0.2.0`.<br>
+**This page contains information partially specific to the current release `0.2.1`.<br>
 For information on previous releases, you can have a look at the corresponding [release notes](../releases/index.html/index.html).**
 
 The development of the Saros/I plugin is still in the alpha stages, so expect it to be a bit rough around the edges.
@@ -314,7 +314,7 @@ For more complex modules, it is advised to share the module structure some other
 
 ## Compatibility
 
-The current release `0.2.0` is not compatible with the previous Saros/I release (`0.1.0`) or other Saros plugins (like Saros/E).
+The current release `0.2.1` is not compatible with the previous Saros/I releases (`0.1.0` or `0.2.0`) or other Saros plugins (like Saros/E).
 
 
 ## How to Use Saros/I
@@ -376,12 +376,13 @@ You can then delete the first account, add a new account with the right values, 
     - Specify the module base path.
   - *To use an existing module:* Choose "Use existing module"
     - Select a module from the drop-down menu.
+      - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](#module-restrictions)).
 - Click "Next".
   - If an existing local module was chosen, a list of local file changes that will be made during the negotiation will be shown. These are the differences between the local version of the module and the version held by the host. The shown actions are the actions necessary to align the local module with the host module.
   - **Warning:** Any local differences will be removed during the project negotiation. These adjustments will only be done if the "Finish" button is selected. If the project negotiation is aborted at this stage, no local files are changed.
 - Click "Finish".
 
-### Changing user colors
+### Changing User Colors
 
 - Open the IntelliJ settings and navigate to `"Editor" > "Color Scheme" > "Saros"`.
 - Select the color scheme to change the colors for.
@@ -434,22 +435,20 @@ Some of the implemented features are still subject to some restrictions:
 You can currently only share a single module. A module has to adhere to the following restrictions to be shareable through Saros:
 
 - The module must have exactly one content root.
-- The module must not be a project module.
 
 Sharing a module will only share resources belonging to that module, not resources belonging to sub-module located inside a content root of the module.
-Creating such a sub-module during a session will lead to an inconsistent state that can not be resolved by Saros.
+Creating such a sub-module during a session will lead to an inconsistent state that can not be resolved by Saros. See [Known Bugs](#known-bugs).
 
-### Working with newly created modules
+### Working With Newly Created Modules
 
 To share a newly created module, you will have to have saved your project at least once before trying to start a session.
 This is necessary as the module file for a new module is only written to disk the first time the module is saved.
 
 You can check if the module file was written to disk by looking at the base directory of the module. It should contain a `*.iml` file with the same name as the module.
 
+### Resource Exclusion Options Are Not Shared
 
-### Excluded resources are not ignored
-
-Saros/I does not currently ignore excluded resources. Instead, such resources will also be shared with the other participants.
+Saros/I does not currently share which resources are marked as 'Excluded' with other participants. This can lead to a situation where another participant creates a resource on their side that already exists as an excluded resource locally. This leads to a session desync. See [Known Bugs](#known-bugs).
 
 ### Number of Participants
 
@@ -487,6 +486,8 @@ There are some bugs in the alpha version of Saros/I that we are already aware of
 - [#223](https://github.com/saros-project/saros/issues/223) - Deleting and then re-creating a file with the same name (or moving a file and then moving it back, etc.) causes the session to desynchronize irreparably, requiring a session restart.
 - [#683](https://github.com/saros-project/saros/issues/683) - Creating a file with an unknown file extension (or without a file extension) leads to a session desynchronization. Opening the file on the other side, choosing a file type, and then running the recovery might repair the session, but the state could also be irreparable, requiring a session restart.
 - [#684](https://github.com/saros-project/saros/issues/683) - Renaming the content root of the shared module leads to the content being deleted for all other participants.
+- [#698](https://github.com/saros-project/saros/issues/698) - Creating a submodule in a shared directory leads to a session desync.
+- [#699](https://github.com/saros-project/saros/issues/699) - Which resource are marked as excluded is not shared between participants.
 
 ### Report a Bug
 

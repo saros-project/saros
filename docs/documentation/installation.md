@@ -57,7 +57,7 @@ or from within Eclipse:
     Eclipse installation.
 3.  Restart Eclipse.
 
-## Good to know
+## Good to Know
 
 *   Please note that Saros requires higher bandwidth and lower latency
     than normal chatting, so public chat servers might be too slow for
@@ -80,7 +80,7 @@ Saros/I can be installed from the JetBrains plugin repository or from disk.
 
 ## Installation Steps
 
-### From the plugin repository
+### From the Plugin Repository
 
 Saros/I is currently released through the `alpha` release channel. To be able find the plugin on the market place, you will first have to add the `alpha` release channel to your list of plugin repositories. A guide on how to do this is given [here](https://www.jetbrains.org/intellij/sdk/docs/plugin_repository/custom_channels.html#configuring-a-custom-channel-in-intellij-platform-based-ides).
 

@@ -83,14 +83,14 @@ You can currently only share a single module. A module has to adhere to the foll
 Sharing a module will only share resources belonging to that module, not resources belonging to sub-module located inside a content root of the module.
 Creating such a sub-module during a session will lead to an inconsistent state that can not be resolved by Saros.
 
-### Working with newly created modules
+### Working With Newly Created Modules
 
 To share a newly created module, you will have to have saved your project at least once before trying to start a session.
 This is necessary as the module file for a new module is only written to disk the first time the module is saved.
 
 You can check if the module file was written to disk by looking at the base directory of the module. It should contain a `*.iml` file with the same name as the module.
 
-### Excluded resources are not ignored
+### Excluded Resources Are Not Ignored
 
 Saros/I does not currently ignore excluded resources. Instead, such resources will also be shared with the other participants.
 
