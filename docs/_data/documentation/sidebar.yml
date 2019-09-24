@@ -7,6 +7,9 @@
 - title: Setup XMPP Server
   url: /documentation/setup-xmpp.html
 
+- title: Setup Saros Server
+  url: /documentation/saros-server.html
+
 - title: Screenshots
   url: /documentation/screenshots.html?tab=eclipse
 
