@@ -13,7 +13,7 @@ import saros.monitoring.IProgressMonitor;
 import saros.monitoring.remote.IRemoteProgressIndicator;
 import saros.monitoring.remote.RemoteProgressManager;
 import saros.session.User;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /** IntelliJ implementation of the {@link IRemoteProgressIndicator} interface. */
 final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndicator {
@@ -65,8 +65,7 @@ final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndica
     started = true;
 
     final UIMonitoredJob job =
-        new UIMonitoredJob(
-            ModelFormatUtils.format("Observing remote progress for {0}", remoteUser)) {
+        new UIMonitoredJob(CoreUtils.format("Observing remote progress for {0}", remoteUser)) {
           @Override
           protected IStatus run(IProgressMonitor monitor) {
             try {

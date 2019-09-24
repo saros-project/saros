@@ -17,7 +17,7 @@ import saros.session.ISarosSession;
 import saros.session.ISessionListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /**
  * Button to follow a user. Displays a PopupMenu containing all session users to choose from.
@@ -147,7 +147,7 @@ public class FollowButton extends AbstractSessionToolbarButton {
   }
 
   private JMenuItem createItemForUser(User user) {
-    String userName = ModelFormatUtils.getDisplayName(user);
+    String userName = CoreUtils.determineUserDisplayName(user);
     String userNameShort = userName;
     int index = userNameShort.indexOf("@");
     if (index > -1) {
@@ -168,7 +168,7 @@ public class FollowButton extends AbstractSessionToolbarButton {
     }
 
     if (currentlyFollowedUser != null) {
-      String currentUserName = ModelFormatUtils.getDisplayName(currentlyFollowedUser);
+      String currentUserName = CoreUtils.determineUserDisplayName(currentlyFollowedUser);
       if (currentUserName.equalsIgnoreCase(userNameShort)) {
         menuItem.setEnabled(false);
       }

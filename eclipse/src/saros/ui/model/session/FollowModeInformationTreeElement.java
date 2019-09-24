@@ -8,7 +8,7 @@ import saros.editor.EditorManager;
 import saros.session.User;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /**
  * This is a tree element that can be displayed as a child element of the user entry in the Saros
@@ -41,7 +41,7 @@ public class FollowModeInformationTreeElement extends AwarenessInformationTreeEl
     User followee = collector.getFollowedUser(user);
     if (followee != null) {
       if (collector.isActiveEditorShared(followee)) {
-        styledString.append("following " + ModelFormatUtils.getDisplayName(followee));
+        styledString.append("following " + CoreUtils.determineUserDisplayName(followee));
       } else {
         styledString.append(following_paused);
       }
