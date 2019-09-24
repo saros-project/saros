@@ -58,3 +58,10 @@ buildSrc/.gradle
 # LSP
 lsp/.classpath
 lsp/build
+
+# VS Code
+vscode*/.classpath
+vscode*/.project
+vscode*/build
+vscode*/package-lock.json
+vscode*/.vscode
