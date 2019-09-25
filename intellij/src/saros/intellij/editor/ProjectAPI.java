@@ -117,6 +117,7 @@ public class ProjectAPI {
    * @see ProjectFileIndex#isExcluded(VirtualFile)
    */
   public static boolean isExcluded(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-    return ProjectFileIndex.getInstance(project).isExcluded(virtualFile);
+    ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
+    return Filesystem.runReadAction(() -> projectFileIndex.isExcluded(virtualFile));
   }
 }
