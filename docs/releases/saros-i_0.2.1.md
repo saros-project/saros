@@ -28,11 +28,12 @@ The current release `0.2.1` is not compatible with the previous Saros/I releases
 
 ## Changes
 
-- Fixed [#696](https://github.com/saros-project/saros/issues/696) - Color settings page not loading for Windows users
 - Allow project module to be shared
   - The project module (i.e. the module that contains the project configuration and is used to load the project) can not be shared through Saros. The project configuration files will be ignored by the session.
 - Honor excluded resources
   - The Saros session now ignores resources marked as 'excluded' in the IDE. As a result, such resources and activities modifying them won't be shared with other participants.
+- Fixed [#696](https://github.com/saros-project/saros/issues/696) - Color settings page not loading on the Windows platform
+- Fixed [#703](https://github.com/saros-project/saros/issues/703) - Fix "Use existing module" option failing on the Windows platform
 
 ## Features
 
