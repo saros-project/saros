@@ -8,6 +8,8 @@
 
 - title: Saros for IntelliJ
   sublinks:
+  - title: 0.2.1
+    url: /releases/saros-i_0.2.1.html
   - title: 0.2.0
     url: /releases/saros-i_0.2.0.html
   - title: 0.1.0
