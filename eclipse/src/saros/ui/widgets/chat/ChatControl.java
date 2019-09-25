@@ -48,7 +48,6 @@ import saros.session.User;
 import saros.ui.Messages;
 import saros.ui.sounds.SoundPlayer;
 import saros.ui.sounds.Sounds;
-import saros.ui.util.ModelFormatUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.widgets.ExplanationComposite;
 import saros.ui.widgets.chat.events.CharacterEnteredEvent;
@@ -60,6 +59,7 @@ import saros.ui.widgets.chat.parts.ChatInput;
 import saros.ui.widgets.chat.parts.IChatDisplay;
 import saros.ui.widgets.chat.parts.IRCStyleChatDisplay;
 import saros.ui.widgets.chat.parts.SkypeStyleChatDisplay;
+import saros.util.CoreUtils;
 
 /**
  * This composite displays a chat conversation and the possibility to enter text.
@@ -634,7 +634,7 @@ public final class ChatControl extends Composite {
           if (rqJID != null) {
             final User user = session.getUser(rqJID);
 
-            if (user != null) return ModelFormatUtils.getDisplayName(user);
+            if (user != null) return CoreUtils.determineUserDisplayName(user);
           }
         }
       }

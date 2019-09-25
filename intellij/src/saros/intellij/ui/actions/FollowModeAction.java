@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import saros.editor.FollowModeManager;
 import saros.session.ISarosSession;
 import saros.session.User;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /** Action to activate or deactivate follow mode. */
 public class FollowModeAction extends AbstractSarosAction {
@@ -40,7 +40,7 @@ public class FollowModeAction extends AbstractSarosAction {
     }
 
     for (User user : session.getRemoteUsers()) {
-      String myUserName = ModelFormatUtils.getDisplayName(user);
+      String myUserName = CoreUtils.determineUserDisplayName(user);
       if (myUserName.equalsIgnoreCase(userName)) {
         return user;
       }
