@@ -113,6 +113,7 @@ There are some bugs in the alpha version of Saros/I that we are already aware of
 - [#684](https://github.com/saros-project/saros/issues/683) - Renaming the content root of the shared module leads to the content being deleted for all other participants.
 - [#698](https://github.com/saros-project/saros/issues/698) - Creating a submodule in a shared directory leads to a session desync.
 - [#699](https://github.com/saros-project/saros/issues/699) - Which resource are marked as excluded is not shared between participants.
+- [#707](https://github.com/saros-project/saros/issues/707) - Client line endings are overwritten with host line endings when starting a session.
 
 ### Report a Bug
 
