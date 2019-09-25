@@ -57,7 +57,8 @@ public class VirtualFileConverter {
   public static IResource convertToResource(
       @NotNull Project project, @NotNull VirtualFile virtualFile) {
 
-    Module module = ModuleUtil.findModuleForFile(virtualFile, project);
+    Module module =
+        Filesystem.runReadAction(() -> ModuleUtil.findModuleForFile(virtualFile, project));
 
     if (module == null) {
       log.debug(

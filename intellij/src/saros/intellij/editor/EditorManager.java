@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.FileIndex;
+import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -402,13 +402,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   private void addProjectResources(IProject project) {
     Module module = project.adaptTo(IntelliJProjectImpl.class).getModule();
-    FileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
+    ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
     Project intellijProject = module.getProject();
 
     Set<VirtualFile> openFiles = new HashSet<>();
 
     for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
-      if (moduleFileIndex.isInContent(openFile)) {
+      if (Filesystem.runReadAction(() -> moduleFileIndex.isInContent(openFile))) {
         openFiles.add(openFile);
       }
     }

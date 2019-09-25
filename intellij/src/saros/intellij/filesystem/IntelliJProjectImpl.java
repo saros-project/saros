@@ -116,8 +116,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   @NotNull
   @Override
   public IResource[] members() throws IOException {
-    // TODO run as read action
-
     final List<IResource> result = new ArrayList<>();
 
     final VirtualFile[] children = moduleRoot.getChildren();
@@ -126,8 +124,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     for (final VirtualFile child : children) {
 
-      if (!moduleFileIndex.isInContent(child)) {
-
+      if (!Filesystem.runReadAction(() -> moduleFileIndex.isInContent(child))) {
         continue;
       }
 
@@ -367,12 +364,14 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     VirtualFile virtualFile = moduleRoot.findFileByRelativePath(path.toString());
 
-    if (virtualFile != null
-        && ModuleRootManager.getInstance(module).getFileIndex().isInContent(virtualFile)) {
-      return virtualFile;
+    if (virtualFile == null) {
+      return null;
     }
 
-    return null;
+    ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
+    boolean isInContent = Filesystem.runReadAction(() -> moduleFileIndex.isInContent(virtualFile));
+
+    return isInContent ? virtualFile : null;
   }
 
   /**

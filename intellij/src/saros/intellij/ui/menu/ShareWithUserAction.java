@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IResource;
 import saros.intellij.context.SharedIDEContext;
+import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
@@ -27,7 +28,8 @@ import saros.net.xmpp.JID;
  *
  * <p>This class assumes that the project is allowed to be shared (at the moment only completely
  * shared projects are implemented) and that the call to {@link
- * ShareWithUserAction#getModuleFromVirtFile(VirtualFile, Project)} is supported for this IDE type.
+ * ShareWithUserAction#getModuleForVirtualFile(VirtualFile, Project)} is supported for this IDE
+ * type.
  */
 public class ShareWithUserAction extends AnAction {
 
@@ -61,7 +63,7 @@ public class ShareWithUserAction extends AnAction {
 
     // We allow only completely shared projects, so no need to check
     // for partially shared ones.
-    List<IResource> resources = Arrays.asList(getModuleFromVirtFile(virtualFile, e.getProject()));
+    List<IResource> resources = Arrays.asList(getModuleForVirtualFile(virtualFile, e.getProject()));
 
     List<JID> contacts = Arrays.asList(userJID);
 
@@ -69,13 +71,13 @@ public class ShareWithUserAction extends AnAction {
     CollaborationUtils.startSession(resources, contacts);
   }
 
-  private IResource getModuleFromVirtFile(VirtualFile virtFile, Project project) {
+  private IResource getModuleForVirtualFile(VirtualFile virtualFile, Project project) {
+    ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
 
-    Module module = ProjectFileIndex.SERVICE.getInstance(project).getModuleForFile(virtFile);
+    Module module = Filesystem.runReadAction(() -> projectFileIndex.getModuleForFile(virtualFile));
 
     if (module == null) {
-      // FIXME: Find way to select moduleName for non-module based IDEAs
-      // (Webstorm)
+      // FIXME: Find way to select moduleName for non-module based IDEAs (Webstorm)
       throw new UnsupportedOperationException();
     }
 
