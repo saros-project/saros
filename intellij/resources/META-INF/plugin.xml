@@ -11,9 +11,10 @@
     <change-notes>
         <![CDATA[
         <ul>
-            <li>Fixed <a href="https://github.com/saros-project/saros/issues/696">#696</a> - Color settings page not loading for Windows users</li>
             <li>Allow project module to be shared</li>
             <li>Honor excluded resources</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/issues/696">#696</a> - Color settings page not loading on the Windows platform</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/issues/703">#703</a> - Fix "Use existing module" option failing on the Windows platform</li>
         </ul>
         <br>
         This list only refers to changes included in the latest release.

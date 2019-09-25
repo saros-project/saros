@@ -10,29 +10,24 @@ import saros.intellij.context.SarosIntellijContextFactory;
 import saros.intellij.ui.swt_browser.SwtLibLoader;
 
 /**
- * Extends the {@link AbstractContextLifecycle} for an IntelliJ plug-in. It contains additional
- * IntelliJ specific fields and methods.
+ * Extends {@link AbstractContextLifecycle} for the Intellij plug-in. It contains additional
+ * Intellij specific fields and methods, defined in {@link SarosIntellijContextFactory}.
  *
- * <p>
- *
- * <p>This class is a singleton.
+ * <p>The lifecycle is singleton an can be obtained through {@link #getInstance()}.
  */
-/*
- * FIXME: Project lifecycle causes serious issues, switch back to application lifecycle and correct the file system implementation as needed !
- */
-public class IntellijProjectLifecycle extends AbstractContextLifecycle {
+public class IntellijApplicationLifecycle extends AbstractContextLifecycle {
 
-  private static IntellijProjectLifecycle instance;
+  private static IntellijApplicationLifecycle instance;
 
   /**
-   * Returns the current intellij project lifecycle instance. The returned instance is singleton. If
-   * no instance is present, a new instance is instantiated.
+   * Returns the current intellij application lifecycle instance. The returned instance is
+   * singleton. If no instance is present, a new instance is instantiated.
    *
    * @return the current intellij project lifecycle instance
    */
-  public static synchronized IntellijProjectLifecycle getInstance() {
+  public static synchronized IntellijApplicationLifecycle getInstance() {
     if (instance == null) {
-      instance = new IntellijProjectLifecycle();
+      instance = new IntellijApplicationLifecycle();
     }
 
     return instance;

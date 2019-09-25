@@ -32,12 +32,12 @@ import saros.negotiation.ProjectNegotiationData;
 public class ModuleConfigurationProvider implements ProjectDataProvider {
   private static Logger log = Logger.getLogger(ModuleConfigurationProvider.class);
 
-  public static final String MODULE_TYPE_KEY = "MODULE_TYPE";
-  public static final String SDK_KEY = "SKD";
-  public static final String SOURCE_ROOTS_KEY = "SOURCE_ROOTS";
-  public static final String TEST_SOURCE_ROOTS_KEY = "TEST_SOURCE_ROOTS";
-  public static final String RESOURCE_ROOTS_KEY = "RESOURCE_ROOTS";
-  public static final String TEST_RESOURCE_ROOTS_KEY = "TEST_RESOURCE_ROOTS";
+  static final String MODULE_TYPE_KEY = "MODULE_TYPE";
+  static final String SDK_KEY = "SKD";
+  static final String SOURCE_ROOTS_KEY = "SOURCE_ROOTS";
+  static final String TEST_SOURCE_ROOTS_KEY = "TEST_SOURCE_ROOTS";
+  static final String RESOURCE_ROOTS_KEY = "RESOURCE_ROOTS";
+  static final String TEST_RESOURCE_ROOTS_KEY = "TEST_RESOURCE_ROOTS";
 
   private static final CharSequence DELIMITER = ":";
 
@@ -104,7 +104,6 @@ public class ModuleConfigurationProvider implements ProjectDataProvider {
     VirtualFile contentRoot = contentEntry.getFile();
 
     if (contentRoot == null) {
-
       log.error(
           "Encountered content root without a valid local representation for shared module \""
               + module
@@ -113,7 +112,7 @@ public class ModuleConfigurationProvider implements ProjectDataProvider {
       return optionsMap;
     }
 
-    String contentRootPath = contentRoot.getPath();
+    Path contentRootPath = Paths.get(contentRoot.getPath());
 
     String sourceRoots =
         flatten(contentRootPath, contentEntry.getSourceFolders(JavaSourceRootType.SOURCE));
@@ -135,7 +134,7 @@ public class ModuleConfigurationProvider implements ProjectDataProvider {
   }
 
   /**
-   * Flattens the list of source folders into a single string containing their relive paths.
+   * Flattens the list of source folders into a single string containing their relative paths.
    *
    * <p>This is done by first making the paths relative to the passed base path, escaping any
    * existing usages of {@link #DELIMITER}, and then joining them into a single string separated by
@@ -147,39 +146,18 @@ public class ModuleConfigurationProvider implements ProjectDataProvider {
    *     of the passed list of source folders is empty
    */
   @Nullable
-  private String flatten(@NotNull String basePath, @NotNull List<SourceFolder> sourceFolders) {
+  private String flatten(@NotNull Path basePath, @NotNull List<SourceFolder> sourceFolders) {
     if (sourceFolders.isEmpty()) {
       return null;
     }
 
     return sourceFolders
         .stream()
-        .map(SourceFolder::getFile)
+        .map(sourceFolder -> ModuleUtils.getRelativeRootPath(basePath, sourceFolder))
         .filter(Objects::nonNull)
-        .map(VirtualFile::getPath)
-        .map(sourcePath -> relativize(basePath, sourcePath))
+        .map(Path::toString)
         .map(ModuleConfigurationProvider::escape)
         .collect(Collectors.joining(DELIMITER));
-  }
-
-  /**
-   * Relativizes the given source path against the given base path.
-   *
-   * @param base the base path
-   * @param path the path to the source location
-   * @return the relative path from the base path to the given source location
-   */
-  @NotNull
-  private String relativize(@NotNull String base, @NotNull String path) {
-    assert path.startsWith(base)
-        : "Encountered path that is not located below the given base directory";
-
-    Path basePath = Paths.get(base);
-    Path childPath = Paths.get(path);
-
-    Path relativePath = basePath.relativize(childPath);
-
-    return relativePath.toString();
   }
 
   /**
@@ -195,7 +173,7 @@ public class ModuleConfigurationProvider implements ProjectDataProvider {
    * @see ProjectNegotiationData#getAdditionalProjectData()
    */
   @Nullable
-  public static String[] split(@Nullable String options) {
+  static String[] split(@Nullable String options) {
     if (options == null) {
       return null;
     }
