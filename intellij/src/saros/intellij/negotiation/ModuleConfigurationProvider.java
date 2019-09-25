@@ -32,12 +32,12 @@ import saros.negotiation.ProjectNegotiationData;
 public class ModuleConfigurationProvider implements ProjectDataProvider {
   private static Logger log = Logger.getLogger(ModuleConfigurationProvider.class);
 
-  public static final String MODULE_TYPE_KEY = "MODULE_TYPE";
-  public static final String SDK_KEY = "SKD";
-  public static final String SOURCE_ROOTS_KEY = "SOURCE_ROOTS";
-  public static final String TEST_SOURCE_ROOTS_KEY = "TEST_SOURCE_ROOTS";
-  public static final String RESOURCE_ROOTS_KEY = "RESOURCE_ROOTS";
-  public static final String TEST_RESOURCE_ROOTS_KEY = "TEST_RESOURCE_ROOTS";
+  static final String MODULE_TYPE_KEY = "MODULE_TYPE";
+  static final String SDK_KEY = "SKD";
+  static final String SOURCE_ROOTS_KEY = "SOURCE_ROOTS";
+  static final String TEST_SOURCE_ROOTS_KEY = "TEST_SOURCE_ROOTS";
+  static final String RESOURCE_ROOTS_KEY = "RESOURCE_ROOTS";
+  static final String TEST_RESOURCE_ROOTS_KEY = "TEST_RESOURCE_ROOTS";
 
   private static final CharSequence DELIMITER = ":";
 
@@ -173,7 +173,7 @@ public class ModuleConfigurationProvider implements ProjectDataProvider {
    * @see ProjectNegotiationData#getAdditionalProjectData()
    */
   @Nullable
-  public static String[] split(@Nullable String options) {
+  static String[] split(@Nullable String options) {
     if (options == null) {
       return null;
     }
