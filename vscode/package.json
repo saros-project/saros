@@ -10,14 +10,15 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.startSaros"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "extension.startSaros",
+				"title": "Start",
+				"category": "Saros"
 			}
 		]
 	},
@@ -38,5 +39,6 @@
 		"typescript": "^3.3.1",
 		"tslint": "^5.12.1",
 		"vscode-test": "^1.2.0"
-	}
+	},
+	"dependencies": {}
 }
