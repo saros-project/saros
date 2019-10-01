@@ -27,8 +27,6 @@
       <module name="saros.stf.test_test" target="1.8" />
       <module name="saros.stf_main" target="1.8" />
       <module name="saros.stf_test" target="1.8" />
-      <module name="saros.ui_main" target="1.8" />
-      <module name="saros.ui_test" target="1.8" />
       <module name="saros.whiteboard_main" target="1.8" />
       <module name="saros.whiteboard_test" target="1.8" />
     </bytecodeTargetLevel>
