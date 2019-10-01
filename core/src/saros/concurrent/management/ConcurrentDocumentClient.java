@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
-import saros.activities.FileActivity;
 import saros.activities.IActivity;
-import saros.activities.IActivityReceiver;
 import saros.activities.JupiterActivity;
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
@@ -32,10 +30,13 @@ public class ConcurrentDocumentClient {
 
   private final JupiterClient jupiterClient;
 
-  public ConcurrentDocumentClient(ISarosSession sarosSession) {
+  private final DeletedResourceFilter deletedResourceFilter;
 
+  public ConcurrentDocumentClient(ISarosSession sarosSession) {
     this.sarosSession = sarosSession;
     this.jupiterClient = new JupiterClient(sarosSession);
+
+    this.deletedResourceFilter = new DeletedResourceFilter(jupiterClient::reset);
   }
 
   /**
@@ -68,6 +69,9 @@ public class ConcurrentDocumentClient {
       return jupiterClient.withTimestamp(checksumActivity);
 
     } else {
+      deletedResourceFilter.handleResourceDeletion(activity);
+      deletedResourceFilter.handleResourceCreation(activity);
+
       return activity;
     }
   }
@@ -91,7 +95,13 @@ public class ConcurrentDocumentClient {
     List<IActivity> activities = new ArrayList<IActivity>();
 
     try {
-      activity.dispatch(clientReceiver);
+      deletedResourceFilter.handleResourceCreation(activity);
+
+      if (deletedResourceFilter.isFiltered(activity)) {
+        log.debug("Ignored activity for already deleted resource: " + activity);
+
+        return activities;
+      }
 
       if (activity instanceof JupiterActivity) {
         activities.addAll(receiveActivity((JupiterActivity) activity));
@@ -101,6 +111,8 @@ public class ConcurrentDocumentClient {
       } else {
         activities.add(activity);
       }
+
+      deletedResourceFilter.handleResourceDeletion(activity);
 
     } catch (Exception e) {
       log.error("Error while transforming activity: " + activity, e);
@@ -122,17 +134,6 @@ public class ConcurrentDocumentClient {
     }
     return activity;
   }
-
-  /** Used to remove JupiterClientDocuments for deleted files */
-  private final IActivityReceiver clientReceiver =
-      new IActivityReceiver() {
-        @Override
-        public void receive(FileActivity fileActivity) {
-          if (fileActivity.getType() == FileActivity.Type.REMOVED) {
-            jupiterClient.reset(fileActivity.getPath());
-          }
-        }
-      };
 
   /**
    * Transforms the JupiterActivity back into textEditActivities.

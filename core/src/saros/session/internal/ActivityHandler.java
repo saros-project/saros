@@ -401,7 +401,7 @@ public final class ActivityHandler implements Startable {
     final List<User> allUsers = session.getUsers();
 
     for (IActivity activity : activities) {
-      documentServer.checkFileDeleted(activity);
+      documentServer.handleResourceChange(activity);
 
       if (activity instanceof JupiterActivity || activity instanceof ChecksumActivity) {
 
