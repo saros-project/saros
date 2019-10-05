@@ -475,8 +475,6 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     cleanUpDeletedFileState(path);
 
     dispatchActivity(activity);
-
-    // TODO reset the vector time for the deleted file or contained files if folder
   }
 
   /**
@@ -835,15 +833,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     dispatchActivity(activity);
 
-    if (oldPathIsShared) {
-      if (fileIsOpen) {
-        EditorActivity closeOldEditorActivity =
-            new EditorActivity(user, EditorActivity.Type.CLOSED, oldFilePath);
+    if (oldPathIsShared && fileIsOpen) {
+      EditorActivity closeOldEditorActivity =
+          new EditorActivity(user, EditorActivity.Type.CLOSED, oldFilePath);
 
-        dispatchActivity(closeOldEditorActivity);
-      }
-
-      // TODO reset the vector time for the old file
+      dispatchActivity(closeOldEditorActivity);
     }
 
     if (newPathIsShared && fileIsOpen) {
