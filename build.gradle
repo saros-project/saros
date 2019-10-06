@@ -208,6 +208,18 @@ task sarosServer(type: Copy, dependsOn: [
   into 'build/distribution/server'
 }
 
+task sarosVSCode(type: Copy, dependsOn: [
+  ':saros.core:test',
+  ':saros.vscode.java:test',
+  ':saros.vscode.java:jar'
+  ]) {
+  group 'Delivery'
+  description 'Builds and tests all modules required by the Saros for VS Code'
+
+  from project(':saros.vscode.java').jar
+  into 'build/distribution/vscode.java'
+}
+
 task sarosIntellij(type: Copy, dependsOn: [
   ':saros.picocontainer:test',
   ':saros.core:test',
