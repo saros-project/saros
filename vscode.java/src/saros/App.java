@@ -1,8 +1,13 @@
-package app;
+package saros;
 
 import java.io.IOException;
 
+import saros.poc.Server;
+import saros.poc.Shell;
+import saros.vscode.Saros;
+
 public class App {
+
     public static void main(String[] args) throws NumberFormatException, IOException {
         for (String arg : args) {
             System.out.println("Argument: " + arg);
@@ -19,11 +24,18 @@ public class App {
             case "sh":
                 startShell();
                 break;
+            case "core":
+                startCore(args);
+                break;
             default:
                 System.out.println("Invalid mode -> exit");
                 break;
         }
 
+    }
+
+    private static void startCore(String[] args) {
+        Saros.main(args);
     }
 
     private static void startShell() throws IOException {
