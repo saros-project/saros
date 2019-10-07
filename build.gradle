@@ -182,6 +182,7 @@ task sarosVSCode(type: Copy, dependsOn: [
 
   from project(':saros.vscode.java').jar
   into 'build/distribution/vscode.java'
+  into 'vscode/out'
 }
 
 task sarosIntellij(type: Copy, dependsOn: [

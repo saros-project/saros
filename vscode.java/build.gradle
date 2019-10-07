@@ -1,5 +1,6 @@
 dependencies {
   compile project(':saros.core')
+  compile project(':saros.server')
   compile 'org.apache.commons:commons-collections4:4.2'
   testCompile configurations.testConfig
 }
@@ -11,11 +12,11 @@ sourceSets {
 
 jar {
   manifest {
-    attributes 'Main-Class': 'app.App' /*'saros.vscode.Saros'*/
+    attributes 'Main-Class': 'saros.App'
   }
   from {
     configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
   }
-  from ('src/log4j.properties')
+  from ('src/log4j.properties')  
   exclude '**/*.jar'
 }
