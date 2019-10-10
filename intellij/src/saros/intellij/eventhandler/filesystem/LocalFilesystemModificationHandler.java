@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Deque;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -350,12 +351,12 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   }
 
   /**
-   * Generates and dispatches a deletion activity for the deleted resource. If the resource was a
-   * file, subsequently removes any editors for the file from the editor pool and drops any held
-   * annotations for the file.
+   * Generates and dispatches a deletion activity for the deleted resource.
    *
    * @param virtualFileEvent the event to react to
    * @see VirtualFileListener#beforeFileDeletion(VirtualFileEvent)
+   * @see #generateFileDeletion(VirtualFile)
+   * @see #generateFolderDeletion(VirtualFile)
    */
   private void generateResourceDeletionActivity(@NotNull VirtualFileEvent virtualFileEvent) {
 
@@ -367,11 +368,24 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting before resource deletion: " + deletedVirtualFile);
     }
 
-    SPath path = VirtualFileConverter.convertToSPath(project, deletedVirtualFile);
+    if (deletedVirtualFile.isDirectory()) {
+      generateFolderDeletion(deletedVirtualFile);
+    } else {
+      generateFileDeletion(deletedVirtualFile);
+    }
+  }
+
+  /**
+   * Generates and dispatches a folder deletion activity for the deleted folder.
+   *
+   * @param deletedFolder the folder that was deleted
+   */
+  private void generateFolderDeletion(@NotNull VirtualFile deletedFolder) {
+    SPath path = VirtualFileConverter.convertToSPath(project, deletedFolder);
 
     if (path == null || !session.isShared(path.getResource())) {
       if (LOG.isTraceEnabled()) {
-        LOG.trace("Ignoring non-shared resource deletion: " + deletedVirtualFile);
+        LOG.trace("Ignoring non-shared folder deletion: " + deletedFolder);
       }
 
       return;
@@ -381,20 +395,38 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     IActivity activity;
 
-    if (deletedVirtualFile.isDirectory()) {
-      // TODO create deletion activities for child resources
-      // TODO clean up editor pool and annotations for child resources
-      activity = new FolderDeletedActivity(user, path);
+    // TODO create deletion activities for child resources
+    // TODO clean up editor pool and annotations for child resources
+    activity = new FolderDeletedActivity(user, path);
 
-    } else {
-      activity =
-          new FileActivity(
-              user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, path, null, null, null);
+    dispatchActivity(activity);
+  }
 
-      editorManager.removeAllEditorsForPath(path);
+  /**
+   * Generated and dispatches a file deletion activity for the deleted file. Subsequently removes
+   * any editors for the file from the editor pool and drops any held annotations for the file.
+   *
+   * @param deletedFile the file that was deleted
+   */
+  private void generateFileDeletion(VirtualFile deletedFile) {
+    SPath path = VirtualFileConverter.convertToSPath(project, deletedFile);
 
-      annotationManager.removeAnnotations(path.getFile());
+    if (path == null || !session.isShared(path.getResource())) {
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Ignoring non-shared file deletion: " + deletedFile);
+      }
+
+      return;
     }
+
+    User user = session.getLocalUser();
+
+    IActivity activity =
+        new FileActivity(user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, path, null, null, null);
+
+    editorManager.removeAllEditorsForPath(path);
+
+    annotationManager.removeAnnotations(path.getFile());
 
     dispatchActivity(activity);
 
@@ -485,7 +517,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     if (!oldPathIsShared && !newPathIsShared) {
       if (LOG.isTraceEnabled()) {
         LOG.trace(
-            "Ignoring non-shared resource move - resource: "
+            "Ignoring non-shared folder move - folder: "
                 + oldFile
                 + ", old parent: "
                 + oldParent
@@ -498,20 +530,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     Deque<IActivity> queuedDeletionActivities = new ConcurrentLinkedDeque<>();
 
-    /*
-     * Filter determining which child resources to iterate over.
-     * It only iterated over resources belonging to the same module as the
-     * base directory. This is needed to exclude submodules.
-     *
-     * TODO once sharing multiple modules is possible, introduce logic to handle deleted submodules if they are shared
-     */
-    VirtualFileFilter virtualFileFilter =
-        file -> {
-          Module baseModule = ModuleUtil.findModuleForFile(oldFile, project);
-          Module module = ModuleUtil.findModuleForFile(file, project);
-
-          return baseModule != null && baseModule.equals(module);
-        };
+    VirtualFileFilter virtualFileFilter = getVirtualFileFilter(oldFile);
 
     /*
      * Defines the actions executed on the base directory and every valid
@@ -703,7 +722,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       // neither source nor destination are shared
       if (LOG.isTraceEnabled()) {
         LOG.trace(
-            "Ignoring non-shared resource move - resource: "
+            "Ignoring non-shared file move - file: "
                 + oldFile
                 + ", old base parent: "
                 + oldBaseParent
@@ -838,6 +857,26 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return null;
     }
+  }
+
+  /**
+   * Returns a filter determining which child resources to iterate over. It only iterated over
+   * resources belonging to the same module as the base directory. This is needed to exclude
+   * submodules. Furthermore, this implicitly excludes resources marked as 'excluded' as the logic
+   * won't find a module for them.
+   *
+   * @param baseFile the base file the iteration starts at
+   * @return a filter determining which child resources to iterate over
+   */
+  // TODO once sharing multiple modules is possible, introduce logic to handle deleted submodules if
+  //  they are shared
+  private VirtualFileFilter getVirtualFileFilter(@NotNull VirtualFile baseFile) {
+    return (file) -> {
+      Module baseModule = ModuleUtil.findModuleForFile(baseFile, project);
+      Module module = ModuleUtil.findModuleForFile(file, project);
+
+      return Objects.equals(baseModule, module);
+    };
   }
 
   /**
