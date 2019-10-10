@@ -22,29 +22,29 @@ import saros.session.ISarosSession;
 import saros.session.ISessionListener;
 import saros.session.User;
 
-/** Class to handle resource deletions and filter out activities for already deleted resources. */
-class DeletedResourceFilter {
-  private static final Logger log = Logger.getLogger(DeletedResourceFilter.class);
+/** Class to handle file deletions and filter out resource activities for already deleted files. */
+class ResourceActivityFilter {
+  private static final Logger log = Logger.getLogger(ResourceActivityFilter.class);
 
   private final ISarosSession sarosSession;
 
-  /** Method passed by the constructor caller that can be used to react to resource deletions. */
-  private final Consumer<SPath> resourceDeletionHandler;
+  /** Method passed by the constructor caller that can be used to react to file deletions. */
+  private final Consumer<SPath> fileDeletionHandler;
 
   /**
-   * A map of shared resources that were deleted during the session onto the pending acknowledgments
-   * from other participants. It is used to filter out activities for such resources that were
-   * created before the other participants ran the corresponding resource deletion activity locally.
+   * A map of shared files that were deleted during the session onto the pending acknowledgments
+   * from other participants. It is used to filter out activities for such files that were created
+   * before the other participants ran the corresponding file deletion activity locally.
    *
-   * <p>The set is updated once the resource is recreated as we then want to handle activities for
-   * it again. Furthermore, it is updated once all acknowledgments for a resource deletion were
-   * received as the filter is then no longer necessary.
+   * <p>The set is updated once the file is recreated as we then want to handle activities for it
+   * again. Furthermore, it is updated once all acknowledgments for a file deletion were received as
+   * the filter is then no longer necessary.
    *
    * <p>This way of filtering can lead to issues when the order of activities is not preserved, e.g.
    * when we receive the content change for a new file is received before the file creation. Such
    * activities will be dropped, leading to inconsistencies.
    */
-  private final Map<SPath, List<User>> deletedResources;
+  private final Map<SPath, List<User>> deletedFileFilter;
 
   /** Activity consumer processing received deletion acknowledgments. */
   private final IActivityConsumer activityConsumer =
@@ -52,16 +52,16 @@ class DeletedResourceFilter {
         @Override
         public void receive(DeletionAcknowledgmentActivity deletionAcknowledgmentActivity) {
           User source = deletionAcknowledgmentActivity.getSource();
-          SPath resource = deletionAcknowledgmentActivity.getPath();
+          SPath file = deletionAcknowledgmentActivity.getPath();
 
-          List<User> remainingUsers = deletedResources.get(resource);
+          List<User> remainingUsers = deletedFileFilter.get(file);
 
           if (remainingUsers == null) {
             log.warn(
                 "Received unexpected deletion acknowledgment for file that is not filtered: "
                     + source
                     + " - "
-                    + resource);
+                    + file);
 
             return;
 
@@ -70,35 +70,33 @@ class DeletedResourceFilter {
                 "Received acknowledgment for file deletion from unexpected user: "
                     + source
                     + " - "
-                    + resource);
+                    + file);
 
             return;
           }
 
-          log.debug("Received deletion acknowledgment from " + source + " for " + resource);
+          log.debug("Received deletion acknowledgment from " + source + " for " + file);
 
           remainingUsers.remove(source);
 
           if (remainingUsers.isEmpty()) {
             log.debug(
-                "Dropping activity filter for "
-                    + resource
-                    + " as all acknowledgments were received");
+                "Dropping activity filter for " + file + " as all acknowledgments were received");
 
-            deletedResources.remove(resource);
+            deletedFileFilter.remove(file);
           }
         }
       };
 
   /**
-   * Session listener updating the held map of filtered resources when participants leave the
-   * session or resources are removed from the session.
+   * Session listener updating the held map of filtered files when participants leave the session or
+   * project are removed from the session.
    */
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
         public void userLeft(User user) {
-          Iterator<Entry<SPath, List<User>>> iterator = deletedResources.entrySet().iterator();
+          Iterator<Entry<SPath, List<User>>> iterator = deletedFileFilter.entrySet().iterator();
           while (iterator.hasNext()) {
             Entry<SPath, List<User>> entry = iterator.next();
 
@@ -118,14 +116,14 @@ class DeletedResourceFilter {
 
         @Override
         public void projectRemoved(IProject project) {
-          Iterator<Entry<SPath, List<User>>> iterator = deletedResources.entrySet().iterator();
+          Iterator<Entry<SPath, List<User>>> iterator = deletedFileFilter.entrySet().iterator();
           while (iterator.hasNext()) {
-            SPath resource = iterator.next().getKey();
+            SPath file = iterator.next().getKey();
 
-            if (resource.getProject().equals(project)) {
+            if (file.getProject().equals(project)) {
               log.debug(
                   "Dropping activity filter for "
-                      + resource
+                      + file
                       + " as it is no longer part of the session");
 
               iterator.remove();
@@ -135,33 +133,33 @@ class DeletedResourceFilter {
       };
 
   /**
-   * Creates a new deleted resource filter. The passed method is called every time a resource
-   * deletion is detected <b>after</b> the resource is added to the map of deleted resources.
+   * Creates a new deleted file filter. The passed method is called every time a file deletion is
+   * detected <b>after</b> the file is added to the map of deleted file.
    *
    * @param sarosSession the current saros session
-   * @param resourceDeletionHandler method that is called every time a resource deletion is detected
+   * @param fileDeletionHandler method that is called every time a file deletion is detected
    */
-  DeletedResourceFilter(ISarosSession sarosSession, Consumer<SPath> resourceDeletionHandler) {
+  ResourceActivityFilter(ISarosSession sarosSession, Consumer<SPath> fileDeletionHandler) {
     this.sarosSession = sarosSession;
-    this.resourceDeletionHandler = resourceDeletionHandler;
+    this.fileDeletionHandler = fileDeletionHandler;
 
-    this.deletedResources = new ConcurrentHashMap<>();
+    this.deletedFileFilter = new ConcurrentHashMap<>();
   }
 
   /**
-   * Adds the deleted resource to the held map of deleted shared resources. This causes activities
-   * for such resources to be detected as filtered out by {@link #isFiltered(IActivity)} until it is
-   * created again (or all deletion acknowledgments were received). Subsequently calls {@link
-   * #resourceDeletionHandler} with the deleted resource.
+   * Adds the deleted file to the held map of deleted shared files. This causes activities for such
+   * files to be detected as filtered out by {@link #isFiltered(IActivity)} until it is created
+   * again (or all deletion acknowledgments were received). Subsequently calls {@link
+   * #fileDeletionHandler} with the deleted file.
    *
    * <p>Does nothing if the passed activity is not a {@link FileActivity} or does not have the type
    * {@link Type#REMOVED} or {@link Type#MOVED}.
    *
    * @param activity the activity to handle
-   * @see #deletedResources
-   * @see #handleResourceCreation(IActivity)
+   * @see #deletedFileFilter
+   * @see #handleFileCreation(IActivity)
    */
-  void handleResourceDeletion(IActivity activity) {
+  void handleFileDeletion(IActivity activity) {
     if (!(activity instanceof FileActivity)) {
       return;
     }
@@ -192,25 +190,24 @@ class DeletedResourceFilter {
               + ", waiting for acknowledgment from user(s) "
               + remoteUsers);
 
-      deletedResources.put(removedFile, remoteUsers);
+      deletedFileFilter.put(removedFile, remoteUsers);
     }
 
-    resourceDeletionHandler.accept(removedFile);
+    fileDeletionHandler.accept(removedFile);
   }
 
   /**
-   * Removes the created resource from the held map of deleted shared resources. This causes
-   * activities for the resources to no longer be detected as filtered out by {@link
-   * #isFiltered(IActivity)}.
+   * Removes the created file from the held map of deleted shared files. This causes activities for
+   * the files to no longer be detected as filtered out by {@link #isFiltered(IActivity)}.
    *
    * <p>Does nothing if the passed activity is not a {@link FileActivity} or does not have the type
    * {@link Type#CREATED} or {@link Type#MOVED}.
    *
    * @param activity the activity to handle
-   * @see #deletedResources
-   * @see #handleResourceDeletion(IActivity)
+   * @see #deletedFileFilter
+   * @see #handleFileDeletion(IActivity)
    */
-  void handleResourceCreation(IActivity activity) {
+  void handleFileCreation(IActivity activity) {
     if (!(activity instanceof FileActivity)) {
       return;
     }
@@ -220,17 +217,17 @@ class DeletedResourceFilter {
     if (fileActivity.getType() == Type.MOVED || fileActivity.getType() == Type.CREATED) {
       SPath addedFile = fileActivity.getPath();
 
-      if (deletedResources.containsKey(addedFile)) {
+      if (deletedFileFilter.containsKey(addedFile)) {
         log.debug("Removing activity filter for re-created file " + addedFile);
 
-        deletedResources.remove(addedFile);
+        deletedFileFilter.remove(addedFile);
       }
     }
   }
 
   /**
-   * Returns whether the passed activity is filtered out. This is determined by the held set of
-   * deleted resources.
+   * Returns whether the passed activity is filtered out. This is determined by the held map of
+   * deleted files.
    *
    * <p>Non-resource activities are never detected as being filtered. Furthermore, resource
    * activities of the type {@link ChecksumActivity} that confirm the file deletion or activities of
@@ -238,8 +235,8 @@ class DeletedResourceFilter {
    *
    * @param activity the activity to check
    * @return whether the passed activity is filtered out
-   * @see #handleResourceDeletion(IActivity)
-   * @see #handleResourceCreation(IActivity)
+   * @see #handleFileDeletion(IActivity)
+   * @see #handleFileCreation(IActivity)
    */
   boolean isFiltered(IActivity activity) {
 
@@ -255,7 +252,7 @@ class DeletedResourceFilter {
       return false;
     }
 
-    boolean pathIsFiltered = deletedResources.containsKey(path);
+    boolean pathIsFiltered = deletedFileFilter.containsKey(path);
 
     if (pathIsFiltered && activity instanceof ChecksumActivity) {
       ChecksumActivity checksumActivity = (ChecksumActivity) activity;
