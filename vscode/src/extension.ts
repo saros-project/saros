@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { SarosServer } from './saros/saros-server';
 import { SarosShell } from './saros/saros-shell';
 import { Saros } from './core/types';
+import { SarosJavaJRE } from './saros/saros-java-jre';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -34,12 +35,14 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 function getSarosImpl(context: vscode.ExtensionContext, output: vscode.OutputChannel): Thenable<Saros | undefined> {
-	return vscode.window.showQuickPick(['local server', 'shell'], {placeHolder: 'Please pick saros type:'}).then<Saros | undefined>(pick => {
+	return vscode.window.showQuickPick(['local server', 'shell', 'java-jre'], {placeHolder: 'Please pick saros type:'}).then<Saros | undefined>(pick => {
 		switch(pick) {
 			case 'local server':
 				return new SarosServer(1234, context, output);
 			case 'shell':
 				return new SarosShell(context, output);
+			case 'java-jre':
+				return new SarosJavaJRE(context, output);
 			default: 
 				return undefined;
 		}

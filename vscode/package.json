@@ -40,5 +40,7 @@
 		"tslint": "^5.12.1",
 		"vscode-test": "^1.2.0"
 	},
-	"dependencies": {}
+	"dependencies": {
+		"node-jre": "^0.2.3"
+	}
 }
