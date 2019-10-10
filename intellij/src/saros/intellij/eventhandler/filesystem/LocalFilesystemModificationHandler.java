@@ -393,13 +393,50 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     User user = session.getLocalUser();
 
-    IActivity activity;
+    Deque<IActivity> queuedDeletionActivities = new ConcurrentLinkedDeque<>();
 
-    // TODO create deletion activities for child resources
-    // TODO clean up editor pool and annotations for child resources
-    activity = new FolderDeletedActivity(user, path);
+    VirtualFileFilter virtualFileFilter = getVirtualFileFilter(deletedFolder);
 
-    dispatchActivity(activity);
+    /*
+     * Defines the actions executed on the base directory and every valid
+     * child resource (defined through the virtualFileFilter).
+     *
+     * Returns whether the content iteration should be continued.
+     */
+    ContentIterator contentIterator =
+        fileOrDir -> {
+          if (!fileOrDir.isDirectory()) {
+            generateFileDeletion(fileOrDir);
+
+            return true;
+          }
+
+          SPath folderPath = VirtualFileConverter.convertToSPath(project, fileOrDir);
+
+          if (folderPath == null) {
+            LOG.debug("Skipping deleted folder as no SPath could be obtained " + fileOrDir);
+
+            return true;
+          }
+
+          IActivity newFolderDeletedActivity = new FolderDeletedActivity(user, folderPath);
+
+          queuedDeletionActivities.addFirst(newFolderDeletedActivity);
+
+          return true;
+        };
+
+    /*
+     * Calls the above defined contentIterator on the base directory and
+     * every contained resource.
+     * Directories are only stepped into if they match the above defined
+     * virtualFileFilter. This also applies to the base directory.
+     */
+    VfsUtilCore.iterateChildrenRecursively(deletedFolder, virtualFileFilter, contentIterator);
+
+    while (!queuedDeletionActivities.isEmpty()) {
+      dispatchActivity(queuedDeletionActivities.pop());
+    }
   }
 
   /**
