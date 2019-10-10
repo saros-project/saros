@@ -10,6 +10,7 @@ import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 
 /**
@@ -22,7 +23,7 @@ import saros.session.ISarosSession;
  * <p>When JupiterActivities are received from the server they are transformed by the
  * ConcurrentDocumentClient to TextEditActivities which can then be executed locally.
  */
-public class ConcurrentDocumentClient {
+public class ConcurrentDocumentClient implements Startable {
 
   private static Logger log = Logger.getLogger(ConcurrentDocumentClient.class);
 
@@ -36,7 +37,17 @@ public class ConcurrentDocumentClient {
     this.sarosSession = sarosSession;
     this.jupiterClient = new JupiterClient(sarosSession);
 
-    this.deletedResourceFilter = new DeletedResourceFilter(jupiterClient::reset);
+    this.deletedResourceFilter = new DeletedResourceFilter(sarosSession, this::reset);
+  }
+
+  @Override
+  public void start() {
+    deletedResourceFilter.initialize();
+  }
+
+  @Override
+  public void stop() {
+    deletedResourceFilter.dispose();
   }
 
   /**
@@ -175,7 +186,7 @@ public class ConcurrentDocumentClient {
    *     authoritative one and thus does not need to be reset).
    */
   public synchronized void reset(SPath path) {
-    log.debug("Resetting jupiter client: " + path.toString());
+    log.debug("Resetting jupiter client for " + path);
     jupiterClient.reset(path);
   }
 

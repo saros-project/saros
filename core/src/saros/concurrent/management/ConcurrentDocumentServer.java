@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
 import saros.activities.IActivity;
@@ -54,17 +55,25 @@ public class ConcurrentDocumentServer implements Startable {
     this.sarosSession = sarosSession;
     this.server = new JupiterServer(sarosSession);
 
-    this.deletedResourceFilter = new DeletedResourceFilter(server::removePath);
+    Consumer<SPath> deletedResourceHandler =
+        resource -> {
+          LOG.debug("Resetting jupiter server for " + resource);
+          server.removePath(resource);
+        };
+
+    this.deletedResourceFilter = new DeletedResourceFilter(sarosSession, deletedResourceHandler);
   }
 
   @Override
   public void start() {
     sarosSession.addListener(sessionListener);
+    deletedResourceFilter.initialize();
   }
 
   @Override
   public void stop() {
     sarosSession.removeListener(sessionListener);
+    deletedResourceFilter.dispose();
   }
 
   /**
