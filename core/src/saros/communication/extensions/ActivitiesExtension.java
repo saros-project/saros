@@ -27,6 +27,7 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import saros.activities.ChangeColorActivity;
 import saros.activities.ChecksumActivity;
 import saros.activities.ChecksumErrorActivity;
+import saros.activities.DeletionAcknowledgmentActivity;
 import saros.activities.EditorActivity;
 import saros.activities.FileActivity;
 import saros.activities.FolderCreatedActivity;
@@ -143,6 +144,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
           ChangeColorActivity.class,
           ChecksumActivity.class,
           ChecksumErrorActivity.class,
+          DeletionAcknowledgmentActivity.class,
           EditorActivity.class,
           FileActivity.class,
           FolderCreatedActivity.class,

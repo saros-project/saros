@@ -15,6 +15,7 @@ import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.internal.ActivityHandler;
 import saros.session.internal.ActivitySequencer;
 import saros.session.internal.ChangeColorManager;
+import saros.session.internal.DeletionAcknowledgmentDispatcher;
 import saros.session.internal.LeaveAndKickHandler;
 import saros.session.internal.PermissionManager;
 import saros.session.internal.UserInformationHandler;
@@ -58,6 +59,7 @@ public class SarosCoreSessionContextFactory implements ISarosSessionContextFacto
     container.addComponent(ActivityHandler.class);
     container.addComponent(ActivitySequencer.class);
     container.addComponent(ChangeColorManager.class);
+    container.addComponent(DeletionAcknowledgmentDispatcher.class);
     container.addComponent(FollowModeManager.class);
     container.addComponent(FollowModeBroadcaster.class);
     container.addComponent(LeaveAndKickHandler.class);
