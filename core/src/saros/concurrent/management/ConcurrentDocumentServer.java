@@ -34,7 +34,7 @@ public class ConcurrentDocumentServer implements Startable {
 
   private final JupiterServer server;
 
-  private final DeletedResourceFilter deletedResourceFilter;
+  private final ResourceActivityFilter resourceActivityFilter;
 
   /** {@link ISessionListener} for updating Jupiter documents on the host. */
   private final ISessionListener sessionListener =
@@ -55,36 +55,36 @@ public class ConcurrentDocumentServer implements Startable {
     this.sarosSession = sarosSession;
     this.server = new JupiterServer(sarosSession);
 
-    Consumer<SPath> deletedResourceHandler =
+    Consumer<SPath> deletedFileHandler =
         resource -> {
           LOG.debug("Resetting jupiter server for " + resource);
           server.removePath(resource);
         };
 
-    this.deletedResourceFilter = new DeletedResourceFilter(sarosSession, deletedResourceHandler);
+    this.resourceActivityFilter = new ResourceActivityFilter(sarosSession, deletedFileHandler);
   }
 
   @Override
   public void start() {
     sarosSession.addListener(sessionListener);
-    deletedResourceFilter.initialize();
+    resourceActivityFilter.initialize();
   }
 
   @Override
   public void stop() {
     sarosSession.removeListener(sessionListener);
-    deletedResourceFilter.dispose();
+    resourceActivityFilter.dispose();
   }
 
   /**
-   * Calls {@link DeletedResourceFilter#handleResourceDeletion(IActivity)} and {@link
-   * DeletedResourceFilter#handleResourceCreation(IActivity)} with the given activity.
+   * Calls {@link ResourceActivityFilter#handleFileDeletion(IActivity)} and {@link
+   * ResourceActivityFilter#handleFileCreation(IActivity)} with the given activity.
    *
    * @param activity the activity to handle
    */
   public void handleResourceChange(IActivity activity) {
-    deletedResourceFilter.handleResourceDeletion(activity);
-    deletedResourceFilter.handleResourceCreation(activity);
+    resourceActivityFilter.handleFileDeletion(activity);
+    resourceActivityFilter.handleFileCreation(activity);
   }
 
   /**
@@ -106,7 +106,7 @@ public class ConcurrentDocumentServer implements Startable {
 
     final List<QueueItem> result = new ArrayList<QueueItem>();
 
-    if (deletedResourceFilter.isFiltered(activity)) {
+    if (resourceActivityFilter.isFiltered(activity)) {
       LOG.debug("Ignored activity for already deleted resource: " + activity);
 
       return result;

@@ -31,23 +31,23 @@ public class ConcurrentDocumentClient implements Startable {
 
   private final JupiterClient jupiterClient;
 
-  private final DeletedResourceFilter deletedResourceFilter;
+  private final ResourceActivityFilter resourceActivityFilter;
 
   public ConcurrentDocumentClient(ISarosSession sarosSession) {
     this.sarosSession = sarosSession;
     this.jupiterClient = new JupiterClient(sarosSession);
 
-    this.deletedResourceFilter = new DeletedResourceFilter(sarosSession, this::reset);
+    this.resourceActivityFilter = new ResourceActivityFilter(sarosSession, this::reset);
   }
 
   @Override
   public void start() {
-    deletedResourceFilter.initialize();
+    resourceActivityFilter.initialize();
   }
 
   @Override
   public void stop() {
-    deletedResourceFilter.dispose();
+    resourceActivityFilter.dispose();
   }
 
   /**
@@ -80,8 +80,8 @@ public class ConcurrentDocumentClient implements Startable {
       return jupiterClient.withTimestamp(checksumActivity);
 
     } else {
-      deletedResourceFilter.handleResourceDeletion(activity);
-      deletedResourceFilter.handleResourceCreation(activity);
+      resourceActivityFilter.handleFileDeletion(activity);
+      resourceActivityFilter.handleFileCreation(activity);
 
       return activity;
     }
@@ -106,9 +106,9 @@ public class ConcurrentDocumentClient implements Startable {
     List<IActivity> activities = new ArrayList<IActivity>();
 
     try {
-      deletedResourceFilter.handleResourceCreation(activity);
+      resourceActivityFilter.handleFileCreation(activity);
 
-      if (deletedResourceFilter.isFiltered(activity)) {
+      if (resourceActivityFilter.isFiltered(activity)) {
         log.debug("Ignored activity for already deleted resource: " + activity);
 
         return activities;
@@ -123,7 +123,7 @@ public class ConcurrentDocumentClient implements Startable {
         activities.add(activity);
       }
 
-      deletedResourceFilter.handleResourceDeletion(activity);
+      resourceActivityFilter.handleFileDeletion(activity);
 
     } catch (Exception e) {
       log.error("Error while transforming activity: " + activity, e);
