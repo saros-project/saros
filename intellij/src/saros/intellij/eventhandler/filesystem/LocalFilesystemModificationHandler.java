@@ -8,6 +8,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -20,6 +21,7 @@ import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -42,6 +44,7 @@ import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
+import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.observables.FileReplacementInProgressObservable;
@@ -577,6 +580,13 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       }
 
       return;
+
+    } else if (oldPathIsShared && isContentRootDirectory(oldFile)) {
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Ignoring move of content root " + oldPath);
+      }
+
+      return;
     }
 
     Deque<IActivity> queuedDeletionActivities = new ConcurrentLinkedDeque<>();
@@ -638,6 +648,31 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     while (!queuedDeletionActivities.isEmpty()) {
       dispatchActivity(queuedDeletionActivities.pop());
     }
+  }
+
+  /**
+   * Returns whether the given virtual file is a content root for the module it is associated with.
+   *
+   * @param virtualFile the virtual file to check
+   * @return <code>true</code> when the virtual file is one of the content roots of the module it is
+   *     associated with, <code>false</code> if it represents a file, does not match one of the
+   *     content roots or is not associated with a module
+   */
+  private boolean isContentRootDirectory(@NotNull VirtualFile virtualFile) {
+    if (!virtualFile.isDirectory()) {
+      return false;
+    }
+
+    Module module =
+        Filesystem.runReadAction(() -> ModuleUtil.findModuleForFile(virtualFile, project));
+
+    if (module == null) {
+      return false;
+    }
+
+    VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+
+    return Arrays.asList(contentRoots).contains(virtualFile);
   }
 
   /**
