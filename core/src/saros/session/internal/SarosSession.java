@@ -43,7 +43,6 @@ import saros.activities.SPath;
 import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
 import saros.concurrent.management.ConcurrentDocumentClient;
-import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.context.IContainerContext;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
@@ -93,8 +92,6 @@ public final class SarosSession implements ISarosSession {
   private final IContainerContext containerContext;
 
   private final ConcurrentDocumentClient concurrentDocumentClient;
-
-  private final ConcurrentDocumentServer concurrentDocumentServer;
 
   private final ActivityHandler activityHandler;
 
@@ -704,13 +701,6 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public ConcurrentDocumentServer getConcurrentDocumentServer() {
-    if (!isHost()) throw new IllegalStateException("the session is running in client mode");
-
-    return concurrentDocumentServer;
-  }
-
-  @Override
   public void exec(List<IActivity> activities) {
     /**
      * @JTourBusStop 7, Activity sending, Incoming activities:
@@ -1105,8 +1095,6 @@ public final class SarosSession implements ISarosSession {
 
     // Force the creation of the components added to the session container.
     sessionContainer.getComponents();
-
-    concurrentDocumentServer = sessionContainer.getComponent(ConcurrentDocumentServer.class);
 
     concurrentDocumentClient = sessionContainer.getComponent(ConcurrentDocumentClient.class);
 

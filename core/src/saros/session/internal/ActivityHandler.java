@@ -114,6 +114,16 @@ public final class ActivityHandler implements Startable {
         }
       };
 
+  // Client CTOR
+  public ActivityHandler(
+      ISarosSession session,
+      IActivityHandlerCallback callback,
+      ConcurrentDocumentClient documentClient,
+      UISynchronizer synchronizer) {
+    this(session, callback, null, documentClient, synchronizer);
+  }
+
+  // Server CTOR
   public ActivityHandler(
       ISarosSession session,
       IActivityHandlerCallback callback,
@@ -382,6 +392,8 @@ public final class ActivityHandler implements Startable {
    * @return A number of targeted activities.
    */
   private TransformationResult directServerActivities(List<IActivity> activities) {
+
+    assert session.isHost() && documentServer != null;
 
     TransformationResult result = new TransformationResult(session.getLocalUser());
 
