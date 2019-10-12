@@ -26,7 +26,6 @@ import java.util.concurrent.CancellationException;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.concurrent.management.ConcurrentDocumentClient;
-import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
@@ -219,13 +218,6 @@ public interface ISarosSession {
    * @immutable This method will always return the same value for this session
    */
   public User getLocalUser();
-
-  /**
-   * the concurrent document manager is responsible for all jupiter controlled documents
-   *
-   * @return the concurrent document manager
-   */
-  public ConcurrentDocumentServer getConcurrentDocumentServer();
 
   /**
    * the concurrent document manager is responsible for all jupiter controlled documents
