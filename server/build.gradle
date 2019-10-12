@@ -9,6 +9,17 @@ sourceSets {
   test.java.srcDir 'test/junit'
 }
 
+jar {
+  manifest {
+    attributes 'Main-Class': 'saros.server.SarosServer'
+  }
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+  from ('src/log4j.properties')
+  exclude '**/*.jar'
+}
+
 sonarqube {
   properties {
     property 'sonar.projectName', 'Saros/Server'
