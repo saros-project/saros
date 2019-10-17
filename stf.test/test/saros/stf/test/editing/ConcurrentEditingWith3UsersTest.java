@@ -10,8 +10,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
+import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
-import saros.test.util.EclipseTestThread;
 
 /**
  * This class tests the concurrent editing of three users during a session.

@@ -1,4 +1,4 @@
-package saros.test.util;
+package saros.stf.client.util;
 
 /**
  * A Thread which runs the give Runnable. After the thread finished, you might call verify to ensure

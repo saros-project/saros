@@ -12,9 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
+import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
 import saros.stf.test.stf.Constants;
-import saros.test.util.EclipseTestThread;
 
 public class EditDuringNonHostInvitationTest extends StfTestCase {
 

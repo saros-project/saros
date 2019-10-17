@@ -7,9 +7,9 @@ import static saros.stf.client.tester.SarosTester.BOB;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
+import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
-import saros.test.util.EclipseTestThread;
 
 public class EditDifferentFilesTest extends StfTestCase {
 
