@@ -1,14 +1,12 @@
 package saros.server.session;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import saros.activities.FileActivity;
 import saros.activities.SPath;
-import saros.filesystem.IFile;
-import saros.filesystem.IResource;
 import saros.repackaged.picocontainer.Startable;
 import saros.server.editor.ServerEditorManager;
+import saros.server.filesystem.ServerReferencePointManager;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;
 
@@ -19,6 +17,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
 
   private final ISarosSession session;
   private final ServerEditorManager editorManager;
+  private final ServerReferencePointManager serverReferencePointManager;
 
   /**
    * Creates a FileActivityExecutor.
@@ -26,10 +25,14 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
    * @param session the current session
    * @param editorManager the editor manager to update the file mapping on a file move
    */
-  public FileActivityExecutor(ISarosSession session, ServerEditorManager editorManager) {
+  public FileActivityExecutor(
+      ISarosSession session,
+      ServerEditorManager editorManager,
+      ServerReferencePointManager serverReferencePointManager) {
 
     this.session = session;
     this.editorManager = editorManager;
+    this.serverReferencePointManager = serverReferencePointManager;
   }
 
   @Override
@@ -65,28 +68,26 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
   }
 
   private void executeFileCreation(FileActivity activity) throws IOException {
-    IFile file = activity.getPath().getFile();
-    file.create(new ByteArrayInputStream(activity.getContent()), true);
+    SPath pathToFile = activity.getPath();
+    byte[] content = activity.getContent();
+
+    serverReferencePointManager.createFile(pathToFile, content);
   }
 
   private void executeFileMove(FileActivity activity) throws IOException {
     SPath oldPath = activity.getOldPath();
-    IFile oldFile = oldPath.getFile();
     SPath newPath = activity.getPath();
-    IFile newFile = newPath.getFile();
-    oldFile.move(activity.getPath().getFullPath(), true);
     byte[] content = activity.getContent();
-    if (content != null) {
-      newFile.setContents(new ByteArrayInputStream(content), true, true);
-    }
+
+    serverReferencePointManager.moveResource(oldPath, newPath, content);
     // only update if all previous operations are successful
     editorManager.updateMapping(oldPath, newPath);
   }
 
   private void executeFileRemoval(FileActivity activity) throws IOException {
     SPath path = activity.getPath();
-    IFile file = path.getFile();
     editorManager.closeEditor(path);
-    file.delete(IResource.NONE);
+
+    serverReferencePointManager.deleteFile(path);
   }
 }
