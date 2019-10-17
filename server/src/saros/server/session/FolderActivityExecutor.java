@@ -5,10 +5,9 @@ import org.apache.log4j.Logger;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.SPath;
-import saros.filesystem.IFolder;
-import saros.filesystem.IResource;
 import saros.repackaged.picocontainer.Startable;
 import saros.server.editor.ServerEditorManager;
+import saros.server.filesystem.ServerReferencePointManager;
 import saros.session.AbstractActivityConsumer;
 import saros.session.ISarosSession;
 
@@ -19,6 +18,7 @@ public class FolderActivityExecutor extends AbstractActivityConsumer implements 
 
   private final ISarosSession session;
   private final ServerEditorManager editorManager;
+  private final ServerReferencePointManager serverReferencePointManager;
 
   /**
    * Creates a FolderActivityExecutor.
@@ -26,10 +26,14 @@ public class FolderActivityExecutor extends AbstractActivityConsumer implements 
    * @param session the current session
    * @param editorManager the editor manager
    */
-  public FolderActivityExecutor(ISarosSession session, ServerEditorManager editorManager) {
+  public FolderActivityExecutor(
+      ISarosSession session,
+      ServerEditorManager editorManager,
+      ServerReferencePointManager serverReferencePointManager) {
 
     this.session = session;
     this.editorManager = editorManager;
+    this.serverReferencePointManager = serverReferencePointManager;
   }
 
   @Override
@@ -61,16 +65,15 @@ public class FolderActivityExecutor extends AbstractActivityConsumer implements 
   }
 
   private void executeFolderCreation(FolderCreatedActivity activity) throws IOException {
+    SPath path = activity.getPath();
 
-    IFolder folder = activity.getPath().getFolder();
-    folder.create(IResource.NONE, true);
+    serverReferencePointManager.createFolder(path);
   }
 
   private void executeFolderRemoval(FolderDeletedActivity activity) throws IOException {
-
     SPath path = activity.getPath();
-    IFolder folder = path.getFolder();
-    folder.delete(IResource.NONE);
+    serverReferencePointManager.deleteFolder(path);
+
     editorManager.closeEditorsInFolder(path);
   }
 }
