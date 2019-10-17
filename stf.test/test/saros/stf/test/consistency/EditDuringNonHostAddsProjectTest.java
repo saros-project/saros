@@ -8,8 +8,8 @@ import static saros.stf.client.tester.SarosTester.CARL;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
+import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
-import saros.test.util.EclipseTestThread;
 
 public class EditDuringNonHostAddsProjectTest extends StfTestCase {
 

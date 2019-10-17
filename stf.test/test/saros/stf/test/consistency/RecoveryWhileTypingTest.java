@@ -8,8 +8,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
+import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
-import saros.test.util.EclipseTestThread;
 
 @TestLink(id = "Saros-7_consistency_watchdog_and_stop_manager")
 public class RecoveryWhileTypingTest extends StfTestCase {
