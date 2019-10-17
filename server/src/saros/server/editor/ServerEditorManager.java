@@ -1,7 +1,10 @@
 package saros.server.editor;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +21,10 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.IResource;
+import saros.filesystem.IWorkspace;
+import saros.server.filesystem.ServerFileImpl;
+import saros.server.filesystem.ServerReferencePointManager;
+import saros.server.filesystem.ServerWorkspaceImpl;
 import saros.session.User;
 
 /** Server implementation of the {@link IEditorManager} interface */
@@ -28,6 +34,15 @@ public class ServerEditorManager implements IEditorManager {
 
   private Map<SPath, Editor> openEditors = Collections.synchronizedMap(new LRUMap<>(10));
   private List<ISharedEditorListener> listeners = new CopyOnWriteArrayList<>();
+
+  private final ServerReferencePointManager serverReferencePointManager;
+  private final IWorkspace workspace;
+
+  public ServerEditorManager(
+      ServerReferencePointManager serverReferencePointManager, ServerWorkspaceImpl workspace) {
+    this.serverReferencePointManager = serverReferencePointManager;
+    this.workspace = workspace;
+  }
 
   @Override
   public void openEditor(SPath path, boolean activate) {
@@ -90,15 +105,18 @@ public class ServerEditorManager implements IEditorManager {
   private Editor getOrCreateEditor(SPath path) throws IOException {
     Editor editor = openEditors.get(path);
     if (editor == null) {
-      IResource resource = path.getResource();
-      if (resource == null) {
+      Path javaPath = Paths.get(path.getFullPath().toString());
+      File javaFile = javaPath.toFile();
+
+      if (javaFile == null) {
         throw new NoSuchFileException(path.toString());
       }
 
-      IFile file = resource.adaptTo(IFile.class);
-      if (file == null) {
+      if (!javaFile.isFile()) {
         throw new IOException("Not a file: " + path);
       }
+
+      IFile file = new ServerFileImpl(workspace, path.getProjectRelativePath());
 
       editor = new Editor(file);
       openEditors.put(path, editor);
