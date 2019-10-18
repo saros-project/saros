@@ -34,6 +34,7 @@ import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
 import saros.filesystem.IPath;
+import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
@@ -212,7 +213,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     SPath path = VirtualFileConverter.convertToSPath(project, file);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (!isShared(path, session)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource's contents change: " + file);
       }
@@ -270,7 +271,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     SPath path = VirtualFileConverter.convertToSPath(project, createdVirtualFile);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (!isShared(path, session)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource creation: " + createdVirtualFile);
       }
@@ -331,7 +332,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     SPath copyPath = VirtualFileConverter.convertToSPath(project, copy);
 
-    if (copyPath == null || !session.isShared(copyPath.getResource())) {
+    if (!isShared(copyPath, session)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource copy: " + copy);
       }
@@ -390,7 +391,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   private void generateFolderDeletionActivity(@NotNull VirtualFile deletedFolder) {
     SPath path = VirtualFileConverter.convertToSPath(project, deletedFolder);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (!isShared(path, session)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared folder deletion: " + deletedFolder);
       }
@@ -561,9 +562,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldPath != null && session.isShared(oldPath.getResource());
-    boolean newPathIsShared =
-        newParentPath != null && session.isShared(newParentPath.getResource());
+    boolean oldPathIsShared = isShared(oldPath, session);
+    boolean newPathIsShared = isShared(newParentPath, session);
 
     if (!oldPathIsShared && !newPathIsShared) {
       if (LOG.isTraceEnabled()) {
@@ -689,9 +689,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldFilePath != null && session.isShared(oldFilePath.getResource());
-    boolean newPathIsShared =
-        newParentPath != null && session.isShared(newParentPath.getResource());
+    boolean oldPathIsShared = isShared(oldFilePath, session);
+    boolean newPathIsShared = isShared(newParentPath, session);
 
     boolean fileIsOpen = ProjectAPI.isOpen(project, oldFile);
 
@@ -847,7 +846,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
           SPath path = VirtualFileConverter.convertToSPath(project, file);
 
-          if (path != null && session.isShared(path.getResource())) {
+          if (isShared(path, session)) {
             LOG.error(
                 "Renamed resource is a root directory. "
                     + "Such an activity can not be shared through Saros.");
@@ -902,6 +901,20 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return null;
     }
+  }
+
+  private boolean isShared(@Nullable SPath path, @NotNull ISarosSession sarosSession) {
+    if (path == null) {
+      return false;
+    }
+
+    IResource resource = path.getResource();
+
+    if (resource == null) {
+      return false;
+    }
+
+    return sarosSession.isShared(resource);
   }
 
   /**
