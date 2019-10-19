@@ -1,52 +1,45 @@
 package saros;
 
 import java.io.IOException;
+import java.net.Socket;
 
-import saros.poc.Server;
-import saros.poc.Shell;
-import saros.vscode.Saros;
+import org.eclipse.lsp4j.jsonrpc.Launcher;
+import org.eclipse.lsp4j.launch.LSPLauncher;
+import org.eclipse.lsp4j.services.LanguageClient;
+
+import saros.lsp.SarosLanguageServer;
 
 public class App {
 
-    public static void main(String[] args) throws NumberFormatException, IOException {
-        for (String arg : args) {
-            System.out.println("Argument: " + arg);
+    public static void main(String[] args) throws Exception {
+
+        if (args.length > 1) {
+            throw new IllegalArgumentException("wrong number of arguments");
+        } else if (args.length != 1) {
+            throw new IllegalArgumentException("port parameter not supplied");
         }
 
-        if (args.length == 0) {
-            System.out.println("Not enough arguments -> exit");
-        }
+        int port = Integer.parseInt(args[0]);
+        Socket socket = new Socket("localhost", port);
 
-        switch (args[0]) {
-            case "srv":
-                startServer(Integer.parseInt(args[1]));
-                break;
-            case "sh":
-                startShell();
-                break;
-            case "core":
-                startCore(args);
-                break;
-            default:
-                System.out.println("Invalid mode -> exit");
-                break;
-        }
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    // NOP
+                }
+            } 
+        }); 
+        
+        SarosLanguageServer langSvr = new SarosLanguageServer();
+        Launcher<LanguageClient> l = LSPLauncher.createServerLauncher(langSvr, socket.getInputStream(), socket.getOutputStream());
+       
+        LanguageClient langClt = l.getRemoteProxy();
+        langSvr.connect(langClt);
 
-    }
+        l.startListening();
 
-    private static void startCore(String[] args) {
-        Saros.main(args);
-    }
-
-    private static void startShell() throws IOException {
-
-        Shell shell = new Shell();
-        shell.start();
-    }
-
-    private static void startServer(int port) throws IOException {
-
-        Server server = new Server();
-        server.start(port);
+        langSvr.sendHello();
     }
 }
