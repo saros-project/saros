@@ -1,7 +1,7 @@
 {
 	"name": "saros",
 	"displayName": "saros",
-	"description": "Saros implementation for vs code.",
+	"description": "Saros implementation for VS Code.",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.38.0"
@@ -10,13 +10,13 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.startSaros"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.startSaros",
+				"command": "saros.start",
 				"title": "Start",
 				"category": "Saros"
 			}
@@ -41,6 +41,7 @@
 		"vscode-test": "^1.2.0"
 	},
 	"dependencies": {
-		"node-jre": "^0.2.3"
+		"node-jre": "^0.2.3",
+		"vscode-languageclient": "^5.2.1"
 	}
 }

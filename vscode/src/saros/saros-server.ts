@@ -1,31 +1,80 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as process from 'child_process';
-import { Saros } from '../core/types';
-import { Socket } from 'net';
+import * as net from 'net';
+import { StreamInfo } from 'vscode-languageclient';
 
-export class SarosServer implements Saros{
-    constructor(private port: number, private ctx: vscode.ExtensionContext, private output: vscode.OutputChannel) {
-
-    }
-
-    public start() {
-        this.startServer();
-        this.startClient();
-    }
-
-    private startServer() {
+export class SarosServer {
         
-        var extDir = path.join(this.ctx.extensionPath,'out', 'saros.jar');
-        var proc = process.spawn(`java`, [`-jar`, `${extDir}`, `srv`, this.port.toString()]);
-                
+    constructor(private context: vscode.ExtensionContext) {
+
+    }
+
+    public start(port: number): void {
+        this.startProcess(port);
+    }
+
+    public getStartFunc(): () => Thenable<StreamInfo> {
+        
+        let self = this;
+        function createServer(): Thenable<StreamInfo> {
+            return new Promise((resolve, reject) => {
+                var server = net.createServer((socket) => {
+                    console.log("Creating server");
+    
+                    resolve({
+                        reader: socket,
+                        writer: socket
+                    });
+    
+                    socket.on('end', () => console.log("Disconnected"));
+                }).on('error', (err) => {
+                    // handle errors here
+                    throw err;
+                });			
+    
+                // grab a random port.
+                server.listen(() => {
+                    let port = (server.address() as net.AddressInfo).port;
+                    
+                    self.start(port);
+                });
+            });
+        }
+
+        return createServer;
+    }
+    
+    private startProcess(...args: any[]): process.ChildProcess { //TODO: error handling
+        
+        var pathToJar = path.resolve(this.context.extensionPath, 'out', 'saros.vscode.java.jar');
+        var jre = require('node-jre');
+
+        console.log('spawning jar process');
+        var proc = jre.spawn(
+            [pathToJar],
+            'saros.App',
+            args,
+            { encoding: 'utf8' }
+        ) as process.ChildProcess;  
+            
+        
+        this.addListeners(proc);
+
+        return proc;
+    }
+
+    private addListeners(proc: process.ChildProcess): void {
+
+        let output = vscode.window.createOutputChannel('Saros Server');
+
         proc.stdout.on("data", (data) => {
-            this.output.appendLine(`[SERVER.STDOUT] ${data.toString()}`);
+            output.appendLine(`[INFO] ${data.toString()}`);
         });
 
         proc.stderr.on("data", (data) => {
-            this.output.appendLine(`[SERVER.STDERR] ${data.toString()}`);
-        });
+            output.appendLine(`[ERROR] ${data.toString()}`);
+        });   
 
         proc.on('error', (error) => {
             vscode.window.showErrorMessage(`child process creating error with error ${error}`);
@@ -41,20 +90,5 @@ export class SarosServer implements Saros{
 
             showMessageFunc(`child process exited with code ${code}`);
         });
-    }
-
-    private startClient() {
-        var socket = new Socket();
-        let self = this;
-
-        socket.connect(this.port, 'localhost', function() {
-            self.output.appendLine('[CLIENT] connected');
-        });
-
-        socket.on('data', data => {
-            self.output.appendLine(`[CLIENT.RCV] ${data.toString()}`);
-        });
-
-        socket.write('hello world from client!');
     }
 }

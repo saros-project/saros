@@ -1,55 +1,42 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { SarosServer } from './saros/saros-server';
-import { SarosShell } from './saros/saros-shell';
-import { Saros } from './core/types';
-import { SarosJavaJRE } from './saros/saros-java-jre';
+import { SarosClient } from './saros/saros-client';
+import { Disposable } from 'vscode-jsonrpc';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "saros" is now active!');
+	console.log('Extension "Saros" is now active!');
+	
+	context.subscriptions.push(createStatusBar());	
 
-	var output = vscode.window.createOutputChannel('Saros');
+	let disposable = vscode.commands.registerCommand('saros.start', async () => {
+				
+		vscode.window.withProgress({location: vscode.ProgressLocation.Window, title: 'Saros: Starting'}, (progress, token) => {
 
-	output.show(true);
+			return new Promise(resolve => {
+				let server = new SarosServer(context);
+				let client = new SarosClient();
+				client.start(server.getStartFunc());
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.startSaros', async () => {
-		// The code you place here will be executed every time your command is executed
-
-		getSarosImpl(context, output).then(saros => {
-			if(saros !== undefined) {
-				saros.start();
-			}
+				resolve();
+			});
 		});
+						
 	});
 
 	context.subscriptions.push(disposable);
 }
 
-function getSarosImpl(context: vscode.ExtensionContext, output: vscode.OutputChannel): Thenable<Saros | undefined> {
-	return vscode.window.showQuickPick(['local server', 'shell', 'java-jre'], {placeHolder: 'Please pick saros type:'}).then<Saros | undefined>(pick => {
-		switch(pick) {
-			case 'local server':
-				return new SarosServer(1234, context, output);
-			case 'shell':
-				return new SarosShell(context, output);
-			case 'java-jre':
-				return new SarosJavaJRE(context, output);
-			default: 
-				return undefined;
-		}
-	});
+function createStatusBar(): Disposable {
+
+	let statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Number.MAX_VALUE);
+    statusBarItem.text = "Saros";
+    statusBarItem.command = "saros.start";
+	statusBarItem.show();
+	
+	return statusBarItem;
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {
-	console.log("deactivated");
+	console.log("deactivated"); //TODO: remove status bar?
 }
