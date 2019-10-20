@@ -23,10 +23,12 @@ public class SarosLanguageServer implements LanguageServer, LanguageClientAware 
     public void sendHello() {
                 
         MessageParams mp = new MessageParams();
-        mp.setMessage("Saros Server connection established.");
+        mp.setMessage("connected");
         mp.setType(MessageType.Info);
         
         this.languageClient.showMessage(mp);
+
+        this.languageClient.logMessage(mp);
     }
 
     @Override
