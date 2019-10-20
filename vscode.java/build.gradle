@@ -15,7 +15,7 @@ sourceSets {
 
 jar {
   manifest {
-    attributes 'Main-Class': 'saros.App'
+    attributes 'Main-Class': 'saros.lsp.SarosLauncher'
   }
   from {
     configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
