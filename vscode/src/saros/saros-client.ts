@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Disposable } from "vscode-jsonrpc";
-import { StreamInfo, LanguageClientOptions, LanguageClient } from "vscode-languageclient";
+import { StreamInfo, LanguageClientOptions, LanguageClient, RevealOutputChannelOn } from "vscode-languageclient";
 
 export class SarosClient {
 
@@ -15,11 +15,12 @@ export class SarosClient {
             documentSelector: ['plaintext'],
             synchronize: {
                 // Synchronize the setting section 'languageServerExample' to the server
-                configurationSection: 'languageServerExample',
+                //configurationSection: 'sarosServer',
                 // Notify the server about file changes to '.clientrc files contain in the workspace
                 fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
             },
-            outputChannel: vscode.window.createOutputChannel('Saros Client')
+            outputChannel: vscode.window.createOutputChannel('Saros'),
+            revealOutputChannelOn: RevealOutputChannelOn.Info
         };
 
         return clientOptions;

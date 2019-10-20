@@ -5,13 +5,22 @@ import * as net from 'net';
 import { StreamInfo } from 'vscode-languageclient';
 
 export class SarosServer {
-        
-    constructor(private context: vscode.ExtensionContext) {
+    
+    private process: process.ChildProcess | undefined;
 
+    constructor(private context: vscode.ExtensionContext) {
+                
     }
 
     public start(port: number): void {
-        this.startProcess(port);
+
+        if(this.process !== undefined) {
+            throw new Error('Server process is still running');
+        }
+
+        this.startProcess(port)
+            .withDebug(true)
+            .withExitAware();
     }
 
     public getStartFunc(): () => Thenable<StreamInfo> {
@@ -45,42 +54,57 @@ export class SarosServer {
         return createServer;
     }
     
-    private startProcess(...args: any[]): process.ChildProcess { //TODO: error handling
+    private startProcess(...args: any[]): SarosServer { //TODO: error handling
         
         var pathToJar = path.resolve(this.context.extensionPath, 'out', 'saros.vscode.java.jar');
         var jre = require('node-jre');
 
         console.log('spawning jar process');
-        var proc = jre.spawn(
+        this.process = jre.spawn(
             [pathToJar],
-            'saros.App',
+            'saros.lsp.SarosLauncher',
             args,
             { encoding: 'utf8' }
         ) as process.ChildProcess;  
-            
-        
-        this.addListeners(proc);
 
-        return proc;
+        return this;
     }
 
-    private addListeners(proc: process.ChildProcess): void {
+    private withDebug(isEnabled: boolean): SarosServer {
 
-        let output = vscode.window.createOutputChannel('Saros Server');
+        if(this.process === undefined) {
+            throw new Error('Server process is undefined');
+        } 
 
-        proc.stdout.on("data", (data) => {
-            output.appendLine(`[INFO] ${data.toString()}`);
+        if(!isEnabled) {
+            return this;
+        }
+
+        let output = vscode.window.createOutputChannel('Saros (Debug)');
+
+        this.process.stdout.on("data", (data) => {
+            output.appendLine(data);
         });
 
-        proc.stderr.on("data", (data) => {
-            output.appendLine(`[ERROR] ${data.toString()}`);
+        this.process.stderr.on("data", (data) => {
+            output.appendLine(data);
         });   
 
-        proc.on('error', (error) => {
+        return this;
+    }
+
+    private withExitAware(): SarosServer {  
+
+        if(this.process === undefined) {
+            throw new Error('Server process is undefined');
+        }
+
+        this.process.on('error', (error) => {
             vscode.window.showErrorMessage(`child process creating error with error ${error}`);
         });
     
-        proc.on('close', (code) => {
+        let self = this;
+        this.process.on('close', (code) => {
             var showMessageFunc;
             if(code === 0) {
                 showMessageFunc = vscode.window.showInformationMessage;
@@ -88,7 +112,10 @@ export class SarosServer {
                 showMessageFunc = vscode.window.showWarningMessage;
             }
 
-            showMessageFunc(`child process exited with code ${code}`);
+            self.process = undefined;
+            showMessageFunc(`child process exited with code ${code}`);            
         });
+
+        return this;
     }
 }

@@ -16,7 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
 			return new Promise(resolve => {
 				let server = new SarosServer(context);
 				let client = new SarosClient();
-				client.start(server.getStartFunc());
+				
+				context.subscriptions.push(client.start(server.getStartFunc()));
 
 				resolve();
 			});
