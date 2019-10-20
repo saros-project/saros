@@ -4,53 +4,42 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
-import org.eclipse.lsp4j.MessageParams;
-import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.ServerCapabilities;
-import org.eclipse.lsp4j.services.LanguageClient;
-import org.eclipse.lsp4j.services.LanguageClientAware;
-import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
+import saros.lsp.extensions.SarosLanguageServer;
+import saros.lsp.extensions.client.SarosLanguageClient;
+import saros.lsp.extensions.client.SarosLanguageClientAware;
+import saros.lsp.extensions.server.account.SarosAccountService;
+import saros.lsp.extensions.server.account.SarosAccountServiceImpl;
 import saros.lsp.service.SarosDocumentService;
 import saros.lsp.service.SarosWorkspaceService;
 
-public class SarosLanguageServer implements LanguageServer, LanguageClientAware {
+public class SarosLanguageServerImpl implements SarosLanguageServer, SarosLanguageClientAware {
 
-    private LanguageClient languageClient;
-
-    public void sendHello() {
-                
-        MessageParams mp = new MessageParams();
-        mp.setMessage("connected");
-        mp.setType(MessageType.Info);
-        
-        this.languageClient.showMessage(mp);
-
-        this.languageClient.logMessage(mp);
-    }
+    private SarosLanguageClient languageClient;
 
     @Override
-    public CompletableFuture<InitializeResult> initialize(InitializeParams params) {        
+    public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
         return CompletableFuture.completedFuture(new InitializeResult(this.getCapabilities()));
     }
 
     private ServerCapabilities getCapabilities() {
         ServerCapabilities capabilities = new ServerCapabilities();
-        
+
         return capabilities;
     }
 
     @Override
     public CompletableFuture<Object> shutdown() {
-        //System.out.println("shutdown");
+        // System.out.println("shutdown");
         return CompletableFuture.completedFuture(null);
     }
 
     @Override
     public void exit() {
-        //System.out.println("exit");
+        // System.out.println("exit");
     }
 
     @Override
@@ -64,8 +53,13 @@ public class SarosLanguageServer implements LanguageServer, LanguageClientAware 
     }
 
     @Override
-    public void connect(LanguageClient client) {
+    public void connect(SarosLanguageClient client) {
         this.languageClient = client;
+    }
+
+    @Override
+    public SarosAccountService getSarosAccountService() {
+        return new SarosAccountServiceImpl();
     }
 
 }
