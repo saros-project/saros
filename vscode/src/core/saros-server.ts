@@ -96,7 +96,7 @@ export class SarosServer {
      */
     private startProcess(...args: any[]): SarosServer {
         
-        var pathToJar = path.resolve(this.context.extensionPath, 'out', 'saros.vscode.java.jar');
+        var pathToJar = path.resolve(this.context.extensionPath, 'out', 'saros.lsp.jar');
         var jre = require('node-jre');
 
         console.log('spawning jar process');

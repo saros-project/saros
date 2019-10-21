@@ -51,7 +51,6 @@ title: Coding and Commit Guidelines
 |---|----------------------------
 |`[E]`|    This commit ONLY affects the Eclipse version of Saros
 |`[I]`|    IntelliJ version of Saros
-|`[VSC]`|  Visual Studio Code version of Saros
 |`[S]`|    Saros Server
 |`[HTML]`| Saros HTML UI
 |`[CORE]`| Saros core

@@ -1,0 +1,111 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+import groovy.json.JsonSlurper
+
+plugins {
+  id "com.github.node-gradle.node" version "2.2.0"
+}
+
+apply plugin: 'com.github.node-gradle.node'
+
+def packageSlurper = new JsonSlurper()
+def packageJson = packageSlurper.parse file('package.json')
+version = packageJson.version
+
+def vscePath = './node_modules/vsce/out/vsce'
+
+node {
+    version = '10.14.1'
+    npmVersion = '6.4.1'
+    download = true
+}
+
+
+// npm_run_compile {
+    // inputs.files fileTree(
+    //   dir: "src",
+    //   excludes: ["bin/**", "node_modules/**"])
+    // inputs.file 'package.json'
+    // inputs.file 'package-lock.json'
+    // inputs.file 'tsconfig.json'
+    // outputs.dir 'out'
+// }
+
+npmInstall {
+		inputs.files fileTree("./")
+}
+
+task copyLsp(type: Copy) {
+  from("$rootProject.projectDir/build/distribution/lsp")
+  into('out')
+}
+
+task buildExtension(dependsOn: [
+  'copyLsp',
+  'npmInstall',
+  'npm_run_compile'
+  ]) {
+  group 'VS Code'
+	description 'Builds the extension'
+}
+
+task runExtension(type: Exec, dependsOn: [
+  'buildExtension'
+]) {  
+  group 'VS Code'
+	description 'Builds and runs the extension'
+
+  def execArgs = "code --extensionDevelopmentPath=${file('./').absolutePath}"
+
+  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    executable = 'cmd'
+    args = ["/c ${execArgs}"]
+  } else {
+    executable = 'sh'
+    args = [execArgs]
+  }
+
+  workingDir = file('./out').absolutePath
+}
+
+task packageExtension(type: NodeTask, dependsOn: [
+  'copyLsp'  
+]) {
+  group 'VS Code'
+	description 'Packages the extension'
+
+  delete 'vsix/*'
+  file('./vsix').mkdirs()
+  
+  ext.archiveName = "$project.name-${project.version}.vsix"
+  ext.destPath = "./vsix/$archiveName"
+  
+  script = file(vscePath)
+	args = ['package', '--out', destPath]
+  // execOverrides {
+	// 	workingDir = file('./')
+	// }
+}
+
+task publishExtension(type: NodeTask, dependsOn: [
+  'copyLsp'
+]) {
+  group 'VS Code'
+	description 'Publishes the extension'
+  
+  script = file(vscePath)
+	args = ['publish', 'patch']
+  execOverrides {
+		workingDir = file('./')
+	}
+}
+
+task unpublishExtension(type: NodeTask) {
+  group 'VS Code'
+	description 'Unpublishes the extension'
+  
+  script = file(vscePath)
+	args = ['unpublish', "${packageJson.publisher}.${packageJson.name}"]
+  execOverrides {
+		workingDir = file('./')
+	}
+}
