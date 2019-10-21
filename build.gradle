@@ -172,16 +172,16 @@ task sarosServer(type: Copy, dependsOn: [
   into 'build/distribution/server'
 }
 
-task sarosVSCode(type: Copy, dependsOn: [
+task sarosLsp(type: Copy, dependsOn: [
   ':saros.core:test',
-  ':saros.vscode.java:test',
-  ':saros.vscode.java:jar'
+  ':saros.lsp:test',
+  ':saros.lsp:jar'
   ]) {
   group 'Delivery'
   description 'Builds and tests all modules required by the Saros for VS Code'
 
-  from project(':saros.vscode.java').jar
-  into 'build/distribution/vscode.java'
+  from project(':saros.lsp').jar
+  into 'build/distribution/lsp'
   into 'vscode/out'
 }
 
