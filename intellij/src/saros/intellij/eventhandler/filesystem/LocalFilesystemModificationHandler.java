@@ -378,6 +378,12 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   /**
    * Generates and dispatches a folder deletion activity for the deleted folder.
    *
+   * <p>Also explicitly creates deletion activities for all contained resources belonging to the
+   * same module. Contained files are processed first (in ascending depth order), followed by the
+   * contained folders in descending depth order. This ensures that deletion activities for folders
+   * are only send once the activities for all contained resources were sent, allowing the receiver
+   * to also explicitly handle all resource deletions.
+   *
    * @param deletedFolder the folder that was deleted
    */
   private void generateFolderDeletionActivity(@NotNull VirtualFile deletedFolder) {
@@ -507,7 +513,16 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
   /**
    * Generates and dispatches matching creation and deletion activities replicating moving the given
-   * directory. Also dispatches activities for all contained resources belonging to the same module.
+   * directory.
+   *
+   * <p>Also explicitly creates activities to move all contained resources belonging to the same
+   * module. When creating the new resources, the creation/move activities are created in ascending
+   * depth order. This ensures that creation/move activities are only send once the creation
+   * activities for all parent resources were sent. When creating the deletion activities, the
+   * contained files are processed first (in ascending depth order), followed by the contained
+   * folders in descending depth order. This ensures that move activities for folders are only send
+   * once the activities for all contained resources were sent, allowing the receiver to also
+   * explicitly handle all resource deletions.
    *
    * <p>How the resources (including the given directory) are handled depends on whether the source
    * and target directory is shared.
