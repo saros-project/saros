@@ -10,17 +10,34 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*"
+		"workspaceContains:*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "saros.start",
-				"title": "Start",
-				"category": "Saros"
+				"command": "saros.account.add",
+				"title": "Add Account",
+				"category": "Saros"			
 			}
-		]
+		],
+		"configuration": {
+			"type": "object",
+			"title": "Example configuration",
+			"properties": {
+				"sarosServer.trace.server": {
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "verbose",
+					"description": "Traces the communication between VS Code and the Saros server."
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

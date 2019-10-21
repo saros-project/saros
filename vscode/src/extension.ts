@@ -1,31 +1,21 @@
 import * as vscode from 'vscode';
-import { SarosServer } from './saros/saros-server';
-import { SarosClient } from './saros/saros-client';
 import { Disposable } from 'vscode-jsonrpc';
+import { sarosExtensionInstance } from './core/saros-extension';
+import { activateAccounts } from './account/activator';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	console.log('Extension "Saros" is now active!');
+	sarosExtensionInstance.setContext(context)
+						.init()
+						.then(() => {
+							console.log('Extension "Saros" is now active!');
+						})
+						.catch(reason => {
+							vscode.window.showErrorMessage('Saros extension did not start propertly.'
+														+ 'Reason: ' + reason); //TODO: restart feature
+						});	
 	
-	context.subscriptions.push(createStatusBar());	
-
-	let disposable = vscode.commands.registerCommand('saros.start', async () => {
-				
-		vscode.window.withProgress({location: vscode.ProgressLocation.Window, title: 'Saros: Starting'}, (progress, token) => {
-
-			return new Promise(resolve => {
-				let server = new SarosServer(context);
-				let client = new SarosClient();
-				
-				context.subscriptions.push(client.start(server.getStartFunc()));
-
-				resolve();
-			});
-		});
-						
-	});
-
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(createStatusBar());
 }
 
 function createStatusBar(): Disposable {
@@ -39,5 +29,5 @@ function createStatusBar(): Disposable {
 }
 
 export function deactivate() {
-	console.log("deactivated"); //TODO: remove status bar?
+	console.log("deactivated");
 }

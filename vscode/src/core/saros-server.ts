@@ -6,7 +6,7 @@ import { StreamInfo } from 'vscode-languageclient';
 
 export class SarosServer {
     
-    private process: process.ChildProcess | undefined;
+    private process?: process.ChildProcess;
 
     constructor(private context: vscode.ExtensionContext) {
                 
