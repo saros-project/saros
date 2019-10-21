@@ -14,11 +14,21 @@ import saros.lsp.extensions.client.SarosLanguageClient;
 import saros.lsp.log.LanguageClientAppender;
 import saros.lsp.log.LogOutputStream;
 
+/**
+ * Entry point for the Saros LSP server.
+ */
 public class SarosLauncher {
 
-    private static final Logger log = Logger.getLogger(SarosLauncher.class);
+    private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
     private static final String LOGGING_CONFIG_FILE = "/log4j.properties";
 
+    
+    /** 
+     * Starts the server.
+     * 
+     * @param args command-line arguments
+     * @throws Exception on critical failures
+     */
     public static void main(String[] args) throws Exception {
 
         if (args.length > 1) {
@@ -30,14 +40,14 @@ public class SarosLauncher {
         URL log4jProperties = SarosLauncher.class.getResource(LOGGING_CONFIG_FILE);
         PropertyConfigurator.configure(log4jProperties);
 
-        LogOutputStream los = new LogOutputStream(log, Level.DEBUG);
+        LogOutputStream los = new LogOutputStream(LOG, Level.DEBUG);
         PrintStream ps = new PrintStream(los);
         System.setOut(ps);
 
         int port = Integer.parseInt(args[0]);
         Socket socket = new Socket("localhost", port);
         
-        log.info("listening on port " + port);
+        LOG.info("listening on port " + port);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -53,7 +63,7 @@ public class SarosLauncher {
         Launcher<SarosLanguageClient> l = Launcher.createLauncher(langSvr, SarosLanguageClient.class, socket.getInputStream(), socket.getOutputStream());
        
         SarosLanguageClient langClt = l.getRemoteProxy();
-        log.addAppender(new LanguageClientAppender(langClt));
+        LOG.addAppender(new LanguageClientAppender(langClt));
         langSvr.connect(langClt);
         
         l.startListening();

@@ -2,6 +2,7 @@ package saros.lsp;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
@@ -11,21 +12,32 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import saros.lsp.extensions.SarosLanguageServer;
 import saros.lsp.extensions.client.SarosLanguageClient;
 import saros.lsp.extensions.client.SarosLanguageClientAware;
-import saros.lsp.extensions.server.account.SarosAccountService;
-import saros.lsp.extensions.server.account.SarosAccountServiceImpl;
-import saros.lsp.service.SarosDocumentService;
-import saros.lsp.service.SarosWorkspaceService;
+import saros.lsp.extensions.server.account.AccountService;
+import saros.lsp.extensions.server.account.AccountServiceImpl;
+import saros.lsp.service.DocumentServiceImpl;
+import saros.lsp.service.WorkspaceServiceImpl;
 
+/**
+ * Implmenentation of the Saros language server.
+ */
 public class SarosLanguageServerImpl implements SarosLanguageServer, SarosLanguageClientAware {
 
+    private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
+    
     private SarosLanguageClient languageClient;
-
+    
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
-        return CompletableFuture.completedFuture(new InitializeResult(this.getCapabilities()));
+        return CompletableFuture.completedFuture(new InitializeResult(this.createCapabilities()));
     }
 
-    private ServerCapabilities getCapabilities() {
+    
+    /** 
+     * Creates the capabilities of the server.
+     * 
+     * @return ServerCapabilities capabilities of the server
+     */
+    private ServerCapabilities createCapabilities() {
         ServerCapabilities capabilities = new ServerCapabilities();
 
         return capabilities;
@@ -33,33 +45,33 @@ public class SarosLanguageServerImpl implements SarosLanguageServer, SarosLangua
 
     @Override
     public CompletableFuture<Object> shutdown() {
-        // System.out.println("shutdown");
+        LOG.info("shutdown");
         return CompletableFuture.completedFuture(null);
     }
 
     @Override
     public void exit() {
-        // System.out.println("exit");
+        LOG.info("exit");
     }
 
     @Override
     public TextDocumentService getTextDocumentService() {
-        return new SarosDocumentService();
+        return new DocumentServiceImpl();
     }
 
     @Override
     public WorkspaceService getWorkspaceService() {
-        return new SarosWorkspaceService();
+        return new WorkspaceServiceImpl();
     }
-
+    
     @Override
     public void connect(SarosLanguageClient client) {
         this.languageClient = client;
     }
-
+    
     @Override
-    public SarosAccountService getSarosAccountService() {
-        return new SarosAccountServiceImpl();
+    public AccountService getSarosAccountService() {
+        return new AccountServiceImpl();
     }
 
 }
