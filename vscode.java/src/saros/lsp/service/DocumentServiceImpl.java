@@ -6,7 +6,10 @@ import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-public class SarosDocumentService implements TextDocumentService {
+/**
+ * Implementation of the text document service.
+ */
+public class DocumentServiceImpl implements TextDocumentService {
 
     @Override
     public void didOpen(DidOpenTextDocumentParams params) {

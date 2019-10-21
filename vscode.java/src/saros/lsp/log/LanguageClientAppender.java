@@ -1,17 +1,25 @@
 package saros.lsp.log;
 
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.services.LanguageClient;
 
+/**
+ * Appender that sends log events to the connected language client.
+ */
 public class LanguageClientAppender extends AppenderSkeleton  {
 
     private LanguageClient client;
     
+    
+    /** 
+     * Instantiates the LanguageClientAppender class.
+     * 
+     * @param client the connected language client
+     */
     public LanguageClientAppender(LanguageClient client) {
 
         this.client = client;

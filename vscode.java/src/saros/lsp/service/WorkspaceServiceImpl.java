@@ -1,19 +1,27 @@
 package saros.lsp.service;
 
+import org.apache.log4j.Logger;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-public class SarosWorkspaceService implements WorkspaceService {
+import saros.lsp.SarosLauncher;
 
+/**
+ * Implementation of the workspace service.
+ */
+public class WorkspaceServiceImpl implements WorkspaceService {
+
+    private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
+    
     @Override
     public void didChangeConfiguration(DidChangeConfigurationParams params) {
-        System.out.println("didChangeConfiguration");
+        LOG.info("didChangeConfiguration");
     }
 
     @Override
     public void didChangeWatchedFiles(DidChangeWatchedFilesParams params) {
-        System.out.println("didChangeWatchedFiles");
+        LOG.info("didChangeWatchedFiles");
     }
 
 }
