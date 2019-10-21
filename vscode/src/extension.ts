@@ -3,6 +3,11 @@ import { Disposable } from 'vscode-jsonrpc';
 import { sarosExtensionInstance } from './core/saros-extension';
 import { activateAccounts } from './account/activator';
 
+/**
+ * Activation function of the extension.
+ * 
+ * @param context - The extension context
+ */
 export function activate(context: vscode.ExtensionContext) {
 
 	sarosExtensionInstance.setContext(context)
@@ -20,6 +25,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(createStatusBar());
 }
 
+/**
+ * Creates the status bar.
+ * 
+ * @returns The status bar item as {@link vscode-jsonrpc#Disposable | disposable}
+ */
 function createStatusBar(): Disposable {
 
 	let statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Number.MAX_VALUE);
@@ -30,6 +40,9 @@ function createStatusBar(): Disposable {
 	return statusBarItem;
 }
 
+/**
+ * Deactivation function of the extension.
+ */
 export function deactivate() {
 	console.log("deactivated");
 }

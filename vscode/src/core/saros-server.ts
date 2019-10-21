@@ -4,14 +4,27 @@ import * as process from 'child_process';
 import * as net from 'net';
 import { StreamInfo } from 'vscode-languageclient';
 
+/**
+ * Encapsulation of the Saros server.
+ */
 export class SarosServer {
     
     private process?: process.ChildProcess;
 
+    /**
+     * Instanciates the Saros server.
+     * 
+     * @param context - The extension context
+     */
     constructor(private context: vscode.ExtensionContext) {
                 
     }
 
+    /**
+     * Stats the server process.
+     * 
+     * @param port - The port the server listens on for connection 
+     */
     public start(port: number): void {
 
         if(this.process !== undefined) {
@@ -23,6 +36,12 @@ export class SarosServer {
             .withExitAware();
     }
 
+    /**
+     * Provides access to the start function.
+     * 
+     * @remarks A free port will be determined and used.
+     * @returns Function that starts the server and retuns the {@link vscode-languageclient#StreamInfo | io access}
+     */
     public getStartFunc(): () => Thenable<StreamInfo> {
         
         let self = this;
@@ -54,7 +73,13 @@ export class SarosServer {
         return createServer;
     }
     
-    private startProcess(...args: any[]): SarosServer { //TODO: error handling
+    /**
+     * Starts the Saros server jar as process.
+     * 
+     * @param args - Additional command line arguments for the server
+     * @returns Itself 
+     */
+    private startProcess(...args: any[]): SarosServer {
         
         var pathToJar = path.resolve(this.context.extensionPath, 'out', 'saros.vscode.java.jar');
         var jre = require('node-jre');
@@ -70,6 +95,13 @@ export class SarosServer {
         return this;
     }
 
+    /**
+     * Attaches listeners for debug informations and prints
+     * retrieved data to a newly created {@link vscode#OutputChannel | output channel}.
+     * 
+     * @param isEnabled - Wether debug output is redirected or not
+     * @returns Itself
+     */
     private withDebug(isEnabled: boolean): SarosServer {
 
         if(this.process === undefined) {
@@ -93,6 +125,11 @@ export class SarosServer {
         return this;
     }
 
+    /**
+     * Attaches listeners to observe terminations of the server.
+     * 
+     * @returns Itself
+     */
     private withExitAware(): SarosServer {  
 
         if(this.process === undefined) {
