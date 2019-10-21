@@ -11,10 +11,10 @@ export function activateAccounts(extension: SarosExtension) {
     commands.registerCommand('saros.account.add', () => {
         extension.onReady()
         .then(resolve => {
-            return extension.client.addAccount('micha@jabber.com');
+            return extension.client.addAccount('foo@bar.com');
         })
         .then(r => {
-            console.log('Response was: ' + r.Response);
+            console.log('Response was: ' + r.response);
         });
     });
 }

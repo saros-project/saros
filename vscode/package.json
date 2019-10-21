@@ -2,7 +2,7 @@
 	"name": "saros",
 	"displayName": "saros",
 	"description": "Saros implementation for VS Code.",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.38.0"
 	},
@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"workspaceContains:*"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -18,7 +18,7 @@
 			{
 				"command": "saros.account.add",
 				"title": "Add Account",
-				"category": "Saros"			
+				"category": "Saros"
 			}
 		],
 		"configuration": {
@@ -55,7 +55,8 @@
 		"mocha": "^6.1.4",
 		"typescript": "^3.3.1",
 		"tslint": "^5.12.1",
-		"vscode-test": "^1.2.0"
+		"vscode-test": "^1.2.0",
+		"vsce": "^1.71.0"
 	},
 	"dependencies": {
 		"node-jre": "^0.2.3",

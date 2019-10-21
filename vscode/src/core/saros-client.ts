@@ -7,7 +7,7 @@ import { LanguageClient } from "vscode-languageclient";
  * @interface AddAccountResponse
  */
 export interface AddAccountResponse {
-    Response: boolean;
+    response: boolean;
 }
 
 /**
