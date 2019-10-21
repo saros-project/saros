@@ -297,8 +297,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     dispatchActivity(activity);
 
+    // TODO check whether the editor is actually open locally
     if (!createdVirtualFile.isDirectory()) {
-      editorManager.openEditor(path, false);
+      setUpCreatedFileState(path);
     }
   }
 
@@ -467,9 +468,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     IActivity activity =
         new FileActivity(user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, path, null, null, null);
 
-    editorManager.removeAllEditorsForPath(path);
-
-    annotationManager.removeAnnotations(path.getFile());
+    cleanUpDeletedFileState(path);
 
     dispatchActivity(activity);
 
@@ -731,9 +730,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               null,
               encoding);
 
-      editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
-
-      annotationManager.updateAnnotationPath(oldFilePath.getFile(), newFilePath.getFile());
+      updateMovedFileState(oldFilePath, newFilePath);
 
     } else if (newPathIsShared) {
       // moved file into shared module
@@ -755,9 +752,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               encoding);
 
       if (fileIsOpen) {
-        Editor editor = ProjectAPI.openEditor(project, oldFile, false);
-
-        editorManager.addEditorMapping(newFilePath, editor);
+        setUpMovedEditorState(oldFile, newFilePath);
       }
 
     } else if (oldPathIsShared) {
@@ -766,9 +761,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           new FileActivity(
               user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, oldFilePath, null, null, null);
 
-      editorManager.removeAllEditorsForPath(oldFilePath);
-
-      annotationManager.removeAnnotations(oldFilePath.getFile());
+      cleanUpDeletedFileState(oldFilePath);
 
     } else {
       // neither source nor destination are shared
@@ -965,6 +958,51 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return new byte[0];
     }
+  }
+
+  /**
+   * Sets the editor manager state up for the created file.
+   *
+   * @param createdFilePath the created file
+   */
+  private void setUpCreatedFileState(@NotNull SPath createdFilePath) {
+    editorManager.openEditor(createdFilePath, false);
+  }
+
+  /**
+   * Drops the held internal state for the deleted file.
+   *
+   * @param deletedFilePath the deleted file
+   */
+  private void cleanUpDeletedFileState(@NotNull SPath deletedFilePath) {
+    editorManager.removeAllEditorsForPath(deletedFilePath);
+
+    annotationManager.removeAnnotations(deletedFilePath.getFile());
+  }
+
+  /**
+   * Updates the held internal state with the new path for the moved file.
+   *
+   * @param oldFilePath the old location/version of the file
+   * @param newFilePath the new location/version of the file
+   */
+  private void updateMovedFileState(@NotNull SPath oldFilePath, @NotNull SPath newFilePath) {
+    editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
+
+    annotationManager.updateAnnotationPath(oldFilePath.getFile(), newFilePath.getFile());
+  }
+
+  /**
+   * Explicitly handles the new editor mapping. This is necessary when the resource with an already
+   * open editor is "created" through a move into a shared module as this triggers before the
+   * resource move is executed, meaning the new resource does not exist yet. The editor for the old
+   * resource does however already exist. As the existing editor will be used for the new resource
+   * once it is moved, we have to add the mapping for the new file onto the "old" editor manually.
+   */
+  private void setUpMovedEditorState(@NotNull VirtualFile oldFile, @NotNull SPath newFilePath) {
+    Editor editor = ProjectAPI.openEditor(project, oldFile, false);
+
+    editorManager.addEditorMapping(newFilePath, editor);
   }
 
   /**
