@@ -355,8 +355,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    *
    * @param virtualFileEvent the event to react to
    * @see VirtualFileListener#beforeFileDeletion(VirtualFileEvent)
-   * @see #generateFileDeletion(VirtualFile)
-   * @see #generateFolderDeletion(VirtualFile)
+   * @see #generateFileDeletionActivity(VirtualFile)
+   * @see #generateFolderDeletionActivity(VirtualFile)
    */
   private void generateResourceDeletionActivity(@NotNull VirtualFileEvent virtualFileEvent) {
 
@@ -369,9 +369,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     }
 
     if (deletedVirtualFile.isDirectory()) {
-      generateFolderDeletion(deletedVirtualFile);
+      generateFolderDeletionActivity(deletedVirtualFile);
     } else {
-      generateFileDeletion(deletedVirtualFile);
+      generateFileDeletionActivity(deletedVirtualFile);
     }
   }
 
@@ -380,7 +380,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    *
    * @param deletedFolder the folder that was deleted
    */
-  private void generateFolderDeletion(@NotNull VirtualFile deletedFolder) {
+  private void generateFolderDeletionActivity(@NotNull VirtualFile deletedFolder) {
     SPath path = VirtualFileConverter.convertToSPath(project, deletedFolder);
 
     if (path == null || !session.isShared(path.getResource())) {
@@ -406,7 +406,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     ContentIterator contentIterator =
         fileOrDir -> {
           if (!fileOrDir.isDirectory()) {
-            generateFileDeletion(fileOrDir);
+            generateFileDeletionActivity(fileOrDir);
 
             return true;
           }
@@ -445,7 +445,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    *
    * @param deletedFile the file that was deleted
    */
-  private void generateFileDeletion(VirtualFile deletedFile) {
+  private void generateFileDeletionActivity(VirtualFile deletedFile) {
     SPath path = VirtualFileConverter.convertToSPath(project, deletedFile);
 
     if (path == null || !session.isShared(path.getResource())) {
@@ -474,8 +474,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * Generates and dispatches activities handling resources moves.
    *
    * @param virtualFileMoveEvent the event to react to
-   * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
-   * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
+   * @see #generateFileMoveActivity(VirtualFile, VirtualFile, VirtualFile, String, String)
+   * @see #generateFolderMoveActivity(VirtualFile, VirtualFile, VirtualFile, String)
    * @see #generateResourceCreationActivity(VirtualFileEvent) (VirtualFileEvent)
    * @see #generateResourceDeletionActivity(VirtualFileEvent) (VirtualFileEvent)
    */
@@ -498,10 +498,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     }
 
     if (oldFile.isDirectory()) {
-      generateFolderMove(oldFile, oldParent, newParent, null);
+      generateFolderMoveActivity(oldFile, oldParent, newParent, null);
 
     } else {
-      generateFileMove(oldFile, oldParent, newParent, null, null);
+      generateFileMoveActivity(oldFile, oldParent, newParent, null, null);
     }
   }
 
@@ -532,9 +532,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param oldParent the old parent of the moved file
    * @param newParent the new parent of the moved file
    * @param newFolderName the new name for the folder or null if the folder was not renamed
-   * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
+   * @see #generateFileMoveActivity(VirtualFile, VirtualFile, VirtualFile, String, String)
    */
-  private void generateFolderMove(
+  private void generateFolderMoveActivity(
       @NotNull VirtualFile oldFile,
       @NotNull VirtualFile oldParent,
       @NotNull VirtualFile newParent,
@@ -584,7 +584,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           }
 
           if (!fileOrDir.isDirectory()) {
-            generateFileMove(fileOrDir, oldParent, newParent, newFolderName, null);
+            generateFileMoveActivity(fileOrDir, oldParent, newParent, newFolderName, null);
 
             return true;
           }
@@ -659,9 +659,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param newBaseParent the new base parent of the file
    * @param newBaseName the new name for the base parent or null if it was not renamed
    * @param newFileName the new name for the file or null if it was not renamed
-   * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
+   * @see #generateFolderMoveActivity(VirtualFile, VirtualFile, VirtualFile, String)
    */
-  private void generateFileMove(
+  private void generateFileMoveActivity(
       @NotNull VirtualFile oldFile,
       @NotNull VirtualFile oldBaseParent,
       @NotNull VirtualFile newBaseParent,
@@ -804,8 +804,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * <p>Other property changes are ignored.
    *
    * @param filePropertyEvent the event to react to
-   * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
-   * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
+   * @see #generateFolderMoveActivity(VirtualFile, VirtualFile, VirtualFile, String)
+   * @see #generateFileMoveActivity(VirtualFile, VirtualFile, VirtualFile, String, String)
    */
   private void generateRenamingResourceMoveActivity(
       @NotNull VirtualFilePropertyEvent filePropertyEvent) {
@@ -849,9 +849,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         }
 
         if (file.isDirectory()) {
-          generateFolderMove(file, parent, parent, newName);
+          generateFolderMoveActivity(file, parent, parent, newName);
         } else {
-          generateFileMove(file, parent, parent, null, newName);
+          generateFileMoveActivity(file, parent, parent, null, newName);
         }
 
         break;
