@@ -18,7 +18,7 @@
 			{
 				"command": "saros.account.add",
 				"title": "Add Account",
-				"category": "Saros"			
+				"category": "Saros"
 			}
 		],
 		"configuration": {
