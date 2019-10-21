@@ -8,6 +8,8 @@ export function activate(context: vscode.ExtensionContext) {
 	sarosExtensionInstance.setContext(context)
 						.init()
 						.then(() => {
+							activateAccounts(sarosExtensionInstance);
+
 							console.log('Extension "Saros" is now active!');
 						})
 						.catch(reason => {
