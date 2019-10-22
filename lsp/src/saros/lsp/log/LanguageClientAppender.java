@@ -7,58 +7,52 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;
 import org.eclipse.lsp4j.services.LanguageClient;
 
-/**
- * Appender that sends log events to the connected language client.
- */
-public class LanguageClientAppender extends AppenderSkeleton  {
+/** Appender that sends log events to the connected language client. */
+public class LanguageClientAppender extends AppenderSkeleton {
 
-    private LanguageClient client;
-    
-    
-    /** 
-     * Instantiates the LanguageClientAppender class.
-     * 
-     * @param client the connected language client
-     */
-    public LanguageClientAppender(LanguageClient client) {
+  private LanguageClient client;
 
-        this.client = client;
-    }
+  /**
+   * Instantiates the LanguageClientAppender class.
+   *
+   * @param client the connected language client
+   */
+  public LanguageClientAppender(LanguageClient client) {
 
-    @Override
-    public void close() {
-        
-    }
+    this.client = client;
+  }
 
-    @Override
-    public boolean requiresLayout() {
-        
-        return false;
-    }
+  @Override
+  public void close() {}
 
-    @Override
-    protected void append(LoggingEvent event) {
-        
-        MessageParams mp = new MessageParams();
-        mp.setMessage(event.getMessage().toString());
+  @Override
+  public boolean requiresLayout() {
+
+    return false;
+  }
+
+  @Override
+  protected void append(LoggingEvent event) {
+
+    MessageParams mp = new MessageParams();
+    mp.setMessage(event.getMessage().toString());
+    mp.setType(MessageType.Info);
+
+    switch (event.getLevel().toInt()) {
+      case Level.FATAL_INT:
+      case Level.ERROR_INT:
+        mp.setType(MessageType.Error);
+        break;
+      case Level.INFO_INT:
         mp.setType(MessageType.Info);
-        
-        switch(event.getLevel().toInt()) {
-            case Level.FATAL_INT:
-            case Level.ERROR_INT:
-                mp.setType(MessageType.Error);
-                break;
-            case Level.INFO_INT:
-                mp.setType(MessageType.Info);
-                break;
-            case Level.WARN_INT:
-                mp.setType(MessageType.Warning);
-                break;
-            default:
-                return;
-        }
-
-        client.logMessage(mp);
+        break;
+      case Level.WARN_INT:
+        mp.setType(MessageType.Warning);
+        break;
+      default:
+        return;
     }
 
+    client.logMessage(mp);
+  }
 }
