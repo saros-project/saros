@@ -3,8 +3,9 @@ import { commands } from "vscode";
 
 /**
  * Activation function of the account module.
- * 
- * @param extension - The instance of the extension
+ *
+ * @export
+ * @param {SarosExtension} extension - The instance of the extension
  */
 export function activateAccounts(extension: SarosExtension) {
     commands.registerCommand('saros.account.add', () => {

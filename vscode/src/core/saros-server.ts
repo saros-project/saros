@@ -6,24 +6,36 @@ import { StreamInfo } from 'vscode-languageclient';
 
 /**
  * Encapsulation of the Saros server.
+ *
+ * @export
+ * @class SarosServer
  */
 export class SarosServer {
     
+    /**
+     * Started process of the server.
+     *
+     * @private
+     * @type {process.ChildProcess}
+     * @memberof SarosServer
+     */
     private process?: process.ChildProcess;
 
     /**
-     * Instanciates the Saros server.
+     * Creates an instance of SarosServer.
      * 
-     * @param context - The extension context
+     * @param {vscode.ExtensionContext} context - The extension context
+     * @memberof SarosServer
      */
     constructor(private context: vscode.ExtensionContext) {
                 
     }
 
     /**
-     * Stats the server process.
-     * 
-     * @param port - The port the server listens on for connection 
+     * Starts the server process.
+     *
+     * @param {number} port - The port the server listens on for connection 
+     * @memberof SarosServer
      */
     public start(port: number): void {
 
@@ -38,9 +50,10 @@ export class SarosServer {
 
     /**
      * Provides access to the start function.
-     * 
+     *
      * @remarks A free port will be determined and used.
-     * @returns Function that starts the server and retuns the {@link vscode-languageclient#StreamInfo | io access}
+     * @returns {() => Thenable<StreamInfo>} Function that starts the server and retuns the io information
+     * @memberof SarosServer
      */
     public getStartFunc(): () => Thenable<StreamInfo> {
         
@@ -72,12 +85,14 @@ export class SarosServer {
 
         return createServer;
     }
-    
+
     /**
      * Starts the Saros server jar as process.
-     * 
-     * @param args - Additional command line arguments for the server
-     * @returns Itself 
+     *
+     * @private
+     * @param {...any[]} args - Additional command line arguments for the server
+     * @returns {SarosServer} Itself 
+     * @memberof SarosServer
      */
     private startProcess(...args: any[]): SarosServer {
         
@@ -97,10 +112,12 @@ export class SarosServer {
 
     /**
      * Attaches listeners for debug informations and prints
-     * retrieved data to a newly created {@link vscode#OutputChannel | output channel}.
+     * retrieved data to a newly created [output channel](#vscode.OutputChannel).
      * 
-     * @param isEnabled - Wether debug output is redirected or not
-     * @returns Itself
+     * @private
+     * @param {boolean} isEnabled - Wether debug output is redirected or not
+     * @returns {SarosServer} Itself
+     * @memberof SarosServer
      */
     private withDebug(isEnabled: boolean): SarosServer {
 
@@ -126,9 +143,11 @@ export class SarosServer {
     }
 
     /**
-     * Attaches listeners to observe terminations of the server.
-     * 
-     * @returns Itself
+     * Attaches listeners to observe termination of the server.
+     *
+     * @private
+     * @returns {SarosServer} Itself
+     * @memberof SarosServer
      */
     private withExitAware(): SarosServer {  
 

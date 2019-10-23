@@ -5,8 +5,9 @@ import { activateAccounts } from './account/activator';
 
 /**
  * Activation function of the extension.
- * 
- * @param context - The extension context
+ *
+ * @export
+ * @param {vscode.ExtensionContext} context - The extension context
  */
 export function activate(context: vscode.ExtensionContext) {
 
@@ -27,8 +28,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 /**
  * Creates the status bar.
- * 
- * @returns The status bar item as {@link vscode-jsonrpc#Disposable | disposable}
+ *
+ * @returns {Disposable} The status bar item as [disposable](#Disposable)
  */
 function createStatusBar(): Disposable {
 
@@ -42,6 +43,8 @@ function createStatusBar(): Disposable {
 
 /**
  * Deactivation function of the extension.
+ *
+ * @export
  */
 export function deactivate() {
 	console.log("deactivated");

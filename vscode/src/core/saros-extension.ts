@@ -5,13 +5,18 @@ import { LanguageClientOptions, RevealOutputChannelOn } from "vscode-languagecli
 
 /**
  * The Saros extension.
+ *
+ * @export
+ * @class SarosExtension
  */
 export class SarosExtension {
     private context!: ExtensionContext;
     public client!: SarosClient;
 
     /**
-     * Instanciates the Saros extension.
+     * Creates an instance of SarosExtension.
+     *
+     * @memberof SarosExtension
      */
     constructor() {
         
@@ -19,9 +24,10 @@ export class SarosExtension {
 
     /**
      * Sets the context the extension runs on.
-     * 
-     * @param context - The extension context
-     * @returns Itself
+     *
+     * @param {ExtensionContext} context - The extension context
+     * @returns {SarosExtension} Itself
+     * @memberof SarosExtension
      */
     setContext(context: ExtensionContext): SarosExtension {
         this.context = context;
@@ -31,8 +37,11 @@ export class SarosExtension {
 
     /**
      * Initializes the extension.
+     *
+     * @returns
+     * @memberof SarosExtension
      */
-    init(): Promise<void> {
+    async init() {
         if(!this.context) {
             return Promise.reject('Context not set');
         }
@@ -55,8 +64,11 @@ export class SarosExtension {
 
     /**
      * Callback when extension is ready.
+     *
+     * @returns
+     * @memberof SarosExtension
      */
-    onReady(): Promise<void> {
+    async onReady() {
         if(!this.client) {
             return Promise.reject('SarosExtension is not initialized');
         }
@@ -65,9 +77,11 @@ export class SarosExtension {
     }
 
     /**
-     * Creates the client options for the {@link vscode-languageclient#LanguageClient | language client}.
-     * 
-     * @returns The language client options
+     * Creates the client options.
+     *
+     * @private
+     * @returns {LanguageClientOptions} The client options
+     * @memberof SarosExtension
      */
     private createClientOptions(): LanguageClientOptions {
         let clientOptions: LanguageClientOptions = {

@@ -1,32 +1,40 @@
 import { LanguageClient } from "vscode-languageclient";
 
 /**
- * Interface of the addAccount response.
+ * Response for adding new accounts.
+ *
+ * @export
+ * @interface AddAccountResponse
  */
 export interface AddAccountResponse {
     Response: boolean;
 }
 
 /**
- * Interface of the addAccount request.
+ * Request for adding new accounts.
+ *
+ * @export
+ * @interface AddAccountRequest
  */
 export interface AddAccountRequest {
 
 }
 
 /**
- * Extension of the {@link vscode-languageclient#LanguageClient | Language Client} 
- * that supports the Saros protocol.
+ * Custom language client for Saros protocol.
+ *
+ * @export
+ * @class SarosClient
+ * @extends {LanguageClient}
  */
 export class SarosClient extends LanguageClient {
-
+    
     /**
      * Adds a new account.
-     * 
-     * @param name - Account identifier
-     * @returns The response of Saros
-     * 
-     * @experimental
+     *
+     * @param {string} name - Account identifier
+     * @returns {Thenable<AddAccountResponse>} The result
+     * @memberof SarosClient
      */
     addAccount(name: string): Thenable<AddAccountResponse> {
         const request: AddAccountRequest = {
