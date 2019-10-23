@@ -10,7 +10,7 @@ import org.eclipse.lsp4j.services.LanguageClient;
 /** Appender that sends log events to the connected language client. */
 public class LanguageClientAppender extends AppenderSkeleton {
 
-  private LanguageClient client;
+  private final LanguageClient client;
 
   /**
    * Instantiates the LanguageClientAppender class.

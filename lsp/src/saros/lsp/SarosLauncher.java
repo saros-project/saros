@@ -8,7 +8,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
-import saros.lsp.extensions.client.SarosLanguageClient;
+import saros.lsp.extensions.client.ISarosLanguageClient;
 import saros.lsp.log.LanguageClientAppender;
 import saros.lsp.log.LogOutputStream;
 
@@ -56,12 +56,12 @@ public class SarosLauncher {
               }
             });
 
-    SarosLanguageServerImpl langSvr = new SarosLanguageServerImpl();
-    Launcher<SarosLanguageClient> l =
+    SarosLanguageServer langSvr = new SarosLanguageServer();
+    Launcher<ISarosLanguageClient> l =
         Launcher.createLauncher(
-            langSvr, SarosLanguageClient.class, socket.getInputStream(), socket.getOutputStream());
+            langSvr, ISarosLanguageClient.class, socket.getInputStream(), socket.getOutputStream());
 
-    SarosLanguageClient langClt = l.getRemoteProxy();
+    ISarosLanguageClient langClt = l.getRemoteProxy();
     LOG.addAppender(new LanguageClientAppender(langClt));
     langSvr.connect(langClt);
 
