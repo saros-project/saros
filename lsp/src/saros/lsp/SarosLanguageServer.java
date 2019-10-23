@@ -7,20 +7,20 @@ import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
-import saros.lsp.extensions.SarosLanguageServer;
-import saros.lsp.extensions.client.SarosLanguageClient;
-import saros.lsp.extensions.client.SarosLanguageClientAware;
+import saros.lsp.extensions.ISarosLanguageServer;
+import saros.lsp.extensions.client.ISarosLanguageClient;
+import saros.lsp.extensions.client.ISarosLanguageClientAware;
 import saros.lsp.extensions.server.account.AccountService;
-import saros.lsp.extensions.server.account.AccountServiceImpl;
-import saros.lsp.service.DocumentServiceImpl;
-import saros.lsp.service.WorkspaceServiceImpl;
+import saros.lsp.extensions.server.account.IAccountService;
+import saros.lsp.service.DocumentServiceStub;
+import saros.lsp.service.WorkspaceServiceStub;
 
 /** Implmenentation of the Saros language server. */
-public class SarosLanguageServerImpl implements SarosLanguageServer, SarosLanguageClientAware {
+public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguageClientAware {
 
   private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
 
-  private SarosLanguageClient languageClient;
+  private ISarosLanguageClient languageClient;
 
   @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
@@ -51,21 +51,21 @@ public class SarosLanguageServerImpl implements SarosLanguageServer, SarosLangua
 
   @Override
   public TextDocumentService getTextDocumentService() {
-    return new DocumentServiceImpl();
+    return new DocumentServiceStub();
   }
 
   @Override
   public WorkspaceService getWorkspaceService() {
-    return new WorkspaceServiceImpl();
+    return new WorkspaceServiceStub();
   }
 
   @Override
-  public void connect(SarosLanguageClient client) {
+  public void connect(ISarosLanguageClient client) {
     this.languageClient = client;
   }
 
   @Override
-  public AccountService getSarosAccountService() {
-    return new AccountServiceImpl();
+  public IAccountService getSarosAccountService() {
+    return new AccountService();
   }
 }

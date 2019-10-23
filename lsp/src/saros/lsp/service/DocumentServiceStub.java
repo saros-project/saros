@@ -6,8 +6,8 @@ import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
-/** Implementation of the text document service. */
-public class DocumentServiceImpl implements TextDocumentService {
+/** Empty implementation of the text document service. */
+public class DocumentServiceStub implements TextDocumentService {
 
   @Override
   public void didOpen(DidOpenTextDocumentParams params) {
