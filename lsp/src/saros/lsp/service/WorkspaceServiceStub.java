@@ -6,8 +6,8 @@ import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.services.WorkspaceService;
 import saros.lsp.SarosLauncher;
 
-/** Implementation of the workspace service. */
-public class WorkspaceServiceImpl implements WorkspaceService {
+/** Empty implementation of the workspace service. */
+public class WorkspaceServiceStub implements WorkspaceService {
 
   private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
 

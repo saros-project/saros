@@ -1,12 +1,12 @@
 package saros.lsp.extensions.client;
 
 /** Interface for Saros language client awareness. */
-public interface SarosLanguageClientAware {
+public interface ISarosLanguageClientAware {
 
   /**
    * Registers the language client.
    *
    * @param client connected language client
    */
-  void connect(SarosLanguageClient client);
+  void connect(ISarosLanguageClient client);
 }
