@@ -710,6 +710,11 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param newFileName the new name for the file or null if it was not renamed
    * @see #generateFolderMoveActivity(VirtualFile, VirtualFile, VirtualFile, String)
    */
+  /*
+   * TODO adjust the logic ignoring module moves once multiple modules can be shared
+   *  Even though module files are ignored by their module, they won't be ignored when moved in/
+   *  between other shared modules.
+   */
   private void generateFileMoveActivity(
       @NotNull VirtualFile oldFile,
       @NotNull VirtualFile oldBaseParent,
@@ -726,6 +731,22 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     boolean oldPathIsShared = isShared(oldFilePath, session);
     boolean newPathIsShared = isShared(newParentPath, session);
+
+    if (newPathIsShared) {
+      Module targetModule =
+          Filesystem.runReadAction(() -> ModuleUtil.findModuleForFile(newBaseParent, project));
+
+      if (targetModule != null) {
+        VirtualFile moduleFile = targetModule.getModuleFile();
+        if (oldFile.equals(moduleFile)) {
+          if (LOG.isTraceEnabled()) {
+            LOG.trace("Ignoring move of module file " + oldFile + " for module " + targetModule);
+          }
+
+          return;
+        }
+      }
+    }
 
     boolean fileIsOpen = ProjectAPI.isOpen(project, oldFile);
 
