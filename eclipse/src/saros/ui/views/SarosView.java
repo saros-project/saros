@@ -82,13 +82,13 @@ import saros.ui.model.roster.RosterEntryElement;
 import saros.ui.sounds.SoundPlayer;
 import saros.ui.sounds.Sounds;
 import saros.ui.util.LayoutUtils;
-import saros.ui.util.ModelFormatUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
 import saros.ui.widgets.ConnectionStateComposite;
 import saros.ui.widgets.chat.ChatRoomsComposite;
 import saros.ui.widgets.viewer.ViewerComposite;
 import saros.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
+import saros.util.CoreUtils;
 
 /**
  * @JTourBusStop 1, The Interface Tour:
@@ -667,12 +667,12 @@ public class SarosView extends ViewPart {
     switch (reason) {
       case KICKED:
         title = Messages.SessionStop_host_removed_you_title;
-        text = ModelFormatUtils.format(Messages.SessionStop_host_removed_you_message, user);
+        text = CoreUtils.format(Messages.SessionStop_host_removed_you_message, user);
         break;
 
       case HOST_LEFT:
         title = Messages.SessionStop_host_closed_session_title;
-        text = ModelFormatUtils.format(Messages.SessionStop_host_closed_session_message, user);
+        text = CoreUtils.format(Messages.SessionStop_host_closed_session_message, user);
         break;
       case CONNECTION_LOST:
         // TODO display the error

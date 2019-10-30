@@ -57,7 +57,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
 
     for (final VirtualFile child : children) {
 
-      if (!moduleFileIndex.isInContent(child)) {
+      if (!Filesystem.runReadAction(() -> moduleFileIndex.isInContent(child))) {
 
         continue;
       }

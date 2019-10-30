@@ -3,8 +3,6 @@ package saros.stf.client.tester;
 import java.rmi.RemoteException;
 import saros.net.xmpp.JID;
 import saros.stf.server.rmi.controlbot.IControlBot;
-import saros.stf.server.rmi.htmlbot.IHTMLBot;
-import saros.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
 import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import saros.stf.server.rmi.superbot.ISuperBot;
 
@@ -13,9 +11,8 @@ public enum SarosTester implements AbstractTester {
   BOB(TesterFactory.createTester("BOB")),
   CARL(TesterFactory.createTester("CARL")),
   DAVE(TesterFactory.createTester("DAVE")) /*
-                                            * EDNA(TesterFactory
-                                            * .createTester("EDNA"))
-                                            */;
+                              * EDNA(TesterFactory .createTester("EDNA"))
+                              */;
 
   private AbstractTester tester;
 
@@ -66,20 +63,5 @@ public enum SarosTester implements AbstractTester {
   @Override
   public IControlBot controlBot() throws RemoteException {
     return this.tester.controlBot();
-  }
-
-  @Override
-  public boolean usesHtmlGui() {
-    return this.tester.usesHtmlGui();
-  }
-
-  @Override
-  public IHTMLWorkbenchBot htmlViewBot() throws RemoteException {
-    return this.tester.htmlViewBot();
-  }
-
-  @Override
-  public IHTMLBot htmlBot() throws RemoteException {
-    return this.tester.htmlBot();
   }
 }

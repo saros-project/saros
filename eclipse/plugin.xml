@@ -18,13 +18,6 @@
            id="saros.ui.views.SarosView"
            name="Saros">
      </view>
-     <!-- <view
-			category="saros.Saros"
-			class="saros.ui.views.SarosViewBrowserVersion"
-			icon="icons/view16/saros_misc.png"
-			id="saros.ui.views.SarosViewBrowserVersion"
-			name="Saros HTML GUI">
-			</view> -->
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

@@ -21,7 +21,7 @@ import saros.session.ISessionLifecycleListener;
 import saros.session.ISessionListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /**
  * Session tree root node.
@@ -251,7 +251,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
     public UserInfo(User user) {
       super(
-          (user.isHost() ? "Host " : "") + ModelFormatUtils.getDisplayName(user),
+          (user.isHost() ? "Host " : "") + CoreUtils.determineUserDisplayName(user),
           IconManager.CONTACT_ONLINE_ICON);
       this.user = user;
     }

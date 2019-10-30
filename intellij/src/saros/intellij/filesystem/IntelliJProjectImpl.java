@@ -4,7 +4,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
+import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -116,8 +116,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   @NotNull
   @Override
   public IResource[] members() throws IOException {
-    // TODO run as read action
-
     final List<IResource> result = new ArrayList<>();
 
     final VirtualFile[] children = moduleRoot.getChildren();
@@ -126,8 +124,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     for (final VirtualFile child : children) {
 
-      if (!moduleFileIndex.isInContent(child)) {
-
+      if (!Filesystem.runReadAction(() -> moduleFileIndex.isInContent(child))) {
         continue;
       }
 
@@ -201,8 +198,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    */
   @Nullable
   private IPath getProjectRelativePath(@NotNull VirtualFile file) {
-    Module fileModule =
-        ProjectFileIndexFacade.getInstance(module.getProject()).getModuleForFile(file);
+    ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
+    Module fileModule = Filesystem.runReadAction(() -> projectFileIndex.getModuleForFile(file));
 
     if (!module.equals(fileModule)) {
       return null;
@@ -367,12 +364,14 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     VirtualFile virtualFile = moduleRoot.findFileByRelativePath(path.toString());
 
-    if (virtualFile != null
-        && ModuleRootManager.getInstance(module).getFileIndex().isInContent(virtualFile)) {
-      return virtualFile;
+    if (virtualFile == null) {
+      return null;
     }
 
-    return null;
+    ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
+    boolean isInContent = Filesystem.runReadAction(() -> moduleFileIndex.isInContent(virtualFile));
+
+    return isInContent ? virtualFile : null;
   }
 
   /**

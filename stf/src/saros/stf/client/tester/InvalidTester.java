@@ -3,8 +3,6 @@ package saros.stf.client.tester;
 import java.rmi.RemoteException;
 import saros.net.xmpp.JID;
 import saros.stf.server.rmi.controlbot.IControlBot;
-import saros.stf.server.rmi.htmlbot.IHTMLBot;
-import saros.stf.server.rmi.htmlbot.IHTMLWorkbenchBot;
 import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import saros.stf.server.rmi.superbot.ISuperBot;
 
@@ -56,21 +54,6 @@ class InvalidTester implements AbstractTester {
 
   @Override
   public IControlBot controlBot() throws RemoteException {
-    throw exception;
-  }
-
-  @Override
-  public boolean usesHtmlGui() {
-    throw exception;
-  }
-
-  @Override
-  public IHTMLWorkbenchBot htmlViewBot() throws RemoteException {
-    throw exception;
-  }
-
-  @Override
-  public IHTMLBot htmlBot() throws RemoteException {
     throw exception;
   }
 

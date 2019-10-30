@@ -4,7 +4,7 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import saros.editor.internal.ContributionAnnotationManager;
 import saros.session.User;
 import saros.ui.Messages;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /**
  * Marks textual additions and changes of other users. They are meant to inform the user of recent
@@ -24,7 +24,7 @@ public class ContributionAnnotation extends SarosAnnotation {
     super(
         ContributionAnnotation.TYPE,
         true,
-        ModelFormatUtils.format(Messages.ContributionAnnotation_text_contributed_by, source),
+        CoreUtils.format(Messages.ContributionAnnotation_text_contributed_by, source),
         source);
     this.model = model;
   }

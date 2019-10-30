@@ -3,7 +3,7 @@ package saros.editor.annotations;
 import saros.editor.internal.LocationAnnotationManager;
 import saros.session.User;
 import saros.ui.Messages;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /**
  * Mimics the text cursor and selection of other session participants.
@@ -19,7 +19,7 @@ public class SelectionAnnotation extends SarosAnnotation {
     super(
         SelectionAnnotation.TYPE,
         true,
-        ModelFormatUtils.format(
+        CoreUtils.format(
             isCursor
                 ? Messages.SelectionAnnotation_cursor_of
                 : Messages.SelectionAnnotation_selection_of,

@@ -12,6 +12,7 @@ import saros.activities.FileActivity.Type;
 import saros.activities.SPath;
 import saros.activities.TargetedFileActivity;
 import saros.annotations.Component;
+import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.editor.IEditorManager;
 import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
@@ -39,13 +40,15 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
   private final ISarosSession session;
 
+  private final ConcurrentDocumentServer concurrentDocumentServer;
+
   private final UISynchronizer synchronizer;
 
   private final IActivityConsumer consumer =
       new AbstractActivityConsumer() {
         @Override
         public void receive(ChecksumErrorActivity checksumError) {
-          if (session.isHost()) triggerRecovery(checksumError);
+          triggerRecovery(checksumError);
         }
       };
 
@@ -63,9 +66,11 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
   public ConsistencyWatchdogHandler(
       final ISarosSession session,
+      final ConcurrentDocumentServer concurrentDocumentServer,
       final IEditorManager editorManager,
       final UISynchronizer synchronizer) {
     this.session = session;
+    this.concurrentDocumentServer = concurrentDocumentServer;
     this.editorManager = editorManager;
     this.synchronizer = synchronizer;
   }
@@ -163,7 +168,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
     final IFile file = path.getFile();
 
     // Reset jupiter
-    session.getConcurrentDocumentServer().reset(from, path);
+    concurrentDocumentServer.reset(from, path);
 
     final User user = session.getLocalUser();
 

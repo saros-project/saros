@@ -20,7 +20,6 @@ import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
-import saros.Saros;
 import saros.account.XMPPAccountStore;
 import saros.context.IContainerContext;
 import saros.preferences.EclipsePreferenceConstants;
@@ -28,18 +27,6 @@ import saros.preferences.PreferenceConstants;
 import saros.stf.server.rmi.controlbot.impl.ControlBotImpl;
 import saros.stf.server.rmi.controlbot.manipulation.impl.AccountManipulatorImpl;
 import saros.stf.server.rmi.controlbot.manipulation.impl.NetworkManipulatorImpl;
-import saros.stf.server.rmi.htmlbot.EclipseHTMLWorkbenchBot;
-import saros.stf.server.rmi.htmlbot.impl.HTMLBotImpl;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLButton;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLCheckbox;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLInputField;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLMultiSelect;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLProgressBar;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLRadioGroup;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLSelect;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLTextElement;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLTree;
-import saros.stf.server.rmi.htmlbot.widget.impl.RemoteHTMLView;
 import saros.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import saros.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
 import saros.stf.server.rmi.remotebot.widget.impl.RemoteBotCCombo;
@@ -175,31 +162,6 @@ public class STFController {
       registry = LocateRegistry.createRegistry(port);
     } catch (RemoteException e) {
       registry = LocateRegistry.getRegistry(port);
-    }
-
-    // remove this conditional when the HTML GUI replaces the old one
-    if (Saros.useHtmlGui()) {
-      HTMLSTFRemoteObject.setContext(context);
-
-      /*
-       * export HTML bots
-       */
-      exportObject(EclipseHTMLWorkbenchBot.getInstance(), "htmlViewBot");
-      exportObject(HTMLBotImpl.getInstance(), "htmlBot");
-
-      /*
-       * export HTML widgets
-       */
-      exportObject(RemoteHTMLView.getInstance(), "htmlView");
-      exportObject(RemoteHTMLButton.getInstance(), "htmlButton");
-      exportObject(RemoteHTMLInputField.getInstance(), "htmlInputField");
-      exportObject(RemoteHTMLCheckbox.getInstance(), "htmlCheckbox");
-      exportObject(RemoteHTMLRadioGroup.getInstance(), "htmlRadioGroup");
-      exportObject(RemoteHTMLSelect.getInstance(), "htmlSelect");
-      exportObject(RemoteHTMLMultiSelect.getInstance(), "htmlMultiSelect");
-      exportObject(RemoteHTMLProgressBar.getInstance(), "htmlProgressBar");
-      exportObject(RemoteHTMLTextElement.getInstance(), "htmlTextElement");
-      exportObject(RemoteHTMLTree.getInstance(), "htmlTree");
     }
 
     /*

@@ -11,7 +11,7 @@ import org.apache.log4j.helpers.LogLog;
 
 /**
  * Component that is initialized when a project is loaded. It initializes the logging, shortcuts and
- * the {@link IntellijProjectLifecycle} singleton.
+ * the {@link IntellijApplicationLifecycle} singleton.
  */
 public class SarosComponent {
 
@@ -48,11 +48,7 @@ public class SarosComponent {
       LogLog.error("could not load saros property file 'saros.properties'", e);
     }
 
-    IntellijProjectLifecycle.getInstance().start();
-  }
-
-  public static boolean isSwtBrowserEnabled() {
-    return Boolean.getBoolean("saros.swtbrowser");
+    IntellijApplicationLifecycle.getInstance().start();
   }
 
   private void loadLoggers() {

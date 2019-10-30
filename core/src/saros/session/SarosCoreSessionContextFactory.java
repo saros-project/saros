@@ -35,11 +35,8 @@ public class SarosCoreSessionContextFactory implements ISarosSessionContextFacto
   public final void createComponents(ISarosSession session, MutablePicoContainer container) {
 
     // Concurrent Editing
-    /*
-     * As Pico Container complains about null, just add the server even in
-     * client mode as it will not matter because it is not accessed.
-     */
-    container.addComponent(ConcurrentDocumentServer.class);
+    if (session.isHost()) container.addComponent(ConcurrentDocumentServer.class);
+
     container.addComponent(ConcurrentDocumentClient.class);
     container.addComponent(HeartbeatDispatcher.class);
 
@@ -48,11 +45,10 @@ public class SarosCoreSessionContextFactory implements ISarosSessionContextFacto
     else container.addComponent(ClientSessionTimeoutHandler.class);
 
     // Watchdogs
-    // FIXME this should only be added to the host context
-    container.addComponent(ConsistencyWatchdogHandler.class);
-
-    if (session.isHost()) container.addComponent(ConsistencyWatchdogServer.class);
-    else container.addComponent(ConsistencyWatchdogClient.class);
+    if (session.isHost()) {
+      container.addComponent(ConsistencyWatchdogServer.class);
+      container.addComponent(ConsistencyWatchdogHandler.class);
+    } else container.addComponent(ConsistencyWatchdogClient.class);
 
     // Session-dependent XStream Converter
     container.addComponent(SPathConverter.class);

@@ -12,9 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
+import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
 import saros.stf.test.stf.Constants;
-import saros.test.util.EclipseTestThread;
 
 @TestLink(id = "Saros-36_edit_during_invitation")
 public class EditDuringInvitationTest extends StfTestCase {

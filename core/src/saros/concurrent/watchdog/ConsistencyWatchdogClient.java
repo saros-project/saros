@@ -27,7 +27,7 @@ import saros.session.AbstractActivityProducer;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.ISarosSession;
-import saros.session.UserFormatUtils;
+import saros.util.CoreUtils;
 
 /**
  * This class is responsible for two things:
@@ -203,7 +203,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
 
       remoteProgress.beginTask(
           "Consistency recovery for user "
-              + UserFormatUtils.getDisplayName(currentSession.getLocalUser()),
+              + CoreUtils.determineUserDisplayName(currentSession.getLocalUser()),
           filesRemaining.get());
 
       fireActivity(

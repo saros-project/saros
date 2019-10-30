@@ -7,7 +7,6 @@ import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
-import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -123,7 +123,7 @@ public class ModuleConfigurationInitializer implements Startable {
 
     ContentEntry contentEntry = contentEntries[0];
 
-    if (!configurationDiffers(contentEntry, moduleConfiguration.getRootPaths())) {
+    if (!configurationDiffers(module, contentEntry, moduleConfiguration.getRootPaths())) {
       return;
     }
 
@@ -146,14 +146,34 @@ public class ModuleConfigurationInitializer implements Startable {
   /**
    * Returns whether the content entry source root configuration matches the passed configuration.
    *
+   * @param module the module the content entry belongs to
    * @param contentEntry the content entry to check
    * @param rootPaths the root paths received from the host
    * @return <code>true</code> if the root paths of the passed content entry match the paths
-   *     received from the host, <code>false</code> otherwise
+   *     received from the host, <code>false</code> if the configuration matches or the
+   *     configuration could not be read
    */
   private boolean configurationDiffers(
+      @NotNull Module module,
       @NotNull ContentEntry contentEntry,
       @NotNull Map<JpsModuleSourceRootType<? extends JpsElement>, String[]> rootPaths) {
+
+    VirtualFile contentEntryFile = contentEntry.getFile();
+
+    if (contentEntryFile == null) {
+      /*
+       * TODO drop module parameter and use content entry module root model instead when
+       *  backwards compatibility is dropped to 2019.2 or later
+       */
+      log.error(
+          "Encountered content root without a valid local representation for shared module \""
+              + module
+              + "\". Can not provide source configuration.");
+
+      return false;
+    }
+
+    Path basePath = Paths.get(contentEntryFile.getPath());
 
     for (Entry<JpsModuleSourceRootType<? extends JpsElement>, String[]> entry :
         rootPaths.entrySet()) {
@@ -168,14 +188,13 @@ public class ModuleConfigurationInitializer implements Startable {
         remoteRoots = Collections.emptySet();
       }
 
-      String contentEntryPath = contentEntry.getUrl();
-
       Set<String> localRoots =
           contentEntry
               .getSourceFolders(type)
               .stream()
-              .map(SourceFolder::getUrl)
-              .map(sourcePath -> relativize(contentEntryPath, sourcePath))
+              .map(sourceFolder -> ModuleUtils.getRelativeRootPath(basePath, sourceFolder))
+              .filter(Objects::nonNull)
+              .map(Path::toString)
               .collect(Collectors.toSet());
 
       if (!remoteRoots.equals(localRoots)) {
@@ -184,26 +203,6 @@ public class ModuleConfigurationInitializer implements Startable {
     }
 
     return false;
-  }
-
-  /**
-   * Relativizes the given source path against the given base path.
-   *
-   * @param base the base path
-   * @param path the path to the source location
-   * @return the relative path from the base path to the given source location
-   */
-  @NotNull
-  private String relativize(@NotNull String base, @NotNull String path) {
-    assert path.startsWith(base)
-        : "Encountered path that is not located below the given base directory";
-
-    Path basePath = Paths.get(base);
-    Path childPath = Paths.get(path);
-
-    Path relativePath = basePath.relativize(childPath);
-
-    return relativePath.toString();
   }
 
   /**

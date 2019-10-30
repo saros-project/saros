@@ -11,7 +11,6 @@ import org.junit.runners.Suite;
   saros.stf.test.editing.TestSuite.class,
   saros.stf.test.filefolderoperations.TestSuite.class,
   saros.stf.test.followmode.TestSuite.class,
-  saros.stf.test.html.TestSuite.class,
   saros.stf.test.invitation.TestSuite.class,
   saros.stf.test.partialsharing.TestSuite.class,
   saros.stf.test.permissions.TestSuite.class,

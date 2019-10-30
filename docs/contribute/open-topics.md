@@ -9,6 +9,9 @@ Here you can find:
 Therefore this page can be used for finding open and interesting topics which can be continued.
 Please, let us know (e.g. via our [Gitter](https://gitter.im/saros-project/saros) or [mailing list](https://groups.google.com/forum/#!forum/saros-devel)) before you continue a topic so we can share our thoughts and experiences.
 
+## HTML-GUI
+You can find all information about the idea of the HTML-GUI [here](html-gui.md).
+
 ## GIT support
 Corresponding Pull Requests:
 * [Add JGit facade](https://github.com/saros-project/saros/pull/428)

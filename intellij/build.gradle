@@ -5,7 +5,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.9"
+    classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.10"
   }
 }
 
@@ -13,8 +13,6 @@ apply plugin: 'org.jetbrains.intellij'
 
 dependencies {
   compile project(':saros.core')
-  compile project(':saros.ui')
-  compile project(path: ':saros.ui', configuration: 'testing')
 
   compile 'org.easytesting:fest-assert:1.2'
   compile 'org.easytesting:fest-reflect:1.2'
@@ -71,7 +69,7 @@ intellij {
   if (intellijHome) {
     localPath = intellijHome
   } else {
-    version = 'IC-2019.2.1'
+    version = 'IC-2019.2.3'
   }
 
   // don't overwrite the version compatibility defined in the plugin.xml

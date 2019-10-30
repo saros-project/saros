@@ -22,8 +22,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.launching;resolution:=optional,
  org.eclipse.gef;bundle-version="3.11.0";resolution:=optional,
  org.eclipse.core.net;resolution:=optional,
- saros.core,
- saros.ui
+ saros.core
 Bundle-ActivationPolicy: lazy
 Export-Package: saros;
   uses:="org.eclipse.core.runtime,
