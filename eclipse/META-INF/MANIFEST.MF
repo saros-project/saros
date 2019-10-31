@@ -20,7 +20,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.security,
  org.junit;resolution:=optional,
  org.eclipse.jdt.launching;resolution:=optional,
- org.eclipse.gef;bundle-version="3.11.0";resolution:=optional,
  org.eclipse.core.net;resolution:=optional,
  saros.core
 Bundle-ActivationPolicy: lazy
