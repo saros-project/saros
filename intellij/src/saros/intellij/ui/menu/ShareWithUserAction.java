@@ -18,6 +18,7 @@ import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.util.NotificationPanel;
 import saros.net.xmpp.JID;
 
 /**
@@ -48,22 +49,37 @@ public class ShareWithUserAction extends AnAction {
   }
 
   @Override
-  public void actionPerformed(AnActionEvent e) {
-    Project project = e.getProject();
+  public void actionPerformed(AnActionEvent event) {
+    Project project = event.getProject();
     if (project == null) {
       throw new IllegalStateException(
           "Unable to start session - could not determine project for highlighted resource.");
     }
 
-    VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+    VirtualFile virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
     if (virtualFile == null) {
       throw new IllegalStateException(
           "Unable to start session - could not determine virtual file for highlighted resource.");
     }
 
-    // We allow only completely shared projects, so no need to check
-    // for partially shared ones.
-    List<IResource> resources = Arrays.asList(getModuleForVirtualFile(virtualFile, e.getProject()));
+    IResource module;
+
+    try {
+      // We allow only completely shared projects, so no need to check
+      // for partially shared ones.
+      module = getModuleForVirtualFile(virtualFile, event.getProject());
+
+    } catch (IllegalArgumentException e) {
+      LOG.error("Tried to share illegal module", e);
+
+      NotificationPanel.showError(
+          MessageFormat.format(Messages.ShareWithUserAction_illegal_module_message, e.getMessage()),
+          Messages.ShareWithUserAction_illegal_module_title);
+
+      return;
+    }
+
+    List<IResource> resources = Arrays.asList(module);
 
     List<JID> contacts = Arrays.asList(userJID);
 

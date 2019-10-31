@@ -137,6 +137,8 @@ public class Messages {
   public static String ContactPopMenu_module_not_found_message_condition;
 
   public static String ShareWithUserAction_description;
+  public static String ShareWithUserAction_illegal_module_title;
+  public static String ShareWithUserAction_illegal_module_message;
 
   public static String SessionStatusChangeHandler_session_started_title;
   public static String SessionStatusChangeHandler_session_started_host_message;
