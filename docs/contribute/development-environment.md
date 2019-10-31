@@ -11,9 +11,7 @@ If you want to execute the STF tests it is recommended to use Eclipse. Otherwise
 * You need a **Java 8 JDK**.
 * You need an **Eclipse 4.6** installation which is used for dependency resolution. You can either install a [minimal Eclipse](http://www.eclipse.org/downloads/packages/release/neon/3/eclipse-ide-java-developers) or [Eclipse for Eclipse Committers](http://www.eclipse.org/downloads/packages/release/neon/3/eclipse-ide-eclipse-committers) if you also want to develop with Eclipse.
 * Install **GEF Legacy** into Eclipse using the 'GEF-Legacy Releases' update site given [here](https://projects.eclipse.org/projects/tools.gef/downloads)
-* You need an **IntelliJ IDEA** installation which is used for dependency resolution. Install a current version of [**IntelliJ IDEA**](https://www.jetbrains.com/idea/download/) (we have only tested Saros/I for IntelliJ releases 2017.X and later)
-
-Set the **system-wide environment variable `ECLIPSE_HOME`** to the Eclipse installation dir that contains the directory `plugins`.<br/>
+* *Optional:* You can install an **IntelliJ IDEA** installation which is used for dependency resolution. Install a current version of [**IntelliJ IDEA**](https://www.jetbrains.com/idea/download/) (we have only tested Saros/I for IntelliJ releases 2017.X and later).<br/>
 Set the **system-wide environment variable `INTELLIJ_HOME`** to the IntelliJ installation dir that contains the directory `lib`.
 
 If the `ECLIPSE_HOME` variable is not set or not global the corresponding Eclipse specific dependencies cannot be found during build.<br/>
@@ -92,7 +90,6 @@ This is necessary in order to allow IntelliJ to execute all build and test actio
 
 * Click on `Open`
 * Select the repository root as project root and click `OK`
-* Open the Gradle task view and execute the task `prepareIntellij`
 
 ## Develop Without an IDE
 
@@ -106,8 +103,7 @@ The following tasks are used to build and test the different Saros components:
 * `sarosIntellij` - Triggers the build and test of the Saros IntelliJ Plugin
 * `sarosServer` - Triggers the build and test of the Saros Server
 * `prepareEclipse` - Executes all tasks which are required before developing in Eclipse
-* `prepareIntellij` - Executes all tasks which are required before developing in IntelliJ
-* `runIde` - Starts a IntelliJ IDE containing the Saros Plugin. The IDE version depends on the value of `INTELLIJ_HOME`.
+* `runIde` - Starts a IntelliJ IDE containing the Saros Plugin. The IDE version depends on the value of `INTELLIJ_HOME` or the `intellijVersion` specified in the build file of the IntelliJ package.
 
 In order to build the whole project without using existing build artifacts simply call `./gradlew cleanAll sarosEclipse sarosIntellij sarosServer`.
 
