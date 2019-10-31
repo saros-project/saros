@@ -4,7 +4,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import saros.activities.SPath;
 import saros.exceptions.LocalCancellationException;
@@ -14,7 +13,7 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.negotiation.ProjectSharingData;
 
 /** Implements Stream creation in {@link AbstractStreamProtocol} format. */
-public class OutgoingStreamProtocol extends AbstractStreamProtocol implements AutoCloseable {
+public class OutgoingStreamProtocol extends AbstractStreamProtocol {
 
   private static final Logger log = Logger.getLogger(OutgoingStreamProtocol.class);
 
@@ -75,17 +74,13 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol implements Au
   }
 
   /**
-   * Writes a end remark to notify stream endpoint about correct end of transmission and closes the
-   * stream correctly.
+   * Writes a end remark to notify stream endpoint about correct end of transmission and flushes the
+   * stream.
    *
    * @throws IOException if stream operation fails
    */
-  @Override
   public void close() throws IOException {
-    try {
-      out.writeUTF("");
-    } finally {
-      IOUtils.closeQuietly(out);
-    }
+    out.writeUTF("");
+    out.flush();
   }
 }
