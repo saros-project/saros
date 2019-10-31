@@ -126,7 +126,6 @@ public class Messages {
 
   public static String ContactPopMenu_root_popup_text;
   public static String ContactPopMenu_menu_tooltip_share_module;
-  public static String ContactPopMenu_menu_tooltip_project_module;
   public static String ContactPopMenu_menu_tooltip_invalid_module;
   public static String ContactPopMenu_menu_entry_error_processing_project;
   public static String ContactPopMenu_menu_entry_no_modules_found;
