@@ -1,6 +1,9 @@
-# Saros <img src="docs/assets/images/logo/saros-logo-100x100.png" alt="drawing" height="42pt"/>  
+# <img src="docs/assets/images/logo/saros-logo-100x100.png" alt="drawing" height="42pt"/> Saros - Distributed Party Programming
+[![Gitter](https://badges.gitter.im/saros-project/saros.svg)](https://gitter.im/saros-project/saros)
+[![Release Saros/E](https://img.shields.io/badge/Saros%2FE-15.0.0-blue)](https://github.com/saros-project/saros/releases/tag/saros-eclipse-15.0.0)
+[![Release Saros/I](https://img.shields.io/badge/Saros%2FI-0.2.1-blue)](https://github.com/saros-project/saros/releases/tag/saros-intellij-0.2.1)
 
-Is an Open Source plugin for connecting multiple IDEs for distributed collaborative software development.
+Saros is an Open Source plugin for connecting multiple IDEs for distributed collaborative software development.
 
 ![saros animation](docs/assets/images/animation/this_is_saros.gif)
 
