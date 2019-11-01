@@ -3,6 +3,7 @@ package saros.negotiation;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.input.CountingInputStream;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
@@ -78,9 +79,10 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
     log.debug(this + ": Host is starting to send...");
 
     IncomingFileTransfer transfer = transferListener.getRequest().accept();
-    try (IncomingStreamProtocol isp =
-        new IncomingStreamProtocol(transfer.recieveFile(), session, monitor)) {
+    try (CountingInputStream countStream = new CountingInputStream(transfer.recieveFile());
+        IncomingStreamProtocol isp = new IncomingStreamProtocol(countStream, session, monitor)) {
       isp.receiveStream();
+      log.debug("stream bytes received: " + countStream.getByteCount());
     } catch (XMPPException e) {
       throw new LocalCancellationException(e.getMessage(), CancelOption.NOTIFY_PEER);
     }
