@@ -886,6 +886,16 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         String oldName = (String) oldValue;
         String newName = (String) newValue;
 
+        // TODO consider using FilePropertyEvent#isRename() once compatibility is dropped to 2019.2
+        if (oldName.equals(newName)) {
+          LOG.debug(
+              "Dropping file property event for "
+                  + file
+                  + " as it is detected to be a re-parsing of the file.");
+
+          return;
+        }
+
         if (LOG.isTraceEnabled()) {
           LOG.trace(
               "Reacting before resource name change - resource: "
