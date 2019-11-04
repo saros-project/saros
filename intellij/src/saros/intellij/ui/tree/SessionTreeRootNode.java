@@ -1,6 +1,7 @@
 package saros.intellij.ui.tree;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import java.util.ArrayList;
@@ -10,10 +11,9 @@ import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import saros.SarosPluginContext;
-import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.IReferencePointManager;
 import saros.filesystem.IResource;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.views.SarosMainPanelView;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -44,6 +44,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
   @Inject private ISarosSessionManager sessionManager;
 
+  @Inject private IntelliJReferencePointManager intelliJReferencePointManager;
+
   private volatile ISarosSession session;
 
   private final ISessionListener sessionListener =
@@ -73,14 +75,11 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
         @Override
         public void resourcesAdded(final IReferencePoint referencePoint) {
 
-          IReferencePointManager referencePointManager =
-              sessionManager.getSession().getComponent(IReferencePointManager.class);
-
           UIUtil.invokeLaterIfNeeded(
               new Runnable() {
                 @Override
                 public void run() {
-                  addProjectNode(referencePointManager.getProject(referencePoint));
+                  addProjectNode(intelliJReferencePointManager.getModule(referencePoint));
                 }
               });
         }
@@ -192,16 +191,17 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
     treeView.expandRow(2);
   }
 
-  private void addProjectNode(IProject project) {
+  private void addProjectNode(Module module) {
     for (DefaultMutableTreeNode nSession : sessionNodeList.values()) {
       ISarosSession session = ((SessionInfo) nSession.getUserObject()).getSession();
 
       ProjectInfo projInfo;
-      if (session.isCompletelyShared(project.getReferencePoint())) {
-        projInfo = new ProjectInfo(project);
+      if (session.isCompletelyShared(IntelliJReferencePointManager.create(module))) {
+        projInfo = new ProjectInfo(module);
       } else {
         projInfo =
-            new ProjectInfo(project, session.getSharedResources(project.getReferencePoint()));
+            new ProjectInfo(
+                module, session.getSharedResources(IntelliJReferencePointManager.create(module)));
       }
 
       DefaultMutableTreeNode nProject = new DefaultMutableTreeNode(projInfo);
@@ -269,28 +269,28 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
   }
 
   protected class ProjectInfo extends LeafInfo {
-    private final IProject project;
+    private final Module module;
     private List<IResource> resList;
 
-    public ProjectInfo(IProject project) {
-      super(project.getName());
-      this.project = project;
+    public ProjectInfo(Module module) {
+      super(module.getName());
+      this.module = module;
     }
 
-    public ProjectInfo(IProject project, List<IResource> resources) {
-      this(project);
+    public ProjectInfo(Module module, List<IResource> resources) {
+      this(module);
       resList = resources;
     }
 
-    public IProject getProject() {
-      return project;
+    public Module getModule() {
+      return module;
     }
 
     @Override
     public String toString() {
       if (resList != null) {
         StringBuilder sbOut = new StringBuilder();
-        sbOut.append(project.getName());
+        sbOut.append(module.getName());
         sbOut.append(" : ");
         for (IResource res : resList) {
           if (res.getType() == IResource.FILE) {
@@ -301,7 +301,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
         return sbOut.toString();
       } else {
-        return project.getName();
+        return module.getName();
       }
     }
   }
