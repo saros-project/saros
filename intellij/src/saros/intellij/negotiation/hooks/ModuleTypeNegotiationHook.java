@@ -1,5 +1,6 @@
 package saros.intellij.negotiation.hooks;
 
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
 import java.util.ArrayList;
@@ -9,10 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import saros.filesystem.IProject;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.IReferencePointManager;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.negotiation.hooks.ISessionNegotiationHook;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
@@ -42,6 +41,8 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
   private final ModuleTypeManager moduleTypeManager;
 
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
+
   /**
    * Creates a <code>ModuleTypeNegotiationHook</code> object and adds it to the {@link
    * SessionNegotiationHookManager}.
@@ -51,13 +52,18 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
    *
    * @param hookManager the <code>SessionNegotiationHookManager</code>
    * @param sessionManager the <code>SessionManger</code>
+   * @param intelliJReferencePointManager the <code>IntelliJReferencePointManager</code>
    * @see saros.intellij.context.SarosIntellijContextFactory
    */
   public ModuleTypeNegotiationHook(
-      SessionNegotiationHookManager hookManager, ISarosSessionManager sessionManager) {
+      SessionNegotiationHookManager hookManager,
+      ISarosSessionManager sessionManager,
+      IntelliJReferencePointManager intelliJReferencePointManager) {
     this.sessionManager = sessionManager;
 
     this.moduleTypeManager = ModuleTypeManager.getInstance();
+
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     hookManager.addHook(this);
   }
@@ -105,16 +111,11 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
     StringBuilder stringBuilder = new StringBuilder();
 
-    IReferencePointManager referencePointManager =
-        sessionManager.getSession().getComponent(IReferencePointManager.class);
-
     for (final IReferencePoint referencePoint : sessionManager.getSession().getReferencePoints()) {
 
-      IProject project = referencePointManager.getProject(referencePoint);
+      Module module = intelliJReferencePointManager.getModule(referencePoint);
 
-      IntelliJProjectImpl intelliJProject = project.adaptTo(IntelliJProjectImpl.class);
-
-      String moduleType = ModuleType.get(intelliJProject.getModule()).getId();
+      String moduleType = ModuleType.get(module).getId();
 
       if (!clientModuleTypes.isEmpty() && !clientModuleTypes.contains(moduleType)) {
 
@@ -122,7 +123,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
             "The module type \""
                 + moduleType
                 + "\" of the module \""
-                + intelliJProject.getName()
+                + module.getName()
                 + "\" is not known to the client \""
                 + client
                 + "\". This might lead to an unexpected behavior of Saros.";
@@ -132,7 +133,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
         NotificationPanel.showWarning(warningMessage, "Unknown module type");
       }
 
-      stringBuilder.append(String.format("%s:%s\t", intelliJProject.getName(), moduleType));
+      stringBuilder.append(String.format("%s:%s\t", module.getName(), moduleType));
     }
 
     sharedParameters.put(KEY_TYPE_MAPPINGS, stringBuilder.toString());
