@@ -24,8 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.JpsElement;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 import saros.filesystem.IReferencePoint;
-import saros.filesystem.IReferencePointManager;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.SafeDialogUtils;
 import saros.repackaged.picocontainer.Startable;
@@ -42,6 +41,8 @@ public class ModuleConfigurationInitializer implements Startable {
 
   private final ISarosSession session;
 
+  private final IntelliJReferencePointManager intelliJReferencePointManager;
+
   private final Map<Module, ModuleConfiguration> queuedModuleOptions;
 
   private final ISessionListener sessionListener =
@@ -53,8 +54,11 @@ public class ModuleConfigurationInitializer implements Startable {
         }
       };
 
-  public ModuleConfigurationInitializer(ISarosSession session) {
+  public ModuleConfigurationInitializer(
+      ISarosSession session, IntelliJReferencePointManager intelliJReferencePointManager) {
     this.session = session;
+
+    this.intelliJReferencePointManager = intelliJReferencePointManager;
 
     this.queuedModuleOptions = new ConcurrentHashMap<>();
   }
@@ -95,13 +99,7 @@ public class ModuleConfigurationInitializer implements Startable {
    * @param referencePoint the <code>IReferencePoint</code> representing the shared module
    */
   private void applyModuleConfiguration(@NotNull IReferencePoint referencePoint) {
-    IReferencePointManager referencePointManger =
-        session.getComponent(IReferencePointManager.class);
-    Module module =
-        referencePointManger
-            .getProject(referencePoint)
-            .adaptTo(IntelliJProjectImpl.class)
-            .getModule();
+    Module module = intelliJReferencePointManager.getModule(referencePoint);
 
     ModuleConfiguration moduleConfiguration = queuedModuleOptions.remove(module);
 
