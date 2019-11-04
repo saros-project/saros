@@ -30,6 +30,7 @@ import saros.SarosPluginContext;
 import saros.filesystem.CoreReferencePointManager;
 import saros.filesystem.EclipseProjectImpl;
 import saros.filesystem.EclipseReferencePointManager;
+import saros.filesystem.IReferencePoint;
 import saros.filesystem.IReferencePointManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.net.xmpp.JID;
@@ -205,8 +206,9 @@ public class CollaborationUtils {
             final List<IProject> projectsToRefresh = new ArrayList<IProject>();
 
             for (IProject project : projectResources.keySet()) {
-              if (!session.isShared(ResourceAdapterFactory.create(project)))
-                projectsToRefresh.add(project);
+              IReferencePoint referencePoint = EclipseReferencePointManager.create(project);
+              if (!session.isShared(referencePoint)) projectsToRefresh.add(project);
+              projectsToRefresh.add(project);
             }
 
             try {
@@ -301,7 +303,7 @@ public class CollaborationUtils {
       fileCountAndSize =
           FileUtils.getFileCountAndSize(
               resources,
-              isCompletelyShared ? true : false,
+              isCompletelyShared,
               isCompletelyShared ? IContainer.EXCLUDE_DERIVED : IResource.NONE);
 
       result.append(
