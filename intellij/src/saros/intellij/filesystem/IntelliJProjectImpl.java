@@ -30,7 +30,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   private final Project project;
 
   private final Module module;
-  private final VirtualFile moduleRoot;
 
   /**
    * Creates a core compatible {@link IProject project} using the given IntelliJ module.
@@ -51,7 +50,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     this.project = module.getProject();
 
-    moduleRoot = getModuleContentRoot(module);
+    // Still used to ensure that the module has exactly one content root
+    getModuleContentRoot(module);
   }
 
   /**
@@ -118,7 +118,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   public IResource[] members() throws IOException {
     final List<IResource> result = new ArrayList<>();
 
-    final VirtualFile[] children = moduleRoot.getChildren();
+    final VirtualFile[] children = getModuleContentRoot(module).getChildren();
 
     ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
 
@@ -205,6 +205,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
       return null;
     }
 
+    VirtualFile moduleRoot = getModuleContentRoot(module);
+
     try {
       Path relativePath = Paths.get(moduleRoot.getPath()).relativize(Paths.get(file.getPath()));
 
@@ -245,7 +247,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   @NotNull
   @Override
   public IPath getLocation() {
-    return IntelliJPathImpl.fromString(moduleRoot.getPath());
+    return IntelliJPathImpl.fromString(getModuleContentRoot(module).getPath());
   }
 
   @Nullable
@@ -359,6 +361,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   public VirtualFile findVirtualFile(final IPath path) {
 
     if (path.isAbsolute()) return null;
+
+    VirtualFile moduleRoot = getModuleContentRoot(module);
 
     if (path.segmentCount() == 0) return moduleRoot;
 

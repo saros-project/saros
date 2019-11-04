@@ -49,6 +49,8 @@ public abstract class IntelliJResourceImpl implements IResource {
    * @param virtualFile the virtual file to check
    * @return whether the given virtual file is the module file for the shared module
    */
+  // TODO consider whether to check all module files for the project to ensure that it is always
+  //  ignored, independently of where it is currently located
   private boolean isModuleFile(@NotNull Module module, @NotNull VirtualFile virtualFile) {
     if (virtualFile.isDirectory()) {
       return false;
