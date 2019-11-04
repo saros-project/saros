@@ -2,13 +2,13 @@ package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.activities.SPath;
-import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.intellij.filesystem.VirtualFileConverter;
@@ -83,23 +83,23 @@ public class LocalEditorHandler {
    * <p><b>Note:</b> This only works for shared resources that belong to the given module.
    *
    * @param virtualFile path of the file to open
-   * @param project module the file belongs to
+   * @param module module the file belongs to
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
    *     to a shared module
    */
   @Nullable
   public Editor openEditor(
-      @NotNull VirtualFile virtualFile, @NotNull IProject project, boolean activate) {
+      @NotNull VirtualFile virtualFile, @NotNull Module module, boolean activate) {
 
-    IResource resource = VirtualFileConverter.convertToResource(virtualFile, project);
+    IResource resource = VirtualFileConverter.convertToResource(module.getProject(), virtualFile);
 
     if (resource == null || !sarosSession.isShared(resource)) {
       LOG.debug(
           "Could not open Editor for file "
               + virtualFile
               + " as it does not belong to the given module "
-              + project);
+              + module);
 
       return null;
     }
