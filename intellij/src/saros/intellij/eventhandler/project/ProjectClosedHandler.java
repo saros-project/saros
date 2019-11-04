@@ -8,9 +8,9 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
-import saros.filesystem.IProject;
+import saros.filesystem.IReferencePoint;
 import saros.intellij.context.SharedIDEContext;
-import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.filesystem.IntelliJReferencePointManager;
 import saros.repackaged.picocontainer.Disposable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -64,17 +64,17 @@ public class ProjectClosedHandler implements Disposable {
          */
         private void disableActivityExecutionForProjectModules(@NotNull Project project) {
           for (Module module : ModuleManager.getInstance(project).getModules()) {
-            IProject wrappedModule;
+            IReferencePoint referencePoint;
 
             try {
-              wrappedModule = new IntelliJProjectImpl(module);
+              referencePoint = IntelliJReferencePointManager.create(module);
 
             } catch (IllegalArgumentException exception) {
               continue;
             }
 
-            if (sarosSession.isShared(wrappedModule)) {
-              sarosSession.setActivityExecution(wrappedModule.getReferencePoint(), false);
+            if (sarosSession.isShared(referencePoint)) {
+              sarosSession.setActivityExecution(referencePoint, false);
             }
           }
         }
