@@ -62,10 +62,10 @@ public class SPathConverterTest {
     EasyMock.replay(session);
 
     /* XStream */
-    XStream sender = new XStream(new DomDriver());
+    XStream sender = XStreamFactory.getSecureXStream(new DomDriver());
     sender.registerConverter(new SPathConverter(session, pathFactory));
 
-    XStream receiver = new XStream(new DomDriver());
+    XStream receiver = XStreamFactory.getSecureXStream(new DomDriver());
     receiver.registerConverter(new SPathConverter(session, pathFactory));
 
     /* Test */
@@ -93,10 +93,10 @@ public class SPathConverterTest {
     EasyMock.replay(senderSession, receiverSession);
 
     /* XStream */
-    XStream sender = new XStream(new DomDriver());
+    XStream sender = XStreamFactory.getSecureXStream(new DomDriver());
     sender.registerConverter(new SPathConverter(senderSession, pathFactory));
 
-    XStream receiver = new XStream(new DomDriver());
+    XStream receiver = XStreamFactory.getSecureXStream(new DomDriver());
     receiver.registerConverter(new SPathConverter(receiverSession, pathFactory));
 
     /* Test */
@@ -127,10 +127,10 @@ public class SPathConverterTest {
     EasyMock.replay(senderSession, receiverSession);
 
     /* XStream */
-    XStream sender = new XStream(new DomDriver());
+    XStream sender = XStreamFactory.getSecureXStream(new DomDriver());
     sender.registerConverter(new SPathConverter(senderSession, pathFactory));
 
-    XStream receiver = new XStream(new DomDriver());
+    XStream receiver = XStreamFactory.getSecureXStream(new DomDriver());
     receiver.registerConverter(new SPathConverter(receiverSession, pathFactory));
 
     /* Test */

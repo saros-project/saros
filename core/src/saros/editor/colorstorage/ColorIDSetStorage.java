@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import saros.annotations.Component;
+import saros.misc.xstream.XStreamFactory;
 import saros.preferences.IPreferenceStore;
 
 /**
@@ -181,7 +182,8 @@ public final class ColorIDSetStorage {
   }
 
   private XStream createXStream() {
-    XStream xStream = new XStream();
+    XStream xStream = XStreamFactory.getSecureXStream();
+
     xStream.alias("colorIDSet", ColorIDSet.class);
     return xStream;
   }

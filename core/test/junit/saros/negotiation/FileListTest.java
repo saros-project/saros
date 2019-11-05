@@ -27,6 +27,7 @@ import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.misc.xstream.XStreamFactory;
 
 /*
  *Project Layout for test
@@ -41,7 +42,7 @@ import saros.filesystem.IResource;
  */
 public class FileListTest {
 
-  private static final XStream xstream = new XStream();
+  private static final XStream xstream = XStreamFactory.getSecureXStream();
 
   static {
     xstream.registerConverter(BooleanConverter.BINARY);

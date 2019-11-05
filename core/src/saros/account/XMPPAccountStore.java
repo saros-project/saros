@@ -31,6 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import saros.annotations.Component;
+import saros.misc.xstream.XStreamFactory;
 import saros.net.xmpp.JID;
 
 /**
@@ -231,7 +232,8 @@ public final class XMPPAccountStore {
   }
 
   private XStream createXStream() {
-    XStream xStream = new XStream();
+    XStream xStream = XStreamFactory.getSecureXStream();
+
     xStream.alias("accounts", AccountStoreInformation.class);
     xStream.alias("xmppAccount", XMPPAccount.class);
     return xStream;
