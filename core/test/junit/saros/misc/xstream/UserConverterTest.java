@@ -32,7 +32,7 @@ public class UserConverterTest {
     EasyMock.replay(session);
 
     /* XStream */
-    xstream = new XStream(new DomDriver());
+    xstream = XStreamFactory.getSecureXStream(new DomDriver());
     xstream.registerConverter(new UserConverter(session));
   }
 
