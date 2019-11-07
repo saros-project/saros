@@ -163,7 +163,9 @@ h6 {
   }
 }
 
-@media (max-width: 640px) {
+$mobile-width: 690px;
+
+@media (max-width: $mobile-width) {
   #media-links-nav {
     display: none !important;
   }
@@ -173,7 +175,7 @@ h6 {
   }
 }
 
-@media (min-width: 640px) {
+@media (min-width: $mobile-width) {
   #nav-mobile-content {
     display: none !important;
   }
