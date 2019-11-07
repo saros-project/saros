@@ -106,12 +106,6 @@ task unlockIntellijSandbox {
 runIde.dependsOn(lockIntellijSandbox)
 runIde.finalizedBy(unlockIntellijSandbox)
 
-afterEvaluate {
-  dependencies {
-    compile intellij {}
-  }
-}
-
 artifacts {
   archives buildPlugin
 }
