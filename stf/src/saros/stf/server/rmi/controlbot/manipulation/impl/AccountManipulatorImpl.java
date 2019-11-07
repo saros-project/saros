@@ -26,21 +26,9 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
   public void restoreDefaultAccount(String username, String password, String domain)
       throws RemoteException {
 
-    XMPPAccountStore accountStore = getXmppAccountStore();
-
-    for (XMPPAccount account : accountStore.getAllAccounts()) {
-
-      if (account.equals(accountStore.getDefaultAccount())) continue;
-
-      LOG.debug("deleting account: " + account);
-
-      accountStore.deleteAccount(account);
-    }
-
-    if (accountStore.isEmpty()) {
-      accountStore.createAccount(username, password, domain, "", 0, true, true);
-      return;
-    }
+    deleteAllAccounts();
+    addAccount(username, password, domain);
+    activateAccount(username, domain);
   }
 
   @Override
@@ -83,6 +71,9 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
 
     final List<XMPPAccount> accounts = accountStore.getAllAccounts();
 
-    for (final XMPPAccount account : accounts) accountStore.deleteAccount(account);
+    for (final XMPPAccount account : accounts) {
+      LOG.debug("deleting account: " + account);
+      accountStore.deleteAccount(account);
+    }
   }
 }
