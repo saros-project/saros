@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.MockPolicy;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import saros.context.CoreContextFactory;
@@ -19,6 +20,7 @@ import saros.test.mocks.PrepareEclipseComponents;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Saros.class})
 @MockPolicy({PrepareCoreComponents.class, PrepareEclipseComponents.class})
+@PowerMockIgnore({"javax.xml.*"})
 public class SarosEclipseContextFactoryTest {
 
   private MutablePicoContainer container;
