@@ -2,11 +2,16 @@ package saros.intellij.project;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.fileTypes.UnknownFileType;
+import com.intellij.openapi.vfs.VirtualFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.activities.FileActivity;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
@@ -22,6 +27,8 @@ import saros.intellij.editor.SelectedEditorStateSnapshot;
 import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler.ApplicationEventHandlerType;
+import saros.intellij.filesystem.Filesystem;
+import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
@@ -225,6 +232,8 @@ public class SharedResourcesManager implements Startable {
 
       newFile.create(oldFile.getContents(), FORCE);
 
+      checkAndSetFileType(newFile, activity.getFileType());
+
       if (fileOpen) {
         localEditorManipulator.openEditor(newPath, false);
 
@@ -295,9 +304,56 @@ public class SharedResourcesManager implements Startable {
 
       file.create(contents, FORCE);
 
+      checkAndSetFileType(file, activity.getFileType());
+
     } finally {
       setFilesystemModificationHandlerEnabled(true);
     }
+  }
+
+  /**
+   * Checks whether there is a known file type associated with the created file. If not, the file
+   * type provided by the file creation activity will be used.
+   *
+   * @param file the created file
+   * @param transferredFileType the file type provided by the file creation activity
+   * @throws IllegalStateException if no <code>VirtualFile</code> can be found for the created file
+   */
+  private void checkAndSetFileType(@NotNull IFile file, @Nullable String transferredFileType) {
+    IntelliJProjectImpl module = file.getProject().adaptTo(IntelliJProjectImpl.class);
+    VirtualFile virtualFile = module.findVirtualFile(file.getProjectRelativePath());
+
+    if (virtualFile == null) {
+      throw new IllegalStateException("File " + file + " does not exist after it was created.");
+    }
+
+    FileType fileType = virtualFile.getFileType();
+
+    if (!fileType.equals(UnknownFileType.INSTANCE)) {
+      return;
+    }
+
+    FileTypeManager fileTypeManager = FileTypeManager.getInstance();
+
+    FileType newFileType;
+
+    if (transferredFileType == null
+        || (newFileType = fileTypeManager.findFileTypeByName(transferredFileType)) == null
+        || newFileType.equals(UnknownFileType.INSTANCE)) {
+
+      LOG.warn(
+          "No file type set for created file "
+              + virtualFile
+              + " as there is no default file type association and the activity did not contain a valid file type.");
+
+      return;
+    }
+
+    Filesystem.runWriteAction(
+        () -> fileTypeManager.associatePattern(newFileType, virtualFile.getName()),
+        ModalityState.defaultModalityState());
+
+    LOG.debug("Associated created file " + virtualFile + " with file type " + newFileType);
   }
 
   private void handleFolderCreation(@NotNull FolderCreatedActivity activity) throws IOException {
