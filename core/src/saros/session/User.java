@@ -1,5 +1,6 @@
 package saros.session;
 
+import java.util.*;
 import saros.net.xmpp.JID;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.PreferenceStore;
@@ -32,59 +33,77 @@ public class User {
   private final boolean isLocal;
   private final IPreferenceStore preferences;
 
-  private volatile Permission permission = Permission.WRITE_ACCESS;
+
+  @Deprecated private volatile Permission permission = Permission.WRITE_ACCESS;
 
   /* More flexible Permissions also known as Privilege */
   private Map<UserPrivilege.Keys, UserPrivilege> privileges;
+
   public Map<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
-      return this.privileges;
+    return this.privileges;
   }
+
   public void setPrivileges(Map<UserPrivilege.Keys, UserPrivilege> privileges) {
-      this.privileges = privileges;
+    this.privileges = privileges;
   }
+
   public void addPrivilege(UserPrivilege privilege) {
-      this.privileges.put(privilege.getKey(), privilege);
+    this.privileges.put(privilege.getKey(), privilege);
   }
   // get any privileges value or false
   public boolean hasPrivilege(UserPrivilege.Keys privilege) {
-//System.out.println("3 - hasPrivilege() " + privilege + " : " + this.privileges.containsKey(privilege));
-	  if (this.privileges.containsKey(privilege)) {
-		  return this.privileges.get(privilege).getValue();
-	  }
-	  return false;
+    // System.out.println("3 - hasPrivilege() " + privilege + " : " +
+    // this.privileges.containsKey(privilege));
+    if (this.privileges.containsKey(privilege)) {
+      return this.privileges.get(privilege).getValue();
+    }
+    return false;
+
   }
 
   // convenience functions to privilege values
   public boolean hasReadOnlyAccessPrivilege() {
-//System.out.println("3 - User.hasReadOnlyAccessPrivilege() " + hasPrivilege(UserPrivilege.Privilege.READONLY_ACCESS));
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS);
+
+    // System.out.println("3 - User.hasReadOnlyAccessPrivilege() " +
+    // hasPrivilege(UserPrivilege.Privilege.READONLY_ACCESS));
+    return hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS);
   }
+
   public boolean hasWriteAccessPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_WRITE_ACCESS);
+    return hasPrivilege(UserPrivilege.Keys.SESSION_WRITE_ACCESS);
   }
+
   public boolean hasShareDocumentPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_SHARE_DOCUMENT);
+    return hasPrivilege(UserPrivilege.Keys.SESSION_SHARE_DOCUMENT);
   }
+
   public boolean hasInvitePrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_INVITE_USER);
+    return hasPrivilege(UserPrivilege.Keys.SESSION_INVITE_USER);
   }
+
   public boolean hasGrantPermissionPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_GRANT_PERMISSION);
+    return hasPrivilege(UserPrivilege.Keys.SESSION_GRANT_PERMISSION);
   }
+
   public boolean hasJoinSessionPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_JOIN);
+    return hasPrivilege(UserPrivilege.Keys.SESSION_JOIN);
   }
+
   public boolean hasStartSessionServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_START_SERVER);
+    return hasPrivilege(UserPrivilege.Keys.SESSION_START_SERVER);
   }
+
   public boolean hasStopSessionServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_STOP_SERVER);
+    return hasPrivilege(UserPrivilege.Keys.SESSION_STOP_SERVER);
   }
+
   public boolean hasDeleteSessionDataPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_DELETE_DATA);
+    return hasPrivilege(UserPrivilege.Keys.SESSION_DELETE_DATA);
   }
+
   public boolean hasConfigureServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER);
+    return hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER);
+
   }
 
   private volatile boolean isInSession;
@@ -94,9 +113,13 @@ public class User {
     this.isHost = isHost;
     this.isLocal = isLocal;
 
-    this.colorID = colorID;
-    this.favoriteColorID = favoriteColorID;
-    
+
+    if (preferences == null) {
+      this.preferences = new PreferenceStore();
+    } else {
+      this.preferences = preferences;
+    }
+
     this.privileges = new HashMap<UserPrivilege.Keys, UserPrivilege>();
 
   }
