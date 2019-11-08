@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.service.prefs.Preferences;
 import org.powermock.api.easymock.PowerMock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import saros.awareness.AwarenessInformationCollector;
@@ -72,6 +73,7 @@ import saros.test.mocks.EditorManagerMock;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({StatisticManager.class, ResourcesPlugin.class})
+@PowerMockIgnore({"javax.xml.*"})
 public class SarosSessionTest {
 
   private static final String SAROS_SESSION_ID = "SAROS_SESSION_TEST";
