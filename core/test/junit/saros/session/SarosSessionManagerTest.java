@@ -28,7 +28,7 @@ import saros.session.internal.SarosSession;
 @PowerMockIgnore({"javax.xml.*"})
 public class SarosSessionManagerTest {
 
-  private class DummyError extends Error {
+  class DummyError extends Error {
     private static final long serialVersionUID = 1L;
   }
 
