@@ -294,9 +294,18 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       byte[] content = getContent(createdVirtualFile);
 
+      String fileType = createdVirtualFile.getFileType().getName();
+
       activity =
           new FileActivity(
-              user, Type.CREATED, FileActivity.Purpose.ACTIVITY, path, null, content, charset);
+              user,
+              Type.CREATED,
+              FileActivity.Purpose.ACTIVITY,
+              path,
+              null,
+              content,
+              charset,
+              fileType);
     }
 
     dispatchActivity(activity);
@@ -348,9 +357,18 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     byte[] content = getContent(copy);
 
+    String fileType = copy.getFileType().getName();
+
     IActivity activity =
         new FileActivity(
-            user, Type.CREATED, FileActivity.Purpose.ACTIVITY, copyPath, null, content, charset);
+            user,
+            Type.CREATED,
+            FileActivity.Purpose.ACTIVITY,
+            copyPath,
+            null,
+            content,
+            charset,
+            fileType);
 
     dispatchActivity(activity);
   }
@@ -470,7 +488,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     User user = session.getLocalUser();
 
     IActivity activity =
-        new FileActivity(user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, path, null, null, null);
+        new FileActivity(
+            user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, path, null, null, null, null);
 
     cleanUpDeletedFileState(path);
 
@@ -775,6 +794,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               newParentPath.getProject(),
               newParentPath.getProjectRelativePath().append(relativePath));
 
+      String fileType = oldFile.getFileType().getName();
+
       activity =
           new FileActivity(
               user,
@@ -783,7 +804,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               newFilePath,
               oldFilePath,
               null,
-              encoding);
+              encoding,
+              fileType);
 
       updateMovedFileState(oldFilePath, newFilePath);
 
@@ -796,6 +818,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               newParentPath.getProject(),
               newParentPath.getProjectRelativePath().append(relativePath));
 
+      String fileType = oldFile.getFileType().getName();
+
       activity =
           new FileActivity(
               user,
@@ -804,7 +828,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               newFilePath,
               null,
               fileContent,
-              encoding);
+              encoding,
+              fileType);
 
       if (fileIsOpen) {
         setUpMovedEditorState(oldFile, newFilePath);
@@ -814,7 +839,14 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       // moved file out of shared module
       activity =
           new FileActivity(
-              user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, oldFilePath, null, null, null);
+              user,
+              Type.REMOVED,
+              FileActivity.Purpose.ACTIVITY,
+              oldFilePath,
+              null,
+              null,
+              null,
+              null);
 
       cleanUpDeletedFileState(oldFilePath);
 

@@ -36,6 +36,8 @@ public class FileActivity extends AbstractResourceActivity
 
   @XStreamAsAttribute protected final String encoding;
 
+  @XStreamAsAttribute protected final String fileType;
+
   protected final byte[] content;
 
   /**
@@ -49,6 +51,8 @@ public class FileActivity extends AbstractResourceActivity
    * @param content content of the file denoted by the path (only valid for {@link Type#CREATED} and
    *     {@link Type#MOVED})
    * @param encoding the encoding the content is encoded with or <code>null</code>
+   * @param fileType the file type of the new file (only used for {@link Type#CREATED} and {@link
+   *     Type#MOVED})
    */
   public FileActivity(
       User source,
@@ -57,7 +61,8 @@ public class FileActivity extends AbstractResourceActivity
       SPath newPath,
       SPath oldPath,
       byte[] content,
-      String encoding) {
+      String encoding,
+      String fileType) {
 
     super(source, newPath);
 
@@ -82,6 +87,7 @@ public class FileActivity extends AbstractResourceActivity
     this.content = content;
     this.encoding = encoding;
     this.purpose = purpose;
+    this.fileType = fileType;
   }
 
   @Override
@@ -116,6 +122,15 @@ public class FileActivity extends AbstractResourceActivity
     return encoding;
   }
 
+  /**
+   * Returns the file type for the file.
+   *
+   * @return the file type for the file
+   */
+  public String getFileType() {
+    return fileType;
+  }
+
   @Override
   public String toString() {
     return "FileActivity [dst:path="
@@ -126,6 +141,8 @@ public class FileActivity extends AbstractResourceActivity
         + type
         + ", encoding="
         + (encoding == null ? "N/A" : encoding)
+        + ", file type="
+        + fileType
         + ", content="
         + (content == null ? "0" : content.length)
         + " byte(s)]";

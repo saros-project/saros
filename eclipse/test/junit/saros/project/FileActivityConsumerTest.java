@@ -119,6 +119,7 @@ public class FileActivityConsumerTest {
         createPathMockForFile(file),
         null,
         content,
+        null,
         null);
   }
 }

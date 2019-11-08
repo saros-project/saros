@@ -182,7 +182,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
       // TODO add encoding
       addActivity(
-          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, null));
+          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, null, null));
 
     } else if (isFolder(resource)) {
       addActivity(new FolderCreatedActivity(user, spath));
@@ -214,7 +214,8 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             ResourceAdapterFactory.create(oldFullPath.removeFirstSegments(1)));
     // TODO add encoding
     addActivity(
-        new FileActivity(user, Type.MOVED, Purpose.ACTIVITY, newPath, oldPath, content, null));
+        new FileActivity(
+            user, Type.MOVED, Purpose.ACTIVITY, newPath, oldPath, content, null, null));
   }
 
   private void generateRemoved(IResource resource) {
@@ -226,6 +227,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
               Type.REMOVED,
               Purpose.ACTIVITY,
               new SPath(ResourceAdapterFactory.create(resource)),
+              null,
               null,
               null,
               null));
@@ -261,7 +263,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     // TODO add encoding
     else
       addActivity(
-          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, null));
+          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, null, null));
   }
 
   private void addActivity(IResourceActivity activity) {

@@ -34,9 +34,10 @@ public class TargetedFileActivity extends FileActivity implements ITargetedActiv
       SPath oldPath,
       byte[] content,
       String encoding,
+      String fileType,
       Purpose purpose) {
 
-    super(source, type, purpose, newPath, oldPath, content, encoding);
+    super(source, type, purpose, newPath, oldPath, content, encoding, fileType);
 
     if (target == null) throw new IllegalArgumentException("target must not be null");
 
@@ -67,6 +68,8 @@ public class TargetedFileActivity extends FileActivity implements ITargetedActiv
         + type
         + ", encoding="
         + (encoding == null ? "N/A" : encoding)
+        + ", file type="
+        + fileType
         + ", content="
         + (content == null ? "0" : content.length)
         + " byte(s)]";
