@@ -330,10 +330,13 @@ public class LocalEditorManipulator {
 
       text = new String(content);
 
+      String qualifiedResource =
+          file.getProject().getName() + " - " + file.getProjectRelativePath();
+
       NotificationPanel.showWarning(
           String.format(
               Messages.LocalEditorManipulator_incompatible_encoding_message,
-              file.getLocation(),
+              qualifiedResource,
               encoding,
               Charset.defaultCharset()),
           Messages.LocalEditorManipulator_incompatible_encoding_title);

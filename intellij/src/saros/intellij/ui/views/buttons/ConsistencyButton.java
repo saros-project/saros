@@ -253,7 +253,9 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
         sb.append(", ");
       }
 
-      sb.append(resource.getFullPath());
+      sb.append(resource.getProject().getName())
+          .append(" - ")
+          .append(resource.getProjectRelativePath());
     }
 
     return sb.toString();
