@@ -19,6 +19,7 @@
  */
 package saros.session;
 
+import java.util.*;
 import saros.net.xmpp.JID;
 
 /**
@@ -54,7 +55,73 @@ public class User {
 
   private final int favoriteColorID;
 
+  @Deprecated
   private volatile Permission permission = Permission.WRITE_ACCESS;
+  
+  
+  
+  
+  
+  
+  /* More flexible Permissions also known as Privilege */
+  private Map<UserPrivilege.Privilege, UserPrivilege> privileges;
+  public Map<UserPrivilege.Privilege, UserPrivilege> getPrivileges() {
+      return this.privileges;
+  }
+  public void setPrivileges(Map<UserPrivilege.Privilege, UserPrivilege> privileges) {
+      this.privileges = privileges;
+  }
+  public void addPrivilege(UserPrivilege privilege) {
+      this.privileges.put(privilege.getKey(), privilege);
+  }
+  // get any privileges value or false
+  public boolean hasPrivilege(UserPrivilege.Privilege privilege) {
+//System.out.println("3 - hasPrivilege() " + privilege + " : " + this.privileges.containsKey(privilege));
+	  if (this.privileges.containsKey(privilege)) {
+		  return this.privileges.get(privilege).getValue();
+	  }
+	  return false;
+  }
+  // convenience functions to privilege values
+  public boolean hasReadOnlyAccessPrivilege() {
+//System.out.println("3 - User.hasReadOnlyAccessPrivilege() " + hasPrivilege(UserPrivilege.Privilege.READONLY_ACCESS));
+	  return hasPrivilege(UserPrivilege.Privilege.READONLY_ACCESS);
+  }
+  public boolean hasWriteAccessPrivilege() {
+	  return hasPrivilege(UserPrivilege.Privilege.WRITE_ACCESS);
+  }
+  public boolean hasShareDocumentPrivilege() {
+	  return hasPrivilege(UserPrivilege.Privilege.SHARE_DOCUMENT);
+  }
+  public boolean hasInvitePrivilege() {
+	  return hasPrivilege(UserPrivilege.Privilege.INVITE_USER);
+  }
+  public boolean hasGrantPermissionPrivilege() {
+	  return hasPrivilege(UserPrivilege.Privilege.GRANT_PERMISSION);
+  }
+  public boolean hasJoinSessionPrivilege() {
+	  return hasPrivilege(UserPrivilege.Privilege.JOIN_SESSION);
+  }
+  public boolean hasStartSessionServerPrivilege() {
+	  return hasPrivilege(UserPrivilege.Privilege.START_SESSION_SERVER);
+  }
+  public boolean hasStopSessionServerPrivilege() {
+	  return hasPrivilege(UserPrivilege.Privilege.STOP_SESSION_SERVER);
+  }
+  public boolean hasDeleteSessionDataPrivilege() {
+	  return hasPrivilege(UserPrivilege.Privilege.DELETE_SESSION_DATA);
+  }
+  public boolean hasConfigureServerPrivilege() {
+	  return hasPrivilege(UserPrivilege.Privilege.CONFIGURE_SERVER);
+  }
+  
+  
+  
+  
+  
+  
+  
+  
 
   private volatile boolean isInSession;
 
@@ -65,6 +132,8 @@ public class User {
     this.isLocal = isLocal;
     this.colorID = colorID;
     this.favoriteColorID = favoriteColorID;
+    
+    this.privileges = new HashMap<UserPrivilege.Privilege, UserPrivilege>();
   }
 
   /**
