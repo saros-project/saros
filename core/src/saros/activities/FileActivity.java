@@ -34,7 +34,7 @@ public class FileActivity extends AbstractResourceActivity
 
   @XStreamAsAttribute protected final Purpose purpose;
 
-  @XStreamAsAttribute protected String encoding;
+  @XStreamAsAttribute protected final String encoding;
 
   protected final byte[] content;
 
