@@ -123,15 +123,6 @@ public class SarosView extends ViewPart {
 
         @Override
         public void presenceChanged(Presence presence) {
-
-          final boolean playAvailableSound =
-              preferenceStore.getBoolean(
-                  EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE);
-
-          final boolean playUnavailableSound =
-              preferenceStore.getBoolean(
-                  EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE);
-
           Presence lastPresence = lastPresenceMap.put(presence.getFrom(), presence);
 
           if ((lastPresence == null || !lastPresence.isAvailable())
@@ -206,8 +197,17 @@ public class SarosView extends ViewPart {
       new IPropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent event) {
-          if (event.getProperty().equals(EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION)) {
-            showBalloonNotifications = Boolean.valueOf(event.getNewValue().toString());
+          boolean newValue = Boolean.parseBoolean(event.getNewValue().toString());
+          switch (event.getProperty()) {
+            case EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION:
+              showBalloonNotifications = newValue;
+              break;
+            case EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE:
+              playAvailableSound = newValue;
+              break;
+            case EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE:
+              playUnavailableSound = newValue;
+              break;
           }
         }
       };
@@ -237,6 +237,8 @@ public class SarosView extends ViewPart {
   @Inject protected XMPPConnectionService connectionService;
 
   private static volatile boolean showBalloonNotifications;
+  private volatile boolean playAvailableSound;
+  private volatile boolean playUnavailableSound;
 
   private Composite notificationAnchor;
 
@@ -259,8 +261,13 @@ public class SarosView extends ViewPart {
     SarosPluginContext.initComponent(this);
     preferenceStore.addPropertyChangeListener(propertyListener);
     sarosSessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+
     showBalloonNotifications =
         preferenceStore.getBoolean(EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
+    playAvailableSound =
+        preferenceStore.getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE);
+    playUnavailableSound =
+        preferenceStore.getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE);
   }
 
   /**
