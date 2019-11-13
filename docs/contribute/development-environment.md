@@ -19,6 +19,15 @@ If the `ECLIPSE_HOME` variable is not set or not global the correponding eclipse
 If the `INTELLIJ_HOME` variable is not set or not global the intellij-gradle plugin will download a version of IntelliJ which is
 defined in the gradle build description.
 
+### Google Java Format
+We are using [google java format](https://github.com/google/google-java-format) to ensure that our source code adheres to unified formatting rules.
+This is checked on our build server, so please make sure to format your code with the tool before pushing.
+For ease of use, the formatter can also be integrated into the default formatting logic of Eclipse and IntelliJ through a plugin.
+Installation instructions are given in the IDE specific sections on the topic ([Eclipse](#install-and-enable-google-java-formatter), [IntelliJ](#install-and-enable-google-java-formatter-1)).
+
+**Important:** We still use [**google java format 1.6**](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6) as the maintainers of the tool have not provided an official build of the corresponding Eclipse plugin for later versions.
+
+
 ## Develop with Eclipse
 If you develop on Eclipse you should have already installed the Eclipse version for "Eclipse Committers".
 
@@ -32,7 +41,7 @@ If you develop on Eclipse you should have already installed the Eclipse version 
 * Select the profile [`saros/clean-up-profile.xml`](https://github.com/saros-project/saros/blob/master/saros/clean-up-profile.xml)
 
 #### Install and Enable Google Java Formatter
-* Install the [eclipse Google Java Formatter](https://github.com/google/google-java-format#eclipse) which is available as Drop-In in [GitHub Releases](https://github.com/google/google-java-format/releases).
+* Install the [Eclipse Google Java Formatter](https://github.com/google/google-java-format#eclipse) **version 1.6**, which is available as a Drop-In in the [GitHub Releases](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6).
 * Enable the formatter by choosing `google-java-format` in `Window > Preferences > Java > Code Style > Formatter > Formatter Implementation`
 
 ### Import the Saros Project
@@ -49,8 +58,12 @@ See [the saros testing framework documentation](saros-testing-framework.md) for 
 ### Configure
 
 #### Install and Enable Google Java Formatter
-* Install the [intellij Google Java Formatter](https://plugins.jetbrains.com/plugin/8527-google-java-format) which is available in the IntelliJ plugin repository. Search for `google-java-format`.
-* Open `Settings > google-java-format Settings` and check the checkbox `Enable google-java-format`
+* Install the [Intellij Google Java Formatter](https://plugins.jetbrains.com/plugin/8527-google-java-format) **version 1.6** which is available in the IntelliJ plugin repository (search for `google-java-format`) or in the [GitHub Releases](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6).
+
+**Important:** If you are using an IntelliJ version newer than 2018.2, the official 1.6 release will not work for you as it's configured to be incompatible with newer IntelliJ releases.
+These compatibility settings were adjusted for later versions of the plugin, but such changes are not available for the 1.6 release.
+
+To avoid the issue, you can have a look at the discussion on the [PR #395](https://github.com/saros-project/saros/pull/395), where we provide a modified plugin zip and reference the adjusted version of the source code if you prefer to build the plugin yourself instead.
 
 #### Delegate IDE Action
 This is necessary in order to allow IntelliJ to execute all build and test action via Gradle.
@@ -86,7 +99,7 @@ If you want to force gradle to reexecute the tasks you have to call `./gradlew -
 The final build results are copied into the directory `<repository root>/build/distribute/(eclipse|intellij)`.
 
 ### Formatting via standalone Google Java Formatter
-* Download the latest release of the [Google Java Formatter](https://github.com/google/google-java-format/releases) `google-java-format-<version>-all-deps.jar`
+* Download the **release 1.6** of the [Google Java Formatter](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6) `google-java-format-<version>-all-deps.jar`
 * Call `java -jar google-java-format-<version>-all-deps.jar --dry-run --set-exit-if-changed **/*.jar` in a shell with enabled globstar (`shopt -s globstar`) to **check the formatting**
   and add the option `--replace` and remove the option `--dry-run` if you want to **trigger automated formatting**.
 ## Format checking in a githook
