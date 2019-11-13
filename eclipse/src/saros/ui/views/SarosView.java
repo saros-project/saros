@@ -1,8 +1,11 @@
 package saros.ui.views;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IAction;
@@ -38,15 +41,15 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-import org.jivesoftware.smack.packet.Presence;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
 import saros.net.ResourceFeature;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.ContactStatus.Type;
+import saros.net.xmpp.contact.IContactsUpdate;
 import saros.net.xmpp.contact.XMPPContact;
-import saros.net.xmpp.roster.IRosterListener;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.net.xmpp.roster.RosterTracker;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -113,29 +116,26 @@ public class SarosView extends ViewPart {
 
   public static final String ID = "saros.ui.views.SarosView";
 
-  private final IRosterListener rosterListener =
-      new IRosterListener() {
-        /**
-         * Stores the most recent presence for each user, so we can keep track of away/available
-         * changes which should not update the RosterView.
-         */
-        private Map<String, Presence> lastPresenceMap = new HashMap<String, Presence>();
+  private final IContactsUpdate contactsUpdate =
+      new IContactsUpdate() {
+        private final Set<XMPPContact> wasAlreadyAvailable = new HashSet<>();
 
         @Override
-        public void presenceChanged(Presence presence) {
-          Presence lastPresence = lastPresenceMap.put(presence.getFrom(), presence);
-
-          if ((lastPresence == null || !lastPresence.isAvailable())
-              && presence.isAvailable()
-              && playAvailableSound) {
-            SoundPlayer.playSound(Sounds.USER_ONLINE);
+        public void update(Optional<XMPPContact> contactOptional, UpdateType type) {
+          if (type != IContactsUpdate.UpdateType.STATUS || !contactOptional.isPresent()) {
+            return;
           }
 
-          if ((lastPresence != null)
-              && lastPresence.isAvailable()
-              && !presence.isAvailable()
-              && playUnavailableSound) {
-            SoundPlayer.playSound(Sounds.USER_OFFLINE);
+          XMPPContact contact = contactOptional.get();
+          Type contactStatus = contact.getStatus().getType();
+          boolean wasAvailable = wasAlreadyAvailable.contains(contact);
+
+          if (contactStatus == Type.AVAILABLE && !wasAvailable) {
+            wasAlreadyAvailable.add(contact);
+            if (playAvailableSound) SoundPlayer.playSound(Sounds.USER_ONLINE);
+          } else if (contactStatus == Type.OFFLINE && wasAvailable) {
+            wasAlreadyAvailable.remove(contact);
+            if (playUnavailableSound) SoundPlayer.playSound(Sounds.USER_OFFLINE);
           }
         }
       };
@@ -234,7 +234,7 @@ public class SarosView extends ViewPart {
 
   @Inject protected RosterTracker rosterTracker;
 
-  @Inject protected XMPPConnectionService connectionService;
+  @Inject private XMPPContactsService contactsService;
 
   private static volatile boolean showBalloonNotifications;
   private volatile boolean playAvailableSound;
@@ -421,8 +421,7 @@ public class SarosView extends ViewPart {
     getSite().registerContextMenu(menuManager, sessionViewer);
     getSite().setSelectionProvider(sessionViewer);
 
-    rosterTracker.addRosterListener(rosterListener);
-    rosterListener.rosterChanged(connectionService.getRoster());
+    contactsService.addListener(contactsUpdate);
 
     getViewSite().getPage().addPartListener(partListener);
   }
@@ -593,7 +592,7 @@ public class SarosView extends ViewPart {
   public void dispose() {
     super.dispose();
 
-    rosterTracker.removeRosterListener(rosterListener);
+    contactsService.removeListener(contactsUpdate);
 
     for (IAction action : registeredActions.values())
       if (action instanceof Disposable) ((Disposable) action).dispose();
