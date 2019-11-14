@@ -141,7 +141,11 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   }
 
   private void handleFileDeletion(FileActivity activity) throws CoreException {
-    final IFile file = toEclipseIFile(activity.getPath().getFile());
+    SPath path = activity.getPath();
+
+    editorManager.closeEditor(path, false);
+
+    final IFile file = toEclipseIFile(path.getFile());
 
     if (file.exists()) FileUtils.delete(file);
     else LOG.warn("could not delete file " + file + " because it does not exist");

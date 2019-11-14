@@ -220,6 +220,8 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
   private void generateRemoved(IResource resource) {
 
     if (resource instanceof IFile) {
+      editorManager.closeEditor(new SPath(ResourceAdapterFactory.create(resource)), false);
+
       addActivity(
           new FileActivity(
               user,
