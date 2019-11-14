@@ -310,7 +310,7 @@ You can
 ### Sharing Complex Modules
 
 Even though Saros offers the option to create the module on the client side as part of the session, this should only be used for relatively simple modules.
-For more complex modules, it is advised to share the module structure some other way (e.g. a VCS) before starting a session. Saros currently does not set up things like libraries or module dependencies, meaning the would have to be configured by hand.
+For more complex modules, it is advised to share the module structure some other way (e.g. a VCS) before starting a session. Saros currently does not set up things like libraries or module dependencies, meaning they would have to be configured by hand.
 
 ## Compatibility
 
