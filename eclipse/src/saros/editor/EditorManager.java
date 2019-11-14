@@ -755,6 +755,20 @@ public class EditorManager implements IEditorManager {
 
   @Override
   public void closeEditor(final SPath path) {
+    closeEditor(path, true);
+  }
+
+  /**
+   * Closes the editor for the given resource. If <code>save=true</code> is specified, the content
+   * of the editor will be written to disk before it is closed.
+   *
+   * <p>Does nothing if the resource is not shared or there is no open editor for the resource.
+   *
+   * @param path the resource whose editor to close
+   * @param save whether to write the editor content to disk before closing it
+   * @see EditorAPI#closeEditor(IEditorPart, boolean)
+   */
+  public void closeEditor(final SPath path, boolean save) {
     if (path == null) throw new IllegalArgumentException("path must not be null");
 
     SWTUtils.runSafeSWTSync(
@@ -763,7 +777,7 @@ public class EditorManager implements IEditorManager {
           @Override
           public void run() {
             for (IEditorPart part : editorPool.getEditors(path)) {
-              EditorAPI.closeEditor(part);
+              EditorAPI.closeEditor(part, save);
             }
           }
         });
