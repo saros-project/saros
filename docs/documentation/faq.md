@@ -60,8 +60,8 @@ In the following we are using these definitions:
 -   Saros requires much less bandwidth (as it transfers only editing
     commands, not screen contents)
 -   Each Saros participant can use a different screen resolution,
-    different IDE-settings, keyboard layout -- and soon, even [different
-    IDEs](saros-for-intellij.md).
+    different IDE-settings, keyboard layout -- and even [different
+    IDEs](https://www.saros-project.org/documentation/installation.html?tab=intellij).
 -   Saros does not slavishly chain users together. For instance, Saros
     allows multiple participants to write to the same file in different
     spots at the same time. It also allows one participant to look
