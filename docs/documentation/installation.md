@@ -68,7 +68,7 @@ or from within Eclipse:
 
 {% capture intellij %}
 
-This is the first alpha release of Saros/I, so expect it to be a bit rough around the edges. Before using the plugin for the first time, please have a look at the page [Getting Started with Saros/I](getting-started.html?tab=intellij) and read the [disclaimer](getting-started.html?tab=intellij#disclaimer) and the current [restrictions of the plugin](getting-started.html?tab=intellij#restrictions).
+This is still an alpha release of Saros/I, so expect it to be a bit rough around the edges. Before using the plugin for the first time, please have a look at the page [Getting Started with Saros/I](getting-started.html?tab=intellij) and read the [disclaimer](getting-started.html?tab=intellij#disclaimer) and the current [restrictions of the plugin](getting-started.html?tab=intellij#restrictions).
 
 ## Prerequisites
 
