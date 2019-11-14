@@ -184,18 +184,23 @@ public class EditorAPI {
   }
 
   /**
-   * Closes the given editor part.
+   * Closes the given editor part. If <code>save=true</code> is specified, the content of the editor
+   * will be written to disk before it is closed.
    *
    * <p>Needs to be called from an UI thread.
+   *
+   * @param part the editor part to close
+   * @param save whether to write the editor content to disk before closing it
+   * @see IWorkbenchPage#closeEditor(IEditorPart, boolean)
    */
-  public static void closeEditor(IEditorPart part) {
+  public static void closeEditor(IEditorPart part, boolean save) {
     IWorkbenchWindow window = getActiveWindow();
 
     if (window == null) return;
 
     IWorkbenchPage page = window.getActivePage();
     // Close AND let user decide if saving is necessary
-    page.closeEditor(part, true);
+    page.closeEditor(part, save);
   }
 
   /**
