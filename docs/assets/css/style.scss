@@ -229,7 +229,7 @@ $mobile-width: 690px;
 /* Multiversion tabs */
 
 // Avoid gap between border of tab and content
-.tab-content :first-child {
+.tab-content > .tab-pane {
   margin-top: 0px;
   padding-top: 10px;
 }
