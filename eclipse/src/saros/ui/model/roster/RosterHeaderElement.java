@@ -3,26 +3,26 @@ package saros.ui.model.roster;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-import org.jivesoftware.smack.Roster;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.model.HeaderElement;
 import saros.ui.model.TreeElement;
 
 /**
- * Container {@link TreeElement} for a {@link Roster}
+ * Container {@link TreeElement} for a contact list.
  *
  * @author bkahlert
  */
 public class RosterHeaderElement extends HeaderElement {
-  protected RosterContentProvider rosterContentProvider;
-  protected Roster roster;
+  private final RosterContentProvider rosterContentProvider;
+  private final XMPPContactsService contactsService;
 
   public RosterHeaderElement(
-      Font font, RosterContentProvider rosterContentProvider, Roster roster) {
+      Font font, RosterContentProvider rosterContentProvider, XMPPContactsService contactsService) {
     super(font);
     this.rosterContentProvider = rosterContentProvider;
-    this.roster = roster;
+    this.contactsService = contactsService;
   }
 
   @Override
@@ -44,6 +44,6 @@ public class RosterHeaderElement extends HeaderElement {
 
   @Override
   public Object[] getChildren() {
-    return rosterContentProvider.getElements(roster);
+    return rosterContentProvider.getElements(contactsService);
   }
 }

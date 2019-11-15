@@ -10,6 +10,7 @@ import org.jivesoftware.smack.Roster;
 import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.internal.SarosSession;
 import saros.ui.model.TreeLabelProvider;
@@ -39,9 +40,7 @@ public final class XMPPSessionDisplayComposite extends SessionDisplayComposite {
   private static final Logger LOG = Logger.getLogger(XMPPSessionDisplayComposite.class);
 
   @Inject private XMPPConnectionService connectionService;
-
-  /** Used to display the {@link Roster} even in case the user is disconnected. */
-  private Roster cachedRoster;
+  @Inject private XMPPContactsService contactsService;
 
   private final IConnectionListener connectionListener =
       new IConnectionListener() {
@@ -86,7 +85,7 @@ public final class XMPPSessionDisplayComposite extends SessionDisplayComposite {
           public void widgetDisposed(DisposeEvent e) {
             connectionService.removeListener(connectionListener);
             connectionService = null;
-            cachedRoster = null;
+            contactsService = null;
           }
         });
   }
@@ -104,10 +103,6 @@ public final class XMPPSessionDisplayComposite extends SessionDisplayComposite {
   protected void updateViewer() {
     checkWidget();
 
-    Roster roster = connectionService.getRoster();
-
-    if (roster != null) cachedRoster = roster;
-
-    getViewer().setInput(new SessionInput(sessionManager.getSession(), cachedRoster));
+    getViewer().setInput(new SessionInput(sessionManager.getSession(), contactsService));
   }
 }

@@ -1,33 +1,26 @@
 package saros.ui.model.roster;
 
+import java.util.Arrays;
+import java.util.Objects;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
-import org.jivesoftware.smack.RosterGroup;
 import saros.ui.ImageManager;
 import saros.ui.model.TreeElement;
 
-/**
- * Wrapper for {@link RosterGroup RosterGroups} in use with {@link Viewer Viewers}
- *
- * @author bkahlert
- */
+/** Wrapper for ContactGroups in use with {@link Viewer Viewers} */
 public class RosterGroupElement extends TreeElement {
-  private final RosterGroup group;
+  private final String groupName;
   private final RosterEntryElement[] children;
 
-  public RosterGroupElement(RosterGroup group, RosterEntryElement[] children) {
-    this.group = group;
+  public RosterGroupElement(String groupName, RosterEntryElement[] children) {
+    this.groupName = groupName;
     this.children = children;
-  }
-
-  public RosterGroup getRosterGroup() {
-    return group;
   }
 
   @Override
   public StyledString getStyledText() {
-    return new StyledString(group.getName());
+    return new StyledString(groupName);
   }
 
   @Override
@@ -47,16 +40,24 @@ public class RosterGroupElement extends TreeElement {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == this) return true;
-
-    if (!(obj instanceof RosterGroupElement)) return false;
-
-    RosterGroupElement rosterGroupElement = (RosterGroupElement) obj;
-    return group.equals(rosterGroupElement.group);
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    RosterGroupElement other = (RosterGroupElement) obj;
+    return Objects.equals(groupName, other.groupName);
   }
 
   @Override
   public int hashCode() {
-    return group != null ? group.hashCode() : 0;
+    return Objects.hashCode(groupName);
+  }
+
+  @Override
+  public String toString() {
+    return "RosterGroupElement [group="
+        + groupName
+        + ", children="
+        + Arrays.toString(children)
+        + "]";
   }
 }

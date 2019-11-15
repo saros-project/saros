@@ -322,7 +322,6 @@ public class Messages extends NLS {
   public static String SessionWithProjects_no_projects_in_workspace;
 
   public static String RenameContactAction_new_nickname_dialog_title;
-  public static String RenameContactAction_rename_current_nickname_message;
   public static String RenameContactAction_rename_message;
   public static String RenameContactAction_title;
   public static String RenameContactAction_tooltip;
@@ -355,8 +354,6 @@ public class Messages extends NLS {
   public static String DeleteContactAction_confirm_title;
   public static String DeleteContactAction_delete_error_in_session;
   public static String DeleteContactAction_error_title;
-  public static String DeleteContactAction_name_begin_deco;
-  public static String DeleteContactAction_name_end_deco;
   public static String DeleteContactAction_title;
   public static String DeleteContactAction_tooltip;
 
