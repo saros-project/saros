@@ -2,6 +2,7 @@ package saros.net.xmpp.contact;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.ContactStatus.Type;
 import saros.net.xmpp.contact.IContactsUpdate.UpdateType;
+import saros.net.xmpp.contact.XMPPContact.Feature;
 import saros.net.xmpp.subscription.SubscriptionHandler;
 import saros.net.xmpp.subscription.SubscriptionListener;
 import saros.repackaged.picocontainer.Disposable;
@@ -385,7 +387,8 @@ public class XMPPContactsService implements Disposable {
     }
     if (contact.setResourceStatus(fullJid, status)) notifyListeners(contact, UpdateType.STATUS);
 
-    discoveryService.querySarosSupport(fullJid, createFeatureQueryResultHandler(fullJid, contact));
+    discoveryService.queryFeatureSupport(
+        fullJid, createFeatureQueryResultHandler(fullJid, contact));
   }
 
   private void handleContactResourceUnavailable(XMPPContact contact, JID fullJid) {
@@ -400,11 +403,12 @@ public class XMPPContactsService implements Disposable {
    * @param contact
    * @return Consumer to be called after a positive query
    */
-  private Consumer<Boolean> createFeatureQueryResultHandler(JID fullJid, XMPPContact contact) {
-    return hasSupport -> {
+  private Consumer<EnumSet<Feature>> createFeatureQueryResultHandler(
+      JID fullJid, XMPPContact contact) {
+    return features -> {
       contactsExecutor.execute(
           () -> {
-            if (hasSupport && contact.setSarosSupported(fullJid))
+            if (contact.setFeatureSupport(fullJid, features))
               notifyListeners(contact, UpdateType.SAROS_SUPPORT);
           });
     };

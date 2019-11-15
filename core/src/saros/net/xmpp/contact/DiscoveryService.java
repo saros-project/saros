@@ -1,6 +1,8 @@
 package saros.net.xmpp.contact;
 
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +20,7 @@ import saros.net.xmpp.JID;
 import saros.util.NamedThreadFactory;
 
 /**
- * A Simple Service to get and cache Feature Support of XMPP resources.
+ * A Simple Service to get and cache {@link XMPPContact.Feature} Support of XMPP resources.
  *
  * <p>All methods are non-blocking and run in a separate thread, which should be stopped after usage
  * via {@link #stop()}.
@@ -36,7 +38,7 @@ class DiscoveryService {
           new LinkedBlockingQueue<Runnable>(),
           new NamedThreadFactory("XMPPContactService-DiscoveryThread", false));
 
-  private Map<String, Boolean> resourcesSarosSupport = new HashMap<>();
+  private Map<String, EnumSet<XMPPContact.Feature>> resourcesFeatureSupport = new HashMap<>();
   private ServiceDiscoveryManager discoveryManager;
 
   /**
@@ -52,41 +54,52 @@ class DiscoveryService {
             return;
           }
           discoveryManager = ServiceDiscoveryManager.getInstanceFor(connection);
-          resourcesSarosSupport = new HashMap<>();
+          resourcesFeatureSupport = new HashMap<>();
         });
   }
 
   /**
-   * Query Feature Support for {@link SarosConstants#XMPP_FEATURE_NAMESPACE}.
+   * Query Feature Support.
    *
    * @param fullJid of contact
-   * @param resultCallback to call on positive result
+   * @param resultCallback to call on result
    */
-  void querySarosSupport(JID fullJid, Consumer<Boolean> resultCallback) {
+  void queryFeatureSupport(JID fullJid, Consumer<EnumSet<XMPPContact.Feature>> resultCallback) {
     discoveryExecutor.execute(
         () -> {
           String jid = fullJid.getRAW();
-          boolean supportsFeature;
-          if (resourcesSarosSupport.containsKey(jid))
-            supportsFeature = resourcesSarosSupport.get(jid);
-          else {
-            supportsFeature = runDiscovery(jid, SarosConstants.XMPP_FEATURE_NAMESPACE);
-            resourcesSarosSupport.put(jid, supportsFeature);
+          EnumSet<XMPPContact.Feature> features;
+          if (resourcesFeatureSupport.containsKey(jid)) {
+            features = resourcesFeatureSupport.get(jid);
+          } else {
+            features = runDiscovery(jid);
+            resourcesFeatureSupport.put(jid, features);
           }
 
-          if (supportsFeature) resultCallback.accept(supportsFeature);
+          resultCallback.accept(features);
         });
   }
 
-  private boolean runDiscovery(String fullJid, String feature) {
-    if (discoveryManager == null) return false;
+  private EnumSet<XMPPContact.Feature> runDiscovery(String fullJid) {
+    EnumSet<XMPPContact.Feature> features = EnumSet.noneOf(XMPPContact.Feature.class);
+
+    if (discoveryManager == null) return features;
     try {
       DiscoverInfo discoverInfo = discoveryManager.discoverInfo(fullJid);
-      return discoverInfo.containsFeature(feature);
+
+      for (Iterator<DiscoverInfo.Feature> it = discoverInfo.getFeatures(); it.hasNext(); ) {
+        String feature = it.next().getVar();
+        if (SarosConstants.XMPP_FEATURE_NAMESPACE.equals(feature)) {
+          features.add(XMPPContact.Feature.SAROS);
+        } else if (SarosConstants.NAMESPACE_SERVER.equals(feature)) {
+          features.add(XMPPContact.Feature.SAROS_SERVER);
+        }
+      }
     } catch (XMPPException e) {
       log.debug("Feature discovery for " + fullJid + " failed", e);
-      return false;
     }
+
+    return features;
   }
 
   /**
@@ -96,7 +109,7 @@ class DiscoveryService {
    */
   void removeResources(List<JID> fullJids) {
     discoveryExecutor.execute(
-        () -> fullJids.forEach(jid -> resourcesSarosSupport.remove(jid.getRAW())));
+        () -> fullJids.forEach(jid -> resourcesFeatureSupport.remove(jid.getRAW())));
   }
 
   /** Shuts down the executor thread. Needs to be called after usage! */

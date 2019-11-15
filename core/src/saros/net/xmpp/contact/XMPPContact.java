@@ -263,15 +263,12 @@ public class XMPPContact {
   }
 
   /**
-   * Updates the current Saros support of a resource.
+   * Set the current feature support of a resource.
    *
    * @param fullJid
    * @return true if operation changed general status of contact
    */
-  boolean setSarosSupported(JID fullJid) {
-    // TODO next patch, make features a parameter, rename method
-    EnumSet<Feature> features = EnumSet.of(Feature.SAROS);
-
+  boolean setFeatureSupport(JID fullJid, EnumSet<Feature> features) {
     Resource current = getResource(fullJid);
     if (current == null || current.features.equals(features)) return false;
 
