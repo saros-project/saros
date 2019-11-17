@@ -28,6 +28,13 @@ Installation instructions are given in the IDE specific sections on the topic ([
 **Important:** We still use [**google java format 1.6**](https://github.com/google/google-java-format/releases/tag/google-java-format-1.6) as the maintainers of the tool have not provided an official build of the corresponding Eclipse plugin for later versions.
 
 
+
+### Gradle setup on Widows
+
+If you are developing on a Windows system using multiple drives, please make sure that the Gradle cache (contained in the `.gradle` directory) is located on the same drive as the Saros repository.
+
+This can be done by either ensuring that the git repository is located on the same drive as the [default Gradle user home directory](https://docs.gradle.org/current/userguide/directory_layout.html#dir:gradle_user_home) or by setting a different base directory for the Gradle user home using the environment variable `GRADLE_USER_HOME`.
+
 ## Develop with Eclipse
 If you develop on Eclipse you should have already installed the Eclipse version for "Eclipse Committers".
 
