@@ -11,7 +11,7 @@ If you want to execute the STF tests it is recommended to use Eclipse. Otherwise
 * You need a **Java 8 JDK**.
 * You need an **Eclipse 4.6** installation which is used for dependency resolution. You can either install a [minimal Eclipse](http://www.eclipse.org/downloads/packages/release/neon/3/eclipse-ide-java-developers) or [Eclipse for Eclipse Committers](http://www.eclipse.org/downloads/packages/release/neon/3/eclipse-ide-eclipse-committers) if you also want to develop with Eclipse.
 * Install **GEF Legacy** into Eclipse using the 'GEF-Legacy Releases' update site given [here](https://projects.eclipse.org/projects/tools.gef/downloads)
-* You need an **IntelliJ IDEA** installation which is used for dependency resolution. Install a current version of [**IntelliJ IDEA**](https://www.jetbrains.com/idea/download/#section=linux) (we have only tested Saros/I for IntelliJ releases 2017.X and later)
+* You need an **IntelliJ IDEA** installation which is used for dependency resolution. Install a current version of [**IntelliJ IDEA**](https://www.jetbrains.com/idea/download/) (we have only tested Saros/I for IntelliJ releases 2017.X and later)
 
 Set the **system-wide environment variable `ECLIPSE_HOME`** to the Eclipse installation dir that contains the directory `plugins`.<br/>
 Set the **system-wide environment variable `INTELLIJ_HOME`** to the IntelliJ installation dir that contains the directory `lib`.
@@ -48,7 +48,7 @@ If you develop on Eclipse you should have already installed the Eclipse version 
 * Right-click the "Saros" project in the project explorer and navigate to<br/>
   `Properties > Java Code Style > Clean up`
 * Under the box `Active profile:`, click `Import...`
-* Select the profile [`saros/clean-up-profile.xml`](https://github.com/saros-project/saros/blob/master/saros/clean-up-profile.xml)
+* Select the profile [`saros/clean-up-profile.xml`](https://github.com/saros-project/saros/blob/master/eclipse/clean-up-profile.xml)
 
 #### Install and Enable Google Java Formatter
 

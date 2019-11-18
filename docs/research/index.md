@@ -31,7 +31,7 @@ Saros includes a statistical framework which is responsible for gathering inform
 ### Reviewed Research Articles
 * Lutz Prechelt and Karl Beecher. “[Four generic issues for tools-as-plugins illustrated by the distributed editor Saros.](http://dl.acm.org/citation.cfm?id=1984708.1984712)” In Proceeding of the 1st workshop on Developing tools as plug-ins, 9. ACM Press, 2011.
 * Lutz Prechelt. “[Some non-usage data for a distributed editor.](http://dl.acm.org/citation.cfm?id=1984642.1984651)” In Proceeding of the 4th international workshop on Cooperative and human aspects of software engineering, 48. ACM Press, 2011.
-* Edna Rosen, Stephan Salinger, and Christopher Oezbek. “[Project Kick-off with Distributed Pair Programming.](http://www.ppig.org/papers/22nd-SE-1.pdf)” In Proceedings of the 22nd Annual Workshop of Psychology of Programming Interest Group, 121-135. Leganès, Spain: Universidad Carlos III de Madrid, 2010.
+* Edna Rosen, Stephan Salinger, and Christopher Oezbek. “[Project Kick-off with Distributed Pair Programming.](http://www.ppig.org/sites/ppig.org/files/2010-PPIG-22nd-Rosen.pdf)” In Proceedings of the 22nd Annual Workshop of Psychology of Programming Interest Group, 121-135. Leganès, Spain: Universidad Carlos III de Madrid, 2010.
 * Stephan Salinger, Christopher Oezbek, Karl Beecher, and Julia Schenk. “[Saros: an eclipse plug-in for distributed party programming.](https://dl.acm.org/citation.cfm?id=1833319)” In Proceedings of the 2010 ICSE Workshop on Cooperative and Human Aspects of Software Engineering, 48-55. ACM Press, 2010.
 
 ### Unreviewed Research Articles

@@ -128,7 +128,7 @@ In case you don't know yet:
 
 ![GitHub merge options](../images/processes/GitHub_choose_merge_method.png)
 
-We allow the two options [merge and squash](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits) and [rebase and merge](https://help.github.com/articles/about-pull-request-merges/#rebase-and-merge-your-pull-request-commits).
+We allow the two options [squash and merge](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits) and [rebase and merge](https://help.github.com/articles/about-pull-request-merges/#rebase-and-merge-your-pull-request-commits).
 Both options avoid merge commits which lead to a strict chronological commit history.
 
 Information on when to use which merge strategy is given in our [development process documentation](development.md#pull-request-structure).
