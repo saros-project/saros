@@ -2,9 +2,9 @@
 title: Saros Server Development
 ---
 
-## What is the Saros Server
+## What is the Saros Server?
 
-Please refer to the [User Documentation](../documentation/saros-server.md) for an explaination and the use-case of the saros server.
+Please refer to the [User Documentation](../documentation/saros-server.md) for an explanation and the use-case of the Saros server.
 
 Technically it is a headless session-host.
 
@@ -18,7 +18,7 @@ Notable exceptions are the [filesystem](https://github.com/saros-project/saros/t
 
 ### Permission System
 
-Traditionally the Session-Host is responsible for moderating an active Saros-Session. The Host-Role allows adding new users and accepting new projects into the session. A headless implementation like the server cannot do this, which is why the server currectly accepts every request for invitations and new projects. Therefor it can only be executed in a trusted environment.
+Traditionally the Session-Host is responsible for moderating an active Saros-Session. The Host-Role allows adding new users and accepting new projects into the session. A headless implementation like the server cannot do this, which is why the server currently accepts every request for invitations and new projects. Therefor it can only be executed in a trusted environment.
 
 The server will need some kind of permission system to allow a remote user to manage these tasks. The simplest (and likely sufficient) variant would move this role to some kind of "Admin"-User, that may be configured for a given server.
 
@@ -37,6 +37,6 @@ This concept could prove to be very memory inefficient, as a new process and JVM
 
 - It is not clear, how this can be represented in the XMPP-Protocol. The Super-Server would be logged with an XMPP-ID to setup the initial communication, but each session-server would need to be dynamically assigned a new JID or the same JID. New JIDs would need some kind of configuration and cooperation with the XMPP-Server. Re-using the same JID is currently not tested with Saros and might cause other unpredictable issues.
 
-### Cleanup old files
+### Cleanup of Old Files
 
 Currently the Server creates it's workspace as a temporary folder, it would be better, if the folder could be cleaned up on shutdown, although caching might be appropriate for larger frequently shared projects.

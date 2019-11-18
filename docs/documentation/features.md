@@ -18,12 +18,12 @@ Saros is designed to at least work with two participants in a session -
 as inherent for pair programming - but there is no maximum limit of
 participants.
 
-## Several concurrent writers
+## Several Concurrent Writers
 
 All participants with write-access can edit the shared files at the same
 time.
 
-## Various sharing options
+## Various Sharing Options
 
 You may share multiple projects within one session. You may also share
 only a selection of files of a project. If you create, delete or rename

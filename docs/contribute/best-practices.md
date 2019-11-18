@@ -16,7 +16,7 @@ title: Best Practices
     that the behavior is well defined, for instance using an
     observable collection)
 
-### Class member visibility
+### Class Member Visibility
 
 By default all fields and methods should be **`private`**. For any field
 or method with a visibility higher than **`private `**(visible from the
@@ -28,7 +28,7 @@ accessible. This is fine up to **package-private** (no modifier). But it
 is not acceptable to make a member part of a package's API
 (`protected `or `public`) solely for testing purposes.
 
-### Final members and variables
+### Final Members and Variables
 
 *   For class variables: By default, make them final, unless you find a
     good reason not to. It makes the code easier to understand when you
@@ -90,7 +90,7 @@ public class A implements D {
   ...
 ```
 
-### Control flow
+### Control Flow
 
 Test whether you can return from a method instead of testing whether
 you should execute a block of code.
@@ -124,7 +124,7 @@ Furthermore, there is no need to put the code after the return
 statement into an explicit "else"-branch. You can easily save one
 level of block-nesting.
 
-### Checking parameters
+### Checking Parameters
 
 *   Methods may assume that they are called with correct non-null input
     unless the method specifies that it allows incorrect or null input.
@@ -164,7 +164,7 @@ level of block-nesting.
 Saros/E is an Eclipse IDE Plugin. Therefore it needs to meet
 the [Eclipse User Interface Guidelines](http://wiki.eclipse.org/User_Interface_Guidelines#Checklist_For_Developers).
 
-### Standard heuristics for system design
+### Standard Heuristics for System Design
 
 When improving Saros either technically or visually you should check
 if you followed the [10 basic heuristics for good user interfaces](https://www.nngroup.com/articles/ten-usability-heuristics).
@@ -172,7 +172,7 @@ if you followed the [10 basic heuristics for good user interfaces](https://www.n
 You do not need many users for this, usually 3 users are enough to quickly find out the most
 important. You can kindly ask them record their test with a tool like [Screencast-O-Matic](http://www.screencast-o-matic.com).
 
-### Progress and Cancelation 101
+### Progress and Cancellation 101
 
 Whenever a method is long-running, i.e. there is a chance that it will
 take longer than 100ms or involves any external factors such as the user
@@ -185,7 +185,7 @@ experience might be reduced. For instance in Saros, there used to be no
 possibility to cancel a file transfer from one user to the other but
 just to cancel in between the files. This behavior seems okay, but once
 we started to see archive files of 10 MB and more, which could only be
-canceled by disconnecting from the Jabber-Server, the undesireability of
+canceled by disconnecting from the Jabber-Server, the undesirability of
 the behavior becomes pretty clear.
 
 Fortunately enough there is a straight-forward and simple solution,
@@ -231,7 +231,7 @@ sufficient to achieve the basic uses of progress monitoring.
 
 #### Nesting Progress
 
-In many cases the situtation is a little bit more complicated, as the
+In many cases the situation is a little bit more complicated, as the
 operation that is long-running is making calls to other long-running
 operations as well. To solve this problem, we need to create **child
 progress monitors**, which consume a given number of work steps from
@@ -266,7 +266,7 @@ public void computeFirstStep(SubMonitor progress){
 }
 ```
 
-#### Reporting information to the user
+#### Reporting Information to the User
 
 A progress monitor provides 3 ways to report information from a long
 running operation to the user
@@ -279,7 +279,7 @@ running operation to the user
 This information is typically presented to the user as a Dialog with a
 message being equal to the taskname of the top level progress monitor, a
 progress bar showing the growing amount of work already done and a label
-for the current sub-task which switches everytime the sub-task is being
+for the current sub-task which switches every time the sub-task is being
 set.
 
 Since the taskName is fixed (by default), only the top level task name
@@ -303,7 +303,7 @@ public void computeInTwoSteps(SubMonitor progress){
 }
 ```
 
-#### Dealing with operation of unspecified length
+#### Dealing With Operations of Unspecified Length
 
 To have a progress dialog on operations for which the amount of steps
 are unknown, the following solution is recommended:
@@ -362,7 +362,7 @@ public BigInteger factorial(int n, SubMonitor progress){
 }
 ```
 
-Btw: It is an convention that we try to avoid `InterruptedException` for
+BTW: It is a convention that we try to avoid `InterruptedException` for
 this, because it is a checked exception and thus cumbersome for the
 caller. To maintain this convention, a method MUST specify whether it is
 cancelable, by providing the demonstrated JavaDoc tag.
@@ -471,7 +471,7 @@ How to do it right:
 
 -   When calling a blocking method, Java uses InterruptedException to
     signal that the waiting thread was told to stop waiting.
--   As a a caller to a blocking method it is your responsibility to deal
+-   As a caller to a blocking method it is your responsibility to deal
     with the possibility of being interrupted. This is why exception is
     checked in Java.
 -   The contract of InterruptedException is the following:
@@ -480,7 +480,7 @@ How to do it right:
 -   Since the InterruptException-contract is assumed to be honored by
     all methods in Java, there are three ways of dealing with the
     InterruptedException:
-    1.  Rethrowing the InterruptedException to tell callers that this
+    1.  Re-throwing the InterruptedException to tell callers that this
         method might be interrupted: As we do not like checked exception
         this is an inferior solution to the problem.
     2.  Resetting the interrupt flag
@@ -589,7 +589,7 @@ public class BroadcastListener implements Listener {
 }
 ```
 
-The code for an Observable becomes therfore much simpler. It only needs
+The code for an Observable therefore becomes much simpler. It only needs
 to know the `BroadcastListener` and can easily notify all registered
 listeners at once.
 ```java
@@ -623,7 +623,7 @@ class Observable {
         users of the class can rely on the objects to be immutable and
         all methods to be side effect free. This helps A LOT when using
         a class.
--   Avoid implementing many interfaces in the same class whereever
+-   Avoid implementing many interfaces in the same class wherever
     possible (more than one is necessary only in rare cases). Use nested
     or anonymous classes instead. It makes it much easier to understand
     and modify your code.
@@ -642,7 +642,7 @@ class Observable {
     so that your threads are named) or even better an `Executor`.
   * Spend some time learning about the [Java Concurrency library java.util.concurrent](http://java.sun.com/javase/6/docs/api/java/util/concurrent/package-summary.md).
 
-## Kinds of comments
+## Kinds of Comments
 
 This section is based on Steve McConnell's Code Complete, Chapter 32.
 
