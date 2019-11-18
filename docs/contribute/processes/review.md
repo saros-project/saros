@@ -136,6 +136,7 @@ Information on when to use which merge strategy is given in our [development pro
 ##### Squash and Merge
 This method squashes all changes of your pull request. If you choose this option, GitHub proposes a possible commit name
 and message which you can change before you merge.
+
 ![GitHub choose commit message](../images/processes/GitHub_choose_commit_message.png)
 
 Use this method if you don't want to preserve the commit history. This is always useful if the history contains multiple commits which
