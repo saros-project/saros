@@ -13,7 +13,7 @@ for updates to all plug-ins that you have installed. To work around this
 problem, uncheck "Contact all update sites during install to find
 required software" in Eclipse's installation dialog.
 
-#### I cannot connect with my jabber account?
+#### I can not connect with my jabber account.
 
 Go to Eclipse -&gt; Saros -&gt; Preferences -&gt; General -&gt; Network
 Connections and make sure, that there are no proxy settings checked.
@@ -54,11 +54,11 @@ selections, click the corresponding entry (e.g. "DPP Selection of buddy
 to repeat this step for all five buddies. The same goes for the
 "contributions" (that portion of source code someone authored).
 
-### Network issues
+### Network Issues
 
 #### I keep getting Mediated Socks5 or slower IBB connections. What am I doing wrong?
 
-#### Troubleshooting Socks5 Bytestream Establishment
+##### Troubleshooting Socks5 Bytestream Establishment
 
 If you keep getting Mediated Socks5 Bytestreams or In-Band Bytestreams,
 other peers cannot connect to you directly (cannot create a TCP
@@ -81,7 +81,7 @@ connection to you). What can you do to improve chances?
     gateway (e.g. Router) manual for port mapping or sometimes labelled
     virtual servers.
 
-#### What might stop you from using Socks5:
+##### What Might Stop You From Using Socks5
 
 Some factors might prevent you from using S5B. Lets have a quick look at
 the S5B protocol when you want connect a buddy.
@@ -105,14 +105,14 @@ connect to the other one. You can check your contact list to see which
 bytestream type is established between you and a contact (if any).
 
 For further information check out data connections in Saros on our
-networklayer
+network layer
 page [here](../old/networklayer.md#Data%20connections%20in%20Saros).
 
 ## Known Issues
 
-### About data transfer
+### About Data Transfer
 
-*   Transfering large amounts of data during session initiation
+*   Transferring large amounts of data during session initiation
     (project synchronization) can take a lot of time. Do as much of the
     synchronization via your version control repository as you can to
     keep session initiation fast by using "copy of existing project"
@@ -126,7 +126,7 @@ page [here](../old/networklayer.md#Data%20connections%20in%20Saros).
     such (possibly large) set of operations for each keypress. It is
     wise to avoid these operations.
 
-### Making your session mates aware of your actions
+### Making Your Session Mates Aware of Your Actions
 
 *   Be aware that Saros transfers only the text editor pane. When you
     use other elements of Eclipse, e.g. structure browsers or the HTML
@@ -134,13 +134,13 @@ page [here](../old/networklayer.md#Data%20connections%20in%20Saros).
     talking aloud about the things that you are doing there is probably
     required to make them aware of your actions.
 
-### Eclipse editor technicalities
+### Eclipse Editor Technicalities
 
 *   You and your session mates should use the same editor settings
     regarding formatting and encoding; in particular regarding TAB
     width, TAB/spaces handling and character encoding.
 
-### About Eclipse plugins
+### About Eclipse Plugins
 
 *   If you are sharing a project which is managed by a source code
     management system such as Subversion, make sure that all

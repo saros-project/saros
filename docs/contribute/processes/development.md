@@ -2,13 +2,13 @@
 title: Development Process
 ---
 
-## Development workflow
+## Development Workflow
 
 Our development workflow bases on the standard [GitHub fork workflow](https://guides.github.com/activities/forking/).
 
 Before a pull request is merged, it will have to pass out [review process](review.md).
 
-## Pull request structure
+## Pull Request Structure
 
 In the Saros project, we use two different strategies to merge pull requests: [squash and merge](#squash-and-merge) and [rebase and merge](#rebase-and-merge).
 
@@ -17,14 +17,14 @@ Which strategy is used to merge a particular pull request depends on the size, c
 
 Independently of the merge strategy, please make sure that all commits have an [appropriate commit message](../guidelines.html#commit-message).
 
-### [Squash and merge](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits)
+### [Squash and Merge](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits)
 
 *This is the preferred merging strategy for small and coherent changes.*
 
 If your change only touches a specific file, functionality, or API and is not "to large" (this is somewhat subjective and will be up to you and the reviewers; as a general rule of thumb, it should not change more than 200 lines of code).
 This allows the changes to be bundled into one concise commit.
 
-### [Rebase and merge](https://help.github.com/en/articles/about-pull-request-merges#rebase-and-merge-your-pull-request-commits)
+### [Rebase and Merge](https://help.github.com/en/articles/about-pull-request-merges#rebase-and-merge-your-pull-request-commits)
 
 *This is the preferred merging strategy for larger changes.*
 

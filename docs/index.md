@@ -2,4 +2,4 @@
 layout: index
 ---
 
-The Open Source IDE plugin for distributed collaborative software development
+The Open Source IDE Plugin for Distributed Collaborative Software Development

@@ -1,5 +1,5 @@
 ---
-title: Getting started
+title: Getting Started
 ---
 
 {% capture eclipse %}
@@ -25,7 +25,7 @@ To get familiar with this concept check out our comic:
 
 ------------------------------------------------------------------------
 
-## First steps
+## First Steps
 
 ### Step 1: Connecting
 
@@ -48,7 +48,7 @@ Saros &gt; Start Saros Configuration*)
 Server](images/1_GettingStartedCreateAccount_0.png)
 
 
-### Step 2: Adding contacts
+### Step 2: Adding Contacts
 
 To add a contact to your list you need to **know his/her XMPP ID**.
 
@@ -60,7 +60,7 @@ status in your contact list**.
 ![Adding
 buddies](images/2_GettingStartedAddContacts.png)
 
-### Step 3: Starting and joining sessions
+### Step 3: Starting and Joining Sessions
 
 You can work together with your contacts by either **starting your own
 session** or by **being invited to one**.
@@ -71,7 +71,7 @@ computer of your invited contacts.
 ![Share
 Projects](images/3_GettingStartedShareProjects_0.png)
 
-#### Start a session ([host](#the-host))
+#### Start a Session ([host](#the-host))
 
 1.  Right-click on...
     a.  a **project** in your **Package Explorer** and select *Share
@@ -85,7 +85,7 @@ Projects](images/3_GettingStartedShareProjects_0.png)
 Want to know more about the Saros host role? Check out our comic
 [here](host-comic.md).
 
-#### Join a session (client)
+#### Join a Session (Client)
 
 1.  Wait for a **session invitation** to appear on your screen
 2.  Click *Accept* to **accept the invitation**
@@ -97,7 +97,7 @@ Want to know more about the Saros host role? Check out our comic
 4.  Select *Finish* and wait for the project to be copied to your
     computer
 
-#### Additional information:
+#### Additional Information:
 
 -   If you accept an invitation and decide to synchronize the incoming
     project with your own copy, Saros will automatically add, change, or
@@ -220,7 +220,7 @@ File:**
 Gives you the opportunity to select a file to be sent to the selected
 participant.
 
-### Good to know
+### Good to Know
 
 #### User Roles
 
@@ -243,7 +243,7 @@ participant:
 -   As s/he scrolls through a file, the viewpoint is moved on your
     computer also, so that you see what s/he sees.
 
-#### Staying Aware of your Fellow Participants
+#### Staying Aware of Your Fellow Participants
 
 There are multiple ways of staying aware of what a driver is currently
 doing:
@@ -401,10 +401,12 @@ You can then delete the first account, add a new account with the right values, 
 - Click the option "Follow participant".
 
 ### Leaving the Follow Mode
+
 - Click the "Follow" button (![follow icon](images/icons-i/follow.png)).
 - Click the option "Leave follow mode".
 
 ### Resolving a Desynchronization
+
 By default, the synchronization button (![synchronization button off](images/icons-i/in_sync.png)) is disabled.
 If Saros detects that the local content has become out of sync with the host (i.e. differs in any way), it will notify the user and enable the synchronization button (![synchronization button on](images/icons-i/out_sync.png)).
 To resolve the desynchronization:
@@ -453,7 +455,6 @@ Saros/I does not currently share which resources are marked as 'Excluded' with o
 ### Number of Participants
 
 Currently, Saros/I is restricted to two-participant sessions, meaning you can only create session containing the host and a single client.
-
 
 ## Missing Features
 
