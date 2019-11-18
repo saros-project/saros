@@ -1,11 +1,10 @@
 package saros.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.function.BiPredicate;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.jivesoftware.smack.Connection;
@@ -16,7 +15,6 @@ import saros.SarosPluginContext;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
-import saros.net.xmpp.subscription.SubscriptionHandler;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
@@ -35,8 +33,6 @@ public class AddContactWizard extends Wizard {
   public static final String TITLE = Messages.AddContactWizard_title;
 
   @Inject protected XMPPConnectionService connectionService;
-
-  @Inject protected SubscriptionHandler subscriptionManager;
 
   protected final AddContactWizardPage addContactWizardPage = new AddContactWizardPage();
 
@@ -93,24 +89,18 @@ public class AddContactWizard extends Wizard {
           .run(
               true,
               false,
-              new IRunnableWithProgress() {
-                @Override
-                public void run(IProgressMonitor monitor)
-                    throws InvocationTargetException, InterruptedException {
+              monitor -> {
+                monitor.beginTask("Adding contact " + jid + "...", IProgressMonitor.UNKNOWN);
 
-                  monitor.beginTask("Adding contact " + jid + "...", IProgressMonitor.UNKNOWN);
-
-                  try {
-                    addToRoster(connectionService.getConnection(), jid, nickname);
-
-                    cachedContact = jid;
-                  } catch (CancellationException e) {
-                    throw new InterruptedException();
-                  } catch (XMPPException e) {
-                    throw new InvocationTargetException(e);
-                  } finally {
-                    monitor.done();
-                  }
+                try {
+                  addToRoster(jid, nickname);
+                  cachedContact = jid;
+                } catch (CancellationException e1) {
+                  throw new InterruptedException();
+                } catch (XMPPException e2) {
+                  throw new InvocationTargetException(e2);
+                } finally {
+                  monitor.done();
                 }
               });
     } catch (InvocationTargetException e) {
@@ -138,42 +128,36 @@ public class AddContactWizard extends Wizard {
   /**
    * Adds given contact to the {@link Roster}.
    *
-   * @param connection
    * @param jid
    * @param nickname
    */
-  private void addToRoster(Connection connection, final JID jid, String nickname)
-      throws XMPPException {
+  private void addToRoster(JID jid, String nickname) throws XMPPException {
+    Connection connection = connectionService.getConnection();
 
     if (connection == null) throw new NullPointerException("connection is null");
-
     if (jid == null) throw new NullPointerException("jid is null");
+
+    BiPredicate<String, String> questionDialogHandler =
+        (title, message) -> {
+          try {
+            return SWTUtils.runSWTSync(
+                () -> DialogUtils.openQuestionMessageDialog(null, title, message));
+          } catch (Exception e) {
+            log.debug("Error opening questionMessageDialog", e);
+            return false;
+          }
+        };
 
     try {
       boolean jidOnServer = XMPPUtils.isJIDonServer(connection, jid, SarosConstants.RESOURCE);
       if (!jidOnServer) {
-        boolean cancel = false;
-        try {
-          cancel =
-              SWTUtils.runSWTSync(
-                  new Callable<Boolean>() {
-                    @Override
-                    public Boolean call() throws Exception {
-                      return !DialogUtils.openQuestionMessageDialog(
-                          null,
-                          "Contact Unknown",
-                          "You entered a valid XMPP server.\n\n"
-                              + "Unfortunately your entered JID is unknown to the server.\n"
-                              + "Please make sure you spelled the JID correctly.\n\n"
-                              + "Do you want to add the contact anyway?");
-                    }
-                  });
-        } catch (Exception e) {
-          log.debug("Error opening questionMessageDialog", e);
-        }
-
-        if (cancel) {
-          throw new XMPPException("Please make sure you spelled the JID correctly.");
+        if (!questionDialogHandler.test(
+            "Contact Unknown",
+            "You entered a valid XMPP server.\n\n"
+                + "Unfortunately your entered JID is unknown to the server.\n"
+                + "Please make sure you spelled the JID correctly.\n\n"
+                + "Do you want to add the contact anyway?")) {
+          throw new IllegalArgumentException("Please make sure you spelled the JID correctly.");
         }
         log.debug(
             "The contact "
@@ -182,25 +166,10 @@ public class AddContactWizard extends Wizard {
                 + " The user chose to add it anyway.");
       }
     } catch (XMPPException e) {
-      final DialogContent dialogContent = getDialogContent(e);
+      DialogContent dialogContent = getDialogContent(e);
 
-      boolean cancel = false;
-
-      try {
-        cancel =
-            SWTUtils.runSWTSync(
-                new Callable<Boolean>() {
-                  @Override
-                  public Boolean call() throws Exception {
-                    return !DialogUtils.openQuestionMessageDialog(
-                        null, dialogContent.dialogTitle, dialogContent.dialogMessage);
-                  }
-                });
-      } catch (Exception e1) {
-        log.debug("Error opening questionMessageDialog", e);
-      }
-
-      if (cancel) throw new XMPPException(dialogContent.invocationTargetExceptionMessage);
+      if (!questionDialogHandler.test(dialogContent.dialogTitle, dialogContent.dialogMessage))
+        throw new XMPPException(dialogContent.invocationTargetExceptionMessage);
 
       log.warn(
           "Problem while adding a contact. User decided to add contact anyway. Problem: "
