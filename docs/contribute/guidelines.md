@@ -21,7 +21,7 @@ title: Coding and Commit Guidelines
 ### Commit Message
 
 1.  Follow the general rule of how Git commit messages are formatted.
-    Refer to the [Git manual](https://git-scm.com/book/ch5-2.md#Commit-Guidelines) for
+    Refer to the [Git manual](https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project#_commit_guidelines) for
     more information. In particular, every patch must have an
     informative short summary or "subject line" (also see next point in
     the list) and it should have a more detailed explanation below.

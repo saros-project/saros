@@ -104,9 +104,9 @@ sides attempts to connect each other. This improves chances of one peer
 connect to the other one. You can check your contact list to see which
 bytestream type is established between you and a contact (if any).
 
-For further information check out data connections in Saros on our
-network layer
-page [here](../old/networklayer.md#Data%20connections%20in%20Saros).
+For further information check out data connections in Saros on our network layer page.
+**Important:** The page may be quite outdated as it is part of our legacy documentation and has not been migrated to our new documentation.
+It can be found [here](https://saros-project.github.io/legacy_docs/networklayer.html#Data%20connections%20in%20Saros).
 
 ## Known Issues
 

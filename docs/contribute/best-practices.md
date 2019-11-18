@@ -539,8 +539,7 @@ How to do it right:
 ```
 -   BTW: There is no obligation in the contract for you to exit as
     quickly as possible.
--   For more read:
-    <http://www-128.ibm.com/developerworks/java/library/j-jtp05236.md>
+-   For more read: <https://www.ibm.com/developerworks/library/j-jtp05236/index.html>
 
 ## Broadcast Listener
 
@@ -640,7 +639,7 @@ class Observable {
   * Try to avoid instantiating the class `Thread` directly but
     rather use a `ThreadFactory` (in particular the `NamedThreadFactory`
     so that your threads are named) or even better an `Executor`.
-  * Spend some time learning about the [Java Concurrency library java.util.concurrent](http://java.sun.com/javase/6/docs/api/java/util/concurrent/package-summary.md).
+  * Spend some time learning about the [Java Concurrency library java.util.concurrent](https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/package-summary.html).
 
 ## Kinds of Comments
 
