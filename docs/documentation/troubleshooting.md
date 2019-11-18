@@ -2,9 +2,9 @@
 title: Troubleshooting
 ---
 
-## Technical Questions {#Technical_Questions}
+## Technical Questions
 
-### Setting up {#Setting_up}
+### Setting up
 
 #### Why is updating Saros over the Eclipse Update mechanism so slow?
 
