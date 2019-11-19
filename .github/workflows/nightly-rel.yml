@@ -1,0 +1,36 @@
+name: Nightly Saros/I Release
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  nightly:
+    name: Build and deploy Saros/I release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+        # Uncomment <depends> entries in order to make Saros/I installable in all JetBrains IDEs
+      - name: Prepare Saros/I plugin.xml
+        run: |
+          sed -i 's/<!--depends/<depends/g' intellij/resources/META-INF/plugin.xml
+          sed -i 's/depends-->/depends>/g' intellij/resources/META-INF/plugin.xml
+
+      - name: Build Saros/I
+        run: ./gradlew sarosIntellij
+          
+      - name: Deploy Saros/I Release
+        uses: WebFreak001/deploy-nightly@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+        with:
+          upload_url: <TODO> # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases in your browser and copy the full "upload_url" value including the {?name,label} part
+          release_id: <TODO> # same as above (id can just be taken out the upload_url, it's used to find old releases)
+          asset_path: build/distribution/intellij/saros.intellij.zip # path to archive to upload
+          asset_name: saros-i-all-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+          asset_content_type: application/zip # required by GitHub API
+          max_releases: 3 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted

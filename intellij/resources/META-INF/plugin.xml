@@ -34,10 +34,11 @@
     <idea-version since-build="182.5107.16"/>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
-    <!-- uncomment to enable plugin in all products
-    <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.lang</depends>
-    -->
+    <!-- ATTENTION: the following "depends" tags are automatically uncommented by nightly-rel.yml. Make sure that changes do not break the logic. -->
+    <!-- uncomment to enable plugin in all products -->
+    <!--depends>com.intellij.modules.platform</depends-->
+    <!--depends>com.intellij.modules.lang</depends-->
+    
 
     <application-components>
         <component>
