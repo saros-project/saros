@@ -1,0 +1,33 @@
+name: STF Tests
+
+on:
+  push:
+    # Temporary restriction: Run only stf tests on branches that work on stf
+    branches:    
+      - 'pr/stf/*'
+
+# Restriction when STFs ha stable results
+#    paths:
+#      - 'stf/**'
+#      - 'stf.test/**'
+
+jobs:
+  stf:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+
+    - name: Prepare STF Setup
+      run: |
+        docker pull saros/ci_build:0.4
+        docker pull saros/stf_test_slave:0.4
+        docker pull saros/stf_xmpp_server:0.4
+        mkdir stf_ws
+        export CONFIG_DIR=travis/config SCRIPT_DIR=travis/script/stf; $PWD/travis/script/stf/setup_stf_container.sh $PWD
+
+    - name: Run STF Tests
+      run: docker exec -t stf_master /home/ci/saros_src/travis/script/stf/master/start_stf_tests.sh
