@@ -273,7 +273,12 @@ public class ConnectionHandler {
       this.currentConnectionError = error;
     }
 
-    for (IConnectionStateListener listener : stateListeners)
-      listener.connectionStateChanged(state, error);
+    for (IConnectionStateListener listener : stateListeners) {
+      try {
+        listener.connectionStateChanged(state, error);
+      } catch (Exception e) {
+        LOG.error("internal error in listener: " + listener, e);
+      }
+    }
   }
 }
