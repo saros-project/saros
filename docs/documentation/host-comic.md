@@ -1,5 +1,5 @@
 ---
-title: A graphical introduction to the Saros Host concept.
+title: A Graphical Introduction to The Saros Host Concept
 toc: false
 ---
 

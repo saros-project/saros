@@ -68,7 +68,7 @@ or from within Eclipse:
 
 {% capture intellij %}
 
-This is the first alpha release of Saros/I, so expect it to be a bit rough around the edges. Before using the plugin for the first time, please have a look at the page [Getting Started with Saros/I](getting-started.html?tab=intellij) and read the [disclaimer](getting-started.html?tab=intellij#disclaimer) and the current [restrictions of the plugin](getting-started.html?tab=intellij#restrictions).
+This is still an alpha release of Saros/I, so expect it to be a bit rough around the edges. Before using the plugin for the first time, please have a look at the page [Getting Started with Saros/I](getting-started.html?tab=intellij) and read the [disclaimer](getting-started.html?tab=intellij#disclaimer) and the current [restrictions of the plugin](getting-started.html?tab=intellij#restrictions).
 
 ## Prerequisites
 
@@ -82,7 +82,7 @@ Saros/I can be installed from the JetBrains plugin repository or from disk.
 
 ### From the Plugin Repository
 
-Saros/I is currently released through the `alpha` release channel. To be able find the plugin on the market place, you will first have to add the `alpha` release channel to your list of plugin repositories. A guide on how to do this is given [here](https://www.jetbrains.org/intellij/sdk/docs/plugin_repository/custom_channels.html#configuring-a-custom-channel-in-intellij-platform-based-ides).
+Saros/I is currently released through the `alpha` release channel. To be able find the plugin on the market place, you will first have to add the `alpha` release channel to your list of plugin repositories. A guide on how to do this is given [here](https://plugins.jetbrains.com/docs/marketplace/custom-release-channels.html#CustomReleaseChannels-ConfiguringaCustomChannelinIntelliJPlatformBasedIDEs).
 
 - Choose "Settings..." > "Plugins".
 - Select the tab "Marketplace"
