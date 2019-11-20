@@ -7,14 +7,10 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
-import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.XMPPException;
-import saros.SarosConstants;
 import saros.SarosPluginContext;
-import saros.net.util.XMPPUtils;
+import saros.exceptions.OperationCanceledException;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
@@ -22,17 +18,13 @@ import saros.ui.util.DialogUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.wizards.pages.AddContactWizardPage;
 
-/**
- * Wizard for adding a new contact to the {@link Roster roster} of the currently connected user.
- *
- * @author bkahlert
- */
+/** Wizard for adding a new contact to the Contact list of the currently connected user. */
 public class AddContactWizard extends Wizard {
   private static final Logger log = Logger.getLogger(AddContactWizard.class);
 
   public static final String TITLE = Messages.AddContactWizard_title;
 
-  @Inject protected XMPPConnectionService connectionService;
+  @Inject private static XMPPContactsService contactsService;
 
   protected final AddContactWizardPage addContactWizardPage = new AddContactWizardPage();
 
@@ -41,26 +33,6 @@ public class AddContactWizard extends Wizard {
    * user still needs access.
    */
   protected JID cachedContact;
-
-  protected static class DialogContent {
-
-    public DialogContent(
-        String dialogTitle, String dialogMessage, String invocationTargetExceptionMessage) {
-      super();
-      this.dialogTitle = dialogTitle;
-      this.dialogMessage = dialogMessage;
-      this.invocationTargetExceptionMessage = invocationTargetExceptionMessage;
-    }
-
-    /** Title displayed in the question dialog */
-    String dialogTitle;
-
-    /** Message displayed in the question dialog */
-    String dialogMessage;
-
-    /** Detailed message for the InvocationTargetMessage */
-    String invocationTargetExceptionMessage;
-  }
 
   public AddContactWizard() {
     SarosPluginContext.initComponent(this);
@@ -93,12 +65,12 @@ public class AddContactWizard extends Wizard {
                 monitor.beginTask("Adding contact " + jid + "...", IProgressMonitor.UNKNOWN);
 
                 try {
-                  addToRoster(jid, nickname);
+                  addContact(jid, nickname);
                   cachedContact = jid;
                 } catch (CancellationException e1) {
                   throw new InterruptedException();
-                } catch (XMPPException e2) {
-                  throw new InvocationTargetException(e2);
+                } catch (OperationCanceledException e1) {
+                  throw new InvocationTargetException(e1);
                 } finally {
                   monitor.done();
                 }
@@ -126,17 +98,13 @@ public class AddContactWizard extends Wizard {
   }
 
   /**
-   * Adds given contact to the {@link Roster}.
+   * Adds given contact to the Contact List.
    *
    * @param jid
    * @param nickname
+   * @throws OperationCanceledException
    */
-  private void addToRoster(JID jid, String nickname) throws XMPPException {
-    Connection connection = connectionService.getConnection();
-
-    if (connection == null) throw new NullPointerException("connection is null");
-    if (jid == null) throw new NullPointerException("jid is null");
-
+  private void addContact(JID jid, String nickname) throws OperationCanceledException {
     BiPredicate<String, String> questionDialogHandler =
         (title, message) -> {
           try {
@@ -148,90 +116,6 @@ public class AddContactWizard extends Wizard {
           }
         };
 
-    try {
-      boolean jidOnServer = XMPPUtils.isJIDonServer(connection, jid, SarosConstants.RESOURCE);
-      if (!jidOnServer) {
-        if (!questionDialogHandler.test(
-            "Contact Unknown",
-            "You entered a valid XMPP server.\n\n"
-                + "Unfortunately your entered JID is unknown to the server.\n"
-                + "Please make sure you spelled the JID correctly.\n\n"
-                + "Do you want to add the contact anyway?")) {
-          throw new IllegalArgumentException("Please make sure you spelled the JID correctly.");
-        }
-        log.debug(
-            "The contact "
-                + jid
-                + " couldn't be found on the server."
-                + " The user chose to add it anyway.");
-      }
-    } catch (XMPPException e) {
-      DialogContent dialogContent = getDialogContent(e);
-
-      if (!questionDialogHandler.test(dialogContent.dialogTitle, dialogContent.dialogMessage))
-        throw new XMPPException(dialogContent.invocationTargetExceptionMessage);
-
-      log.warn(
-          "Problem while adding a contact. User decided to add contact anyway. Problem: "
-              + e.getMessage());
-    }
-
-    connection.getRoster().createEntry(jid.getBase(), nickname, null);
-  }
-
-  private DialogContent getDialogContent(XMPPException e) {
-
-    // FIXME: use e.getXMPPError().getCode(); !
-
-    if (e.getMessage().contains("item-not-found")) {
-      return new DialogContent(
-          "Contact Unknown",
-          "The contact is unknown to the XMPP server.\n\n"
-              + "Do you want to add the contact anyway?",
-          "Contact unknown to XMPP server.");
-    }
-
-    if (e.getMessage().contains("remote-server-not-found")) {
-      return new DialogContent(
-          "Server Not Found",
-          "The responsible XMPP server could not be found.\n\n"
-              + "Do you want to add the contact anyway?",
-          "Unable to find the responsible XMPP server.");
-    }
-
-    if (e.getMessage().contains("501")) {
-      return new DialogContent(
-          "Unsupported Contact Status Check",
-          "The responsible XMPP server does not support status requests.\n\n"
-              + "If the contact exists you can still successfully add him.\n\n"
-              + "Do you want to try to add the contact?",
-          "Contact status check unsupported by XMPP server.");
-    }
-
-    if (e.getMessage().contains("503")) {
-      return new DialogContent(
-          "Unknown Contact Status",
-          "For privacy reasons the XMPP server does not reply to status requests.\n\n"
-              + "If the contact exists you can still successfully add him.\n\n"
-              + "Do you want to try to add the contact?",
-          "Unable to check the contact status.");
-    }
-
-    if (e.getMessage().contains("No response from the server")) {
-      return new DialogContent(
-          "Server Not Responding",
-          "The responsible XMPP server is not connectable.\n"
-              + "The server is either inexistent or offline right now.\n\n"
-              + "Do you want to add the contact anyway?",
-          "The XMPP server did not respond.");
-    }
-
-    return new DialogContent(
-        "Unknown Error",
-        "An unknown error has occured:\n\n"
-            + e.getMessage()
-            + "\n\n"
-            + "Do you want to add the contact anyway?",
-        "Unknown error: " + e.getMessage());
+    contactsService.addContact(jid, nickname, questionDialogHandler);
   }
 }
