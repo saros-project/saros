@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -20,6 +21,7 @@ import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket.ItemStatus;
+import saros.exceptions.OperationCanceledException;
 import saros.net.ConnectionState;
 import saros.net.ResourceFeature;
 import saros.net.xmpp.IConnectionListener;
@@ -72,6 +74,8 @@ public class XMPPContactsService implements Disposable {
           new NamedThreadFactory("XMPPContactService-ContactsThread", false));
   /** Modification only within contactsExecutor */
   private final ContactStore contacts = new ContactStore();
+  /** Access to current Connection Service. */
+  private final XMPPConnectionService connectionService;
   /** Only access within contactsExecutor */
   private Roster roster;
 
@@ -126,6 +130,7 @@ public class XMPPContactsService implements Disposable {
 
   public XMPPContactsService(
       XMPPConnectionService connectionService, SubscriptionHandler subscriptionHandler) {
+    this.connectionService = connectionService;
     connectionService.addListener(connectionListener);
     subscriptionHandler.addSubscriptionListener(subscriptionListener);
   }
@@ -173,6 +178,21 @@ public class XMPPContactsService implements Disposable {
    */
   public void removeListener(IContactsUpdate listener) {
     updateListeners.remove(listener);
+  }
+
+  /**
+   * Add a contact to the roster.
+   *
+   * @param jid JID of the Contact to add
+   * @param nickname Optional a Nickname for the Contact
+   * @param questionDialog BiPredicate which will be called by this method with {@code String title}
+   *     and {@code String message} if user interaction is needed.
+   * @throws OperationCanceledException If information about JID can not be found / retrieved from
+   *     Server and User canceled further trying, or Smack experienced an error.
+   */
+  public void addContact(JID jid, String nickname, BiPredicate<String, String> questionDialog)
+      throws OperationCanceledException {
+    AddContactUtility.addToRoster(connectionService, jid, nickname, questionDialog);
   }
 
   /**
