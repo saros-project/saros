@@ -30,8 +30,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.Connection;
 import saros.annotations.Component;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
 import saros.context.IContainerContext;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
@@ -53,9 +54,7 @@ import saros.negotiation.hooks.SessionNegotiationHookManager;
 import saros.net.ConnectionState;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
-import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.PreferenceStore;
 import saros.session.internal.SarosSession;
@@ -110,7 +109,7 @@ public class SarosSessionManager implements ISarosSessionManager {
       new ProjectNegotiationCollector();
   private Thread nextProjectNegotiationWorker;
 
-  private XMPPConnectionService connectionService;
+  private final ConnectionHandler connectionHandler;
 
   private final List<ISessionLifecycleListener> sessionLifecycleListeners =
       new CopyOnWriteArrayList<ISessionLifecycleListener>();
@@ -162,14 +161,10 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
       };
 
-  private final IConnectionListener connectionListener =
-      new IConnectionListener() {
-        @Override
-        public void connectionStateChanged(Connection connection, ConnectionState state) {
-
-          if (state == ConnectionState.DISCONNECTING) {
-            stopSession(SessionEndReason.CONNECTION_LOST);
-          }
+  private final IConnectionStateListener connectionListener =
+      (state, error) -> {
+        if (state == ConnectionState.DISCONNECTING) {
+          stopSession(SessionEndReason.CONNECTION_LOST);
         }
       };
 
@@ -177,15 +172,15 @@ public class SarosSessionManager implements ISarosSessionManager {
       IContainerContext context,
       NegotiationFactory negotiationFactory,
       SessionNegotiationHookManager hookManager,
-      XMPPConnectionService connectionService,
+      ConnectionHandler connectionHandler,
       ITransmitter transmitter,
       IReceiver receiver) {
 
     this.context = context;
-    this.connectionService = connectionService;
+    this.connectionHandler = connectionHandler;
     this.currentSessionNegotiations = new SessionNegotiationObservable();
     this.currentProjectNegotiations = new ProjectNegotiationObservable();
-    this.connectionService.addListener(connectionListener);
+    this.connectionHandler.addConnectionStateListener(connectionListener);
 
     this.negotiationFactory = negotiationFactory;
     this.hookManager = hookManager;
