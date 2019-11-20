@@ -114,6 +114,16 @@ public class ConnectionHandler {
   }
 
   /**
+   * Returns the local JID for the current connection.
+   *
+   * @return the local JID for the current connection or <code>null</code> if no connection is
+   *     established or the connection has no jid
+   */
+  public JID getLocalJID() {
+    return connectionService.getJID();
+  }
+
+  /**
    * Checks if a connection is currently established.
    *
    * @return <code>true</code> if a connection is established, <code>false</code> otherwise
