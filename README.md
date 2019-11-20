@@ -1,4 +1,4 @@
-# <img src="docs/assets/images/logo/saros-logo-100x100.png" alt="drawing" height="42pt"/> Saros - Distributed Party Programming
+# <img src="docs/assets/images/logo/saros-logo.svg" alt="drawing" align="right" width="100"/> Saros - Distributed Party Programming
 [![Travis](https://travis-ci.com/saros-project/saros.svg?branch=master)](https://travis-ci.com/saros-project/saros/branches)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/297b67607a5f4b5b8d00d0446615849b)](https://www.codacy.com/manual/Saros/saros)
 [![Gitter](https://badges.gitter.im/saros-project/saros.svg)](https://gitter.im/saros-project/saros)
