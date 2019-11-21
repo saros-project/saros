@@ -13,12 +13,12 @@ import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import saros.communication.connection.ConnectionHandler;
 import saros.context.IContainerContext;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.IPreferenceStore;
 import saros.session.internal.SarosSession;
 
@@ -88,7 +88,7 @@ public class SarosSessionManagerTest {
   public void setUp() throws Exception {
     SarosSession session = PowerMock.createNiceMock(SarosSession.class);
 
-    XMPPConnectionService network = PowerMock.createNiceMock(XMPPConnectionService.class);
+    ConnectionHandler network = PowerMock.createNiceMock(ConnectionHandler.class);
 
     ITransmitter transmitter = PowerMock.createNiceMock(ITransmitter.class);
     IReceiver receiver = PowerMock.createNiceMock(IReceiver.class);

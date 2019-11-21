@@ -44,16 +44,16 @@ Please make sure before creating the artifacts that **all unit and stf tests are
 **Artifacts:**
 * Plug-in zip
 
-#### Plug-in zip
+#### Plug-In zip
 
 * Open bash
-* Navigate to the saros repository dir
+* Navigate to the Saros repository dir
 * Execute the command `./gradlew sarosIntellij`
 * You find the zip here: `./build/distribution/intellij/saros.inteliij.zip`
 
 ## How do I test the artifacts?
 
-As mentioned before you should already executed all unit and stf tests (which has to be successful).
+As mentioned before you should already executed all unit and STF tests (which has to be successful).
 
 The release artifacts are manually tested with at least one other person:
 * You have to install the artifact and start a session.
@@ -99,7 +99,7 @@ in the marketplace.
 
 **Login process**
 
-* Login with the saro-outreach user
+* Login with the saros-outreach user
 
 **Release/Metadata change process**
 
@@ -128,7 +128,7 @@ We release the IntelliJ IDEA plug-in zip via this repository.
 * Login as user `saros-infrastructure` in [GitHub](https://github.com)
 * Open the [JetBrains Plugin Repository](https://plugins.jetbrains.com/)
 * Click on `Sign In`
-* Instead of entering user credentials, choose the login via Github (click on the GitHub icon)
+* Instead of entering user credentials, choose the login via GitHub (click on the GitHub icon)
 
 **Release process**
 
@@ -157,7 +157,7 @@ We release the Saros for Eclipse drop-in and the Saros for IntelliJ zip via this
 * Click on `draft a new release`
 * Fill the form:
   * Tag: `saros-<ide>-<version>` (e.g. `saros-intellij-0.1.1`)
-  * Tag taget: a commit id
+  * Tag target: a commit id
   * Release title: Short title as `Saros for <ide> <version>`
   * Description: Short description of artifacts and link the release notes
   * Upload binaries as artifacts (e.g. drop-in, plug-in zip)

@@ -1,9 +1,9 @@
 ---
-title: Frequently asked questions
+title: Frequently Asked Questions
 ---
 
 This page lists common questions about Saros. If your question is not
-answered here you should look aroud the
+answered here you should look around the
 [Support](../support/) area. There you will
 find more information that may help you.
 
@@ -29,14 +29,14 @@ In the following we are using these definitions:
 * **Freeware** - You can use the software for free, but the code is not published.
 * **Self-hosted** - The possibility to host a corresponding server that manages the connection or also the shared workspaces.
 
-#### Web-based IDEs
+#### Web-Based IDEs
 
 |Name         |Category    |Self-hosted |
 |-------------|------------|------------|
 |CodeEnvy     |Commercial  |No          |
 |Cloud9       |Commercial  |No          |
 
-#### Plug-ins
+#### Plug-Ins
 
 |Name         |IDE                                              |Category    |Self-hosted |
 |-------------|-------------------------------------------------|------------|------------|
@@ -45,7 +45,7 @@ In the following we are using these definitions:
 |Live Share   |Visual Studio (Code)                             |Freeware    |No          |
 |Teletype     |Atom                                             |Open-Source |Yes         |
 
-#### Stand-alone Editors
+#### Stand-Alone Editors
 
 |Name         |OS                  |Category    |Self-hosted |
 |-------------|--------------------|------------|------------|
@@ -151,7 +151,7 @@ Saros session?
 -   Saros uses an [XMPP](http://en.wikipedia.org/wiki/XMPP) server to
     get in contact with the other participant(s). Companies can [run their own XMPP server](setup-xmpp.md)
     for maximum privacy; home users can use almost any public XMPP server.
--   Thoughout the session (if possible) Saros uses
+-   Throughout the session (if possible) Saros uses
     [Socks5](http://en.wikipedia.org/wiki/SOCKS) connections (direct
     or mediated) between the participants. Saros supports optional [UPnP
     port
@@ -162,7 +162,7 @@ Saros session?
 ### How to use a Google account / Google Talk service with Saros?
 
 We don't recommend to use you Google account for XMPP anymore, since
-Google has droped Google Talk XMPP support with the introduction of
+Google has dropped Google Talk XMPP support with the introduction of
 Google Hangouts.
 
 ### Is Saros language dependent or which languages does Saros support?

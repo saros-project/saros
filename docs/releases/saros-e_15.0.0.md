@@ -20,7 +20,7 @@ You may know the Saros whiteboard from the previous release.
 Due to stability issues we did not release the Whiteboard feature of Saros, which allowed to share drawings between Saros users.
 We plan to release a new whiteboard as soon as it works reliable.
 
-## JDK requirements
+## JDK Requirements
 Saros 15.0.0 requires JDK8+, since we switched to JDK8 internally.
 
 ## Feedback

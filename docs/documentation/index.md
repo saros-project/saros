@@ -42,9 +42,9 @@ toc: false
 *   That means for instance that it does not support joint
     interactive [testing](host-comic.md).
 
-## Saros can be used in various scenarios
+## Saros can be used in various scenarios.
 
-* **Joint review**                      
+* **Joint review**
 
   One participant (**"driver"**)
   reviews the contents of one or more
@@ -60,9 +60,9 @@ toc: false
   the mouse for all the others to
   see. Also, any participant can
   become driver at any time.
-                                        
 
-* **Introducing beginners**             
+
+* **Introducing beginners**
 
   Much like before, except that
   explaining rather than reviewing is
@@ -74,9 +74,9 @@ toc: false
   session for the others. To do that,
   s/he will temporarily leave follow
   mode.
-                                        
 
-* **Distributed Party Programming**     
+
+* **Distributed Party Programming**
 
   **Two or more participants work
   together in a loosely coupled
@@ -93,13 +93,12 @@ toc: false
   hour. Just think how this can speed
   up the coordination work just before
   release time after a code freeze!
-                                        
 
-* **Distributed Pair Programming **     
-  Is a particular form of Distributed
+
+* **Distributed Pair Programming **
+  is a particular form of Distributed
   Party Programming in which two
   people develop code or text in
   continuous close collaboration,
   discussing the approach and
   combining the best of their ideas.
-                                        

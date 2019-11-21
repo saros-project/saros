@@ -5,18 +5,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.jivesoftware.smack.Connection;
 import saros.SarosPluginContext;
-import saros.net.ConnectionState;
-import saros.net.xmpp.IConnectionListener;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -34,23 +30,11 @@ public class DeleteContactAction extends Action implements Disposable {
 
   private static final Logger LOG = Logger.getLogger(DeleteContactAction.class);
 
-  protected IConnectionListener connectionListener =
-      new IConnectionListener() {
-        @Override
-        public void connectionStateChanged(Connection connection, final ConnectionState newState) {
-          updateEnablement();
-        }
-      };
+  protected IConnectionStateListener connectionListener = (state, error) -> updateEnablement();
 
-  protected ISelectionListener selectionListener =
-      new ISelectionListener() {
-        @Override
-        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-          updateEnablement();
-        }
-      };
+  protected ISelectionListener selectionListener = (part, selection) -> updateEnablement();
 
-  @Inject private XMPPConnectionService connectionService;
+  @Inject private ConnectionHandler connectionHandler;
   @Inject private XMPPContactsService contactsService;
   @Inject private ISarosSessionManager sessionManager;
 
@@ -69,7 +53,7 @@ public class DeleteContactAction extends Action implements Disposable {
 
     SarosPluginContext.initComponent(this);
 
-    connectionService.addListener(connectionListener);
+    connectionHandler.addConnectionStateListener(connectionListener);
     SelectionUtils.getSelectionService().addSelectionListener(selectionListener);
     updateEnablement();
   }
@@ -78,7 +62,7 @@ public class DeleteContactAction extends Action implements Disposable {
     try {
       List<JID> contacts =
           SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
-      this.setEnabled(connectionService.isConnected() && contacts.size() == 1);
+      this.setEnabled(connectionHandler.isConnected() && contacts.size() == 1);
     } catch (NullPointerException e) {
       this.setEnabled(false);
     } catch (Exception e) {
@@ -141,6 +125,6 @@ public class DeleteContactAction extends Action implements Disposable {
   @Override
   public void dispose() {
     SelectionUtils.getSelectionService().removeSelectionListener(selectionListener);
-    connectionService.removeListener(connectionListener);
+    connectionHandler.removeConnectionStateListener(connectionListener);
   }
 }

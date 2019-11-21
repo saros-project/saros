@@ -2,7 +2,7 @@
 title: Saros-Server
 ---
 
-**Note**: This is an *alpha* feature and not intended for general use yet. However please feel free to play around and give some initial feedback. Contributers to the Saros-Server project are very welcome and might want to take a look at [contribution wiki](../contribute/saros-server.md) for further information.
+**Note**: This is an *alpha* feature and not intended for general use yet. However please feel free to play around and give some initial feedback. Contributors to the Saros-Server project are very welcome and might want to take a look at [contribution wiki](../contribute/saros-server.md) for further information.
 
 ## Use-case
 
@@ -10,7 +10,7 @@ The use-case of the server is to host session independently of any participant. 
 
 ## Usage
 
-The Saros-Server is currently available in version **0.1.0** as a standalone jar on [our Github Releases](https://github.com/saros-project/saros/releases).
+The Saros-Server is currently not available for download, but is scheduled to be on the next Saros/E Release (no ETA).
 
 The server needs it's own XMPP account and can then be started via:
 `java -Dsaros.server.jid=max@mustermann.de -Dsaros.server.password=1234 -jar saros.server.jar`
