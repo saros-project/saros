@@ -114,6 +114,16 @@ public class ConnectionHandler {
   }
 
   /**
+   * Returns the local JID for the current connection.
+   *
+   * @return the local JID for the current connection or <code>null</code> if no connection is
+   *     established or the connection has no jid
+   */
+  public JID getLocalJID() {
+    return connectionService.getJID();
+  }
+
+  /**
    * Checks if a connection is currently established.
    *
    * @return <code>true</code> if a connection is established, <code>false</code> otherwise
@@ -273,7 +283,12 @@ public class ConnectionHandler {
       this.currentConnectionError = error;
     }
 
-    for (IConnectionStateListener listener : stateListeners)
-      listener.connectionStateChanged(state, error);
+    for (IConnectionStateListener listener : stateListeners) {
+      try {
+        listener.connectionStateChanged(state, error);
+      } catch (Exception e) {
+        LOG.error("internal error in listener: " + listener, e);
+      }
+    }
   }
 }

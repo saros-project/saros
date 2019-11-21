@@ -13,15 +13,14 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.jetbrains.annotations.NotNull;
-import org.jivesoftware.smack.Connection;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccountStore;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.views.SarosMainPanelView;
 import saros.net.ConnectionState;
-import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
@@ -37,7 +36,7 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
 
   @Inject private XMPPAccountStore accountStore;
 
-  @Inject private XMPPConnectionService connectionService;
+  @Inject private ConnectionHandler connectionHandler;
 
   /**
    * A cell renderer that sets the node icon according to the node type (root, session, contact, or
@@ -84,14 +83,8 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
         }
       };
 
-  private final IConnectionListener connectionStateListener =
-      new IConnectionListener() {
-
-        @Override
-        public void connectionStateChanged(Connection connection, ConnectionState state) {
-          renderConnectionState(connection, state);
-        }
-      };
+  private final IConnectionStateListener connectionStateListener =
+      (state, error) -> renderConnectionState(state);
 
   public SessionAndContactsTreeView(@NotNull Project project) {
     super(new SarosTreeRootNode());
@@ -110,20 +103,19 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
     getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setCellRenderer(renderer);
 
-    connectionService.addListener(connectionStateListener);
+    connectionHandler.addConnectionStateListener(connectionStateListener);
 
     // show correct initial state
-    renderConnectionState(
-        connectionService.getConnection(), connectionService.getConnectionState());
+    renderConnectionState(connectionHandler.getConnectionState());
     sessionTreeRootNode.setInitialState();
   }
 
   @Override
   public void dispose() {
-    connectionService.removeListener(connectionStateListener);
+    connectionHandler.removeConnectionStateListener(connectionStateListener);
   }
 
-  private void renderConnectionState(Connection connection, ConnectionState state) {
+  private void renderConnectionState(ConnectionState state) {
 
     switch (state) {
       case CONNECTED:
@@ -145,19 +137,12 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
    */
   private void renderConnected() {
     UIUtil.invokeLaterIfNeeded(
-        new Runnable() {
-          @Override
-          public void run() {
-            Connection connection = connectionService.getConnection();
-            if (connection == null) return;
+        () -> {
+          JID userJID = connectionHandler.getLocalJID();
+          if (userJID == null) return;
 
-            String userJID = connection.getUser();
-            String rootText = new JID(userJID).getBareJID().toString();
-
-            getSarosTreeRootNode().setTitle(rootText);
-
-            updateTree();
-          }
+          getSarosTreeRootNode().setTitle(userJID.getBareJID().toString());
+          updateTree();
         });
   }
 
