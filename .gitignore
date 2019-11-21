@@ -1,5 +1,7 @@
 bin/
 bin_test/
+buildSrc/build
+buildSrc/.gradle
 /.idea/*.iws
 /.idea/tasks.xml
 /.idea/workspace.xml

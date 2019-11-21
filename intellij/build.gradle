@@ -1,15 +1,10 @@
-buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.10"
-  }
-}
+apply plugin: 'saros.gradle.intellij.plugin'
 
-apply plugin: 'org.jetbrains.intellij'
+sarosIntellij {
+  sandboxBaseDir = intellijSandboxDir as File
+  localIntellijHome = intellijHome as File
+  intellijVersion = 'IC-2019.2.4'
+}
 
 dependencies {
   compile project(':saros.core')
@@ -45,67 +40,4 @@ jar {
   version = null
 
   from sourceSets.main.output
-}
-
-// Intellij configuration
-ext.intellijLockFileName = 'saros_sandbox.lock'
-ext.intellijSandboxBaseDir = System.getenv('SAROS_INTELLIJ_SANDBOX') ?: project.buildDir
-ext.intellijSandboxDir = null
-
-intellij {
-  // helper functions
-  Closure lockSandbox = { File sandboxDir ->
-    sandboxDir.mkdirs()
-    new File(sandboxDir, intellijLockFileName).createNewFile()
-  }
-  Closure isSandboxLocked = { File sandboxDir ->
-    new File(sandboxDir, intellijLockFileName).exists()
-  }
-  Closure getSandboxDir = { sandboxCount ->
-    "${project.ext.intellijSandboxBaseDir}/idea-sandbox$sandboxCount" as File
-  }
-
-  // Download intellij only if the home property is not set
-  if (intellijHome) {
-    localPath = intellijHome
-  } else {
-    version = 'IC-2019.2.4'
-  }
-
-  // don't overwrite the version compatibility defined in the plugin.xml
-  updateSinceUntilBuild = false
-
-  pluginName 'Saros'
-
-  // determine new sandbox dir that is not locked
-  Integer sandboxCount = 1
-  File currentSandboxDir = getSandboxDir(sandboxCount)
-  while (isSandboxLocked(currentSandboxDir)) {
-    sandboxCount++
-    currentSandboxDir = getSandboxDir(sandboxCount)
-  }
-  project.ext.intellijSandboxDir = currentSandboxDir
-  sandboxDirectory = currentSandboxDir
-}
-
-task lockIntellijSandbox {
-  doLast {
-    File sandboxDir = project.ext.intellijSandboxDir
-    sandboxDir.mkdirs()
-    new File(sandboxDir, intellijLockFileName).createNewFile()
-  }
-}
-
-// remove lock file if sandbox is closed
-task unlockIntellijSandbox {
-  doLast {
-    new File(project.ext.intellijSandboxDir, intellijLockFileName).delete()
-  }
-}
-
-runIde.dependsOn(lockIntellijSandbox)
-runIde.finalizedBy(unlockIntellijSandbox)
-
-artifacts {
-  archives buildPlugin
 }
