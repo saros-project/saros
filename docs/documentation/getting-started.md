@@ -44,8 +44,7 @@ You need an **XMPP account** to use Saros.
 To do that simply start the *Saros Configuration* wizard (*Menu &gt;
 Saros &gt; Start Saros Configuration*)
 
-![Connecting to
-Server](images/1_GettingStartedCreateAccount_0.png)
+![Connecting to Server](images/1_GettingStartedCreateAccount_0.png){:class="img-fluid"}
 
 
 ### Step 2: Adding Contacts
@@ -57,8 +56,7 @@ your contact.
 Once s/he accepts your request you will be able to see his/her **online
 status in your contact list**.
 
-![Adding
-buddies](images/2_GettingStartedAddContacts.png)
+![Adding buddies](images/2_GettingStartedAddContacts.png){:class="img-fluid"}
 
 ### Step 3: Starting and Joining Sessions
 
@@ -68,8 +66,7 @@ session** or by **being invited to one**.
 When **starting** a session, **Saros will copy the project** to the
 computer of your invited contacts.
 
-![Share
-Projects](images/3_GettingStartedShareProjects_0.png)
+![Share Projects](images/3_GettingStartedShareProjects_0.png){:class="img-fluid"}
 
 #### Start a Session ([host](#the-host))
 
@@ -129,7 +126,7 @@ accompany your sessions.
 Whenever you begin a Saros session, a **chat session** is also
 automatically started.
 
-![saros\_view\_with\_contextmenu](images/saros_view_with_contextmenu_1.png)
+![saros\_view\_with\_contextmenu](images/saros_view_with_contextmenu_1.png){:class="img-fluid"}
 
 ### Step 5: Exploring the Saros Toolbar
 
