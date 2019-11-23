@@ -30,104 +30,104 @@ public class SarosSessionUserTest {
   public void testSessionUserReadOnlyPrivilegeDefault() {
 	  setUp();
 // System.out.println("2 - testSessionUserReadOnlyPrivilegeDefault()" + HOST.hasReadOnlyAccessPrivilege());
-	  assertEquals(HOST.hasReadOnlyAccessPrivilege(), false);
+	  assertEquals(HOST.hasReadOnlyAccessPrivilege(), new Boolean(false));
   }
   @Test
   public void testSessionUserWritePrivilegeDefault() {
-	  assertEquals(HOST.hasWriteAccessPrivilege(), false);
+	  assertEquals(HOST.hasWriteAccessPrivilege(), new Boolean(false));
   }
   @Test
   public void testSessionUserShareDocumentPrivilegeDefault() {
-	  assertEquals(HOST.hasShareDocumentPrivilege(), false);
+	  assertEquals(HOST.hasShareDocumentPrivilege(), new Boolean(false));
   }
   @Test
   public void testSessionUserInvitePrivilegeDefault() {
-	  assertEquals(HOST.hasInvitePrivilege(), false);
+	  assertEquals(HOST.hasInvitePrivilege(), new Boolean(false));
   }
   @Test
   public void testSessionUserGrantPermissionPrivilegeDefault() {
-	  assertEquals(HOST.hasGrantPermissionPrivilege(), false);
+	  assertEquals(HOST.hasGrantPermissionPrivilege(), new Boolean(false));
   }
   @Test
   public void testSessionUserJoinSessionPrivilegeDefault() {
-	  assertEquals(HOST.hasJoinSessionPrivilege(), false);
+	  assertEquals(HOST.hasJoinSessionPrivilege(), new Boolean(false));
   }
   @Test
   public void testSessionUserStartSessionPrivilegeDefault() {
-	  assertEquals(HOST.hasStartSessionServerPrivilege(), false);
+	  assertEquals(HOST.hasStartSessionServerPrivilege(), new Boolean(false));
   }
   @Test
   public void testSessionUserStopSessionPrivilegeDefault() {
-	  assertEquals(HOST.hasStopSessionServerPrivilege(), false);
+	  assertEquals(HOST.hasStopSessionServerPrivilege(), new Boolean(false));
   }
   @Test
   public void testSessionUserDeleteSessionDataPrivilegeDefault() {
-	  assertEquals(HOST.hasDeleteSessionDataPrivilege(), false);
+	  assertEquals(HOST.hasDeleteSessionDataPrivilege(), new Boolean(false));
   }
   @Test
   public void testSessionUserConfigureServerPrivilegeDefault() {
-	  assertEquals(HOST.hasConfigureServerPrivilege(), false);
+	  assertEquals(HOST.hasConfigureServerPrivilege(), new Boolean(false));
   }
-  
+
   // test add privilege
   @Test
   public void testSessionUserReadOnlyPrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.READONLY_ACCESS, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasReadOnlyAccessPrivilege(), true);
+	  assertEquals(HOST.hasReadOnlyAccessPrivilege(), new Boolean(true));
   }
   @Test
   public void testSessionUserWritePrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.WRITE_ACCESS, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_WRITE_ACCESS, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasWriteAccessPrivilege(), true);
+	  assertEquals(HOST.hasWriteAccessPrivilege(), new Boolean(true));
   }
   @Test
   public void testSessionUserShareDocumentPrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.SHARE_DOCUMENT, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_SHARE_DOCUMENT, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasShareDocumentPrivilege(), true);
+	  assertEquals(HOST.hasShareDocumentPrivilege(), new Boolean(true));
   }
   @Test
   public void testSessionUserInvitePrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.INVITE_USER, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_INVITE_USER, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasInvitePrivilege(), true);
+	  assertEquals(HOST.hasInvitePrivilege(), new Boolean(true));
   }
   @Test
   public void testSessionUserGrantPermissionPrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.GRANT_PERMISSION, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_GRANT_PERMISSION, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasGrantPermissionPrivilege(), true);
+	  assertEquals(HOST.hasGrantPermissionPrivilege(), new Boolean(true));
   }
   @Test
   public void testSessionUserJoinSessionPrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.JOIN_SESSION, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_JOIN, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasJoinSessionPrivilege(), true);
+	  assertEquals(HOST.hasJoinSessionPrivilege(), new Boolean(true));
   }
   @Test
   public void testSessionUserStartSessionPrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.START_SESSION_SERVER, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_START_SERVER, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasStartSessionServerPrivilege(), true);
+	  assertEquals(HOST.hasStartSessionServerPrivilege(), new Boolean(true));
   }
   @Test
   public void testSessionUserStopSessionPrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.STOP_SESSION_SERVER, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_STOP_SERVER, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasStopSessionServerPrivilege(), true);
+	  assertEquals(HOST.hasStopSessionServerPrivilege(), new Boolean(true));
   }
   @Test
   public void testSessionUserDeleteSessionDataPrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.DELETE_SESSION_DATA, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_DELETE_DATA, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasDeleteSessionDataPrivilege(), true);
+	  assertEquals(HOST.hasDeleteSessionDataPrivilege(), new Boolean(true));
   }
   @Test
   public void testSessionUserConfigureServerPrivilegeAdd() {
-	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Privilege.CONFIGURE_SERVER, true);
+	  UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER, new Boolean(true));
 	  HOST.addPrivilege(priv);
-	  assertEquals(HOST.hasConfigureServerPrivilege(), true);
+	  assertEquals(HOST.hasConfigureServerPrivilege(), new Boolean(true));
   }
 }

@@ -2,23 +2,24 @@ package saros.session;
 
 public class UserPrivilege {
 	
-	public enum Privilege {
-	    WRITE_ACCESS,
-	    READONLY_ACCESS,
-	    SHARE_DOCUMENT,
-	    INVITE_USER,
-	    GRANT_PERMISSION,
-	    JOIN_SESSION,
-	    START_SESSION_SERVER,
-	    STOP_SESSION_SERVER,
-	    DELETE_SESSION_DATA,
-	    CONFIGURE_SERVER
-	  }
+	public enum Keys {
+    SESSION_ADMINISTER,
+    SESSION_DELETE_DATA,
+    SESSION_GRANT_PERMISSION,
+    SESSION_INVITE_USER,
+    SESSION_JOIN,
+    SESSION_READONLY_ACCESS,
+    SESSION_SHARE_DOCUMENT,
+    SESSION_START_SERVER,
+    SESSION_STOP_SERVER,
+    SESSION_WRITE_ACCESS,
+    CONFIGURE_SERVER
+  }
 
-	protected Privilege key;
+	protected UserPrivilege.Keys key;
 	protected Boolean value = false; // defaults to false, no?
 
-    public UserPrivilege(Privilege key, Boolean value) {
+    public UserPrivilege(UserPrivilege.Keys key, Boolean value) {
         this.key = key;
         this.value = value;
     }
@@ -31,20 +32,20 @@ public class UserPrivilege {
         return this.key.toString() + " : " + getValue();
     }
     
-    public void setKey(Privilege key) {
+    public void setKey(UserPrivilege.Keys key) {
         this.key = key;
     }
 
-    public Privilege getKey() {
+    public UserPrivilege.Keys getKey() {
         return this.key;
     }
 
     // null becomes false
     public void setValue(Boolean value) {
-        if (value == true) {
+        if (value.compareTo(true) == 0) {
             this.value = value;
         } else if (value == null) {
-            this.value = false;
+            this.value = new Boolean(false);
         }
     }
 

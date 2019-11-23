@@ -64,55 +64,56 @@ public class User {
   
   
   /* More flexible Permissions also known as Privilege */
-  private Map<UserPrivilege.Privilege, UserPrivilege> privileges;
-  public Map<UserPrivilege.Privilege, UserPrivilege> getPrivileges() {
+  private Map<UserPrivilege.Keys, UserPrivilege> privileges;
+  public Map<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
       return this.privileges;
   }
-  public void setPrivileges(Map<UserPrivilege.Privilege, UserPrivilege> privileges) {
+  public void setPrivileges(Map<UserPrivilege.Keys, UserPrivilege> privileges) {
       this.privileges = privileges;
   }
   public void addPrivilege(UserPrivilege privilege) {
       this.privileges.put(privilege.getKey(), privilege);
   }
   // get any privileges value or false
-  public boolean hasPrivilege(UserPrivilege.Privilege privilege) {
+  public boolean hasPrivilege(UserPrivilege.Keys privilege) {
 //System.out.println("3 - hasPrivilege() " + privilege + " : " + this.privileges.containsKey(privilege));
 	  if (this.privileges.containsKey(privilege)) {
 		  return this.privileges.get(privilege).getValue();
 	  }
 	  return false;
   }
+
   // convenience functions to privilege values
   public boolean hasReadOnlyAccessPrivilege() {
 //System.out.println("3 - User.hasReadOnlyAccessPrivilege() " + hasPrivilege(UserPrivilege.Privilege.READONLY_ACCESS));
-	  return hasPrivilege(UserPrivilege.Privilege.READONLY_ACCESS);
+	  return hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS);
   }
   public boolean hasWriteAccessPrivilege() {
-	  return hasPrivilege(UserPrivilege.Privilege.WRITE_ACCESS);
+	  return hasPrivilege(UserPrivilege.Keys.SESSION_WRITE_ACCESS);
   }
   public boolean hasShareDocumentPrivilege() {
-	  return hasPrivilege(UserPrivilege.Privilege.SHARE_DOCUMENT);
+	  return hasPrivilege(UserPrivilege.Keys.SESSION_SHARE_DOCUMENT);
   }
   public boolean hasInvitePrivilege() {
-	  return hasPrivilege(UserPrivilege.Privilege.INVITE_USER);
+	  return hasPrivilege(UserPrivilege.Keys.SESSION_INVITE_USER);
   }
   public boolean hasGrantPermissionPrivilege() {
-	  return hasPrivilege(UserPrivilege.Privilege.GRANT_PERMISSION);
+	  return hasPrivilege(UserPrivilege.Keys.SESSION_GRANT_PERMISSION);
   }
   public boolean hasJoinSessionPrivilege() {
-	  return hasPrivilege(UserPrivilege.Privilege.JOIN_SESSION);
+	  return hasPrivilege(UserPrivilege.Keys.SESSION_JOIN);
   }
   public boolean hasStartSessionServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Privilege.START_SESSION_SERVER);
+	  return hasPrivilege(UserPrivilege.Keys.SESSION_START_SERVER);
   }
   public boolean hasStopSessionServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Privilege.STOP_SESSION_SERVER);
+	  return hasPrivilege(UserPrivilege.Keys.SESSION_STOP_SERVER);
   }
   public boolean hasDeleteSessionDataPrivilege() {
-	  return hasPrivilege(UserPrivilege.Privilege.DELETE_SESSION_DATA);
+	  return hasPrivilege(UserPrivilege.Keys.SESSION_DELETE_DATA);
   }
   public boolean hasConfigureServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Privilege.CONFIGURE_SERVER);
+	  return hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER);
   }
   
   
@@ -133,7 +134,7 @@ public class User {
     this.colorID = colorID;
     this.favoriteColorID = favoriteColorID;
     
-    this.privileges = new HashMap<UserPrivilege.Privilege, UserPrivilege>();
+    this.privileges = new HashMap<UserPrivilege.Keys, UserPrivilege>();
   }
 
   /**
