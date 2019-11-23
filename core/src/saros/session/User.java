@@ -57,11 +57,7 @@ public class User {
 
   @Deprecated
   private volatile Permission permission = Permission.WRITE_ACCESS;
-  
-  
-  
-  
-  
+
   
   /* More flexible Permissions also known as Privilege */
   private Map<UserPrivilege.Keys, UserPrivilege> privileges;
@@ -115,14 +111,6 @@ public class User {
   public boolean hasConfigureServerPrivilege() {
 	  return hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER);
   }
-  
-  
-  
-  
-  
-  
-  
-  
 
   private volatile boolean isInSession;
 
