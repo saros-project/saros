@@ -409,7 +409,7 @@ public class XMPPContactsService implements Disposable {
       contactsExecutor.execute(
           () -> {
             if (contact.setFeatureSupport(fullJid, features))
-              notifyListeners(contact, UpdateType.SAROS_SUPPORT);
+              notifyListeners(contact, UpdateType.FEATURE_SUPPORT);
           });
     };
   }
