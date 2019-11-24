@@ -58,59 +58,8 @@ public class User {
   @Deprecated
   private volatile Permission permission = Permission.WRITE_ACCESS;
 
-  
   /* More flexible Permissions also known as Privilege */
   private Map<UserPrivilege.Keys, UserPrivilege> privileges;
-  public Map<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
-      return this.privileges;
-  }
-  public void setPrivileges(Map<UserPrivilege.Keys, UserPrivilege> privileges) {
-      this.privileges = privileges;
-  }
-  public void addPrivilege(UserPrivilege privilege) {
-      this.privileges.put(privilege.getKey(), privilege);
-  }
-  // get any privileges value or false
-  public boolean hasPrivilege(UserPrivilege.Keys privilege) {
-//System.out.println("3 - hasPrivilege() " + privilege + " : " + this.privileges.containsKey(privilege));
-	  if (this.privileges.containsKey(privilege)) {
-		  return this.privileges.get(privilege).getValue();
-	  }
-	  return false;
-  }
-
-  // convenience functions to privilege values
-  public boolean hasReadOnlyAccessPrivilege() {
-//System.out.println("3 - User.hasReadOnlyAccessPrivilege() " + hasPrivilege(UserPrivilege.Privilege.READONLY_ACCESS));
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS);
-  }
-  public boolean hasWriteAccessPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_WRITE_ACCESS);
-  }
-  public boolean hasShareDocumentPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_SHARE_DOCUMENT);
-  }
-  public boolean hasInvitePrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_INVITE_USER);
-  }
-  public boolean hasGrantPermissionPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_GRANT_PERMISSION);
-  }
-  public boolean hasJoinSessionPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_JOIN);
-  }
-  public boolean hasStartSessionServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_START_SERVER);
-  }
-  public boolean hasStopSessionServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_STOP_SERVER);
-  }
-  public boolean hasDeleteSessionDataPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_DELETE_DATA);
-  }
-  public boolean hasConfigureServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER);
-  }
 
   private volatile boolean isInSession;
 
@@ -184,6 +133,44 @@ public class User {
   public boolean isInSession() {
     return isInSession;
   }
+
+
+  /**
+   * Get a Map of the UserPrivileges of this user instance.
+   *
+   * @return <code>Map<UserPrivilege.Keys, UserPrivilege></code>
+   */
+  public Map<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
+    return this.privileges;
+  }
+
+  /**
+   * Set a Map of the UserPrivileges to this user instance.
+   */
+  public void setPrivileges(Map<UserPrivilege.Keys, UserPrivilege> privileges) {
+    this.privileges = privileges;
+  }
+
+  /**
+   * Add a UserPrivileges to this user instance.
+   */
+  public void addPrivilege(UserPrivilege privilege) {
+    this.privileges.put(privilege.getKey(), privilege);
+  }
+
+  /**
+   * Get the UserPrivileges value for this user instance.
+   *
+   * @return <code>true</code> if this User has {@link UserPrivilege.Keys} or <code>false</code>.
+   */
+  public boolean hasPrivilege(UserPrivilege.Keys privilege) {
+    if (this.privileges.containsKey(privilege)) {
+      return this.privileges.get(privilege).getValue();
+    }
+    return false;
+  }
+
+
 
   @Override
   public String toString() {
