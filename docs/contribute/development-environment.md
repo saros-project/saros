@@ -9,12 +9,9 @@ If you want to execute the STF tests it is recommended to use Eclipse. Otherwise
 
 * You have to [clone](https://help.github.com/articles/cloning-a-repository/) the Saros repository with [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 * You need a **Java 8 JDK**.
-* You need an **Eclipse 4.6** installation which is used for dependency resolution. You can either install a [minimal Eclipse](http://www.eclipse.org/downloads/packages/release/neon/3/eclipse-ide-java-developers) or [Eclipse for Eclipse Committers](http://www.eclipse.org/downloads/packages/release/neon/3/eclipse-ide-eclipse-committers) if you also want to develop with Eclipse.
-* Install **GEF Legacy** into Eclipse using the 'GEF-Legacy Releases' update site given [here](https://projects.eclipse.org/projects/tools.gef/downloads)
 * *Optional:* You can install an **IntelliJ IDEA** installation which is used for dependency resolution. Install a current version of [**IntelliJ IDEA**](https://www.jetbrains.com/idea/download/) (we have only tested Saros/I for IntelliJ releases 2017.X and later).<br/>
 Set the **system-wide environment variable `INTELLIJ_HOME`** to the IntelliJ installation dir that contains the directory `lib`.
 
-If the `ECLIPSE_HOME` variable is not set or not global the corresponding Eclipse specific dependencies cannot be found during build.<br/>
 If the `INTELLIJ_HOME` variable is not set or not global the intellij-gradle-plugin will download a version of IntelliJ which is
 defined in the Gradle build description.
 
