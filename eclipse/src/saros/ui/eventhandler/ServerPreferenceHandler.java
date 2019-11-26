@@ -3,8 +3,8 @@ package saros.ui.eventhandler;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
-import saros.SarosConstants;
 import saros.net.ConnectionState;
+import saros.net.ResourceFeature;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.EclipsePreferenceConstants;
@@ -48,7 +48,7 @@ public class ServerPreferenceHandler {
 
     if (discoveryManager == null) return;
 
-    discoveryManager.addFeature(SarosConstants.NAMESPACE_SERVER);
+    discoveryManager.addFeature(ResourceFeature.SAROS_SERVER.getIdentifier());
   }
 
   private void removeServerFeature(Connection connection) {
@@ -58,6 +58,6 @@ public class ServerPreferenceHandler {
 
     if (discoveryManager == null) return;
 
-    discoveryManager.removeFeature(SarosConstants.NAMESPACE_SERVER);
+    discoveryManager.removeFeature(ResourceFeature.SAROS_SERVER.getIdentifier());
   }
 }

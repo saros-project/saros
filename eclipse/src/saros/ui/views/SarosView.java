@@ -42,10 +42,10 @@ import org.jivesoftware.smack.packet.Presence;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
+import saros.net.ResourceFeature;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.XMPPContact;
-import saros.net.xmpp.contact.XMPPContact.Feature;
 import saros.net.xmpp.roster.IRosterListener;
 import saros.net.xmpp.roster.RosterTracker;
 import saros.preferences.EclipsePreferenceConstants;
@@ -475,7 +475,7 @@ public class SarosView extends ViewPart {
 
             // TODO: Currently only Saros/S is known to have a working JoinSessionRequestHandler,
             //       remove this once the situation changes / change this to it's own feature.
-            if (contact.hasFeatureSupport(Feature.SAROS_SERVER)) {
+            if (contact.hasFeatureSupport(ResourceFeature.SAROS_SERVER)) {
               manager.add(getAction(RequestSessionInviteAction.ACTION_ID));
               manager.add(new Separator());
             }

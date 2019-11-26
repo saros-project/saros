@@ -12,6 +12,7 @@ import saros.SarosConstants;
 import saros.account.XMPPAccount;
 import saros.net.ConnectionState;
 import saros.net.IConnectionManager;
+import saros.net.ResourceFeature;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
@@ -57,7 +58,7 @@ public class ConnectionHandler {
 
           if (state == ConnectionState.CONNECTING) {
             ServiceDiscoveryManager.getInstanceFor(connection)
-                .addFeature(SarosConstants.XMPP_FEATURE_NAMESPACE);
+                .addFeature(ResourceFeature.SAROS.getIdentifier());
           }
 
           final Exception error =

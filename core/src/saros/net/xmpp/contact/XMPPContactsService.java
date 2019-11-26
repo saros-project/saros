@@ -21,12 +21,12 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket.ItemStatus;
 import saros.net.ConnectionState;
+import saros.net.ResourceFeature;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.ContactStatus.Type;
 import saros.net.xmpp.contact.IContactsUpdate.UpdateType;
-import saros.net.xmpp.contact.XMPPContact.Feature;
 import saros.net.xmpp.subscription.SubscriptionHandler;
 import saros.net.xmpp.subscription.SubscriptionListener;
 import saros.repackaged.picocontainer.Disposable;
@@ -403,7 +403,7 @@ public class XMPPContactsService implements Disposable {
    * @param contact
    * @return Consumer to be called after a positive query
    */
-  private Consumer<EnumSet<Feature>> createFeatureQueryResultHandler(
+  private Consumer<EnumSet<ResourceFeature>> createFeatureQueryResultHandler(
       JID fullJid, XMPPContact contact) {
     return features -> {
       contactsExecutor.execute(

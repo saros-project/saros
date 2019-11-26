@@ -3,9 +3,9 @@ package saros.server.net;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
-import saros.SarosConstants;
 import saros.annotations.Component;
 import saros.net.ConnectionState;
+import saros.net.ResourceFeature;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.XMPPConnectionService;
 
@@ -41,6 +41,6 @@ public class ServerFeatureAdvertiser {
 
     ServiceDiscoveryManager discoveryManager = ServiceDiscoveryManager.getInstanceFor(connection);
 
-    discoveryManager.addFeature(SarosConstants.NAMESPACE_SERVER);
+    discoveryManager.addFeature(ResourceFeature.SAROS_SERVER.getIdentifier());
   }
 }

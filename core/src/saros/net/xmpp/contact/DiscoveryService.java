@@ -15,12 +15,12 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo;
-import saros.SarosConstants;
+import saros.net.ResourceFeature;
 import saros.net.xmpp.JID;
 import saros.util.NamedThreadFactory;
 
 /**
- * A Simple Service to get and cache {@link XMPPContact.Feature} Support of XMPP resources.
+ * A Simple Service to get and cache {@link ResourceFeature} Support of XMPP resources.
  *
  * <p>All methods are non-blocking and run in a separate thread, which should be stopped after usage
  * via {@link #stop()}.
@@ -38,7 +38,7 @@ class DiscoveryService {
           new LinkedBlockingQueue<Runnable>(),
           new NamedThreadFactory("XMPPContactService-DiscoveryThread", false));
 
-  private Map<String, EnumSet<XMPPContact.Feature>> resourcesFeatureSupport = new HashMap<>();
+  private Map<String, EnumSet<ResourceFeature>> resourcesFeatureSupport = new HashMap<>();
   private ServiceDiscoveryManager discoveryManager;
 
   /**
@@ -64,11 +64,11 @@ class DiscoveryService {
    * @param fullJid of contact
    * @param resultCallback to call on result
    */
-  void queryFeatureSupport(JID fullJid, Consumer<EnumSet<XMPPContact.Feature>> resultCallback) {
+  void queryFeatureSupport(JID fullJid, Consumer<EnumSet<ResourceFeature>> resultCallback) {
     discoveryExecutor.execute(
         () -> {
           String jid = fullJid.getRAW();
-          EnumSet<XMPPContact.Feature> features;
+          EnumSet<ResourceFeature> features;
           if (resourcesFeatureSupport.containsKey(jid)) {
             features = resourcesFeatureSupport.get(jid);
           } else {
@@ -80,20 +80,15 @@ class DiscoveryService {
         });
   }
 
-  private EnumSet<XMPPContact.Feature> runDiscovery(String fullJid) {
-    EnumSet<XMPPContact.Feature> features = EnumSet.noneOf(XMPPContact.Feature.class);
+  private EnumSet<ResourceFeature> runDiscovery(String fullJid) {
+    EnumSet<ResourceFeature> features = EnumSet.noneOf(ResourceFeature.class);
 
     if (discoveryManager == null) return features;
     try {
       DiscoverInfo discoverInfo = discoveryManager.discoverInfo(fullJid);
 
       for (Iterator<DiscoverInfo.Feature> it = discoverInfo.getFeatures(); it.hasNext(); ) {
-        String feature = it.next().getVar();
-        if (SarosConstants.XMPP_FEATURE_NAMESPACE.equals(feature)) {
-          features.add(XMPPContact.Feature.SAROS);
-        } else if (SarosConstants.NAMESPACE_SERVER.equals(feature)) {
-          features.add(XMPPContact.Feature.SAROS_SERVER);
-        }
+        ResourceFeature.getFeature(it.next().getVar()).ifPresent(features::add);
       }
     } catch (XMPPException e) {
       log.debug("Feature discovery for " + fullJid + " failed", e);

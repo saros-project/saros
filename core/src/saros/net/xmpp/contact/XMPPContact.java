@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.RosterPacket.ItemType;
+import saros.net.ResourceFeature;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.ContactStatus.Type;
@@ -27,26 +28,18 @@ import saros.net.xmpp.contact.ContactStatus.Type;
  */
 public class XMPPContact {
 
-  /** Possible Contact Features */
-  public enum Feature {
-    /** Contact has Saros Support */
-    SAROS,
-    /** Contact has Saros Server Support */
-    SAROS_SERVER
-  }
-
   /** Bundles information about a resource of a client. */
   private static final class Resource {
     static final Comparator<Resource> BEST_RESOURCE_FIRST =
-        Comparator.comparing((Resource r) -> !r.features.contains(Feature.SAROS))
+        Comparator.comparing((Resource r) -> !r.features.contains(ResourceFeature.SAROS))
             .thenComparing(r -> r.status)
             .thenComparing(r -> r.fullJid.getRAW());
 
     final JID fullJid;
     final ContactStatus status;
-    final EnumSet<Feature> features;
+    final EnumSet<ResourceFeature> features;
 
-    Resource(JID fullJid, ContactStatus status, EnumSet<Feature> features) {
+    Resource(JID fullJid, ContactStatus status, EnumSet<ResourceFeature> features) {
       this.fullJid = Objects.requireNonNull(fullJid, "fullJid is null");
       if (fullJid.isBareJID()) throw new IllegalArgumentException("fullJid is a bare JID");
       this.status = Objects.requireNonNull(status, "status is null");
@@ -161,7 +154,7 @@ public class XMPPContact {
    * @return true if contact has Saros support
    */
   public boolean hasSarosSupport() {
-    return hasFeatureSupport(Feature.SAROS);
+    return hasFeatureSupport(ResourceFeature.SAROS);
   }
 
   /**
@@ -169,7 +162,7 @@ public class XMPPContact {
    *
    * @return true if contact supports feature
    */
-  public boolean hasFeatureSupport(Feature feature) {
+  public boolean hasFeatureSupport(ResourceFeature feature) {
     return bestResource.map(r -> r.features.contains(feature)).orElse(false);
   }
 
@@ -243,7 +236,7 @@ public class XMPPContact {
         new Resource(
             fullJid,
             status,
-            oldResource.map(r -> r.features).orElse(EnumSet.noneOf(Feature.class))));
+            oldResource.map(r -> r.features).orElse(EnumSet.noneOf(ResourceFeature.class))));
     updateBestResource();
 
     return !getStatus().equals(oldStatus);
@@ -268,7 +261,7 @@ public class XMPPContact {
    * @param fullJid
    * @return true if operation changed general status of contact
    */
-  boolean setFeatureSupport(JID fullJid, EnumSet<Feature> features) {
+  boolean setFeatureSupport(JID fullJid, EnumSet<ResourceFeature> features) {
     Resource current = getResource(fullJid);
     if (current == null || current.features.equals(features)) return false;
 
