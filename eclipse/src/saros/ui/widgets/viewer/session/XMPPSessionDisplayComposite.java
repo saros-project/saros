@@ -2,14 +2,11 @@ package saros.ui.widgets.viewer.session;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
-import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.Roster;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
 import saros.net.ConnectionState;
-import saros.net.xmpp.IConnectionListener;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.internal.SarosSession;
 import saros.ui.model.TreeLabelProvider;
@@ -21,7 +18,7 @@ import saros.ui.model.session.SessionInput;
 import saros.ui.util.SWTUtils;
 
 /**
- * This {@link Composite} displays the {@link SarosSession} and the {@link Roster} in parallel.
+ * This {@link Composite} displays the {@link SarosSession} and the Contact list in parallel.
  *
  * <p>This composite does <strong>NOT</strong> handle setting the layout.
  *
@@ -38,56 +35,32 @@ public final class XMPPSessionDisplayComposite extends SessionDisplayComposite {
 
   private static final Logger LOG = Logger.getLogger(XMPPSessionDisplayComposite.class);
 
-  @Inject private XMPPConnectionService connectionService;
+  @Inject private ConnectionHandler connectionHandler;
+  @Inject private XMPPContactsService contactsService;
 
-  /** Used to display the {@link Roster} even in case the user is disconnected. */
-  private Roster cachedRoster;
-
-  private final IConnectionListener connectionListener =
-      new IConnectionListener() {
-        @Override
-        public void connectionStateChanged(Connection connection, ConnectionState state) {
-
-          boolean inputChanged = false;
-
-          switch (state) {
-            case CONNECTED:
-            case NOT_CONNECTED:
-              inputChanged = true;
-              break;
-            default:
-              break;
-          }
-
-          if (!inputChanged) return;
-
+  private final IConnectionStateListener connectionListener =
+      (state, error) -> {
+        if (state == ConnectionState.CONNECTED || state == ConnectionState.NOT_CONNECTED) {
           SWTUtils.runSafeSWTAsync(
               LOG,
-              new Runnable() {
+              () -> {
+                if (getViewer().getControl().isDisposed()) return;
 
-                @Override
-                public void run() {
-                  if (getViewer().getControl().isDisposed()) return;
-
-                  updateViewer();
-                  getViewer().expandAll();
-                }
+                updateViewer();
+                getViewer().expandAll();
               });
         }
       };
 
   public XMPPSessionDisplayComposite(Composite parent, int style) {
     super(parent, style);
-    connectionService.addListener(connectionListener);
+    connectionHandler.addConnectionStateListener(connectionListener);
 
     addDisposeListener(
-        new DisposeListener() {
-          @Override
-          public void widgetDisposed(DisposeEvent e) {
-            connectionService.removeListener(connectionListener);
-            connectionService = null;
-            cachedRoster = null;
-          }
+        e -> {
+          connectionHandler.removeConnectionStateListener(connectionListener);
+          connectionHandler = null;
+          contactsService = null;
         });
   }
 
@@ -104,10 +77,6 @@ public final class XMPPSessionDisplayComposite extends SessionDisplayComposite {
   protected void updateViewer() {
     checkWidget();
 
-    Roster roster = connectionService.getRoster();
-
-    if (roster != null) cachedRoster = roster;
-
-    getViewer().setInput(new SessionInput(sessionManager.getSession(), cachedRoster));
+    getViewer().setInput(new SessionInput(sessionManager.getSession(), contactsService));
   }
 }

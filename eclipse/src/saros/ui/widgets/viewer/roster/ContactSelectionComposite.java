@@ -18,13 +18,10 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Tree;
-import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.RosterEntry;
 import saros.SarosPluginContext;
-import saros.net.ConnectionState;
-import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.IContactsUpdate;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.model.ITreeElement;
 import saros.ui.model.TreeLabelProvider;
@@ -40,8 +37,7 @@ import saros.ui.widgets.viewer.roster.events.ContactSelectionListener;
 import saros.util.ArrayUtils;
 
 /**
- * This {@link Composite} displays {@link RosterEntry roster entries} and allows to check (via check
- * boxes) them.
+ * This {@link Composite} displays contact entries and allows to check (via check boxes) them.
  *
  * <p>This composite does <strong>NOT</strong> handle setting the layout.
  *
@@ -62,29 +58,10 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
   protected List<ContactSelectionListener> contactSelectionListeners =
       new ArrayList<ContactSelectionListener>();
 
-  @Inject protected XMPPConnectionService connectionService;
+  @Inject private XMPPContactsService contactsService;
 
-  protected final IConnectionListener connectionListener =
-      new IConnectionListener() {
-        @Override
-        public void connectionStateChanged(Connection connection, ConnectionState newState) {
-          switch (newState) {
-            case CONNECTED:
-              ViewerUtils.setInput(getViewer(), connectionService.getRoster());
-              ViewerUtils.expandAll(getViewer());
-              break;
-            case NOT_CONNECTED:
-              /*
-               * The Roster should also be displayed in case we are not
-               * connected but have been already connected before.
-               */
-              // ViewerUtils.setInput(viewer, null);
-              break;
-            default:
-              break;
-          }
-        }
-      };
+  private final IContactsUpdate contactsUpdate =
+      (contact, type) -> ViewerUtils.refresh(getViewer(), true);
 
   protected final ICheckStateListener checkStateListener =
       new ICheckStateListener() {
@@ -94,7 +71,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
           checkStateProvider.setChecked(event.getElement(), event.getChecked());
 
           // Fire selection event
-          JID jid = (JID) Platform.getAdapterManager().getAdapter(event.getElement(), JID.class);
+          JID jid = Platform.getAdapterManager().getAdapter(event.getElement(), JID.class);
           if (jid != null) notifyContactSelectionChanged(jid, event.getChecked());
         }
       };
@@ -107,11 +84,11 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
     super.setLayout(LayoutUtils.createGridLayout());
 
     getViewer().getControl().setLayoutData(LayoutUtils.createFillGridData());
-    getViewer().setInput(connectionService.getRoster());
+    getViewer().setInput(contactsService);
 
     ViewerUtils.expandAll(getViewer());
 
-    connectionService.addListener(connectionListener);
+    contactsService.addListener(contactsUpdate);
 
     getViewer().addCheckStateListener(checkStateListener);
 
@@ -122,7 +99,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
             CheckboxTreeViewer viewer = getViewer();
             if (viewer != null) viewer.removeCheckStateListener(checkStateListener);
 
-            if (connectionService != null) connectionService.removeListener(connectionListener);
+            contactsService.removeListener(contactsUpdate);
           }
         });
   }
@@ -163,14 +140,8 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
             RosterEntryElement.class,
             Platform.getAdapterManager());
 
-    List<RosterEntryElement> elementsToCheck = new ArrayList<RosterEntryElement>();
-
-    // insert dummy values except the jid as those elements are never
-    // display anyways and only used for comparison
-    for (JID contact : contacts) elementsToCheck.add(new RosterEntryElement(null, contact, false));
-
     Map<RosterEntryElement, Boolean> checkStatesChanges =
-        calculateCheckStateDiff(allElements, checkedElements, elementsToCheck);
+        calculateCheckStateDiff(allElements, checkedElements, contacts);
 
     /*
      * Update the check state in the RosterCheckStateProvider
@@ -192,7 +163,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
     for (Entry<RosterEntryElement, Boolean> entryElement : checkStatesChanges.entrySet()) {
       RosterEntryElement rosterEntryElement = entryElement.getKey();
       boolean checked = checkStatesChanges.get(rosterEntryElement);
-      notifyContactSelectionChanged((JID) rosterEntryElement.getAdapter(JID.class), checked);
+      notifyContactSelectionChanged(rosterEntryElement.getAdapter(JID.class), checked);
     }
   }
 
@@ -202,23 +173,21 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
    *
    * @param allRosterEntryElements
    * @param checkedRosterEntryElement {@link RosterEntryElement}s which are already checked
-   * @param rosterEntryElementToCheck {@link RosterEntryElement}s which have to be exclusively
-   *     checked
+   * @param contacts {@link List} of {@link JID JIDs} which have to be exclusively checked
    * @return {@link Map} of {@link RosterEntryElement} that must change their check state
    */
   protected Map<RosterEntryElement, Boolean> calculateCheckStateDiff(
       List<RosterEntryElement> allRosterEntryElements,
       List<RosterEntryElement> checkedRosterEntryElement,
-      List<RosterEntryElement> rosterEntryElementToCheck) {
+      List<JID> contacts) {
 
-    Map<RosterEntryElement, Boolean> checkStatesChanges =
-        new HashMap<RosterEntryElement, Boolean>();
+    Map<RosterEntryElement, Boolean> checkStatesChanges = new HashMap<>();
     for (RosterEntryElement rosterEntryElement : allRosterEntryElements) {
-      if (rosterEntryElementToCheck.contains(rosterEntryElement)
-          && !checkedRosterEntryElement.contains(rosterEntryElement)) {
+      boolean contactsContain = contacts.contains(rosterEntryElement.getJID());
+      boolean checkedContain = checkedRosterEntryElement.contains(rosterEntryElement);
+      if (contactsContain && !checkedContain) {
         checkStatesChanges.put(rosterEntryElement, true);
-      } else if (!rosterEntryElementToCheck.contains(rosterEntryElement)
-          && checkedRosterEntryElement.contains(rosterEntryElement)) {
+      } else if (!contactsContain && checkedContain) {
         checkStatesChanges.put(rosterEntryElement, false);
       }
     }
@@ -235,7 +204,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
     List<JID> contacts = new ArrayList<JID>();
 
     for (Object element : getViewer().getCheckedElements()) {
-      JID contact = (JID) ((ITreeElement) element).getAdapter(JID.class);
+      JID contact = ((ITreeElement) element).getAdapter(JID.class);
       if (contact != null) contacts.add(contact);
     }
     return contacts;
@@ -249,7 +218,7 @@ public class ContactSelectionComposite extends ViewerComposite<CheckboxTreeViewe
   public List<JID> getSelectedContactsWithSarosSupport() {
     List<JID> contacts = new ArrayList<JID>();
     for (Object element : getViewer().getCheckedElements()) {
-      JID contact = (JID) ((ITreeElement) element).getAdapter(JID.class);
+      JID contact = ((ITreeElement) element).getAdapter(JID.class);
       boolean isSarosSupported =
           element instanceof RosterEntryElement
               && ((RosterEntryElement) element).isSarosSupported();

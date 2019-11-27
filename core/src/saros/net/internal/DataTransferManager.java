@@ -1,6 +1,5 @@
 package saros.net.internal;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
@@ -12,9 +11,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import saros.annotations.Component;
@@ -22,9 +18,6 @@ import saros.context.IContextKeyBindings.IBBStreamService;
 import saros.context.IContextKeyBindings.Socks5StreamService;
 import saros.net.ConnectionState;
 import saros.net.IConnectionManager;
-import saros.net.IPacketInterceptor;
-import saros.net.IReceiver;
-import saros.net.ITransferListener;
 import saros.net.stream.IStreamService;
 import saros.net.stream.StreamMode;
 import saros.net.xmpp.IConnectionListener;
@@ -45,27 +38,17 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
 
   private static final Logger LOG = Logger.getLogger(DataTransferManager.class);
 
-  private static final int CHUNKSIZE = 16 * 1024;
-
   private static final String DEFAULT_CONNECTION_ID = "default";
 
   private static final String IN = "in";
 
   private static final String OUT = "out";
 
-  private final CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors =
-      new CopyOnWriteArrayList<IPacketInterceptor>();
-
-  private final List<ITransferListener> transferListeners =
-      new CopyOnWriteArrayList<ITransferListener>();
-
   private volatile JID currentLocalJID;
 
   private Connection xmppConnection;
 
   private int serviceMask = -1;
-
-  private final IReceiver receiver;
 
   private final IStreamService mainService;
 
@@ -79,57 +62,15 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
 
   private final List<IStreamService> streamServices = new CopyOnWriteArrayList<IStreamService>();
 
+  private final CopyOnWriteArrayList<IByteStreamConnectionListener> connectionListeners =
+      new CopyOnWriteArrayList<>();
+
   private final IByteStreamConnectionListener byteStreamConnectionListener =
       new IByteStreamConnectionListener() {
 
         @Override
-        public void receive(final BinaryXMPPExtension extension) {
-
-          boolean dispatchPacket = true;
-
-          for (IPacketInterceptor packetInterceptor : packetInterceptors)
-            dispatchPacket &= packetInterceptor.receivedPacket(extension);
-
-          if (!dispatchPacket) return;
-
-          if (LOG.isTraceEnabled())
-            LOG.trace(
-                "received binary XMPP extension: "
-                    + extension.getTransferDescription()
-                    + ", size: "
-                    + extension.getCompressedSize()
-                    + ", RX time: "
-                    + extension.getTransferDuration()
-                    + " ms ["
-                    + extension.getTransferMode()
-                    + "]");
-
-          if (extension.getTransferDescription().compressContent()) {
-            byte[] payload = extension.getPayload();
-            long compressedPayloadLength = payload.length;
-
-            try {
-              payload = inflate(payload);
-            } catch (IOException e) {
-              LOG.error("could not decompress extension payload", e);
-              return;
-            }
-
-            extension.setPayload(compressedPayloadLength, payload);
-          }
-
-          notifyDataReceived(
-              extension.getTransferMode(),
-              extension.getCompressedSize(),
-              extension.getUncompressedSize(),
-              extension.getTransferDuration());
-
-          receiver.processBinaryXMPPExtension(extension);
-        }
-
-        @Override
         public void connectionChanged(
-            final String connectionID,
+            final String connectionId,
             final IByteStreamConnection connection,
             final boolean incomingRequest) {
 
@@ -138,7 +79,12 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
 
           final String id =
               toConnectionIDToken(
-                  connectionID, incomingRequest ? IN : OUT, connection.getRemoteAddress());
+                  connectionId, incomingRequest ? IN : OUT, connection.getRemoteAddress());
+
+          /// TODO we currently have to announce not initialized connections otherwise the IReceiver
+          // will miss updates
+
+          notfiyconnectionChanged(id, connection, incomingRequest);
 
           LOG.debug(
               "bytestream connection changed "
@@ -181,18 +127,18 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
         }
 
         @Override
-        public void connectionClosed(String connectionID, IByteStreamConnection connection) {
-          closeConnection(connectionID, connection.getRemoteAddress());
+        public void connectionClosed(
+            final String connectionId, final IByteStreamConnection connection) {
+          closeConnection(connectionId, connection.getRemoteAddress());
+          notfiyConnectionClosed(connectionId, connection);
         }
       };
 
   public DataTransferManager(
       XMPPConnectionService connectionService,
-      IReceiver receiver,
       @Nullable @Socks5StreamService IStreamService mainService,
       @Nullable @IBBStreamService IStreamService fallbackService) {
 
-    this.receiver = receiver;
     this.fallbackService = fallbackService;
     this.mainService = mainService;
     this.setStreamServices();
@@ -200,125 +146,24 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     connectionService.addListener(this);
   }
 
-  @Override
-  public void addTransferListener(ITransferListener listener) {
-    transferListeners.add(listener);
-  }
-
-  @Override
-  public void removeTransferListener(ITransferListener listener) {
-    transferListeners.remove(listener);
-  }
-
-  public void sendData(
-      final String connectionID, final TransferDescription description, final byte[] data)
-      throws IOException {
-
-    final JID connectionJID = currentLocalJID;
-
-    if (connectionJID == null) throw new IOException("not connected to a XMPP server");
-
-    final IByteStreamConnection connection =
-        getCurrentConnection(connectionID, description.getRecipient());
-
-    if (connection == null)
-      throw new IOException(
-          "not connected to "
-              + description.getRecipient()
-              + " [connection identifier="
-              + connectionID
-              + "]");
-
-    description.setSender(connectionJID);
-
-    if (LOG.isTraceEnabled())
-      LOG.trace(
-          "send "
-              + description
-              + ", data len="
-              + data.length
-              + " byte(s), connection="
-              + connection);
-
-    sendInternal(connectionID, connection, description, data);
-  }
-
-  /**
-   * @deprecated establishes connections on demand
-   * @param transferDescription
-   * @param payload
-   * @throws IOException
-   */
-  @Deprecated
-  public void sendData(TransferDescription transferDescription, byte[] payload) throws IOException {
-
-    JID connectionJID = currentLocalJID;
-
-    if (connectionJID == null) throw new IOException("not connected to a XMPP server");
-
-    if (LOG.isTraceEnabled())
-      LOG.trace(
-          "sending data ... from " + connectionJID + " to " + transferDescription.getRecipient());
-
-    JID recipient = transferDescription.getRecipient();
-    transferDescription.setSender(connectionJID);
-
-    sendInternal(
-        DEFAULT_CONNECTION_ID,
-        connectInternal(DEFAULT_CONNECTION_ID, recipient),
-        transferDescription,
-        payload);
-  }
-
-  private void sendInternal(
-      final String connectionID,
-      final IByteStreamConnection connection,
-      final TransferDescription description,
-      byte[] payload)
-      throws IOException {
-
-    boolean sendPacket = true;
-
-    for (IPacketInterceptor packetInterceptor : packetInterceptors)
-      sendPacket &= packetInterceptor.sendPacket(connectionID, description, payload);
-
-    if (!sendPacket) return;
-
-    long sizeUncompressed = payload.length;
-
-    if (description.compressContent()) payload = deflate(payload);
-
-    final long transferStartTime = System.currentTimeMillis();
-
-    try {
-      connection.send(description, payload);
-    } catch (IOException e) {
-      LOG.error(
-          "failed to send " + description + ", connection=" + connection + ":" + e.getMessage(), e);
-      throw e;
-    }
-
-    notifyDataSent(
-        connection.getMode(),
-        payload.length,
-        sizeUncompressed,
-        System.currentTimeMillis() - transferStartTime);
-  }
-
   /** @deprecated */
   @Override
   @Deprecated
-  public void connect(JID peer) throws IOException {
-    connect(DEFAULT_CONNECTION_ID, peer);
+  public IByteStreamConnection connect(JID peer) throws IOException {
+    return connect(DEFAULT_CONNECTION_ID, peer);
   }
 
   @Override
-  public void connect(String connectionID, JID peer) throws IOException {
+  public IByteStreamConnection connect(String connectionID, JID peer) throws IOException {
     if (connectionID == null) throw new NullPointerException("connectionID is null");
 
     if (peer == null) throw new NullPointerException("peer is null");
 
-    connectInternal(connectionID, peer);
+    return connectInternal(connectionID, peer);
+  }
+
+  public IByteStreamConnection getConnection(final String connectionId, final JID peer) {
+    return getCurrentConnection(connectionId, peer);
   }
 
   /**
@@ -379,6 +224,14 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
   public StreamMode getTransferMode(String connectionID, JID jid) {
     IByteStreamConnection connection = getCurrentConnection(connectionID, jid);
     return connection == null ? StreamMode.NONE : connection.getMode();
+  }
+
+  public void addConnectionListener(final IByteStreamConnectionListener listener) {
+    connectionListeners.addIfAbsent(listener);
+  }
+
+  public void removeConnectionListener(final IByteStreamConnectionListener listener) {
+    connectionListeners.remove(listener);
   }
 
   private IByteStreamConnection connectInternal(String connectionID, JID peer) throws IOException {
@@ -525,27 +378,6 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     else if (this.xmppConnection != null) disposeConnection();
   }
 
-  // TODO: move to ITransmitter
-  public void addPacketInterceptor(IPacketInterceptor interceptor) {
-    packetInterceptors.addIfAbsent(interceptor);
-  }
-
-  // TODO: move to IReceiver
-  public void removePacketInterceptor(IPacketInterceptor interceptor) {
-    packetInterceptors.remove(interceptor);
-  }
-
-  /**
-   * Left over and <b>MUST</b> only used by the STF
-   *
-   * @param extension
-   * @deprecated
-   */
-  @Deprecated
-  public void addIncomingTransferObject(BinaryXMPPExtension extension) {
-    byteStreamConnectionListener.receive(extension);
-  }
-
   /**
    * Returns the current connection for the remote side. If the local side is connected to the
    * remote side as well as the remote side is connected to the local side the local to remote
@@ -574,72 +406,29 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     return connectionIdentifier + ":" + mode + ":" + jid.toString();
   }
 
-  private void notifyDataSent(
-      final StreamMode mode,
-      final long sizeCompressed,
-      final long sizeUncompressed,
-      final long duration) {
+  private void notfiyConnectionClosed(
+      final String connectionId, final IByteStreamConnection connection) {
 
-    for (final ITransferListener listener : transferListeners) {
+    for (final IByteStreamConnectionListener listener : connectionListeners) {
       try {
-        listener.sent(mode, sizeCompressed, sizeUncompressed, duration);
+        listener.connectionClosed(connectionId, connection);
       } catch (RuntimeException e) {
-        LOG.error("invoking sent() on listener: " + listener + " failed", e);
+        LOG.error("invoking connectionClosed() on listener: " + listener + " failed", e);
       }
     }
   }
 
-  private void notifyDataReceived(
-      final StreamMode mode,
-      final long sizeCompressed,
-      final long sizeUncompressed,
-      final long duration) {
+  private void notfiyconnectionChanged(
+      final String connectionId,
+      final IByteStreamConnection connection,
+      final boolean incomingRequest) {
 
-    for (final ITransferListener listener : transferListeners) {
+    for (final IByteStreamConnectionListener listener : connectionListeners) {
       try {
-        listener.received(mode, sizeCompressed, sizeUncompressed, duration);
+        listener.connectionChanged(connectionId, connection, incomingRequest);
       } catch (RuntimeException e) {
-        LOG.error("invoking received() on listener: " + listener + " failed", e);
+        LOG.error("invoking connectionChanged() on listener: " + listener + " failed", e);
       }
-    }
-  }
-
-  private static byte[] deflate(byte[] input) {
-
-    Deflater compressor = new Deflater(Deflater.DEFLATED);
-    compressor.setInput(input);
-    compressor.finish();
-
-    ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
-
-    byte[] buf = new byte[CHUNKSIZE];
-
-    while (!compressor.finished()) {
-      int count = compressor.deflate(buf);
-      bos.write(buf, 0, count);
-    }
-
-    return bos.toByteArray();
-  }
-
-  private static byte[] inflate(byte[] input) throws IOException {
-
-    ByteArrayOutputStream bos;
-    Inflater decompressor = new Inflater();
-
-    decompressor.setInput(input, 0, input.length);
-    bos = new ByteArrayOutputStream(input.length);
-
-    byte[] buf = new byte[CHUNKSIZE];
-
-    try {
-      while (!decompressor.finished()) {
-        int count = decompressor.inflate(buf);
-        bos.write(buf, 0, count);
-      }
-      return bos.toByteArray();
-    } catch (DataFormatException e) {
-      throw new IOException("failed to inflate data", e);
     }
   }
 }

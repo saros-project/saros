@@ -15,9 +15,10 @@ import org.osgi.service.prefs.Preferences;
 import saros.context.IContextKeyBindings;
 import saros.editor.EditorManager;
 import saros.editor.FollowModeManager;
-import saros.net.IConnectionManager;
-import saros.net.internal.DataTransferManager;
+import saros.net.IReceiver;
+import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
+import saros.preferences.EclipsePreferenceConstants;
 import saros.repackaged.picocontainer.BindKey;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.repackaged.picocontainer.PicoBuilder;
@@ -38,8 +39,8 @@ public class StatisticCollectorTest {
 
   private static ISarosSession createSessionMock(final List<Object> sessionListeners) {
     ISarosSession session = EasyMock.createMock(ISarosSession.class);
-    final User bob = new User(new JID("bob"), false, false, 1, -1);
-    final User alice = new User(new JID("alice"), false, false, 2, -1);
+    final User bob = new User(new JID("bob"), false, false, null);
+    final User alice = new User(new JID("alice"), false, false, null);
     final List<User> participants = new LinkedList<User>();
     participants.add(bob);
     participants.add(alice);
@@ -106,11 +107,16 @@ public class StatisticCollectorTest {
     IPreferenceStore store = EclipseMocker.initPreferenceStore(container);
     Preferences preferences = EclipseMocker.initPreferences();
 
+    // triggers SWTUtils if not disabled and causes issues
+    preferences.putInt(
+        EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED, FeedbackManager.FEEDBACK_DISABLED);
+
     EclipseMocker.mockSarosWithPreferences(container, store, preferences);
 
     FeedbackPreferences.setPreferences(preferences);
 
-    addMockedComponent(IConnectionManager.class, DataTransferManager.class);
+    addMockedComponent(IReceiver.class, IReceiver.class);
+    addMockedComponent(ITransmitter.class, ITransmitter.class);
 
     // Components we want to create
     container.addComponent(StatisticManager.class);

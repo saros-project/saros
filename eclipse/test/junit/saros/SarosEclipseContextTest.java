@@ -16,7 +16,6 @@ import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.test.mocks.ContextMocker;
 import saros.test.mocks.EclipseMocker;
 import saros.test.mocks.PrepareEclipseComponents;
-import saros.ui.browser.EclipseHTMLUIContextFactory;
 
 /** Checks the Saros/E context for integrity. */
 @RunWith(PowerMockRunner.class)
@@ -34,7 +33,7 @@ public class SarosEclipseContextTest {
     // mock Eclipse dependencies
     EclipseMocker.mockResourcesPlugin();
     EclipseMocker.mockPlatform();
-
+    EclipseMocker.mockSWTDisplay();
     // mock Saros environment
     saros = EclipseMocker.mockSaros();
 
@@ -63,8 +62,6 @@ public class SarosEclipseContextTest {
 
     factories.add(new SarosEclipseContextFactory(saros));
     factories.add(new CoreContextFactory());
-    factories.add(new HTMLUIContextFactory());
-    factories.add(new EclipseHTMLUIContextFactory());
 
     for (IContextFactory factory : factories) {
       factory.createComponents(container);

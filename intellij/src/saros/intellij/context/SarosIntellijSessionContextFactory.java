@@ -2,15 +2,14 @@ package saros.intellij.context;
 
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
-import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.ApplicationEventHandlersFactory;
 import saros.intellij.eventhandler.ProjectEventHandlersFactory;
-import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.eventhandler.project.ProjectClosedHandler;
 import saros.intellij.followmode.FollowModeNotificationDispatcher;
+import saros.intellij.negotiation.ModuleConfigurationInitializer;
 import saros.intellij.project.SharedResourcesManager;
-import saros.intellij.project.filesystem.ModuleInitialization;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionContextFactory;
@@ -27,7 +26,7 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
     container.addComponent(ProjectEventHandlersFactory.class);
 
     // Project interaction
-    container.addComponent(ProjectAPI.class);
+    container.addComponent(ProjectClosedHandler.class);
 
     // Editor interaction
     container.addComponent(LocalEditorHandler.class);
@@ -39,14 +38,11 @@ public class SarosIntellijSessionContextFactory extends SarosCoreSessionContextF
 
     // Other
     if (!session.isHost()) {
-      container.addComponent(ModuleInitialization.class);
+      container.addComponent(ModuleConfigurationInitializer.class);
     }
     container.addComponent(SharedResourcesManager.class);
 
     // User notifications
     container.addComponent(FollowModeNotificationDispatcher.class);
-
-    // Utility
-    container.addComponent(VirtualFileConverter.class);
   }
 }

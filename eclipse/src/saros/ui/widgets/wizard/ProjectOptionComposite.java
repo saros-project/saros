@@ -7,8 +7,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -21,7 +19,6 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import saros.ui.Messages;
-import saros.ui.widgets.wizard.events.ProjectNameChangedEvent;
 import saros.ui.widgets.wizard.events.ProjectOptionListener;
 
 public class ProjectOptionComposite extends Composite {
@@ -94,7 +91,7 @@ public class ProjectOptionComposite extends Composite {
   }
 
   /**
-   * Returns the currently selected local project name for the remote project.
+   * Returns the currently selected local project name for the remote project ID.
    *
    * @return the currently selected local project name
    */
@@ -105,24 +102,28 @@ public class ProjectOptionComposite extends Composite {
   }
 
   /**
-   * Sets the local project name for the remote project
+   * Sets the local project name for the remote project ID.
    *
-   * @param useExistingProject <code>true</code>, if the local project should point to an existing
-   *     local project, <code>false</code> otherwise
+   * @param useExistingProject if <code>true</code> the project name references an existing project
+   *     name, otherwise the project name reference a non existing local project
    * @param name the local name of the project
+   * @see #useExistingProject()
    */
-  public void setProjectName(boolean useExistingProject, String name) {
+  public void setProjectName(String name, boolean useExistingProject) {
     if (useExistingProject) {
       newProjectRadioButton.setSelection(false);
       existingProjectRadioButton.setSelection(true);
-
+      existingProjectNameText.setFocus();
       existingProjectNameText.setText(name);
     } else {
       newProjectRadioButton.setSelection(true);
       existingProjectRadioButton.setSelection(false);
-
+      newProjectNameText.setFocus();
       newProjectNameText.setText(name);
     }
+
+    // setting the selection of the button by code does by design not trigger the listener
+    updateEnablement(useExistingProject ? existingProjectRadioButton : newProjectRadioButton);
   }
 
   /** Create components of "Create new project" area of EnterProjectNamePage */
@@ -143,11 +144,14 @@ public class ProjectOptionComposite extends Composite {
           @Override
           public void widgetSelected(SelectionEvent e) {
             updateEnablement(newProjectRadioButton);
+            newProjectNameText.setFocus();
+            fireProjectNameChanged();
+            fireProjectOptionChanged();
           }
 
           @Override
           public void widgetDefaultSelected(SelectionEvent e) {
-            updateEnablement(newProjectRadioButton);
+            widgetSelected(e);
           }
         });
 
@@ -163,16 +167,7 @@ public class ProjectOptionComposite extends Composite {
     gridData.horizontalSpan = 2;
 
     newProjectNameText.setLayoutData(gridData);
-    newProjectNameText.addModifyListener(
-        new ModifyListener() {
-          @Override
-          public void modifyText(ModifyEvent e) {
-            for (ProjectOptionListener listener : listeners) {
-              listener.projectNameChanged(
-                  new ProjectNameChangedEvent(getRemoteProjectID(), getProjectName()));
-            }
-          }
-        });
+    newProjectNameText.addModifyListener(e -> fireProjectNameChanged());
 
     newProjectNameText.setFocus();
   }
@@ -193,11 +188,14 @@ public class ProjectOptionComposite extends Composite {
           @Override
           public void widgetSelected(SelectionEvent e) {
             updateEnablement(existingProjectRadioButton);
+            existingProjectNameText.setFocus();
+            fireProjectNameChanged();
+            fireProjectOptionChanged();
           }
 
           @Override
           public void widgetDefaultSelected(SelectionEvent e) {
-            updateEnablement(existingProjectRadioButton);
+            widgetSelected(e);
           }
         });
 
@@ -210,15 +208,7 @@ public class ProjectOptionComposite extends Composite {
     existingProjectNameText = new Text(this, SWT.BORDER);
     existingProjectNameText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     existingProjectNameText.setEnabled(false);
-    existingProjectNameText.addModifyListener(
-        new ModifyListener() {
-          @Override
-          public void modifyText(ModifyEvent e) {
-            for (ProjectOptionListener listener : listeners)
-              listener.projectNameChanged(
-                  new ProjectNameChangedEvent(getRemoteProjectID(), getProjectName()));
-          }
-        });
+    existingProjectNameText.addModifyListener(e -> fireProjectNameChanged());
 
     /* Button */
     browseProjectsButton = new Button(this, SWT.PUSH);
@@ -229,6 +219,7 @@ public class ProjectOptionComposite extends Composite {
           public void widgetSelected(SelectionEvent e) {
             String projectName =
                 getProjectDialog(Messages.EnterProjectNamePage_select_project_for_update);
+
             if (projectName != null) existingProjectNameText.setText(projectName);
           }
         });
@@ -252,19 +243,21 @@ public class ProjectOptionComposite extends Composite {
 
   /**
    * Enables or disables the widgets of this composite depending on the selection of the radio
-   * buttons. Then, all listeners are informed because the current project name has changed.
+   * buttons.
    */
   private void updateEnablement(Button button) {
     boolean updateSelected = (button == existingProjectRadioButton);
 
     newProjectNameText.setEnabled(!updateSelected);
-
     existingProjectNameText.setEnabled(updateSelected);
     browseProjectsButton.setEnabled(updateSelected);
+  }
 
-    for (ProjectOptionListener listener : listeners) {
-      listener.projectNameChanged(
-          new ProjectNameChangedEvent(getRemoteProjectID(), getProjectName()));
-    }
+  private void fireProjectNameChanged() {
+    for (ProjectOptionListener listener : listeners) listener.projectNameChanged(this);
+  }
+
+  private void fireProjectOptionChanged() {
+    for (ProjectOptionListener listener : listeners) listener.projectOptionChanged(this);
   }
 }

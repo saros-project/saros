@@ -32,7 +32,7 @@ public class ReplaceableSingleValueConverterTest {
     EasyMock.replay(c1);
 
     /* XStream config */
-    XStream xstream = new XStream(new DomDriver());
+    XStream xstream = XStreamFactory.getSecureXStream(new DomDriver());
     ReplaceableSingleValueConverter resetable = new ReplaceableSingleValueConverter(c1);
     xstream.registerConverter(resetable);
 
@@ -72,7 +72,7 @@ public class ReplaceableSingleValueConverterTest {
     EasyMock.replay(c1, c2);
 
     /* XStream config */
-    XStream xstream = new XStream(new DomDriver());
+    XStream xstream = XStreamFactory.getSecureXStream(new DomDriver());
     ReplaceableConverter resetable = new ReplaceableConverter(c1);
     xstream.registerConverter(resetable);
 

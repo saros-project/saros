@@ -73,4 +73,20 @@ public interface ITransmitter {
    */
   public void send(String connectionID, JID recipient, PacketExtension extension)
       throws IOException;
+
+  public default void addTransferListener(ITransferListener listener) {
+    // NOP
+  }
+
+  public default void removeTransferListener(ITransferListener listener) {
+    // NOP
+  }
+
+  public default void addPacketInterceptor(IPacketInterceptor interceptor) {
+    // NOP
+  }
+
+  public default void removePacketInterceptor(IPacketInterceptor interceptor) {
+    // NOP
+  }
 }

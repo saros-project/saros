@@ -1,7 +1,7 @@
 package saros.session.internal;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -30,8 +30,8 @@ import saros.session.User;
 
 public class ActivityQueuerTest {
 
-  private static final User ALICE = new User(new JID("Alice"), true, true, 0, 0);
-  private static final User BOB = new User(new JID("Bob"), false, false, 0, 0);
+  private static final User ALICE = new User(new JID("Alice"), true, true, null);
+  private static final User BOB = new User(new JID("Bob"), false, false, null);
 
   private static IProject SHARED_PROJECT;
   private static IProject NOT_SHARED_PROJECT;

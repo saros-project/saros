@@ -19,15 +19,15 @@ public class VirtualFileConverter {
 
   private static final Logger log = Logger.getLogger(VirtualFileConverter.class);
 
-  private final Project project;
-
-  public VirtualFileConverter(Project project) {
-    this.project = project;
+  private VirtualFileConverter() {
+    // NOP
   }
 
   /**
-   * Returns an <code>SPath</code> representing the given file.
+   * Returns an <code>SPath</code> representing the given file. Uses the given project to try to
+   * obtain a valid module for the given file.
    *
+   * @param project the project to use for the conversion
    * @param virtualFile file to get the <code>SPath</code> for
    * @return an <code>SPath</code> representing the given file or <code>null</code> if given file
    *     does not exist, no module could be found for the file or the found module can not be shared
@@ -35,16 +35,18 @@ public class VirtualFileConverter {
    *     constructed
    */
   @Nullable
-  public SPath convertToSPath(@NotNull VirtualFile virtualFile) {
+  public static SPath convertToSPath(@NotNull Project project, @NotNull VirtualFile virtualFile) {
 
-    IResource resource = convertToResource(virtualFile);
+    IResource resource = convertToResource(project, virtualFile);
 
     return resource == null ? null : new SPath(resource);
   }
 
   /**
-   * Returns an <code>IResource</code> representing the given <code>VirtualFile</code>.
+   * Returns an <code>IResource</code> representing the given <code>VirtualFile</code>. Uses the
+   * given project to try to obtain a valid module for the given file.
    *
+   * @param project the project to use for the conversion
    * @param virtualFile file to get the <code>IResource</code> for
    * @return an <code>IResource</code> representing the given file or <code>null</code> if given
    *     file does not exist, no module could be found for the file or the found module can not be
@@ -52,9 +54,11 @@ public class VirtualFileConverter {
    *     be constructed
    */
   @Nullable
-  public IResource convertToResource(@NotNull VirtualFile virtualFile) {
+  public static IResource convertToResource(
+      @NotNull Project project, @NotNull VirtualFile virtualFile) {
 
-    Module module = ModuleUtil.findModuleForFile(virtualFile, project);
+    Module module =
+        Filesystem.runReadAction(() -> ModuleUtil.findModuleForFile(virtualFile, project));
 
     if (module == null) {
       log.debug(
@@ -77,17 +81,6 @@ public class VirtualFileConverter {
                 + virtualFile
                 + " as the module for the resource does not comply with the current restrictions.");
       }
-
-      return null;
-
-    } catch (IllegalStateException e) {
-      log.warn(
-          "Could not convert VirtualFile "
-              + virtualFile
-              + " as the creation of an IProject object for its module "
-              + module
-              + " failed.",
-          e);
 
       return null;
     }
@@ -116,7 +109,8 @@ public class VirtualFileConverter {
    *
    * @param path the SPath representing the resource to get a VirtualFile for
    * @return a VirtualFile for the given resource or <code>null</code> if the given resource does
-   *     not exists in the VFS snapshot, is derived, or belongs to a sub-module
+   *     not exists in the VFS snapshot, is ignored, or belongs to a sub-module
+   * @see IntelliJResourceImpl#isIgnored()
    */
   @Nullable
   public static VirtualFile convertToVirtualFile(@NotNull SPath path) {
@@ -135,7 +129,8 @@ public class VirtualFileConverter {
    *
    * @param resource the resource to get a VirtualFile for
    * @return a VirtualFile for the given resource or <code>null</code> if the given resource does
-   *     not exists in the VFS snapshot, is derived, or belongs to a sub-module
+   *     not exists in the VFS snapshot, is ignored, or belongs to a sub-module
+   * @see IntelliJResourceImpl#isIgnored()
    */
   @Nullable
   public static VirtualFile convertToVirtualFile(@NotNull IResource resource) {

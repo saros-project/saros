@@ -24,6 +24,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -54,6 +56,7 @@ import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
 import saros.ui.BalloonNotification;
+import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.actions.ChangeColorAction;
 import saros.ui.actions.ChangeWriteAccessAction;
@@ -73,17 +76,19 @@ import saros.ui.actions.RenameContactAction;
 import saros.ui.actions.RequestSessionInviteAction;
 import saros.ui.actions.SendFileAction;
 import saros.ui.actions.SkypeAction;
+import saros.ui.expressions.ContactPropertyTester;
+import saros.ui.menuContributions.StartSessionWithProjects;
 import saros.ui.model.roster.RosterEntryElement;
 import saros.ui.sounds.SoundPlayer;
 import saros.ui.sounds.Sounds;
 import saros.ui.util.LayoutUtils;
-import saros.ui.util.ModelFormatUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
 import saros.ui.widgets.ConnectionStateComposite;
 import saros.ui.widgets.chat.ChatRoomsComposite;
 import saros.ui.widgets.viewer.ViewerComposite;
 import saros.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
+import saros.util.CoreUtils;
 
 /**
  * @JTourBusStop 1, The Interface Tour:
@@ -236,6 +241,8 @@ public class SarosView extends ViewPart {
 
   private static volatile boolean showBalloonNotifications;
 
+  private Composite notificationAnchor;
+
   /**
    * Stores actions by their {@link IAction#getId() ID}, so they can (1) be {@linkplain
    * #getAction(String) retrieved} and (2) {@linkplain Disposable#dispose() disposed} when and if
@@ -274,10 +281,20 @@ public class SarosView extends ViewPart {
   @Override
   public void createPartControl(Composite parent) {
 
-    parent.setLayout(new FillLayout());
+    GridData gridData;
+
+    final GridLayout layout = new GridLayout(1, false);
+
+    layout.horizontalSpacing = 0;
+    layout.verticalSpacing = 0;
+
+    parent.setLayout(layout);
 
     final SashForm baseSashForm = new SashForm(parent, SWT.SMOOTH);
 
+    gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+
+    baseSashForm.setLayoutData(gridData);
     /*
      * LEFT COLUMN
      */
@@ -357,6 +374,14 @@ public class SarosView extends ViewPart {
 
     chatRooms = new ChatRoomsComposite(rightComposite, SWT.NONE, rosterTracker);
 
+    notificationAnchor = new Composite(parent, SWT.NONE);
+
+    gridData = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
+    gridData.heightHint = 0;
+
+    notificationAnchor.setLayoutData(gridData);
+    notificationAnchor.setVisible(false);
+
     /**
      * @JTourBusStop 3, The Interface Tour:
      *
@@ -432,21 +457,35 @@ public class SarosView extends ViewPart {
                 SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
             if (contacts.size() == 0) return;
 
-            /*
-             * disabled because feature does not work properly(current
-             * version 14.1.31)
-             */
-            // manager.add(getAction(SkypeAction.class));
+            final JID jid = contacts.get(0);
+
+            // FIXME dirty hack
+            final ContactPropertyTester tester = new ContactPropertyTester();
+            final boolean isOnline = tester.test(jid, "isOnline", null, null);
+
+            if (sarosSessionManager.getSession() == null && isOnline) {
+              MenuManager shareProjectSubMenu =
+                  new MenuManager(
+                      "Share Project(s)...",
+                      ImageManager.getImageDescriptor(ImageManager.ELCL_SESSION),
+                      "Share_Project");
+
+              shareProjectSubMenu.add(new StartSessionWithProjects());
+              // TODO it seems it not that trivial to add tooltips to these entries
+              manager.add(shareProjectSubMenu);
+              manager.add(new Separator());
+            }
 
             // TODO: Currently only Saros/S is known to have a working JoinSessionRequestHandler,
             //       remove this once the situation changes / change this to it's own feature.
             Boolean isServer =
-                discoveryManager.isFeatureSupported(
-                    contacts.get(0), SarosConstants.NAMESPACE_SERVER);
+                discoveryManager.isFeatureSupported(jid, SarosConstants.NAMESPACE_SERVER);
             if (contacts.size() == 1 && isServer != null && isServer) {
               manager.add(getAction(RequestSessionInviteAction.ACTION_ID));
+              manager.add(new Separator());
             }
-            manager.add(new Separator());
+
+            manager.add(getAction(SkypeAction.ACTION_ID));
             manager.add(getAction(OpenChatAction.ACTION_ID));
             manager.add(getAction(SendFileAction.ACTION_ID));
             manager.add(getAction(RenameContactAction.ACTION_ID));
@@ -579,26 +618,29 @@ public class SarosView extends ViewPart {
           @Override
           public void run() {
 
-            if (control != null) {
-              BalloonNotification.showNotification(control, title, text);
+            Control attachToControl = control;
+
+            if (attachToControl != null) {
+              BalloonNotification.showNotification(
+                  attachToControl, SWT.LEFT | SWT.BOTTOM, title, text);
               return;
             }
 
             IViewPart sarosView = SWTUtils.findView(SarosView.ID);
+
             /*
              * If no session view is open then show the balloon notification
              * in the control which has the keyboard focus
              */
 
-            Control sarosViewControl;
-
             if (sarosView != null) {
-              sarosViewControl = ((SarosView) sarosView).leftComposite;
+              attachToControl = ((SarosView) sarosView).notificationAnchor;
             } else {
-              sarosViewControl = Display.getDefault().getFocusControl();
+              attachToControl = Display.getCurrent().getFocusControl();
             }
 
-            BalloonNotification.showNotification(sarosViewControl, title, text);
+            BalloonNotification.showNotification(
+                attachToControl, SWT.LEFT | SWT.BOTTOM, title, text);
           }
         });
   }
@@ -625,12 +667,12 @@ public class SarosView extends ViewPart {
     switch (reason) {
       case KICKED:
         title = Messages.SessionStop_host_removed_you_title;
-        text = ModelFormatUtils.format(Messages.SessionStop_host_removed_you_message, user);
+        text = CoreUtils.format(Messages.SessionStop_host_removed_you_message, user);
         break;
 
       case HOST_LEFT:
         title = Messages.SessionStop_host_closed_session_title;
-        text = ModelFormatUtils.format(Messages.SessionStop_host_closed_session_message, user);
+        text = CoreUtils.format(Messages.SessionStop_host_closed_session_message, user);
         break;
       case CONNECTION_LOST:
         // TODO display the error

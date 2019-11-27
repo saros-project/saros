@@ -1,33 +1,35 @@
 package saros.ui.wizards.pages;
 
-import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.IDialogPage;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import saros.negotiation.ProjectNegotiationData;
@@ -38,32 +40,36 @@ import saros.session.ISarosSession;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.SWTUtils;
-import saros.ui.views.SarosView;
 import saros.ui.widgets.wizard.ProjectOptionComposite;
-import saros.ui.widgets.wizard.events.ProjectNameChangedEvent;
 import saros.ui.widgets.wizard.events.ProjectOptionListener;
 
 /** A wizard page that allows to enter the new project name or to choose to overwrite a project. */
 public class EnterProjectNamePage extends WizardPage {
 
-  private static final Logger log = Logger.getLogger(EnterProjectNamePage.class.getName());
+  private static final Pattern PROJECT_NAME_PROPOSAL_PATTERN =
+      Pattern.compile("(?<name>.*) \\((?<number>\\d+)\\)$");
 
   private final JID peer;
 
   private final ISarosSession session;
 
-  private final Map<String, String> remoteProjectMapping;
+  /** Map containing the mapping from the remote project id to the remote project name. */
+  private final Map<String, String> remoteProjectIdToNameMapping;
+
   private final Map<String, ProjectOptionComposite> projectOptionComposites =
       new HashMap<String, ProjectOptionComposite>();
 
   /** Map containing the current error messages for every project id. */
-  private Map<String, String> currentErrors = new HashMap<String, String>();
+  private final Map<String, String> currentErrors = new HashMap<>();
 
-  private IConnectionManager connectionManager;
+  /**
+   * Map containing the desired project name mapping as remote project name to local project name
+   */
+  private final Map<String, String> desiredRemoteToLocalProjectNameMapping;
 
   private Preferences preferences;
 
-  private boolean flashState;
+  private final IConnectionManager connectionManager;
 
   private final Set<String> unsupportedCharsets = new HashSet<String>();
 
@@ -72,7 +78,8 @@ public class EnterProjectNamePage extends WizardPage {
       IConnectionManager connectionManager,
       Preferences preferences,
       JID peer,
-      List<ProjectNegotiationData> projectNegotiationData) {
+      List<ProjectNegotiationData> projectNegotiationData,
+      Map<String, String> desiredRemoteToLocalProjectNameMapping) {
 
     super(Messages.EnterProjectNamePage_title);
     this.session = session;
@@ -80,11 +87,16 @@ public class EnterProjectNamePage extends WizardPage {
     this.preferences = preferences;
     this.peer = peer;
 
-    remoteProjectMapping = new HashMap<String, String>();
+    this.desiredRemoteToLocalProjectNameMapping =
+        desiredRemoteToLocalProjectNameMapping != null
+            ? desiredRemoteToLocalProjectNameMapping
+            : Collections.emptyMap();
+
+    remoteProjectIdToNameMapping = new HashMap<String, String>();
 
     for (final ProjectNegotiationData data : projectNegotiationData) {
 
-      remoteProjectMapping.put(data.getProjectID(), data.getProjectName());
+      remoteProjectIdToNameMapping.put(data.getProjectID(), data.getProjectName());
 
       unsupportedCharsets.addAll(getUnsupportedCharsets(data.getFileList().getEncodings()));
     }
@@ -108,45 +120,39 @@ public class EnterProjectNamePage extends WizardPage {
 
   @Override
   public void performHelp() {
-    try {
-      Desktop.getDesktop().browse(URI.create(Messages.EnterProjectNamePage_saros_url));
-    } catch (IOException e) {
-      SarosView.showNotification(
-          Messages.EnterProjectNamePage_faq, Messages.EnterProjectNamePage_error_browser_open);
-    }
+    SWTUtils.openExternalBrowser(Messages.EnterProjectNamePage_saros_url);
   }
 
   @Override
   public void createControl(Composite parent) {
-    GridData gridData;
 
-    Composite composite = new Composite(parent, SWT.NONE);
+    Composite composite =
+        new Composite(parent, SWT.NONE) {
+          // dirty hack - if someone knows how to do it right with layout please change this
+          @Override
+          public Point computeSize(int wHint, int hHint, boolean changed) {
+            final Point result = super.computeSize(wHint, hHint, changed);
+
+            final int maxSize = 800; // prevent the TAB folder exploding horizontal
+
+            if (result.x < maxSize) return result;
+
+            result.x = maxSize;
+
+            return result;
+          }
+        };
+
     setControl(composite);
 
-    composite.setLayout(new GridLayout());
-
-    gridData = new GridData(SWT.BEGINNING, SWT.FILL, false, false);
-    composite.setLayoutData(gridData);
+    composite.setLayout(new FillLayout());
 
     TabFolder tabFolder = new TabFolder(composite, SWT.TOP);
 
-    /*
-     * grabExcessHorizontalSpace must be true or the tab folder will not
-     * display a scroll bar if the wizard is resized
-     */
-    gridData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false);
-
-    /*
-     * FIXME this does not work and the wizard may "explode" if too many
-     * remote projects are presented
-     */
-    gridData.widthHint = 400;
-    tabFolder.setLayoutData(gridData);
-
-    for (final String projectID : remoteProjectMapping.keySet()) {
+    for (final String projectID : remoteProjectIdToNameMapping.keySet()) {
 
       TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
-      tabItem.setText(remoteProjectMapping.get(projectID));
+      tabItem.setText(remoteProjectIdToNameMapping.get(projectID));
 
       ProjectOptionComposite tabComposite = new ProjectOptionComposite(tabFolder, projectID);
 
@@ -169,8 +175,31 @@ public class EnterProjectNamePage extends WizardPage {
       composite.addProjectOptionListener(
           new ProjectOptionListener() {
             @Override
-            public void projectNameChanged(ProjectNameChangedEvent event) {
-              updatePageComplete(event.projectID);
+            public void projectNameChanged(ProjectOptionComposite composite) {
+              updatePageComplete(composite.getRemoteProjectID());
+            }
+
+            @Override
+            public void projectOptionChanged(ProjectOptionComposite composite) {
+              if (composite.useExistingProject()) return;
+
+              if (!composite.getProjectName().isEmpty()) return;
+
+              final List<String> reservedNames = new ArrayList<>();
+
+              for (ProjectOptionComposite c : projectOptionComposites.values()) {
+                if (c.getProjectName().isEmpty()) continue;
+
+                reservedNames.add(c.getProjectName());
+              }
+
+              final String remoteProjectName =
+                  remoteProjectIdToNameMapping.get(composite.getRemoteProjectID());
+
+              final String proposal =
+                  findProjectNameProposal(remoteProjectName, reservedNames.toArray(new String[0]));
+
+              composite.setProjectName(proposal, false);
             }
           });
     }
@@ -191,7 +220,7 @@ public class EnterProjectNamePage extends WizardPage {
     if (projectName.isEmpty())
       return Messages.EnterProjectNamePage_set_project_name
           + " for remote project "
-          + remoteProjectMapping.get(projectID);
+          + remoteProjectIdToNameMapping.get(projectID);
 
     IStatus status = ResourcesPlugin.getWorkspace().validateName(projectName, IResource.PROJECT);
 
@@ -336,18 +365,17 @@ public class EnterProjectNamePage extends WizardPage {
   }
 
   /**
-   * Preselect project names for the remote projects. This method will either use an existing shared
-   * project and disable the option to change the preselected values or just generate a unique
-   * project name for new projects.
+   * Preselect project names for the remote projects. First this method will try to use an existing
+   * shared project and then disable the option to change the preselected values for this project.
    *
-   * <p>This method does <b>not</b> preselect values for existing projects unless they are already
-   * shared ! This can do more harm than indented when the user is so eager and just ignores all
-   * warnings that will be presented before he can finish the wizard.
+   * <p>Afterwards it tries to assign a desired project mapping and lastly will generate a unique
+   * project name for projects that are still unassigned.
    */
   private void preselectProjectNames() {
 
     final Set<String> reservedProjectNames = new HashSet<String>();
 
+    // force pre-selection of already shared projects
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
       String projectID = entry.getKey();
@@ -355,13 +383,15 @@ public class EnterProjectNamePage extends WizardPage {
 
       saros.filesystem.IProject project = session.getProject(projectID);
 
+      // not shared yet
       if (project == null) continue;
 
-      projectOptionComposite.setProjectName(true, project.getName());
+      projectOptionComposite.setProjectName(project.getName(), true);
       projectOptionComposite.setEnabled(false);
       reservedProjectNames.add(project.getName());
     }
 
+    // try to assign local names for the remaining remote projects
     for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites.entrySet()) {
 
       String projectID = entry.getKey();
@@ -369,13 +399,37 @@ public class EnterProjectNamePage extends WizardPage {
 
       saros.filesystem.IProject project = session.getProject(projectID);
 
+      // already shared
       if (project != null) continue;
 
-      String projectNameProposal =
-          findProjectNameProposal(
-              remoteProjectMapping.get(projectID), reservedProjectNames.toArray(new String[0]));
+      final String remoteProjectName = remoteProjectIdToNameMapping.get(projectID);
 
-      projectOptionComposite.setProjectName(false, projectNameProposal);
+      final String desiredLocalProjectName =
+          desiredRemoteToLocalProjectNameMapping.get(remoteProjectName);
+
+      boolean existingProject = false;
+
+      String projectNameProposal = null;
+
+      /*
+       * find a proposal based on the desired name only if the name is not already used and such a
+       * project already exists in the workspace
+       */
+      if (desiredLocalProjectName != null
+          && !reservedProjectNames.contains(desiredLocalProjectName)) {
+        existingProject =
+            ResourcesPlugin.getWorkspace().getRoot().getProject(desiredLocalProjectName).exists();
+        projectNameProposal = existingProject ? desiredLocalProjectName : null;
+      }
+
+      /*
+       * if we failed to find a proposal, generate one and suggest it a new project
+       */
+      if (projectNameProposal == null)
+        projectNameProposal =
+            findProjectNameProposal(remoteProjectName, reservedProjectNames.toArray(new String[0]));
+
+      projectOptionComposite.setProjectName(projectNameProposal, existingProject);
       reservedProjectNames.add(projectNameProposal);
     }
   }
@@ -401,7 +455,8 @@ public class EnterProjectNamePage extends WizardPage {
   /** get transfer mode and set header information of the wizard. */
   private void updateConnectionStatus() {
 
-    switch (connectionManager.getTransferMode(this.peer)) {
+    // FIXME we are using Smack for File transfer so we might end up with other transfer modes
+    switch (connectionManager.getTransferMode(ISarosSession.SESSION_CONNECTION_ID, peer)) {
       case SOCKS5_MEDIATED:
         if (preferences.isLocalSOCKS5ProxyEnabled())
           setDescription(Messages.EnterProjectNamePage_description_socks5proxy);
@@ -410,71 +465,30 @@ public class EnterProjectNamePage extends WizardPage {
         break;
 
       case SOCKS5_DIRECT:
-        setDescription(Messages.EnterProjectNamePage_description_direct_filetranfser);
-        setImageDescriptor(ImageManager.getImageDescriptor("icons/wizban/socks5.png"));
-        break;
-
+        // all is fine
       case NONE:
         // lost data connection
         break;
 
       case IBB:
-        String speedInfo = "";
-
         if (preferences.forceIBBTransport()) {
-          setDescription(
-              MessageFormat.format(
-                  Messages.EnterProjectNamePage_direct_filetransfer_deactivated, speedInfo));
+          setDescription(Messages.EnterProjectNamePage_direct_filetransfer_deactivated);
         } else {
-          setDescription(
-              MessageFormat.format(
-                  Messages.EnterProjectNamePage_direct_filetransfer_nan, speedInfo));
+          setDescription(Messages.EnterProjectNamePage_direct_filetransfer_nan);
         }
-        startIBBLogoFlash();
+
+        new FlashTask(
+                this,
+                1000,
+                ImageManager.getImage("icons/wizban/ibb.png"),
+                ImageManager.getImage("icons/wizban/ibbFaded.png"))
+            .run();
+
         break;
       default:
         setDescription(Messages.EnterProjectNamePage_unknown_transport_method);
         break;
     }
-  }
-
-  /**
-   * Starts and maintains a timer that will flash two IBB logos to make the user aware of the
-   * warning.
-   */
-  private void startIBBLogoFlash() {
-
-    final Timer timer = new Timer();
-
-    timer.schedule(
-        new TimerTask() {
-
-          @Override
-          public void run() {
-            SWTUtils.runSafeSWTSync(
-                log,
-                new Runnable() {
-
-                  @Override
-                  public void run() {
-
-                    if (EnterProjectNamePage.this.getControl().isDisposed()) {
-                      timer.cancel();
-                      return;
-                    }
-
-                    flashState = !flashState;
-                    if (flashState)
-                      setImageDescriptor(ImageManager.getImageDescriptor("icons/wizban/ibb.png"));
-                    else
-                      setImageDescriptor(
-                          ImageManager.getImageDescriptor("icons/wizban/ibbFaded.png"));
-                  }
-                });
-          }
-        },
-        0,
-        1000);
   }
 
   /**
@@ -515,36 +529,28 @@ public class EnterProjectNamePage extends WizardPage {
    */
   String findProjectNameProposal(String projectName, String... reservedProjectNames) {
 
-    int idx;
+    int idx = 2;
 
-    for (idx = projectName.length() - 1;
-        idx >= 0 && Character.isDigit(projectName.charAt(idx));
-        idx--) {
-      // NOP
-    }
+    Matcher matcher = PROJECT_NAME_PROPOSAL_PATTERN.matcher(projectName);
 
-    String newProjectName;
-
-    if (idx < 0) newProjectName = "";
-    else newProjectName = projectName.substring(0, idx + 1);
-
-    if (idx == projectName.length() - 1) idx = 2;
-    else {
+    if (matcher.matches()) {
       try {
-        idx = Integer.valueOf(projectName.substring(idx + 1));
+        idx = Integer.parseInt(matcher.group("number"));
+        projectName = matcher.group("name");
+
       } catch (NumberFormatException e) {
-        idx = 2;
+        // IGNORE
       }
     }
 
-    projectName = newProjectName;
+    String nextProjectName = projectName;
 
-    while (!projectNameIsUnique(projectName, reservedProjectNames)) {
-      projectName = newProjectName + idx;
+    while (!projectNameIsUnique(nextProjectName, reservedProjectNames)) {
+      nextProjectName = projectName + " " + "(" + idx + ")";
       idx++;
     }
 
-    return projectName;
+    return nextProjectName;
   }
 
   /** Returns all charsets from a given set that are not available on the current JVM. */
@@ -560,5 +566,38 @@ public class EnterProjectNamePage extends WizardPage {
     }
 
     return missingCharsets;
+  }
+
+  private static class FlashTask implements Runnable {
+
+    private final ImageDescriptor[] states;
+    private final Display display;
+    private final Control control;
+    private final IDialogPage page;
+    private final int delay;
+
+    int state = 0;
+
+    public FlashTask(final IDialogPage page, final int delay, final Image... images) {
+      this.page = page;
+      this.delay = delay;
+
+      control = page.getControl();
+      display = page.getControl().getDisplay();
+      states = new ImageDescriptor[images.length];
+
+      for (int i = 0; i < states.length; i++)
+        states[i] = ImageDescriptor.createFromImage(images[i]);
+    }
+
+    @Override
+    public void run() {
+      if (display.isDisposed() || control.isDisposed()) return;
+
+      state %= states.length;
+
+      page.setImageDescriptor(states[state++]);
+      display.timerExec(delay, this);
+    }
   }
 }

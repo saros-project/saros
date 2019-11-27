@@ -3,7 +3,6 @@ package saros.ui.wizards;
 import java.util.Collection;
 import java.util.List;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import saros.SarosPluginContext;
@@ -26,7 +25,6 @@ import saros.ui.wizards.pages.ResourceSelectionWizardPage;
 public class StartSessionWizard extends Wizard {
 
   public static final String TITLE = Messages.SessionStartWizard_title;
-  public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SESSION_OUTGOING;
 
   private final ResourceSelectionWizardPage resourceSelectionWizardPage;
   private final ContactSelectionWizardPage contactSelectionWizardPage;
@@ -35,7 +33,8 @@ public class StartSessionWizard extends Wizard {
   public StartSessionWizard(final Collection<IResource> preselectedResources) {
     SarosPluginContext.initComponent(this);
     setWindowTitle(TITLE);
-    setDefaultPageImageDescriptor(IMAGE);
+    setDefaultPageImageDescriptor(
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_SESSION_OUTGOING));
     setNeedsProgressMonitor(true);
     setHelpAvailable(false);
 

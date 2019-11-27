@@ -1,5 +1,6 @@
 package saros.intellij.ui.wizards.pages;
 
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,7 +18,7 @@ import javax.swing.text.DefaultEditorKit;
 public class TextAreaPage extends AbstractWizardPage {
   private JTextArea display;
   private String title = "";
-  private Color fontColor = Color.BLACK;
+  private Color fontColor = JBColor.BLACK;
 
   /**
    * Constructor with custom ID

@@ -18,10 +18,10 @@ title: Coding and Commit Guidelines
     manual](https://git-scm.com/book/tr/v2/Customizing-Git-Git-Configuration#Formatting-and-Whitespace)
     for more information.
 
-### Commit message
+### Commit Message
 
 1.  Follow the general rule of how Git commit messages are formatted.
-    Refer to the [Git manual](https://git-scm.com/book/ch5-2.md#Commit-Guidelines) for
+    Refer to the [Git manual](https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project#_commit_guidelines) for
     more information. In particular, every patch must have an
     informative short summary or "subject line" (also see next point in
     the list) and it should have a more detailed explanation below.
@@ -60,7 +60,7 @@ implementation in IntelliJ.
 If you can't decide on a single type tag, you probably mixed up
 different concerns and should consider splitting your patch.
 
-## Coding rules
+## Coding Rules
 
 ### Formatting
 
@@ -99,7 +99,7 @@ The only differences and additional conventions are:
     that the behavior is well defined, for instance using an
     observable collection)
 
-#### Class member visibility
+#### Class Member Visibility
 
 By default all fields and methods should be **`private`**. For any field
 or method with a visibility higher than **`private `**(visible from the
@@ -111,7 +111,7 @@ accessible. This is fine up to **package-private** (no modifier). But it
 is not acceptable to make a member part of a package's API
 (`protected `or `public`) solely for testing purposes.
 
-#### Final members and variables
+#### Final Members and Variables
 
 *   For class variables: By default, make them final, unless you find a
     good reason not to. It makes the code easier to understand when you
@@ -174,7 +174,7 @@ public class A implements D {
   ...
 ```
 
-#### Control flow
+#### Control Flow
 
 Test whether you can return from a method instead of testing whether
 you should execute a block of code.
@@ -208,7 +208,7 @@ Furthermore, there is no need to put the code after the return
 statement into an explicit "else"-branch. You can easily save one
 level of block-nesting.
 
-#### Checking parameters
+#### Checking Parameters
 
 *   Methods may assume that they are called with correct non-null input
     unless the method specifies that it allows incorrect or null input.

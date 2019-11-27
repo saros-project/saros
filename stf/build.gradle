@@ -1,27 +1,8 @@
-eclipse{
-    project {
-        natures 'org.eclipse.pde.PluginNature'
-    }
-}
-
-buildscript {
-    repositories {
-        maven {
-            url  "http://dl.bintray.com/monkey-works/BuildMonkey"
-        }
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath "de.monkeyworks.buildmonkey:gradle.dependency:0.4.13"
-    }
-}
-
-apply plugin: 'de.monkeyworks.buildmonkey.ManifestDependencyPlugin'
-
-repositories {
-    maven { url rootProject.file('build/maven') }
+sarosEclipse {
+  manifest = file('META-INF/MANIFEST.MF')
+  excludeManifestDependencies = ['saros.core', 'saros.eclipse', 'org.junit', 'org.eclipse.gef']
+  createBundleJar = true
+  addDependencies = true
 }
 
 sourceSets {
@@ -37,48 +18,26 @@ sourceSets {
     }
 }
 
-manifestDependencies {
-    eclipseGroup = 'eclipse-deps'
-
-    dependencyHandling {
-        def ids = [:]
-
-        return ids
-    }
-}
-
 dependencies {
     compile junitVersion
     compile project(':saros.core')
-    compile project(':saros.ui')
     compile project(':saros.eclipse')
 
-    compile project(path: ':saros.ui', configuration: 'testing')
     compile project(path: ':saros.eclipse', configuration: 'testing')
 
-    releaseDep fileTree(dir: 'libs', include: '*.jar', exclude: '*source*.jar')
-    compile fileTree(dir: eclipseHome + '/plugins').matching {
+    // Required for the whiteboard stf component
+    compile files('libs/org.eclipse.draw2d_3.6.2.v20110128-0100.jar', 'libs/org.eclipse.gef_3.6.2.v20110110-2020.jar')
+
+    releaseDep fileTree('libs'){
         include '*.jar'
-        exclude '*commons.lang*'
-        exclude 'de.fu_berlin.*'
+        exclude 'org.eclipse.draw2d*.jar'
+        exclude 'org.eclipse.ged*.jar'
     }
     compile configurations.releaseDep
 }
 
 jar {
-    manifest {
-        def manif = "${projectDir}/META-INF/MANIFEST.MF"
-        if (new File(manif).exists()) {
-            from (manif)
-        }
-    }
-
-    from sourceSets.main.output
     from 'plugin.xml'
-
-    into('lib') {
-        from configurations.getByName('releaseDep')
-    }
     into('test/resources') {
         from('test/resources')
     }
@@ -91,12 +50,4 @@ task testJar(type: Jar) {
 
 artifacts {
     testing testJar
-}
-
-sonarqube {
-    properties {
-        property 'sonar.projectName', 'Saros/STF'
-        property 'sonar.projectDescription', 'Saros Test Framework'
-        property 'sonar.projectVersion', '0.1.0'
-    }
 }

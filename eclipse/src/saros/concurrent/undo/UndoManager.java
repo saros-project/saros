@@ -377,7 +377,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     this.sessionManager = sessionManager;
 
-    editorManager.addActivityListener(this.activityListener);
+    editorManager.getActivityProducer().addActivityListener(this.activityListener);
     this.editorManager = editorManager;
 
     editorManager.addSharedEditorListener(sharedEditorListener);
@@ -473,7 +473,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
   public void dispose() {
     OperationHistoryFactory.getOperationHistory().removeOperationHistoryListener(historyListener);
     sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
-    editorManager.removeActivityListener(activityListener);
+    editorManager.getActivityProducer().removeActivityListener(activityListener);
     enabled = false;
     eclipseHistory.removeOperationApprover(operationBlocker);
     editorManager.removeSharedEditorListener(sharedEditorListener);

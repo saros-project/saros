@@ -8,7 +8,6 @@ import org.junit.runners.Suite;
   saros.intellij.context.TestSuite.class,
   saros.intellij.eventhandler.editor.document.TestSuite.class,
   saros.intellij.project.filesystem.TestSuite.class,
-  saros.intellij.ui.swt_browser.TestSuite.class,
 })
 public class SarosIntellijTestSuite {
   // the class remains completely empty,

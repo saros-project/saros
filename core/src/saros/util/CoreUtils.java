@@ -1,5 +1,12 @@
 package saros.util;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import saros.net.util.XMPPUtils;
+import saros.net.xmpp.JID;
+import saros.session.User;
+
 public class CoreUtils {
 
   /**
@@ -57,5 +64,37 @@ public class CoreUtils {
     format += minutes > 0 ? String.format(hours > 0 ? "%02d" : "%d", minutes) + "m " : "";
     format += seconds > 0 ? String.format(minutes > 0 ? "%02d" : "%d", secs) + "s" : "";
     return format;
+  }
+
+  /**
+   * This method formats patterns for display in the UI by replacing occurrences of {@link User}
+   * objects by {@link ModelFormatUtils#determineUserDisplayName(User)}.
+   *
+   * @param pattern
+   * @param arguments occurrences of User objects are replaced by their display name
+   * @return the formatted string
+   */
+  public static String format(String pattern, Object... arguments) {
+    List<Object> mappedValues = new ArrayList<Object>(arguments.length);
+    for (Object obj : arguments) {
+      if (obj instanceof User) {
+        User user = (User) obj;
+        mappedValues.add(determineUserDisplayName(user));
+      } else {
+        mappedValues.add(obj);
+      }
+    }
+    return MessageFormat.format(pattern, mappedValues.toArray());
+  }
+
+  /**
+   * Retrieves a user's nickname from the XMPP roster. If none is present it returns the base name.
+   *
+   * @param user
+   * @return the user's nickname, or if none is set JID's base.
+   */
+  public static String determineUserDisplayName(User user) {
+    JID jid = user.getJID();
+    return XMPPUtils.getNickname(null, jid, jid.getBase());
   }
 }

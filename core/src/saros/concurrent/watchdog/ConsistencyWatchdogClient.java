@@ -27,7 +27,7 @@ import saros.session.AbstractActivityProducer;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.ISarosSession;
-import saros.session.UserFormatUtils;
+import saros.util.CoreUtils;
 
 /**
  * This class is responsible for two things:
@@ -35,8 +35,7 @@ import saros.session.UserFormatUtils;
  * <ol>
  *   <li>Process checksums sent to us from the server by checking our locally existing files against
  *       them. See {@link #performCheck(ChecksumActivity)} If an inconsistency is detected the
- *       inconsistency state is set via the {@link IsInconsistentObservable}. This enables the
- *       {@link ConsistencyAction} in the {@link SarosView}.
+ *       inconsistency state is set via the {@link IsInconsistentObservable}.
  *   <li>Send a ChecksumError to the host, if the user wants to recover from an inconsistency. See
  *       {@link #runRecovery}
  * </ol>
@@ -204,7 +203,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
 
       remoteProgress.beginTask(
           "Consistency recovery for user "
-              + UserFormatUtils.getDisplayName(currentSession.getLocalUser()),
+              + CoreUtils.determineUserDisplayName(currentSession.getLocalUser()),
           filesRemaining.get());
 
       fireActivity(

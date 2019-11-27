@@ -4,10 +4,10 @@
  * <h1>Jupiter Algorithm Overview</h1>
  *
  * The Jupiter Architecture is the central concept for Distributed Party Programming in Saros. Each
- * client administers its own copy of a shared artifact (resource). Local {@link Operation}s will be
- * performed immediately and communicated to a central server. From there all other clients get
- * informed about the operation which they will transform in order to perform it on their own
- * copies.
+ * client administers its own copy of a shared artifact (resource). Local {@link
+ * saros.concurrent.jupiter.Operation}s will be performed immediately and communicated to a central
+ * server. From there all other clients get informed about the operation which they will transform
+ * in order to perform it on their own copies.
  *
  * <p>The transformation is needed to keep all copies consistent. Consistency maintenance is made up
  * of three components:
@@ -26,9 +26,10 @@
  * Important components of the Jupiter package:
  *
  * <ul>
- *   <li>{@link internal.Jupiter} is the central class of the Jupiter Algorithm
- *   <li>{@link internal.text.GOTOInclusionTransformation} is an implementation of the
- *       transformation function of the Jupiter Algorithm
+ *   <li>{@link saros.concurrent.jupiter.internal.Jupiter} is the central class of the Jupiter
+ *       Algorithm
+ *   <li>{@link saros.concurrent.jupiter.internal.text.GOTOInclusionTransformation} is an
+ *       implementation of the transformation function of the Jupiter Algorithm
  * </ul>
  */
 package saros.concurrent.jupiter;

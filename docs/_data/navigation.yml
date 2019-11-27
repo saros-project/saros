@@ -17,3 +17,8 @@
   long_title: Support
   url: /support
   icon_class: fa fa-headset
+
+- title: Research
+  long_title: Research
+  url: /research
+  icon_class: fa fa-glasses

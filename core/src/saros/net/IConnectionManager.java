@@ -21,15 +21,11 @@ public interface IConnectionManager {
    */
   public void setServices(int serviceMask);
 
-  public void addTransferListener(ITransferListener listener);
-
-  public void removeTransferListener(ITransferListener listener);
-
   /** @deprecated */
   @Deprecated
-  public void connect(JID peer) throws IOException;
+  public IByteStreamConnection connect(JID peer) throws IOException;
 
-  public void connect(String connectionID, JID peer) throws IOException;
+  public IByteStreamConnection connect(String connectionID, JID peer) throws IOException;
 
   /**
    * @deprecated Disconnects {@link IByteStreamConnection} with the specified peer

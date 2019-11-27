@@ -77,12 +77,7 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
-  public boolean isDerived(boolean checkAncestors) {
-    return false;
-  }
-
-  @Override
-  public boolean isDerived() {
+  public boolean isIgnored() {
     return false;
   }
 

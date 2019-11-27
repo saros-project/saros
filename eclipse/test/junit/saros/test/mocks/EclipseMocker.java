@@ -21,6 +21,7 @@ import saros.preferences.EclipsePreferenceStoreAdapter;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.test.util.EclipseMemoryPreferenceStore;
 import saros.test.util.MemoryPreferences;
+import saros.ui.util.SWTUtils;
 
 public class EclipseMocker {
   /** Mock the static call {@link ResourcesPlugin#getWorkspace()}. */
@@ -48,6 +49,12 @@ public class EclipseMocker {
     Platform.getBundle("org.eclipse.core.runtime");
     EasyMock.expectLastCall().andStubReturn(bundle);
     PowerMock.replay(Platform.class);
+  }
+
+  public static void mockSWTDisplay() {
+    PowerMock.mockStaticPartial(SWTUtils.class, "getDisplay");
+    EasyMock.expect(SWTUtils.getDisplay()).andStubReturn(null);
+    PowerMock.replay(SWTUtils.class);
   }
 
   /** Mock a somewhat clever Saros, with a version number and a preference store. */

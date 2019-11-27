@@ -31,7 +31,6 @@ public class Filesystem {
    *
    * @see Application#runWriteAction(Runnable)
    */
-  @Nullable
   @SuppressWarnings("unchecked")
   public static <T, E extends Throwable> T runWriteAction(
       @NotNull final ThrowableComputable<T, E> computation,
@@ -97,7 +96,6 @@ public class Filesystem {
   }
 
   /** @see Application#runReadAction(Computable computation) */
-  @Nullable
   public static <T> T runReadAction(@NotNull final Computable<T> computation) {
     return application.runReadAction(computation);
   }

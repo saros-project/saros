@@ -3,6 +3,7 @@ package saros.negotiation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
@@ -52,6 +53,8 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
   private PacketCollector startActivityQueuingResponseCollector;
 
+  private final AdditionalProjectDataFactory additionalProjectDataFactory;
+
   protected AbstractOutgoingProjectNegotiation( //
       final JID peer, //
       final ProjectSharingData projects, //
@@ -62,7 +65,8 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
       final IChecksumCache checksumCache, //
       final XMPPConnectionService connectionService, //
       final ITransmitter transmitter, //
-      final IReceiver receiver //
+      final IReceiver receiver, //
+      final AdditionalProjectDataFactory additionalProjectDataFactory //
       ) {
     super(
         String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()),
@@ -78,6 +82,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
     this.projects = projects;
 
     this.editorManager = editorManager;
+    this.additionalProjectDataFactory = additionalProjectDataFactory;
   }
 
   public Status run(IProgressMonitor monitor) {
@@ -346,8 +351,11 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
 
         projectFileList.setProjectID(projectID);
 
+        Map<String, String> additionalProjectData = additionalProjectDataFactory.build(project);
+
         ProjectNegotiationData data =
-            new ProjectNegotiationData(projectID, project.getName(), partial, projectFileList);
+            new ProjectNegotiationData(
+                projectID, project.getName(), partial, projectFileList, additionalProjectData);
 
         negData.add(data);
 

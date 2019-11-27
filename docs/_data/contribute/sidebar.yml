@@ -13,6 +13,9 @@
 - title: Saros Testing Framework
   url: /contribute/saros-testing-framework.html
 
+- title: Saros Server Development
+  url: /contribute/saros-server.html
+
 - title: Processes
   sublinks:
   - title: Development Process
@@ -26,3 +29,6 @@
 
   - title: Release Process
     url: /contribute/processes/release.html
+
+- title: Open Topics
+  url: /contribute/open-topics.html

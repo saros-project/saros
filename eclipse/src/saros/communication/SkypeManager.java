@@ -1,22 +1,25 @@
 package saros.communication;
 
-import java.util.HashMap;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.filter.PacketIDFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
-import saros.annotations.Component;
 import saros.communication.extensions.SarosPacketExtension;
 import saros.misc.xstream.XStreamExtensionProvider;
 import saros.misc.xstream.XStreamExtensionProvider.XStreamIQPacket;
@@ -24,27 +27,29 @@ import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.roster.IRosterListener;
 import saros.preferences.PreferenceConstants;
-import saros.util.ThreadUtils;
 
 /**
  * A manager class that allows to discover if a given XMPP entity supports Skype and that allows to
  * initiate Skype VOIP sessions with that entity.
  *
- * <p>TODO CO: Verify that IQ Packets are the best way of doing this. It seems kind of hackisch.
- * Could we also use ServiceDiscovery?
- *
- * @author rdjemili
- * @author oezbek
+ * <p>TODO CO: Verify that IQ Packets are the best way of doing this. Could we also use
+ * ServiceDiscovery?
  */
-@Component(module = "net")
+/*
+ * Hint: There is a race condition in this code, e.g someone requests the name while
+ * we setup a new one the wrong name can be received in the end. However the issue is
+ * likely not to happen at all so we ignore it.
+ */
 public class SkypeManager implements IConnectionListener {
-  private final Logger log = Logger.getLogger(SkypeManager.class);
 
-  protected XStreamExtensionProvider<String> skypeProvider =
+  private static final Logger log = Logger.getLogger(SkypeManager.class);
+
+  private static final XStreamExtensionProvider<String> skypeProvider =
       new XStreamExtensionProvider<String>(SarosPacketExtension.EXTENSION_NAMESPACE, "skypeInfo");
 
-  protected final Map<JID, String> skypeNames = new HashMap<JID, String>();
+  private final Map<JID, String> skypeNames = new ConcurrentHashMap<JID, String>();
 
   private final XMPPConnectionService connectionService;
   private final IPreferenceStore preferenceStore;
@@ -55,19 +60,38 @@ public class SkypeManager implements IConnectionListener {
         public void processPacket(Packet packet) {
 
           @SuppressWarnings("unchecked")
-          XStreamIQPacket<String> iq = (XStreamIQPacket<String>) packet;
+          final XStreamIQPacket<String> iq = (XStreamIQPacket<String>) packet;
 
           if (iq.getType() == IQ.Type.GET) {
-            IQ reply = skypeProvider.createIQ(getLocalSkypeName());
+
+            final IQ reply = skypeProvider.createIQ(getLocalSkypeName());
             reply.setType(IQ.Type.RESULT);
             reply.setPacketID(iq.getPacketID());
             reply.setTo(iq.getFrom());
 
-            connectionService.getConnection().sendPacket(reply);
+            final Connection connection = connectionService.getConnection();
+
+            if (connection == null) return;
+
+            try {
+              connection.sendPacket(reply);
+            } catch (IllegalStateException e) {
+              log.warn("failed to send IQ-RESULT reply to contact: " + iq.getFrom(), e);
+            }
+
+            return;
           }
-          if (iq.getType() == IQ.Type.SET) {
+
+          /* see hint for the class, maybe it is better to ignore result if there is already a name
+           * present and only force updates on SET
+           */
+          if (iq.getType() == IQ.Type.SET || iq.getType() == IQ.Type.RESULT) {
+
             String skypeName = iq.getPayload();
-            if (skypeName != null && skypeName.length() > 0) {
+
+            if (skypeName != null && skypeName.trim().isEmpty()) skypeName = null;
+
+            if (skypeName != null) {
               skypeNames.put(new JID(iq.getFrom()), skypeName);
               log.debug("Skype Username for " + iq.getFrom() + " added: " + skypeName);
             } else {
@@ -78,154 +102,82 @@ public class SkypeManager implements IConnectionListener {
         }
       };
 
+  private final IRosterListener rosterListener =
+      new IRosterListener() {
+        @Override
+        public void presenceChanged(Presence presence) {
+
+          if (!presence.isAvailable()) return;
+
+          // TODO this also fires for AWAY, DND presence changes
+          final String from = presence.getFrom();
+
+          if (from == null) return;
+
+          requestSkypeName(new JID(from));
+        }
+      };
+
   public SkypeManager(XMPPConnectionService connectionService, IPreferenceStore preferenceStore) {
     this.connectionService = connectionService;
     this.preferenceStore = preferenceStore;
     this.connectionService.addListener(this);
 
-    /** Register for our preference store, so we can be notified if the Skype Username changes. */
+    /** Register for our preference store, so we can be notified if the Skype user name changes. */
     preferenceStore.addPropertyChangeListener(
         new IPropertyChangeListener() {
           @Override
           public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(PreferenceConstants.SKYPE_USERNAME)) {
-              publishSkypeIQ(event.getNewValue().toString());
+              publishSkypeIQ();
             }
           }
         });
   }
 
   /**
-   * Non-blocking variant of {@link #getSkypeURL(String)}.
+   * Returns the Skype name for user identified by the given JID.
    *
-   * @return the skype url for given roster entry or <code>null</code> if roster entry has no skype
-   *     name or the entry's skype name is not cached
-   *     <p>This method will return previously cached results.
+   * @return the skype name for given {@link JID} or <code>null</code> if the user has no skype name
+   *     or it is not known yet
    */
-  public String getSkypeURLNonBlock(String jid) {
-
-    Connection connection = connectionService.getConnection();
-    if (connection == null) return null;
-
-    Roster roster = connection.getRoster();
-    if (roster == null) return null;
-
-    for (Presence presence : asIterable(roster.getPresences(jid))) {
-      if (presence.isAvailable()) {
-        String result = getSkypeURLNonBlock(new JID(presence.getFrom()));
-        if (result != null) return result;
-      }
-    }
-
-    return null;
+  public String getSkypeName(final JID jid) {
+    return skypeNames.get(jid);
   }
 
   /**
-   * Non-blocking variant of {@link #getSkypeURL(JID)}.
-   *
-   * @return the skype url for given {@link JID} or <code>null</code> if roster entry has no skype
-   *     name or the entry's skype name is not cached
-   *     <p>This method will return previously cached results.
-   */
-  public String getSkypeURLNonBlock(final JID rqJID) {
-    if (this.skypeNames.containsKey(rqJID)) {
-      return this.skypeNames.get(rqJID);
-    }
-
-    ThreadUtils.runSafeAsync(
-        "dpp-skype-url-resolver",
-        log,
-        new Runnable() {
-          @Override
-          public void run() {
-            getSkypeURL(rqJID);
-          }
-        });
-
-    return null;
-  }
-
-  /**
-   * Returns the Skype-URL for given JID. This method will query all presences associated with the
-   * given JID and return the first valid Skype url (if any).
-   *
-   * <p>The order in which the presences are queried is undefined. If you need more control use
-   * getSkypeURL(JID).
-   *
-   * @return the skype url for given roster entry or <code>null</code> if roster entry has no skype
-   *     name.
-   *     <p>This method will return previously cached results.
-   * @blocking This method is potentially long-running
-   */
-  public String getSkypeURL(String jid) {
-
-    Connection connection = connectionService.getConnection();
-    if (connection == null) return null;
-
-    Roster roster = connection.getRoster();
-    if (roster == null) return null;
-
-    for (Presence presence : asIterable(roster.getPresences(jid))) {
-      if (presence.isAvailable()) {
-        String result = getSkypeURL(new JID(presence.getFrom()));
-        if (result != null) return result;
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Returns the Skype-URL for user identified by the given RQ-JID.
-   *
-   * @return the skype url for given {@link JID} or <code>null</code> if the user has no skype name
-   *     set for this client.
-   *     <p>This method will return previously cached results.
-   * @blocking This method is potentially long-running
-   */
-  public String getSkypeURL(JID rqJID) {
-
-    Connection connection = connectionService.getConnection();
-
-    if (connection == null) return null;
-
-    String skypeName;
-
-    if (this.skypeNames.containsKey(rqJID)) {
-      skypeName = this.skypeNames.get(rqJID);
-    } else {
-      skypeName = requestSkypeName(connection, rqJID);
-      if (skypeName != null) {
-        // Only cache if we found something
-        this.skypeNames.put(rqJID, skypeName);
-      }
-    }
-
-    if (skypeName == null) return null;
-
-    return "skype:" + skypeName;
-  }
-
-  /**
-   * Send the given Skype user name to all our contacts that are currently available.
+   * Send the current Skype user name to all our contacts that are currently available.
    *
    * <p>TODO SS only send to those, that we know use Saros.
    */
-  public void publishSkypeIQ(String newSkypeName) {
-    Connection connection = connectionService.getConnection();
+  private void publishSkypeIQ() {
+    final Connection connection = connectionService.getConnection();
 
     if (connection == null) return;
 
-    Roster roster = connection.getRoster();
+    final Roster roster = connection.getRoster();
+
     if (roster == null) return;
+
+    final String localSkypeName = getLocalSkypeName();
 
     for (RosterEntry rosterEntry : roster.getEntries()) {
       for (Presence presence : asIterable(roster.getPresences(rosterEntry.getUser()))) {
-        if (presence.isAvailable()) {
-          IQ result = skypeProvider.createIQ(newSkypeName);
-          result.setType(IQ.Type.SET);
-          result.setTo(presence.getFrom());
+
+        if (!presence.isAvailable()) continue;
+
+        final String toJid = presence.getFrom();
+
+        final IQ result = skypeProvider.createIQ(localSkypeName);
+        result.setType(IQ.Type.SET);
+        result.setTo(toJid);
+
+        try {
           connection.sendPacket(result);
+        } catch (IllegalStateException e) {
+          log.warn("failed to send IQ-SET request to contact: " + toJid, e);
+          // we can abort here as the connection is closed
+          return;
         }
       }
     }
@@ -234,70 +186,44 @@ public class SkypeManager implements IConnectionListener {
   /** Register a new PacketListener for intercepting SkypeIQ packets. */
   @Override
   public void connectionStateChanged(final Connection connection, ConnectionState newState) {
-    if (newState == ConnectionState.CONNECTED) {
+    if (newState == ConnectionState.CONNECTING) {
       connection.addPacketListener(packetListener, skypeProvider.getIQFilter());
-
-      String skypeUsername = preferenceStore.getString(PreferenceConstants.SKYPE_USERNAME);
-      if (skypeUsername != null && !skypeUsername.isEmpty()) publishSkypeIQ(skypeUsername);
-      refreshCache(connection);
+      connection.getRoster().addRosterListener(rosterListener);
     }
 
     if (newState == ConnectionState.DISCONNECTING) {
+      connection.getRoster().removeRosterListener(rosterListener);
       connection.removePacketListener(packetListener);
-      skypeNames.clear();
-    }
-  }
 
-  /**
-   * Request the skype name of all known contacts and caches the results.
-   *
-   * @param connection
-   */
-  protected void refreshCache(final Connection connection) {
-    log.debug("Refreshing Skype username cache...");
-    for (final RosterEntry rosterEntry : connection.getRoster().getEntries()) {
-      getSkypeURLNonBlock(rosterEntry.getUser());
+      if (newState == ConnectionState.NOT_CONNECTED) skypeNames.clear();
     }
   }
 
   /** @return the local Skype name or <code>null</code> if none is set. */
-  protected String getLocalSkypeName() {
-    return preferenceStore.getString(PreferenceConstants.SKYPE_USERNAME);
+  private String getLocalSkypeName() {
+    final String localSkypeName = preferenceStore.getString(PreferenceConstants.SKYPE_USERNAME);
+
+    if (localSkypeName.trim().isEmpty()) return null;
+
+    return localSkypeName;
   }
 
-  /**
-   * Requests the Skype user name of given user. This method blocks up to 5 seconds to receive the
-   * value.
-   *
-   * @param rqJID the rqJID of the user for which the Skype name is requested.
-   * @return the Skype user name of given user or <code>null</code> if the user doesn't respond in
-   *     time (5s) or has no Skype name.
-   */
-  protected String requestSkypeName(Connection connection, JID rqJID) {
+  /** Requests the Skype user name of given user. */
+  private void requestSkypeName(JID rqJID) {
 
-    if ((connection == null) || !connection.isConnected()) {
-      return null;
-    }
+    final Connection connection = connectionService.getConnection();
 
-    IQ request = skypeProvider.createIQ(null);
+    if (connection == null) return;
+
+    final IQ request = skypeProvider.createIQ(null);
 
     request.setType(IQ.Type.GET);
     request.setTo(rqJID.toString());
 
-    // Create a packet collector to listen for a response.
-    PacketCollector collector =
-        connection.createPacketCollector(new PacketIDFilter(request.getPacketID()));
-
     try {
       connection.sendPacket(request);
-
-      // Wait up to 5 seconds for a result.
-      String skypeName = skypeProvider.getPayload(collector.nextResult(5000));
-
-      if (skypeName == null || skypeName.trim().length() == 0) return null;
-      else return skypeName.trim();
-    } finally {
-      collector.cancel();
+    } catch (IllegalStateException e) {
+      log.warn("failed to send IQ-GET request to contact: " + rqJID, e);
     }
   }
 
@@ -308,5 +234,96 @@ public class SkypeManager implements IConnectionListener {
         return it;
       }
     };
+  }
+
+  // https://docs.microsoft.com/en-us/skype-sdk/skypeuris/skypeuriapireference
+
+  public static String getChatCallUri(final String skypeName) {
+    final String encoded = urlEncode(skypeName);
+    return encoded == null ? null : "skype:" + encoded + "?chat";
+  }
+
+  public static String getAudioCallUri(final String skypeName) {
+    final String encoded = urlEncode(skypeName);
+    return encoded == null ? null : "skype:" + encoded;
+  }
+
+  public static String getVideoCallUri(final String skypeName) {
+    final String encoded = urlEncode(skypeName);
+    return encoded == null ? null : "skype:" + encoded + "?call&video=true";
+  }
+
+  public static boolean isEchoService(final String skypeName) {
+    return "echo123".equalsIgnoreCase(skypeName);
+  }
+
+  private static String urlEncode(final String value) {
+
+    String result = null;
+
+    try {
+      result = URLEncoder.encode(value, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+
+      log.warn("failed to url encode data:" + value, e);
+    }
+
+    return result;
+  }
+
+  private static Boolean isAvailable = null;
+
+  /**
+   * Crude check to see if Skype is available on the current system. This method may return <code>
+   * true</code> even if <b>NO</b> Skype installation can be found. Subsequent calls will always
+   * return the same result unless a refresh is performed.
+   *
+   * @param refresh if <code>true</code> a Skype installation will be searched again
+   * @return <code>true</code> if Skype may be installed, <code>false</code> if it is definitely not
+   *     installed
+   */
+  public static synchronized boolean isSkypeAvailable(final boolean refresh) {
+
+    if (!refresh && isAvailable != null) return isAvailable;
+
+    isAvailable = true;
+
+    if (!SystemUtils.IS_OS_WINDOWS) return isAvailable;
+
+    final ProcessBuilder builder = new ProcessBuilder("powershell");
+
+    builder.command().add("-NonInteractive");
+    builder.command().add("-command");
+    builder
+        .command()
+        .add("$result=Get-AppxPackage -Name Microsoft.SkypeApp; if(!$result) { exit 1 }");
+
+    builder.redirectErrorStream(true);
+
+    InputStream in = null;
+
+    final Process p;
+
+    try {
+      p = builder.start();
+
+      in = p.getInputStream();
+
+      while (in.read() != -1) {
+        // NOP
+      }
+
+      isAvailable = p.waitFor() == 0;
+
+    } catch (IOException | InterruptedException e) {
+      log.warn("failed to determine Skype installation", e);
+      isAvailable = true;
+
+      if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+
+    return isAvailable;
   }
 }

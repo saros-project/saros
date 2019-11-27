@@ -1,61 +1,30 @@
 package saros.intellij.ui.actions;
 
-import saros.SarosPluginContext;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.editor.FollowModeManager;
-import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
-import saros.session.ISarosSessionManager;
-import saros.session.ISessionLifecycleListener;
-import saros.session.SessionEndReason;
 import saros.session.User;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /** Action to activate or deactivate follow mode. */
 public class FollowModeAction extends AbstractSarosAction {
 
   public static final String NAME = "follow";
 
-  @SuppressWarnings("FieldCanBeLocal")
-  private final ISessionLifecycleListener sessionLifecycleListener =
-      new ISessionLifecycleListener() {
-        @Override
-        public void sessionStarted(final ISarosSession session) {
-          FollowModeAction.this.session = session;
-          followModeManager = session.getComponent(FollowModeManager.class);
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
-          session = null;
-          followModeManager = null;
-        }
-      };
-
-  @Inject private ISarosSessionManager sessionManager;
-
-  private volatile ISarosSession session;
-  private volatile FollowModeManager followModeManager;
-
-  public FollowModeAction() {
-    SarosPluginContext.initComponent(this);
-
-    sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-  }
-
   @Override
   public String getActionName() {
     return NAME;
   }
 
-  public void execute(String userName) {
-    FollowModeManager currentFollowModeManager = followModeManager;
-    User userToFollow = findUser(userName);
+  public void execute(
+      @NotNull ISarosSession session,
+      @NotNull FollowModeManager followModeManager,
+      @Nullable String userName) {
 
-    if (currentFollowModeManager == null) {
-      return;
-    }
+    User userToFollow = findUser(session, userName);
 
-    currentFollowModeManager.follow(userToFollow);
+    followModeManager.follow(userToFollow);
 
     actionPerformed();
   }
@@ -65,15 +34,13 @@ public class FollowModeAction extends AbstractSarosAction {
     // never called
   }
 
-  private User findUser(String userName) {
-    ISarosSession currentSession = session;
-
-    if (userName == null || currentSession == null) {
+  private User findUser(@NotNull ISarosSession session, @Nullable String userName) {
+    if (userName == null) {
       return null;
     }
 
     for (User user : session.getRemoteUsers()) {
-      String myUserName = ModelFormatUtils.getDisplayName(user);
+      String myUserName = CoreUtils.determineUserDisplayName(user);
       if (myUserName.equalsIgnoreCase(userName)) {
         return user;
       }

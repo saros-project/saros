@@ -4,7 +4,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Method;
-import junit.framework.Assert;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
@@ -16,6 +15,7 @@ import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

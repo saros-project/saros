@@ -36,17 +36,13 @@ public class SharedIDEContext implements Disposable {
 
   public SharedIDEContext(
       ApplicationEventHandlersFactory applicationEventHandlersFactory,
-      ProjectEventHandlersFactory projectEventHandlersFactory,
-      Project project) {
+      ProjectEventHandlersFactory projectEventHandlersFactory) {
 
     this.applicationEventHandlersFactory = applicationEventHandlersFactory;
     this.projectEventHandlersFactory = projectEventHandlersFactory;
 
     if (preregisteredProject != null) {
       startProjectComponents(preregisteredProject);
-    } else {
-      // TODO remove this workaround once the shared project object is correctly initialized
-      startProjectComponents(project);
     }
   }
 
@@ -161,6 +157,7 @@ public class SharedIDEContext implements Disposable {
    * @return the project object for the current session
    * @throws IllegalStateException if this is called before the context was completely initialized
    */
+  // TODO improve behavior before initialization
   @NotNull
   public Project getProject() {
     if (project == null) {
@@ -168,6 +165,15 @@ public class SharedIDEContext implements Disposable {
     }
 
     return project;
+  }
+
+  /**
+   * Returns whether the context is completely initialized.
+   *
+   * @return whether the context is completely initialized
+   */
+  public boolean isInitialized() {
+    return project != null;
   }
 
   /**

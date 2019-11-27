@@ -12,7 +12,7 @@ import saros.session.User;
 import saros.session.User.Permission;
 import saros.ui.Messages;
 import saros.ui.util.ColorUtils;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /**
  * The annotation that shows the viewports of users with {@link Permission#WRITE_ACCESS}.
@@ -41,7 +41,7 @@ public class ViewportAnnotation extends SarosAnnotation implements IAnnotationPr
     super(
         ViewportAnnotation.TYPE,
         true,
-        ModelFormatUtils.format(Messages.ViewportAnnotation_visible_scope_of, source),
+        CoreUtils.format(Messages.ViewportAnnotation_visible_scope_of, source),
         source);
 
     Display display = Display.getDefault();

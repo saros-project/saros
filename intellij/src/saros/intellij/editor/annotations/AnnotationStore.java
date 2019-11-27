@@ -41,6 +41,20 @@ class AnnotationStore<E extends AbstractEditorAnnotation> {
   }
 
   /**
+   * Returns all stored annotations.
+   *
+   * @return all stored annotations
+   */
+  @NotNull
+  List<E> getAnnotations() {
+    List<E> annotations = new ArrayList<>();
+
+    annotationMap.values().forEach(map -> map.values().forEach(annotations::addAll));
+
+    return annotations;
+  }
+
+  /**
    * Returns all annotations for the given file.
    *
    * @param file the file to get annotations for

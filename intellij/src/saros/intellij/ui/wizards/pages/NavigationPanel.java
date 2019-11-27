@@ -1,7 +1,7 @@
 package saros.intellij.ui.wizards.pages;
 
+import com.intellij.util.ui.JBInsets;
 import java.awt.BorderLayout;
-import java.awt.Insets;
 import java.awt.event.ActionListener;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -46,7 +46,7 @@ public class NavigationPanel extends JPanel {
 
     add(new JSeparator(), BorderLayout.NORTH);
 
-    box.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
+    box.setBorder(new EmptyBorder(new JBInsets(5, 10, 5, 10)));
 
     backButton.setActionCommand(BACK_ACTION);
     box.add(backButton);

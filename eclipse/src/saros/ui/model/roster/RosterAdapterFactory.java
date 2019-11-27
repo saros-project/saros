@@ -1,21 +1,18 @@
 package saros.ui.model.roster;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterGroup;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.contact.XMPPContact;
 
 /**
- * Provides adapters for {@link Roster} entities which are provided by {@link
- * RosterContentProvider}.
+ * Provides adapters for contact entities which are provided by {@link RosterContentProvider}.
  *
- * <p>E.g. let's you adapt {@link RosterGroupElement} to {@link RosterGroup} with
+ * <p>E.g. let's you adapt {@link RosterEntryElement} to {@link JID} with
  *
  * <pre>
- * RosterGroup rosterGroup = (RosterGroup) rosterGroupElement.getAdapter(RosterGroup.class);
+ * JID jid = rosterEntryElement.getAdapter(JID.class)
  *
- * if (rosterGroup != null)
+ * if (jid != null)
  *     return true;
  * else
  *     return false;
@@ -30,24 +27,17 @@ import saros.net.xmpp.JID;
 public class RosterAdapterFactory implements IAdapterFactory {
 
   @Override
-  @SuppressWarnings("rawtypes")
-  public Class[] getAdapterList() {
-    return new Class[] {RosterGroup.class, RosterEntry.class, JID.class};
+  public Class<?>[] getAdapterList() {
+    return new Class[] {XMPPContact.class, JID.class};
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
-  public Object getAdapter(Object adaptableObject, Class adapterType) {
-    if (adaptableObject instanceof RosterGroupElement) {
-      if (adapterType == RosterGroup.class) {
-        return ((RosterGroupElement) adaptableObject).getRosterGroup();
-      }
-    }
-
+  public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
     if (adaptableObject instanceof RosterEntryElement) {
-      if (adapterType == RosterEntry.class)
-        return ((RosterEntryElement) adaptableObject).getRosterEntry();
-      if (adapterType == JID.class) return ((RosterEntryElement) adaptableObject).getJID();
+      if (adapterType == XMPPContact.class)
+        return adapterType.cast(((RosterEntryElement) adaptableObject).getContact());
+      if (adapterType == JID.class)
+        return adapterType.cast(((RosterEntryElement) adaptableObject).getJID());
     }
 
     return null;

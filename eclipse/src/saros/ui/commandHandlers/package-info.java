@@ -8,7 +8,9 @@
  *   <dt><b>Example:</b>
  *   <dd>A command "copy" is defined by Eclipse with the ID org.eclipse.ui.copy. What you can do now
  *       is to define a command handlers for the copy command that becomes instantiated and executed
- *       (method {@link org.eclipse.core.commands.AbstractHandler#execute(ExecutionEvent)}) if
+ *       (method {@link
+ *       org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)})
+ *       if
  *       <ol>
  *         <li>The user clicks on a button invoking the copy command.
  *         <li>The command handler is the ONLY active one for the copy command.

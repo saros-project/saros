@@ -4,11 +4,11 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IFile;
 import saros.intellij.editor.colorstorage.ColorManager;
+import saros.intellij.editor.colorstorage.ColorManager.ColorKeys;
 import saros.repackaged.picocontainer.Disposable;
 import saros.session.User;
 
@@ -385,56 +386,57 @@ public class AnnotationManager implements Disposable {
    */
   public void applyStoredAnnotations(@NotNull IFile file, @NotNull Editor editor) {
 
-    addLocalRepresentationToAnnotations(selectionAnnotationStore.getAnnotations(file), editor);
+    selectionAnnotationStore
+        .getAnnotations(file)
+        .forEach(annotation -> addLocalRepresentationToAnnotation(annotation, editor));
 
-    addLocalRepresentationToAnnotations(contributionAnnotationQueue.getAnnotations(file), editor);
+    contributionAnnotationQueue
+        .getAnnotations(file)
+        .forEach(annotation -> addLocalRepresentationToAnnotation(annotation, editor));
   }
 
   /**
-   * Creates RangeHighlighters for the given annotations and adds the given editor and the matching
-   * created RangeHighlighters to each given annotation.
+   * Creates RangeHighlighters for the given annotation and adds the given editor and the matching
+   * created RangeHighlighters to the given annotation.
    *
-   * @param annotations the annotations to add a local representation to
+   * @param annotation the annotation to add a local representation to
    * @param editor the editor to create RangeHighlighters in
    * @param <E> the annotation type
    * @see #addRangeHighlighter(User, int, int, Editor, AnnotationType, IFile)
    */
-  private <E extends AbstractEditorAnnotation> void addLocalRepresentationToAnnotations(
-      @NotNull List<E> annotations, @NotNull Editor editor) {
+  private <E extends AbstractEditorAnnotation> void addLocalRepresentationToAnnotation(
+      @NotNull E annotation, @NotNull Editor editor) {
 
-    annotations.forEach(
-        annotation -> {
-          AnnotationType annotationType;
+    AnnotationType annotationType;
 
-          if (annotation instanceof SelectionAnnotation) {
-            annotationType = AnnotationType.SELECTION_ANNOTATION;
+    if (annotation instanceof SelectionAnnotation) {
+      annotationType = AnnotationType.SELECTION_ANNOTATION;
 
-          } else if (annotation instanceof ContributionAnnotation) {
-            annotationType = AnnotationType.CONTRIBUTION_ANNOTATION;
+    } else if (annotation instanceof ContributionAnnotation) {
+      annotationType = AnnotationType.CONTRIBUTION_ANNOTATION;
 
-          } else {
-            throw new IllegalArgumentException("Unknown annotation type " + annotation.getClass());
+    } else {
+      throw new IllegalArgumentException("Unknown annotation type " + annotation.getClass());
+    }
+
+    User user = annotation.getUser();
+    List<AnnotationRange> annotationRanges = annotation.getAnnotationRanges();
+
+    annotation.addEditor(editor);
+
+    IFile file = annotation.getFile();
+
+    annotationRanges.forEach(
+        annotationRange -> {
+          int start = annotationRange.getStart();
+          int end = annotationRange.getEnd();
+
+          RangeHighlighter rangeHighlighter =
+              addRangeHighlighter(user, start, end, editor, annotationType, file);
+
+          if (rangeHighlighter != null) {
+            annotationRange.addRangeHighlighter(rangeHighlighter);
           }
-
-          User user = annotation.getUser();
-          List<AnnotationRange> annotationRanges = annotation.getAnnotationRanges();
-
-          annotation.addEditor(editor);
-
-          IFile file = annotation.getFile();
-
-          annotationRanges.forEach(
-              annotationRange -> {
-                int start = annotationRange.getStart();
-                int end = annotationRange.getEnd();
-
-                RangeHighlighter rangeHighlighter =
-                    addRangeHighlighter(user, start, end, editor, annotationType, file);
-
-                if (rangeHighlighter != null) {
-                  annotationRange.addRangeHighlighter(rangeHighlighter);
-                }
-              });
         });
   }
 
@@ -504,6 +506,51 @@ public class AnnotationManager implements Disposable {
     contributionAnnotationQueue
         .getAnnotations(file)
         .forEach(AbstractEditorAnnotation::removeLocalRepresentation);
+  }
+
+  /**
+   * Reloads all annotations in all held annotation stores.
+   *
+   * <p>This method should be used to react to changes in the IDE theme, which could cause the
+   * appearance (e.g. color) of the annotation to change.
+   */
+  public void reloadAnnotations() {
+    reloadAnnotations(selectionAnnotationStore);
+
+    reloadAnnotations(contributionAnnotationQueue);
+  }
+
+  /**
+   * Reloads all annotations in the passed annotation store.
+   *
+   * <p>This is done by first updating the store annotations to ensure that the new local
+   * representations span the correct area of text. Then, for each annotation, the local
+   * representation is removed and re-added.
+   *
+   * @param annotationStore the annotation store whose annotations to reload
+   * @param <E> the annotation type
+   * @see AbstractEditorAnnotation#updateBoundaries()
+   * @see #removeRangeHighlighter(AbstractEditorAnnotation)
+   * @see AbstractEditorAnnotation#removeLocalRepresentation()
+   * @see #addLocalRepresentationToAnnotation(AbstractEditorAnnotation, Editor)
+   */
+  private <E extends AbstractEditorAnnotation> void reloadAnnotations(
+      @NotNull AnnotationStore<E> annotationStore) {
+
+    for (E annotation : annotationStore.getAnnotations()) {
+      Editor editor = annotation.getEditor();
+
+      if (editor == null) {
+        continue;
+      }
+
+      annotation.updateBoundaries();
+
+      removeRangeHighlighter(annotation);
+      annotation.removeLocalRepresentation();
+
+      addLocalRepresentationToAnnotation(annotation, editor);
+    }
   }
 
   /**
@@ -687,24 +734,24 @@ public class AnnotationManager implements Disposable {
       return null;
     }
 
-    Color color;
+    // Retrieve color keys based on the color ID selected by this user. This will automatically
+    // fall back to default colors, if no colors for the given ID are available.
+    final ColorKeys colorKeys = ColorManager.getColorKeys(user.getColorID());
+    final TextAttributesKey highlightColorKey;
     switch (annotationType) {
       case SELECTION_ANNOTATION:
-        color = ColorManager.getColorModel(user.getColorID()).getSelectColor();
+        highlightColorKey = colorKeys.getSelectionColorKey();
         break;
-
       case CONTRIBUTION_ANNOTATION:
-        color = ColorManager.getColorModel(user.getColorID()).getEditColor();
+        highlightColorKey = colorKeys.getContributionColorKey();
         break;
-
       default:
-        throw new IllegalArgumentException("Unknown annotation type: " + annotationType);
+        throw new IllegalStateException("Unknown AnnotationType: " + annotationType);
     }
 
-    TextAttributes textAttr = new TextAttributes();
-    textAttr.setBackgroundColor(color);
-
-    AtomicReference<RangeHighlighter> result = new AtomicReference<>();
+    // Resolve the correct text attributes based on the currently configured IDE scheme.
+    final TextAttributes textAttr = editor.getColorsScheme().getAttributes(highlightColorKey);
+    final AtomicReference<RangeHighlighter> result = new AtomicReference<>();
 
     application.invokeAndWait(
         () ->

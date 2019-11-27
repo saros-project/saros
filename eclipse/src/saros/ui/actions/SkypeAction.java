@@ -1,54 +1,29 @@
 package saros.ui.actions;
 
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.URLHyperlink;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import saros.SarosPluginContext;
-import saros.annotations.Component;
 import saros.communication.SkypeManager;
 import saros.net.xmpp.JID;
-import saros.preferences.PreferenceConstants;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
-import saros.ui.util.SWTUtils;
 import saros.ui.util.selection.SelectionUtils;
 import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
-import saros.util.ThreadUtils;
 
-/**
- * A action for skyping other JIDs.
- *
- * @author rdjemili
- */
-@Component(module = "net")
+/** An action for starting a Skype Audio Session to other contacts. */
 public class SkypeAction extends Action implements Disposable {
 
   public static final String ACTION_ID = SkypeAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(SkypeAction.class);
-
-  protected IPropertyChangeListener propertyChangeListener =
-      new IPropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent event) {
-          if (event.getProperty().equals(PreferenceConstants.SKYPE_USERNAME)) {
-            updateEnablement();
-          }
-        }
-      };
-
-  protected ISelectionListener selectionListener =
+  private ISelectionListener selectionListener =
       new ISelectionListener() {
         @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
@@ -56,7 +31,7 @@ public class SkypeAction extends Action implements Disposable {
         }
       };
 
-  @Inject protected SkypeManager skypeManager;
+  @Inject private SkypeManager skypeManager;
 
   public SkypeAction() {
     super(Messages.SkypeAction_title);
@@ -77,19 +52,21 @@ public class SkypeAction extends Action implements Disposable {
     updateEnablement();
   }
 
-  public void updateEnablement() {
-    try {
-      List<JID> contacts =
-          SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
-      setEnabled(
-          contacts.size() == 1
-              && skypeManager.getSkypeURLNonBlock(contacts.get(0).getBareJID()) != null);
-    } catch (NullPointerException e) {
-      this.setEnabled(false);
-    } catch (Exception e) {
-      if (!PlatformUI.getWorkbench().isClosing())
-        LOG.error("Unexpected error while updating enablement", e); // $NON-NLS-1$
-    }
+  private void updateEnablement() {
+
+    setEnabled(false);
+
+    final List<JID> contacts =
+        SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
+
+    if (contacts.size() != 1) return;
+
+    final String skypeName = skypeManager.getSkypeName(contacts.get(0));
+
+    setEnabled(
+        SkypeManager.isSkypeAvailable(false)
+            && skypeName != null
+            && !SkypeManager.isEchoService(skypeName));
   }
 
   @Override
@@ -100,34 +77,17 @@ public class SkypeAction extends Action implements Disposable {
 
     if (participants.size() != 1) return;
 
-    ThreadUtils.runSafeAsync(
-        "SkypeAction",
-        LOG,
-        new Runnable() { //$NON-NLS-1$
-          @Override
-          public void run() {
-            SWTUtils.runSafeSWTSync(
-                LOG,
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    setEnabled(false);
-                  }
-                });
-            final String skypeURL = skypeManager.getSkypeURL(participants.get(0).getBareJID());
-            if (skypeURL != null) {
-              SWTUtils.runSafeSWTSync(
-                  LOG,
-                  new Runnable() {
-                    @Override
-                    public void run() {
-                      URLHyperlink link = new URLHyperlink(new Region(0, 0), skypeURL);
-                      link.open();
-                    }
-                  });
-            }
-          }
-        });
+    final String skypeName = skypeManager.getSkypeName(participants.get(0));
+
+    if (skypeName == null || SkypeManager.isEchoService(skypeName)) return;
+
+    final String uri = SkypeManager.getAudioCallUri(skypeName);
+
+    if (uri == null) return;
+
+    final URLHyperlink link = new URLHyperlink(new Region(0, 0), uri);
+
+    link.open();
   }
 
   @Override

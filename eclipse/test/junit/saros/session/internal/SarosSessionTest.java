@@ -48,9 +48,9 @@ import saros.net.IConnectionManager;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
-import saros.net.internal.BinaryXMPPExtension;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.preferences.EclipsePreferenceConstants;
 import saros.preferences.EclipsePreferences;
 import saros.preferences.PreferenceStore;
 import saros.project.internal.SarosEclipseSessionContextFactory;
@@ -97,11 +97,6 @@ public class SarosSessionTest {
 
     @Override
     public PacketCollector createCollector(PacketFilter filter) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void processBinaryXMPPExtension(final BinaryXMPPExtension extension) {
       throw new UnsupportedOperationException();
     }
 
@@ -279,6 +274,10 @@ public class SarosSessionTest {
 
     final Preferences preferences = EclipseMocker.initPreferences();
 
+    // triggers SWTUtils if not disabled and causes issues
+    preferences.putInt(
+        EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED, FeedbackManager.FEEDBACK_DISABLED);
+
     // Init Feedback
     FeedbackPreferences.setPreferences(preferences);
 
@@ -300,6 +299,9 @@ public class SarosSessionTest {
 
     container.removeComponent(ITransmitter.class);
     addMockedComponent(ITransmitter.class);
+
+    container.removeComponent(IReceiver.class);
+    addMockedComponent(IReceiver.class);
 
     /*
      * Additional components

@@ -1,4 +1,5 @@
 <head>
+  <title>{{ page.title | default: site.title }}</title>
   <meta charset='utf-8'>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,maximum-scale=2">
@@ -15,4 +16,5 @@
   <meta name="theme-color" content="#ffffff">
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js" integrity="sha384-7aThvCh9TypR7fIc2HV4O/nFMVCBwyIUKL8XCtKE+8xgCgl/PQGuFsvShjr74PBp" crossorigin="anonymous"></script>
+  <script src="{{ '/assets/js/ide-tabs.js' | relative_url }}"></script>
 </head>

@@ -1,21 +1,21 @@
 ---
-title: A graphical introduction to the Saros Host concept.
+title: A Graphical Introduction to The Saros Host Concept
 toc: false
 ---
 
-![](images/comics/6-1_host-comic_frame-1_sm.jpg)
+![](images/comics/6-1_host-comic_frame-1_sm.jpg){:class="img-fluid"}
 
-![](images/comics/6-1_host-comic_frame-2_sm.jpg)
+![](images/comics/6-1_host-comic_frame-2_sm.jpg){:class="img-fluid"}
 
-![](images/comics/6-1_host-comic_frame-3_0.jpg)
+![](images/comics/6-1_host-comic_frame-3_0.jpg){:class="img-fluid"}
 
-![](images/comics/6-1_host-comic_frame-4_0.jpg)
+![](images/comics/6-1_host-comic_frame-4_0.jpg){:class="img-fluid"}
 
-![](images/comics/host-comic_frame-5.jpg)
+![](images/comics/host-comic_frame-5.jpg){:class="img-fluid"}
 
-![](images/comics/host-comic_frame-6.jpg)
+![](images/comics/host-comic_frame-6.jpg){:class="img-fluid"}
 
-![](images/comics/host-comic_frame-7.jpg)
+![](images/comics/host-comic_frame-7.jpg){:class="img-fluid"}
 
 ------------------------------------------------------------------------
 

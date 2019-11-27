@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import saros.SarosPluginContext;
 import saros.activities.SPath;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.concurrent.watchdog.IsInconsistentObservable;
@@ -22,17 +21,18 @@ import saros.intellij.ui.util.NotificationPanel;
 import saros.observables.ValueChangeListener;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
-import saros.session.ISarosSessionManager;
-import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
 
 /**
- * Button for triggering a {@link ConsistencyAction}. Displays a different symbol when state is
- * inconsistent or not.
+ * Session button for triggering a {@link ConsistencyAction}. Displays a different symbol when state
+ * is inconsistent or not.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link AbstractSessionToolbarButton}.
  *
  * <p>FIXME: Remove awkward session handling together with UI components created with session.
  */
-public class ConsistencyButton extends ToolbarButton {
+public class ConsistencyButton extends AbstractSessionToolbarButton {
   private static final Logger LOG = Logger.getLogger(ConsistencyButton.class);
 
   private boolean previouslyInConsistentState = true;
@@ -68,34 +68,7 @@ public class ConsistencyButton extends ToolbarButton {
         }
       };
 
-  @SuppressWarnings("FieldCanBeLocal")
-  private final ISessionLifecycleListener sessionLifecycleListener =
-      new ISessionLifecycleListener() {
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-          if (!newSarosSession.isHost()) {
-            setSarosSession(newSarosSession);
-          }
-
-          setToolTipText(Messages.ConsistencyButton_tooltip_no_inconsistency);
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
-          if (!oldSarosSession.isHost()) {
-            setSarosSession(null);
-          }
-
-          setEnabledFromUIThread(false);
-          setToolTipText(Messages.ConsistencyButton_tooltip_functionality);
-        }
-      };
-
   private final ValueChangeListener<Boolean> isConsistencyListener = this::handleConsistencyChange;
-
-  private final Project project;
-
-  @Inject private ISarosSessionManager sessionManager;
 
   @Inject private IsInconsistentObservable inconsistentObservable;
 
@@ -104,19 +77,45 @@ public class ConsistencyButton extends ToolbarButton {
   /** Creates a Consistency button, adds a sessionListener and disables the button. */
   public ConsistencyButton(@NotNull Project project) {
     super(
+        project,
         ConsistencyAction.NAME,
         Messages.ConsistencyButton_tooltip_functionality,
         IconManager.IN_SYNC_ICON);
 
-    SarosPluginContext.initComponent(this);
-
-    this.project = project;
-
-    setSarosSession(sessionManager.getSession());
-    sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+    setSarosSession(sarosSessionManager.getSession());
 
     addActionListener(actionListener);
     setEnabled(false);
+
+    setInitialState();
+  }
+
+  @Override
+  void disposeComponents() {
+    inconsistentObservable.remove(isConsistencyListener);
+  }
+
+  @Override
+  void sessionStarted(ISarosSession newSarosSession) {
+    setToolTipText(Messages.ConsistencyButton_tooltip_no_inconsistency);
+
+    if (!newSarosSession.isHost()) {
+      setSarosSession(newSarosSession);
+
+      Boolean isInconsistent = inconsistentObservable.getValue();
+      if (isInconsistent != null && isInconsistent) handleConsistencyChange(Boolean.TRUE);
+    }
+  }
+
+  @Override
+  void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
+    if (!oldSarosSession.isHost()) {
+      setSarosSession(null);
+    }
+
+    setEnabledFromUIThread(false);
+    setToolTipText(Messages.ConsistencyButton_tooltip_functionality);
+    setButtonIcon(IconManager.IN_SYNC_ICON);
   }
 
   private class SessionInconsistencyState {
@@ -177,7 +176,7 @@ public class ConsistencyButton extends ToolbarButton {
    * displays a tooltip.
    */
   private void handleConsistencyChange(final Boolean isInconsistent) {
-    if (sessionManager.getSession() == null) {
+    if (sarosSessionManager.getSession() == null) {
       return;
     }
 
@@ -228,9 +227,9 @@ public class ConsistencyButton extends ToolbarButton {
     StringBuilder sbInconsistentFiles = new StringBuilder();
 
     for (SPath path : paths) {
-      sbInconsistentFiles.append("module: ");
-      sbInconsistentFiles.append(path.getProject().getName());
-      sbInconsistentFiles.append(", file: ");
+      sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_module).append(": ");
+      sbInconsistentFiles.append(path.getProject().getName()).append(", ");
+      sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_file).append(": ");
       sbInconsistentFiles.append(path.getProjectRelativePath().toOSString());
       sbInconsistentFiles.append("\n");
     }
@@ -254,7 +253,9 @@ public class ConsistencyButton extends ToolbarButton {
         sb.append(", ");
       }
 
-      sb.append(resource.getFullPath());
+      sb.append(resource.getProject().getName())
+          .append(" - ")
+          .append(resource.getProjectRelativePath());
     }
 
     return sb.toString();

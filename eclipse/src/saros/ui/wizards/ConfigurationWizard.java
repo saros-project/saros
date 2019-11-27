@@ -1,26 +1,72 @@
 package saros.ui.wizards;
 
+import java.util.Arrays;
 import org.bitlet.weupnp.GatewayDevice;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import saros.SarosPluginContext;
+import saros.account.XMPPAccount;
+import saros.account.XMPPAccountStore;
 import saros.editor.colorstorage.UserColorID;
 import saros.feedback.ErrorLogManager;
 import saros.feedback.FeedbackManager;
 import saros.feedback.StatisticManagerConfiguration;
+import saros.net.xmpp.JID;
 import saros.preferences.PreferenceConstants;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
+import saros.ui.util.XMPPConnectionSupport;
+import saros.ui.widgets.SimpleNoteComposite;
 import saros.ui.wizards.pages.ColorChooserWizardPage;
 import saros.ui.wizards.pages.ConfigurationSettingsWizardPage;
 import saros.ui.wizards.pages.ConfigurationSummaryWizardPage;
+import saros.ui.wizards.pages.EnterXMPPAccountWizardPage;
 
 /**
  * A wizard to configure Saros (XMPP account, network settings, statistic submission).
  *
  * @author bkahlert
  */
-public class ConfigurationWizard extends AddXMPPAccountWizard {
+public class ConfigurationWizard extends Wizard {
+
+  private final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage =
+      new EnterXMPPAccountWizardPage() {
+        /*
+         *  Note this is more like a hack as we know how the original page is created.
+         *  As this information contained in the SimpleNoteComposite below is only displayed in
+         *  the context of this Wizard it is not worth to add logic to the EnterXMPPAccountWizardPage
+         *  that should decide if this Note is displayed at all. So do it the dirty way and inject the SimpleNoteComposite
+         *  that it is the first widget displayed in this page.
+         */
+
+        @Override
+        public void createControl(final Composite parent) {
+          super.createControl(parent);
+
+          final Composite composite = (Composite) getControl();
+
+          final Control controlToMoveAbove =
+              Arrays.asList(composite.getChildren()).stream().findFirst().orElse(null);
+
+          SimpleNoteComposite noteComposite =
+              new SimpleNoteComposite(
+                  composite,
+                  SWT.BORDER,
+                  SWT.ICON_INFORMATION,
+                  Messages.ConfigurationWizard_info_already_created_account);
+
+          noteComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+          noteComposite.setSpacing(8);
+
+          if (controlToMoveAbove != null) noteComposite.moveAbove(controlToMoveAbove);
+        }
+      };
 
   private final ConfigurationSettingsWizardPage configurationSettingsWizardPage =
       new ConfigurationSettingsWizardPage();
@@ -33,11 +79,17 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
   @Inject private IPreferenceStore preferences;
 
+  @Inject private XMPPAccountStore accountStore;
+
   public ConfigurationWizard() {
     SarosPluginContext.initComponent(this);
 
     setWindowTitle("Saros Configuration");
-    setDefaultPageImageDescriptor(ImageManager.WIZBAN_CONFIGURATION);
+    setHelpAvailable(false);
+    setNeedsProgressMonitor(false);
+    setDefaultPageImageDescriptor(
+        ImageManager.getImageDescriptor(ImageManager.WIZBAN_CONFIGURATION));
+
     colorChooserWizardPage.setTitle(Messages.ChangeColorWizardPage_configuration_mode_title);
 
     colorChooserWizardPage.setDescription(
@@ -46,7 +98,7 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
   @Override
   public void addPages() {
-    super.addPages();
+    addPage(enterXMPPAccountWizardPage);
     addPage(configurationSettingsWizardPage);
     addPage(colorChooserWizardPage);
     addPage(configurationSummaryWizardPage);
@@ -55,12 +107,38 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
   @Override
   public boolean performFinish() {
     setConfiguration();
-    return super.performFinish();
+
+    final XMPPAccount accountToConnect = addOrGetXMPPAccount();
+
+    assert (accountToConnect != null);
+
+    /* it is possible to finish the wizard multiple times
+     * (also it makes no sense) so ensure the behavior is always the same.
+     */
+
+    accountStore.setDefaultAccount(accountToConnect);
+
+    if (preferences.getBoolean(PreferenceConstants.AUTO_CONNECT)) {
+      getShell().getDisplay().asyncExec(() -> XMPPConnectionSupport.getInstance().connect(false));
+    }
+
+    return true;
   }
 
   @Override
   public boolean canFinish() {
     return getContainer().getCurrentPage() == configurationSummaryWizardPage;
+  }
+
+  @Override
+  public boolean performCancel() {
+
+    if (!enterXMPPAccountWizardPage.isExistingAccount()) return true;
+
+    return MessageDialog.openQuestion(
+        getShell(),
+        Messages.ConfigurationWizard_account_created,
+        Messages.ConfigurationWizard_account_created_text);
   }
 
   /**
@@ -98,5 +176,30 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     if (gatewayDevice != null)
       preferences.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, gatewayDevice.getUSN());
+  }
+
+  /** Adds the {@link EnterXMPPAccountWizardPage}'s account data to the {@link XMPPAccountStore}. */
+  private XMPPAccount addOrGetXMPPAccount() {
+
+    boolean isExistingAccount = enterXMPPAccountWizardPage.isExistingAccount();
+    JID jid = enterXMPPAccountWizardPage.getJID();
+
+    String username = jid.getName();
+    String password = enterXMPPAccountWizardPage.getPassword();
+    String domain = jid.getDomain().toLowerCase();
+    String server = enterXMPPAccountWizardPage.getServer();
+
+    int port;
+
+    if (enterXMPPAccountWizardPage.getPort().length() != 0)
+      port = Integer.valueOf(enterXMPPAccountWizardPage.getPort());
+    else port = 0;
+
+    boolean useTLS = enterXMPPAccountWizardPage.isUsingTLS();
+    boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
+
+    if (isExistingAccount) return accountStore.getAccount(username, domain, server, port);
+
+    return accountStore.createAccount(username, password, domain, server, port, useTLS, useSASL);
   }
 }

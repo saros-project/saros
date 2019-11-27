@@ -20,10 +20,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.security,
  org.junit;resolution:=optional,
  org.eclipse.jdt.launching;resolution:=optional,
- org.eclipse.gef;bundle-version="3.11.0";resolution:=optional,
  org.eclipse.core.net;resolution:=optional,
- saros.core,
- saros.ui
+ saros.core
 Bundle-ActivationPolicy: lazy
 Export-Package: saros;
   uses:="org.eclipse.core.runtime,
@@ -69,6 +67,7 @@ Export-Package: saros;
    saros.invitation,
    saros.net",
  saros.session.internal,
+ saros.session.resources.validation,
  saros.test.util,
  saros.ui;
   uses:="org.eclipse.jface.window,

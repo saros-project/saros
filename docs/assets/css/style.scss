@@ -1,6 +1,9 @@
 ---
 ---
 
+$link-color-active: #007bff;
+$link-color: #343a40;
+
 html {
   position: relative;
   min-height: 100%;
@@ -160,8 +163,26 @@ h6 {
   }
 }
 
+$mobile-width: 690px;
+
+@media (max-width: $mobile-width) {
+  #media-links-nav {
+    display: none !important;
+  }
+
+  #nav-widescreen-content {
+    display: none !important;
+  }
+}
+
+@media (min-width: $mobile-width) {
+  #nav-mobile-content {
+    display: none !important;
+  }
+}
+
 .main-content, .sidenav, .toc-bar {
-  top: 40px;
+  margin-top: 40px;
 }
 
 .sidenav, .toc-bar {
@@ -176,16 +197,16 @@ h6 {
 
 .sidenav a {
   display: block;
-  color: #343a40;
+  color: $link-color;
 }
 
 .sidenav a:hover {
-  color: #007bff;
+  color: $link-color-active;
   text-decoration: underline;
 }
 
 .active-sidelink {
-  color: #007bff !important;
+  color: $link-color-active !important;
 }
 
 .toc-bar ul {
@@ -202,5 +223,21 @@ h6 {
 }
 
 .toc-bar a:hover {
-  color: #007bff;
+  color: $link-color-active;
+}
+
+/* Multiversion tabs */
+
+// Avoid gap between border of tab and content
+.tab-content > .tab-pane {
+  margin-top: 0px;
+  padding-top: 10px;
+}
+
+.nav-link {
+  color: $link-color;
+}
+
+.nav-link.active {
+  color: $link-color-active !important;
 }

@@ -21,9 +21,9 @@ import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
 import saros.net.xmpp.JID;
 import saros.stf.client.tester.AbstractTester;
+import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
 import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
-import saros.test.util.EclipseTestThread;
 
 public abstract class StfTestCase {
 

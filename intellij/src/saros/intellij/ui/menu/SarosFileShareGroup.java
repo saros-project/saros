@@ -3,7 +3,7 @@ package saros.intellij.ui.menu;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import java.util.ArrayList;
@@ -77,12 +77,12 @@ public class SarosFileShareGroup extends ActionGroup {
   private boolean isSharableResource(AnActionEvent e) {
     // FIXME also returns null when a module with multiple roots is selected
     // Don't allow to share any file or folder other than a module
-    if (e.getDataContext().getData(DataKeys.MODULE_CONTEXT.getName()) == null) {
+    if (e.getDataContext().getData(LangDataKeys.MODULE_CONTEXT.getName()) == null) {
       return false;
     }
 
-    Project project = e.getData(DataKeys.PROJECT);
-    Module module = e.getData(DataKeys.MODULE);
+    Project project = e.getData(LangDataKeys.PROJECT);
+    Module module = e.getData(LangDataKeys.MODULE);
 
     if (project == null || module == null || project.getName().equalsIgnoreCase(module.getName())) {
 
@@ -101,15 +101,6 @@ public class SarosFileShareGroup extends ActionGroup {
                 + moduleName
                 + " as it does not meet the current release restrictions.");
       }
-
-      return false;
-
-    } catch (IllegalStateException exception) {
-      LOG.warn(
-          "Ignoring module "
-              + moduleName
-              + " as an error occurred while trying to create an IProject object.",
-          exception);
 
       return false;
     }

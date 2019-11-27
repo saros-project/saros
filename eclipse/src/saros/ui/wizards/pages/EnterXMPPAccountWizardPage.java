@@ -15,7 +15,6 @@ import saros.account.XMPPAccountStore;
 import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
-import saros.ui.widgets.SimpleNoteComposite;
 import saros.ui.widgets.wizard.EnterXMPPAccountComposite;
 
 /**
@@ -66,19 +65,9 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
 
     composite.setLayout(new GridLayout(1, false));
 
-    SimpleNoteComposite noteComposite =
-        new SimpleNoteComposite(
-            composite,
-            SWT.BORDER,
-            SWT.ICON_INFORMATION,
-            Messages.EnterXMPPAccountWizardPage_info_already_created_account);
-
-    noteComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    noteComposite.setSpacing(8);
-
     enterXMPPAccountComposite = new EnterXMPPAccountComposite(composite, SWT.NONE);
 
-    enterXMPPAccountComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+    enterXMPPAccountComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     enterXMPPAccountComposite.setUsingTLS(true);
     enterXMPPAccountComposite.setUsingSASL(true);
@@ -205,7 +194,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
      */
     if ((isJIDValid && isPasswordValid && isServerValid && isPortValid))
       accountExists =
-          accountStore.exists(getJID().getName(), getJID().getDomain(), getServer(), port);
+          accountStore.existsAccount(getJID().getName(), getJID().getDomain(), getServer(), port);
 
     if (!isJIDValid && wasJIDValid) {
       errorMessage = Messages.jid_format_errorMessage;

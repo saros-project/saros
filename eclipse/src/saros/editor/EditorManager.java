@@ -59,9 +59,9 @@ import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.AbstractActivityConsumer;
-import saros.session.AbstractActivityProducer;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
+import saros.session.IActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
@@ -86,7 +86,7 @@ import saros.util.StackTrace;
  *     annotations...
  */
 @Component(module = "core")
-public class EditorManager extends AbstractActivityProducer implements IEditorManager {
+public class EditorManager implements IEditorManager {
 
   /**
    * @JTourBusStop 6, Some Basics:
@@ -108,6 +108,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private ISarosSession session;
 
   private SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
+
+  private final EditorActivityDelayer activityDelayer = new EditorActivityDelayer();
 
   private final IPreferenceStore preferenceStore;
 
@@ -273,15 +275,16 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           // TODO The user should be able to ask for this
           User localUser = session.getLocalUser();
           for (SPath path : getOpenEditors()) {
-            fireActivity(new EditorActivity(localUser, Type.ACTIVATED, path));
+            activityDelayer.fireActivity(new EditorActivity(localUser, Type.ACTIVATED, path));
           }
 
-          fireActivity(new EditorActivity(localUser, Type.ACTIVATED, locallyActiveEditor));
+          activityDelayer.fireActivity(
+              new EditorActivity(localUser, Type.ACTIVATED, locallyActiveEditor));
 
           if (locallyActiveEditor == null) return;
 
           if (localViewport != null) {
-            fireActivity(
+            activityDelayer.fireActivity(
                 new ViewportActivity(
                     localUser,
                     localViewport.getStartLine(),
@@ -295,7 +298,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             int offset = localSelection.getOffset();
             int length = localSelection.getLength();
 
-            fireActivity(new TextSelectionActivity(localUser, offset, length, locallyActiveEditor));
+            activityDelayer.fireActivity(
+                new TextSelectionActivity(localUser, offset, length, locallyActiveEditor));
           } else {
             LOG.warn("No selection for locallyActivateEditor: " + locallyActiveEditor);
           }
@@ -487,7 +491,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
-    fireActivity(new EditorActivity(session.getLocalUser(), Type.ACTIVATED, path));
+    activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.ACTIVATED, path));
   }
 
   /**
@@ -521,7 +525,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         new ViewportActivity(
             session.getLocalUser(), viewport.getStartLine(), viewport.getNumberOfLines(), path);
 
-    fireActivity(activity);
+    activityDelayer.fireActivity(activity);
   }
 
   /**
@@ -545,7 +549,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     int offset = newSelection.getOffset();
     int length = newSelection.getLength();
 
-    fireActivity(new TextSelectionActivity(session.getLocalUser(), offset, length, path));
+    activityDelayer.fireActivity(
+        new TextSelectionActivity(session.getLocalUser(), offset, length, path));
   }
 
   /**
@@ -624,7 +629,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       return;
     }
 
-    fireActivity(textEdit);
+    activityDelayer.fireActivity(textEdit);
 
     // inform all registered ISharedEditorListeners about this text edit
     editorListenerDispatch.textEdited(textEdit);
@@ -750,6 +755,20 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   @Override
   public void closeEditor(final SPath path) {
+    closeEditor(path, true);
+  }
+
+  /**
+   * Closes the editor for the given resource. If <code>save=true</code> is specified, the content
+   * of the editor will be written to disk before it is closed.
+   *
+   * <p>Does nothing if the resource is not shared or there is no open editor for the resource.
+   *
+   * @param path the resource whose editor to close
+   * @param save whether to write the editor content to disk before closing it
+   * @see EditorAPI#closeEditor(IEditorPart, boolean)
+   */
+  public void closeEditor(final SPath path, boolean save) {
     if (path == null) throw new IllegalArgumentException("path must not be null");
 
     SWTUtils.runSafeSWTSync(
@@ -758,7 +777,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           @Override
           public void run() {
             for (IEditorPart part : editorPool.getEditors(path)) {
-              EditorAPI.closeEditor(part);
+              EditorAPI.closeEditor(part, save);
             }
           }
         });
@@ -839,6 +858,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     }
 
     SPath editorPath = EditorAPI.getEditorPath(editorPart);
+
+    if (editorPath.equals(locallyActiveEditor)) {
+      LOG.debug(
+          "ignoring partActivated event for editor path "
+              + editorPath
+              + " because it is already active");
+      return;
+    }
+
     TextSelection selection = EditorAPI.getSelection(editorPart);
 
     // Set (and thus send) in this order:
@@ -922,7 +950,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
-    fireActivity(new EditorActivity(session.getLocalUser(), Type.CLOSED, path));
+    activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.CLOSED, path));
 
     /**
      * TODO We need a reliable way to communicate editors which are outside the shared project scope
@@ -1192,7 +1220,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *     Permission#WRITE_ACCESS} was editing.
    */
   void sendEditorActivitySaved(SPath path) {
-    fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED, path));
+    activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED, path));
   }
 
   /**
@@ -1642,7 +1670,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     hasWriteAccess = session.hasWriteAccess();
     session.addListener(sessionListener);
-    session.addActivityProducer(this);
+    activityDelayer.start(session);
     session.addActivityConsumer(consumer, Priority.ACTIVE);
 
     annotationModelHelper = new AnnotationModelHelper();
@@ -1697,7 +1725,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     assert session != null;
     session.getStopManager().removeBlockable(stopManagerListener);
     session.removeListener(sessionListener);
-    session.removeActivityProducer(this);
+    activityDelayer.stop(session);
     session.removeActivityConsumer(consumer);
     session = null;
 
@@ -1715,5 +1743,14 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   private void checkThreadAccess() {
     if (!SWTUtils.isSWT()) throw new IllegalStateException("method must be invoked from EDT");
+  }
+
+  /**
+   * Returns the activity producer for this editor.
+   *
+   * @return the activity producer
+   */
+  public IActivityProducer getActivityProducer() {
+    return activityDelayer;
   }
 }

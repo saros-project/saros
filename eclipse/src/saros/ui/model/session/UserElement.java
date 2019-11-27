@@ -11,8 +11,8 @@ import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.model.TreeContentProvider;
 import saros.ui.model.TreeElement;
-import saros.ui.util.ModelFormatUtils;
 import saros.ui.util.SWTBoldStyler;
+import saros.util.CoreUtils;
 
 /**
  * Model element for a session {@link User user}. This element can only be used in conjunction with
@@ -81,7 +81,7 @@ public final class UserElement extends TreeElement {
       text.append(Messages.UserElement_host, StyledString.COUNTER_STYLER);
     }
 
-    text.append(ModelFormatUtils.getDisplayName(user));
+    text.append(CoreUtils.determineUserDisplayName(user));
 
     /*
      * Right level
@@ -158,8 +158,8 @@ public final class UserElement extends TreeElement {
 
     if (user2.isHost()) return +1;
 
-    String nickname1 = ModelFormatUtils.getDisplayName(user1);
-    String nickname2 = ModelFormatUtils.getDisplayName(user2);
+    String nickname1 = CoreUtils.determineUserDisplayName(user1);
+    String nickname2 = CoreUtils.determineUserDisplayName(user2);
 
     return nickname1.compareToIgnoreCase(nickname2);
   }

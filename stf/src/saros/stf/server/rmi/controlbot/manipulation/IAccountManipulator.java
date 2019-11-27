@@ -12,13 +12,12 @@ import saros.account.XMPPAccountStore;
 public interface IAccountManipulator extends Remote {
 
   /**
-   * Deletes all accounts except the default one. If the default account does not exist it will be
-   * created and activated.
+   * Delete the whole account store except for the account with the given credentials and set it as
+   * the default account. The account will be created if it did not exist before.
    *
    * @param username the username of the default account
-   * @param password the password of the default account which should be used if the default account
-   *     does not exists
-   * @param domain the domain name of the account
+   * @param password the password of the default account
+   * @param domain the domain name of the default account
    * @throws RemoteException
    */
   public void restoreDefaultAccount(String username, String password, String domain)
@@ -45,4 +44,11 @@ public interface IAccountManipulator extends Remote {
    * @throws RemoteException if the account does not exist in the current {@link XMPPAccountStore}
    */
   public boolean activateAccount(String username, String domain) throws RemoteException;
+
+  /**
+   * Deletes all accounts.
+   *
+   * @throws RemoteException
+   */
+  public void deleteAllAccounts() throws RemoteException;
 }

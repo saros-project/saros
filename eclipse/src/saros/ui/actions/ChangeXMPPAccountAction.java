@@ -1,10 +1,11 @@
 package saros.ui.actions;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -12,23 +13,23 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import saros.SarosPluginContext;
+import saros.account.IAccountStoreListener;
 import saros.account.XMPPAccount;
 import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
 import saros.net.ConnectionState;
+import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSessionManager;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
-import saros.ui.util.DialogUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.WizardUtils;
-import saros.util.ThreadUtils;
+import saros.ui.util.XMPPConnectionSupport;
 
 /**
- * In addition to the connect/disconnect action, this allows the user to switch between accounts. At
- * the moment, it is implemented by a drop-down in the RosterView.
+ * In addition to the connect/disconnect action, this allows the user to switch between accounts.
  */
 public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Disposable {
 
@@ -44,9 +45,9 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
 
   @Inject private ISarosSessionManager sarosSessionManager;
 
-  private final AtomicBoolean running = new AtomicBoolean();
-
   private boolean isConnectionError;
+
+  private boolean defaultAccountChanged;
 
   private final IConnectionStateListener connectionStateListener =
       new IConnectionStateListener() {
@@ -64,6 +65,14 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
         }
       };
 
+  private final IAccountStoreListener accountStoreListener =
+      new IAccountStoreListener() {
+        @Override
+        public void activeAccountChanged(final XMPPAccount activeAccount) {
+          defaultAccountChanged = true;
+        }
+      };
+
   public ChangeXMPPAccountAction() {
     SarosPluginContext.initComponent(this);
 
@@ -73,18 +82,54 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
     connectionHandler.addConnectionStateListener(connectionStateListener);
     setMenuCreator(this);
     updateStatus(connectionHandler.getConnectionState());
+
+    accountService.addListener(accountStoreListener);
   }
 
-  // user clicks on Button
   @Override
   public void run() {
-    if (connectionHandler.isConnected()) disconnect();
-    else connect(accountService.isEmpty() ? null : accountService.getActiveAccount());
+
+    if (connectionHandler.isConnected()) {
+      XMPPConnectionSupport.getInstance().disconnect();
+      return;
+    }
+
+    final XMPPAccount lastUsedAccount = XMPPConnectionSupport.getInstance().getCurrentXMPPAccount();
+
+    final List<XMPPAccount> accounts = accountService.getAllAccounts();
+
+    final boolean exists = accounts.indexOf(lastUsedAccount) != -1;
+
+    final XMPPAccount defaultAccount = accountService.getDefaultAccount();
+
+    final boolean isEmpty = accountService.isEmpty();
+
+    if (!exists && (defaultAccount == null || isEmpty)) {
+      if (!MessageDialog.openQuestion(
+          SWTUtils.getShell(),
+          "Default account missing",
+          "A default account has not been set yet. Do you want set a default account?")) return;
+
+      SWTUtils.runSafeSWTAsync(LOG, this::openPreferences);
+      return;
+    }
+
+    final XMPPAccount accountToConnect;
+
+    if (defaultAccountChanged || !exists) {
+      defaultAccountChanged = false;
+      accountToConnect = defaultAccount;
+    } else {
+      accountToConnect = lastUsedAccount;
+    }
+
+    XMPPConnectionSupport.getInstance().connect(accountToConnect, false, false);
   }
 
   @Override
   public void dispose() {
     connectionHandler.removeConnectionStateListener(connectionStateListener);
+    accountService.removeListener(accountStoreListener);
   }
 
   @Override
@@ -96,13 +141,26 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
   public Menu getMenu(Control parent) {
     accountMenu = new Menu(parent);
 
-    XMPPAccount activeAccount = null;
+    final List<XMPPAccount> accounts = accountService.getAllAccounts();
 
-    if (connectionHandler.isConnected()) activeAccount = accountService.getActiveAccount();
+    final String connectionId = connectionHandler.getConnectionID();
 
-    for (XMPPAccount account : accountService.getAllAccounts()) {
-      if (!account.equals(activeAccount)) addMenuItem(account);
+    if (connectionHandler.isConnected() && connectionId != null) {
+
+      final JID jid = new JID(connectionId);
+
+      /*
+       *  TODO this may filter out too much but this situation is somewhat rare (multiple accounts
+       *  with same name and domain but different server
+       */
+
+      accounts.removeIf(
+          a ->
+              a.getUsername().equalsIgnoreCase(jid.getName())
+                  && a.getDomain().equalsIgnoreCase(jid.getDomain()));
     }
+
+    accounts.forEach(this::addMenuItem);
 
     new MenuItem(accountMenu, SWT.SEPARATOR);
 
@@ -120,19 +178,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
         new Action(Messages.ChangeXMPPAccountAction_configure_account) {
           @Override
           public void run() {
-            IHandlerService service =
-                (IHandlerService)
-                    PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .getActivePart()
-                        .getSite()
-                        .getService(IHandlerService.class);
-            try {
-              service.executeCommand("saros.ui.commands.OpenSarosPreferences", null);
-            } catch (Exception e) {
-              LOG.debug("Could execute command", e);
-            }
+            openPreferences();
           }
         });
     return accountMenu;
@@ -148,76 +194,12 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
 
           @Override
           public void run() {
-            connectWithThisAccount(account);
+            defaultAccountChanged = false;
+            XMPPConnectionSupport.getInstance().connect(account, false, false);
           }
         };
+
     addActionToMenu(accountMenu, action);
-  }
-
-  private void connectWithThisAccount(final XMPPAccount account) {
-
-    if (sarosSessionManager.getSession() == null) {
-      connect(account);
-      return;
-    }
-
-    SWTUtils.runSafeSWTAsync(
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            boolean proceed =
-                DialogUtils.openQuestionMessageDialog(
-                    SWTUtils.getShell(),
-                    "Disconnecting from the current Saros Session",
-                    "Connecting with a different account will disconnect you from your current Saros session. Do you wish to continue ?");
-
-            if (proceed) connect(account);
-          }
-        });
-  }
-
-  private void connect(final XMPPAccount account) {
-    // remember this account for the next connection attempt
-    if (account != null) accountService.setAccountActive(account);
-
-    ThreadUtils.runSafeAsync(
-        "dpp-connect-manual",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              if (running.getAndSet(true)) {
-                LOG.info("User clicked too fast, running already a connect or disconnect.");
-                return;
-              }
-              connectionHandler.connect(account, false);
-            } finally {
-              running.set(false);
-            }
-          }
-        });
-  }
-
-  private void disconnect() {
-    ThreadUtils.runSafeAsync(
-        "dpp-disconnect-manual",
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              if (running.getAndSet(true)) {
-                LOG.info("User clicked too fast, running already a connect or disconnect.");
-                return;
-              }
-              connectionHandler.disconnect();
-            } finally {
-              running.set(false);
-            }
-          }
-        });
   }
 
   private void addActionToMenu(Menu parent, Action action) {
@@ -269,6 +251,21 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
 
     } catch (RuntimeException e) {
       LOG.error("Internal error in ChangeXMPPAccountAction:", e);
+    }
+  }
+
+  private void openPreferences() {
+    IHandlerService service =
+        PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow()
+            .getActivePage()
+            .getActivePart()
+            .getSite()
+            .getService(IHandlerService.class);
+    try {
+      service.executeCommand("saros.ui.commands.OpenSarosPreferences", null);
+    } catch (Exception e) {
+      LOG.debug("Could execute command", e);
     }
   }
 }

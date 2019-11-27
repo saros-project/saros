@@ -8,6 +8,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -20,7 +21,9 @@ import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Deque;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +36,7 @@ import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
 import saros.filesystem.IPath;
+import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
@@ -40,6 +44,7 @@ import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
+import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.observables.FileReplacementInProgressObservable;
@@ -59,15 +64,14 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
   private static final Logger LOG = Logger.getLogger(LocalFilesystemModificationHandler.class);
 
+  private final Project project;
+
   private final EditorManager editorManager;
   private final ISarosSession session;
   private final LocalFileSystem localFileSystem;
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
-  private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
-  private final Project project;
   private final LocalEditorHandler localEditorHandler;
-  private final VirtualFileConverter virtualFileConverter;
 
   private boolean enabled;
   private boolean disposed;
@@ -172,23 +176,20 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @see #dispose()
    */
   public LocalFilesystemModificationHandler(
+      Project project,
       EditorManager editorManager,
       ISarosSession session,
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
-      ProjectAPI projectAPI,
       AnnotationManager annotationManager,
-      Project project,
-      LocalEditorHandler localEditorHandler,
-      VirtualFileConverter virtualFileConverter) {
+      LocalEditorHandler localEditorHandler) {
+
+    this.project = project;
 
     this.editorManager = editorManager;
     this.session = session;
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
-    this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
-    this.project = project;
     this.localEditorHandler = localEditorHandler;
-    this.virtualFileConverter = virtualFileConverter;
 
     this.enabled = false;
     this.disposed = false;
@@ -213,9 +214,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting before resource contents changed: " + file);
     }
 
-    SPath path = virtualFileConverter.convertToSPath(file);
+    SPath path = VirtualFileConverter.convertToSPath(project, file);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (!isShared(path, session)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource's contents change: " + file);
       }
@@ -271,9 +272,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting to resource creation: " + createdVirtualFile);
     }
 
-    SPath path = virtualFileConverter.convertToSPath(createdVirtualFile);
+    SPath path = VirtualFileConverter.convertToSPath(project, createdVirtualFile);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (!isShared(path, session)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource creation: " + createdVirtualFile);
       }
@@ -300,8 +301,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     dispatchActivity(activity);
 
+    // TODO check whether the editor is actually open locally
     if (!createdVirtualFile.isDirectory()) {
-      editorManager.openEditor(path, false);
+      setUpCreatedFileState(path);
     }
   }
 
@@ -331,9 +333,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               + copy);
     }
 
-    SPath copyPath = virtualFileConverter.convertToSPath(copy);
+    SPath copyPath = VirtualFileConverter.convertToSPath(project, copy);
 
-    if (copyPath == null || !session.isShared(copyPath.getResource())) {
+    if (!isShared(copyPath, session)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Ignoring non-shared resource copy: " + copy);
       }
@@ -354,12 +356,12 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   }
 
   /**
-   * Generates and dispatches a deletion activity for the deleted resource. If the resource was a
-   * file, subsequently removes any editors for the file from the editor pool and drops any held
-   * annotations for the file.
+   * Generates and dispatches a deletion activity for the deleted resource.
    *
    * @param virtualFileEvent the event to react to
    * @see VirtualFileListener#beforeFileDeletion(VirtualFileEvent)
+   * @see #generateFileDeletionActivity(VirtualFile)
+   * @see #generateFolderDeletionActivity(VirtualFile)
    */
   private void generateResourceDeletionActivity(@NotNull VirtualFileEvent virtualFileEvent) {
 
@@ -371,11 +373,30 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       LOG.trace("Reacting before resource deletion: " + deletedVirtualFile);
     }
 
-    SPath path = virtualFileConverter.convertToSPath(deletedVirtualFile);
+    if (deletedVirtualFile.isDirectory()) {
+      generateFolderDeletionActivity(deletedVirtualFile);
+    } else {
+      generateFileDeletionActivity(deletedVirtualFile);
+    }
+  }
 
-    if (path == null || !session.isShared(path.getResource())) {
+  /**
+   * Generates and dispatches a folder deletion activity for the deleted folder.
+   *
+   * <p>Also explicitly creates deletion activities for all contained resources belonging to the
+   * same module. Contained files are processed first (in ascending depth order), followed by the
+   * contained folders in descending depth order. This ensures that deletion activities for folders
+   * are only send once the activities for all contained resources were sent, allowing the receiver
+   * to also explicitly handle all resource deletions.
+   *
+   * @param deletedFolder the folder that was deleted
+   */
+  private void generateFolderDeletionActivity(@NotNull VirtualFile deletedFolder) {
+    SPath path = VirtualFileConverter.convertToSPath(project, deletedFolder);
+
+    if (!isShared(path, session)) {
       if (LOG.isTraceEnabled()) {
-        LOG.trace("Ignoring non-shared resource deletion: " + deletedVirtualFile);
+        LOG.trace("Ignoring non-shared folder deletion: " + deletedFolder);
       }
 
       return;
@@ -383,22 +404,75 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     User user = session.getLocalUser();
 
-    IActivity activity;
+    Deque<IActivity> queuedDeletionActivities = new ConcurrentLinkedDeque<>();
 
-    if (deletedVirtualFile.isDirectory()) {
-      // TODO create deletion activities for child resources
-      // TODO clean up editor pool and annotations for child resources
-      activity = new FolderDeletedActivity(user, path);
+    VirtualFileFilter virtualFileFilter = getVirtualFileFilter(deletedFolder);
 
-    } else {
-      activity =
-          new FileActivity(
-              user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, path, null, null, null);
+    /*
+     * Defines the actions executed on the base directory and every valid
+     * child resource (defined through the virtualFileFilter).
+     *
+     * Returns whether the content iteration should be continued.
+     */
+    ContentIterator contentIterator =
+        fileOrDir -> {
+          if (!fileOrDir.isDirectory()) {
+            generateFileDeletionActivity(fileOrDir);
 
-      editorManager.removeAllEditorsForPath(path);
+            return true;
+          }
 
-      annotationManager.removeAnnotations(path.getFile());
+          SPath folderPath = VirtualFileConverter.convertToSPath(project, fileOrDir);
+
+          if (folderPath == null) {
+            LOG.debug("Skipping deleted folder as no SPath could be obtained " + fileOrDir);
+
+            return true;
+          }
+
+          IActivity newFolderDeletedActivity = new FolderDeletedActivity(user, folderPath);
+
+          queuedDeletionActivities.addFirst(newFolderDeletedActivity);
+
+          return true;
+        };
+
+    /*
+     * Calls the above defined contentIterator on the base directory and
+     * every contained resource.
+     * Directories are only stepped into if they match the above defined
+     * virtualFileFilter. This also applies to the base directory.
+     */
+    VfsUtilCore.iterateChildrenRecursively(deletedFolder, virtualFileFilter, contentIterator);
+
+    while (!queuedDeletionActivities.isEmpty()) {
+      dispatchActivity(queuedDeletionActivities.pop());
     }
+  }
+
+  /**
+   * Generated and dispatches a file deletion activity for the deleted file. Subsequently removes
+   * any editors for the file from the editor pool and drops any held annotations for the file.
+   *
+   * @param deletedFile the file that was deleted
+   */
+  private void generateFileDeletionActivity(VirtualFile deletedFile) {
+    SPath path = VirtualFileConverter.convertToSPath(project, deletedFile);
+
+    if (path == null || !session.isShared(path.getResource())) {
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Ignoring non-shared file deletion: " + deletedFile);
+      }
+
+      return;
+    }
+
+    User user = session.getLocalUser();
+
+    IActivity activity =
+        new FileActivity(user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, path, null, null, null);
+
+    cleanUpDeletedFileState(path);
 
     dispatchActivity(activity);
 
@@ -409,8 +483,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * Generates and dispatches activities handling resources moves.
    *
    * @param virtualFileMoveEvent the event to react to
-   * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
-   * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
+   * @see #generateFileMoveActivity(VirtualFile, VirtualFile, VirtualFile, String, String)
+   * @see #generateFolderMoveActivity(VirtualFile, VirtualFile, VirtualFile, String)
    * @see #generateResourceCreationActivity(VirtualFileEvent) (VirtualFileEvent)
    * @see #generateResourceDeletionActivity(VirtualFileEvent) (VirtualFileEvent)
    */
@@ -433,16 +507,25 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     }
 
     if (oldFile.isDirectory()) {
-      generateFolderMove(oldFile, oldParent, newParent, null);
+      generateFolderMoveActivity(oldFile, oldParent, newParent, null);
 
     } else {
-      generateFileMove(oldFile, oldParent, newParent, null, null);
+      generateFileMoveActivity(oldFile, oldParent, newParent, null, null);
     }
   }
 
   /**
    * Generates and dispatches matching creation and deletion activities replicating moving the given
-   * directory. Also dispatches activities for all contained resources belonging to the same module.
+   * directory.
+   *
+   * <p>Also explicitly creates activities to move all contained resources belonging to the same
+   * module. When creating the new resources, the creation/move activities are created in ascending
+   * depth order. This ensures that creation/move activities are only send once the creation
+   * activities for all parent resources were sent. When creating the deletion activities, the
+   * contained files are processed first (in ascending depth order), followed by the contained
+   * folders in descending depth order. This ensures that move activities for folders are only send
+   * once the activities for all contained resources were sent, allowing the receiver to also
+   * explicitly handle all resource deletions.
    *
    * <p>How the resources (including the given directory) are handled depends on whether the source
    * and target directory is shared.
@@ -467,9 +550,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param oldParent the old parent of the moved file
    * @param newParent the new parent of the moved file
    * @param newFolderName the new name for the folder or null if the folder was not renamed
-   * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
+   * @see #generateFileMoveActivity(VirtualFile, VirtualFile, VirtualFile, String, String)
    */
-  private void generateFolderMove(
+  private void generateFolderMoveActivity(
       @NotNull VirtualFile oldFile,
       @NotNull VirtualFile oldParent,
       @NotNull VirtualFile newParent,
@@ -477,19 +560,18 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String folderName = newFolderName != null ? newFolderName : oldFile.getName();
 
-    SPath oldPath = virtualFileConverter.convertToSPath(oldFile);
-    SPath newParentPath = virtualFileConverter.convertToSPath(newParent);
+    SPath oldPath = VirtualFileConverter.convertToSPath(project, oldFile);
+    SPath newParentPath = VirtualFileConverter.convertToSPath(project, newParent);
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldPath != null && session.isShared(oldPath.getResource());
-    boolean newPathIsShared =
-        newParentPath != null && session.isShared(newParentPath.getResource());
+    boolean oldPathIsShared = isShared(oldPath, session);
+    boolean newPathIsShared = isShared(newParentPath, session);
 
     if (!oldPathIsShared && !newPathIsShared) {
       if (LOG.isTraceEnabled()) {
         LOG.trace(
-            "Ignoring non-shared resource move - resource: "
+            "Ignoring non-shared folder move - folder: "
                 + oldFile
                 + ", old parent: "
                 + oldParent
@@ -498,24 +580,18 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       }
 
       return;
+
+    } else if (oldPathIsShared && isContentRootDirectory(oldFile)) {
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Ignoring move of content root " + oldPath);
+      }
+
+      return;
     }
 
     Deque<IActivity> queuedDeletionActivities = new ConcurrentLinkedDeque<>();
 
-    /*
-     * Filter determining which child resources to iterate over.
-     * It only iterated over resources belonging to the same module as the
-     * base directory. This is needed to exclude submodules.
-     *
-     * TODO once sharing multiple modules is possible, introduce logic to handle deleted submodules if they are shared
-     */
-    VirtualFileFilter virtualFileFilter =
-        file -> {
-          Module baseModule = ModuleUtil.findModuleForFile(oldFile, project);
-          Module module = ModuleUtil.findModuleForFile(file, project);
-
-          return baseModule != null && baseModule.equals(module);
-        };
+    VirtualFileFilter virtualFileFilter = getVirtualFileFilter(oldFile);
 
     /*
      * Defines the actions executed on the base directory and every valid
@@ -532,7 +608,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           }
 
           if (!fileOrDir.isDirectory()) {
-            generateFileMove(fileOrDir, oldParent, newParent, newFolderName, null);
+            generateFileMoveActivity(fileOrDir, oldParent, newParent, newFolderName, null);
 
             return true;
           }
@@ -575,6 +651,31 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   }
 
   /**
+   * Returns whether the given virtual file is a content root for the module it is associated with.
+   *
+   * @param virtualFile the virtual file to check
+   * @return <code>true</code> when the virtual file is one of the content roots of the module it is
+   *     associated with, <code>false</code> if it represents a file, does not match one of the
+   *     content roots or is not associated with a module
+   */
+  private boolean isContentRootDirectory(@NotNull VirtualFile virtualFile) {
+    if (!virtualFile.isDirectory()) {
+      return false;
+    }
+
+    Module module =
+        Filesystem.runReadAction(() -> ModuleUtil.findModuleForFile(virtualFile, project));
+
+    if (module == null) {
+      return false;
+    }
+
+    VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+
+    return Arrays.asList(contentRoots).contains(virtualFile);
+  }
+
+  /**
    * How the moved file is handled depends on whether the source and target directory are shared:
    *
    * <ul>
@@ -607,9 +708,14 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param newBaseParent the new base parent of the file
    * @param newBaseName the new name for the base parent or null if it was not renamed
    * @param newFileName the new name for the file or null if it was not renamed
-   * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
+   * @see #generateFolderMoveActivity(VirtualFile, VirtualFile, VirtualFile, String)
    */
-  private void generateFileMove(
+  /*
+   * TODO adjust the logic ignoring module moves once multiple modules can be shared
+   *  Even though module files are ignored by their module, they won't be ignored when moved in/
+   *  between other shared modules.
+   */
+  private void generateFileMoveActivity(
       @NotNull VirtualFile oldFile,
       @NotNull VirtualFile oldBaseParent,
       @NotNull VirtualFile newBaseParent,
@@ -618,16 +724,31 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String encoding = oldFile.getCharset().name();
 
-    SPath oldFilePath = virtualFileConverter.convertToSPath(oldFile);
-    SPath newParentPath = virtualFileConverter.convertToSPath(newBaseParent);
+    SPath oldFilePath = VirtualFileConverter.convertToSPath(project, oldFile);
+    SPath newParentPath = VirtualFileConverter.convertToSPath(project, newBaseParent);
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldFilePath != null && session.isShared(oldFilePath.getResource());
-    boolean newPathIsShared =
-        newParentPath != null && session.isShared(newParentPath.getResource());
+    boolean oldPathIsShared = isShared(oldFilePath, session);
+    boolean newPathIsShared = isShared(newParentPath, session);
 
-    boolean fileIsOpen = projectAPI.isOpen(oldFile);
+    if (newPathIsShared) {
+      Module targetModule =
+          Filesystem.runReadAction(() -> ModuleUtil.findModuleForFile(newBaseParent, project));
+
+      if (targetModule != null) {
+        VirtualFile moduleFile = targetModule.getModuleFile();
+        if (oldFile.equals(moduleFile)) {
+          if (LOG.isTraceEnabled()) {
+            LOG.trace("Ignoring move of module file " + oldFile + " for module " + targetModule);
+          }
+
+          return;
+        }
+      }
+    }
+
+    boolean fileIsOpen = ProjectAPI.isOpen(project, oldFile);
 
     IPath relativePath = getRelativePath(oldBaseParent, oldFile);
 
@@ -664,9 +785,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               null,
               encoding);
 
-      editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
-
-      annotationManager.updateAnnotationPath(oldFilePath.getFile(), newFilePath.getFile());
+      updateMovedFileState(oldFilePath, newFilePath);
 
     } else if (newPathIsShared) {
       // moved file into shared module
@@ -688,9 +807,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               encoding);
 
       if (fileIsOpen) {
-        Editor editor = projectAPI.openEditor(oldFile, false);
-
-        editorManager.addEditorMapping(newFilePath, editor);
+        setUpMovedEditorState(oldFile, newFilePath);
       }
 
     } else if (oldPathIsShared) {
@@ -699,15 +816,13 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           new FileActivity(
               user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, oldFilePath, null, null, null);
 
-      editorManager.removeAllEditorsForPath(oldFilePath);
-
-      annotationManager.removeAnnotations(oldFilePath.getFile());
+      cleanUpDeletedFileState(oldFilePath);
 
     } else {
       // neither source nor destination are shared
       if (LOG.isTraceEnabled()) {
         LOG.trace(
-            "Ignoring non-shared resource move - resource: "
+            "Ignoring non-shared file move - file: "
                 + oldFile
                 + ", old base parent: "
                 + oldBaseParent
@@ -752,8 +867,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * <p>Other property changes are ignored.
    *
    * @param filePropertyEvent the event to react to
-   * @see #generateFolderMove(VirtualFile, VirtualFile, VirtualFile, String)
-   * @see #generateFileMove(VirtualFile, VirtualFile, VirtualFile, String, String)
+   * @see #generateFolderMoveActivity(VirtualFile, VirtualFile, VirtualFile, String)
+   * @see #generateFileMoveActivity(VirtualFile, VirtualFile, VirtualFile, String, String)
    */
   private void generateRenamingResourceMoveActivity(
       @NotNull VirtualFilePropertyEvent filePropertyEvent) {
@@ -771,6 +886,16 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         String oldName = (String) oldValue;
         String newName = (String) newValue;
 
+        // TODO consider using FilePropertyEvent#isRename() once compatibility is dropped to 2019.2
+        if (oldName.equals(newName)) {
+          LOG.debug(
+              "Dropping file property event for "
+                  + file
+                  + " as it is detected to be a re-parsing of the file.");
+
+          return;
+        }
+
         if (LOG.isTraceEnabled()) {
           LOG.trace(
               "Reacting before resource name change - resource: "
@@ -785,9 +910,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
         if (parent == null) {
 
-          SPath path = virtualFileConverter.convertToSPath(file);
+          SPath path = VirtualFileConverter.convertToSPath(project, file);
 
-          if (path != null && session.isShared(path.getResource())) {
+          if (isShared(path, session)) {
             LOG.error(
                 "Renamed resource is a root directory. "
                     + "Such an activity can not be shared through Saros.");
@@ -797,9 +922,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         }
 
         if (file.isDirectory()) {
-          generateFolderMove(file, parent, parent, newName);
+          generateFolderMoveActivity(file, parent, parent, newName);
         } else {
-          generateFileMove(file, parent, parent, null, newName);
+          generateFileMoveActivity(file, parent, parent, null, newName);
         }
 
         break;
@@ -844,6 +969,40 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     }
   }
 
+  private boolean isShared(@Nullable SPath path, @NotNull ISarosSession sarosSession) {
+    if (path == null) {
+      return false;
+    }
+
+    IResource resource = path.getResource();
+
+    if (resource == null) {
+      return false;
+    }
+
+    return sarosSession.isShared(resource);
+  }
+
+  /**
+   * Returns a filter determining which child resources to iterate over. It only iterated over
+   * resources belonging to the same module as the base directory. This is needed to exclude
+   * submodules. Furthermore, this implicitly excludes resources marked as 'excluded' as the logic
+   * won't find a module for them.
+   *
+   * @param baseFile the base file the iteration starts at
+   * @return a filter determining which child resources to iterate over
+   */
+  // TODO once sharing multiple modules is possible, introduce logic to handle deleted submodules if
+  //  they are shared
+  private VirtualFileFilter getVirtualFileFilter(@NotNull VirtualFile baseFile) {
+    return (file) -> {
+      Module baseModule = ModuleUtil.findModuleForFile(baseFile, project);
+      Module module = ModuleUtil.findModuleForFile(file, project);
+
+      return Objects.equals(baseModule, module);
+    };
+  }
+
   /**
    * Returns the content of the given file. If available, the cached document content representing
    * the file held by Intellij will be used. Otherwise, the file content on disk (obtained using the
@@ -878,6 +1037,51 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return new byte[0];
     }
+  }
+
+  /**
+   * Sets the editor manager state up for the created file.
+   *
+   * @param createdFilePath the created file
+   */
+  private void setUpCreatedFileState(@NotNull SPath createdFilePath) {
+    editorManager.openEditor(createdFilePath, false);
+  }
+
+  /**
+   * Drops the held internal state for the deleted file.
+   *
+   * @param deletedFilePath the deleted file
+   */
+  private void cleanUpDeletedFileState(@NotNull SPath deletedFilePath) {
+    editorManager.removeAllEditorsForPath(deletedFilePath);
+
+    annotationManager.removeAnnotations(deletedFilePath.getFile());
+  }
+
+  /**
+   * Updates the held internal state with the new path for the moved file.
+   *
+   * @param oldFilePath the old location/version of the file
+   * @param newFilePath the new location/version of the file
+   */
+  private void updateMovedFileState(@NotNull SPath oldFilePath, @NotNull SPath newFilePath) {
+    editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
+
+    annotationManager.updateAnnotationPath(oldFilePath.getFile(), newFilePath.getFile());
+  }
+
+  /**
+   * Explicitly handles the new editor mapping. This is necessary when the resource with an already
+   * open editor is "created" through a move into a shared module as this triggers before the
+   * resource move is executed, meaning the new resource does not exist yet. The editor for the old
+   * resource does however already exist. As the existing editor will be used for the new resource
+   * once it is moved, we have to add the mapping for the new file onto the "old" editor manually.
+   */
+  private void setUpMovedEditorState(@NotNull VirtualFile oldFile, @NotNull SPath newFilePath) {
+    Editor editor = ProjectAPI.openEditor(project, oldFile, false);
+
+    editorManager.addEditorMapping(newFilePath, editor);
   }
 
   /**

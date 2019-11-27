@@ -21,8 +21,8 @@ import java.awt.Window;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,17 +32,20 @@ import org.jetbrains.annotations.Nullable;
 import saros.SarosPluginContext;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
-import saros.filesystem.IWorkspace;
+import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.negotiation.ModuleConfiguration;
+import saros.intellij.negotiation.ModuleConfigurationInitializer;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.intellij.ui.widgets.progress.ProgessMonitorAdapter;
 import saros.intellij.ui.wizards.pages.HeaderPanel;
 import saros.intellij.ui.wizards.pages.PageActionListener;
-import saros.intellij.ui.wizards.pages.SelectProjectPage;
 import saros.intellij.ui.wizards.pages.TextAreaPage;
+import saros.intellij.ui.wizards.pages.moduleselection.ModuleSelectionResult;
+import saros.intellij.ui.wizards.pages.moduleselection.SelectLocalModuleRepresentationPage;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
 import saros.monitoring.SubProgressMonitor;
@@ -75,11 +78,10 @@ import saros.util.ThreadUtils;
  */
 
 //  FIXME: Add facility for more than one project.
-
 public class AddProjectToSessionWizard extends Wizard {
   private static final Logger LOG = Logger.getLogger(AddProjectToSessionWizard.class);
 
-  public static final String SELECT_PROJECT_PAGE_ID = "selectProject";
+  public static final String SELECT_MODULE_REPRESENTATION_PAGE_ID = "selectModuleRepresentation";
   public static final String FILE_LIST_PAGE_ID = "fileListPage";
 
   private final String remoteProjectID;
@@ -97,9 +99,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
   @Inject private ISarosSessionManager sessionManager;
 
-  @Inject private IWorkspace workspace;
-
-  private final SelectProjectPage selectProjectPage;
+  private final SelectLocalModuleRepresentationPage selectLocalModuleRepresentationPage;
   private final TextAreaPage fileListPage;
 
   private final PageActionListener selectProjectsPageListener =
@@ -118,123 +118,250 @@ public class AddProjectToSessionWizard extends Wizard {
 
           DocumentAPI.saveAllDocuments();
 
-          // FIXME: Only projects with the same name are supported,
-          // because the project name is connected to the name of the .iml file
-          // and it is unclear how that resolves.
-          final String moduleName = selectProjectPage.getLocalProjectName();
+          ModuleSelectionResult moduleSelectionResult;
 
-          if (selectProjectPage.isNewProjectSelected()) {
-            Module module;
+          try {
+            moduleSelectionResult =
+                selectLocalModuleRepresentationPage.getModuleSelectionResult(remoteProjectName);
 
-            try {
-              module = createModuleStub(moduleName);
+          } catch (IllegalStateException e) {
+            noisyCancel("Request to get module selection result failed: " + e.getMessage(), e);
 
-            } catch (IOException e) {
-              LOG.error("Could not create the shared module " + moduleName + ".", e);
-
-              cancelNegotiation("Failed to create shared module");
-
-              NotificationPanel.showError(
-                  MessageFormat.format(
-                      Messages.Contact_saros_message_conditional,
-                      MessageFormat.format(
-                              Messages
-                                  .AddProjectToSessionWizard_module_creation_failed_message_condition,
-                              moduleName)
-                          + "\n"
-                          + e),
-                  Messages.AddProjectToSessionWizard_module_creation_failed_title);
-
-              return;
-
-            } catch (ModuleWithNameAlreadyExists e) {
-              LOG.warn("Could not create the shared module " + moduleName + ".", e);
-
-              cancelNegotiation("Failed to create shared module");
-
-              NotificationPanel.showError(
-                  MessageFormat.format(
-                      Messages.Contact_saros_message_conditional,
-                      MessageFormat.format(
-                          Messages
-                              .AddProjectToSessionWizard_module_already_exists_message_condition,
-                          moduleName)),
-                  Messages.AddProjectToSessionWizard_module_already_exists_title);
-
-              return;
-            }
-
-            IProject sharedProject = new IntelliJProjectImpl(module);
-
-            localProjects.put(remoteProjectID, sharedProject);
-
-            triggerProjectNegotiation();
-
-          } else {
-            IProject sharedProject;
-
-            try {
-              sharedProject = workspace.getProject(moduleName);
-
-            } catch (IllegalArgumentException e) {
-              LOG.debug("No session is started as an invalid module was chosen");
-
-              cancelNegotiation("Invalid module chosen by client");
-
-              NotificationPanel.showError(
-                  MessageFormat.format(
-                      Messages.Contact_saros_message_conditional,
-                      MessageFormat.format(
-                          Messages.AddProjectToSessionWizard_invalid_module_message_condition,
-                          moduleName)),
-                  Messages.AddProjectToSessionWizard_invalid_module_title);
-
-              return;
-
-            } catch (IllegalStateException e) {
-              LOG.warn(
-                  "Aborted negotiation as an error occurred while trying to create an "
-                      + "IProject object for "
-                      + moduleName
-                      + ".",
-                  e);
-
-              cancelNegotiation("Error while processing module chosen by client");
-
-              NotificationPanel.showWarning(
-                  MessageFormat.format(
-                      Messages.AddProjectToSessionWizard_error_creating_module_object_message,
-                      moduleName,
-                      e),
-                  MessageFormat.format(
-                      Messages.AddProjectToSessionWizard_error_creating_module_object_title,
-                      moduleName));
-
-              return;
-            }
-
-            if (sharedProject == null) {
-              LOG.error("Could not find the shared module " + moduleName + ".");
-
-              cancelNegotiation("Could not find chosen local representation of shared module");
-
-              NotificationPanel.showError(
-                  MessageFormat.format(
-                      Messages.Contact_saros_message_conditional,
-                      MessageFormat.format(
-                          Messages.AddProjectToSessionWizard_module_not_found_message_condition,
-                          moduleName)),
-                  Messages.AddProjectToSessionWizard_module_not_found_title);
-
-              return;
-            }
-
-            localProjects.put(remoteProjectID, sharedProject);
-
-            prepareFilesChangedPage(localProjects);
-
-            setTopPanelText(Messages.EnterProjectNamePage_description_changed_files);
+            return;
           }
+
+          if (moduleSelectionResult == null) {
+            noisyCancel(
+                "Could not find a module selection result for the module " + remoteProjectName,
+                null);
+
+            return;
+          }
+
+          Project project = moduleSelectionResult.getProject();
+
+          sessionManager.getSession().getComponent(SharedIDEContext.class).setProject(project);
+
+          switch (moduleSelectionResult.getLocalRepresentationOption()) {
+            case CREATE_NEW_MODULE:
+              String newModuleName = moduleSelectionResult.getNewModuleName();
+              Path newModuleBasePath = moduleSelectionResult.getNewModuleBasePath();
+
+              if (newModuleName == null || newModuleBasePath == null) {
+                noisyCancel("No valid new module name or base path was given", null);
+
+                return;
+              }
+
+              doNewModule(project, newModuleName, newModuleBasePath);
+              break;
+
+            case USE_EXISTING_MODULE:
+              Module existingModule = moduleSelectionResult.getExistingModule();
+
+              if (existingModule == null) {
+                noisyCancel("No valid existing module was given", null);
+
+                return;
+              }
+
+              doExistingModule(existingModule);
+              break;
+
+            default:
+              noisyCancel("No valid option on how to represent the shared module was given", null);
+          }
+        }
+
+        /**
+         * Creates a stub module and starts the project negotiation with the newly created module.
+         *
+         * @param project the project to create the module in
+         * @param moduleName the name for the new module
+         * @param moduleBasePath the base path for the new module
+         * @see AddProjectToSessionWizard#createBaseModule(String, String, Path, Project)
+         */
+        private void doNewModule(
+            @NotNull Project project, @NotNull String moduleName, @NotNull Path moduleBasePath) {
+
+          Map<String, String> moduleParameters =
+              negotiation.getProjectNegotiationData(remoteProjectID).getAdditionalProjectData();
+
+          ModuleConfiguration moduleConfiguration =
+              new ModuleConfiguration(moduleParameters, false);
+
+          String moduleType = moduleConfiguration.getModuleType();
+
+          if (moduleType == null) {
+            LOG.error("Aborted module creation as no module type was received.");
+
+            cancelNegotiation("Failed to create shared module");
+
+            NotificationPanel.showError(
+                Messages.AddProjectToSessionWizard_no_module_type_received_message,
+                Messages.AddProjectToSessionWizard_no_module_type_received_title);
+
+            return;
+          }
+
+          Module module;
+
+          try {
+            module = createBaseModule(moduleName, moduleType, moduleBasePath, project);
+
+          } catch (IOException e) {
+            LOG.error("Could not create the shared module " + moduleName + ".", e);
+
+            cancelNegotiation("Failed to create shared module");
+
+            NotificationPanel.showError(
+                MessageFormat.format(
+                    Messages.Contact_saros_message_conditional,
+                    MessageFormat.format(
+                            Messages
+                                .AddProjectToSessionWizard_module_creation_failed_message_condition,
+                            moduleName)
+                        + "\n"
+                        + e),
+                Messages.AddProjectToSessionWizard_module_creation_failed_title);
+
+            return;
+
+          } catch (ModuleWithNameAlreadyExists e) {
+            LOG.warn("Could not create the shared module " + moduleName + ".", e);
+
+            cancelNegotiation("Failed to create shared module");
+
+            NotificationPanel.showError(
+                MessageFormat.format(
+                    Messages.Contact_saros_message_conditional,
+                    MessageFormat.format(
+                        Messages.AddProjectToSessionWizard_module_already_exists_message_condition,
+                        moduleName)),
+                Messages.AddProjectToSessionWizard_module_already_exists_title);
+
+            return;
+          }
+
+          queueModuleConfigurationChange(module, moduleConfiguration);
+
+          IProject sharedProject = new IntelliJProjectImpl(module);
+
+          localProjects.put(remoteProjectID, sharedProject);
+
+          triggerProjectNegotiation();
+        }
+
+        /**
+         * Checks if the chosen module is valid and then starts the project negotiation with the
+         * module.
+         *
+         * @param existingModule the existing module to use for the project negotiation
+         */
+        private void doExistingModule(@NotNull Module existingModule) {
+          String moduleName = existingModule.getName();
+
+          IProject sharedProject;
+
+          try {
+            sharedProject = new IntelliJProjectImpl(existingModule);
+
+          } catch (IllegalArgumentException e) {
+            LOG.debug("No session is started as an invalid module was chosen");
+
+            cancelNegotiation("Invalid module chosen by client");
+
+            NotificationPanel.showError(
+                MessageFormat.format(
+                    Messages.Contact_saros_message_conditional,
+                    MessageFormat.format(
+                        Messages.AddProjectToSessionWizard_invalid_module_message_condition,
+                        moduleName)),
+                Messages.AddProjectToSessionWizard_invalid_module_title);
+
+            return;
+          }
+
+          Map<String, String> moduleParameters =
+              negotiation.getProjectNegotiationData(remoteProjectID).getAdditionalProjectData();
+
+          ModuleConfiguration moduleConfiguration = new ModuleConfiguration(moduleParameters, true);
+
+          /*
+           * TODO move to finish of FilesChangedPage iff back button is configured to function as
+           *  the module might change in that case
+           */
+          queueModuleConfigurationChange(existingModule, moduleConfiguration);
+
+          localProjects.put(remoteProjectID, sharedProject);
+
+          prepareFilesChangedPage(localProjects);
+
+          setTopPanelText(Messages.AddProjectToSessionWizard_description_changed_files);
+        }
+
+        /**
+         * Adds the given module configuration to the {@link ModuleConfigurationInitializer}.
+         *
+         * <p>Cancels the negotiation if the session or session context is no longer valid.
+         *
+         * @param module the module the configuration belongs to
+         * @param moduleConfiguration the module configuration
+         */
+        private void queueModuleConfigurationChange(
+            @NotNull Module module, @NotNull ModuleConfiguration moduleConfiguration) {
+
+          ISarosSession session = sessionManager.getSession();
+
+          if (session == null) {
+            LOG.error("Encountered project negotiation without running session");
+
+            NotificationPanel.showError(
+                Messages.AddProjectToSessionWizard_no_session_message,
+                Messages.AddProjectToSessionWizard_no_session_title);
+
+            return;
+          }
+
+          ModuleConfigurationInitializer moduleConfigurationInitializer =
+              session.getComponent(ModuleConfigurationInitializer.class);
+
+          if (moduleConfigurationInitializer == null) {
+            LOG.error(
+                "Could not obtain class from session context - "
+                    + ModuleConfigurationInitializer.class.getSimpleName());
+
+            NotificationPanel.showError(
+                Messages.AddProjectToSessionWizard_context_teardown_message,
+                Messages.AddProjectToSessionWizard_context_teardown_title);
+
+            return;
+          }
+
+          moduleConfigurationInitializer.enqueueModuleConfigurationChange(
+              module, moduleConfiguration);
+        }
+
+        /**
+         * Cancels the project negotiation. Informs all channels of this cancellation by logging an
+         * error and showing an error notification to the local user.
+         *
+         * @param reason the reason for the cancellation
+         */
+        private void noisyCancel(@NotNull String reason, @Nullable Throwable throwable) {
+          if (throwable != null) {
+            LOG.error("Encountered error reading module selection results: " + reason, throwable);
+          } else {
+            LOG.error("Encountered error reading module selection results: " + reason);
+          }
+
+          NotificationPanel.showError(
+              MessageFormat.format(
+                  Messages.AddProjectToSessionWizard_error_reading_module_selection_result_message,
+                  reason),
+              Messages.AddProjectToSessionWizard_error_reading_module_selection_result_title);
+
+          cancelNegotiation("Encountered an error during project negotiation");
         }
 
         @Override
@@ -268,24 +395,33 @@ public class AddProjectToSessionWizard extends Wizard {
   }
 
   /**
-   * Creates an empty stub module with the given name in the base directory of the current project.
+   * Creates an empty base module with the given name, base path, and module type in the given
+   * project.
    *
-   * <p>The created module has the module type {@link IntelliJProjectImpl#RELOAD_STUB_MODULE_TYPE}
-   * which allows us to easily identify it as stub.
+   * <p>The created module does not contain any further configuration. The needed configuration
+   * options will be added through {@link ModuleConfigurationInitializer}.
    *
    * @param moduleName name of the module
-   * @return a stub <code>Module</code> object with the given name
-   * @throws FileNotFoundException if the base directory of the current project, the base directory
-   *     of the created module, or the module file of the created module could not be found in the
-   *     local filesystem
+   * @param moduleType the type of the module
+   * @param targetBasePath the base path of the created module
+   * @param targetProject the project to create the module in
+   * @return a <code>Module</code> object with the given parameters
+   * @throws ModuleWithNameAlreadyExists if a module with the given name already exists in the given
+   *     project
+   * @throws FileNotFoundException if the base directory or module file of the created module could
+   *     not be found in the local filesystem
    * @throws IOException if the creation of the module did not return a valid <code>Module</code>
    *     object
    */
   @NotNull
-  private Module createModuleStub(@NotNull final String moduleName)
-      throws IOException, ModuleWithNameAlreadyExists {
+  private Module createBaseModule(
+      @NotNull String moduleName,
+      @NotNull String moduleType,
+      @NotNull Path targetBasePath,
+      @NotNull Project targetProject)
+      throws FileNotFoundException, IOException, ModuleWithNameAlreadyExists {
 
-    for (Module module : ModuleManager.getInstance(project).getModules()) {
+    for (Module module : ModuleManager.getInstance(targetProject).getModules()) {
       if (moduleName.equals(module.getName()))
         throw new ModuleWithNameAlreadyExists(
             "Could not create stub module as a module with the chosen name already exists",
@@ -298,30 +434,19 @@ public class AddProjectToSessionWizard extends Wizard {
 
               @Override
               public Module compute() throws IOException {
-                VirtualFile baseDir = project.getBaseDir();
-
-                if (baseDir == null) {
-                  throw new FileNotFoundException(
-                      "Could not find base directory for project " + project + ".");
-                }
-
-                Path moduleBasePath = Paths.get(baseDir.getPath()).resolve(moduleName);
+                Path moduleBasePath = targetBasePath.resolve(moduleName);
 
                 Path moduleFilePath =
                     moduleBasePath.resolve(moduleName + ModuleFileType.DOT_DEFAULT_EXTENSION);
 
                 ModifiableModuleModel modifiableModuleModel =
-                    ModuleManager.getInstance(project).getModifiableModel();
+                    ModuleManager.getInstance(targetProject).getModifiableModel();
 
                 Module module =
-                    modifiableModuleModel.newModule(
-                        moduleFilePath.toString(), IntelliJProjectImpl.RELOAD_STUB_MODULE_TYPE);
+                    modifiableModuleModel.newModule(moduleFilePath.toString(), moduleType);
 
                 modifiableModuleModel.commit();
-                project.save();
-
-                ModifiableRootModel modifiableRootModel =
-                    ModuleRootManager.getInstance(module).getModifiableModel();
+                targetProject.save();
 
                 VirtualFile moduleFile = module.getModuleFile();
 
@@ -337,9 +462,18 @@ public class AddProjectToSessionWizard extends Wizard {
                       "Could not  find base directory for module " + module + ".");
                 }
 
-                modifiableRootModel.addContentEntry(moduleRoot);
+                ModifiableRootModel modifiableRootModel =
+                    ModuleRootManager.getInstance(module).getModifiableModel();
 
-                modifiableRootModel.commit();
+                try {
+                  modifiableRootModel.addContentEntry(moduleRoot);
+                  modifiableRootModel.commit();
+
+                } finally {
+                  if (!modifiableRootModel.isDisposed()) {
+                    modifiableRootModel.dispose();
+                  }
+                }
 
                 return module;
               }
@@ -398,14 +532,15 @@ public class AddProjectToSessionWizard extends Wizard {
         parent,
         Messages.AddProjectToSessionWizard_title,
         new HeaderPanel(
-            Messages.EnterProjectNamePage_title2, Messages.EnterProjectNamePage_description));
+            Messages.AddProjectToSessionWizard_title2,
+            Messages.AddProjectToSessionWizard_description));
 
     SarosPluginContext.initComponent(this);
 
     this.negotiation = negotiation;
     this.peer = negotiation.getPeer();
 
-    this.setPreferredSize(new Dimension(650, 515));
+    this.setPreferredSize(new Dimension(650, 535));
 
     List<ProjectNegotiationData> data = negotiation.getProjectNegotiationData();
 
@@ -414,15 +549,13 @@ public class AddProjectToSessionWizard extends Wizard {
     remoteProjectID = data.get(0).getProjectID();
     remoteProjectName = data.get(0).getProjectName();
 
-    selectProjectPage =
-        new SelectProjectPage(
-            SELECT_PROJECT_PAGE_ID,
-            remoteProjectName,
-            remoteProjectName,
-            workspace.getLocation().toOSString(),
-            selectProjectsPageListener);
+    selectLocalModuleRepresentationPage =
+        new SelectLocalModuleRepresentationPage(
+            SELECT_MODULE_REPRESENTATION_PAGE_ID,
+            selectProjectsPageListener,
+            Collections.singleton(remoteProjectName));
 
-    registerPage(selectProjectPage);
+    registerPage(selectLocalModuleRepresentationPage);
 
     fileListPage =
         new TextAreaPage(

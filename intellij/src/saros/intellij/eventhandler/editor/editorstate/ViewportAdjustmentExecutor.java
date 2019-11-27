@@ -21,7 +21,6 @@ import saros.intellij.editor.ProjectAPI;
  * adjustment once the corresponding editor is selected.
  */
 public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeHandler {
-  private final ProjectAPI projectAPI;
   private final LocalEditorManipulator localEditorManipulator;
 
   private static final Map<String, QueuedViewPortChange> queuedViewPortChanges =
@@ -38,11 +37,10 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
       };
 
   public ViewportAdjustmentExecutor(
-      Project project, ProjectAPI projectAPI, LocalEditorManipulator localEditorManipulator) {
+      Project project, LocalEditorManipulator localEditorManipulator) {
 
     super(project);
 
-    this.projectAPI = projectAPI;
     this.localEditorManipulator = localEditorManipulator;
   }
 
@@ -79,7 +77,7 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
       editor = queuedEditor;
 
     } else {
-      editor = projectAPI.openEditor(virtualFile, false);
+      editor = ProjectAPI.openEditor(project, virtualFile, false);
     }
 
     ApplicationManager.getApplication()

@@ -303,7 +303,7 @@ class SharedProjectMapper {
 
     if (isCompletelyShared(project))
       // TODO how should partial sharing handle this case ?
-      return !resource.isDerived(true);
+      return !resource.isIgnored();
     else return partiallySharedResourceMapping.get(project).contains(resource);
   }
 

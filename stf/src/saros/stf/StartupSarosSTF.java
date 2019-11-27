@@ -48,7 +48,7 @@ public class StartupSarosSTF implements IStartup {
   private void startSTFController(final int port) {
 
     ThreadUtils.runSafeAsync(
-        "dpp-stf-startup",
+        "stf-startup",
         LOG,
         new Runnable() {
           @Override

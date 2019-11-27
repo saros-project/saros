@@ -1,10 +1,9 @@
 package saros.negotiation;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CountingInputStream;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
@@ -70,7 +69,6 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
   private void receiveStream(IProgressMonitor monitor, int fileCount)
       throws SarosCancellationException, IOException {
-
     String message = "Receiving files from " + getPeer().getName() + "...";
     monitor.beginTask(message, fileCount);
     monitor.subTask("Waiting for Host to start...");
@@ -81,17 +79,12 @@ public class InstantIncomingProjectNegotiation extends AbstractIncomingProjectNe
     log.debug(this + ": Host is starting to send...");
 
     IncomingFileTransfer transfer = transferListener.getRequest().accept();
-    InputStream in = null;
-    try {
-      in = transfer.recieveFile();
-
-      IncomingStreamProtocol isp;
-      isp = new IncomingStreamProtocol(in, session, monitor);
+    try (CountingInputStream countStream = new CountingInputStream(transfer.recieveFile());
+        IncomingStreamProtocol isp = new IncomingStreamProtocol(countStream, session, monitor)) {
       isp.receiveStream();
+      log.debug("stream bytes received: " + countStream.getByteCount());
     } catch (XMPPException e) {
       throw new LocalCancellationException(e.getMessage(), CancelOption.NOTIFY_PEER);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
 
     log.debug(this + ": stream transmission done");

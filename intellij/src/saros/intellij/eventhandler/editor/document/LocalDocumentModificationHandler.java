@@ -3,10 +3,10 @@ package saros.intellij.eventhandler.editor.document;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.intellij.editor.EditorManager;
-import saros.intellij.filesystem.VirtualFileConverter;
 import saros.session.ISarosSession;
 
 /**
@@ -26,11 +26,9 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
       };
 
   public LocalDocumentModificationHandler(
-      EditorManager editorManager,
-      ISarosSession sarosSession,
-      VirtualFileConverter virtualFileConverter) {
+      Project project, EditorManager editorManager, ISarosSession sarosSession) {
 
-    super(editorManager, sarosSession, virtualFileConverter);
+    super(project, editorManager, sarosSession);
   }
 
   /**

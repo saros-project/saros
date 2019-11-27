@@ -27,6 +27,7 @@ import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.misc.xstream.XStreamFactory;
 
 /*
  *Project Layout for test
@@ -41,7 +42,7 @@ import saros.filesystem.IResource;
  */
 public class FileListTest {
 
-  private static final XStream xstream = new XStream();
+  private static final XStream xstream = XStreamFactory.getSecureXStream();
 
   static {
     xstream.registerConverter(BooleanConverter.BINARY);
@@ -148,7 +149,7 @@ public class FileListTest {
     EasyMock.expect(fileMock.getProject()).andStubReturn(project);
     EasyMock.expect(fileMock.getProjectRelativePath()).andStubReturn(relativePath);
 
-    EasyMock.expect(fileMock.isDerived()).andStubReturn(false);
+    EasyMock.expect(fileMock.isIgnored()).andStubReturn(false);
     EasyMock.expect(fileMock.exists()).andStubReturn(true);
     EasyMock.expect(fileMock.getType()).andStubReturn(IResource.FILE);
 
@@ -195,7 +196,7 @@ public class FileListTest {
     EasyMock.expect(folderMock.getProject()).andStubReturn(project);
     EasyMock.expect(folderMock.getProjectRelativePath()).andStubReturn(relativePath);
 
-    EasyMock.expect(folderMock.isDerived()).andStubReturn(false);
+    EasyMock.expect(folderMock.isIgnored()).andStubReturn(false);
     EasyMock.expect(folderMock.exists()).andStubReturn(true);
     EasyMock.expect(folderMock.getType()).andStubReturn(IResource.FOLDER);
 

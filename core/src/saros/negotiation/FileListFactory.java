@@ -100,7 +100,7 @@ public class FileListFactory {
     while (!stack.isEmpty()) {
       IResource resource = stack.pop();
 
-      if (resource.isDerived() || !resource.exists()) continue;
+      if (resource.isIgnored() || !resource.exists()) continue;
 
       String path = resource.getProjectRelativePath().toPortableString();
 

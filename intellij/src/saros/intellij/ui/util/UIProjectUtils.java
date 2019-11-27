@@ -2,11 +2,12 @@ package saros.intellij.ui.util;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.concurrency.Promise;
+import saros.intellij.context.SharedIDEContext;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
@@ -42,18 +43,6 @@ public class UIProjectUtils {
    * Returns the <code>Project</code> object contained in the session context or <code>null</code>
    * if there currently is no session.
    *
-   * @return the <code>Project</code> object contained in the session context or <code>null</code>
-   *     if there currently is no session.
-   */
-  @Nullable
-  Project getSharedProject() {
-    return getProjectFromSession();
-  }
-
-  /**
-   * Returns the <code>Project</code> object contained in the session context or <code>null</code>
-   * if there currently is no session.
-   *
    * <p><b>NOTE:</b> This method should only be used to for UI purposes. To interact with the
    * project whose module is shared as part of a Saros session, please use the Project object
    * contained in the session context.
@@ -69,7 +58,13 @@ public class UIProjectUtils {
       return null;
     }
 
-    return currentSession.getComponent(Project.class);
+    SharedIDEContext sharedIDEContext = currentSession.getComponent(SharedIDEContext.class);
+
+    if (sharedIDEContext == null || !sharedIDEContext.isInitialized()) {
+      return null;
+    }
+
+    return sharedIDEContext.getProject();
   }
 
   /**
@@ -97,7 +92,7 @@ public class UIProjectUtils {
 
     Promise<DataContext> promisedDataContext =
         DataManager.getInstance().getDataContextFromFocusAsync();
-    Promise<Project> promisedProject = promisedDataContext.then(DataKeys.PROJECT::getData);
+    Promise<Project> promisedProject = promisedDataContext.then(LangDataKeys.PROJECT::getData);
 
     promisedProject.onProcessed(projectRunner::run);
   }

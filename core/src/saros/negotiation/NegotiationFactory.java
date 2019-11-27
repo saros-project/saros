@@ -49,6 +49,8 @@ public final class NegotiationFactory {
   private final ITransmitter transmitter;
   private final IReceiver receiver;
 
+  private final AdditionalProjectDataFactory additionalProjectDataFactory;
+
   public NegotiationFactory(
       final VersionManager versionManager, //
       final SessionNegotiationHookManager hookManager, //
@@ -60,7 +62,8 @@ public final class NegotiationFactory {
       final XMPPConnectionService connectionService, //
       final IConnectionManager connectionManager, //
       final ITransmitter transmitter, //
-      final IReceiver receiver, //
+      final IReceiver receiver,
+      final AdditionalProjectDataFactory additionalProjectDataFactory, //
 
       /*
        * FIXME HACK for now to avoid cyclic dependencies between this class,
@@ -87,6 +90,8 @@ public final class NegotiationFactory {
     this.connectionManager = connectionManager;
     this.transmitter = transmitter;
     this.receiver = receiver;
+
+    this.additionalProjectDataFactory = additionalProjectDataFactory;
   }
 
   public OutgoingSessionNegotiation newOutgoingSessionNegotiation(
@@ -148,7 +153,8 @@ public final class NegotiationFactory {
             checksumCache,
             connectionService,
             transmitter,
-            receiver);
+            receiver,
+            additionalProjectDataFactory);
       case INSTANT:
         return new InstantOutgoingProjectNegotiation(
             remoteAddress,
@@ -160,7 +166,8 @@ public final class NegotiationFactory {
             checksumCache,
             connectionService,
             transmitter,
-            receiver);
+            receiver,
+            additionalProjectDataFactory);
       default:
         throw new UnsupportedOperationException("transferType not implemented");
     }
@@ -213,7 +220,7 @@ public final class NegotiationFactory {
       throw new IllegalStateException("User <" + user + "> is not part of the session.");
     }
 
-    String type = session.getUserProperties(user).getString(ProjectNegotiationTypeHook.KEY_TYPE);
+    String type = user.getPreferences().getString(ProjectNegotiationTypeHook.KEY_TYPE);
     if (type.isEmpty()) {
       throw new IllegalArgumentException("Missing TransferType for User: " + user);
     }

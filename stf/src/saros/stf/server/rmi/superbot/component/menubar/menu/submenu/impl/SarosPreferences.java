@@ -87,7 +87,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
         .bot()
         .waitUntil(Conditions.shellCloses(activateAccountConfirmationShell));
 
-    assert shell.bot().label("Active: " + jid.getBase()).isVisible();
+    assert shell.bot().label(LABEL_ACTIVE_ACCOUNT_PREFIX + jid.getBase()).isVisible();
 
     shell.bot().button(APPLY).click();
     shell.bot().button(OK).click();
@@ -112,9 +112,6 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
 
     if (!isAccountExistNoGUI(jid)) return;
 
-    if (isAccountActiveNoGUI(jid))
-      throw new RuntimeException("it is not allowed to remove an active account");
-
     SWTBotShell shell = preCondition();
     shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).select(jid.getBase());
 
@@ -134,7 +131,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
       shell.bot().button(APPLY).click();
       shell.bot().button(OK).click();
       shell.bot().waitUntil(Conditions.shellCloses(shell));
-    } else throw new RuntimeException("it is not allowed to remove an active account");
+    } else throw new RuntimeException("button to delete an account is not enabled");
   }
 
   @Override
@@ -342,18 +339,16 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
   }
 
   private boolean isAccountActiveNoGUI(JID jid) {
-    XMPPAccount account = null;
-    try {
-      account = getXmppAccountStore().getActiveAccount();
-      return account.getUsername().equals(jid.getName())
-          && account.getDomain().equals(jid.getDomain());
-    } catch (IllegalStateException e) {
-      return false;
-    }
+    final XMPPAccount account = getXmppAccountStore().getDefaultAccount();
+
+    if (account == null) return false;
+
+    return account.getUsername().equals(jid.getName())
+        && account.getDomain().equals(jid.getDomain());
   }
 
   private boolean isAccountExistNoGUI(JID jid) {
-    return getXmppAccountStore().exists(jid.getName(), jid.getDomain(), "", 0);
+    return getXmppAccountStore().existsAccount(jid.getName(), jid.getDomain(), "", 0);
   }
 
   @Override

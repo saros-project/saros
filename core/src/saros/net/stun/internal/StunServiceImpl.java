@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.PortUnreachableException;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -140,6 +141,9 @@ public final class StunServiceImpl implements IStunService {
                 new InetSocketAddress(stunAddress, stunPort),
                 new InetSocketAddress(localAddress, 0),
                 timeout);
+      } catch (PortUnreachableException e) {
+        log.warn("aborted STUN discovery: " + e.getMessage());
+        return;
       } catch (IOException e) {
         log.error("an error occurred while performing a STUN discovery: " + e.getMessage(), e);
         return;

@@ -1,7 +1,6 @@
 package saros.negotiation;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
@@ -71,8 +70,9 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       final IChecksumCache checksumCache, //
       final XMPPConnectionService connectionService, //
       final ITransmitter transmitter, //
-      final IReceiver receiver) //
-      {
+      final IReceiver receiver, //
+      final AdditionalProjectDataFactory additionalProjectDataFactory //
+      ) {
     super(
         peer,
         projects,
@@ -83,7 +83,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
         checksumCache,
         connectionService,
         transmitter,
-        receiver);
+        receiver,
+        additionalProjectDataFactory);
   }
 
   @Override
@@ -139,34 +140,42 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     String message = "Sending files to " + getPeer().getName() + "...";
     monitor.beginTask(message, transferList.size());
 
-    /* use piped stream to communicate with transfer thread */
-    PipedInputStream in = new PipedInputStream();
-    OutputStream out = new PipedOutputStream(in);
-
     String userID = getPeer().toString();
-    OutgoingFileTransfer transfer;
-    transfer = fileTransferManager.createOutgoingFileTransfer(userID);
+    OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(userID);
 
-    try {
-      OutgoingStreamProtocol osp;
-      osp = new OutgoingStreamProtocol(out, projects, monitor);
-
+    long writtenBytes = 0;
+    try (PipedInputStream in = new PipedInputStream();
+        CountingOutputStream out = new CountingOutputStream(new PipedOutputStream(in)); ) {
       /* id in description needed to bypass SendFileAction handler */
       String streamName = TRANSFER_ID_PREFIX + getID();
       transfer.sendStream(in, streamName, 0, streamName);
 
       awaitNegotation(transfer, monitor);
 
+      OutgoingStreamProtocol osp = new OutgoingStreamProtocol(out, projects, monitor);
       sendProjectConfigFiles(osp);
       sendRemainingPreferOpenedFirst(osp);
-
       osp.close();
-    } finally {
-      IOUtils.closeQuietly(out);
+
+      /* await sending is done before closing stream */
+      try {
+        while (!transfer.isDone() && transfer.getAmountWritten() != out.getByteCount()) {
+          log.debug(
+              "stream bytes written/planned "
+                  + transfer.getAmountWritten()
+                  + "/"
+                  + out.getByteCount());
+          Thread.sleep(100);
+        }
+      } catch (InterruptedException e) {
+        log.error(this + ": file transfer interrupted at closing", e);
+        Thread.currentThread().interrupt();
+      }
+      writtenBytes = out.getByteCount();
     }
 
     monitor.done();
-    log.debug(this + ": file transfer done");
+    log.debug(this + ": file transfer done, " + writtenBytes + " bytes sent");
   }
 
   @Override

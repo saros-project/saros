@@ -1,6 +1,8 @@
 package saros.concurrent.management;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import saros.activities.ChecksumActivity;
 import saros.activities.JupiterActivity;
 import saros.activities.SPath;
@@ -23,18 +25,14 @@ public class JupiterClient {
    * Jupiter instances for each local editor.
    *
    * @host and @client
+   *     <p>Note: This needs to be a *Concurrent*HashMap, because it is periodically iterated by the
+   *     HeartbeatDispatcher class.
    */
-  protected final HashMap<SPath, Jupiter> clientDocs = new HashMap<SPath, Jupiter>();
+  private final ConcurrentHashMap<SPath, Jupiter> clientDocs = new ConcurrentHashMap<>();
 
   /** @host and @client */
   protected synchronized Jupiter get(SPath path) {
-
-    Jupiter clientDoc = this.clientDocs.get(path);
-    if (clientDoc == null) {
-      clientDoc = new Jupiter(true);
-      this.clientDocs.put(path, clientDoc);
-    }
-    return clientDoc;
+    return clientDocs.computeIfAbsent(path, (key) -> new Jupiter(true));
   }
 
   public synchronized Operation receive(JupiterActivity jupiterActivity)
@@ -70,5 +68,10 @@ public class JupiterClient {
   public synchronized ChecksumActivity withTimestamp(ChecksumActivity checksumActivity) {
 
     return get(checksumActivity.getPath()).withTimestamp(checksumActivity);
+  }
+
+  // Package-private function for the HeartbeatDispatcher
+  Map<SPath, Jupiter> getClientDocs() {
+    return Collections.unmodifiableMap(clientDocs);
   }
 }

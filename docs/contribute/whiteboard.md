@@ -2,14 +2,12 @@
 title: Saros HTML Whiteboard
 ---
 
-# {{ page.title }}
-
 The Saros Whiteboard was designed to enable Saros users to communicate ideas graphically.
 
 ## Developing the Whiteboard
 
 ### Setup
-First of all, The view has to be un-commented from `saros.whiteboard/plugin.xml`, the view has the following id: `saros.whiteboard.ui.HTMLWhiteboardView`.
+First of all, the view has to be un-commented from `saros.whiteboard/plugin.xml`, the view has the following id: `saros.whiteboard.ui.HTMLWhiteboardView`.
 
 Then install the dependencies using the command `npm run setup`, note that `npm install` does not suffice.
 
@@ -24,7 +22,7 @@ The Saros HTML Whiteboard uses a graphics library called [Fabric.js](http://fabr
 
 As for the bundling, it uses [Webpack](https://webpack.js.org/) to bundle the resources using [Babel](https://babeljs.io/) loader to transpile the code to a more browser-friendly version.
 
-## How it works internally
+## How it Works Internally
 
 The Saros HTML Whiteboard builds upon the internal infrastructure of the [GEF](https://www.eclipse.org/gef/) based Whiteboard and uses most of its components such as [SXE](https://xmpp.org/extensions/xep-0284.html).
 

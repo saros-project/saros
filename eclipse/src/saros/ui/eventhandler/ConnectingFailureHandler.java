@@ -2,16 +2,15 @@ package saros.ui.eventhandler;
 
 import java.text.MessageFormat;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.XMPPError;
 import saros.account.XMPPAccount;
-import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectingFailureCallback;
-import saros.ui.util.DialogUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.WizardUtils;
-import saros.util.ThreadUtils;
+import saros.ui.util.XMPPConnectionSupport;
 
 /**
  * This UI handler is responsible for displaying error information to the user if a connection
@@ -19,86 +18,62 @@ import saros.util.ThreadUtils;
  */
 public class ConnectingFailureHandler implements IConnectingFailureCallback {
 
-  private static final Logger LOG = Logger.getLogger(ConnectingFailureHandler.class);
+  private static final Logger log = Logger.getLogger(ConnectingFailureHandler.class);
 
   private final ConnectionHandler connectionHandler;
-  private final XMPPAccountStore accountStore;
 
   private boolean isHandling;
 
-  public ConnectingFailureHandler(
-      final ConnectionHandler connectionHandler, final XMPPAccountStore accountStore) {
+  public ConnectingFailureHandler(final ConnectionHandler connectionHandler) {
     this.connectionHandler = connectionHandler;
     this.connectionHandler.setCallback(this);
-    this.accountStore = accountStore;
   }
 
   @Override
   public void connectingFailed(final Exception exception) {
-    SWTUtils.runSafeSWTAsync(
-        LOG,
-        new Runnable() {
-
-          @Override
-          public void run() {
-            handleConnectionFailed(exception);
-          }
-        });
+    SWTUtils.runSafeSWTAsync(log, () -> handleConnectionFailed(exception));
   }
 
   private void handleConnectionFailed(Exception exception) {
 
-    // account store is empty
-    if (exception == null) {
-      SWTUtils.runSafeSWTAsync(
-          LOG,
-          new Runnable() {
-
-            @Override
-            public void run() {
-              // Wizard will perform a connection attempt if it is
-              // finished
-              WizardUtils.openSarosConfigurationWizard();
-            }
-          });
-      return;
-    }
-
-    // avoid mass dialog popups
-    if (isHandling) return;
-
     try {
+
+      // avoid mass dialog popups
+      if (isHandling) return;
+
       isHandling = true;
 
       if (!(exception instanceof XMPPException)) {
-
-        DialogUtils.popUpFailureMessage(
+        MessageDialog.openError(
+            SWTUtils.getShell(),
             "Connecting Error",
             MessageFormat.format(
-                "Could not connect to XMPP server. Unexpected error: {0}", exception.getMessage()),
-            false);
-
+                "Could not connect to XMPP server. Unexpected error: {0}", exception.getMessage()));
         return;
       }
 
-      if (DialogUtils.popUpYesNoQuestion(
-          "Connecting Error",
-          generateHumanReadableErrorMessage((XMPPException) exception),
-          false)) {
+      final XMPPAccount accountUsedForConnecting =
+          XMPPConnectionSupport.getInstance().getCurrentXMPPAccount();
 
-        if (WizardUtils.openEditXMPPAccountWizard(accountStore.getActiveAccount()) == null) return;
-
-        final XMPPAccount account = accountStore.getActiveAccount();
-
-        ThreadUtils.runSafeAsync(
-            LOG,
-            new Runnable() {
-              @Override
-              public void run() {
-                connectionHandler.connect(account, false);
-              }
-            });
+      // should not happen
+      if (accountUsedForConnecting == null) {
+        log.warn(
+            "could not found the account that was used for establishing the connection - "
+                + "this can happen if connections are not established through class: "
+                + XMPPConnectionSupport.class.getSimpleName());
+        return;
       }
+
+      final String errorMessesage = generateHumanReadableErrorMessage((XMPPException) exception);
+
+      final boolean editAccountAndConnectAgain =
+          MessageDialog.openQuestion(SWTUtils.getShell(), "Connecting Error", errorMessesage);
+
+      if (!editAccountAndConnectAgain) return;
+
+      if (WizardUtils.openEditXMPPAccountWizard(accountUsedForConnecting) == null) return;
+
+      XMPPConnectionSupport.getInstance().connect(accountUsedForConnecting, false);
 
     } finally {
       isHandling = false;
@@ -114,14 +89,14 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
 
     if (error != null && error.getCode() == 504)
       return "The XMPP server could not be found. Make sure that you entered the domain part of your JID correctly.\n\nIn case of DNS or SRV problems please try to manually configure the server address and port under the advanced settings for this account or update the hosts file of your OS.\n\n"
-          + "Do you want to edit your current XMPP account now?"
+          + "Do you want to edit your current XMPP account now and try to connect again?"
           + "\n\nDetailed error:\nSMACK: "
           + error
           + "\n" //$NON-NLS-1$ //$NON-NLS-2$
           + e.getMessage();
     else if (error != null && error.getCode() == 502)
       return "Could not connect to the XMPP server. Make sure that a XMPP service is running on the given domain / IP address and port.\n\nIn case of DNS or SRV problems please try to manually configure the server address and port under the advanced settings for this account or update the hosts file of your OS.\n\n"
-          + "Do you want to edit your current XMPP account now?"
+          + "Do you want to edit your current XMPP account now and try to connect again?"
           + "\n\nDetailed error:\nSMACK: "
           + error
           + "\n" //$NON-NLS-1$ //$NON-NLS-2$
@@ -141,18 +116,18 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
 
         question =
             "Invalid username or password.\n\n"
-                + "Do you want to edit your current XMPP account now?";
+                + "Do you want to edit your current XMPP account now and try to connect again?";
       } else if (errorMessage.toLowerCase().contains("503")) { // $NON-NLS-1$
         question =
             "The XMPP server only allows authentication via SASL.\nPlease enable SASL for the current account in the account options and try again.\n\n"
-                + "Do you want to edit your current XMPP account now?";
+                + "Do you want to edit your current XMPP account now and try to connect again?";
       }
     }
 
     if (question == null)
       question =
           "Could not connect to XMPP server.\n\n"
-              + "Do you want to edit your current XMPP account now?";
+              + "Do you want to edit your current XMPP account now and try to connect again?";
 
     return question;
   }

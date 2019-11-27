@@ -1,26 +1,9 @@
-/*
- * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
- * (c) Riad Djemili - 2006
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 1, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- */
 package saros.session;
 
 import java.util.*;
 import saros.net.xmpp.JID;
+import saros.preferences.IPreferenceStore;
+import saros.preferences.PreferenceStore;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse instance for the use in one
@@ -45,96 +28,27 @@ public class User {
     READONLY_ACCESS
   }
 
-  private final boolean isHost;
-
-  private final boolean isLocal;
-
   private final JID jid;
-
-  private volatile int colorID;
-
-  private final int favoriteColorID;
+  private final boolean isHost;
+  private final boolean isLocal;
+  private final IPreferenceStore preferences;
 
   @Deprecated
   private volatile Permission permission = Permission.WRITE_ACCESS;
-  
-  
-  
-  
-  
-  
-  /* More flexible Permissions also known as Privilege */
-  private Map<UserPrivilege.Keys, UserPrivilege> privileges;
-  public Map<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
-      return this.privileges;
-  }
-  public void setPrivileges(Map<UserPrivilege.Keys, UserPrivilege> privileges) {
-      this.privileges = privileges;
-  }
-  public void addPrivilege(UserPrivilege privilege) {
-      this.privileges.put(privilege.getKey(), privilege);
-  }
-  // get any privileges value or false
-  public boolean hasPrivilege(UserPrivilege.Keys privilege) {
-//System.out.println("3 - hasPrivilege() " + privilege + " : " + this.privileges.containsKey(privilege));
-	  if (this.privileges.containsKey(privilege)) {
-		  return this.privileges.get(privilege).getValue();
-	  }
-	  return false;
-  }
-
-  // convenience functions to privilege values
-  public boolean hasReadOnlyAccessPrivilege() {
-//System.out.println("3 - User.hasReadOnlyAccessPrivilege() " + hasPrivilege(UserPrivilege.Privilege.READONLY_ACCESS));
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS);
-  }
-  public boolean hasWriteAccessPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_WRITE_ACCESS);
-  }
-  public boolean hasShareDocumentPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_SHARE_DOCUMENT);
-  }
-  public boolean hasInvitePrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_INVITE_USER);
-  }
-  public boolean hasGrantPermissionPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_GRANT_PERMISSION);
-  }
-  public boolean hasJoinSessionPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_JOIN);
-  }
-  public boolean hasStartSessionServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_START_SERVER);
-  }
-  public boolean hasStopSessionServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_STOP_SERVER);
-  }
-  public boolean hasDeleteSessionDataPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.SESSION_DELETE_DATA);
-  }
-  public boolean hasConfigureServerPrivilege() {
-	  return hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER);
-  }
-  
-  
-  
-  
-  
-  
-  
-  
 
   private volatile boolean isInSession;
 
-  public User(JID jid, boolean isHost, boolean isLocal, int colorID, int favoriteColorID) {
-
+  public User(JID jid, boolean isHost, boolean isLocal, IPreferenceStore preferences) {
     this.jid = jid;
     this.isHost = isHost;
     this.isLocal = isLocal;
-    this.colorID = colorID;
-    this.favoriteColorID = favoriteColorID;
-    
-    this.privileges = new HashMap<UserPrivilege.Keys, UserPrivilege>();
+
+    if (preferences == null) {
+      this.preferences = new PreferenceStore();
+    } else {
+      this.preferences = preferences;
+    }
+>>>>>>> upstream/master
   }
 
   /**
@@ -223,11 +137,11 @@ public class User {
   }
 
   public int getColorID() {
-    return colorID;
+    return preferences.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
   }
 
   public int getFavoriteColorID() {
-    return favoriteColorID;
+    return preferences.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
   }
 
   /**
@@ -256,19 +170,12 @@ public class User {
     return !isHost();
   }
 
-  /**
-   * FOR INTERNAL USE ONLY
-   *
-   * @param colorID
-   * @deprecated this must only be called by the component that handles color changes
-   */
-  @Deprecated
-  public void setColorID(int colorID) {
-    this.colorID = colorID;
-  }
-
   /** FOR INTERNAL USE ONLY */
   public void setInSession(boolean isInSession) {
     this.isInSession = isInSession;
+  }
+
+  public IPreferenceStore getPreferences() {
+    return preferences;
   }
 }

@@ -26,7 +26,7 @@ public class ServerEditorManager implements IEditorManager {
 
   private static final Logger LOG = Logger.getLogger(ServerEditorManager.class);
 
-  private Map<SPath, Editor> openEditors = Collections.synchronizedMap(new LRUMap(10));
+  private Map<SPath, Editor> openEditors = Collections.synchronizedMap(new LRUMap<>(10));
   private List<ISharedEditorListener> listeners = new CopyOnWriteArrayList<>();
 
   @Override

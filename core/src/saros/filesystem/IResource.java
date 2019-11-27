@@ -48,15 +48,18 @@ public interface IResource {
   public int getType();
 
   /**
-   * Equivalent to the Eclipse call <code>IResource#isDerived(checkAncestors ?
-   * IResource#CHECK_ANCESTORS : IResource#NONE)</code>
+   * Returns whether the resource should be ignored. Resources should be ignored if they match any
+   * of the following characteristics:
    *
-   * @param checkAncestors
-   * @return
+   * <ul>
+   *   <li>Their direct manipulation can cause unwanted side effects to the filesystem, IDE, or IDE
+   *       configuration.
+   *   <li>They are not of interest to the IDE. (This mostly concerns things like build artifacts.)
+   * </ul>
+   *
+   * @return whether the resource should be ignored
    */
-  public boolean isDerived(boolean checkAncestors);
-
-  public boolean isDerived();
+  public boolean isIgnored();
 
   /** Equivalent to the Eclipse call <code>IResource#delete(updateFlags, null)</code> */
   public void delete(int updateFlags) throws IOException;

@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import saros.activities.FileActivity;
@@ -38,10 +39,10 @@ import saros.activities.IActivity;
 import saros.activities.IFileSystemModificationActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.NOPActivity;
+import saros.activities.SPath;
 import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
 import saros.concurrent.management.ConcurrentDocumentClient;
-import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.context.IContainerContext;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
@@ -54,7 +55,6 @@ import saros.net.xmpp.XMPPConnectionService;
 import saros.preferences.IPreferenceStore;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.repackaged.picocontainer.annotations.Inject;
-import saros.session.ColorNegotiationHook;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.IActivityHandlerCallback;
@@ -93,12 +93,12 @@ public final class SarosSession implements ISarosSession {
 
   private final ConcurrentDocumentClient concurrentDocumentClient;
 
-  private final ConcurrentDocumentServer concurrentDocumentServer;
-
   private final ActivityHandler activityHandler;
 
   private final CopyOnWriteArrayList<IActivityProducer> activityProducers =
       new CopyOnWriteArrayList<IActivityProducer>();
+
+  private final Set<IProject> filteredProjects = new CopyOnWriteArraySet<>();
 
   private final List<IActivityConsumer> activeActivityConsumers =
       new CopyOnWriteArrayList<IActivityConsumer>();
@@ -109,9 +109,6 @@ public final class SarosSession implements ISarosSession {
   private final User localUser;
 
   private final ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
-
-  private final ConcurrentHashMap<User, IPreferenceStore> userProperties =
-      new ConcurrentHashMap<User, IPreferenceStore>();
 
   private final SessionListenerDispatch listenerDispatch = new SessionListenerDispatch();
 
@@ -168,6 +165,17 @@ public final class SarosSession implements ISarosSession {
 
         @Override
         public void execute(IActivity activity) {
+          // Filters out resource activities for projects whose activity execution is disabled
+          if (activity instanceof IResourceActivity) {
+            SPath path = ((IResourceActivity) activity).getPath();
+
+            if (path != null && filteredProjects.contains(path.getProject())) {
+              log.debug("Dropped activity for resource of filtered project: " + activity);
+
+              return;
+            }
+          }
+
           /**
            * @JTourBusStop 10, Activity sending, Local Execution, first dispatch:
            *
@@ -361,7 +369,7 @@ public final class SarosSession implements ISarosSession {
    * proper initialization etc. of User objects !
    */
   @Override
-  public void addUser(final User user, IPreferenceStore properties) {
+  public void addUser(final User user) {
 
     // TODO synchronize this method !
 
@@ -376,9 +384,6 @@ public final class SarosSession implements ISarosSession {
     if (participants.putIfAbsent(jid, user) != null) {
       log.error("user " + user + " added twice to SarosSession", new StackTrace());
       throw new IllegalArgumentException();
-    }
-    if (this.userProperties.putIfAbsent(user, properties) != null) {
-      log.warn("user " + user + " already has properties");
     }
 
     /*
@@ -493,9 +498,6 @@ public final class SarosSession implements ISarosSession {
       log.error("tried to remove user " + user + " who was never added to the session");
       return;
     }
-    if (userProperties.remove(user) == null) {
-      log.error("tried to remove properties of user " + user + " that were never initialized");
-    }
 
     activitySequencer.unregisterUser(user);
 
@@ -567,6 +569,17 @@ public final class SarosSession implements ISarosSession {
   @Override
   public void removeListener(ISessionListener listener) {
     listenerDispatch.remove(listener);
+  }
+
+  @Override
+  public void setActivityExecution(IProject project, boolean enabled) {
+    if (project != null) {
+      if (!enabled) {
+        filteredProjects.add(project);
+      } else {
+        filteredProjects.remove(project);
+      }
+    }
   }
 
   @Override
@@ -666,13 +679,6 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public IPreferenceStore getUserProperties(User user) {
-    if (user == null) throw new IllegalArgumentException("user is null");
-
-    return userProperties.get(user);
-  }
-
-  @Override
   public JID getResourceQualifiedJID(JID jid) {
 
     if (jid == null) throw new IllegalArgumentException("jid is null");
@@ -692,13 +698,6 @@ public final class SarosSession implements ISarosSession {
   @Override
   public ConcurrentDocumentClient getConcurrentDocumentClient() {
     return concurrentDocumentClient;
-  }
-
-  @Override
-  public ConcurrentDocumentServer getConcurrentDocumentServer() {
-    if (!isHost()) throw new IllegalStateException("the session is running in client mode");
-
-    return concurrentDocumentServer;
   }
 
   @Override
@@ -1074,25 +1073,17 @@ public final class SarosSession implements ISarosSession {
 
     assert localUserJID != null;
 
-    int localColorID = localProperties.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
-    int localFavoriteColorID = localProperties.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
-    localUser = new User(localUserJID, host == null, true, localColorID, localFavoriteColorID);
-
+    localUser = new User(localUserJID, host == null, true, localProperties);
     localUser.setInSession(true);
 
     if (host == null) {
       hostUser = localUser;
       participants.put(hostUser.getJID(), hostUser);
-      userProperties.put(hostUser, localProperties);
     } else {
-      int hostColorID = hostProperties.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
-      int hostFavoriteColorID = hostProperties.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
-      hostUser = new User(host, true, false, hostColorID, hostFavoriteColorID);
+      hostUser = new User(host, true, false, hostProperties);
       hostUser.setInSession(true);
       participants.put(hostUser.getJID(), hostUser);
       participants.put(localUser.getJID(), localUser);
-      userProperties.put(hostUser, hostProperties);
-      userProperties.put(localUser, localProperties);
     }
 
     sessionContainer = context.createChildContainer();
@@ -1104,8 +1095,6 @@ public final class SarosSession implements ISarosSession {
 
     // Force the creation of the components added to the session container.
     sessionContainer.getComponents();
-
-    concurrentDocumentServer = sessionContainer.getComponent(ConcurrentDocumentServer.class);
 
     concurrentDocumentClient = sessionContainer.getComponent(ConcurrentDocumentClient.class);
 

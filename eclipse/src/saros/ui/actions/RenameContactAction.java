@@ -10,13 +10,12 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.RosterEntry;
 import saros.SarosPluginContext;
-import saros.net.ConnectionState;
-import saros.net.xmpp.IConnectionListener;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.XMPPContact;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
@@ -36,13 +35,7 @@ public class RenameContactAction extends Action {
 
   private static final Logger LOG = Logger.getLogger(RenameContactAction.class);
 
-  protected IConnectionListener connectionListener =
-      new IConnectionListener() {
-        @Override
-        public void connectionStateChanged(Connection connection, final ConnectionState newState) {
-          updateEnablement();
-        }
-      };
+  private IConnectionStateListener connectionListener = (state, error) -> updateEnablement();
 
   protected ISelectionListener selectionListener =
       new ISelectionListener() {
@@ -52,7 +45,8 @@ public class RenameContactAction extends Action {
         }
       };
 
-  @Inject private XMPPConnectionService connectionService;
+  @Inject private ConnectionHandler connectionHandler;
+  @Inject private XMPPContactsService contactsService;
 
   public RenameContactAction() {
     super(Messages.RenameContactAction_title);
@@ -63,7 +57,7 @@ public class RenameContactAction extends Action {
 
     SarosPluginContext.initComponent(this);
 
-    connectionService.addListener(connectionListener);
+    connectionHandler.addConnectionStateListener(connectionListener);
 
     SelectionUtils.getSelectionService().addSelectionListener(selectionListener);
     updateEnablement();
@@ -72,7 +66,7 @@ public class RenameContactAction extends Action {
   protected void updateEnablement() {
     List<JID> contacts = SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
 
-    setEnabled(connectionService.isConnected() && contacts.size() == 1);
+    setEnabled(connectionHandler.isConnected() && contacts.size() == 1);
   }
 
   @Override
@@ -82,23 +76,23 @@ public class RenameContactAction extends Action {
         new Runnable() {
           @Override
           public void run() {
-            RosterEntry rosterEntry = null;
-            List<RosterEntry> selectedRosterEntries =
-                SelectionRetrieverFactory.getSelectionRetriever(RosterEntry.class).getSelection();
+            XMPPContact contact = null;
+            List<XMPPContact> selectedRosterEntries =
+                SelectionRetrieverFactory.getSelectionRetriever(XMPPContact.class).getSelection();
             if (selectedRosterEntries.size() == 1) {
+              contact = selectedRosterEntries.get(0);
               /*
                * TODO Why forbid renaming self? Is the own entry displayed
                * at all?
                */
-              // Compare the plain-JID portion of the XMPP address
-              if (!new JID(selectedRosterEntries.get(0).getUser())
-                  .equals(connectionService.getJID())) {
-                rosterEntry = selectedRosterEntries.get(0);
+              if (contact.getBareJid().equals(connectionHandler.getLocalJID())) {
+                LOG.error("Rename of own contact is forbidden!");
+                return;
               }
             }
 
-            if (rosterEntry == null) {
-              LOG.error("RosterEntry should not be null at this point!"); // $NON-NLS-1$
+            if (contact == null) {
+              LOG.error("XMPPContact should not be null at this point!"); // $NON-NLS-1$
               return;
             }
 
@@ -109,28 +103,18 @@ public class RenameContactAction extends Action {
 
             String message =
                 MessageFormat.format(
-                    Messages.RenameContactAction_rename_message, rosterEntry.getUser());
-
-            if (rosterEntry.getName() != null
-                && !rosterEntry.getName().equals(rosterEntry.getUser())) {
-              message +=
-                  MessageFormat.format(
-                      Messages.RenameContactAction_rename_current_nickname_message,
-                      rosterEntry.getName());
-            }
-            message += ":"; // $NON-NLS-1$
+                    Messages.RenameContactAction_rename_message, contact.getDisplayableNameLong());
 
             InputDialog dialog =
                 new InputDialog(
                     shell,
                     Messages.RenameContactAction_new_nickname_dialog_title,
                     message,
-                    rosterEntry.getName(),
+                    contact.getNickname().orElse(""),
                     null);
 
             if (dialog.open() == Window.OK) {
-              String newName = dialog.getValue();
-              rosterEntry.setName(newName.length() == 0 ? null : newName);
+              contactsService.renameContact(contact, dialog.getValue());
             }
           }
         });
@@ -138,6 +122,6 @@ public class RenameContactAction extends Action {
 
   public void dispose() {
     SelectionUtils.getSelectionService().removeSelectionListener(selectionListener);
-    connectionService.removeListener(connectionListener);
+    connectionHandler.removeConnectionStateListener(connectionListener);
   }
 }

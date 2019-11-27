@@ -28,20 +28,19 @@ import saros.session.internal.SarosSession;
 public class SessionContentAdapterFactory implements IAdapterFactory {
 
   @Override
-  @SuppressWarnings("rawtypes")
-  public Class[] getAdapterList() {
+  public Class<?>[] getAdapterList() {
     return new Class[] {User.class};
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
-  public Object getAdapter(Object adaptableObject, Class adapterType) {
+  public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
     if (adapterType != User.class) return null;
 
-    if (adaptableObject instanceof UserElement) return ((UserElement) adaptableObject).getUser();
+    if (adaptableObject instanceof UserElement)
+      return adapterType.cast(((UserElement) adaptableObject).getUser());
 
     if (adaptableObject instanceof AwarenessInformationTreeElement)
-      return ((AwarenessInformationTreeElement) adaptableObject).getUser();
+      return adapterType.cast(((AwarenessInformationTreeElement) adaptableObject).getUser());
 
     return null;
   }

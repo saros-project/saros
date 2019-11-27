@@ -90,7 +90,10 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
       LOG.debug(connection + " ReceiverThread started.");
       try {
-        while (!isInterrupted()) listener.receive(readNextXMPPExtension());
+        while (!isInterrupted()) {
+          final BinaryXMPPExtension extension = readNextXMPPExtension();
+          if (receiver != null) receiver.receive(extension);
+        }
 
       } catch (SocketException e) {
         LOG.debug(connection + " connection closed locally: " + e.getMessage());
@@ -105,6 +108,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
       }
     }
   }
+
+  private IBinaryXMPPExtensionReceiver receiver;
 
   public BinaryChannelConnection(
       JID localAddress,
@@ -124,6 +129,13 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     outputStream = new DataOutputStream(new BufferedOutputStream(stream.getOutputStream()));
     inputStream = new DataInputStream(new BufferedInputStream(stream.getInputStream()));
+  }
+
+  @Override
+  public void setBinaryXMPPExtensionReceiver(IBinaryXMPPExtensionReceiver receiver) {
+    if (this.receiver != null || receiver == null) return;
+
+    this.receiver = receiver;
   }
 
   @Override
@@ -208,8 +220,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
       Integer elementNameId;
 
       synchronized (this) {
-        boolean sendUpdate = false;
-
         final String namespace = data.getNamespace();
         namespaceId = outNamespaceCache.get(namespace);
 
@@ -229,7 +239,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
           outputStream.write(Opcode.NAMESPACE_UPDATE);
           outputStream.write(namespaceId);
           outputStream.writeUTF(namespace);
-          sendUpdate = true;
         }
 
         final String elementName = data.getElementName();
@@ -251,10 +260,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
           outputStream.write(Opcode.ELEMENT_NAME_UPDATE);
           outputStream.writeShort(elementNameId);
           outputStream.writeUTF(elementName);
-          sendUpdate = true;
         }
-
-        if (sendUpdate) outputStream.flush();
       }
 
       assert content.length > 0;
@@ -452,7 +458,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     outputStream.write(namespaceId);
     outputStream.writeShort(elementNameId);
     outputStream.write(compress ? 1 : 0);
-    outputStream.flush();
   }
 
   /** Splits the given data into chunks of CHUNKSIZE to send the BinaryPackets. */

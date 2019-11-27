@@ -30,9 +30,9 @@ import saros.session.SessionEndReason;
 import saros.session.User;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
-import saros.ui.util.ModelFormatUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.selection.SelectionUtils;
+import saros.util.CoreUtils;
 
 /** Action to enter into FollowMode via toolbar. */
 public class FollowModeAction extends Action implements IMenuCreator, Disposable {
@@ -330,6 +330,6 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
   }
 
   private String getFollowUserMessage(User user) {
-    return ModelFormatUtils.format(Messages.FollowModeAction_follow_user, user);
+    return CoreUtils.format(Messages.FollowModeAction_follow_user, user);
   }
 }

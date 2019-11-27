@@ -12,7 +12,7 @@ import saros.activities.ProgressActivity;
 import saros.activities.ProgressActivity.ProgressAction;
 import saros.session.User;
 import saros.ui.Messages;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
 /** Eclipse-specific implementation of the {@link IRemoteProgressIndicator} interface. */
 final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicator {
@@ -64,8 +64,7 @@ final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicat
     started = true;
 
     final Job job =
-        new Job(
-            ModelFormatUtils.format(Messages.RemoteProgress_observing_progress_for, remoteUser)) {
+        new Job(CoreUtils.format(Messages.RemoteProgress_observing_progress_for, remoteUser)) {
           @Override
           protected IStatus run(IProgressMonitor monitor) {
             try {

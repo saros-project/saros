@@ -26,11 +26,9 @@ import java.util.concurrent.CancellationException;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.concurrent.management.ConcurrentDocumentClient;
-import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
-import saros.preferences.IPreferenceStore;
 import saros.session.IActivityConsumer.Priority;
 import saros.session.User.Permission;
 import saros.synchronize.StopManager;
@@ -102,9 +100,8 @@ public interface ISarosSession {
    * will be noticed about the new user.
    *
    * @param user the user that is to be added
-   * @param preferences the initial properties of the new user
    */
-  public void addUser(User user, IPreferenceStore preferences);
+  public void addUser(User user);
 
   /**
    * Informs all listeners that a user now has Projects and can process {@link IResourceActivity}s.
@@ -154,6 +151,21 @@ public interface ISarosSession {
   public void removeListener(ISessionListener listener);
 
   /**
+   * Enables or disables the execution of received activities for the given project. If the
+   * execution is disabled, activities for resources of the given projects will be dropped without
+   * being applied.
+   *
+   * <p>This method can be used to disable the execution of received activities for projects that
+   * are no longer available (i.e. are no longer part of the session or are no longer
+   * present/accessible locally).
+   *
+   * @param project the shared project to enable or disable the activity execution for
+   * @param enabled <code>true</code> to enable or <code>false</code> to disable the activity
+   *     execution
+   */
+  public void setActivityExecution(IProject project, boolean enabled);
+
+  /**
    * @return the shared projects associated with this session, never <code>null</code> but may be
    *     empty
    */
@@ -177,15 +189,6 @@ public interface ISarosSession {
    *     a JID exists in the session
    */
   public User getUser(JID jid);
-
-  /**
-   * Given a user, this method will return this users session properties.
-   *
-   * @param user the user to get the preferences for
-   * @return Properties of the given user or <code>null</code> if the user is not known to the
-   *     session
-   */
-  public IPreferenceStore getUserProperties(User user);
 
   /**
    * Given a JID (resource qualified or not), will return the resource qualified JID associated with
@@ -215,13 +218,6 @@ public interface ISarosSession {
    * @immutable This method will always return the same value for this session
    */
   public User getLocalUser();
-
-  /**
-   * the concurrent document manager is responsible for all jupiter controlled documents
-   *
-   * @return the concurrent document manager
-   */
-  public ConcurrentDocumentServer getConcurrentDocumentServer();
 
   /**
    * the concurrent document manager is responsible for all jupiter controlled documents

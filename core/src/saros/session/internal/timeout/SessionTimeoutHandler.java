@@ -96,7 +96,7 @@ abstract class SessionTimeoutHandler implements Startable {
 
     if (session.isHost()) {
       ThreadUtils.runSafeAsync(
-          "dpp-kill-user-" + jid.getName() + "-" + threadName,
+          "kill-user-" + jid.getName() + "-" + threadName,
           LOG,
           new Runnable() {
             @Override
@@ -107,7 +107,7 @@ abstract class SessionTimeoutHandler implements Startable {
           });
     } else {
       ThreadUtils.runSafeAsync(
-          "dpp-kill-session-" + threadName,
+          "kill-session-" + threadName,
           LOG,
           new Runnable() {
             @Override

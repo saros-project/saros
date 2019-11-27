@@ -1,9 +1,15 @@
 package saros.editor;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.apache.log4j.Logger;
 import saros.activities.EditorActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
+import saros.activities.StartFollowingActivity;
+import saros.activities.StopFollowingActivity;
 import saros.activities.TextEditActivity;
 import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
@@ -34,6 +40,9 @@ import saros.session.User;
  * from a inheritance-based to a composition-based style, just like the {@link IContextFactory}s.)
  */
 public class FollowModeManager implements Startable {
+
+  private static final Logger log = Logger.getLogger(FollowModeManager.class);
+
   private final ISarosSession session;
 
   private final IEditorManager editorManager;
@@ -42,6 +51,8 @@ public class FollowModeManager implements Startable {
   private User localUser;
   private User currentlyFollowedUser;
 
+  private final Map<User, User> followModeStates = Collections.synchronizedMap(new HashMap<>());
+
   private final CopyOnWriteArrayList<IFollowModeListener> listeners = new CopyOnWriteArrayList<>();
 
   /** If the user left which I am following, then stop following him/her */
@@ -49,6 +60,9 @@ public class FollowModeManager implements Startable {
       new ISessionListener() {
         @Override
         public void userLeft(User user) {
+
+          followModeStates.remove(user);
+
           if (!isFollowing()) return;
 
           if (user.equals(currentlyFollowedUser)) {
@@ -90,6 +104,26 @@ public class FollowModeManager implements Startable {
             dropFollowModeState();
             notifyStopped(reason);
           }
+        }
+      };
+
+  private IActivityConsumer remoteFollowStates =
+      new AbstractActivityConsumer() {
+        @Override
+        public void receive(StartFollowingActivity activity) {
+          final User follower = activity.getSource();
+          final User followee = activity.getFollowedUser();
+
+          followModeStates.put(follower, followee);
+          notifyRemoteStarted(follower, followee);
+        }
+
+        @Override
+        public void receive(StopFollowingActivity activity) {
+          final User follower = activity.getSource();
+
+          followModeStates.remove(follower);
+          notifyRemoteStopped(follower);
         }
       };
 
@@ -173,7 +207,7 @@ public class FollowModeManager implements Startable {
 
     session.addListener(stopFollowingWhenUserLeaves);
     session.addActivityConsumer(mirrorRemoteEditor, Priority.ACTIVE);
-
+    session.addActivityConsumer(remoteFollowStates, Priority.ACTIVE);
     editorManager.addSharedEditorListener(stopFollowingOnOwnActions);
   }
 
@@ -182,10 +216,13 @@ public class FollowModeManager implements Startable {
     localUser = null;
     currentlyFollowedUser = null;
 
+    session.removeActivityConsumer(remoteFollowStates);
     session.removeActivityConsumer(mirrorRemoteEditor);
     session.removeListener(stopFollowingWhenUserLeaves);
 
     editorManager.removeSharedEditorListener(stopFollowingOnOwnActions);
+
+    followModeStates.clear();
   }
 
   /* Public methods */
@@ -212,10 +249,13 @@ public class FollowModeManager implements Startable {
    *     should be followed.
    */
   public void follow(User newFollowedUser) {
-    assert newFollowedUser == null || !newFollowedUser.equals(session.getLocalUser())
+
+    final User localUser = session.getLocalUser();
+
+    assert newFollowedUser == null || !newFollowedUser.equals(localUser)
         : "local user cannot follow himself!";
 
-    User previouslyFollowedUser = currentlyFollowedUser;
+    final User previouslyFollowedUser = currentlyFollowedUser;
 
     currentlyFollowedUser = newFollowedUser;
 
@@ -223,11 +263,15 @@ public class FollowModeManager implements Startable {
       editorManager.jumpToUser(newFollowedUser);
 
       if (previouslyFollowedUser != null) {
+        followModeStates.remove(localUser);
         notifyStopped(Reason.FOLLOWER_SWITCHES_FOLLOWEE);
       }
+
+      followModeStates.put(localUser, newFollowedUser);
       notifyStarted(newFollowedUser);
 
     } else if (newFollowedUser == null && previouslyFollowedUser != null) {
+      followModeStates.remove(localUser);
       notifyStopped(Reason.FOLLOWER_STOPPED);
     }
   }
@@ -262,6 +306,17 @@ public class FollowModeManager implements Startable {
     return currentlyFollowedUser;
   }
 
+  /**
+   * Returns the current follow mode states as a snapshot.
+   *
+   * @return the current follow mode states, never <code>null</code>
+   */
+  public FollowModeStates getFollowModeStates() {
+    synchronized (followModeStates) {
+      return new FollowModeStates(followModeStates);
+    }
+  }
+
   /* Listener related */
 
   /**
@@ -281,16 +336,43 @@ public class FollowModeManager implements Startable {
 
   private void notifyStopped(Reason reason) {
     for (IFollowModeListener listener : listeners) {
-      listener.stoppedFollowing(reason);
+      try {
+        listener.stoppedFollowing(reason);
+      } catch (RuntimeException e) {
+        log.error("error while calling listener " + listener, e);
+      }
     }
   }
 
   private void notifyStarted(User followee) {
     for (IFollowModeListener listener : listeners) {
-      listener.startedFollowing(followee);
+      try {
+        listener.startedFollowing(followee);
+      } catch (RuntimeException e) {
+        log.error("error while calling listener " + listener, e);
+      }
     }
   }
 
+  private void notifyRemoteStarted(final User follower, final User followee) {
+    for (IFollowModeListener listener : listeners) {
+      try {
+        listener.startedFollowing(follower, followee);
+      } catch (RuntimeException e) {
+        log.error("error while calling listener " + listener, e);
+      }
+    }
+  }
+
+  private void notifyRemoteStopped(final User follower) {
+    for (IFollowModeListener listener : listeners) {
+      try {
+        listener.stoppedFollowing(follower);
+      } catch (RuntimeException e) {
+        log.error("error while calling listener " + listener, e);
+      }
+    }
+  }
   /**
    * Drops the currently held state of the follow mode, thereby ending the current follow mode.
    *

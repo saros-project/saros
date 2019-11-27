@@ -12,18 +12,11 @@ sourceSets {
 jar {
   manifest {
     attributes 'Main-Class': 'saros.server.SarosServer'
+
   }
   from {
     configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
   }
   from ('src/log4j.properties')
   exclude '**/*.jar'
-}
-
-sonarqube {
-  properties {
-    property 'sonar.projectName', 'Saros/Server'
-    property 'sonar.projectDescription', 'Standalone Saros Server'
-    property 'sonar.projectVersion', '0.1.0.DEVEL'
-  }
 }

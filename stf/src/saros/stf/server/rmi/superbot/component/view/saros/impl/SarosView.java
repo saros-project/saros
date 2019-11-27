@@ -392,11 +392,9 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     Chatroom.getInstance()
         .setChatTab(
             new SWTBotCTabItem(
-                (CTabItem)
-                    view.bot()
-                        .widget(
-                            allOf(widgetOfType(CTabItem.class), withRegex(regex)),
-                            view.getWidget())));
+                view.bot()
+                    .widget(
+                        allOf(widgetOfType(CTabItem.class), withRegex(regex)), view.getWidget())));
 
     return Chatroom.getInstance();
   }

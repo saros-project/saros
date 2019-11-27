@@ -25,7 +25,6 @@ import saros.net.xmpp.JID;
 import saros.net.xmpp.discovery.DiscoveryManager;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.PreferenceStore;
-import saros.session.ColorNegotiationHook;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.User;
@@ -184,9 +183,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
       IPreferenceStore clientProperties = new PreferenceStore();
       applySessionParameters(
-          actualSessionParameters,
-          sarosSession.getUserProperties(sarosSession.getHost()),
-          clientProperties);
+          actualSessionParameters, sarosSession.getHost().getPreferences(), clientProperties);
 
       User newUser = completeInvitation(clientProperties, monitor);
 
@@ -461,14 +458,16 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     monitor.setTaskName("Synchronizing user list...");
 
-    int clientColorID = properties.getInt(ColorNegotiationHook.KEY_INITIAL_COLOR);
-    int clientFavoriteColorID = properties.getInt(ColorNegotiationHook.KEY_FAV_COLOR);
-    User user = new User(getPeer(), false, false, clientColorID, clientFavoriteColorID);
+    User user = new User(getPeer(), false, false, properties);
 
     synchronized (REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE) {
-      sarosSession.addUser(user, properties);
+      sarosSession.addUser(user);
       log.debug(
-          this + " : added " + getPeer() + " to the current session, colorID: " + clientColorID);
+          this
+              + " : added "
+              + getPeer()
+              + " to the current session, colorID: "
+              + user.getColorID());
 
       /* *
        *

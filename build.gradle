@@ -9,13 +9,8 @@ buildscript
 }
 
 plugins {
-  id "de.monkeyworks.buildmonkey.mavenizer.MavenizerPlugin" version "0.4.2"
-  id 'com.gradle.build-scan' version '2.0.2'
-  id 'org.sonarqube' version '2.6.2'
+  id 'com.gradle.build-scan' version '2.4.1'
 }
-
-// avoid that the buildmonkey plugin triggers verbose ant logging
-ant.lifecycleLogLevel = "ERROR"
 
 // Use gradle scan plugin and service in order to visualize build/test failures
 buildScan {
@@ -24,46 +19,30 @@ buildScan {
  publishOnFailure()
 }
 
-// Configuration that leads to the conversion of the eclipse home dir
-// (which is also a P2 repository) to a maven repository.
-mavenize {
-  mavenizeTask {
-    useP2MirrorOutput = false
-    sourceP2Repository = System.getenv('ECLIPSE_HOME')
-    targetDir = rootProject.file('build/maven')
-    groupId = 'eclipse-deps'
+
+// Adjust Intellij module configuration for all sub-projects
+configure(subprojects) {projectToConf->
+  apply plugin: 'idea'
+
+  idea{
+    module{
+      excludeDirs += [file("bin"), file("lib"), file("libs")]
+    }
   }
 }
 
-sonarqube {
-  properties {
-    property 'sonar.preview.excludePlugins', 'devcockpit, jira, pdfreport, views, report, buildstability, scmactivity, buildbreaker, scmstats'
-    property 'sonar.projectName', 'Saros/Complete'
-    property 'sonar.projectKey', 'saros_complete'
-    property 'sonar.projectDescription', 'The whole Saros product family'
-    property 'sonar.projectVersion', '14.11.28.DEVEL'
-    property 'sonar.cpd.cross_project', 'true'
-  }
-}
 
-ext.projectsToConfigure = subprojects - project(':saros.ui.frontend') - project(':saros.picocontainer')
+ext.projectsToConfigure = subprojects - project(':saros.picocontainer')
+
 // Configurations that are specific to all subprojects
-// saros.ui.frontend is not a real subproject and contains
-// only a build.gradle in order to allow to scan the sources of this subproject
 configure(projectsToConfigure) { projectToConf ->
 
-  apply plugin: 'eclipse'
   apply plugin: 'java' // default java build plugin
-  apply plugin: 'jacoco' // code coverage tool
+  apply plugin: 'saros.gradle.eclipse.plugin'
 
   repositories {
     // general purpose repository
     mavenCentral()
-    // repositories for specific artifacts
-    maven {
-      url 'http://maven-eclipse.github.io/maven'
-      content { includeGroup 'org.eclipse.swt' }
-    }
   }
 
   configurations {
@@ -78,6 +57,7 @@ configure(projectsToConfigure) { projectToConf ->
 
     // Exclude test suites if property is set. Otherwise tests are executed multiple times
     // in the ci server (via test class and suite).
+    // see gradle.properties for default values
     if (projectToConf.hasProperty('skipTestSuites') && skipTestSuites.equalsIgnoreCase("true")) {
       exclude '**/*TestSuite*'
     }
@@ -91,6 +71,7 @@ configure(projectsToConfigure) { projectToConf ->
       exclude 'saros/stf/test/stf/*'
     }
 
+    // Don't execute abstract test classes
     exclude '**/Abstract*'
 
     testLogging {
@@ -101,14 +82,16 @@ configure(projectsToConfigure) { projectToConf ->
 
   projectToConf.ext.junitVersion = 'junit:junit:4.12'
   projectToConf.ext.log4jVersion = 'log4j:log4j:1.2.15'
-
-  dependencies {
-    compile (log4jVersion) {
+  projectToConf.ext.addLog4JDependency = { config ->
+    config.dependencies.add(dependencies.create('log4j:log4j:1.2.15') {
       exclude group: 'com.sun.jmx', module: 'jmxri'
       exclude group: 'com.sun.jdmk', module: 'jmxtools'
       exclude group: 'javax.jms', module: 'jms'
-    }
+    })
+  }
 
+  dependencies {
+    addLog4JDependency(configurations.testConfig)
     testConfig junitVersion
     testConfig 'org.easymock:easymock:3.5.1'
     testConfig 'org.powermock:powermock-core:2.0.0'
@@ -125,37 +108,17 @@ configure(projectsToConfigure) { projectToConf ->
     from projectToConf.configurations.releaseDep
   }
 
-  projectToConf.ext.eclipseHome = projectToConf.hasProperty('eclipseHome') ? eclipseHome : System.getenv('ECLIPSE_HOME')
   projectToConf.ext.intellijHome = projectToConf.hasProperty('intellijHome') ? intellijHome : System.getenv('INTELLIJ_HOME')
-
-    // In order to use the relocated shadowJar of picocontainer it is necessary to replace
-    // the eclipse classpath entry that points to the sources of saros.picocontainer with
-    // the reference to the reloacted jar
-    eclipse.classpath {
-      file {
-        whenMerged { classpath ->
-          classpath.entries.removeAll{ it.path.contains('saros.picocontainer')}
-        }
-        withXml {
-          String jarPath = project(':saros.picocontainer').configurations.getByName('shadow').artifacts.first().file
-          it.asNode().appendNode('classpathentry', [kind: 'lib', path: jarPath])
-             .appendNode('attributes')
-             .appendNode('attribute', [name: 'gradle_used_by_scope', value: 'main,test'])
-          }
-        }
-    }
+  projectToConf.ext.intellijSandboxDir = System.getenv('SAROS_INTELLIJ_SANDBOX')
 }
 
-
 // remove all build dirs. The frontend package has no build directory
-task cleanAll(dependsOn: projectsToConfigure.collect{":${it.name}:clean"} << 'clean')
+task cleanAll(dependsOn: projectsToConfigure.collect{":${it.name}:clean"})
 
 ext.projectsToPrepare = projectsToConfigure + project(':saros.picocontainer') 
 task prepareEclipse(dependsOn: projectsToPrepare.collect { [":${it.name}:cleanEclipseProject", ":${it.name}:cleanEclipseClasspath"] }.flatten() +
                                projectsToPrepare.collect { [":${it.name}:eclipseProject", ":${it.name}:eclipseClasspath"]}.flatten() +
-                               ['mavenizeP2Repository', 'generateLibAll'])
-
-task prepareIntellij(dependsOn: ['mavenizeP2Repository'])
+                               ['generateLibAll'])
 
 task cleanGenerateLibAll {
   doLast {
@@ -164,24 +127,20 @@ task cleanGenerateLibAll {
     project(':saros.whiteboard').file('lib').deleteDir()
     project(':saros.stf').file('lib').deleteDir()
     project(':saros.stf.test').file('lib').deleteDir()
-    project(':saros.ui').file('lib').deleteDir()
   }
 }
 
 // generate all lib dirs in order to run stf tests
 task generateLibAll(dependsOn:['cleanGenerateLibAll',
                                ':saros.core:generateLib',
-                               ':saros.ui:generateLib',
                                ':saros.eclipse:generateLib',
                                ':saros.stf:generateLib',
                                ':saros.stf.test:generateLib',
                                ':saros.whiteboard:generateLib'])
 
 task sarosEclipse(type: Copy, dependsOn: [
-  'mavenizeP2Repository',
   ':saros.picocontainer:test',
   ':saros.core:test',
-  ':saros.ui:test',
   ':saros.eclipse:test',
   ':saros.eclipse:jar',
   ':saros.whiteboard:test',
@@ -191,7 +150,6 @@ task sarosEclipse(type: Copy, dependsOn: [
   description 'Builds and tests all modules required by Saros for Eclipse'
 
   from project(':saros.core').jar
-  from project(':saros.ui').jar
   from project(':saros.eclipse').jar
   from project(':saros.whiteboard').jar
   into 'build/distribution/eclipse'
@@ -203,10 +161,12 @@ task sarosStf(type: Copy, dependsOn: ['sarosEclipse', 'saros.stf:jar']) {
 }
 
 task sarosServer(type: Copy, dependsOn: [
-   ':saros.core:test',
-   ':saros.server:test',
-   ':saros.server:jar'
-]) {
+
+  ':saros.core:test',
+  ':saros.server:test',
+  ':saros.server:jar'
+  ]) {
+
   group 'Delivery'
   description 'Builds and tests all modules required by the Saros Server'
 
@@ -217,7 +177,6 @@ task sarosServer(type: Copy, dependsOn: [
 task sarosIntellij(type: Copy, dependsOn: [
   ':saros.picocontainer:test',
   ':saros.core:test',
-  ':saros.ui:test',
   ':saros.intellij:test',
   ':saros.intellij:buildPlugin'
   ]) {

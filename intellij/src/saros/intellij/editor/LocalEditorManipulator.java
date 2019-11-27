@@ -29,7 +29,6 @@ public class LocalEditorManipulator {
 
   private static final Logger LOG = Logger.getLogger(LocalEditorManipulator.class);
 
-  private final ProjectAPI projectAPI;
   private final AnnotationManager annotationManager;
   private final ISarosSession sarosSession;
 
@@ -39,12 +38,10 @@ public class LocalEditorManipulator {
   private EditorManager manager;
 
   public LocalEditorManipulator(
-      ProjectAPI projectAPI,
       AnnotationManager annotationManager,
       EditorManager editorManager,
       ISarosSession sarosSession) {
 
-    this.projectAPI = projectAPI;
     this.annotationManager = annotationManager;
     this.manager = editorManager;
     this.sarosSession = sarosSession;
@@ -82,7 +79,9 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    Editor editor = projectAPI.openEditor(virtualFile, activate);
+    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+
+    Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
     manager.startEditor(editor);
     editorPool.add(path, editor);
@@ -114,8 +113,10 @@ public class LocalEditorManipulator {
       return;
     }
 
-    if (projectAPI.isOpen(virtualFile)) {
-      projectAPI.closeEditor(virtualFile);
+    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+
+    if (ProjectAPI.isOpen(project, virtualFile)) {
+      ProjectAPI.closeEditor(project, virtualFile);
     }
 
     LOG.debug("Closed editor for file " + virtualFile);
@@ -329,10 +330,13 @@ public class LocalEditorManipulator {
 
       text = new String(content);
 
+      String qualifiedResource =
+          file.getProject().getName() + " - " + file.getProjectRelativePath();
+
       NotificationPanel.showWarning(
           String.format(
               Messages.LocalEditorManipulator_incompatible_encoding_message,
-              file.getLocation(),
+              qualifiedResource,
               encoding,
               Charset.defaultCharset()),
           Messages.LocalEditorManipulator_incompatible_encoding_title);
@@ -366,8 +370,8 @@ public class LocalEditorManipulator {
     }
 
     Editor editor = null;
-    if (projectAPI.isOpen(virtualFile)) {
-      editor = projectAPI.openEditor(virtualFile, false);
+    if (ProjectAPI.isOpen(project, virtualFile)) {
+      editor = ProjectAPI.openEditor(project, virtualFile, false);
     }
 
     annotationManager.addContributionAnnotation(source, file, 0, documentLength, editor);

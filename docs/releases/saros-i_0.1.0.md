@@ -21,7 +21,7 @@ Saros/I 0.1.0 requires
  - `JDK 8` or newer
  - `IntelliJ 2018.2.7` or newer
 
-Saros/I can be installed from the JetBrains plugin repository or from disk. A detailed guide is given [here](../documentation/installation-intellij.md).
+Saros/I can be installed from the JetBrains plugin repository or from disk. A detailed guide is given [here](../documentation/installation.html?tab=intellij).
 
 ## Features
 
@@ -36,7 +36,7 @@ You can
 - work on shared resources
 - create, delete, and move resources in the shared module
 - interact freely with non-shared resources
-- follow other participants of the session ([follow mode](../documentation/getting-started-eclipse.md#follow-mode))
+- follow other participants of the session ([follow mode](../documentation/features.md#follow-mode))
 
 ## Restrictions
 
@@ -84,7 +84,7 @@ You can currently only share a single module. A module has to adhere to the foll
 Sharing a module will only share resources belonging to that module, not resources belonging to sub-module located inside a content root of the module.
 Creating such a sub-module during a session will lead to an inconsistent state that can not be resolved by Saros.
 
-### Working with newly created modules
+### Working With Newly Created Modules
 
 To share a newly created module, you will have to have saved your project at least once before trying to start a session.
 This is necessary as the module file for a new module is only written to disk the first time the module is saved.

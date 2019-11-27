@@ -19,10 +19,10 @@ import saros.session.ISarosSessionManager;
 import saros.session.ISessionLifecycleListener;
 import saros.session.User;
 import saros.ui.ImageManager;
-import saros.ui.util.ModelFormatUtils;
 import saros.ui.util.SWTUtils;
 import saros.ui.util.selection.SelectionUtils;
 import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
+import saros.util.CoreUtils;
 
 public class RemoveUserAction extends Action {
 
@@ -115,7 +115,7 @@ public class RemoveUserAction extends Action {
 
               List<String> userNames = new ArrayList<String>();
 
-              for (User user : users) userNames.add(ModelFormatUtils.getDisplayName(user));
+              for (User user : users) userNames.add(CoreUtils.determineUserDisplayName(user));
 
               monitor.beginTask(
                   "Removing user(s): " + StringUtils.join(userNames, ", "),

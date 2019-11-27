@@ -20,7 +20,7 @@ import saros.intellij.eventhandler.IProjectEventHandler;
  */
 public abstract class AbstractLocalEditorStatusChangeHandler implements IProjectEventHandler {
 
-  private final Project project;
+  protected final Project project;
 
   private boolean enabled;
   private boolean disposed;

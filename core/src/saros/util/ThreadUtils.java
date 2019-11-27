@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 
 public class ThreadUtils {
 
-  private static final Logger LOG = Logger.getLogger(ThreadUtils.class);
+  static final String THREAD_PREFIX = "saros-";
+
+  private static final Logger defaultLog = Logger.getLogger(ThreadUtils.class);
 
   private ThreadUtils() {
     // NOP do not allow object creation
@@ -22,11 +24,8 @@ public class ThreadUtils {
    *     runnable or <code>null</code>
    */
   public static Runnable wrapSafe(Logger log, final Runnable runnable) {
-
-    if (log == null) log = LOG;
-
-    final Logger logToUse = log;
-    final StackTrace stackTrace = new StackTrace();
+    Logger logToUse = log == null ? defaultLog : log;
+    StackTrace stackTrace = new StackTrace();
 
     return new Runnable() {
       @Override
@@ -54,9 +53,11 @@ public class ThreadUtils {
    * @nonBlocking
    */
   public static Thread runSafeAsync(String name, final Logger log, final Runnable runnable) {
-
     Thread t = new Thread(wrapSafe(log, runnable));
-    if (name != null) t.setName(name);
+
+    String threadName = name == null ? t.getName() : name;
+    t.setName(THREAD_PREFIX + threadName);
+
     t.start();
     return t;
   }

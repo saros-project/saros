@@ -16,7 +16,9 @@ import saros.activities.NOPActivity;
 import saros.monitoring.IProgressMonitor;
 import saros.net.IPacketInterceptor;
 import saros.net.internal.BinaryXMPPExtension;
+import saros.net.internal.IByteStreamConnection;
 import saros.net.internal.TransferDescription;
+import saros.net.internal.XMPPReceiver;
 import saros.net.xmpp.JID;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityListener;
@@ -168,7 +170,8 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
   private NetworkManipulatorImpl() {
     this.getSessionManager().addSessionLifecycleListener(this);
-    getDataTransferManager().addPacketInterceptor(sessionPacketInterceptor);
+    this.getReceiver().addPacketInterceptor(sessionPacketInterceptor);
+    this.getTransmitter().addPacketInterceptor(sessionPacketInterceptor);
   }
 
   @Override
@@ -273,7 +276,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
         LOG.trace("dispatching blocked packet: " + object);
 
-        getDataTransferManager().addIncomingTransferObject(object);
+        ((XMPPReceiver) getReceiver()).receive(object);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }
@@ -316,6 +319,9 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
       return;
     }
 
+    IByteStreamConnection connection =
+        getDataTransferManager().getConnection(ISarosSession.SESSION_CONNECTION_ID, jid);
+
     while (!pendingOutgoingPackets.isEmpty()) {
       try {
         OutgoingPacketHolder holder = pendingOutgoingPackets.remove();
@@ -326,8 +332,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
                 + ", payload length: "
                 + holder.payload.length);
 
-        getDataTransferManager()
-            .sendData(ISarosSession.SESSION_CONNECTION_ID, holder.description, holder.payload);
+        connection.send(holder.description, holder.payload);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }

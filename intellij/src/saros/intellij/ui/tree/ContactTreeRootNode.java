@@ -1,5 +1,7 @@
 package saros.intellij.ui.tree;
 
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import saros.SarosPluginContext;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.views.SarosMainPanelView;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.roster.IRosterListener;
 import saros.net.xmpp.roster.RosterTracker;
@@ -22,6 +25,9 @@ import saros.repackaged.picocontainer.annotations.Inject;
  *
  * <p>It registers as {@link IRosterListener} and keeps the displayed contacts in sync with the
  * server.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}.
  */
 
 /*
@@ -29,7 +35,8 @@ import saros.repackaged.picocontainer.annotations.Inject;
  * the same issue as the Eclipse counterpart, it cannot
  * handle multiple JIDs with different resources
  */
-public class ContactTreeRootNode extends DefaultMutableTreeNode implements IRosterListener {
+public class ContactTreeRootNode extends DefaultMutableTreeNode
+    implements IRosterListener, Disposable {
 
   private static final long serialVersionUID = 1L;
 
@@ -48,6 +55,9 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements IRost
 
   public ContactTreeRootNode(SessionAndContactsTreeView treeView) {
     super(treeView);
+
+    Disposer.register(treeView, this);
+
     SarosPluginContext.initComponent(this);
 
     this.treeView = treeView;
@@ -56,6 +66,11 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode implements IRost
 
     rosterTracker.addRosterListener(this);
     rosterChanged(rosterTracker.getRoster());
+  }
+
+  @Override
+  public void dispose() {
+    rosterTracker.removeRosterListener(this);
   }
 
   /**

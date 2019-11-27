@@ -1,5 +1,8 @@
 package saros.intellij.ui.tree;
 
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import javax.swing.JTree;
@@ -9,25 +12,31 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import org.jivesoftware.smack.Connection;
+import org.jetbrains.annotations.NotNull;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccountStore;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.views.SarosMainPanelView;
 import saros.net.ConnectionState;
-import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.repackaged.picocontainer.annotations.Inject;
 
-/** Saros tree view for contacts and sessions. */
-public class SessionAndContactsTreeView extends JTree {
+/**
+ * Saros tree view for contacts and sessions.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}.
+ */
+public class SessionAndContactsTreeView extends JTree implements Disposable {
 
   private final SessionTreeRootNode sessionTreeRootNode;
   private final ContactTreeRootNode contactTreeRootNode;
 
   @Inject private XMPPAccountStore accountStore;
 
-  @Inject private XMPPConnectionService connectionService;
+  @Inject private ConnectionHandler connectionHandler;
 
   /**
    * A cell renderer that sets the node icon according to the node type (root, session, contact, or
@@ -74,17 +83,14 @@ public class SessionAndContactsTreeView extends JTree {
         }
       };
 
-  private final IConnectionListener connectionStateListener =
-      new IConnectionListener() {
+  private final IConnectionStateListener connectionStateListener =
+      (state, error) -> renderConnectionState(state);
 
-        @Override
-        public void connectionStateChanged(Connection connection, ConnectionState state) {
-          renderConnectionState(connection, state);
-        }
-      };
-
-  public SessionAndContactsTreeView() {
+  public SessionAndContactsTreeView(@NotNull Project project) {
     super(new SarosTreeRootNode());
+
+    Disposer.register(project, this);
+
     SarosPluginContext.initComponent(this);
 
     sessionTreeRootNode = new SessionTreeRootNode(this);
@@ -97,14 +103,19 @@ public class SessionAndContactsTreeView extends JTree {
     getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setCellRenderer(renderer);
 
-    connectionService.addListener(connectionStateListener);
+    connectionHandler.addConnectionStateListener(connectionStateListener);
 
     // show correct initial state
-    renderConnectionState(
-        connectionService.getConnection(), connectionService.getConnectionState());
+    renderConnectionState(connectionHandler.getConnectionState());
+    sessionTreeRootNode.setInitialState();
   }
 
-  private void renderConnectionState(Connection connection, ConnectionState state) {
+  @Override
+  public void dispose() {
+    connectionHandler.removeConnectionStateListener(connectionStateListener);
+  }
+
+  private void renderConnectionState(ConnectionState state) {
 
     switch (state) {
       case CONNECTED:
@@ -126,19 +137,12 @@ public class SessionAndContactsTreeView extends JTree {
    */
   private void renderConnected() {
     UIUtil.invokeLaterIfNeeded(
-        new Runnable() {
-          @Override
-          public void run() {
-            Connection connection = connectionService.getConnection();
-            if (connection == null) return;
+        () -> {
+          JID userJID = connectionHandler.getLocalJID();
+          if (userJID == null) return;
 
-            String userJID = connection.getUser();
-            String rootText = new JID(userJID).getBareJID().toString();
-
-            getSarosTreeRootNode().setTitle(rootText);
-
-            updateTree();
-          }
+          getSarosTreeRootNode().setTitle(userJID.getBareJID().toString());
+          updateTree();
         });
   }
 

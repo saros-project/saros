@@ -7,8 +7,8 @@ import saros.session.ISessionListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
 import saros.ui.Messages;
-import saros.ui.util.ModelFormatUtils;
 import saros.ui.views.SarosView;
+import saros.util.CoreUtils;
 
 /**
  * Simple handler that informs the local user of the status changes for users in the current
@@ -45,7 +45,7 @@ public class UserStatusChangeHandler {
           if (user.isLocal()) {
             SarosView.showNotification(
                 Messages.UserStatusChangeHandler_permission_changed,
-                ModelFormatUtils.format(
+                CoreUtils.format(
                     Messages.UserStatusChangeHandler_you_have_now_access,
                     user,
                     user.hasWriteAccess()
@@ -54,7 +54,7 @@ public class UserStatusChangeHandler {
           } else {
             SarosView.showNotification(
                 Messages.UserStatusChangeHandler_permission_changed,
-                ModelFormatUtils.format(
+                CoreUtils.format(
                     Messages.UserStatusChangeHandler_he_has_now_access,
                     user,
                     user.hasWriteAccess()
@@ -68,14 +68,14 @@ public class UserStatusChangeHandler {
 
           SarosView.showNotification(
               Messages.UserStatusChangeHandler_user_joined,
-              ModelFormatUtils.format(Messages.UserStatusChangeHandler_user_joined_text, user));
+              CoreUtils.format(Messages.UserStatusChangeHandler_user_joined_text, user));
         }
 
         @Override
         public void userLeft(User user) {
           SarosView.showNotification(
               Messages.UserStatusChangeHandler_user_left,
-              ModelFormatUtils.format(Messages.UserStatusChangeHandler_user_left_text, user));
+              CoreUtils.format(Messages.UserStatusChangeHandler_user_left_text, user));
         }
       };
 

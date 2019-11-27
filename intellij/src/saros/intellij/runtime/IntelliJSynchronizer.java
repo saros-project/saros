@@ -3,6 +3,8 @@ package saros.intellij.runtime;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import org.apache.log4j.Logger;
 import saros.synchronize.UISynchronizer;
 
 /**
@@ -10,6 +12,8 @@ import saros.synchronize.UISynchronizer;
  * {@link Application#invokeAndWait(Runnable, ModalityState)}.
  */
 public class IntelliJSynchronizer implements UISynchronizer {
+
+  private static final Logger log = Logger.getLogger(IntelliJSynchronizer.class);
 
   @Override
   public void asyncExec(Runnable runnable) {
@@ -32,7 +36,11 @@ public class IntelliJSynchronizer implements UISynchronizer {
     if (async) {
       application.invokeLater(runnable, ModalityState.defaultModalityState());
     } else {
-      application.invokeAndWait(runnable, ModalityState.defaultModalityState());
+      try {
+        application.invokeAndWait(runnable, ModalityState.defaultModalityState());
+      } catch (ProcessCanceledException e) {
+        log.error("Synchronous execution on EDT interrupted - " + runnable, e);
+      }
     }
   }
 }

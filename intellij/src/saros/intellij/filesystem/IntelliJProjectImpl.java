@@ -1,11 +1,10 @@
 package saros.intellij.filesystem;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
+import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,7 +15,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.exceptions.ModuleNotFoundException;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
@@ -25,26 +23,13 @@ import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
 
+/** A <code>IntelliJProjectImpl</code> represents a specific module loaded in a specific project. */
 public final class IntelliJProjectImpl extends IntelliJResourceImpl implements IProject {
-
-  /*
-   * Used to identify module stubs that were created during the project
-   * negotiation and have to be reloaded after the correct module file was
-   * transferred by the host.
-   *
-   * Used in AddProjectToSessionWizard#createModuleStub(String) and
-   * ModuleInitialization.ModuleReloader#run()
-   */
-  public static final String RELOAD_STUB_MODULE_TYPE = "SAROS_RELOAD_STUB_MODULE";
-
   private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
 
-  // Module names are unique (even among different projects)
-  private final String moduleName;
+  private final Project project;
 
-  private volatile Module module;
-
-  private volatile VirtualFile moduleRoot;
+  private final Module module;
 
   /**
    * Creates a core compatible {@link IProject project} using the given IntelliJ module.
@@ -58,20 +43,15 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    * objects for modules with fewer or more than one content root can not be created.
    *
    * @param module an IntelliJ <i>module</i>
-   * @throws IllegalArgumentException if the given module does not have exactly one content root,
-   *     the content root is not located under the project root or the module file is not located in
-   *     the base directory of the content root
-   * @throws IllegalStateException if the project base dir, the module file or the directory
-   *     containing the module file could not be found
+   * @throws IllegalArgumentException if the given module does not have exactly one content root
    */
   public IntelliJProjectImpl(@NotNull final Module module) {
     this.module = module;
-    this.moduleName = module.getName();
 
-    moduleRoot = getModuleContentRoot(module);
+    this.project = module.getProject();
 
-    checkIfContentRootLocatedBelowProjectRoot(module, moduleRoot);
-    checkIfModuleFileLocatedInContentRoot(module, moduleRoot);
+    // Still used to ensure that the module has exactly one content root
+    getModuleContentRoot(module);
   }
 
   /**
@@ -108,88 +88,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   }
 
   /**
-   * Checks whether the given content root is located under the project root.
-   *
-   * <p>This method is used to enforce the current restriction concerning the module structure.
-   *
-   * @param module the module to check the structure for
-   * @param moduleRoot the content root of the given module
-   * @throws IllegalArgumentException if the given content root is not located under the project
-   *     root
-   * @throws IllegalStateException if the project basedir could not be found
-   */
-  private static void checkIfContentRootLocatedBelowProjectRoot(
-      @NotNull Module module, @NotNull VirtualFile moduleRoot) {
-
-    Project project = module.getProject();
-
-    VirtualFile projectRoot = project.getBaseDir();
-
-    if (projectRoot == null) {
-      throw new IllegalStateException(
-          "The base dir for the project " + project + " could not be found.");
-    }
-
-    Path moduleRootPath = Paths.get(moduleRoot.getPath());
-    Path projectRootPath = Paths.get(projectRoot.getPath());
-
-    if (moduleRoot.equals(projectRoot) || !moduleRootPath.startsWith(projectRootPath)) {
-
-      throw new IllegalArgumentException(
-          "The content root "
-              + moduleRoot
-              + " of the module "
-              + module
-              + " is not located under the project root "
-              + projectRoot
-              + ".");
-    }
-  }
-
-  /**
-   * Checks whether the module file is located in the base directory of the given content root.
-   *
-   * <p>This method is used to enforce the current restriction concerning the module structure.
-   *
-   * @param module the module to check the structure for
-   * @param moduleRoot the content root of the given module
-   * @throws IllegalArgumentException if the module file is not located in the base directory of
-   *     given content root
-   * @throws IllegalStateException if the module file or the directory containing the module file
-   *     could not be found
-   */
-  private static void checkIfModuleFileLocatedInContentRoot(
-      @NotNull Module module, @NotNull VirtualFile moduleRoot) {
-
-    VirtualFile moduleFile = module.getModuleFile();
-
-    if (moduleFile == null) {
-      throw new IllegalStateException(
-          "The module file for the module " + module + " could not be found.");
-    }
-
-    VirtualFile moduleFileParent = moduleFile.getParent();
-
-    if (moduleFileParent == null) {
-      throw new IllegalStateException(
-          "The parent directory of the module file for the module "
-              + module
-              + " could not be found.");
-    }
-
-    if (!moduleRoot.equals(moduleFileParent)) {
-      throw new IllegalArgumentException(
-          "The module file "
-              + moduleFile
-              + " for the module "
-              + module
-              + " is not located in the base directory of the content root "
-              + moduleRoot
-              + ".");
-    }
-  }
-
-  /**
    * Returns the IntelliJ {@link Module module}.
    *
    * @return the IntelliJ module.
@@ -200,55 +98,13 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   }
 
   /**
-   * This method can be used to refresh the held <code>Module</code> object in case the module was
-   * reloaded.
-   *
-   * <p><b>Note:</b> This method should only be needed in special cases as we can not guarantee a
-   * graceful handling of a disposed module object. Any classes or methods still holding a reference
-   * to the old module object could lead to a failure of the related logic as operations on disposed
-   * modules will result in an exception.
-   *
-   * @return <code>true</code> if the held <code>Module</code> has the status disposed and is
-   *     replaced with a new <code>Module</code> object with the same name, <code>false</code>
-   *     otherwise
-   * @throws ModuleNotFoundException if the old <code>Module</code> object is disposed but no new
-   *     module with the same name could be found
-   */
-  public boolean refreshModule() throws ModuleNotFoundException {
-    if (module.isDisposed()) {
-      Project project = module.getProject();
-
-      Module newModule = ModuleManager.getInstance(project).findModuleByName(moduleName);
-
-      if (newModule == null) {
-
-        throw new ModuleNotFoundException(
-            "The module "
-                + moduleName
-                + " could not be refreshed as no module with the same name could be found in the "
-                + "current project "
-                + project);
-      }
-
-      module = newModule;
-
-      moduleRoot = getModuleContentRoot(module);
-      checkIfContentRootLocatedBelowProjectRoot(module, moduleRoot);
-      checkIfModuleFileLocatedInContentRoot(module, moduleRoot);
-
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
    * Returns whether the resource for the given path exists.
    *
-   * <p><b>Note:</b> A derived resource is treated as being nonexistent.
+   * <p><b>Note:</b> An ignored resource is treated as being nonexistent.
    *
-   * @return <code>true</code> if the resource exists and is not derived, <code>false</code>
+   * @return <code>true</code> if the resource exists and is not ignored, <code>false</code>
    *     otherwise
+   * @see #isIgnored()
    */
   @Override
   public boolean exists(final IPath path) {
@@ -260,18 +116,15 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   @NotNull
   @Override
   public IResource[] members() throws IOException {
-    // TODO run as read action
-
     final List<IResource> result = new ArrayList<>();
 
-    final VirtualFile[] children = moduleRoot.getChildren();
+    final VirtualFile[] children = getModuleContentRoot(module).getChildren();
 
     ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
 
     for (final VirtualFile child : children) {
 
-      if (!moduleFileIndex.isInContent(child)) {
-
+      if (!Filesystem.runReadAction(() -> moduleFileIndex.isInContent(child))) {
         continue;
       }
 
@@ -283,7 +136,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
               : new IntelliJFileImpl(this, childPath));
     }
 
-    return result.toArray(new IResource[result.size()]);
+    return result.toArray(new IResource[0]);
   }
 
   @NotNull
@@ -313,7 +166,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   @NotNull
   @Override
   public String getName() {
-    return moduleName;
+    return module.getName();
   }
 
   @Nullable
@@ -345,12 +198,14 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
    */
   @Nullable
   private IPath getProjectRelativePath(@NotNull VirtualFile file) {
-    Module fileModule =
-        ProjectFileIndexFacade.getInstance(module.getProject()).getModuleForFile(file);
+    ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
+    Module fileModule = Filesystem.runReadAction(() -> projectFileIndex.getModuleForFile(file));
 
-    if (fileModule == null || !moduleName.equals(fileModule.getName())) {
+    if (!module.equals(fileModule)) {
       return null;
     }
+
+    VirtualFile moduleRoot = getModuleContentRoot(module);
 
     try {
       Path relativePath = Paths.get(moduleRoot.getPath()).relativize(Paths.get(file.getPath()));
@@ -375,12 +230,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   }
 
   @Override
-  public boolean isDerived(final boolean checkAncestors) {
-    return false;
-  }
-
-  @Override
-  public boolean isDerived() {
+  public boolean isIgnored() {
     return false;
   }
 
@@ -397,7 +247,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   @NotNull
   @Override
   public IPath getLocation() {
-    return IntelliJPathImpl.fromString(moduleRoot.getPath());
+    return IntelliJPathImpl.fromString(getModuleContentRoot(module).getPath());
   }
 
   @Nullable
@@ -499,35 +349,58 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   /**
    * Returns the virtual file for the given path belonging to this module.
    *
-   * <p><b>Note:</b> This method can not return files for derived resources or resources belonging
+   * <p><b>Note:</b> This method can not return files for ignored resources or resources belonging
    * to a sub-module.
    *
    * @param path relative path to the file
    * @return the virtual file or <code>null</code> if it does not exists in the VFS snapshot, is
-   *     derived, belongs to a sub-module, or the given path is absolute.
+   *     ignored, belongs to a sub-module, or the given path is absolute.
+   * @see #isIgnored()
    */
   @Nullable
   public VirtualFile findVirtualFile(final IPath path) {
 
     if (path.isAbsolute()) return null;
 
+    VirtualFile moduleRoot = getModuleContentRoot(module);
+
     if (path.segmentCount() == 0) return moduleRoot;
 
     VirtualFile virtualFile = moduleRoot.findFileByRelativePath(path.toString());
 
-    if (virtualFile != null
-        && ModuleRootManager.getInstance(module).getFileIndex().isInContent(virtualFile)) {
-      return virtualFile;
+    if (virtualFile == null) {
+      return null;
     }
 
-    return null;
+    ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
+    boolean isInContent = Filesystem.runReadAction(() -> moduleFileIndex.isInContent(virtualFile));
+
+    return isInContent ? virtualFile : null;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This method operates under the assumption that module objects are handled as a singleton
+   * across the IDE lifecycle, i.e. a module will always be represented by a single, unique <code>
+   * Module</code> object.
+   *
+   * @return a hash code value for this object
+   */
   @Override
   public int hashCode() {
-    return moduleName.hashCode();
+    return module.hashCode();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This method operates under the assumption that module objects are handled as a singleton
+   * across the IDE lifecycle, i.e. a module will always be represented by a single, unique <code>
+   * Module</code> object.
+   *
+   * @return whether the given objects is equal to this object
+   */
   @Override
   public boolean equals(final Object obj) {
 
@@ -539,11 +412,11 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
     IntelliJProjectImpl other = (IntelliJProjectImpl) obj;
 
-    return moduleName.equals(other.moduleName);
+    return module.equals(other.module);
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " : " + moduleName;
+    return getClass().getSimpleName() + " : " + project + " - " + module;
   }
 }

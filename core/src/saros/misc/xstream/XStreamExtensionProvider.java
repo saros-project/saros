@@ -92,7 +92,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
     this.elementName = elementName;
     this.namespace = namespace;
 
-    xstream = new XStream();
+    xstream = XStreamFactory.getSecureXStream();
 
     if (classLoader != null) xstream.setClassLoader(classLoader);
     else xstream.setClassLoader(getClass().getClassLoader());

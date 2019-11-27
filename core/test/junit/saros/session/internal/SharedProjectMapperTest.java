@@ -241,18 +241,18 @@ public class SharedProjectMapperTest {
   }
 
   @Test
-  public void testDerivedResourcesOnCompletelySharedProject() {
+  public void testIgnoredResourcesOnCompletelySharedProject() {
     IProject projectMock = createProjectMock();
 
     IResource resourceMock = EasyMock.createNiceMock(IResource.class);
     EasyMock.expect(resourceMock.getProject()).andStubReturn(projectMock);
-    EasyMock.expect(resourceMock.isDerived(true)).andReturn(true);
+    EasyMock.expect(resourceMock.isIgnored()).andReturn(true);
 
     EasyMock.replay(resourceMock);
 
     mapper.addProject("0", projectMock, false);
 
-    assertFalse("derived resource is marked as shared", mapper.isShared(resourceMock));
+    assertFalse("ignored resource is marked as shared", mapper.isShared(resourceMock));
 
     EasyMock.verify(resourceMock);
   }

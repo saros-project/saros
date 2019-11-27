@@ -13,9 +13,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IResource;
+import saros.intellij.context.SharedIDEContext;
+import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.util.NotificationPanel;
 import saros.net.xmpp.JID;
 
 /**
@@ -26,7 +29,8 @@ import saros.net.xmpp.JID;
  *
  * <p>This class assumes that the project is allowed to be shared (at the moment only completely
  * shared projects are implemented) and that the call to {@link
- * ShareWithUserAction#getModuleFromVirtFile(VirtualFile, Project)} is supported for this IDE type.
+ * ShareWithUserAction#getModuleForVirtualFile(VirtualFile, Project)} is supported for this IDE
+ * type.
  */
 public class ShareWithUserAction extends AnAction {
 
@@ -45,28 +49,51 @@ public class ShareWithUserAction extends AnAction {
   }
 
   @Override
-  public void actionPerformed(AnActionEvent e) {
-    VirtualFile virtFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
-    if (virtFile == null) {
+  public void actionPerformed(AnActionEvent event) {
+    Project project = event.getProject();
+    if (project == null) {
+      throw new IllegalStateException(
+          "Unable to start session - could not determine project for highlighted resource.");
+    }
+
+    VirtualFile virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
+    if (virtualFile == null) {
+      throw new IllegalStateException(
+          "Unable to start session - could not determine virtual file for highlighted resource.");
+    }
+
+    IResource module;
+
+    try {
+      // We allow only completely shared projects, so no need to check
+      // for partially shared ones.
+      module = getModuleForVirtualFile(virtualFile, event.getProject());
+
+    } catch (IllegalArgumentException e) {
+      LOG.error("Tried to share illegal module", e);
+
+      NotificationPanel.showError(
+          MessageFormat.format(Messages.ShareWithUserAction_illegal_module_message, e.getMessage()),
+          Messages.ShareWithUserAction_illegal_module_title);
+
       return;
     }
 
-    // We allow only completely shared projects, so no need to check
-    // for partially shared ones.
-    List<IResource> resources = Arrays.asList(getModuleFromVirtFile(virtFile, e.getProject()));
+    List<IResource> resources = Arrays.asList(module);
 
     List<JID> contacts = Arrays.asList(userJID);
 
+    SharedIDEContext.preregisterProject(project);
     CollaborationUtils.startSession(resources, contacts);
   }
 
-  private IResource getModuleFromVirtFile(VirtualFile virtFile, Project project) {
+  private IResource getModuleForVirtualFile(VirtualFile virtualFile, Project project) {
+    ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
 
-    Module module = ProjectFileIndex.SERVICE.getInstance(project).getModuleForFile(virtFile);
+    Module module = Filesystem.runReadAction(() -> projectFileIndex.getModuleForFile(virtualFile));
 
     if (module == null) {
-      // FIXME: Find way to select moduleName for non-module based IDEAs
-      // (Webstorm)
+      // FIXME: Find way to select moduleName for non-module based IDEAs (Webstorm)
       throw new UnsupportedOperationException();
     }
 

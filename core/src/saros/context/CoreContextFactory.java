@@ -8,6 +8,7 @@ import saros.communication.connection.ConnectionHandler;
 import saros.concurrent.watchdog.IsInconsistentObservable;
 import saros.editor.colorstorage.ColorIDSetStorage;
 import saros.monitoring.remote.RemoteProgressManager;
+import saros.negotiation.AdditionalProjectDataFactory;
 import saros.negotiation.NegotiationFactory;
 import saros.negotiation.hooks.SessionNegotiationHookManager;
 import saros.net.DispatchThreadContext;
@@ -27,6 +28,7 @@ import saros.net.upnp.IUPnPService;
 import saros.net.upnp.internal.UPnPAccessImpl;
 import saros.net.upnp.internal.UPnPServiceImpl;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.net.xmpp.discovery.DiscoveryManager;
 import saros.net.xmpp.roster.RosterTracker;
 import saros.net.xmpp.subscription.SubscriptionHandler;
@@ -67,6 +69,7 @@ public class CoreContextFactory extends AbstractContextFactory {
 
       // Negotiation
       Component.create(NegotiationFactory.class),
+      Component.create(AdditionalProjectDataFactory.class),
 
       // Negotiation hooks
       Component.create(SessionNegotiationHookManager.class),
@@ -87,6 +90,7 @@ public class CoreContextFactory extends AbstractContextFactory {
       Component.create(XMPPConnectionService.class),
       Component.create(IStunService.class, StunServiceImpl.class),
       Component.create(SubscriptionHandler.class),
+      Component.create(XMPPContactsService.class),
       Component.create(IUPnPService.class, UPnPServiceImpl.class),
       Component.create(IUPnPAccess.class, UPnPAccessImpl.class),
       Component.create(IReceiver.class, XMPPReceiver.class),

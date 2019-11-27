@@ -3,7 +3,6 @@ package saros.concurrent.management;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
-import saros.activities.AbstractActivityReceiver;
 import saros.activities.ChecksumActivity;
 import saros.activities.FileActivity;
 import saros.activities.IActivity;
@@ -126,7 +125,7 @@ public class ConcurrentDocumentClient {
 
   /** Used to remove JupiterClientDocuments for deleted files */
   private final IActivityReceiver clientReceiver =
-      new AbstractActivityReceiver() {
+      new IActivityReceiver() {
         @Override
         public void receive(FileActivity fileActivity) {
           if (fileActivity.getType() == FileActivity.Type.REMOVED) {
@@ -187,5 +186,10 @@ public class ConcurrentDocumentClient {
       // TODO this should trigger a consistency recovery. Difficult :-(
       return false;
     }
+  }
+
+  // Package-private function for HeartbeatDispatcher
+  JupiterClient getJupiterClient() {
+    return jupiterClient;
   }
 }

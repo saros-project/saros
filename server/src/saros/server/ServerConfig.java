@@ -47,7 +47,7 @@ public class ServerConfig {
    * @return if the user has requested an interactive console
    */
   public static boolean isInteractive() {
-    String value = System.getProperty(INTERACTIVE_KEY);
+    String value = System.getProperty(INTERACTIVE_KEY, "false");
     return value.equalsIgnoreCase("true")
         || value.equalsIgnoreCase("yes")
         || value.equalsIgnoreCase("y");

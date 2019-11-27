@@ -1,8 +1,8 @@
 package saros.ui.menuContributions;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.ContributionItem;
@@ -11,14 +11,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import saros.SarosConstants;
 import saros.SarosPluginContext;
-import saros.net.util.XMPPUtils;
-import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
-import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.net.xmpp.contact.XMPPContact;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
 import saros.ui.model.roster.RosterEntryElement;
@@ -33,7 +29,7 @@ public class StartSessionWithContacts extends ContributionItem {
 
   @Inject private XMPPConnectionService connectionService;
 
-  @Inject private DiscoveryManager discoveryManager;
+  @Inject private XMPPContactsService contactsService;
 
   public StartSessionWithContacts() {
     this(null);
@@ -53,13 +49,11 @@ public class StartSessionWithContacts extends ContributionItem {
 
     int numSarosSupportedContacts = 0;
 
-    for (final RosterEntry rosterEntry : getSortedRosterEntries()) {
-      Boolean sarosSupport =
-          discoveryManager.isFeatureSupported(
-              new JID(rosterEntry.getUser()), SarosConstants.XMPP_FEATURE_NAMESPACE);
-
-      if (sarosSupport != null && sarosSupport) {
-        createContactMenuItem(menu, numSarosSupportedContacts++, rosterEntry, selectedResources);
+    Iterator<XMPPContact> sortedContacts = getSortedContacts();
+    while (sortedContacts.hasNext()) {
+      XMPPContact contact = sortedContacts.next();
+      if (contact.hasSarosSupport()) {
+        createContactMenuItem(menu, numSarosSupportedContacts++, contact, selectedResources);
       }
     }
 
@@ -68,33 +62,22 @@ public class StartSessionWithContacts extends ContributionItem {
     }
   }
 
-  /** Returns a sorted array of {@link Roster}'s contacts. */
-  private RosterEntry[] getSortedRosterEntries() {
-    RosterEntry[] rosterEntries =
-        connectionService.getRoster().getEntries().toArray(new RosterEntry[0]);
-
-    Arrays.sort(
-        rosterEntries,
-        new Comparator<RosterEntry>() {
-          @Override
-          public int compare(RosterEntry o1, RosterEntry o2) {
-            String name1 = XMPPUtils.getDisplayableName(o1);
-            String name2 = XMPPUtils.getDisplayableName(o2);
-            return name1.compareToIgnoreCase(name2);
-          }
-        });
-    return rosterEntries;
+  /** Returns a sorted iterator of xmpp contacts. */
+  private Iterator<XMPPContact> getSortedContacts() {
+    return contactsService
+        .getAllContacts()
+        .stream()
+        .sorted(Comparator.comparing(XMPPContact::getDisplayableName))
+        .iterator();
   }
 
-  /** Creates a menu entry which shares projects with the given {@link RosterEntry}. */
+  /** Creates a menu entry which shares projects with the given {@link XMPPContact}. */
   private MenuItem createContactMenuItem(
-      Menu parentMenu, int index, final RosterEntry rosterEntry, final List<IResource> resources) {
-
+      Menu parentMenu, int index, XMPPContact contact, List<IResource> resources) {
     /*
      * The model knows how to display roster entries best.
      */
-    RosterEntryElement rosterEntryElement =
-        new RosterEntryElement(connectionService.getRoster(), new JID(rosterEntry.getUser()), true);
+    RosterEntryElement rosterEntryElement = new RosterEntryElement(contact);
 
     MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
     menuItem.setText(rosterEntryElement.getStyledText().toString());
@@ -105,7 +88,7 @@ public class StartSessionWithContacts extends ContributionItem {
           @Override
           public void widgetSelected(SelectionEvent e) {
             CollaborationUtils.startSession(
-                resources, Collections.singletonList(new JID(rosterEntry.getUser())));
+                resources, Collections.singletonList(contact.getBareJid()));
           }
         });
 

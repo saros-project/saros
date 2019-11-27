@@ -54,9 +54,8 @@ public class ServerLifecycle extends AbstractContextLifecycle {
     if (jidString == null || password == null) {
       log.fatal(
           "XMPP credentials are missing! Pass the "
-              + "system properties saros.server.jid and"
-              + "de.fu_berln.inf.dpp.server.password to the server");
-      stop();
+              + "system properties saros.server.jid and "
+              + "saros.server.password to the server");
       System.exit(1);
     }
 
@@ -65,11 +64,13 @@ public class ServerLifecycle extends AbstractContextLifecycle {
      * instead
      */
     XMPPAccountStore store = context.getComponent(XMPPAccountStore.class);
-    XMPPAccount account = store.findAccount(jidString);
-    if (account == null) {
-      JID jid = new JID(jidString);
-      account = store.createAccount(jid.getName(), password, jid.getDomain(), "", 0, true, true);
-    }
+
+    // ensure we do not save anything and that the store is empty
+    store.setAccountFile(null, null);
+
+    JID jid = new JID(jidString);
+    XMPPAccount account =
+        store.createAccount(jid.getName(), password, jid.getDomain(), "", 0, true, true);
 
     ConnectionHandler connectionHandler = context.getComponent(ConnectionHandler.class);
     connectionHandler.connect(account, false);

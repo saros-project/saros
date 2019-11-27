@@ -1,28 +1,9 @@
-eclipse{
-  project {
-    natures 'org.eclipse.pde.PluginNature'
-  }
-}
-
-
-buildscript {
-  repositories {
-    maven {
-      url  "http://dl.bintray.com/monkey-works/BuildMonkey"
-    }
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
- dependencies {
-    classpath "de.monkeyworks.buildmonkey:gradle.dependency:0.4.13"
-  }
-}
-
-apply plugin: 'de.monkeyworks.buildmonkey.ManifestDependencyPlugin'
-
-repositories {
-  maven { url rootProject.file('build/maven') }
+sarosEclipse {
+  manifest = file('META-INF/MANIFEST.MF')
+  excludeManifestDependencies = ['saros.core', 'org.junit', 'org.eclipse.gef']
+  addPdeNature = true
+  createBundleJar = true
+  addDependencies = true
 }
 
 sourceSets {
@@ -41,51 +22,14 @@ sourceSets {
   }
 }
 
-manifestDependencies {
-    eclipseGroup = 'eclipse-deps'
-
-    dependencyHandling {
-      def ids = [:]
-      if (it.matches('org.junit'))
-      {
-        ids['groupId'] = 'junit'
-        ids['artifactId'] = 'junit'
-        ids['version'] = '4.11'
-      }
-      return ids
-    }
-}
-
 dependencies {
-  compile project(':saros.core')
-  compile project(':saros.ui')
+  implementation project(':saros.core')
 
-  compile project(path: ':saros.core', configuration: 'testing')
-  compile project(path: ':saros.ui', configuration: 'testing')
-
+  testImplementation project(path: ':saros.core', configuration: 'testing')
   testImplementation configurations.testConfig
 }
 
-tasks.withType(Test) {
-  enableAssertions = false
-}
-
-compileJava.dependsOn rootProject.mavenizeP2Repository
-
 jar {
-  manifest {
-      // benutze das im Projekt vorliegende File, falls vorhanden:
-      def manif = "${projectDir}/META-INF/MANIFEST.MF"
-      if (new File(manif).exists()) {
-         from (manif)
-      }
-  }
-
-  from sourceSets.main.output
-
-  into('lib') {
-    from configurations.getByName('releaseDep')
-  }
   into('assets') {
     from 'assets'
   }
@@ -107,20 +51,6 @@ task testJar(type: Jar) {
   from sourceSets.test.output
 }
 
-compileJava.dependsOn rootProject.mavenizeP2Repository
-
 artifacts {
   testing testJar
-}
-
-sonarqube {
-  properties {
-    property 'sonar.projectName', 'Saros/Eclipse'
-    property 'sonar.projectDescription', 'Saros plugin for the Eclipse IDE'
-    property 'sonar.projectVersion', '14.11.28.DEVEL'
-    property 'sonar.exclusion', '**/Messages.java'
-    // necessary to avoid the scanning of stf
-    property 'sonar.sources', 'src'
-    property 'sonar.tests', 'test/junit, test/stf'
-  }
 }

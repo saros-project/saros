@@ -4,7 +4,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import saros.activities.SPath;
 import saros.exceptions.LocalCancellationException;
@@ -49,9 +48,7 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
 
     writeHeader(file, fileHandle.getSize());
 
-    InputStream fileIn = null;
-    try {
-      fileIn = fileHandle.getContents();
+    try (InputStream fileIn = fileHandle.getContents()) {
       int readBytes = 0;
       /* buffer the file content and send to stream */
       while (readBytes != -1) {
@@ -62,15 +59,8 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
           throw new LocalCancellationException(
               "transmission was canceled", CancelOption.NOTIFY_PEER);
       }
-    } catch (IOException e) {
-      IOUtils.closeQuietly(out);
-      throw e;
-    } catch (LocalCancellationException e) {
-      IOUtils.closeQuietly(out);
-      throw e;
-    } finally {
-      IOUtils.closeQuietly(fileIn);
     }
+
     monitor.worked(1);
   }
 
@@ -84,16 +74,13 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
   }
 
   /**
-   * Writes a end remark to notify stream endpoint about correct end of transmission and closes the
-   * stream correctly.
+   * Writes a end remark to notify stream endpoint about correct end of transmission and flushes the
+   * stream.
    *
    * @throws IOException if stream operation fails
    */
   public void close() throws IOException {
-    try {
-      out.writeUTF("");
-    } finally {
-      IOUtils.closeQuietly(out);
-    }
+    out.writeUTF("");
+    out.flush();
   }
 }

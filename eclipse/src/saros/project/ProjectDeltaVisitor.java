@@ -173,7 +173,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
 
     if (isFile(resource)) {
-      byte[] content = FileUtils.getLocalFileContent((IFile) resource.getAdapter(IFile.class));
+      byte[] content = FileUtils.getLocalFileContent(resource.getAdapter(IFile.class));
 
       if (content == null) {
         logResourceReadError(resource);
@@ -199,7 +199,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     if (contentChange) {
       assert resource.getType() == IResource.FILE;
 
-      content = FileUtils.getLocalFileContent((IFile) resource.getAdapter(IFile.class));
+      content = FileUtils.getLocalFileContent(resource.getAdapter(IFile.class));
 
       if (content == null) {
         logResourceReadError(resource);
@@ -220,6 +220,8 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
   private void generateRemoved(IResource resource) {
 
     if (resource instanceof IFile) {
+      editorManager.closeEditor(new SPath(ResourceAdapterFactory.create(resource)), false);
+
       addActivity(
           new FileActivity(
               user,
@@ -252,10 +254,10 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     if (!session.isShared(ResourceAdapterFactory.create(resource))) return;
 
-    if (editorManager.isOpened(spath)
-        || editorManager.isManaged((IFile) resource.getAdapter(IFile.class))) return;
+    if (editorManager.isOpened(spath) || editorManager.isManaged(resource.getAdapter(IFile.class)))
+      return;
 
-    byte[] content = FileUtils.getLocalFileContent((IFile) resource.getAdapter(IFile.class));
+    byte[] content = FileUtils.getLocalFileContent(resource.getAdapter(IFile.class));
 
     if (content == null) logResourceReadError(resource);
     // TODO add encoding

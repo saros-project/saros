@@ -37,4 +37,6 @@ public interface IByteStreamConnection {
   public String getConnectionID();
 
   public StreamMode getMode();
+
+  public void setBinaryXMPPExtensionReceiver(IBinaryXMPPExtensionReceiver receiver);
 }

@@ -12,17 +12,20 @@
  *       selection and viewport
  *   <li>package internal--- manages the editors, their views and the needed listeners
  *   <li>package remote -- holds the state of the Editors of the other users in the session
- *   <li>the {@link AbstractSharedEditorListener} is an empty stub
- *   <li>the {@link DirtyStateListener} synchronizes file save events with shared documents.
- *   <li>the {@link EditorManager} handles and synchronizes all editors in a session.
- *   <li>the {@link EditorPool} manages EditorParts of the local users.
- *   <li>the {@link ISharedEditorListener} is an interface for synchronizing editor tabs
- *   <li>the {@link RemoteWriteAccessManager} locally executes remote user activities (like editing
- *       in an editor or closing it) for open editor views
- *   <li>the {@link SharedEditorListenerDispatch} dispatchs to a changing set of {@link
- *       ISharedEditorListener}s
- *   <li>the {@link StoppableDocumentListener} informs the given EditorManager of changes before
- *       they occur in a document (using documentAboutToBeChanged)
+ *   <li>the {@link saros.editor.DirtyStateListener} synchronizes file save events with shared
+ *       documents.
+ *   <li>the {@link saros.editor.EditorManager} handles and synchronizes all editors in a session.
+ *   <li>the {@link saros.editor.EditorPool} manages EditorParts of the local users.
+ *   <li>the {@link saros.editor.RemoteWriteAccessManager} locally executes remote user activities
+ *       (like editing in an editor or closing it) for open editor views
+ *   <li>the {@link saros.editor.SharedEditorListenerDispatch} dispatches to a changing set of
+ *       {@link saros.editor.ISharedEditorListener}s
+ *   <li>the {@link saros.editor.StoppableDocumentListener} informs the given EditorManager of
+ *       changes before they occur in a document (using documentAboutToBeChanged) *
+ *   <li>the {@link saros.editor.EditorPartListener} listens to the editor's view state
+ *       changes.Transmit the result to {@link saros.editor.EditorManager} *
+ *   <li>the {@link saros.editor.EditorListener} listen for selection and viewport changes in the
+ *       text content of the editor view. Transmit the result to {@link saros.editor.EditorManager}
  * </ul>
  */
 package saros.editor;

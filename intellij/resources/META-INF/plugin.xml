@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin url="https://www.saros-project.org">
 
     <name>Saros</name>
 
@@ -10,39 +10,42 @@
 
     <change-notes>
         <![CDATA[
-        This is the first alpha version of Saros for IntelliJ. Use at your own risk.
-        <br><br>
-        Detailed release notes can be found at
-        <a href="https://www.saros-project.org/releases/saros-i_0.1.0.html">
-            https://www.saros-project.org/releases/saros-i_0.1.0.html
-        </a>
+        <ul>
+            <li>Allow project module to be shared</li>
+            <li>Honor excluded resources</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/issues/696">#696</a> - Color settings page not loading on the Windows platform</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/issues/703">#703</a> - Fix "Use existing module" option failing on the Windows platform</li>
+        </ul>
+        <br>
+        This list only refers to changes included in the latest release.
+        For the change history, you can have a look at JetBrains plugin site or
+        <a href="https://www.saros-project.org/releases/">our release page</a>,
+        which also contains a more detailed version of the release notes.
         ]]>
     </change-notes>
 
-    <version>0.1.0</version>
+    <version>0.2.1</version>
 
     <vendor url="https://www.saros-project.org" email="saros-devel@googlegroups.com">
         Saros Project
     </vendor>
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="182.5107.16"/>
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
     <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     -->
 
     <application-components>
-        <!-- Add your application components here -->
-    </application-components>
-
-    <project-components>
         <component>
-            <implementation-class>saros.intellij.SarosComponent
+            <implementation-class>
+                saros.intellij.SarosComponent
             </implementation-class>
         </component>
-    </project-components>
+    </application-components>
 
     <actions>
         <group keep-content="true" compact="false" popup="true"
@@ -59,9 +62,9 @@
                     anchor="bottom" secondary="true"
                     factoryClass="saros.intellij.ui.SarosToolWindowFactory"/>
 
-        <toolWindow id="Swt Browser" icon="/icons/saros/saros_misc.png"
-                    anchor="bottom" secondary="true"
-                    factoryClass="saros.intellij.ui.swt_browser.SwtToolWindowFactory"
-                    conditionClass="saros.intellij.ui.swt_browser.BrowserCondition"/>
+        <colorSettingsPage id="saros"
+                           implementation="saros.intellij.preferences.colors.LocalSarosAnnotationColorsPage" />
+        <additionalTextAttributes scheme="Default" file="/colorSchemes/SarosDefault.xml" />
+        <additionalTextAttributes scheme="Darcula" file="/colorSchemes/SarosDarcula.xml" />
     </extensions>
 </idea-plugin>

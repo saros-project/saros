@@ -1,6 +1,7 @@
 package saros.editor.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,7 +25,6 @@ public class AnnotationModelHelper {
   private static Iterable<Annotation> toIterable(final IAnnotationModel model) {
     return new Iterable<Annotation>() {
       @Override
-      @SuppressWarnings("unchecked")
       public Iterator<Annotation> iterator() {
         return model.getAnnotationIterator();
       }
@@ -56,6 +56,37 @@ public class AnnotationModelHelper {
   }
 
   /**
+   * Removes annotations and replaces them in one step.
+   *
+   * @param model The {@link IAnnotationModel} that should be cleaned.
+   * @param annotationsToRemove The annotations to remove.
+   * @param annotationsToAdd The annotations to add.
+   */
+  public void replaceAnnotationsInModel(
+      IAnnotationModel model,
+      Collection<? extends Annotation> annotationsToRemove,
+      Map<? extends Annotation, Position> annotationsToAdd) {
+
+    if (model instanceof IAnnotationModelExtension) {
+      IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
+      extension.replaceAnnotations(
+          annotationsToRemove.toArray(new Annotation[annotationsToRemove.size()]),
+          annotationsToAdd);
+    } else {
+      if (LOG.isTraceEnabled())
+        LOG.trace("AnnotationModel " + model + " does not support IAnnotationModelExtension");
+
+      for (Annotation annotation : annotationsToRemove) {
+        model.removeAnnotation(annotation);
+      }
+
+      for (Entry<? extends Annotation, Position> entry : annotationsToAdd.entrySet()) {
+        model.addAnnotation(entry.getKey(), entry.getValue());
+      }
+    }
+  }
+
+  /**
    * Removes annotations that match a given predicate and replaces them in one step.
    *
    * @param model The {@link IAnnotationModel} that should be cleaned.
@@ -66,7 +97,6 @@ public class AnnotationModelHelper {
       Predicate<Annotation> predicate,
       Map<Annotation, Position> replacement) {
 
-    // Collect annotations.
     ArrayList<Annotation> annotationsToRemove = new ArrayList<Annotation>(128);
 
     for (Annotation annotation : AnnotationModelHelper.toIterable(model)) {
@@ -75,22 +105,7 @@ public class AnnotationModelHelper {
       }
     }
 
-    // Remove collected annotations.
-    if (model instanceof IAnnotationModelExtension) {
-      IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
-      extension.replaceAnnotations(
-          annotationsToRemove.toArray(new Annotation[annotationsToRemove.size()]), replacement);
-    } else {
-      LOG.trace("AnnotationModel does not " + "support IAnnotationModelExtension: " + model);
-
-      for (Annotation annotation : annotationsToRemove) {
-        model.removeAnnotation(annotation);
-      }
-
-      for (Entry<Annotation, Position> entry : replacement.entrySet()) {
-        model.addAnnotation(entry.getKey(), entry.getValue());
-      }
-    }
+    replaceAnnotationsInModel(model, annotationsToRemove, replacement);
   }
 
   public IAnnotationModel retrieveAnnotationModel(IEditorPart editorPart) {

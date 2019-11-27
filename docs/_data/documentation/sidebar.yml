@@ -1,24 +1,17 @@
 - title: Installation
-  sublinks:
-  - title: Eclipse
-    url: /documentation/installation-eclipse.html
-  - title: IntelliJ
-    url: /documentation/installation-intellij.html
+  url: /documentation/installation.html?tab=eclipse
 
 - title: Getting Started
-  sublinks:
-  - title: Eclipse
-    url: /documentation/getting-started-eclipse.html
-  - title: IntelliJ
-    url: /documentation/getting-started-intellij.html
+  url: /documentation/getting-started.html?tab=eclipse
 
 - title: Setup XMPP Server
   url: /documentation/setup-xmpp.html
 
+- title: Setup Saros Server
+  url: /documentation/saros-server.html
+
 - title: Screenshots
-  sublinks:
-  - title: Eclipse
-    url: /documentation/screenshots-eclipse.html
+  url: /documentation/screenshots.html?tab=eclipse
 
 - title: Host Comic
   url: /documentation/host-comic.html

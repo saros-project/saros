@@ -216,7 +216,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
            * CARLs MUC is broken !
            */
           ThreadUtils.runSafeAsync(
-              "dpp-muc-join",
+              "muc-join",
               log,
               new Runnable() {
                 @Override

@@ -1,5 +1,7 @@
 package saros.intellij.ui.tree;
 
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import saros.SarosPluginContext;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.ui.util.IconManager;
+import saros.intellij.ui.views.SarosMainPanelView;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -18,10 +21,15 @@ import saros.session.ISessionLifecycleListener;
 import saros.session.ISessionListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
-import saros.ui.util.ModelFormatUtils;
+import saros.util.CoreUtils;
 
-/** Session tree root node. */
-public class SessionTreeRootNode extends DefaultMutableTreeNode {
+/**
+ * Session tree root node.
+ *
+ * <p><b>NOTE:</b>This component and any component added here must be correctly torn down when the
+ * project the components belong to is closed. See {@link SarosMainPanelView}.
+ */
+public class SessionTreeRootNode extends DefaultMutableTreeNode implements Disposable {
   public static final String TREE_TITLE = "Session";
   public static final String TREE_TITLE_NO_SESSIONS = "No Session Running";
 
@@ -33,6 +41,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
   private final DefaultTreeModel treeModel;
 
   @Inject private ISarosSessionManager sessionManager;
+
+  private volatile ISarosSession session;
 
   private final ISessionListener sessionListener =
       new ISessionListener() {
@@ -74,14 +84,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
       new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession newSarosSession) {
-          UIUtil.invokeLaterIfNeeded(
-              new Runnable() {
-                @Override
-                public void run() {
-                  newSarosSession.addListener(sessionListener);
-                  createSessionNode(newSarosSession);
-                }
-              });
+          SessionTreeRootNode.this.sessionStarted(newSarosSession);
         }
 
         @Override
@@ -93,6 +96,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
                 public void run() {
                   oldSarosSession.removeListener(sessionListener);
                   removeSessionNode(oldSarosSession);
+
+                  session = null;
                 }
               });
         }
@@ -100,12 +105,44 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
 
   public SessionTreeRootNode(SessionAndContactsTreeView treeView) {
     super(treeView);
+
+    Disposer.register(treeView, this);
+
     SarosPluginContext.initComponent(this);
     this.treeView = treeView;
     treeModel = (DefaultTreeModel) this.treeView.getModel();
     setUserObject(TREE_TITLE_NO_SESSIONS);
 
     sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+  }
+
+  @Override
+  public void dispose() {
+    sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
+
+    ISarosSession currentSession = session;
+
+    if (currentSession != null) {
+      currentSession.removeListener(sessionListener);
+    }
+  }
+
+  void setInitialState() {
+    ISarosSession session = sessionManager.getSession();
+
+    if (session != null) {
+      sessionStarted(session);
+    }
+  }
+
+  private void sessionStarted(final ISarosSession newSarosSession) {
+    session = newSarosSession;
+
+    UIUtil.invokeLaterIfNeeded(
+        () -> {
+          newSarosSession.addListener(sessionListener);
+          createSessionNode(newSarosSession);
+        });
   }
 
   private void createSessionNode(ISarosSession newSarosSession) {
@@ -214,7 +251,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
 
     public UserInfo(User user) {
       super(
-          (user.isHost() ? "Host " : "") + ModelFormatUtils.getDisplayName(user),
+          (user.isHost() ? "Host " : "") + CoreUtils.determineUserDisplayName(user),
           IconManager.CONTACT_ONLINE_ICON);
       this.user = user;
     }

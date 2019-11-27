@@ -18,13 +18,6 @@
            id="saros.ui.views.SarosView"
            name="Saros">
      </view>
-     <!-- <view
-			category="saros.Saros"
-			class="saros.ui.views.SarosViewBrowserVersion"
-			icon="icons/view16/saros_misc.png"
-			id="saros.ui.views.SarosViewBrowserVersion"
-			name="Saros HTML GUI">
-			</view> -->
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -130,6 +123,7 @@
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <!-- viewports -->
       <specification
             annotationType="saros.annotations.viewport.default"
             colorPreferenceKey="saros.annotations.viewport.color.default"
@@ -138,7 +132,8 @@
             highlightPreferenceKey="saros.annotations.viewport.highlight.default"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Default Viewport"
+            label="Saros Default User Viewport"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.viewport.overview.default"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
@@ -155,7 +150,8 @@
             highlightPreferenceKey="saros.annotations.viewport.highlight.1"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport User 1"
+            label="Saros User 1 Viewport"
+            icon="icons/etool16/saros_menu.png"            
             overviewRulerPreferenceKey="saros.annotations.viewport.overview.1"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
@@ -172,7 +168,8 @@
             highlightPreferenceKey="saros.annotations.viewport.highlight.2"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport User 2"
+            label="Saros User 2 Viewport"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.viewport.overview.2"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
@@ -189,7 +186,8 @@
             highlightPreferenceKey="saros.annotations.viewport.highlight.3"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport User 3"
+            label="Saros User 3 Viewport"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.viewport.overview.3"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
@@ -206,7 +204,8 @@
             highlightPreferenceKey="saros.annotations.viewport.highlight.4"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport User 4"
+            label="Saros User 4 Viewport"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.viewport.overview.4"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
@@ -223,7 +222,8 @@
             highlightPreferenceKey="saros.annotations.viewport.highlight.5"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport User 5"
+            label="Saros User 5 Viewport"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.viewport.overview.5"
             overviewRulerPreferenceValue="true"
             presentationLayer="1"
@@ -233,6 +233,7 @@
             verticalRulerPreferenceKey="saros.annotations.viewport.ruler.5"
             verticalRulerPreferenceValue="false"/>
 
+      <!-- contributions -->
       <specification
             annotationType="saros.annotations.contribution.default"
             colorPreferenceKey="saros.annotations.contribution.color.default"
@@ -245,7 +246,8 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Default Contribution"
+            label="Saros Default User Contribution"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -263,7 +265,8 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Contribution User 1"
+            label="Saros User 1 Contribution"
+            icon="icons/etool16/saros_menu.png"            
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -281,7 +284,8 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Contribution User 2"
+            label="Saros User 2 Contribution"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -299,7 +303,8 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Contribution User 3"
+            label="Saros User 3 Contribution"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -317,7 +322,8 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Contribution User 4"
+            label="Saros User 4 Contribution"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -335,13 +341,15 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Contribution User 5"
+            label="Saros User 5 Contribution"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
             textStylePreferenceValue="UNDERLINE"
             verticalRulerPreferenceValue="false"/>
 
+      <!-- selections -->
       <specification
             annotationType="saros.annotations.selection.default"
             colorPreferenceKey="saros.annotations.selection.color.default"
@@ -350,7 +358,8 @@
             highlightPreferenceKey="saros.annotations.selection.highlight.default"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Default Selection"
+            label="Saros Default User Selection"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.selection.overview.default"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -368,7 +377,8 @@
             highlightPreferenceKey="saros.annotations.selection.highlight.1"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection User 1"
+            label="Saros User 1 Selection"
+            icon="icons/etool16/saros_menu.png"            
             overviewRulerPreferenceKey="saros.annotations.selection.overview.1"
             overviewRulerPreferenceValue="true"
             presentationLayer="9"
@@ -386,7 +396,8 @@
             highlightPreferenceKey="saros.annotations.selection.highlight.2"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection User 2"
+            label="Saros User 2 Selection"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.selection.overview.2"
             overviewRulerPreferenceValue="true"
             presentationLayer="10"
@@ -404,7 +415,8 @@
             highlightPreferenceKey="saros.annotations.selection.highlight.3"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection User 3"
+            label="Saros User 3 Selection"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.selection.overview.3"
             overviewRulerPreferenceValue="true"
             presentationLayer="11"
@@ -422,7 +434,8 @@
             highlightPreferenceKey="saros.annotations.selection.highlight.4"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection User 4"
+            label="Saros User 4 Selection"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.selection.overview.4"
             overviewRulerPreferenceValue="true"
             presentationLayer="12"
@@ -440,7 +453,8 @@
             highlightPreferenceKey="saros.annotations.selection.highlight.5"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection User 5"
+            label="Saros User 5 Selection"
+            icon="icons/etool16/saros_menu.png"
             overviewRulerPreferenceKey="saros.annotations.selection.overview.5"
             overviewRulerPreferenceValue="true"
             presentationLayer="13"
@@ -450,12 +464,11 @@
             textStylePreferenceValue="BOX"
             verticalRulerPreferenceKey="saros.annotations.selection.ruler.5"
             verticalRulerPreferenceValue="false"/>
-
    </extension>
    <extension
          id="saros.modelProvider"
          point="org.eclipse.core.resources.modelProviders">
-      <modelProvider class="saros.project.internal.ResourceChangeValidator"/>
+      <modelProvider class="saros.session.resources.validation.ResourceChangeValidator"/>
       <enablement>
          <instanceof value="org.eclipse.core.resources.IResource"/>
       </enablement>
@@ -1002,6 +1015,7 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?before=menustart">
+         <!-- See SarosView, the context menu is created manually 
          <command
                commandId="saros.ui.commands.ShareResource"
                disabledIcon="icons/dlcl16/spacer.png"
@@ -1023,6 +1037,7 @@
                </and>
             </visibleWhen>
          </command>
+         -->
          <command
                commandId="saros.ui.commands.SessionAddSelectedContacts"
                disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
@@ -1038,10 +1053,13 @@
                         definitionId="saros.ui.definitions.isSarosSessionRunning">
                   </reference>
                   <reference
+                        definitionId="saros.ui.definitions.isSarosSessionHost">
+                  </reference>
+                  <reference
                         definitionId="saros.ui.definitions.contactsSelected">
                   </reference>
                   <reference
-                        definitionId="saros.ui.definitions.isSarosSessionHost">
+                        definitionId="saros.ui.definitions.contactsOnline">
                   </reference>
                </and>
             </visibleWhen>
@@ -1186,6 +1204,28 @@
                type="saros.net.xmpp.JID">
          </adapt>
       </definition>
+      <definition
+      		id="saros.ui.definitions.isContactOnline">
+         <adapt
+               type="saros.net.xmpp.JID">
+            <test
+                  property="saros.isOnline">
+            </test>
+         </adapt>
+      </definition>
+            <definition
+            id="saros.ui.definitions.contactsOnline">
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <reference
+                     definitionId="saros.ui.definitions.isContactOnline">
+               </reference>
+            </iterate>
+         </with>
+      </definition>      
       <definition
             id="saros.ui.definitions.contactsSelected">
          <with
@@ -1378,7 +1418,7 @@
             class="saros.ui.expressions.ContactPropertyTester"
             id="saros.ui.expressions.ContactPropertyTester"
             namespace="saros"
-            properties="isInSarosSession"
+            properties="isInSarosSession,isOnline"
             type="saros.net.xmpp.JID">
       </propertyTester>
       <propertyTester
@@ -1392,17 +1432,10 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="saros.ui.model.roster.RosterGroupElement"
-            class="saros.ui.model.roster.RosterAdapterFactory">
-         <adapter
-               type="org.jivesoftware.smack.RosterGroup">
-         </adapter>
-      </factory>
-      <factory
             adaptableType="saros.ui.model.roster.RosterEntryElement"
             class="saros.ui.model.roster.RosterAdapterFactory">
          <adapter
-               type="org.jivesoftware.smack.RosterEntry">
+               type="saros.net.xmpp.contact.XMPPContact">
          </adapter>
          <adapter
                type="saros.net.xmpp.JID">

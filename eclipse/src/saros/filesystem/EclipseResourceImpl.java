@@ -102,15 +102,8 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public boolean isDerived(boolean checkAncestors) {
-    if (!checkAncestors) return delegate.isDerived();
-
+  public boolean isIgnored() {
     return delegate.isDerived(org.eclipse.core.resources.IResource.CHECK_ANCESTORS);
-  }
-
-  @Override
-  public boolean isDerived() {
-    return delegate.isDerived();
   }
 
   @Override
