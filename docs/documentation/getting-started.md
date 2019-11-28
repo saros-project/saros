@@ -44,8 +44,7 @@ You need an **XMPP account** to use Saros.
 To do that simply start the *Saros Configuration* wizard (*Menu &gt;
 Saros &gt; Start Saros Configuration*)
 
-![Connecting to
-Server](images/1_GettingStartedCreateAccount_0.png)
+![Connecting to Server](images/1_GettingStartedCreateAccount_0.png){:class="img-fluid"}
 
 
 ### Step 2: Adding Contacts
@@ -57,8 +56,7 @@ your contact.
 Once s/he accepts your request you will be able to see his/her **online
 status in your contact list**.
 
-![Adding
-buddies](images/2_GettingStartedAddContacts.png)
+![Adding buddies](images/2_GettingStartedAddContacts.png){:class="img-fluid"}
 
 ### Step 3: Starting and Joining Sessions
 
@@ -68,8 +66,7 @@ session** or by **being invited to one**.
 When **starting** a session, **Saros will copy the project** to the
 computer of your invited contacts.
 
-![Share
-Projects](images/3_GettingStartedShareProjects_0.png)
+![Share Projects](images/3_GettingStartedShareProjects_0.png){:class="img-fluid"}
 
 #### Start a Session ([host](#the-host))
 
@@ -129,44 +126,36 @@ accompany your sessions.
 Whenever you begin a Saros session, a **chat session** is also
 automatically started.
 
-![saros\_view\_with\_contextmenu](images/saros_view_with_contextmenu_1.png)
+![saros\_view\_with\_contextmenu](images/saros_view_with_contextmenu_1.png){:class="img-fluid"}
 
 ### Step 5: Exploring the Saros Toolbar
 
 #### General
 
-![connect
-button](images/saros_connect_button.png)**Connecting:**
+![connect button](images/saros_connect_button.png)**Connecting:**
 
 Click here to connect or disconnect from the server, or to switch
 between user accounts if you have more than one. When you connect, you
 will see information about your contacts (including whether they are
 connected and also whether they support Saros).
 
-![add buddy
-icon](images/saros_addbuddy_button.png)**Add
-Contact:**
+![add buddy icon](images/saros_addbuddy_button.png)**Add Contact:**
 
 To add a new contact click here (you will need the full XMPP address of
 your contact in the format: `username@server`).
 
-![saros preferences
-button](images/preferences_open_tsk.png)**Open
-Saros preferences:**
+![saros preferences button](images/preferences_open_tsk.png)**Open Saros preferences:**
 
 Opens the Saros section of the Eclipse preferences. This is a shortcut
 for *Window &gt; Preferences &gt; Saros*.
 
-![saros consistency
-button](images/saros_consistency_button_0.png)**Inconsistency
-repair:**
+![saros consistency button](images/saros_consistency_button_0.png)**Inconsistency repair:**
 
 Sometimes accidents can happen and your copy of the project can become
 out of sync with the host's copy. When it does, this button will light
 up. When you click it, the inconsistencies will be repaired.
 
-![follow mode](images/followmode_0.png)**Switch
-Follow Mode on/off:**
+![follow mode](images/followmode_0.png)**Switch Follow Mode on/off:**
 
 You can turn the Follow Mode on and of. In Follow Mode Saros will
 automatically sync your Eclipse view with the user you are following,
@@ -174,9 +163,7 @@ opening shared files the user is opening, and automatically scroll to
 the visible part of the editor of open files, so you always see what the
 followed user sees.
 
-![saros leave button
-](images/saros_leave_button.png)**Leave the
-session:**
+![saros leave button](images/saros_leave_button.png)**Leave the session:**
 
 Click here to leave the current session. If you are the
 [host](#the-host), the session will be
@@ -184,22 +171,16 @@ closed and all participants will be ejected from the session.
 
 #### Context Menu
 
-![write
-access](images/buddy_saros_obj.png)**Grant Write
-Access:**
+![write access](images/buddy_saros_obj.png)**Grant Write Access:**
 
 Gives the selected participant write access.
 
-![read-only
-access](images/participant_readonly_0.png)**Restrict
-to Read-Only Access:**
+![read-only access](images/participant_readonly_0.png)**Restrict to Read-Only Access:**
 
 Removes the write access right from the selected participant. The
 affected participant will only have read access afterwards.
 
-![follow mode
-icon](images/followmode_0.png)**Follow
-Participant:**
+![follow mode icon](images/followmode_0.png)**Follow Participant:**
 
 Follows the selected participant as described in section [Follow Mode](#follow-mode).
 
@@ -213,9 +194,7 @@ chat:**
 
 Opens a chat with this contact on the right side.
 
-![share file
-icon](images/saros_sharefile_button.png)**Send
-File:**
+![share file icon](images/saros_sharefile_button.png)**Send File:**
 
 Gives you the opportunity to select a file to be sent to the selected
 participant.
