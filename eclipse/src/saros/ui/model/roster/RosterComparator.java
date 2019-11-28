@@ -2,11 +2,10 @@ package saros.ui.model.roster;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.jivesoftware.smack.Roster;
 import saros.ui.model.ITreeElement;
 
 /**
- * Comparator for {@link ITreeElement} describing {@link Roster} entities.
+ * Comparator for {@link ITreeElement} describing Contact entities.
  *
  * <p>{@link RosterGroupElement}s and {@link RosterEntryElement}s are sorted alphabetically.
  *

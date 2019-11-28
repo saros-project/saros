@@ -8,7 +8,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.jivesoftware.smack.Roster;
 import saros.SarosPluginContext;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.IContactsUpdate;
@@ -23,7 +22,7 @@ import saros.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
 import saros.ui.widgets.viewer.roster.events.ContactSelectionListener;
 
 /**
- * Allows the user to select a {@link JID} from the {@link Roster}.
+ * Allows the user to select a {@link JID} from the Contact List.
  *
  * @author bkahlert
  */
