@@ -126,7 +126,7 @@ In case you don't know yet:
 
 #### Which merge option should be used?
 
-![GitHub merge options](../images/processes/GitHub_choose_merge_method.png)
+![GitHub merge options](../images/processes/GitHub_choose_merge_method.png){:class="img-fluid"}
 
 We allow the two options [squash and merge](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits) and [rebase and merge](https://help.github.com/articles/about-pull-request-merges/#rebase-and-merge-your-pull-request-commits).
 Both options avoid merge commits which lead to a strict chronological commit history.
@@ -137,7 +137,7 @@ Information on when to use which merge strategy is given in our [development pro
 This method squashes all changes of your pull request. If you choose this option, GitHub proposes a possible commit name
 and message which you can change before you merge.
 
-![GitHub choose commit message](../images/processes/GitHub_choose_commit_message.png)
+![GitHub choose commit message](../images/processes/GitHub_choose_commit_message.png){:class="img-fluid"}
 
 Use this method if you don't want to preserve the commit history. This is always useful if the history contains multiple commits which
 are nice to have during the reviewing process, but not necessary in the whole history of the project.
