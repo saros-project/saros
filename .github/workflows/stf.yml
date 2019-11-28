@@ -6,7 +6,7 @@ on:
     branches:    
       - 'pr/stf/*'
 
-# Restriction when STFs ha stable results
+# Restriction when STF has stable results
 #    paths:
 #      - 'stf/**'
 #      - 'stf.test/**'
