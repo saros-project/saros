@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
 import saros.activities.DeletionAcknowledgmentActivity;
+import saros.activities.EditorActivity;
 import saros.activities.FileActivity;
-import saros.activities.FileActivity.Type;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.SPath;
@@ -153,7 +153,7 @@ class ResourceActivityFilter {
    * #fileDeletionHandler} with the deleted file.
    *
    * <p>Does nothing if the passed activity is not a {@link FileActivity} or does not have the type
-   * {@link Type#REMOVED} or {@link Type#MOVED}.
+   * {@link FileActivity.Type#REMOVED} or {@link FileActivity.Type#MOVED}.
    *
    * @param activity the activity to handle
    * @see #deletedFileFilter
@@ -167,10 +167,10 @@ class ResourceActivityFilter {
     FileActivity fileActivity = (FileActivity) activity;
 
     SPath removedFile;
-    if (fileActivity.getType() == Type.REMOVED) {
+    if (fileActivity.getType() == FileActivity.Type.REMOVED) {
       removedFile = fileActivity.getPath();
 
-    } else if (fileActivity.getType() == Type.MOVED
+    } else if (fileActivity.getType() == FileActivity.Type.MOVED
         && !fileActivity.getPath().equals(fileActivity.getOldPath())) {
 
       removedFile = fileActivity.getOldPath();
@@ -201,7 +201,7 @@ class ResourceActivityFilter {
    * the files to no longer be detected as filtered out by {@link #isFiltered(IActivity)}.
    *
    * <p>Does nothing if the passed activity is not a {@link FileActivity} or does not have the type
-   * {@link Type#CREATED} or {@link Type#MOVED}.
+   * {@link FileActivity.Type#CREATED} or {@link FileActivity.Type#MOVED}.
    *
    * @param activity the activity to handle
    * @see #deletedFileFilter
@@ -214,7 +214,9 @@ class ResourceActivityFilter {
 
     FileActivity fileActivity = (FileActivity) activity;
 
-    if (fileActivity.getType() == Type.MOVED || fileActivity.getType() == Type.CREATED) {
+    if (fileActivity.getType() == FileActivity.Type.MOVED
+        || fileActivity.getType() == FileActivity.Type.CREATED) {
+
       SPath addedFile = fileActivity.getPath();
 
       if (deletedFileFilter.containsKey(addedFile)) {
@@ -230,8 +232,18 @@ class ResourceActivityFilter {
    * deleted files.
    *
    * <p>Non-resource activities are never detected as being filtered. Furthermore, resource
-   * activities of the type {@link ChecksumActivity} that confirm the file deletion or activities of
-   * the type {@link DeletionAcknowledgmentActivity} are never detected as being filtered.
+   * activities dealing with the tear-down of the internal Saros state related to the deleted
+   * resource are never detected as being filtered. This applies to the following kinds of
+   * activities:
+   *
+   * <ul>
+   *   <li>a {@link ChecksumActivity} with the content {@link ChecksumActivity#NON_EXISTING_DOC} (as
+   *       it is used to confirm the file deletion; necessary for the consistency logic)
+   *   <li>a {@link EditorActivity} of the type {@link EditorActivity.Type#CLOSED} (as it is used to
+   *       confirm that the editor was closed; necessary for the user editor state logic)
+   *   <li>a {@link DeletionAcknowledgmentActivity} (as it is used confirm that the file deletion
+   *       was processed; necessary for the resource activity filter logic)
+   * </ul>
    *
    * @param activity the activity to check
    * @return whether the passed activity is filtered out
@@ -254,11 +266,18 @@ class ResourceActivityFilter {
 
     boolean pathIsFiltered = deletedFileFilter.containsKey(path);
 
-    if (pathIsFiltered && activity instanceof ChecksumActivity) {
-      ChecksumActivity checksumActivity = (ChecksumActivity) activity;
+    if (pathIsFiltered) {
+      if (activity instanceof ChecksumActivity) {
+        ChecksumActivity checksumActivity = (ChecksumActivity) activity;
 
-      return checksumActivity.getHash() != ChecksumActivity.NON_EXISTING_DOC
-          && checksumActivity.getLength() != ChecksumActivity.NON_EXISTING_DOC;
+        return checksumActivity.getHash() != ChecksumActivity.NON_EXISTING_DOC
+            && checksumActivity.getLength() != ChecksumActivity.NON_EXISTING_DOC;
+
+      } else if (activity instanceof EditorActivity) {
+        EditorActivity editorActivity = (EditorActivity) activity;
+
+        return EditorActivity.Type.CLOSED != editorActivity.getType();
+      }
     }
 
     return pathIsFiltered;
