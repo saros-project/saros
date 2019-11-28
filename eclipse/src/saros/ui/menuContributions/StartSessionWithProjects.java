@@ -15,7 +15,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.jivesoftware.smack.RosterEntry;
 import saros.net.xmpp.JID;
 import saros.ui.Messages;
 import saros.ui.util.CollaborationUtils;
@@ -81,7 +80,7 @@ public class StartSessionWithProjects extends ContributionItem {
     return workspaceProjects;
   }
 
-  /** Creates a menu entry which shares projects with the given {@link RosterEntry}. */
+  /** Creates a menu entry which shares projects with the given Contacts. */
   private MenuItem createProjectMenuItem(
       final Menu parentMenu, final int index, final IProject project, final List<JID> contacts) {
 

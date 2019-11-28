@@ -2,14 +2,13 @@ package saros.ui.widgets.viewer.session;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.jivesoftware.smack.Roster;
 import saros.net.xmpp.JID;
 import saros.session.ISarosSession;
 import saros.ui.model.roster.RosterEntryElement;
 
 /**
- * This filter is responsible for hiding those contacts in the {@linkplain Roster contact list} that
- * are currently part of the running Saros session.
+ * This filter is responsible for hiding those contacts in the contact list that are currently part
+ * of the running Saros session.
  *
  * @author srossbach
  * @author waldmann
