@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Random;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
-import saros.SarosConstants;
 import saros.communication.extensions.ConnectionEstablishedExtension;
 import saros.communication.extensions.InvitationAcceptedExtension;
 import saros.communication.extensions.InvitationAcknowledgedExtension;
@@ -21,6 +20,7 @@ import saros.negotiation.hooks.SessionNegotiationHookManager;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
+import saros.net.ResourceFeature;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.discovery.DiscoveryManager;
 import saros.preferences.IPreferenceStore;
@@ -213,7 +213,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     monitor.setTaskName("Checking Saros support...");
 
     JID resourceQualifiedJID =
-        discoveryManager.getSupportingPresence(getPeer(), SarosConstants.XMPP_FEATURE_NAMESPACE);
+        discoveryManager.getSupportingPresence(getPeer(), ResourceFeature.SAROS.getIdentifier());
 
     if (resourceQualifiedJID == null)
       throw new LocalCancellationException(

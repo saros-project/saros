@@ -39,13 +39,13 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.packet.Presence;
-import saros.SarosConstants;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
+import saros.net.ResourceFeature;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
-import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.roster.IRosterListener;
 import saros.net.xmpp.roster.RosterTracker;
 import saros.preferences.EclipsePreferenceConstants;
@@ -76,7 +76,6 @@ import saros.ui.actions.RenameContactAction;
 import saros.ui.actions.RequestSessionInviteAction;
 import saros.ui.actions.SendFileAction;
 import saros.ui.actions.SkypeAction;
-import saros.ui.expressions.ContactPropertyTester;
 import saros.ui.menuContributions.StartSessionWithProjects;
 import saros.ui.model.roster.RosterEntryElement;
 import saros.ui.sounds.SoundPlayer;
@@ -236,8 +235,6 @@ public class SarosView extends ViewPart {
   @Inject protected RosterTracker rosterTracker;
 
   @Inject protected XMPPConnectionService connectionService;
-
-  @Inject private DiscoveryManager discoveryManager;
 
   private static volatile boolean showBalloonNotifications;
 
@@ -453,17 +450,17 @@ public class SarosView extends ViewPart {
              * Do not display the following actions if no contacts are
              * selected.
              */
-            List<JID> contacts =
-                SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
-            if (contacts.size() == 0) return;
+            List<XMPPContact> contacts =
+                SelectionRetrieverFactory.getSelectionRetriever(XMPPContact.class).getSelection();
+            if (contacts.isEmpty()) return;
 
-            final JID jid = contacts.get(0);
+            XMPPContact contact = contacts.get(0);
 
-            // FIXME dirty hack
-            final ContactPropertyTester tester = new ContactPropertyTester();
-            final boolean isOnline = tester.test(jid, "isOnline", null, null);
-
-            if (sarosSessionManager.getSession() == null && isOnline) {
+            // TODO OLD Behavior: here (and at other places) we check if contact is online
+            // (currently you can invite a  contact without saros support and get a error message),
+            // but could check already for saros support via contact.hasSarosSupport(). In this case
+            // we should probably add a Information about missing saros support.
+            if (sarosSessionManager.getSession() == null && contact.getStatus().isOnline()) {
               MenuManager shareProjectSubMenu =
                   new MenuManager(
                       "Share Project(s)...",
@@ -478,9 +475,7 @@ public class SarosView extends ViewPart {
 
             // TODO: Currently only Saros/S is known to have a working JoinSessionRequestHandler,
             //       remove this once the situation changes / change this to it's own feature.
-            Boolean isServer =
-                discoveryManager.isFeatureSupported(jid, SarosConstants.NAMESPACE_SERVER);
-            if (contacts.size() == 1 && isServer != null && isServer) {
+            if (contact.hasFeatureSupport(ResourceFeature.SAROS_SERVER)) {
               manager.add(getAction(RequestSessionInviteAction.ACTION_ID));
               manager.add(new Separator());
             }

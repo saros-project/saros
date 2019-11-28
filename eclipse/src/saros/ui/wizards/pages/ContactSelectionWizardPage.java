@@ -9,11 +9,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.Roster;
-import saros.SarosConstants;
 import saros.SarosPluginContext;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.discovery.DiscoveryManager;
-import saros.net.xmpp.discovery.DiscoveryManagerListener;
+import saros.net.xmpp.contact.IContactsUpdate;
+import saros.net.xmpp.contact.IContactsUpdate.UpdateType;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
 import saros.ui.util.SWTUtils;
@@ -48,7 +48,7 @@ public class ContactSelectionWizardPage extends WizardPage {
   /** This flag is true as soon as the user selected contacts without problems. */
   protected boolean selectionWasValid = false;
 
-  @Inject protected DiscoveryManager discoveryManager;
+  @Inject private XMPPContactsService contactsService;
 
   /**
    * This {@link ContactSelectionListener} changes the {@link WizardPage}'s state according to the
@@ -64,24 +64,17 @@ public class ContactSelectionWizardPage extends WizardPage {
       };
 
   /** This listener update the page completion if someone's presence changed. */
-  protected final DiscoveryManagerListener discoveryManagerListener =
-      new DiscoveryManagerListener() {
-        @Override
-        public void featureSupportUpdated(final JID jid, String feature, boolean isSupported) {
+  private final IContactsUpdate contactsUpdate =
+      (contact, type) -> {
+        if (type != UpdateType.FEATURE_SUPPORT) return;
 
-          if (!SarosConstants.XMPP_FEATURE_NAMESPACE.equals(feature)) return;
+        SWTUtils.runSafeSWTAsync(
+            LOG,
+            () -> {
+              if (ContactSelectionWizardPage.this.getControl().isDisposed()) return;
 
-          SWTUtils.runSafeSWTAsync(
-              LOG,
-              new Runnable() {
-                @Override
-                public void run() {
-                  if (ContactSelectionWizardPage.this.getControl().isDisposed()) return;
-
-                  updatePageCompletion();
-                }
-              });
-        }
+              updatePageCompletion();
+            });
       };
 
   public ContactSelectionWizardPage() {
@@ -94,13 +87,13 @@ public class ContactSelectionWizardPage extends WizardPage {
     setDescription(DESCRIPTION);
 
     SarosPluginContext.initComponent(this);
-    discoveryManager.addDiscoveryManagerListener(discoveryManagerListener);
+    contactsService.addListener(contactsUpdate);
     this.allowEmptyContactSelection = allowEmptyContactSelection;
   }
 
   @Override
   public void dispose() {
-    discoveryManager.removeDiscoveryManagerListener(discoveryManagerListener);
+    contactsService.removeListener(contactsUpdate);
     super.dispose();
   }
 
