@@ -1,15 +1,15 @@
 package saros.ui.actions;
 
 import java.util.List;
+import java.util.Objects;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.jivesoftware.smack.Connection;
 import saros.SarosPluginContext;
 import saros.communication.chat.single.SingleUserChatService;
+import saros.communication.connection.ConnectionHandler;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.User;
 import saros.ui.ImageManager;
@@ -23,8 +23,7 @@ public class OpenChatAction extends Action implements Disposable {
 
   public static final String ACTION_ID = OpenChatAction.class.getName();
 
-  @Inject private XMPPConnectionService connectionService;
-
+  @Inject private ConnectionHandler connectionHandler;
   @Inject private SingleUserChatService chatService;
 
   private ChatRoomsComposite chatRoomsComposite;
@@ -52,19 +51,10 @@ public class OpenChatAction extends Action implements Disposable {
 
   @Override
   public void run() {
-    Connection connection = connectionService.getConnection();
-    if (connection == null) return;
-
-    String localUser = connection.getUser();
-    if (localUser == null) return;
-
+    JID localJID = connectionHandler.getLocalJID();
     JID jid = getSelectedJID();
-    if (jid == null) {
-      return;
-    }
 
-    JID localJID = new JID(localUser);
-    if (localJID.equals(jid)) return;
+    if (Objects.equals(localJID, jid)) return;
 
     chatRoomsComposite.openChat(chatService.createChat(jid), true);
   }
@@ -75,8 +65,7 @@ public class OpenChatAction extends Action implements Disposable {
   }
 
   private void updateEnablement() {
-    Connection connection = connectionService.getConnection();
-    if (connection == null) {
+    if (!connectionHandler.isConnected()) {
       setEnabled(false);
       return;
     }

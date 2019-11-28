@@ -3,6 +3,7 @@ package saros.communication.connection;
 import saros.net.ConnectionState;
 
 /** A listener for changes to the current connection state. */
+@FunctionalInterface
 public interface IConnectionStateListener {
 
   /**

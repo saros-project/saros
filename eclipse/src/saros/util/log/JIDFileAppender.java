@@ -7,14 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.spi.LoggingEvent;
-import org.jivesoftware.smack.Connection;
 import saros.Saros;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
 import saros.net.ConnectionState;
-import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
@@ -44,14 +43,14 @@ public class JIDFileAppender extends FileAppender {
   /*
    * Dependencies
    */
-  @Inject protected XMPPConnectionService connectionService;
+  @Inject private ConnectionHandler connectionHandler;
 
   @Inject protected Saros saros;
 
   @Override
   public synchronized void append(LoggingEvent event) {
 
-    if (connectionService == null && Saros.isInitialized()) {
+    if (connectionHandler == null && Saros.isInitialized()) {
       initialize();
     }
 
@@ -69,25 +68,20 @@ public class JIDFileAppender extends FileAppender {
     if (localJID != null) super.activateOptions();
   }
 
-  private IConnectionListener listener =
-      new IConnectionListener() {
-
-        @Override
-        public void connectionStateChanged(Connection connection, ConnectionState newState) {
-
-          if (newState == ConnectionState.CONNECTED) {
-            setJID(new JID(connection.getUser()));
-          }
+  private IConnectionStateListener listener =
+      (state, error) -> {
+        if (state == ConnectionState.CONNECTED) {
+          setJID(connectionHandler.getLocalJID());
         }
       };
 
   protected void initialize() {
     SarosPluginContext.initComponent(this);
 
-    connectionService.addListener(listener);
+    connectionHandler.addConnectionStateListener(listener);
 
     // If already connected use the current JID.
-    setJID(connectionService.getJID());
+    setJID(connectionHandler.getLocalJID());
   }
 
   protected synchronized void setJID(JID newJID) {
@@ -108,7 +102,7 @@ public class JIDFileAppender extends FileAppender {
 
     // log4j config changed, we are out
     if (fileNameBackup == null) {
-      connectionService.removeListener(listener);
+      connectionHandler.removeConnectionStateListener(listener);
       return;
     }
 

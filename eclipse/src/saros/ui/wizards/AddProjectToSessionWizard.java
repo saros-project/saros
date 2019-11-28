@@ -309,7 +309,8 @@ public class AddProjectToSessionWizard extends Wizard {
                       /*
                        * close all editors to avoid any conflicts.
                        */
-                      for (final IEditorPart editor : editorsToClose) EditorAPI.closeEditor(editor);
+                      for (final IEditorPart editor : editorsToClose)
+                        EditorAPI.closeEditor(editor, true);
                     }
                   });
 

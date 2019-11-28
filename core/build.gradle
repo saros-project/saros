@@ -1,5 +1,7 @@
-eclipse.project {
-  natures 'org.eclipse.pde.PluginNature'
+sarosEclipse {
+  manifest = file('META-INF/MANIFEST.MF')
+  createBundleJar = true
+  addPdeNature = true
 }
 
 dependencies {
@@ -13,11 +15,7 @@ dependencies {
   releaseDep 'com.thoughtworks.xstream:xstream:1.4.10'
   releaseDep 'org.gnu.inet:libidn:1.15'
 
-  releaseDep (log4jVersion) {
-      exclude group: 'com.sun.jmx', module: 'jmxri'
-      exclude group: 'com.sun.jdmk', module: 'jmxtools'
-      exclude group: 'javax.jms', module: 'jms'
-    }
+  addLog4JDependency(configurations.releaseDep)
   // The used version is a SNAPSHOT version which is not available!
   // TODO: use real release
   releaseDep files('libs/weupnp.jar')
@@ -31,22 +29,6 @@ dependencies {
 
 sourceSets.main.java.srcDirs = ['src', 'patches']
 sourceSets.test.java.srcDir 'test/junit'
-
-jar {
-  manifest {
-      def manif = "${projectDir}/META-INF/MANIFEST.MF"
-      if (new File(manif).exists()) {
-          from (manif) 
-      }
-  }
-
-  from sourceSets.main.output
-
-  // copy release dependencies into jar
-  into('lib') {
-    from configurations.getByName('releaseDep')
-  }
-}
 
 task testJar(type: Jar) {
   classifier = 'tests'

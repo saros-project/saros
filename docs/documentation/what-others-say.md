@@ -23,7 +23,7 @@ you.
 ## Magazines
 
 [Eclipse Magizine](http://it-republik.de/jaxenter/eclipse-magazin-ausgaben/Plug-in-Parade-000340.md)
-as part of issue number 2.10's cover-feature "Plug-in-Parade" (german)
+as part of issue number 2.10's cover-feature "Plug-in-Parade" (German)
 
 ## The Web
 

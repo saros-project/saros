@@ -1,5 +1,5 @@
 ---
-title: Setup Own XMPP Server
+title: Setup Your Own XMPP Server
 ---
 
 If you are an experienced user or if you want to use Saros in your
@@ -7,7 +7,7 @@ company and you want to use another XMPP Server or set up your own with
 Openfire, you will find information below.
 
 
-## XMPP servers
+## XMPP Servers
 
 In order to use Saros you need to configure an XMPP/Jabber account.
 
@@ -23,7 +23,7 @@ In order to use Saros you need to configure an XMPP/Jabber account.
     such as [ejabberd](https://www.process-one.net/en/ejabberd/) should
     be suitable as well)
 
-### Suitable Jabber servers
+### Suitable Jabber Servers
 
 *   The following public Jabber servers have been tested to **work
     reliably with no known problems**:
@@ -48,7 +48,7 @@ In order to use Saros you need to configure an XMPP/Jabber account.
 See [https://www.ejabberd.im](https://www.ejabberd.im/).
 
 
-## Openfire installation (Windows)
+## Openfire Installation (Windows)
 
 1.  Download [Openfire for
     Windows](http://www.igniterealtime.org/downloads/index.jsp)

@@ -3,11 +3,10 @@ package saros.ui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.ImageData;
-import org.jivesoftware.smack.Connection;
 import saros.SarosPluginContext;
+import saros.communication.connection.ConnectionHandler;
+import saros.communication.connection.IConnectionStateListener;
 import saros.net.ConnectionState;
-import saros.net.xmpp.IConnectionListener;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
@@ -17,15 +16,10 @@ public class NewContactAction extends Action implements Disposable {
 
   public static final String ACTION_ID = NewContactAction.class.getName();
 
-  @Inject private XMPPConnectionService sarosNet;
+  private final IConnectionStateListener connectionListener =
+      (state, error) -> setEnabled(state == ConnectionState.CONNECTED);
 
-  private final IConnectionListener connectionListener =
-      new IConnectionListener() {
-        @Override
-        public void connectionStateChanged(Connection connection, ConnectionState state) {
-          setEnabled(sarosNet.isConnected());
-        }
-      };
+  @Inject private ConnectionHandler connectionHandler;
 
   public NewContactAction() {
     setId(ACTION_ID);
@@ -40,13 +34,13 @@ public class NewContactAction extends Action implements Disposable {
 
     SarosPluginContext.initComponent(this);
 
-    sarosNet.addListener(connectionListener);
-    setEnabled(sarosNet.isConnected());
+    connectionHandler.addConnectionStateListener(connectionListener);
+    setEnabled(connectionHandler.isConnected());
   }
 
   @Override
   public void dispose() {
-    sarosNet.removeListener(connectionListener);
+    connectionHandler.removeConnectionStateListener(connectionListener);
   }
 
   @Override
