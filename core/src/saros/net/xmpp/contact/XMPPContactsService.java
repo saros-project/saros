@@ -196,6 +196,17 @@ public class XMPPContactsService implements Disposable {
   }
 
   /**
+   * Get a known contact by address.
+   *
+   * @param jid contact address
+   * @return Optional with contact if found
+   */
+  public Optional<XMPPContact> getContact(String jid) {
+    String baseJid = new JID(jid).getBase();
+    return Optional.ofNullable(contacts.get(baseJid));
+  }
+
+  /**
    * Remove a contact completely from roster.
    *
    * <p>This method runs asynchronous and can fail silently (logging errors). If the removal was
