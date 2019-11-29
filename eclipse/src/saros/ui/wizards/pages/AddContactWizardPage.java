@@ -11,10 +11,10 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.jivesoftware.smack.Roster;
 import saros.SarosPluginContext;
+import saros.communication.connection.ConnectionHandler;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
 import saros.ui.util.FontUtils;
@@ -39,7 +39,8 @@ public class AddContactWizardPage extends WizardPage {
   public static final String TITLE = "Add Contact";
   public static final String DESCRIPTION = "Enter the JID of the contact you want to add.";
 
-  @Inject protected XMPPConnectionService connectionService;
+  @Inject private ConnectionHandler connectionHandler;
+  @Inject private XMPPContactsService contactsService;
 
   protected JIDCombo jidCombo;
 
@@ -48,7 +49,7 @@ public class AddContactWizardPage extends WizardPage {
   /** This flag is true as soon as the typed in {@link JID} was correctly formatted. */
   protected boolean wasJIDValid = false;
 
-  /** True if the contact is already in the {@link Roster}. */
+  /** True if the contact is already in the Contact List. */
   protected boolean isContactAlreadyAdded = false;
 
   public AddContactWizardPage() {
@@ -126,7 +127,7 @@ public class AddContactWizardPage extends WizardPage {
   }
 
   protected void updatePageCompletion() {
-    JID ownJid = connectionService.getJID();
+    JID ownJid = connectionHandler.getLocalJID();
     JID foreignJid = getContact();
 
     if (!foreignJid.getName().trim().isEmpty()
@@ -139,8 +140,7 @@ public class AddContactWizardPage extends WizardPage {
 
       wasJIDValid = true;
 
-      Roster roster = connectionService.getRoster();
-      if (roster != null && roster.contains(foreignJid.getBase())) {
+      if (contactsService.getContact(foreignJid.getBase()).isPresent()) {
         setMessage(
             Messages.roster_alreadyadded_errorMessage
                 + "\n"
