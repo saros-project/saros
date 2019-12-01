@@ -14,6 +14,7 @@ import org.junit.Test;
 import saros.net.xmpp.JID;
 import saros.session.User;
 import saros.session.UserPrivilege;
+import saros.session.UserPrivilege.Keys;
 
 public class SarosSessionUserTest {
 
@@ -23,6 +24,7 @@ public class SarosSessionUserTest {
   // testing default privileges, all should return false
   @Test
   public void testSessionUserReadOnlyPrivilegeDefault() {
+<<<<<<< HEAD
     assertEquals(HOST.hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS), false);
   }
   @Test
@@ -60,11 +62,52 @@ public class SarosSessionUserTest {
   @Test
   public void testSessionUserConfigureServerPrivilegeDefault() {
     assertEquals(HOST.hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER), false);
+=======
+	  setUp();
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_READONLY_ACCESS), false);
+  }
+  @Test
+  public void testSessionUserWritePrivilegeDefault() {
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_WRITE_ACCESS), false);
+  }
+  @Test
+  public void testSessionUserShareDocumentPrivilegeDefault() {
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_SHARE_DOCUMENT), false);
+  }
+  @Test
+  public void testSessionUserInvitePrivilegeDefault() {
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_INVITE_USER), false);
+  }
+  @Test
+  public void testSessionUserGrantPermissionPrivilegeDefault() {
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_GRANT_PERMISSION), false);
+  }
+  @Test
+  public void testSessionUserJoinSessionPrivilegeDefault() {
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_JOIN), false);
+  }
+  @Test
+  public void testSessionUserStartSessionPrivilegeDefault() {
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_START_SERVER), false);
+  }
+  @Test
+  public void testSessionUserStopSessionPrivilegeDefault() {
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_STOP_SERVER), false);
+  }
+  @Test
+  public void testSessionUserDeleteSessionDataPrivilegeDefault() {
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_DELETE_DATA), false);
+  }
+  @Test
+  public void testSessionUserConfigureServerPrivilegeDefault() {
+	  assertEquals(HOST.hasPrivilege(Keys.CONFIGURE_SERVER), false);
+>>>>>>> d1a31d8c88cd50c0c7f51ee219b1291514d746b4
   }
 
-  // test add privilege
+  // testing to create every single privilege and to add it to the users privileges
   @Test
   public void testSessionUserReadOnlyPrivilegeAdd() {
+<<<<<<< HEAD
     UserPrivilege priv = new UserPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS, true);
     HOST.addPrivilege(priv);
     assertTrue(HOST.hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS));
@@ -174,5 +217,64 @@ public class SarosSessionUserTest {
   public void testSessionUserConfigureServerPrivilegeRemove() {
     HOST.setPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER, false);
     assertFalse(HOST.hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER));
+=======
+	  UserPrivilege priv = new UserPrivilege(Keys.SESSION_READONLY_ACCESS, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_READONLY_ACCESS), true);
+  }
+  @Test
+  public void testSessionUserWritePrivilegeAdd() {
+	  UserPrivilege priv = new UserPrivilege(Keys.SESSION_WRITE_ACCESS, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_WRITE_ACCESS), true);
+  }
+  @Test
+  public void testSessionUserShareDocumentPrivilegeAdd() {
+	  UserPrivilege priv = new UserPrivilege(Keys.SESSION_SHARE_DOCUMENT, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_SHARE_DOCUMENT), true);
+  }
+  @Test
+  public void testSessionUserInvitePrivilegeAdd() {
+	  UserPrivilege priv = new UserPrivilege(Keys.SESSION_INVITE_USER, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_INVITE_USER), true);
+  }
+  @Test
+  public void testSessionUserGrantPermissionPrivilegeAdd() {
+	  UserPrivilege priv = new UserPrivilege(Keys.SESSION_GRANT_PERMISSION, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_GRANT_PERMISSION), true);
+  }
+  @Test
+  public void testSessionUserJoinSessionPrivilegeAdd() {
+	  UserPrivilege priv = new UserPrivilege(Keys.SESSION_JOIN, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_JOIN), true);
+  }
+  @Test
+  public void testSessionUserStartSessionPrivilegeAdd() {
+	  UserPrivilege priv = new UserPrivilege(Keys.SESSION_START_SERVER, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_START_SERVER), true);
+  }
+  @Test
+  public void testSessionUserStopSessionPrivilegeAdd() {
+	  UserPrivilege priv = new UserPrivilege(Keys.SESSION_STOP_SERVER, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_STOP_SERVER), true);
+  }
+  @Test
+  public void testSessionUserDeleteSessionDataPrivilegeAdd() {
+	  UserPrivilege priv = new UserPrivilege(Keys.SESSION_DELETE_DATA, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.SESSION_DELETE_DATA), true);
+  }
+  @Test
+  public void testSessionUserConfigureServerPrivilegeAdd() {
+	  UserPrivilege priv = new UserPrivilege(Keys.CONFIGURE_SERVER, true);
+	  HOST.addPrivilege(priv);
+	  assertEquals(HOST.hasPrivilege(Keys.CONFIGURE_SERVER), true);
+>>>>>>> d1a31d8c88cd50c0c7f51ee219b1291514d746b4
   }
 }

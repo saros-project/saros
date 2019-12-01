@@ -38,7 +38,11 @@ public class User {
   private volatile Permission permission = Permission.WRITE_ACCESS;
 
   /* More flexible Permissions also known as Privilege */
+<<<<<<< HEAD
   private volatile ConcurrentMap<UserPrivilege.Keys, UserPrivilege> privileges;
+=======
+  private Map<UserPrivilege.Keys, UserPrivilege> privileges;
+>>>>>>> d1a31d8c88cd50c0c7f51ee219b1291514d746b4
 
   private volatile boolean isInSession;
 
@@ -116,19 +120,31 @@ public class User {
     return isInSession;
   }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d1a31d8c88cd50c0c7f51ee219b1291514d746b4
   /**
    * Get a Map of the UserPrivileges of this user instance.
    *
    * @return <code>Map<UserPrivilege.Keys, UserPrivilege></code>
    */
+<<<<<<< HEAD
   public ConcurrentMap<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
+=======
+  public Map<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
+>>>>>>> d1a31d8c88cd50c0c7f51ee219b1291514d746b4
     return this.privileges;
   }
 
   /**
    * Set a Map of the UserPrivileges to this user instance.
    */
+<<<<<<< HEAD
   public void setPrivileges(ConcurrentMap<UserPrivilege.Keys, UserPrivilege> privileges) {
+=======
+  public void setPrivileges(Map<UserPrivilege.Keys, UserPrivilege> privileges) {
+>>>>>>> d1a31d8c88cd50c0c7f51ee219b1291514d746b4
     this.privileges = privileges;
   }
 
@@ -140,6 +156,7 @@ public class User {
   }
 
   /**
+<<<<<<< HEAD
    * Set a UserPrivileges for this user instance.
    */
   public void setPrivilege(UserPrivilege.Keys privilegeKey, boolean value) {
@@ -155,6 +172,8 @@ public class User {
   }
 
   /**
+=======
+>>>>>>> d1a31d8c88cd50c0c7f51ee219b1291514d746b4
    * Get the UserPrivileges value for this user instance.
    *
    * @return <code>true</code> if this User has {@link UserPrivilege.Keys} or <code>false</code>.
@@ -167,6 +186,10 @@ public class User {
   }
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d1a31d8c88cd50c0c7f51ee219b1291514d746b4
   @Override
   public String toString() {
     return jid.toString();
