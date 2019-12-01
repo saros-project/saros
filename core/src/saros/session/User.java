@@ -1,6 +1,7 @@
 package saros.session;
 
 import java.util.*;
+import java.util.concurrent.*;
 import saros.net.xmpp.JID;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.PreferenceStore;
@@ -36,6 +37,9 @@ public class User {
   @Deprecated
   private volatile Permission permission = Permission.WRITE_ACCESS;
 
+  /* More flexible Permissions also known as Privilege */
+  private volatile ConcurrentMap<UserPrivilege.Keys, UserPrivilege> privileges;
+
   private volatile boolean isInSession;
 
   public User(JID jid, boolean isHost, boolean isLocal, IPreferenceStore preferences) {
@@ -48,7 +52,8 @@ public class User {
     } else {
       this.preferences = preferences;
     }
->>>>>>> upstream/master
+
+    this.privileges = new ConcurrentHashMap<UserPrivilege.Keys, UserPrivilege>();
   }
 
   /**
@@ -110,6 +115,57 @@ public class User {
   public boolean isInSession() {
     return isInSession;
   }
+
+  /**
+   * Get a Map of the UserPrivileges of this user instance.
+   *
+   * @return <code>Map<UserPrivilege.Keys, UserPrivilege></code>
+   */
+  public ConcurrentMap<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
+    return this.privileges;
+  }
+
+  /**
+   * Set a Map of the UserPrivileges to this user instance.
+   */
+  public void setPrivileges(ConcurrentMap<UserPrivilege.Keys, UserPrivilege> privileges) {
+    this.privileges = privileges;
+  }
+
+  /**
+   * Add a UserPrivileges to this user instance.
+   */
+  public void addPrivilege(UserPrivilege privilege) {
+    this.privileges.put(privilege.getKey(), privilege);
+  }
+
+  /**
+   * Set a UserPrivileges for this user instance.
+   */
+  public void setPrivilege(UserPrivilege.Keys privilegeKey, boolean value) {
+    addPrivilege(new UserPrivilege(privilegeKey, value));
+    /*
+    if (this.privileges.containsKey(privilegeKey)) {
+      this.privileges.set(privilegeKey, value);
+    } else {
+      this.privileges.put(new UserPrivilege(privilegeKey, value), privilegeKey);
+    }
+
+     */
+  }
+
+  /**
+   * Get the UserPrivileges value for this user instance.
+   *
+   * @return <code>true</code> if this User has {@link UserPrivilege.Keys} or <code>false</code>.
+   */
+  public boolean hasPrivilege(UserPrivilege.Keys privilege) {
+    if (this.privileges.containsKey(privilege)) {
+      return this.privileges.get(privilege).getValue();
+    }
+    return false;
+  }
+
 
   @Override
   public String toString() {
@@ -179,3 +235,6 @@ public class User {
     return preferences;
   }
 }
+
+
+
