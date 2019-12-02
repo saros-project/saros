@@ -1,6 +1,7 @@
 package saros.session;
 
 import java.util.*;
+import java.util.concurrent.*;
 import saros.net.xmpp.JID;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.PreferenceStore;
@@ -37,72 +38,32 @@ public class User {
   @Deprecated private volatile Permission permission = Permission.WRITE_ACCESS;
 
   /* More flexible Permissions also known as Privilege */
-  private Map<UserPrivilege.Keys, UserPrivilege> privileges;
+  private volatile ConcurrentMap<UserPrivilege.Keys, UserPrivilege> privileges;
 
-  public Map<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
+  public synchronized ConcurrentMap<UserPrivilege.Keys, UserPrivilege> getPrivileges() {
     return this.privileges;
   }
 
-  public void setPrivileges(Map<UserPrivilege.Keys, UserPrivilege> privileges) {
+  public synchronized void setPrivileges(ConcurrentMap<UserPrivilege.Keys, UserPrivilege> privileges) {
     this.privileges = privileges;
   }
 
-  public void addPrivilege(UserPrivilege privilege) {
+  public synchronized void setPrivilege(UserPrivilege.Keys key, boolean value) {
+    UserPrivilege priv = new UserPrivilege(key, value);
+    this.addPrivilege(priv);
+  }
+
+  public synchronized void addPrivilege(UserPrivilege privilege) {
     this.privileges.put(privilege.getKey(), privilege);
   }
   // get any privileges value or false
-  public boolean hasPrivilege(UserPrivilege.Keys privilege) {
-    // System.out.println("3 - hasPrivilege() " + privilege + " : " +
-    // this.privileges.containsKey(privilege));
+  public synchronized boolean hasPrivilege(UserPrivilege.Keys privilege) {
+
     if (this.privileges.containsKey(privilege)) {
       return this.privileges.get(privilege).getValue();
     }
     return false;
 
-  }
-
-  // convenience functions to privilege values
-  public boolean hasReadOnlyAccessPrivilege() {
-
-    // System.out.println("3 - User.hasReadOnlyAccessPrivilege() " +
-    // hasPrivilege(UserPrivilege.Privilege.READONLY_ACCESS));
-    return hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS);
-  }
-
-  public boolean hasWriteAccessPrivilege() {
-    return hasPrivilege(UserPrivilege.Keys.SESSION_WRITE_ACCESS);
-  }
-
-  public boolean hasShareDocumentPrivilege() {
-    return hasPrivilege(UserPrivilege.Keys.SESSION_SHARE_DOCUMENT);
-  }
-
-  public boolean hasInvitePrivilege() {
-    return hasPrivilege(UserPrivilege.Keys.SESSION_INVITE_USER);
-  }
-
-  public boolean hasGrantPermissionPrivilege() {
-    return hasPrivilege(UserPrivilege.Keys.SESSION_GRANT_PERMISSION);
-  }
-
-  public boolean hasJoinSessionPrivilege() {
-    return hasPrivilege(UserPrivilege.Keys.SESSION_JOIN);
-  }
-
-  public boolean hasStartSessionServerPrivilege() {
-    return hasPrivilege(UserPrivilege.Keys.SESSION_START_SERVER);
-  }
-
-  public boolean hasStopSessionServerPrivilege() {
-    return hasPrivilege(UserPrivilege.Keys.SESSION_STOP_SERVER);
-  }
-
-  public boolean hasDeleteSessionDataPrivilege() {
-    return hasPrivilege(UserPrivilege.Keys.SESSION_DELETE_DATA);
-  }
-
-  public boolean hasConfigureServerPrivilege() {
-    return hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER);
 
   }
 
@@ -120,7 +81,8 @@ public class User {
       this.preferences = preferences;
     }
 
-    this.privileges = new HashMap<UserPrivilege.Keys, UserPrivilege>();
+
+    this.privileges = new ConcurrentHashMap<UserPrivilege.Keys, UserPrivilege>();
 
   }
 
@@ -150,6 +112,10 @@ public class User {
   public Permission getPermission() {
     return permission;
   }
+
+
+
+
 
   /**
    * Utility method to determine whether this user has {@link User.Permission#WRITE_ACCESS}
