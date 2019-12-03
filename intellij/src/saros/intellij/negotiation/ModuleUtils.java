@@ -1,10 +1,9 @@
 package saros.intellij.negotiation;
 
 import com.intellij.openapi.roots.SourceFolder;
-import java.io.File;
-import java.io.IOException;
+import com.intellij.openapi.vfs.VfsUtil;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.log4j.Logger;
@@ -28,10 +27,18 @@ class ModuleUtils {
   @Nullable
   static Path getRelativeRootPath(@NotNull Path basePath, @NotNull SourceFolder sourceFolder) {
     String sourcePath = sourceFolder.getUrl();
+
+    // Workaround to convert the Intellij "URI" to a real URI
+    URI uri = VfsUtil.toUri(sourcePath);
+
+    if (uri == null) {
+      log.error("Intellij was unable to parse source folder URI. Error was logged by Intellij.");
+
+      return null;
+    }
+
     try {
-      // Workaround to convert the URI to the canonical path needed for Windows paths
-      File childFile = new File(new URI(sourcePath).getPath());
-      Path childPath = Paths.get(childFile.getCanonicalPath());
+      Path childPath = Paths.get(uri);
 
       assert childPath.startsWith(basePath)
           : "Encountered path that is not located below the given base directory "
@@ -41,11 +48,8 @@ class ModuleUtils {
 
       return basePath.relativize(childPath);
 
-    } catch (URISyntaxException e) {
-      log.warn("Could not parse source folder url", e);
-
-    } catch (IOException e) {
-      log.warn("Could not make source folder path canonical", e);
+    } catch (SecurityException | FileSystemNotFoundException e) {
+      log.warn("Failed to get path for URI " + uri, e);
 
     } catch (IllegalArgumentException e) {
       log.warn("Could not construct relative path for the given source folder", e);
