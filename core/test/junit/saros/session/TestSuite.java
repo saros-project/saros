@@ -5,11 +5,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 
-@Suite.SuiteClasses({
-	SarosSessionManagerTest.class,
-	SarosSessionUserTest.class
-})
-
+@Suite.SuiteClasses({SarosSessionManagerTest.class, SarosSessionUserTest.class})
 
 public class TestSuite {
   // the class remains completely empty,

@@ -44,7 +44,8 @@ public class User {
     return this.privileges;
   }
 
-  public synchronized void setPrivileges(ConcurrentMap<UserPrivilege.Keys, UserPrivilege> privileges) {
+  public synchronized void setPrivileges(
+      ConcurrentMap<UserPrivilege.Keys, UserPrivilege> privileges) {
     this.privileges = privileges;
   }
 
@@ -58,14 +59,12 @@ public class User {
   }
   // get any privileges value or false
   public synchronized boolean hasPrivilege(UserPrivilege.Keys privilege) {
-
     if (this.privileges.containsKey(privilege)) {
       return this.privileges.get(privilege).getValue();
     }
     return false;
 
 
-  }
 
   private volatile boolean isInSession;
 
@@ -112,10 +111,6 @@ public class User {
   public Permission getPermission() {
     return permission;
   }
-
-
-
-
 
   /**
    * Utility method to determine whether this user has {@link User.Permission#WRITE_ACCESS}

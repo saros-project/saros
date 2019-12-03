@@ -15,6 +15,7 @@ public class UserPrivilege {
     SESSION_WRITE_ACCESS,
     CONFIGURE_SERVER
   }
+
   private UserPrivilege.Keys key;
   private boolean value = false; // defaults to false, no?
 
@@ -25,12 +26,11 @@ public class UserPrivilege {
     this.value = value;
   }
 
-
   @Override
   public String toString() {
     return this.key.toString() + " : " + getValue();
   }
-    
+
   public void setKey(UserPrivilege.Keys key) {
     this.key = key;
   }
@@ -38,6 +38,7 @@ public class UserPrivilege {
   public UserPrivilege.Keys getKey() {
     return this.key;
   }
+
   public void setValue(boolean value) {
     this.value = value;
   }
