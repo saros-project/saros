@@ -20,7 +20,7 @@ import saros.net.internal.XMPPReceiver;
 import saros.net.internal.XMPPTransmitter;
 import saros.net.stream.IBBStreamService;
 import saros.net.stream.IStreamService;
-import saros.net.stream.Socks5StreamService;
+import saros.net.stream.TCPTransport;
 import saros.net.stun.IStunService;
 import saros.net.stun.internal.StunServiceImpl;
 import saros.net.upnp.IUPnPAccess;
@@ -85,7 +85,7 @@ public class CoreContextFactory extends AbstractContextFactory {
           IBBStreamService.class),
       Component.create(
           BindKey.bindKey(IStreamService.class, IContextKeyBindings.Socks5StreamService.class),
-          Socks5StreamService.class),
+          TCPTransport.class /*Socks5StreamService.class*/),
       Component.create(RosterTracker.class),
       Component.create(XMPPConnectionService.class),
       Component.create(IStunService.class, StunServiceImpl.class),

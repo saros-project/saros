@@ -19,6 +19,7 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import saros.annotations.Component;
 import saros.net.ConnectionState;
+import saros.net.stream.TCPTransport;
 import saros.net.stun.IStunService;
 import saros.net.upnp.IUPnPService;
 import saros.net.util.NetworkingUtils;
@@ -392,6 +393,14 @@ public class XMPPConnectionService {
 
     if (!isProxyEnabled) return; // we are done, STUN and UPNP only affect Socks5
 
+    /*
+     *  TODO the UPNP port opening has to be done in the Transport, as we do not know yet which
+     *  socket it will bound to.
+     */
+
+    TCPTransport.getConfiguration().setLocalPort(proxyPort);
+
+    // TODO the proxy is still needed for for certain file transfers. OPN -> IPN, SendFile
     SmackConfiguration.setLocalSocks5ProxyPort(proxyPort);
 
     final Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
@@ -419,6 +428,7 @@ public class XMPPConnectionService {
       LOG.debug("using autodetected addresses: " + interfaceAddresses);
     }
 
+    TCPTransport.getConfiguration().setAddresses(interfaceAddresses);
     proxy.replaceLocalAddresses(interfaceAddresses);
 
     /*
@@ -438,8 +448,10 @@ public class XMPPConnectionService {
               Collection<InetSocketAddress> addresses =
                   stunService.discover(stunServer, stunPort, 10000);
 
-              for (InetSocketAddress address : addresses)
+              for (InetSocketAddress address : addresses) {
+                TCPTransport.getConfiguration().addAddress(address.getAddress().getHostAddress());
                 NetworkingUtils.addProxyAddress(address.getAddress().getHostAddress(), true);
+              }
             }
           });
     }
@@ -510,8 +522,10 @@ public class XMPPConnectionService {
 
                 InetAddress externalAddress = upnpService.getExternalAddress(device);
 
-                if (externalAddress != null)
+                if (externalAddress != null) {
+                  TCPTransport.getConfiguration().addAddress(externalAddress.getHostAddress());
                   NetworkingUtils.addProxyAddress(externalAddress.getHostAddress(), true);
+                }
               }
             }
           });
