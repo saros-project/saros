@@ -32,7 +32,7 @@ public class ServerConsole implements Runnable {
   public void run() {
     output.println("# Welcome to Saros Server (type 'help' for available commands)");
     while (true) {
-    	Boolean found = false;
+      Boolean found = false;
       output.print("> ");
       output.flush();
       String line = input.nextLine().trim();
@@ -60,7 +60,8 @@ public class ServerConsole implements Runnable {
             break;
           }
         }
-        if (found == false) output.printf("Command '%s' is not known. (Type 'help' for available commands)", line);
+        if (found == false)
+          output.printf("Command '%s' is not known. (Type 'help' for available commands)", line);
       }
       output.flush();
     }

@@ -1,7 +1,6 @@
 package saros.session;
 
 public class UserPrivilege {
-
   public enum Keys {
     SESSION_ADMINISTER,
     SESSION_DELETE_DATA,
@@ -20,7 +19,6 @@ public class UserPrivilege {
   private boolean value = false; // defaults to false, no?
 
   public UserPrivilege(UserPrivilege.Keys key, boolean value) {
-
     this.key = key;
     this.value = value;
   }
@@ -43,7 +41,6 @@ public class UserPrivilege {
   }
 
   public boolean getValue() {
-
     return this.value;
   }
 }

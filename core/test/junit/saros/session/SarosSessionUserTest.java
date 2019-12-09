@@ -10,7 +10,6 @@ import saros.net.xmpp.JID;
 public class SarosSessionUserTest {
 
   private JID ALICE = new JID("alice@test/Saros");
-
   private User HOST = new User(ALICE, true, true, null);
 
   // testing default privileges, all should return false

@@ -1,7 +1,9 @@
 package saros.session;
 
-import java.util.*;
-import java.util.concurrent.*;
+// import java.util.*;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import saros.net.xmpp.JID;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.PreferenceStore;

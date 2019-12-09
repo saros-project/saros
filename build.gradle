@@ -115,7 +115,7 @@ configure(projectsToConfigure) { projectToConf ->
 // remove all build dirs. The frontend package has no build directory
 task cleanAll(dependsOn: projectsToConfigure.collect{":${it.name}:clean"})
 
-ext.projectsToPrepare = projectsToConfigure + project(':saros.picocontainer') 
+ext.projectsToPrepare = projectsToConfigure + project(':saros.picocontainer')
 task prepareEclipse(dependsOn: projectsToPrepare.collect { [":${it.name}:cleanEclipseProject", ":${it.name}:cleanEclipseClasspath"] }.flatten() +
                                projectsToPrepare.collect { [":${it.name}:eclipseProject", ":${it.name}:eclipseClasspath"]}.flatten() +
                                ['generateLibAll'])
@@ -164,13 +164,13 @@ task sarosServer(type: Copy, dependsOn: [
   ':saros.core:test',
   ':saros.server:test',
   ':saros.server:jar'
-  ]) {
+]) {
   group 'Delivery'
   description 'Builds and tests all modules required by the Saros Server'
 
   from project(':saros.server').jar
   into 'build/distribution/server'
-}
+ }
 
 task sarosIntellij(type: Copy, dependsOn: [
   ':saros.picocontainer:test',
