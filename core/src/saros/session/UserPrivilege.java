@@ -19,7 +19,6 @@ public class UserPrivilege {
   private UserPrivilege.Keys key;
   private boolean value = false; // defaults to false, no?
 
-
   public UserPrivilege(UserPrivilege.Keys key, boolean value) {
 
     this.key = key;

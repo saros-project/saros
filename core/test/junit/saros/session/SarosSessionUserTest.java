@@ -4,15 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
-
 import org.junit.Test;
 import saros.net.xmpp.JID;
 
 public class SarosSessionUserTest {
 
   private JID ALICE = new JID("alice@test/Saros");
-
 
   private User HOST = new User(ALICE, true, true, null);
 
@@ -22,7 +19,6 @@ public class SarosSessionUserTest {
   public void testSessionUserReadOnlyPrivilegeDefault() {
     assertEquals(HOST.hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS), false);
   }
-
 
   @Test
   public void testSessionUserWritePrivilegeDefault() {
@@ -147,7 +143,6 @@ public class SarosSessionUserTest {
     assertFalse(HOST.hasPrivilege(UserPrivilege.Keys.SESSION_READONLY_ACCESS));
   }
 
-
   @Test
   public void testSessionUserWritePrivilegeRemove() {
     HOST.setPrivilege(UserPrivilege.Keys.SESSION_WRITE_ACCESS, false);
@@ -201,5 +196,4 @@ public class SarosSessionUserTest {
     HOST.setPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER, false);
     assertFalse(HOST.hasPrivilege(UserPrivilege.Keys.CONFIGURE_SERVER));
   }
-
 }

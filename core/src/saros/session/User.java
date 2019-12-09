@@ -34,7 +34,6 @@ public class User {
   private final boolean isLocal;
   private final IPreferenceStore preferences;
 
-
   @Deprecated private volatile Permission permission = Permission.WRITE_ACCESS;
 
   /* More flexible Permissions also known as Privilege */
@@ -63,8 +62,7 @@ public class User {
       return this.privileges.get(privilege).getValue();
     }
     return false;
-
-
+  }
 
   private volatile boolean isInSession;
 
@@ -73,16 +71,13 @@ public class User {
     this.isHost = isHost;
     this.isLocal = isLocal;
 
-
     if (preferences == null) {
       this.preferences = new PreferenceStore();
     } else {
       this.preferences = preferences;
     }
 
-
     this.privileges = new ConcurrentHashMap<UserPrivilege.Keys, UserPrivilege>();
-
   }
 
   /**
