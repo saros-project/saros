@@ -91,6 +91,9 @@ public class ConcurrentDocumentServer implements Startable {
    * Transforms the given activities on the server side and returns a list of QueueItems containing
    * the transformed activities and there receivers.
    *
+   * <p>Drops activities that are reported as filtered out by {@link
+   * ResourceActivityFilter#isFiltered(IActivity)}.
+   *
    * @host
    * @sarosThread Must be executed in the Saros dispatch thread.
    * @notGUI This method may not be called from SWT, otherwise a deadlock might occur!!

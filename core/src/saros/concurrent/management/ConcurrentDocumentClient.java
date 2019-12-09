@@ -93,6 +93,9 @@ public class ConcurrentDocumentClient implements Startable {
    * <p>This method will transform them back from Jupiter-specific activities to locally executable
    * activities. @GUI Must be called on the GUI Thread to ensure proper synchronization
    *
+   * <p>Drops activities that are reported as filtered out by {@link
+   * ResourceActivityFilter#isFiltered(IActivity)}.
+   *
    * @host and @client This is called whenever activities are received from REMOTELY both on the
    *     client and on the host
    * @param activity The activity to be transformed
