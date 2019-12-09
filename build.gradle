@@ -160,6 +160,7 @@ task sarosStf(type: Copy, dependsOn: ['sarosEclipse', 'saros.stf:jar']) {
   into 'build/distribution/eclipse'
 }
 
+
 task sarosServer(type: Copy, dependsOn: [
   ':saros.core:test',
   ':saros.server:test',
@@ -171,6 +172,7 @@ task sarosServer(type: Copy, dependsOn: [
   from project(':saros.server').jar
   into 'build/distribution/server'
 }
+
 
 task sarosIntellij(type: Copy, dependsOn: [
   ':saros.picocontainer:test',
