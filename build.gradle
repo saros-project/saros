@@ -161,6 +161,7 @@ task sarosStf(type: Copy, dependsOn: ['sarosEclipse', 'saros.stf:jar']) {
 }
 
 task sarosServer(type: Copy, dependsOn: [
+
   ':saros.core:test',
   ':saros.server:test',
   ':saros.server:jar'
