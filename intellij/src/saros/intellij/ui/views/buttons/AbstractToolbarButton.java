@@ -4,7 +4,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.JBColor;
-import com.intellij.util.ui.UIUtil;
 import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -44,11 +43,6 @@ abstract class AbstractToolbarButton extends JButton implements Disposable {
     setToolTipText(tooltipText);
 
     setBorder(BorderFactory.createLineBorder(JBColor.border(), 1, true));
-  }
-
-  /** calls {@link #setEnabled(boolean)} from the UI thread. */
-  void setEnabledFromUIThread(final boolean enabled) {
-    UIUtil.invokeAndWaitIfNeeded((Runnable) () -> setEnabled(enabled));
   }
 
   /**

@@ -100,7 +100,7 @@ public class FollowButton extends AbstractSessionToolbarButton {
     followModeManager.addListener(followModeListener);
 
     updateMenu();
-    setEnabledFromUIThread(true);
+    setEnabled(true);
   }
 
   @Override
@@ -112,7 +112,7 @@ public class FollowButton extends AbstractSessionToolbarButton {
     followModeManager = null;
 
     updateMenu();
-    setEnabledFromUIThread(false);
+    setEnabled(false);
   }
 
   private void createMenu() {
