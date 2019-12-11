@@ -363,7 +363,9 @@ You can then delete the first account, add a new account with the right values, 
 
 ### Changing User Colors
 
-- Open the IntelliJ settings and navigate to `"Editor" > "Color Scheme" > "Saros"`.
+
+- Open the [IntelliJ settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
+- Navigate to `"Editor" > "Color Scheme" > "Saros"`.
 - Select the color scheme to change the colors for.
 - Expand the user whose colors to change.
   - Currently, Saros internally has the concept of 5 user colors that will be used locally. These will be negotiated and assigned to the session participants when a session is started. As a consequence, the other user in a two-user-session will not necessarily have the user color 1.

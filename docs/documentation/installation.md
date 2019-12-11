@@ -84,8 +84,9 @@ Saros/I can be installed from the JetBrains plugin repository or from disk.
 
 Saros/I is currently released through the `alpha` release channel. To be able find the plugin on the market place, you will first have to add the `alpha` release channel to your list of plugin repositories. A guide on how to do this is given [here](https://plugins.jetbrains.com/docs/marketplace/custom-release-channels.html#CustomReleaseChannels-ConfiguringaCustomChannelinIntelliJPlatformBasedIDEs).
 
-- Choose "Settings..." > "Plugins".
-- Select the tab "Marketplace"
+- Open the [IntelliJ settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
+- Select the "Plugins" section.
+- Select the tab "Marketplace".
 - Search for "Saros" in the search bar and select the entry from the list.
 - Click the "Install" button.
 - Close the settings menu.
@@ -95,7 +96,9 @@ Saros/I is currently released through the `alpha` release channel. To be able fi
 ### From Disk
 The zip file containing the plugin can be downloaded from our [release page](https://github.com/saros-project/saros/releases).
 
-- Choose "Settings..." > "Plugins".
+
+- Open the [IntelliJ settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
+- Select the "Plugins" section.
 - Click the settings icon (gear/cog) and choose "Install plugin from disk...".
 - Navigate to the directory containing the plugin zip.
 - Select the zip file.
