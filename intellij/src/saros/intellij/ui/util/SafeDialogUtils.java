@@ -4,6 +4,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.TextRange;
 import java.util.concurrent.atomic.AtomicReference;
@@ -60,6 +61,7 @@ public class SafeDialogUtils {
       final String message,
       final String initialValue,
       final String title,
+      InputValidator inputValidator,
       TextRange selection)
       throws IllegalAWTContextException {
 
@@ -80,7 +82,7 @@ public class SafeDialogUtils {
                   title,
                   Messages.getQuestionIcon(),
                   initialValue,
-                  null,
+                  inputValidator,
                   selection);
           if (option != null) {
             response.set(option);
@@ -92,8 +94,25 @@ public class SafeDialogUtils {
   }
 
   /**
-   * Calls {@link #showInputDialog(Project, String, String, String, TextRange)} with <code>
-   * TextRange=null</code>.
+   * Calls {@link #showInputDialog(Project, String, String, String, InputValidator, TextRange)} with
+   * <code>inputValidator=null</code>.
+   *
+   * @see #showInputDialog(Project, String, String, String, TextRange)
+   */
+  public static String showInputDialog(
+      Project project,
+      final String message,
+      final String initialValue,
+      final String title,
+      TextRange selection)
+      throws IllegalAWTContextException {
+
+    return showInputDialog(project, message, initialValue, title, null, selection);
+  }
+
+  /**
+   * Calls {@link #showInputDialog(Project, String, String, String, InputValidator, TextRange)} with
+   * <code>inputValidator=null</code> and <code>selection=null</code>.
    *
    * @see #showInputDialog(Project, String, String, String, TextRange)
    */
