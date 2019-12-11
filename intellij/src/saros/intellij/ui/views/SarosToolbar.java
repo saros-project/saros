@@ -5,6 +5,7 @@ import com.intellij.ui.JBColor;
 import java.awt.FlowLayout;
 import javax.swing.JToolBar;
 import org.jetbrains.annotations.NotNull;
+import saros.intellij.ui.views.buttons.AddContactButton;
 import saros.intellij.ui.views.buttons.ConnectButton;
 import saros.intellij.ui.views.buttons.ConsistencyButton;
 import saros.intellij.ui.views.buttons.FollowButton;
@@ -46,7 +47,8 @@ class SarosToolbar extends JToolBar {
 
     add(new ConnectButton(project));
 
-    // TODO add an "Add Contact" button once logic is implemented
+    add(new AddContactButton(project));
+
     // TODO add "Preferences" button once logic is implemented
 
     add(new FollowButton(project));
