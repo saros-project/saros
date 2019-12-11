@@ -91,7 +91,9 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
   }
 
   @Override
-  void disposeComponents() {
+  public void dispose() {
+    super.dispose();
+
     inconsistentObservable.remove(isConsistencyListener);
   }
 

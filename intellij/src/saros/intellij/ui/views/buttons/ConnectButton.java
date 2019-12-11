@@ -41,15 +41,16 @@ public class ConnectButton extends AbstractToolbarButton {
   private final ConnectServerAction connectAction;
   private final AbstractSarosAction configureAccounts;
 
-  private final Project project;
-
   @Inject private XMPPAccountStore accountStore;
 
   public ConnectButton(@NotNull Project project) {
-    super(ConnectServerAction.NAME, Messages.ConnectButton_tooltip, IconManager.CONNECT_ICON);
-    SarosPluginContext.initComponent(this);
+    super(
+        project,
+        ConnectServerAction.NAME,
+        Messages.ConnectButton_tooltip,
+        IconManager.CONNECT_ICON);
 
-    this.project = project;
+    SarosPluginContext.initComponent(this);
 
     disconnectAction = new DisconnectServerAction(project);
     connectAction = new ConnectServerAction(project);
@@ -92,6 +93,11 @@ public class ConnectButton extends AbstractToolbarButton {
 
           popupMenu.show(ConnectButton.this, 0, getBounds().y + getBounds().height);
         });
+  }
+
+  @Override
+  public void dispose() {
+    // NOP
   }
 
   private void createMenuItems() {

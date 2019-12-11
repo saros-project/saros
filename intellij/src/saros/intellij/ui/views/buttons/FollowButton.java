@@ -77,7 +77,9 @@ public class FollowButton extends AbstractSessionToolbarButton {
   }
 
   @Override
-  void disposeComponents() {
+  public void dispose() {
+    super.dispose();
+
     ISarosSession currentSession = session;
     if (currentSession != null) {
       currentSession.removeListener(sessionListener);
