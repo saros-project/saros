@@ -33,6 +33,9 @@ You need an **XMPP account** to use Saros.
 
 1.  You can **create a new account** within Saros by using the
     FU-Berlin servers.
+  - **Note:** Due to abuse by spammers, we had to disable in-band registration.
+    As a consequence, the "Create New Account..." button currently no longer works.
+    Instead, to create an account on our XMPP server, you can **visit our [signup page](https://saros-con.imp.fu-berlin.de:5280/register/new)**.
 2.  You can **use an existing account.**
     For example your Google mail address. **This is a
     valid XMPP accounts**.
@@ -303,6 +306,13 @@ This window is attached to the bottom right of the IDE by default.
 It is marked with the title "Saros" and the Saros icon (![saros icon](images/icons-i/saros.png)).
 All actions described in the following sections take place in this tool window.
 
+### Creating an XMPP Account
+
+Saros requires an XMPP account to connect to and communicate with other users. You can use an openly available XMPP server or [setup your own XMPP server](https://www.saros-project.org/documentation/setup-xmpp.html).
+
+Furthermore, we also host an XMPP server (`saros-con.imp.fu-berlin.de`) specifically for the purpose of Saros that is freely available.
+To use it, you will first have to create an account using the [signup page](https://saros-con.imp.fu-berlin.de:5280/register/new).
+
 ### Adding an XMPP Account
 
 - In the top bar of the Saros view, click the "Connect" button (![connect icon](images/icons-i/connect.png)).
@@ -363,7 +373,9 @@ You can then delete the first account, add a new account with the right values, 
 
 ### Changing User Colors
 
-- Open the IntelliJ settings and navigate to `"Editor" > "Color Scheme" > "Saros"`.
+
+- Open the [IntelliJ settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
+- Navigate to `"Editor" > "Color Scheme" > "Saros"`.
 - Select the color scheme to change the colors for.
 - Expand the user whose colors to change.
   - Currently, Saros internally has the concept of 5 user colors that will be used locally. These will be negotiated and assigned to the session participants when a session is started. As a consequence, the other user in a two-user-session will not necessarily have the user color 1.
