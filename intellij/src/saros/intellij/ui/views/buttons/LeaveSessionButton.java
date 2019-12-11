@@ -35,11 +35,11 @@ public class LeaveSessionButton extends AbstractSessionToolbarButton {
 
   @Override
   void sessionStarted(ISarosSession newSarosSession) {
-    setEnabledFromUIThread(true);
+    setEnabled(true);
   }
 
   @Override
   void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
-    setEnabledFromUIThread(false);
+    setEnabled(false);
   }
 }
