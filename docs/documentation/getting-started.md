@@ -33,6 +33,9 @@ You need an **XMPP account** to use Saros.
 
 1.  You can **create a new account** within Saros by using the
     FU-Berlin servers.
+  - **Note:** Due to abuse by spammers, we had to disable in-band registration.
+    As a consequence, the "Create New Account..." button currently no longer works.
+    Instead, to create an account on our XMPP server, you can **visit our [signup page](https://saros-con.imp.fu-berlin.de:5280/register/new)**.
 2.  You can **use an existing account.**
     For example your Google mail address. **This is a
     valid XMPP accounts**.
@@ -302,6 +305,13 @@ Most interactions with the Saros session logic (like starting or ending a sessio
 This window is attached to the bottom right of the IDE by default.
 It is marked with the title "Saros" and the Saros icon (![saros icon](images/icons-i/saros.png)).
 All actions described in the following sections take place in this tool window.
+
+### Creating an XMPP Account
+
+Saros requires an XMPP account to connect to and communicate with other users. You can use an openly available XMPP server or [setup your own XMPP server](https://www.saros-project.org/documentation/setup-xmpp.html).
+
+Furthermore, we also host an XMPP server (`saros-con.imp.fu-berlin.de`) specifically for the purpose of Saros that is freely available.
+To use it, you will first have to create an account using the [signup page](https://saros-con.imp.fu-berlin.de:5280/register/new).
 
 ### Adding an XMPP Account
 
