@@ -14,7 +14,7 @@ You need a [development environment](development-environment.md) with **Eclipse 
 ### Configuration
 
 * Before you can run the STF tests you need four XMPP accounts. If you want to use our XMPP server you can create accounts as described in the [user documentation](../documentation/getting-started.html?tab=eclipse).
-* Then you have to create the file `configuration.properties` in directory `saros/test/framework/stf/src/saros/stf/client`.
+* Then you have to create the file `configuration.properties` in directory `stf/src/saros/stf/client`.
 * Add the following lines to the config and **replace the placeholders with your credentials** (make sure **every tester has an unique JID**)
 
 ```properties
@@ -47,7 +47,7 @@ Therefore the current workaround is to execute the Gradle task `generateLibAll` 
 ### Run Tests
 
 1.  Start the **requiered launch configurations** which are located
-    in the directory `test/resources/launch` by **right clicking the
+    in the directory `stf/launch` by **right clicking the
     launch file** and chose **Run As > Saros\_STF\_\<name\>**. This
     will start a new Eclipse instance with the selected launch
     configuration.
