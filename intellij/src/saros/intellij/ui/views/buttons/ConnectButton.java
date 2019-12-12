@@ -173,13 +173,13 @@ public class ConnectButton extends AbstractToolbarButton {
 
   private void askToConnectToAccount(@NotNull XMPPAccount account) {
     try {
-      Integer option =
+      boolean choseYes =
           SafeDialogUtils.showYesNoDialog(
               project,
               Messages.ConnectButton_connect_to_new_account_message,
               Messages.ConnectButton_connect_to_new_account_title);
 
-      if (option == com.intellij.openapi.ui.Messages.YES) {
+      if (choseYes) {
         connectAction.executeWithUser(
             account.getUsername() + USER_ID_SEPARATOR + account.getDomain());
       }
