@@ -186,12 +186,14 @@ public class SafeDialogUtils {
    * @param project the project used as a reference to generate and position the dialog
    * @param message the text displayed as the message of the dialog
    * @param title the text displayed as the title of the dialog
-   * @return the value {@link Messages#YES} if "Yes" is chosen and {@link Messages#NO} if "No" is
-   *     chosen or the dialog is closed
+   * @return <code>true</code> if {@link Messages#YES} is chosen or <code>false</code> if {@link
+   *     Messages#NO} is chosen or the dialog is closed
    * @throws IllegalAWTContextException if the calling thread is currently inside a write safe
    *     context
+   * @throws IllegalStateException if no response value was received from the dialog or the response
+   *     was not {@link Messages#YES} or {@link Messages#NO}.
    */
-  public static Integer showYesNoDialog(Project project, final String message, final String title)
+  public static boolean showYesNoDialog(Project project, final String message, final String title)
       throws IllegalAWTContextException {
 
     if (application.isWriteAccessAllowed()) {
@@ -211,7 +213,16 @@ public class SafeDialogUtils {
         },
         ModalityState.defaultModalityState());
 
-    return response.get();
+    Integer result = response.get();
+
+    switch (result) {
+      case Messages.YES:
+        return true;
+      case Messages.NO:
+        return false;
+      default:
+        throw new IllegalStateException("Encountered unknown dialog answer " + result);
+    }
   }
 
   /**
@@ -223,6 +234,8 @@ public class SafeDialogUtils {
    * @param message the text displayed as the message of the dialog
    * @param title the text displayed as the title of the dialog
    * @param runAfter the runnable to execute if the user chooses {@link Messages#YES}
+   * @throws IllegalStateException if the response from the dialog was not {@link Messages#YES} or
+   *     {@link Messages#NO}.
    */
   public static void showYesNoDialog(
       @NotNull Project project,
@@ -239,6 +252,9 @@ public class SafeDialogUtils {
 
           if (option == Messages.YES) {
             runAfter.run();
+
+          } else if (option != Messages.NO) {
+            throw new IllegalStateException("Encountered unknown dialog answer " + option);
           }
         },
         ModalityState.defaultModalityState());
