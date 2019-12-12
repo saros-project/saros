@@ -18,7 +18,6 @@ import saros.intellij.ui.Messages;
 import saros.intellij.ui.actions.AbstractSarosAction;
 import saros.intellij.ui.actions.ConnectServerAction;
 import saros.intellij.ui.actions.DisconnectServerAction;
-import saros.intellij.ui.actions.NotImplementedAction;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.SafeDialogUtils;
 import saros.net.xmpp.JID;
@@ -40,7 +39,7 @@ public class ConnectButton extends AbstractToolbarButton {
 
   private final AbstractSarosAction disconnectAction;
   private final ConnectServerAction connectAction;
-  private final NotImplementedAction configureAccounts;
+  private final AbstractSarosAction configureAccounts;
 
   private final Project project;
 
@@ -54,13 +53,23 @@ public class ConnectButton extends AbstractToolbarButton {
 
     disconnectAction = new DisconnectServerAction(project);
     connectAction = new ConnectServerAction(project);
+    configureAccounts =
+        new AbstractSarosAction() {
+          @Override
+          public String getActionName() {
+            throw new UnsupportedOperationException("Not yet implemented");
+          }
+
+          @Override
+          public void execute() {
+            throw new UnsupportedOperationException("Not yet implemented");
+          }
+        };
 
     popupMenu = new JBPopupMenu();
 
     popupMenu.setForeground(FOREGROUND_COLOR);
     popupMenu.setBackground(BACKGROUND_COLOR);
-
-    configureAccounts = new NotImplementedAction("configure accounts");
 
     createDisconnectMenuItem();
     createAddAccountMenuItem();
