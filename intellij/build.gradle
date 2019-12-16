@@ -6,6 +6,12 @@ sarosIntellij {
   intellijVersion = 'IC-2019.3'
 }
 
+runIde {
+  // set heap size for the test JVM(s)
+  minHeapSize = "128m"
+  maxHeapSize = "2048m"
+}
+
 dependencies {
   compile project(':saros.core')
 
