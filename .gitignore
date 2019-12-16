@@ -6,6 +6,7 @@ buildSrc/.gradle
 /.idea/tasks.xml
 /.idea/workspace.xml
 /.idea/inspectionProfiles/
+/.idea/jarRepositories.xml
 /.idea/copyright/
 /.idea/dictionaries/
 /.idea/libraries/
