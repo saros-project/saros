@@ -11,6 +11,7 @@ import saros.editor.FollowModeManager;
 import saros.editor.IFollowModeListener;
 import saros.editor.ISharedEditorListener;
 import saros.net.xmpp.contact.IContactsUpdate;
+import saros.net.xmpp.contact.IContactsUpdate.UpdateType;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
@@ -97,7 +98,10 @@ public class SessionContentProvider extends TreeContentProvider {
 
   // TODO call update and not refresh
   private final IContactsUpdate contactsUpdate =
-      (contact, type) -> ViewerUtils.refresh(viewer, true);
+      (contact, type) -> {
+        if (type == UpdateType.ADDED) ViewerUtils.expandAll(viewer);
+        ViewerUtils.refresh(viewer, true);
+      };
 
   /*
    * as we have a filter installed that will hide contacts from the contact
@@ -200,7 +204,6 @@ public class SessionContentProvider extends TreeContentProvider {
 
   // TODO abstract !
   private void createHeaders(SessionInput input) {
-
     sessionHeaderElement =
         new SessionHeaderElement(viewer.getControl().getFont(), input, editorManager, collector);
 
