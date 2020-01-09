@@ -127,6 +127,8 @@ public class ChatViewFunctionsTest extends StfTestCase {
             .getChatMessage());
   }
 
+  // TODO: The test fails in single execution and succeeds
+  //       if the whole test class is executed.
   @Test
   public void testVisualChatNotification() throws Exception {
 
