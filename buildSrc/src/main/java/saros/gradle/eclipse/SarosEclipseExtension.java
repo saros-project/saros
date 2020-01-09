@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class SarosEclipseExtension {
   private File manifest = null;
-  private String eclipseVersion = "4.6.3";
+  private String eclipseVersion = "4.8.0";
   private List<String> excludeManifestDependencies = new ArrayList<>();
   private boolean addDependencies = false;
   private boolean addPdeNature = false;
