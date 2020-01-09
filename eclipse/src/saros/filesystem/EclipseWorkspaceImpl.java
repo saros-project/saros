@@ -77,17 +77,8 @@ public class EclipseWorkspaceImpl implements IWorkspace {
   public void run(IWorkspaceRunnable runnable, IResource[] resources)
       throws IOException, OperationCanceledException {
 
-    final org.eclipse.core.resources.IWorkspaceRunnable eclipseRunnable;
-
-    /*
-     * Don't wrap the runnable again if its actually a wrapped Eclipse
-     * runnable, but extract the delegate instead.
-     */
-    if (runnable instanceof EclipseWorkspaceRunnableImpl) {
-      eclipseRunnable = ((EclipseWorkspaceRunnableImpl) runnable).getDelegate();
-    } else {
-      eclipseRunnable = new EclipseRunnableAdapter(runnable);
-    }
+    final org.eclipse.core.resources.IWorkspaceRunnable eclipseRunnable =
+        new EclipseRunnableAdapter(runnable);
 
     final List<org.eclipse.core.resources.IResource> eclipseResources =
         ResourceAdapterFactory.convertBack(resources != null ? Arrays.asList(resources) : null);
