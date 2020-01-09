@@ -3,11 +3,11 @@ package saros.stf.test.session;
 import static org.junit.Assert.assertEquals;
 import static saros.stf.client.tester.SarosTester.ALICE;
 import static saros.stf.client.tester.SarosTester.BOB;
+import static saros.stf.shared.Constants.APPLY_AND_CLOSE;
 import static saros.stf.shared.Constants.MENU_PREFERENCES;
 import static saros.stf.shared.Constants.MENU_SAROS;
 import static saros.stf.shared.Constants.NODE_SAROS;
 import static saros.stf.shared.Constants.NODE_SAROS_NETWORK;
-import static saros.stf.shared.Constants.OK;
 import static saros.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_GROUP;
 import static saros.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_IBB_CHECKBOX;
 import static saros.stf.shared.Constants.PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_SOCKS5_MEDIATED_CHECKBOX;
@@ -127,7 +127,7 @@ public class EstablishSessionWithDifferentTransportModesTest extends StfTestCase
             .select();
       }
 
-      shell.bot().button(OK).click();
+      shell.bot().button(APPLY_AND_CLOSE).click();
       shell.waitShortUntilIsClosed();
     }
   }

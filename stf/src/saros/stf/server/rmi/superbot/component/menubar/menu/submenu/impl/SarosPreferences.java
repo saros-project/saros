@@ -50,7 +50,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
     createAccountShell.bot().button(NEXT).click();
     createAccountShell.bot().button(FINISH).click();
     createAccountShell.bot().button(APPLY).click();
-    createAccountShell.bot().button(OK).click();
+    createAccountShell.bot().button(APPLY_AND_CLOSE).click();
 
     preferencesShell.bot().waitUntil(SarosConditions.isShellClosed(preferencesShell));
   }
@@ -63,7 +63,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
     SuperBot.getInstance().confirmShellAddXMPPAccount(jid, password);
 
     shell.bot().button(APPLY).click();
-    shell.bot().button(OK).click();
+    shell.bot().button(APPLY_AND_CLOSE).click();
     shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
   }
 
@@ -90,7 +90,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
     assert shell.bot().label(LABEL_ACTIVE_ACCOUNT_PREFIX + jid.getBase()).isVisible();
 
     shell.bot().button(APPLY).click();
-    shell.bot().button(OK).click();
+    shell.bot().button(APPLY_AND_CLOSE).click();
     shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
   }
 
@@ -103,7 +103,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
     shell.bot().buttonInGroup(BUTTON_EDIT_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
     SuperBot.getInstance().confirmShellEditXMPPAccount(newXmppJabberID, newPassword);
     shell.bot().button(APPLY).click();
-    shell.bot().button(OK).click();
+    shell.bot().button(APPLY_AND_CLOSE).click();
     shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
   }
 
@@ -129,7 +129,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
           .waitUntil(Conditions.shellCloses(removeAccountConfirmationShell));
 
       shell.bot().button(APPLY).click();
-      shell.bot().button(OK).click();
+      shell.bot().button(APPLY_AND_CLOSE).click();
       shell.bot().waitUntil(Conditions.shellCloses(shell));
     } else throw new RuntimeException("button to delete an account is not enabled");
   }
@@ -166,7 +166,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
     assert shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).itemCount() == 1;
 
     shell.bot().button(APPLY).click();
-    shell.bot().button(OK).click();
+    shell.bot().button(APPLY_AND_CLOSE).click();
     shell.bot().waitUntil(Conditions.shellCloses(shell));
   }
 
@@ -202,7 +202,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
     else checkBox.deselect();
 
     shell.bot().button(APPLY).click();
-    shell.bot().button(OK).click();
+    shell.bot().button(APPLY_AND_CLOSE).click();
 
     shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
   }
@@ -223,7 +223,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
               Messages.getString("feedback.page.group.interval"))
           .click();
       shell.bot().button(APPLY).click();
-      shell.bot().button(OK).click();
+      shell.bot().button(APPLY_AND_CLOSE).click();
       shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
   }
@@ -379,7 +379,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
     else checkBox.deselect();
 
     shell.bot().button(APPLY).click();
-    shell.bot().button(OK).click();
+    shell.bot().button(APPLY_AND_CLOSE).click();
 
     shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
   }
@@ -389,7 +389,7 @@ public final class SarosPreferences extends StfRemoteObject implements ISarosPre
     SWTBotShell shell = preCondition();
     shell.bot().button(RESTORE_DEFAULTS).click();
     shell.bot().button(APPLY).click();
-    shell.bot().button(OK).click();
+    shell.bot().button(APPLY_AND_CLOSE).click();
     shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
   }
 }
