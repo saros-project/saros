@@ -260,7 +260,7 @@ doing:
 {% capture intellij %}
 
 **This page contains information partially specific to the current release `0.2.1`.<br>
-For information on previous releases, you can have a look at the corresponding [release notes](../releases/index.html/index.html).**
+For information on previous releases, you can have a look at the corresponding [release notes](../releases/index.md).**
 
 The development of the Saros/I plugin is still in the alpha stages, so expect it to be a bit rough around the edges.
 There are still some [restrictions](#restrictions) that apply to the usage and some basic [features are still missing](#missing-features).
@@ -308,7 +308,7 @@ All actions described in the following sections take place in this tool window.
 
 ### Creating an XMPP Account
 
-Saros requires an XMPP account to connect to and communicate with other users. You can use an openly available XMPP server or [setup your own XMPP server](https://www.saros-project.org/documentation/setup-xmpp.html).
+Saros requires an XMPP account to connect to and communicate with other users. You can use an openly available XMPP server or [setup your own XMPP server](./setup-xmpp.md).
 
 Furthermore, we also host an XMPP server (`saros-con.imp.fu-berlin.de`) specifically for the purpose of Saros that is freely available.
 To use it, you will first have to create an account using the [signup page](https://saros-con.imp.fu-berlin.de:5280/register/new).
