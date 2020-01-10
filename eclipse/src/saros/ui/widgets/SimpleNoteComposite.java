@@ -5,13 +5,14 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Link;
+import saros.ui.util.LinkListener;
 
 /** An easy to use {@link NoteComposite} that can only contain text. */
 public class SimpleNoteComposite extends NoteComposite {
 
-  protected Label contentLabel;
+  protected Link contentLabel;
 
   public SimpleNoteComposite(Composite parent, int style, Image image, String text) {
     this(parent, style);
@@ -51,7 +52,8 @@ public class SimpleNoteComposite extends NoteComposite {
 
   @Override
   public void createContent(Composite parent) {
-    contentLabel = new Label(parent, SWT.WRAP);
+    contentLabel = new Link(parent, SWT.WRAP);
+    contentLabel.addListener(SWT.Selection, new LinkListener());
   }
 
   /**
