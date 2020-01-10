@@ -29,26 +29,15 @@ To get familiar with this concept check out our comic:
 
 ### Step 1: Connecting
 
-You need an **XMPP account** to use Saros.
+You first need an **XMPP account** to use Saros.
 
-1.  You can **create a new account** within Saros by using the
-    FU-Berlin servers.
-  - **Note:** Due to abuse by spammers, we had to disable in-band registration.
-    As a consequence, the "Create New Account..." button currently no longer works.
-    Instead, to create an account on our XMPP server, you can **visit our [signup page](https://saros-con.imp.fu-berlin.de:5280/register/new)**.
-2.  You can **use an existing account.**
-    For example your Google mail address. **This is a
-    valid XMPP accounts**.
-    To use your Google account you have to allow less secure apps access
-    your account, see [here](https://support.google.com/accounts/answer/6010255?hl=en).
-    Unfortunately, gmx and web.de accounts do not work currently.
-     
+1.  You can **create a new account** on our XMPP server using our **[signup page](https://saros-con.imp.fu-berlin.de:5280/register/new)**.
+  - Note: Due to abuse by spammers, we had to disable in-band registration and from within Saros.
+2.  You can **use an existing account** or [setup your own XMPP server](setup-xmpp.md).
+  - Please note that your mileage may vary depending on the XMPP server settings, such as bandwidth restrictions or feature supports.
 
-To do that simply start the *Saros Configuration* wizard (*Menu &gt;
-Saros &gt; Start Saros Configuration*)
-
-![Connecting to Server](images/1_GettingStartedCreateAccount_0.png){:class="img-fluid"}
-
+Now you can start the *Saros Configuration* wizard (*Menu &gt;
+Saros &gt; Start Saros Configuration*) to configure your account in Saros and connect.
 
 ### Step 2: Adding Contacts
 
