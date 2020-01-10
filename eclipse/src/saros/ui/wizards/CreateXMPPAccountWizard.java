@@ -33,11 +33,23 @@ import saros.ui.wizards.pages.CreateXMPPAccountWizardPage;
 /**
  * A wizard that is used to create XMPP accounts.
  *
+ * <p><b>This Dialog is disabled due to missing Captcha Support! see {@link
+ * #CREATE_DIALOG_ENABLED}</b>
+ *
  * @author rdjemili
  * @author coezbek
  * @author bkahlert
  */
 public class CreateXMPPAccountWizard extends Wizard {
+
+  /**
+   * This Registration logic just works for Servers without Captchas. Defacto it is broken as the
+   * Saros server and all other public XMPP servers use Captchas. See issue #787 for more details.
+   *
+   * <p>TODO After Update to Smack 4 or higher add Captcha Support and enable this Dialog again.
+   */
+  public static final boolean CREATE_DIALOG_ENABLED = false;
+
   private static final Logger log = Logger.getLogger(CreateXMPPAccountWizard.class);
 
   @Inject private XMPPAccountStore accountStore;
