@@ -9,7 +9,7 @@ This document is not up-to-date, but still contains useful information about the
 
 ### Prerequisites
 
-You need a [development environment](development-environment.md) with **Eclipse 4.6** which is currently the only supported eclipse version.
+You need a [development environment](development-environment.md) with **Eclipse 4.8** which is currently the only supported eclipse version.
 
 ### Configuration
 
