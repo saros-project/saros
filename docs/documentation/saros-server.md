@@ -13,7 +13,7 @@ The use-case of the server is to host session independently of any participant. 
 The Saros-Server is currently not available for download, but is scheduled to be on the next Saros/E Release (no ETA).
 
 If you would like to use the server in the meantime, you will have to build it yourself.
-Furthermore, to start a session with the server through the Saros/E GUI, you will also have to build the Saros/E versions you want to use with the server yourself.
+Furthermore, you will also have to build the Saros/E versions you want to use with the server yourself to avoid incompatibilities.
 A guide on how to build Saros (and its different components) is given [here](../contribute/development-environment.md).
 
 The server needs it's own XMPP account and can then be started via:
