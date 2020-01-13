@@ -29,7 +29,6 @@ import saros.net.upnp.internal.UPnPAccessImpl;
 import saros.net.upnp.internal.UPnPServiceImpl;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.XMPPContactsService;
-import saros.net.xmpp.discovery.DiscoveryManager;
 import saros.net.xmpp.roster.RosterTracker;
 import saros.net.xmpp.subscription.SubscriptionHandler;
 import saros.observables.FileReplacementInProgressObservable;
@@ -79,7 +78,6 @@ public class CoreContextFactory extends AbstractContextFactory {
       // Network
       Component.create(DispatchThreadContext.class),
       Component.create(IConnectionManager.class, DataTransferManager.class),
-      Component.create(DiscoveryManager.class),
       Component.create(
           BindKey.bindKey(IStreamService.class, IContextKeyBindings.IBBStreamService.class),
           IBBStreamService.class),
