@@ -11,7 +11,7 @@ import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
-import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -20,31 +20,19 @@ import saros.session.User;
 import saros.versioning.VersionManager;
 
 public final class NegotiationFactory {
-
   private final VersionManager versionManager;
   private final SessionNegotiationHookManager hookManager;
 
   // TODO remove, do not use Smack Filetransfer
   private final XMPPConnectionService connectionService;
-  /*
-   * TODO is this really needed ? The only usage is to obtain the RQJID via
-   * the discoveryManager which is already not a good practice, also there is
-   * no need to check the support here as the negotiation will fail if the
-   * remote side does not support Saros. Checking the support should be done
-   * before the negotiation is started, and if we want to check the support it
-   * should be made using our own protocol and not some handy and dandy XMPP
-   * stuff which can be faked anyway, the request may timeout, etc.
-   */
-  private final DiscoveryManager discoveryManager;
 
-  // private final IEditorManager editorManager;
+  /** This is unneeded here if the Factory gets called directly with Contact objects. */
+  private final XMPPContactsService contactsService;
+
   private final IContainerContext context;
-
   private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
-
   private final IWorkspace workspace;
   private final IChecksumCache checksumCache;
-
   private final IConnectionManager connectionManager;
   private final ITransmitter transmitter;
   private final IReceiver receiver;
@@ -52,53 +40,44 @@ public final class NegotiationFactory {
   private final AdditionalProjectDataFactory additionalProjectDataFactory;
 
   public NegotiationFactory(
-      final VersionManager versionManager, //
-      final SessionNegotiationHookManager hookManager, //
-      final DiscoveryManager discoveryManager, //
-      // final IEditorManager editorManager, //
-      final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
-      final IWorkspace workspace, //
-      final IChecksumCache checksumCache, //
-      final XMPPConnectionService connectionService, //
-      final IConnectionManager connectionManager, //
-      final ITransmitter transmitter, //
-      final IReceiver receiver,
-      final AdditionalProjectDataFactory additionalProjectDataFactory, //
+      VersionManager versionManager,
+      SessionNegotiationHookManager hookManager,
+      XMPPContactsService contactsService,
+      FileReplacementInProgressObservable fileReplacementInProgressObservable,
+      IWorkspace workspace,
+      IChecksumCache checksumCache,
+      XMPPConnectionService connectionService,
+      IConnectionManager connectionManager,
+      ITransmitter transmitter,
+      IReceiver receiver,
+      AdditionalProjectDataFactory additionalProjectDataFactory,
 
       /*
        * FIXME HACK for now to avoid cyclic dependencies between this class,
        * the SessionManager and IEditorManager implementations which are using
        * the SessionManager as well.
        */
-      final IContainerContext context //
-      ) {
+      IContainerContext context) {
 
     this.versionManager = versionManager;
     this.hookManager = hookManager;
-    this.discoveryManager = discoveryManager;
-
-    // this.editorManager = editorManager;
+    this.contactsService = contactsService;
     this.context = context;
-
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
-
     this.workspace = workspace;
     this.checksumCache = checksumCache;
-
     this.connectionService = connectionService;
-
     this.connectionManager = connectionManager;
     this.transmitter = transmitter;
     this.receiver = receiver;
-
     this.additionalProjectDataFactory = additionalProjectDataFactory;
   }
 
   public OutgoingSessionNegotiation newOutgoingSessionNegotiation(
-      final JID remoteAddress,
-      final ISarosSessionManager sessionManager,
-      final ISarosSession session,
-      final String description) {
+      JID remoteAddress,
+      ISarosSessionManager sessionManager,
+      ISarosSession session,
+      String description) {
 
     return new OutgoingSessionNegotiation(
         remoteAddress,
@@ -107,7 +86,7 @@ public final class NegotiationFactory {
         session,
         hookManager,
         versionManager,
-        discoveryManager,
+        contactsService,
         transmitter,
         receiver);
   }
@@ -134,20 +113,18 @@ public final class NegotiationFactory {
   }
 
   public AbstractOutgoingProjectNegotiation newOutgoingProjectNegotiation(
-      final JID remoteAddress,
-      final ProjectSharingData projectSharingData,
-      final ISarosSessionManager sessionManager,
-      final ISarosSession session) {
+      JID remoteAddress,
+      ProjectSharingData projectSharingData,
+      ISarosSessionManager sessionManager,
+      ISarosSession session) {
 
-    TransferType transferType = getTransferType(session, remoteAddress);
-
-    switch (transferType) {
+    switch (getTransferType(session, remoteAddress)) {
       case ARCHIVE:
         return new ArchiveOutgoingProjectNegotiation(
             remoteAddress,
             projectSharingData,
             sessionManager,
-            session, /* editorManager */
+            session,
             context.getComponent(IEditorManager.class),
             workspace,
             checksumCache,
@@ -160,7 +137,7 @@ public final class NegotiationFactory {
             remoteAddress,
             projectSharingData,
             sessionManager,
-            session, /* editorManager */
+            session,
             context.getComponent(IEditorManager.class),
             workspace,
             checksumCache,
@@ -174,15 +151,13 @@ public final class NegotiationFactory {
   }
 
   public AbstractIncomingProjectNegotiation newIncomingProjectNegotiation(
-      final JID remoteAddress,
-      final String negotiationID,
-      final List<ProjectNegotiationData> projectNegotiationData,
-      final ISarosSessionManager sessionManager,
-      final ISarosSession session) {
+      JID remoteAddress,
+      String negotiationID,
+      List<ProjectNegotiationData> projectNegotiationData,
+      ISarosSessionManager sessionManager,
+      ISarosSession session) {
 
-    TransferType transferType = getTransferType(session, remoteAddress);
-
-    switch (transferType) {
+    switch (getTransferType(session, remoteAddress)) {
       case ARCHIVE:
         return new ArchiveIncomingProjectNegotiation(
             remoteAddress,

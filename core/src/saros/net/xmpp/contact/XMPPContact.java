@@ -136,7 +136,7 @@ public class XMPPContact {
    */
   @Deprecated
   public Optional<JID> getSarosJid() {
-    return bestResource.map(r -> r.fullJid);
+    return bestResource.filter(r -> r.features.contains(ResourceFeature.SAROS)).map(r -> r.fullJid);
   }
 
   /**
