@@ -178,11 +178,10 @@ task sarosLsp(type: Copy, dependsOn: [
   ':saros.lsp:jar'
   ]) {
   group 'Delivery'
-  description 'Builds and tests all modules required by the Saros for VS Code'
+  description 'Builds and tests all modules required by the Saros Language Server'
 
   from project(':saros.lsp').jar
   into 'build/distribution/lsp'
-  into 'vscode/out'
 }
 
 task sarosIntellij(type: Copy, dependsOn: [
