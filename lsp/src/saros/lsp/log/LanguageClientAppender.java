@@ -12,11 +12,6 @@ public class LanguageClientAppender extends AppenderSkeleton {
 
   private final LanguageClient client;
 
-  /**
-   * Instantiates the LanguageClientAppender class.
-   *
-   * @param client the connected language client
-   */
   public LanguageClientAppender(LanguageClient client) {
 
     this.client = client;

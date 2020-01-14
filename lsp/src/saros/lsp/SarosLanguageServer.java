@@ -28,8 +28,22 @@ public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguage
   }
 
   /**
-   * Creates the capabilities of the server.
+   * Creates the language capabilities of the server.
    *
+   * Capabilities are language related features like:
+   *  * syntax highlighting
+   *  * code lens
+   *  * hover
+   *  * code completition
+   * 
+   * The capabilities are being evaluated by the IDE
+   * that uses the server in order to know which
+   * features can be used.
+   * 
+   * Since this server isn't processing any programming
+   * language in the original sense all features will
+   * default to false.
+   * 
    * @return ServerCapabilities capabilities of the server
    */
   private ServerCapabilities createCapabilities() {

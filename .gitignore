@@ -68,10 +68,3 @@ docs/Gemfile.lock
 # LSP
 lsp/.classpath
 lsp/build
-
-# VS Code
-vscode/.project
-vscode/package-lock.json
-*.vscode
-*.code-workspace
-*.vscodeignore
