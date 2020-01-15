@@ -85,6 +85,17 @@ public class Messages {
   public static String ConnectButton_connect_to_new_account_title;
   public static String ConnectButton_connect_to_new_account_message;
 
+  public static String AddContactButton_tooltip;
+  public static String AddContactButton_contact_jid_dialog_title;
+  public static String AddContactButton_contact_jid_dialog_message;
+  public static String AddContactButton_contact_jid_dialog_initial_input;
+  public static String AddContactButton_contact_jid_dialog_illegal_input_title;
+  public static String AddContactButton_contact_jid_dialog_illegal_input_message;
+  public static String AddContactButton_contact_nickname_dialog_title;
+  public static String AddContactButton_contact_nickname_dialog_message;
+  public static String AddContactButton_contact_addition_failed_error_notification_title;
+  public static String AddContactButton_contact_addition_failed_error_notification_message;
+
   public static String NegotiationHandler_session_local_error_title;
   public static String NegotiationHandler_session_local_error_message;
   public static String NegotiationHandler_session_remote_cancel_title;
