@@ -57,7 +57,8 @@ public class Messages {
   public static String FollowButton_user_entry_prefix;
   public static String FollowButton_leave_follow_mode_entry;
 
-  public static String LeaveSessionButton_tooltip;
+  public static String LeaveSessionButton_leave_tooltip;
+  public static String LeaveSessionButton_terminate_tooltip;
 
   public static String ConnectButton_tooltip;
   public static String ConnectButton_disconnect;
