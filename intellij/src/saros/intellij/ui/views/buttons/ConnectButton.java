@@ -18,7 +18,6 @@ import saros.intellij.ui.Messages;
 import saros.intellij.ui.actions.AbstractSarosAction;
 import saros.intellij.ui.actions.ConnectServerAction;
 import saros.intellij.ui.actions.DisconnectServerAction;
-import saros.intellij.ui.actions.NotImplementedAction;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.SafeDialogUtils;
 import saros.net.xmpp.JID;
@@ -40,27 +39,38 @@ public class ConnectButton extends AbstractToolbarButton {
 
   private final AbstractSarosAction disconnectAction;
   private final ConnectServerAction connectAction;
-  private final NotImplementedAction configureAccounts;
-
-  private final Project project;
+  private final AbstractSarosAction configureAccounts;
 
   @Inject private XMPPAccountStore accountStore;
 
   public ConnectButton(@NotNull Project project) {
-    super(ConnectServerAction.NAME, Messages.ConnectButton_tooltip, IconManager.CONNECT_ICON);
-    SarosPluginContext.initComponent(this);
+    super(
+        project,
+        ConnectServerAction.NAME,
+        Messages.ConnectButton_tooltip,
+        IconManager.CONNECT_ICON);
 
-    this.project = project;
+    SarosPluginContext.initComponent(this);
 
     disconnectAction = new DisconnectServerAction(project);
     connectAction = new ConnectServerAction(project);
+    configureAccounts =
+        new AbstractSarosAction() {
+          @Override
+          public String getActionName() {
+            throw new UnsupportedOperationException("Not yet implemented");
+          }
+
+          @Override
+          public void execute() {
+            throw new UnsupportedOperationException("Not yet implemented");
+          }
+        };
 
     popupMenu = new JBPopupMenu();
 
     popupMenu.setForeground(FOREGROUND_COLOR);
     popupMenu.setBackground(BACKGROUND_COLOR);
-
-    configureAccounts = new NotImplementedAction("configure accounts");
 
     createDisconnectMenuItem();
     createAddAccountMenuItem();
@@ -83,6 +93,11 @@ public class ConnectButton extends AbstractToolbarButton {
 
           popupMenu.show(ConnectButton.this, 0, getBounds().y + getBounds().height);
         });
+  }
+
+  @Override
+  public void dispose() {
+    // NOP
   }
 
   private void createMenuItems() {
@@ -158,13 +173,13 @@ public class ConnectButton extends AbstractToolbarButton {
 
   private void askToConnectToAccount(@NotNull XMPPAccount account) {
     try {
-      Integer option =
+      boolean choseYes =
           SafeDialogUtils.showYesNoDialog(
               project,
               Messages.ConnectButton_connect_to_new_account_message,
               Messages.ConnectButton_connect_to_new_account_title);
 
-      if (option == com.intellij.openapi.ui.Messages.YES) {
+      if (choseYes) {
         connectAction.executeWithUser(
             account.getUsername() + USER_ID_SEPARATOR + account.getDomain());
       }

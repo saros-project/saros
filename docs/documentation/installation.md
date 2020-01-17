@@ -7,7 +7,7 @@ title: Install Saros
 ## Prerequisites
 
 *   Saros requires **Java SE 8** or higher
-*   Saros is developed and tested using **Eclipse 4.6**, but it
+*   Saros is developed and tested using **Eclipse 4.8**, but it
     should work on any newer version without problems.
     *   [Download Eclipse](http://www.eclipse.org/downloads/)
 *   Saros ought to run on all platforms that can execute Eclipse

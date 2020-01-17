@@ -21,6 +21,9 @@ import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.views.SarosMainPanelView;
 import saros.net.ConnectionState;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.contact.IContactsUpdate;
+import saros.net.xmpp.contact.IContactsUpdate.UpdateType;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
@@ -34,9 +37,12 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
   private final SessionTreeRootNode sessionTreeRootNode;
   private final ContactTreeRootNode contactTreeRootNode;
 
+  private final Project project;
+
   @Inject private XMPPAccountStore accountStore;
 
   @Inject private ConnectionHandler connectionHandler;
+  @Inject private XMPPContactsService xmppContactsService;
 
   /**
    * A cell renderer that sets the node icon according to the node type (root, session, contact, or
@@ -86,8 +92,18 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
   private final IConnectionStateListener connectionStateListener =
       (state, error) -> renderConnectionState(state);
 
+  private final IContactsUpdate contactsUpdateListener =
+      (contact, updateType) -> {
+        // TODO react to other update types once the corresponding information is actually displayed
+        if (updateType == UpdateType.ADDED || updateType == UpdateType.REMOVED) {
+          renderConnected();
+        }
+      };
+
   public SessionAndContactsTreeView(@NotNull Project project) {
     super(new SarosTreeRootNode());
+
+    this.project = project;
 
     Disposer.register(project, this);
 
@@ -104,6 +120,7 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
     setCellRenderer(renderer);
 
     connectionHandler.addConnectionStateListener(connectionStateListener);
+    xmppContactsService.addListener(contactsUpdateListener);
 
     // show correct initial state
     renderConnectionState(connectionHandler.getConnectionState());
@@ -113,6 +130,7 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
   @Override
   public void dispose() {
     connectionHandler.removeConnectionStateListener(connectionStateListener);
+    xmppContactsService.removeListener(contactsUpdateListener);
   }
 
   private void renderConnectionState(ConnectionState state) {
@@ -138,6 +156,10 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
   private void renderConnected() {
     UIUtil.invokeLaterIfNeeded(
         () -> {
+          if (project.isDisposed()) {
+            return;
+          }
+
           JID userJID = connectionHandler.getLocalJID();
           if (userJID == null) return;
 

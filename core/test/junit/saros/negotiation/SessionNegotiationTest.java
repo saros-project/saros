@@ -10,6 +10,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.fail;
 
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,7 +28,8 @@ import saros.net.IConnectionManager;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.net.xmpp.contact.XMPPContact;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.preferences.IPreferenceStore;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -71,7 +73,7 @@ public class SessionNegotiationTest {
   private IConnectionManager aliceConnectionManager;
   private IConnectionManager bobConnectionManager;
 
-  private DiscoveryManager aliceDiscoveryManager;
+  private XMPPContactsService aliceXMPPContactsService;
 
   private ISarosSession aliceSession;
   private ISarosSession bobSession;
@@ -106,7 +108,7 @@ public class SessionNegotiationTest {
 
     bobVersionManager = new VersionManager("47.11.8015.TEST", bobReceiver, bobTransmitter);
 
-    aliceDiscoveryManager = discoveryManagerMockFor(BOB);
+    aliceXMPPContactsService = contactsServiceMockFor(BOB);
 
     aliceSession = createNiceMock(ISarosSession.class);
 
@@ -135,15 +137,18 @@ public class SessionNegotiationTest {
     replay(aliceSessionManager, bobSessionManager);
   }
 
-  private DiscoveryManager discoveryManagerMockFor(final JID jid) {
+  private XMPPContactsService contactsServiceMockFor(final JID jid) {
+    XMPPContact contactMock = createMock(XMPPContact.class);
+    expect(contactMock.getSarosJid()).andStubReturn(Optional.of(jid));
+    replay(contactMock);
 
-    final DiscoveryManager discoManagerMock = createMock(DiscoveryManager.class);
+    XMPPContactsService contactsServiceMock = createMock(XMPPContactsService.class);
 
-    expect(discoManagerMock.getSupportingPresence(eq(jid), anyObject(String.class)))
-        .andStubReturn(jid);
-    replay(discoManagerMock);
+    expect(contactsServiceMock.getContact(anyObject(String.class)))
+        .andStubReturn(Optional.of(contactMock));
+    replay(contactsServiceMock);
 
-    return discoManagerMock;
+    return contactsServiceMock;
   }
 
   @After
@@ -164,7 +169,7 @@ public class SessionNegotiationTest {
             aliceSession,
             new SessionNegotiationHookManager(),
             aliceVersionManager,
-            aliceDiscoveryManager,
+            aliceXMPPContactsService,
             aliceTransmitter,
             aliceReceiver);
 

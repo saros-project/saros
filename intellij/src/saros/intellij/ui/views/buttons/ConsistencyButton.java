@@ -46,7 +46,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
 
           if (!sessionInconsistencyState.isInconsistent) return;
 
-          setEnabledFromUIThread(false);
+          setEnabled(false);
 
           final Set<SPath> paths =
               new HashSet<>(sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
@@ -64,7 +64,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
             sessionInconsistencyState.action.execute();
           }
 
-          setEnabledFromUIThread(true);
+          setEnabled(true);
         }
       };
 
@@ -91,7 +91,9 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
   }
 
   @Override
-  void disposeComponents() {
+  public void dispose() {
+    super.dispose();
+
     inconsistentObservable.remove(isConsistencyListener);
   }
 
@@ -113,7 +115,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
       setSarosSession(null);
     }
 
-    setEnabledFromUIThread(false);
+    setEnabled(false);
     setToolTipText(Messages.ConsistencyButton_tooltip_functionality);
     setButtonIcon(IconManager.IN_SYNC_ICON);
   }
@@ -149,11 +151,11 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
     sessionInconsistencyState.isInconsistent = isInconsistent;
 
     if (isInconsistent) {
-      setEnabledFromUIThread(true);
+      setEnabled(true);
       setButtonIcon(IconManager.OUT_OF_SYNC_ICON);
       setToolTipText(Messages.ConsistencyButton_tooltip_inconsistency_detected);
     } else {
-      setEnabledFromUIThread(false);
+      setEnabled(false);
       setButtonIcon(IconManager.IN_SYNC_ICON);
       setToolTipText(Messages.ConsistencyButton_tooltip_no_inconsistency);
     }

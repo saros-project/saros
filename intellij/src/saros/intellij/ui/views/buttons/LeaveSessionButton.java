@@ -1,6 +1,7 @@
 package saros.intellij.ui.views.buttons;
 
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.actions.LeaveSessionAction;
 import saros.intellij.ui.util.IconManager;
@@ -19,7 +20,7 @@ public class LeaveSessionButton extends AbstractSessionToolbarButton {
    *
    * <p>LeaveSessionButton is created as disabled.
    */
-  public LeaveSessionButton(Project project) {
+  public LeaveSessionButton(@NotNull Project project) {
     super(
         project,
         LeaveSessionAction.NAME,
@@ -33,17 +34,12 @@ public class LeaveSessionButton extends AbstractSessionToolbarButton {
   }
 
   @Override
-  void disposeComponents() {
-    // NOP
-  }
-
-  @Override
   void sessionStarted(ISarosSession newSarosSession) {
-    setEnabledFromUIThread(true);
+    setEnabled(true);
   }
 
   @Override
   void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
-    setEnabledFromUIThread(false);
+    setEnabled(false);
   }
 }

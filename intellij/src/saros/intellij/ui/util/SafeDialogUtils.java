@@ -4,6 +4,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.TextRange;
 import java.util.concurrent.atomic.AtomicReference;
@@ -60,6 +61,7 @@ public class SafeDialogUtils {
       final String message,
       final String initialValue,
       final String title,
+      InputValidator inputValidator,
       TextRange selection)
       throws IllegalAWTContextException {
 
@@ -80,7 +82,7 @@ public class SafeDialogUtils {
                   title,
                   Messages.getQuestionIcon(),
                   initialValue,
-                  null,
+                  inputValidator,
                   selection);
           if (option != null) {
             response.set(option);
@@ -92,8 +94,25 @@ public class SafeDialogUtils {
   }
 
   /**
-   * Calls {@link #showInputDialog(Project, String, String, String, TextRange)} with <code>
-   * TextRange=null</code>.
+   * Calls {@link #showInputDialog(Project, String, String, String, InputValidator, TextRange)} with
+   * <code>inputValidator=null</code>.
+   *
+   * @see #showInputDialog(Project, String, String, String, TextRange)
+   */
+  public static String showInputDialog(
+      Project project,
+      final String message,
+      final String initialValue,
+      final String title,
+      TextRange selection)
+      throws IllegalAWTContextException {
+
+    return showInputDialog(project, message, initialValue, title, null, selection);
+  }
+
+  /**
+   * Calls {@link #showInputDialog(Project, String, String, String, InputValidator, TextRange)} with
+   * <code>inputValidator=null</code> and <code>selection=null</code>.
    *
    * @see #showInputDialog(Project, String, String, String, TextRange)
    */
@@ -167,12 +186,14 @@ public class SafeDialogUtils {
    * @param project the project used as a reference to generate and position the dialog
    * @param message the text displayed as the message of the dialog
    * @param title the text displayed as the title of the dialog
-   * @return the value {@link Messages#YES} if "Yes" is chosen and {@link Messages#NO} if "No" is
-   *     chosen or the dialog is closed
+   * @return <code>true</code> if {@link Messages#YES} is chosen or <code>false</code> if {@link
+   *     Messages#NO} is chosen or the dialog is closed
    * @throws IllegalAWTContextException if the calling thread is currently inside a write safe
    *     context
+   * @throws IllegalStateException if no response value was received from the dialog or the response
+   *     was not {@link Messages#YES} or {@link Messages#NO}.
    */
-  public static Integer showYesNoDialog(Project project, final String message, final String title)
+  public static boolean showYesNoDialog(Project project, final String message, final String title)
       throws IllegalAWTContextException {
 
     if (application.isWriteAccessAllowed()) {
@@ -192,7 +213,16 @@ public class SafeDialogUtils {
         },
         ModalityState.defaultModalityState());
 
-    return response.get();
+    Integer result = response.get();
+
+    switch (result) {
+      case Messages.YES:
+        return true;
+      case Messages.NO:
+        return false;
+      default:
+        throw new IllegalStateException("Encountered unknown dialog answer " + result);
+    }
   }
 
   /**
@@ -204,6 +234,8 @@ public class SafeDialogUtils {
    * @param message the text displayed as the message of the dialog
    * @param title the text displayed as the title of the dialog
    * @param runAfter the runnable to execute if the user chooses {@link Messages#YES}
+   * @throws IllegalStateException if the response from the dialog was not {@link Messages#YES} or
+   *     {@link Messages#NO}.
    */
   public static void showYesNoDialog(
       @NotNull Project project,
@@ -220,6 +252,9 @@ public class SafeDialogUtils {
 
           if (option == Messages.YES) {
             runAfter.run();
+
+          } else if (option != Messages.NO) {
+            throw new IllegalStateException("Encountered unknown dialog answer " + option);
           }
         },
         ModalityState.defaultModalityState());

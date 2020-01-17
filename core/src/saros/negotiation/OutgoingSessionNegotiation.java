@@ -20,9 +20,8 @@ import saros.negotiation.hooks.SessionNegotiationHookManager;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
-import saros.net.ResourceFeature;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.discovery.DiscoveryManager;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.PreferenceStore;
 import saros.session.ISarosSession;
@@ -53,20 +52,18 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
   private PacketCollector invitationConnectionEstablishedCollector;
 
   private final VersionManager versionManager;
+  private final XMPPContactsService contactsService;
 
-  private final DiscoveryManager discoveryManager;
-
-  public OutgoingSessionNegotiation( //
-      final JID peer, //
-      final String description, //
-      final ISarosSessionManager sessionManager, //
-      final ISarosSession session, //
-      final SessionNegotiationHookManager hookManager, //
-      final VersionManager versionManager, //
-      final DiscoveryManager discoveryManager, //
-      final ITransmitter transmitter, //
-      final IReceiver receiver //
-      ) {
+  public OutgoingSessionNegotiation(
+      JID peer,
+      String description,
+      ISarosSessionManager sessionManager,
+      ISarosSession session,
+      SessionNegotiationHookManager hookManager,
+      VersionManager versionManager,
+      XMPPContactsService contactsService,
+      ITransmitter transmitter,
+      IReceiver receiver) {
     super(
         String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()),
         peer,
@@ -77,9 +74,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         receiver);
 
     this.sarosSession = session;
-
     this.versionManager = versionManager;
-    this.discoveryManager = discoveryManager;
+    this.contactsService = contactsService;
   }
 
   @Override
@@ -127,7 +123,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
        * <p>For starting a session, the host does the following things (see next JTourBusStops for
        * the corresponding steps on the client side):
        *
-       * <p>(1) Check whether Saros is available on the client's side (via the DiscoveryManager).
+       * <p>(1) Check whether Saros is available on the client's side.
        *
        * <p>(2) Check whether the client's Saros is compatible with own version (via the
        * VersionManager).
@@ -203,9 +199,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
   }
 
   /**
-   * Performs a discovery request on the remote side and checks for Saros support. When this method
-   * returns, the remote JID (see {@link SessionNegotiation#peer}) has been properly updated to a
-   * full resource qualified JID.
+   * Check the remote side for Saros support. When this method returns, the remote JID (see {@link
+   * SessionNegotiation#peer}) has been properly updated to a full resource qualified JID.
    */
   private void checkAvailability(IProgressMonitor monitor) throws LocalCancellationException {
 
@@ -213,7 +208,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     monitor.setTaskName("Checking Saros support...");
 
     JID resourceQualifiedJID =
-        discoveryManager.getSupportingPresence(getPeer(), ResourceFeature.SAROS.getIdentifier());
+        contactsService.getContact(getPeer().getRAW()).flatMap(c -> c.getSarosJid()).orElse(null);
 
     if (resourceQualifiedJID == null)
       throw new LocalCancellationException(
