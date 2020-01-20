@@ -18,7 +18,7 @@ import saros.lsp.service.WorkspaceServiceStub;
 /** Implmenentation of the Saros language server. */
 public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguageClientAware {
 
-  private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
+  private static final Logger LOG = Logger.getLogger(SarosLanguageServer.class);
 
   private ISarosLanguageClient languageClient;
 
@@ -30,20 +30,15 @@ public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguage
   /**
    * Creates the language capabilities of the server.
    *
-   * Capabilities are language related features like:
-   *  * syntax highlighting
-   *  * code lens
-   *  * hover
-   *  * code completition
-   * 
-   * The capabilities are being evaluated by the IDE
-   * that uses the server in order to know which
+   * <p>Capabilities are language related features like: * syntax highlighting * code lens * hover *
+   * code completition
+   *
+   * <p>The capabilities are being evaluated by the IDE that uses the server in order to know which
    * features can be used.
-   * 
-   * Since this server isn't processing any programming
-   * language in the original sense all features will
-   * default to false.
-   * 
+   *
+   * <p>Since this server isn't processing any programming language in the original sense all
+   * features will default to false.
+   *
    * @return ServerCapabilities capabilities of the server
    */
   private ServerCapabilities createCapabilities() {
