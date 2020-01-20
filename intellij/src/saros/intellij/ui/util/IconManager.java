@@ -31,6 +31,9 @@ public class IconManager {
   public static final ImageIcon LEAVE_SESSION_ICON =
       getIcon("/icons/famfamfam/session_leave_tsk.png", "leave");
 
+  public static final ImageIcon TERMINATE_SESSION_ICON =
+      getIcon("/icons/elcl16/session_terminate_tsk.png", "terminate session");
+
   public static final ImageIcon ADD_CONTACT_ICON =
       getIcon("/icons/famfamfam/contact_add_tsk.png", "addContact");
   public static final ImageIcon OPEN_PREFERENCES_ICON =

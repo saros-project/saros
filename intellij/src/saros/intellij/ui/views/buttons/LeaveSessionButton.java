@@ -24,7 +24,7 @@ public class LeaveSessionButton extends AbstractSessionToolbarButton {
     super(
         project,
         LeaveSessionAction.NAME,
-        Messages.LeaveSessionButton_tooltip,
+        Messages.LeaveSessionButton_leave_tooltip,
         IconManager.LEAVE_SESSION_ICON);
 
     addActionListener(actionEvent -> new LeaveSessionAction(project).execute());
@@ -36,10 +36,20 @@ public class LeaveSessionButton extends AbstractSessionToolbarButton {
   @Override
   void sessionStarted(ISarosSession newSarosSession) {
     setEnabled(true);
+
+    if (newSarosSession.isHost()) {
+      setButtonIcon(IconManager.TERMINATE_SESSION_ICON);
+      setToolTipText(Messages.LeaveSessionButton_terminate_tooltip);
+    }
   }
 
   @Override
   void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
     setEnabled(false);
+
+    if (oldSarosSession.isHost()) {
+      setButtonIcon(IconManager.LEAVE_SESSION_ICON);
+      setToolTipText(Messages.LeaveSessionButton_leave_tooltip);
+    }
   }
 }
