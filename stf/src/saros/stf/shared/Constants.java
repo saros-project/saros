@@ -303,8 +303,6 @@ public interface Constants {
    */
   public static final String VIEW_SAROS = get("view_saros");
   public static final String VIEW_SAROS_ID = get("view_saros_id");
-  public static final String VIEW_SAROS_WHITEBOARD = get("view_saros_whiteboard");
-  public static final String VIEW_SAROS_WHITEBOARD_ID = get("view_saros_whiteboard_id");
   public static final String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED =
       get("SubscriptionManager_incoming_subscription_request_title");
   public static final String SHELL_SERVER_NOT_FOUND = get("shell_server_not_found");

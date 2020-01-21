@@ -74,8 +74,6 @@ import saros.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
 import saros.stf.server.rmi.superbot.component.view.impl.Views;
 import saros.stf.server.rmi.superbot.component.view.saros.impl.Chatroom;
 import saros.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
-import saros.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
-import saros.stf.server.rmi.superbot.component.view.whiteboard.impl.WhiteboardFigure;
 import saros.stf.server.rmi.superbot.impl.SuperBot;
 import saros.stf.server.rmi.superbot.internal.impl.InternalImpl;
 import saros.stf.shared.Constants;
@@ -210,12 +208,6 @@ public class STFController {
     exportObject(ProgressView.getInstance(), "progressView");
     exportObject(SarosView.getInstance(), "rosterView");
     exportObject(ConsoleView.getInstance(), "consoleView");
-
-    /*
-     * whiteboard specific components
-     */
-    exportObject(SarosWhiteboardView.getInstance(), "sarosWhiteboardView");
-    exportObject(WhiteboardFigure.getInstance(), "whiteboardFigure");
 
     /*
      * SuperBot components
