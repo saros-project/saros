@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.monitoring.IProgressMonitor;
 import saros.net.xmpp.JID;
 import saros.preferences.IPreferenceStore;
 
@@ -106,9 +105,6 @@ public interface ISarosSessionManager {
    */
   @Deprecated
   void sessionStarted(ISarosSession sarosSession);
-
-  /** Call this on the host after the invitation was accepted and has been completed. */
-  void postOutgoingInvitationCompleted(IProgressMonitor monitor, User newUser);
 
   /**
    * Sets the {@link INegotiationHandler negotiation handler} that will handle incoming and outgoing
