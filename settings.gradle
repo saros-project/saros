@@ -1,3 +1,7 @@
+plugins {
+  id "com.gradle.enterprise" version "3.1.1"
+}
+
 String prefix = 'saros.'
 List projectDirs = ['core', 'eclipse', 'whiteboard', 'intellij', 'server', 'stf', 'stf.test'].each { dir ->
   String projectName = prefix + dir
