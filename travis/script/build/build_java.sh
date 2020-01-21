@@ -9,4 +9,4 @@ tasks='clean cleanAll'
 [ "$mode" == 'stf' ] && tasks+=' sarosStf' || tasks+=' sarosEclipse'
 tasks+=' sarosServer sarosIntellij'
 
-./gradlew -PskipTestSuites=true -DmaxParallelForks=4 --no-daemon --parallel $tasks
+./gradlew -PskipTestSuites=true -PuseBuildScan=true -DmaxParallelForks=4 --no-daemon --parallel $tasks
