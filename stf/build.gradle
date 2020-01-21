@@ -25,9 +25,6 @@ dependencies {
 
     compile project(path: ':saros.eclipse', configuration: 'testing')
 
-    // Required for the whiteboard stf component
-    compile files('libs/org.eclipse.draw2d_3.6.2.v20110128-0100.jar', 'libs/org.eclipse.gef_3.6.2.v20110110-2020.jar')
-
     releaseDep fileTree('libs'){
         include '*.jar'
         exclude 'org.eclipse.draw2d*.jar'

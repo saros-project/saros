@@ -13,7 +13,6 @@ import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import saros.activities.IActivity;
 import saros.activities.NOPActivity;
-import saros.monitoring.IProgressMonitor;
 import saros.net.IPacketInterceptor;
 import saros.net.internal.BinaryXMPPExtension;
 import saros.net.internal.IByteStreamConnection;
@@ -26,7 +25,6 @@ import saros.session.IActivityProducer;
 import saros.session.ISarosSession;
 import saros.session.ISessionLifecycleListener;
 import saros.session.SessionEndReason;
-import saros.session.User;
 import saros.stf.server.StfRemoteObject;
 import saros.stf.server.bot.SarosSWTBotPreferences;
 import saros.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
@@ -477,14 +475,6 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
   @Override
   public void removeActivityListener(IActivityListener listener) {
     this.listener = null;
-  }
-
-  // ISarosSessionListener interface implementation
-
-  @Override
-  public void postOutgoingInvitationCompleted(
-      ISarosSession sarosSession, User user, IProgressMonitor monitor) {
-    // NOP
   }
 
   @Override

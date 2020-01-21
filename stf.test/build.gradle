@@ -54,5 +54,4 @@ task stfTest (type: Test, dependsOn: [':saros.eclipse:build']) {
 
     include '**/stf/test/**/*Test.*'
     exclude '**/stf/test/stf/**'
-    exclude '**/whiteboard/**'
 }
