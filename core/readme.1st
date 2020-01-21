@@ -16,9 +16,5 @@ It is a good practice to either export all packages from a third party library o
 
 We have currently some issues with the logging components as the logging does not confirm to OSGi standards.
 
-If you look at the Whiteboard plugin you may notice that it has its own log4j library. This library is never used
-because the core plugin already exports its log4j library and so the class files of this library are used which normally
-violates the OSGi principles. (This is the current behavior for Eclipse Version 3.6 and 3.7).
-
 Furthermore you must not place third party libraries into the core which are only used by a specific Saros product (e.g Saros
 for Eclipse but not for Saros for IntelliJ).
