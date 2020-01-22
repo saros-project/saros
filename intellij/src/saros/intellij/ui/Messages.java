@@ -61,9 +61,9 @@ public class Messages {
   public static String LeaveSessionButton_terminate_tooltip;
 
   public static String ConnectButton_tooltip;
-  public static String ConnectButton_disconnect;
-  public static String ConnectButton_configure_accounts;
   public static String ConnectButton_add_account;
+  public static String ConnectButton_configure_accounts;
+  public static String ConnectButton_disconnect;
   public static String ConnectButton_account_creation_jid_title;
   public static String ConnectButton_account_creation_jid_initial_input;
   public static String ConnectButton_account_creation_jid_message;
