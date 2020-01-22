@@ -124,7 +124,7 @@ public class Messages {
   public static String UserStatusChangeHandler_user_joined_title;
   public static String UserStatusChangeHandler_user_joined_message;
   public static String UserStatusChangeHandler_user_left_title;
-  public static String UserStatusChangeHandler_user_left_text_message;
+  public static String UserStatusChangeHandler_user_left_message;
   public static String UserStatusChangeHandler_permission_changed_title;
   public static String UserStatusChangeHandler_he_has_now_access_message;
   public static String UserStatusChangeHandler_you_have_now_access_message;

@@ -54,7 +54,7 @@ public class UserStatusChangeHandler {
         @Override
         public void userLeft(User user) {
           NotificationPanel.showInformation(
-              CoreUtils.format(Messages.UserStatusChangeHandler_user_left_text_message, user),
+              CoreUtils.format(Messages.UserStatusChangeHandler_user_left_message, user),
               Messages.UserStatusChangeHandler_user_left_title);
         }
       };
