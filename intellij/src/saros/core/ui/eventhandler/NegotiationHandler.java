@@ -226,11 +226,11 @@ public class NegotiationHandler implements INegotiationHandler {
           case REMOTE_ERROR:
             message =
                 MessageFormat.format(
-                    Messages.NegotiationHandler_sharing_project_canceled_remotely_title,
+                    Messages.NegotiationHandler_sharing_project_canceled_remotely_message,
                     peerName,
                     negotiation.getErrorMessage());
             NotificationPanel.showError(
-                message, Messages.NegotiationHandler_sharing_project_canceled_remotely_message);
+                message, Messages.NegotiationHandler_sharing_project_canceled_remotely_title);
 
             return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID, message);
         }
