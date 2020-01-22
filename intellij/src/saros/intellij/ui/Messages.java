@@ -62,6 +62,7 @@ public class Messages {
 
   public static String ConnectButton_tooltip;
   public static String ConnectButton_add_account;
+  public static String ConnectButton_create_account;
   public static String ConnectButton_configure_accounts;
   public static String ConnectButton_disconnect;
   public static String ConnectButton_account_creation_jid_title;
@@ -85,6 +86,8 @@ public class Messages {
   public static String ConnectButton_account_creation_xmpp_server_invalid_port_message;
   public static String ConnectButton_connect_to_new_account_title;
   public static String ConnectButton_connect_to_new_account_message;
+  public static String ConnectButton_create_account_title;
+  public static String ConnectButton_create_account_message;
 
   public static String AddContactButton_tooltip;
   public static String AddContactButton_contact_jid_dialog_title;

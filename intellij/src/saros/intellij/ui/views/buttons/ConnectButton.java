@@ -35,6 +35,7 @@ public class ConnectButton extends AbstractToolbarButton {
   private final JPopupMenu popupMenu;
 
   private final JMenuItem addAccountItem;
+  private final JMenuItem createAccountItem;
   private final JMenuItem configureAccountItem;
   private final JMenuItem disconnectItem;
 
@@ -71,6 +72,7 @@ public class ConnectButton extends AbstractToolbarButton {
     popupMenu = new JBPopupMenu();
 
     addAccountItem = createAddAccountMenuItem();
+    createAccountItem = createCreateAccountMenuItem();
     configureAccountItem = createConfigureAccountMenuItem();
     disconnectItem = createDisconnectMenuItem();
 
@@ -116,6 +118,19 @@ public class ConnectButton extends AbstractToolbarButton {
     return addAccountItem;
   }
 
+  private JMenuItem createCreateAccountMenuItem() {
+    JMenuItem createAccountItem = getPreconfiguredMenuItem(Messages.ConnectButton_create_account);
+
+    createAccountItem.addActionListener(
+        (actionEvent) ->
+            SafeDialogUtils.showInfo(
+                project,
+                Messages.ConnectButton_create_account_message,
+                Messages.ConnectButton_create_account_title));
+
+    return createAccountItem;
+  }
+
   private JMenuItem createConfigureAccountMenuItem() {
     JMenuItem configureAccountItem =
         getPreconfiguredMenuItem(Messages.ConnectButton_configure_accounts);
@@ -146,6 +161,7 @@ public class ConnectButton extends AbstractToolbarButton {
 
     popupMenu.addSeparator();
     popupMenu.add(addAccountItem);
+    popupMenu.add(createAccountItem);
 
     if (ENABLE_CONFIGURE_ACCOUNTS) {
       popupMenu.add(configureAccountItem);
