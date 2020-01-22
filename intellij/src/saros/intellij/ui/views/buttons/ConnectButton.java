@@ -98,10 +98,7 @@ public class ConnectButton extends AbstractToolbarButton {
   }
 
   private JMenuItem createAddAccountMenuItem() {
-    JMenuItem addAccountItem = new JBMenuItem(Messages.ConnectButton_add_account);
-
-    addAccountItem.setForeground(FOREGROUND_COLOR);
-    addAccountItem.setBackground(BACKGROUND_COLOR);
+    JMenuItem addAccountItem = getPreconfiguredMenuItem(Messages.ConnectButton_add_account);
 
     addAccountItem.addActionListener(
         actionEvent -> {
@@ -120,10 +117,8 @@ public class ConnectButton extends AbstractToolbarButton {
   }
 
   private JMenuItem createConfigureAccountMenuItem() {
-    JMenuItem configureAccountItem = new JBMenuItem(Messages.ConnectButton_configure_accounts);
-
-    configureAccountItem.setForeground(FOREGROUND_COLOR);
-    configureAccountItem.setBackground(BACKGROUND_COLOR);
+    JMenuItem configureAccountItem =
+        getPreconfiguredMenuItem(Messages.ConnectButton_configure_accounts);
 
     configureAccountItem.addActionListener(actionEvent -> configureAccounts.execute());
 
@@ -131,10 +126,7 @@ public class ConnectButton extends AbstractToolbarButton {
   }
 
   private JMenuItem createDisconnectMenuItem() {
-    JMenuItem disconnectItem = new JBMenuItem(Messages.ConnectButton_disconnect);
-
-    disconnectItem.setForeground(FOREGROUND_COLOR);
-    disconnectItem.setBackground(BACKGROUND_COLOR);
+    JMenuItem disconnectItem = getPreconfiguredMenuItem(Messages.ConnectButton_disconnect);
 
     disconnectItem.addActionListener(actionEvent -> disconnectAction.execute());
 
@@ -169,10 +161,7 @@ public class ConnectButton extends AbstractToolbarButton {
   }
 
   private JMenuItem createMenuItemForUser(final String userName) {
-    JMenuItem accountItem = new JBMenuItem(userName);
-
-    accountItem.setForeground(FOREGROUND_COLOR);
-    accountItem.setBackground(BACKGROUND_COLOR);
+    JMenuItem accountItem = getPreconfiguredMenuItem(userName);
 
     accountItem.addActionListener(actionEvent -> connectAction.executeWithUser(userName));
 
@@ -375,5 +364,14 @@ public class ConnectButton extends AbstractToolbarButton {
         MessageFormat.format(
             Messages.ConnectButton_account_creation_failed_message, e.getMessage()),
         Messages.ConnectButton_account_creation_failed_title);
+  }
+
+  private JMenuItem getPreconfiguredMenuItem(String text) {
+    JMenuItem jMenuItem = new JBMenuItem(text);
+
+    jMenuItem.setForeground(FOREGROUND_COLOR);
+    jMenuItem.setBackground(BACKGROUND_COLOR);
+
+    return jMenuItem;
   }
 }
