@@ -259,7 +259,7 @@ doing:
 
 {% capture intellij %}
 
-**This page contains information partially specific to the current release `0.2.1`.<br>
+**This page contains information partially specific to the current release `0.2.2`.<br>
 For information on previous releases, you can have a look at the corresponding [release notes](../releases/index.md).**
 
 The development of the Saros/I plugin is still in the alpha stages, so expect it to be a bit rough around the edges.
@@ -296,7 +296,7 @@ For more complex modules, it is advised to share the module structure some other
 
 ## Compatibility
 
-The current release `0.2.1` is not compatible with the previous Saros/I releases (`0.1.0` or `0.2.0`) or other Saros plugins (like Saros/E).
+The current release `0.2.2` is not compatible with the previous Saros/I releases (`0.1.0`, `0.2.0`, or `0.2.1`) or other Saros plugins (like Saros/E).
 
 
 ## How to Use Saros/I
@@ -317,7 +317,7 @@ To use it, you will first have to create an account using the [signup page](http
 
 - In the top bar of the Saros view, click the "Connect" button (![connect icon](images/icons-i/connect.png)).
 - Choose "Add account..." from the pop-up menu.
-- Enter the fully qualified user name (`USER_NAME@YOUR.DOMIAN`).
+- Enter the fully qualified user name (`USER_NAME@YOUR.DOMIAN`) of the account you would like to add.
   - If the basic Saros XMPP server is used, the domain would be `@saros-con.imp.fu-berlin.de`.
 - Click OK.
 - Enter your password.
@@ -336,11 +336,28 @@ Saros/E does not permit the deletion of the currently chosen account.
 If you only added one account and would like to remove it, you will have to add a second account (for example with random values) and choose this new account as the default.
 You can then delete the first account, add a new account with the right values, choose it as the correct default and delete the temporary account entry.
 
+### Connecting to an XMPP Account
+
+- Click the "Connect" button (![connect icon](images/icons-i/connect.png)).
+- Choose the account you would like to connect to from the pop-up menu.
+
+### Adding a Contact to an XMPP Account
+
+- Connect to the XMPP account you would like to add a contact to.
+- Click the "Add Contact" button (![add contact icon](images/icons-i/add_contact.png)).
+- Enter the fully qualified user name (`USER_NAME@YOUR.DOMIAN`) of the contact you would like to add.
+    - If the basic Saros XMPP server is used, the domain would be `@saros-con.imp.fu-berlin.de`.
+- Click "OK".
+- Enter a nickname for the contact (optional).
+- Click "OK".
+    - An additional dialog will be shown if the server does support user status requests. This does not impact the contact addition process, which can still completed by simply clicking "OK".
+
+Once the other user has accepted your contact request, they will request you adding them as a contact as well.
+This will automatically be displayed by the plugin as a dialog when you are connected to the account.
 
 ### Starting a Session - Host
 
-- Click the "Connect" button (![connect icon](images/icons-i/connect.png)).
-- Choose an account.
+- Connect to the XMPP account you would like to use.
 - Choose the section "Contacts" in the window on the left side of the Saros view.
 - Choose a friend that is online.
 - Right-click the name of that friend. This will open a list of all open projects. Each project contains a list of its shareable modules.
@@ -353,8 +370,7 @@ You can then delete the first account, add a new account with the right values, 
 
 ### Starting a Session - Client
 
-- Click the "Connect" button (![connect icon](images/icons-i/connect.png)).
-- Choose an account.
+- Connect to the XMPP account you would like to use.
 - Wait until the host invites you to join their session.
 - After the host invited you, the session negotiation will open.
 - Click "Next". This will open the project negotiation.
@@ -372,7 +388,6 @@ You can then delete the first account, add a new account with the right values, 
 - Click "Finish".
 
 ### Changing User Colors
-
 
 - Open the [IntelliJ settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
 - Navigate to `"Editor" > "Color Scheme" > "Saros"`.
@@ -407,13 +422,18 @@ To resolve the desynchronization:
   - **WARNING** As stated in the dialog, this will replace the content of the affected file(s) with the content of the corresponding file(s) on the host's side.
   This might override recent changes to the local files. To avoid data-loss, consider making a backup of the affected files/changes before executing the synchronization recovery.
 
-### Leaving a Session
+### Leaving a Session - Host
+
+- Click on the "Terminate session" button (![terminate session icon](images/icons-i/terminate_session.png)).
+- Select "OK".
+    - As you are the host of the session, this will cause the session to end, kicking all other participants.
+
+### Leaving a Session - Client
 
 - Click on the "Leave session" button (![leave session icon](images/icons-i/leave_session.png)).
 - Select "OK".
-  - If you are the host of the session, this will cause the session to end, kicking all other participants.
 
-### Disconnecting from the XMPP-Server
+### Disconnecting From the XMPP Server
 
 - Click on the "Connect" button (![connect icon](images/icons-i/connect.png)).
 - Choose "Disconnect server".
@@ -477,10 +497,12 @@ There are some bugs in the alpha version of Saros/I that we are already aware of
 - [#116](https://github.com/saros-project/saros/issues/116) - The position of local text selection is not updated correctly for closed files when text edits are received through Saros.
 - [#223](https://github.com/saros-project/saros/issues/223) - Deleting and then re-creating a file with the same name (or moving a file and then moving it back, etc.) causes the session to desynchronize irreparably, requiring a session restart.
 - [#683](https://github.com/saros-project/saros/issues/683) - Creating a file with an unknown file extension (or without a file extension) leads to a session desynchronization. Opening the file on the other side, choosing a file type, and then running the recovery might repair the session, but the state could also be irreparable, requiring a session restart.
-- [#684](https://github.com/saros-project/saros/issues/683) - Renaming the content root of the shared module leads to the content being deleted for all other participants.
 - [#698](https://github.com/saros-project/saros/issues/698) - Creating a submodule in a shared directory leads to a session desync.
 - [#699](https://github.com/saros-project/saros/issues/699) - Which resource are marked as excluded is not shared between participants.
 - [#707](https://github.com/saros-project/saros/issues/707) - Client line endings are overwritten with host line endings when starting a session.
+- [#711](https://github.com/saros-project/saros/issues/711) - Opening a non-text-editor for shared resources leads to user-visible error.
+- [#821](https://github.com/saros-project/saros/issues/821) - Changing XMPP accounts during a session freezes/blocks the IDE.
+- [#822](https://github.com/saros-project/saros/issues/822) - The state of the Saros view is not reset correctly when the the host is unexpectedly disconnected from the XMPP server.
 
 ### Report a Bug
 
