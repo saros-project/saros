@@ -100,7 +100,7 @@ public class DocumentAPI {
               commandName,
               commandProcessor.getCurrentCommandGroupId(),
               UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-              document);
+              false);
         };
 
     Filesystem.runWriteAction(insertCommand, ModalityState.defaultModalityState());
@@ -114,18 +114,18 @@ public class DocumentAPI {
    * project.
    *
    * @param project the project to assign the resulting deletion action to
-   * @param doc the document to delete text from
+   * @param document the document to delete text from
    * @param start the start offset of the range to delete
    * @param end the end offset of the range to delete
    * @see Document#deleteString(int, int)
    * @see CommandProcessor
    */
   static void deleteText(
-      @NotNull Project project, @NotNull final Document doc, final int start, final int end) {
+      @NotNull Project project, @NotNull final Document document, final int start, final int end) {
 
     Runnable deletionCommand =
         () -> {
-          Runnable deleteRange = () -> doc.deleteString(start, end);
+          Runnable deleteRange = () -> document.deleteString(start, end);
 
           String commandName = "Saros text deletion from index " + start + " to " + end;
 
@@ -135,7 +135,7 @@ public class DocumentAPI {
               commandName,
               commandProcessor.getCurrentCommandGroupId(),
               UndoConfirmationPolicy.REQUEST_CONFIRMATION,
-              doc);
+              false);
         };
 
     Filesystem.runWriteAction(deletionCommand, ModalityState.defaultModalityState());
