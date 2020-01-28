@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/core/picocontainer" />
             <option value="$PROJECT_DIR$/eclipse" />
             <option value="$PROJECT_DIR$/intellij" />
+            <option value="$PROJECT_DIR$/lsp" />
             <option value="$PROJECT_DIR$/server" />
             <option value="$PROJECT_DIR$/stf" />
             <option value="$PROJECT_DIR$/stf.test" />
