@@ -124,6 +124,21 @@ public class SafeDialogUtils {
   }
 
   /**
+   * Asynchronously shows an info dialog.
+   *
+   * @param project the project used as a reference to generate and position the dialog
+   * @param message the text displayed as the message of the dialog
+   * @param title the text displayed as the title of the dialog
+   */
+  public static void showInfo(Project project, final String message, final String title) {
+    LOG.info("Showing info dialog: " + title + " - " + message);
+
+    application.invokeLater(
+        () -> Messages.showInfoMessage(project, message, title),
+        ModalityState.defaultModalityState());
+  }
+
+  /**
    * Asynchronously shows an error dialog.
    *
    * @param project the project used as a reference to generate and position the dialog

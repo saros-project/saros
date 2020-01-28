@@ -32,7 +32,7 @@ public class MessageUtils {
         }
       }
     } catch (Exception e) {
-      // it can not happen anyway!
+      log.error("Failed to initialize messages", e);
     }
   }
 }
