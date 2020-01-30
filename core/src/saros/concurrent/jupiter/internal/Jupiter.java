@@ -260,16 +260,20 @@ public class Jupiter implements Algorithm {
     if (!this.ackJupiterActivityList.isEmpty()
         && (time.getRemoteOperationCount()
             < this.ackJupiterActivityList.get(0).getLocalOperationCount())) {
+      // TODO improve exception message; what is precondition 1?
       throw new TransformationException("Precondition #1 violated.");
     } else if (time.getRemoteOperationCount() > this.vectorTime.getLocalOperationCount()) {
       throw new TransformationException(
-          "precondition #2 violated (Remote vector time is greater than local vector time).");
+          "precondition #2 violated (Remote vector time is greater than local vector time) - remote time: "
+              + time
+              + " ,local time: "
+              + vectorTime);
     } else if (time.getLocalOperationCount() != this.vectorTime.getRemoteOperationCount()) {
       throw new TransformationException(
-          "Precondition #3 violated (Vector time does not match): "
+          "Precondition #3 violated (Vector time does not match) - remote time :"
               + time
-              + " , "
-              + this.vectorTime);
+              + " ,local time: "
+              + vectorTime);
     }
   }
 

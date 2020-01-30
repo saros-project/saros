@@ -31,6 +31,10 @@ public interface IActivityReceiver {
     /*NOP*/
   }
 
+  default void receive(DeletionAcknowledgmentActivity deletionAcknowledgmentActivity) {
+    /*NOP*/
+  }
+
   default void receive(EditorActivity editorActivity) {
     /*NOP*/
   }

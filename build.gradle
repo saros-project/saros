@@ -170,6 +170,18 @@ task sarosServer(type: Copy, dependsOn: [
   into 'build/distribution/server'
 }
 
+task sarosLsp(type: Copy, dependsOn: [
+  ':saros.core:test',
+  ':saros.lsp:test',
+  ':saros.lsp:jar'
+  ]) {
+  group 'Delivery'
+  description 'Builds and tests all modules required by the Saros Language Server'
+
+  from project(':saros.lsp').jar
+  into 'build/distribution/lsp'
+}
+
 task sarosIntellij(type: Copy, dependsOn: [
   ':saros.picocontainer:test',
   ':saros.core:test',

@@ -30,12 +30,12 @@ public class Messages {
   public static String AddProjectToSessionWizard_context_teardown_title;
   public static String AddProjectToSessionWizard_context_teardown_message;
 
-  public static String CollaborationUtils_confirm_closing;
-  public static String CollaborationUtils_confirm_closing_text;
-  public static String CollaborationUtils_confirm_leaving;
-  public static String CollaborationUtils_confirm_leaving_text;
-  public static String CollaborationUtils_insufficient_privileges;
-  public static String CollaborationUtils_insufficient_privileges_text;
+  public static String CollaborationUtils_confirm_closing_title;
+  public static String CollaborationUtils_confirm_closing_message;
+  public static String CollaborationUtils_confirm_leaving_title;
+  public static String CollaborationUtils_confirm_leaving_message;
+  public static String CollaborationUtils_insufficient_privileges_title;
+  public static String CollaborationUtils_insufficient_privileges_message;
   public static String CollaborationUtils_partial;
 
   public static String ConsistencyAction_progress_perform_recovery;
@@ -61,9 +61,10 @@ public class Messages {
   public static String LeaveSessionButton_terminate_tooltip;
 
   public static String ConnectButton_tooltip;
-  public static String ConnectButton_disconnect;
-  public static String ConnectButton_configure_accounts;
   public static String ConnectButton_add_account;
+  public static String ConnectButton_create_account;
+  public static String ConnectButton_configure_accounts;
+  public static String ConnectButton_disconnect;
   public static String ConnectButton_account_creation_jid_title;
   public static String ConnectButton_account_creation_jid_initial_input;
   public static String ConnectButton_account_creation_jid_message;
@@ -85,6 +86,8 @@ public class Messages {
   public static String ConnectButton_account_creation_xmpp_server_invalid_port_message;
   public static String ConnectButton_connect_to_new_account_title;
   public static String ConnectButton_connect_to_new_account_message;
+  public static String ConnectButton_create_account_title;
+  public static String ConnectButton_create_account_message;
 
   public static String AddContactButton_tooltip;
   public static String AddContactButton_contact_jid_dialog_title;
@@ -121,15 +124,15 @@ public class Messages {
   public static String JoinSessionWizard_inv_canceled_text3;
   public static String JoinSessionWizard_title;
 
-  public static String UserStatusChangeHandler_user_joined;
-  public static String UserStatusChangeHandler_user_joined_text;
-  public static String UserStatusChangeHandler_user_left;
-  public static String UserStatusChangeHandler_user_left_text;
-  public static String UserStatusChangeHandler_he_has_now_access;
-  public static String UserStatusChangeHandler_permission_changed;
+  public static String UserStatusChangeHandler_user_joined_title;
+  public static String UserStatusChangeHandler_user_joined_message;
+  public static String UserStatusChangeHandler_user_left_title;
+  public static String UserStatusChangeHandler_user_left_message;
+  public static String UserStatusChangeHandler_permission_changed_title;
+  public static String UserStatusChangeHandler_he_has_now_access_message;
+  public static String UserStatusChangeHandler_you_have_now_access_message;
   public static String UserStatusChangeHandler_read_only;
   public static String UserStatusChangeHandler_write;
-  public static String UserStatusChangeHandler_you_have_now_access;
 
   public static String SubscriptionManager_incoming_subscription_request_title;
   public static String SubscriptionManager_incoming_subscription_request_message;

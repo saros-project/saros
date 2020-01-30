@@ -60,3 +60,11 @@ docs/_site
 docs/Gemfile.lock
 /.gradle/
 /build/
+
+# Common
+.project
+.settings
+
+# LSP
+lsp/.classpath
+lsp/build

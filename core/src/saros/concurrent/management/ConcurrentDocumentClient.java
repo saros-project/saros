@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
-import saros.activities.FileActivity;
 import saros.activities.IActivity;
-import saros.activities.IActivityReceiver;
 import saros.activities.JupiterActivity;
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
+import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 
 /**
@@ -24,7 +23,7 @@ import saros.session.ISarosSession;
  * <p>When JupiterActivities are received from the server they are transformed by the
  * ConcurrentDocumentClient to TextEditActivities which can then be executed locally.
  */
-public class ConcurrentDocumentClient {
+public class ConcurrentDocumentClient implements Startable {
 
   private static Logger log = Logger.getLogger(ConcurrentDocumentClient.class);
 
@@ -32,10 +31,23 @@ public class ConcurrentDocumentClient {
 
   private final JupiterClient jupiterClient;
 
-  public ConcurrentDocumentClient(ISarosSession sarosSession) {
+  private final ResourceActivityFilter resourceActivityFilter;
 
+  public ConcurrentDocumentClient(ISarosSession sarosSession) {
     this.sarosSession = sarosSession;
     this.jupiterClient = new JupiterClient(sarosSession);
+
+    this.resourceActivityFilter = new ResourceActivityFilter(sarosSession, this::reset);
+  }
+
+  @Override
+  public void start() {
+    resourceActivityFilter.initialize();
+  }
+
+  @Override
+  public void stop() {
+    resourceActivityFilter.dispose();
   }
 
   /**
@@ -68,6 +80,9 @@ public class ConcurrentDocumentClient {
       return jupiterClient.withTimestamp(checksumActivity);
 
     } else {
+      resourceActivityFilter.handleFileDeletion(activity);
+      resourceActivityFilter.handleFileCreation(activity);
+
       return activity;
     }
   }
@@ -77,6 +92,9 @@ public class ConcurrentDocumentClient {
    *
    * <p>This method will transform them back from Jupiter-specific activities to locally executable
    * activities. @GUI Must be called on the GUI Thread to ensure proper synchronization
+   *
+   * <p>Drops activities that are reported as filtered out by {@link
+   * ResourceActivityFilter#isFiltered(IActivity)}.
    *
    * @host and @client This is called whenever activities are received from REMOTELY both on the
    *     client and on the host
@@ -91,7 +109,13 @@ public class ConcurrentDocumentClient {
     List<IActivity> activities = new ArrayList<IActivity>();
 
     try {
-      activity.dispatch(clientReceiver);
+      resourceActivityFilter.handleFileCreation(activity);
+
+      if (resourceActivityFilter.isFiltered(activity)) {
+        log.debug("Ignored activity for already deleted resource: " + activity);
+
+        return activities;
+      }
 
       if (activity instanceof JupiterActivity) {
         activities.addAll(receiveActivity((JupiterActivity) activity));
@@ -101,6 +125,8 @@ public class ConcurrentDocumentClient {
       } else {
         activities.add(activity);
       }
+
+      resourceActivityFilter.handleFileDeletion(activity);
 
     } catch (Exception e) {
       log.error("Error while transforming activity: " + activity, e);
@@ -122,17 +148,6 @@ public class ConcurrentDocumentClient {
     }
     return activity;
   }
-
-  /** Used to remove JupiterClientDocuments for deleted files */
-  private final IActivityReceiver clientReceiver =
-      new IActivityReceiver() {
-        @Override
-        public void receive(FileActivity fileActivity) {
-          if (fileActivity.getType() == FileActivity.Type.REMOVED) {
-            jupiterClient.reset(fileActivity.getPath());
-          }
-        }
-      };
 
   /**
    * Transforms the JupiterActivity back into textEditActivities.
@@ -174,7 +189,7 @@ public class ConcurrentDocumentClient {
    *     authoritative one and thus does not need to be reset).
    */
   public synchronized void reset(SPath path) {
-    log.debug("Resetting jupiter client: " + path.toString());
+    log.debug("Resetting jupiter client for " + path);
     jupiterClient.reset(path);
   }
 

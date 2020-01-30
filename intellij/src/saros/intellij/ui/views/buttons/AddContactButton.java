@@ -193,7 +193,7 @@ public class AddContactButton extends AbstractToolbarButton {
       xmppContactsService.addContact(jid, nickname, dialog);
 
     } catch (OperationCanceledException e) {
-      log.debug("Adding contact canceled by user during XMPP request", e);
+      log.debug("Adding contact canceled by user during XMPP request: " + e.getMessage());
     }
   }
 

@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
-import saros.activities.FileActivity;
 import saros.activities.IActivity;
-import saros.activities.IActivityReceiver;
 import saros.activities.JupiterActivity;
 import saros.activities.QueueItem;
 import saros.activities.SPath;
@@ -35,6 +34,8 @@ public class ConcurrentDocumentServer implements Startable {
 
   private final JupiterServer server;
 
+  private final ResourceActivityFilter resourceActivityFilter;
+
   /** {@link ISessionListener} for updating Jupiter documents on the host. */
   private final ISessionListener sessionListener =
       new ISessionListener() {
@@ -53,41 +54,45 @@ public class ConcurrentDocumentServer implements Startable {
   public ConcurrentDocumentServer(final ISarosSession sarosSession) {
     this.sarosSession = sarosSession;
     this.server = new JupiterServer(sarosSession);
+
+    Consumer<SPath> deletedFileHandler =
+        resource -> {
+          LOG.debug("Resetting jupiter server for " + resource);
+          server.removePath(resource);
+        };
+
+    this.resourceActivityFilter = new ResourceActivityFilter(sarosSession, deletedFileHandler);
   }
 
   @Override
   public void start() {
     sarosSession.addListener(sessionListener);
+    resourceActivityFilter.initialize();
   }
 
   @Override
   public void stop() {
     sarosSession.removeListener(sessionListener);
+    resourceActivityFilter.dispose();
   }
 
   /**
-   * Dispatched the activity to the internal ActivityReceiver. The ActivityReceiver will remove
-   * FileDocuments when the file has been deleted.
+   * Calls {@link ResourceActivityFilter#handleFileDeletion(IActivity)} and {@link
+   * ResourceActivityFilter#handleFileCreation(IActivity)} with the given activity.
    *
-   * @param activity Activity to be dispatched
+   * @param activity the activity to handle
    */
-  public void checkFileDeleted(final IActivity activity) {
-    activity.dispatch(hostReceiver);
+  public void handleResourceChange(IActivity activity) {
+    resourceActivityFilter.handleFileDeletion(activity);
+    resourceActivityFilter.handleFileCreation(activity);
   }
-
-  private final IActivityReceiver hostReceiver =
-      new IActivityReceiver() {
-        @Override
-        public void receive(final FileActivity activity) {
-          if (activity.getType() == FileActivity.Type.REMOVED) {
-            server.removePath(activity.getPath());
-          }
-        }
-      };
 
   /**
    * Transforms the given activities on the server side and returns a list of QueueItems containing
    * the transformed activities and there receivers.
+   *
+   * <p>Drops activities that are reported as filtered out by {@link
+   * ResourceActivityFilter#isFiltered(IActivity)}.
    *
    * @host
    * @sarosThread Must be executed in the Saros dispatch thread.
@@ -104,9 +109,13 @@ public class ConcurrentDocumentServer implements Startable {
 
     final List<QueueItem> result = new ArrayList<QueueItem>();
 
-    try {
-      activity.dispatch(hostReceiver);
+    if (resourceActivityFilter.isFiltered(activity)) {
+      LOG.debug("Ignored activity for already deleted resource: " + activity);
 
+      return result;
+    }
+
+    try {
       if (activity instanceof JupiterActivity) {
         result.addAll(receive((JupiterActivity) activity));
 
