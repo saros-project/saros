@@ -36,13 +36,13 @@ npmInstall {
 
 task copyLsp(type: Copy) {
   from("$rootProject.projectDir/build/distribution/lsp")
-  into('out')
+  into('dist')
 }
 
 task buildExtension(dependsOn: [
   'copyLsp',
   'npmInstall',
-  'npm_run_compile'
+  'npm_run_webpack'
   ]) {
   group 'VS Code'
 	description 'Builds the extension'

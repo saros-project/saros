@@ -70,3 +70,4 @@ vscode*/.vscode
 *.vscode
 *.code-workspace
 *.vscodeignore
+dist/

@@ -42,16 +42,18 @@ export class SarosExtension {
      * @memberof SarosExtension
      */
     async init() {
+        
         if(!this.context) {
             return Promise.reject('Context not set');
         }
 
-        try {                      
+        try {                    
             let self = this;
 
             return new Promise((resolve, reject) => {
+                
                 const server = new SarosServer(self.context);
-                self.client = new SarosClient('sarosServer', 'Saros Server', server.getStartFunc(), this.createClientOptions());               
+                self.client = new SarosClient('sarosServer', 'Saros Server', server.getStartFunc(), this.createClientOptions());          
                 self.context.subscriptions.push(self.client.start());
 
                 resolve();
@@ -70,9 +72,11 @@ export class SarosExtension {
      */
     async onReady() {
         if(!this.client) {
+            console.log("onReady.reject");
             return Promise.reject('SarosExtension is not initialized');
         }
 
+        console.log("onReady");
         return this.client.onReady();
     }
 

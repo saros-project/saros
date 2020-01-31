@@ -19,6 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
 							console.log('Extension "Saros" is now active!');
 						})
 						.catch(reason => {
+							console.log(reason);
 							vscode.window.showErrorMessage('Saros extension did not start propertly.'
 														+ 'Reason: ' + reason); //TODO: restart feature
 						});	
@@ -35,7 +36,6 @@ function createStatusBar(): Disposable {
 
 	let statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Number.MAX_VALUE);
     statusBarItem.text = "Saros";
-    statusBarItem.command = "saros.start";
 	statusBarItem.show();
 	
 	return statusBarItem;
