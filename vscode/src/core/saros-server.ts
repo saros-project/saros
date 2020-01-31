@@ -96,16 +96,10 @@ export class SarosServer {
      */
     private startProcess(...args: any[]): SarosServer {
         
-        var pathToJar = path.resolve(this.context.extensionPath, 'out', 'saros.lsp.jar');
-        var jre = require('node-jre');
+        var pathToJar = path.resolve(this.context.extensionPath, 'dist', 'saros.lsp.jar');
 
         console.log('spawning jar process');
-        this.process = jre.spawn(
-            [pathToJar],
-            'saros.lsp.SarosLauncher',
-            args,
-            { encoding: 'utf8' }
-        ) as process.ChildProcess;  
+        this.process = process.spawn('java', ['-jar', pathToJar].concat(args));
 
         return this;
     }
@@ -120,7 +114,7 @@ export class SarosServer {
      * @memberof SarosServer
      */
     private withDebug(isEnabled: boolean): SarosServer {
-
+       
         if(this.process === undefined) {
             throw new Error('Server process is undefined');
         } 
