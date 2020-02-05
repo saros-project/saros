@@ -8,17 +8,15 @@ buildscript
   }
 }
 
-plugins {
-  id 'com.gradle.build-scan' version '2.4.1'
-}
-
 // Use gradle scan plugin and service in order to visualize build/test failures
-buildScan {
- termsOfServiceUrl = 'https://gradle.com/terms-of-service'
- termsOfServiceAgree = 'yes'
- publishOnFailure()
-}
 
+if (project.hasProperty('useBuildScan') && useBuildScan.equalsIgnoreCase("true")) {
+  buildScan {
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
+    publishOnFailure()
+  }
+}
 
 // Adjust Intellij module configuration for all sub-projects
 configure(subprojects) {projectToConf->

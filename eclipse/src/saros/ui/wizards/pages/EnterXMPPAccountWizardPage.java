@@ -15,6 +15,7 @@ import saros.account.XMPPAccountStore;
 import saros.net.xmpp.JID;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.Messages;
+import saros.ui.widgets.SimpleNoteComposite;
 import saros.ui.widgets.wizard.EnterXMPPAccountComposite;
 
 /**
@@ -61,6 +62,17 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
   @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
+
+    SimpleNoteComposite noteComposite =
+        new SimpleNoteComposite(
+            composite,
+            SWT.BORDER,
+            SWT.ICON_INFORMATION,
+            Messages.ConfigurationWizard_info_already_created_account);
+
+    noteComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    noteComposite.setSpacing(8);
+
     setControl(composite);
 
     composite.setLayout(new GridLayout(1, false));
