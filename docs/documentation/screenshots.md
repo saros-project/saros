@@ -22,6 +22,7 @@ your collaborators are doing.**
 
 **The main components of the Saros interface.**
 
+{:start="5"}
 5.  The users in the current session. Notice how their color here
     matches their annotations in the editor.
 6.  The contact list, where all the people known to you are kept.
@@ -36,6 +37,7 @@ Whiteboard](images/screenshot_whiteboard.png){:class="img-fluid"}
 **There is the whiteboard feature that allows you to sketch and share
 your ideas with other users.**
 
+{:start="8"}
 8.  The list of tools to sketch the ideas of an user.
     -   If you want to select some drawn ideas, you need to use the
         tools Select and Marquee.
