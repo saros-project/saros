@@ -89,6 +89,13 @@ public class Messages {
   public static String ConnectButton_create_account_title;
   public static String ConnectButton_create_account_message;
 
+  public static String ConnectServerAction_leave_session_confirmation_title;
+  public static String ConnectServerAction_leave_session_confirmation_message;
+  public static String ConnectServerAction_leave_session_confirmation_host_addendum_message;
+  public static String ConnectServerAction_leave_session_confirmation_host_addendum_error_title;
+  public static String ConnectServerAction_leave_session_confirmation_host_addendum_error_message;
+  public static String ConnectServerAction_progress_message;
+
   public static String AddContactButton_tooltip;
   public static String AddContactButton_contact_jid_dialog_title;
   public static String AddContactButton_contact_jid_dialog_message;
