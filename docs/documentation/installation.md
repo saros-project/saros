@@ -37,14 +37,10 @@ or from within Eclipse:
 <https://www.saros-project.org/update-site/eclipse>**
 
 1.  Open Eclipse
-2.  Open the software updates manager: *Menu &gt; Help &gt; Install
-    New Software...*
+2.  Open the software updates manager: *Menu &gt; Help &gt; Install New Software...*
 3.  In the *Available Software* wizard select *Add*
-4.  Enter `https://www.saros-project.org/update-site/eclipse` in the Location field;
-    press OK
-
-5.  Choose the plugin in the list of available software and select
-    it
+4.  Enter `https://www.saros-project.org/update-site/eclipse` in the Location field; press OK
+5.  Choose the plugin in the list of available software and select it
 6.  In the next window select *Next *to confirm installation
 7.  Accept the license agreement and select *Finish*
 8.  Restart Eclipse

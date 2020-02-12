@@ -63,12 +63,8 @@ computer of your invited contacts.
 #### Start a Session ([host](#the-host))
 
 1.  Right-click on...
-    a.  a **project** in your **Package Explorer** and select *Share
-        With*
-        or
-    b.  a **contact** in the **Saros View** and select *Work Together
-        on*
-
+  - a **project** in your **Package Explorer** and select *Share With* or
+  - a **contact** in the **Saros View** and select *Work Together on*
 2.  Wait for your contacts to accept the **session invitation**
 
 Want to know more about the Saros host role? Check out our comic
@@ -79,10 +75,8 @@ Want to know more about the Saros host role? Check out our comic
 1.  Wait for a **session invitation** to appear on your screen
 2.  Click *Accept* to **accept the invitation**
 3.  Tell Saros **where to save the incoming project**:
-    a.  You can create a **new project**, or
-    b.  synchronize with an **already existing project** on
-        your computer.
-
+  - You can create a **new project**, or
+  - synchronize with an **already existing project** on your computer.
 4.  Select *Finish* and wait for the project to be copied to your
     computer
 
@@ -353,7 +347,9 @@ This will automatically be displayed by the plugin as a dialog when you are conn
   - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](#module-restrictions)).
 - Choose the module that is supposed to be shared from the displayed list of modules.
 
-- Alternatively, select a module in the project view and right-click it.
+*Alternatively:*
+
+- Select a module in the project view and right-click it.
 - Select "Share With..." from the options (or use the keyboard-shortcut 's').
 - Select a user from the list (or use their number as the keyboard-shortcut).
 
@@ -392,7 +388,9 @@ This will automatically be displayed by the plugin as a dialog when you are conn
 - Click the "Follow" button (![follow icon](images/icons-i/follow.png)).
 - Select the user to follow from the list and click the entry.
 
-- Alternatively, select another participant in the list of session participants in the session view (on the left) and right-click their name.
+*Alternatively:*
+
+- Select another participant in the list of session participants in the session view (on the left) and right-click their name.
 - Click the option "Follow participant".
 
 ### Leaving the Follow Mode
