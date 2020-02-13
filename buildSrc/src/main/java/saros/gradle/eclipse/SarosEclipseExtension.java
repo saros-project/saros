@@ -25,6 +25,7 @@ import java.util.List;
 public class SarosEclipseExtension {
   private File manifest = null;
   private String eclipseVersion = "4.8.0";
+  private String pluginVersionQualifier = null;
   private List<String> excludeManifestDependencies = new ArrayList<>();
   private boolean addDependencies = false;
   private boolean addPdeNature = false;
@@ -48,6 +49,14 @@ public class SarosEclipseExtension {
 
   public String getEclipseVersion() {
     return eclipseVersion;
+  }
+
+  public void setPluginVersionQualifier(String qualifier) {
+    this.pluginVersionQualifier = qualifier;
+  }
+
+  public String getPluginVersionQualifier() {
+    return this.pluginVersionQualifier;
   }
 
   /**
