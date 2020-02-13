@@ -14,10 +14,10 @@ import org.gradle.api.GradleException;
  * Class that provides methods to change the eclipse plugin version defined in an osgi manifest
  * files.
  */
-public class EclipseVersionConfigurator {
+public class OsgiBundleVersionConfigurator {
   private final File manifest;
 
-  public EclipseVersionConfigurator(File manifest) {
+  public OsgiBundleVersionConfigurator(File manifest) {
     this.manifest = manifest;
   }
 
