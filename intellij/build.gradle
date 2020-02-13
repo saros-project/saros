@@ -16,6 +16,12 @@ runIde {
   maxHeapSize = "2048m"
 }
 
+intellij {
+  patchPluginXml {
+    version = '0.2.2' + versionQualifier
+  }
+}
+
 dependencies {
   compile project(path: ':saros.core', configuration: 'plain')
 
