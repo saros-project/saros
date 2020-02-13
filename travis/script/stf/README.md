@@ -11,7 +11,7 @@ The stf test process is much more complex than the build process and also requir
   * Contains only scripts which are called within the slave docker container of the stf infrastructure (`saros/stf_slave`).
   * The purpose of the scripts is to start eclipse
 * `stf`
-  * Contains scripts which are directly executed from travis.
+  * Contains scripts which are directly executed from GitHub Actions.
   * The purpose of the scripts is to parse the stf configuration file and derive the required infrastructure from the configuration.
     Then the required docker containers are created.
 

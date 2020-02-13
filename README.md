@@ -1,5 +1,5 @@
 # <img src="docs/assets/images/logo/saros-logo.svg" alt="drawing" align="right" width="100"/> Saros - Distributed Party Programming
-[![Travis](https://travis-ci.com/saros-project/saros.svg?branch=master)](https://travis-ci.com/saros-project/saros/branches)
+[![Build](https://github.com/saros-project/saros/workflows/Build/badge.svg?branch=master)](https://github.com/saros-project/saros/actions?query=workflow%3ABuild+branch%3Amaster)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/297b67607a5f4b5b8d00d0446615849b)](https://www.codacy.com/manual/Saros/saros)
 [![Gitter](https://img.shields.io/gitter/room/saros-project/saros?color=%2346BC99&logo=gitter)](https://gitter.im/saros-project/saros)
 [![Release Saros/E](https://img.shields.io/badge/Saros%2FE-15.0.0-blue?logo=eclipse)](https://github.com/saros-project/saros/releases/tag/saros-eclipse-15.0.0)

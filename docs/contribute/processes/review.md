@@ -12,7 +12,7 @@ Make sure that your change:
 
 In order for a pull request to get merged, it needs to fulfill the following requirements:
 
-* all checks (Travis CI, Codacy) passed
+* all checks (GitHub Actions, Codacy) passed
 * two reviewers approved **OR**
 * one reviewer approved two days ago and no further modification requests are posted
 
