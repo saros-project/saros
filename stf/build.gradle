@@ -3,6 +3,7 @@ sarosEclipse {
   excludeManifestDependencies = ['saros.core', 'saros.eclipse', 'org.junit', 'org.eclipse.gef']
   createBundleJar = true
   addDependencies = true
+  pluginVersionQualifier = versionQualifier
 }
 
 sourceSets {
