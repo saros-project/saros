@@ -7,8 +7,6 @@ on:
   pull_request:
     paths-ignore:
     - 'docs/**'
-  schedule:
-    - cron: '0 8 * * *'
 
 jobs:
 
