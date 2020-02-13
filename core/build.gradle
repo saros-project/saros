@@ -6,6 +6,7 @@ sarosEclipse {
   manifest = file('META-INF/MANIFEST.MF')
   createBundleJar = true
   addPdeNature = true
+  pluginVersionQualifier = versionQualifier
 }
 
 dependencies {

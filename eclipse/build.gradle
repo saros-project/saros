@@ -4,6 +4,7 @@ sarosEclipse {
   addPdeNature = true
   createBundleJar = true
   addDependencies = true
+  pluginVersionQualifier = versionQualifier
 }
 
 sourceSets {
