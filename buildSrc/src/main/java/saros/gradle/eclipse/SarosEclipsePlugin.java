@@ -5,8 +5,8 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import saros.gradle.eclipse.configurator.EclipseConfigurator;
-import saros.gradle.eclipse.configurator.EclipseVersionConfigurator;
 import saros.gradle.eclipse.configurator.JarConfigurator;
+import saros.gradle.eclipse.configurator.OsgiBundleVersionConfigurator;
 import saros.gradle.eclipse.configurator.OsgiDependencyConfigurator;
 
 /**
@@ -47,7 +47,7 @@ public class SarosEclipsePlugin implements Plugin<Project> {
               task.doLast(
                   (t) -> {
                     methodRequiresManifest("set version qualifier", e);
-                    new EclipseVersionConfigurator(e.getManifest()).addQualifier(qualifier);
+                    new OsgiBundleVersionConfigurator(e.getManifest()).addQualifier(qualifier);
                   });
             });
 
