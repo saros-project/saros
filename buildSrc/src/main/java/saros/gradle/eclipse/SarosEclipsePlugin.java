@@ -3,7 +3,9 @@ package saros.gradle.eclipse;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import saros.gradle.eclipse.configurator.EclipseConfigurator;
+import saros.gradle.eclipse.configurator.EclipseVersionConfigurator;
 import saros.gradle.eclipse.configurator.JarConfigurator;
 import saros.gradle.eclipse.configurator.OsgiDependencyConfigurator;
 
@@ -13,6 +15,7 @@ import saros.gradle.eclipse.configurator.OsgiDependencyConfigurator;
  */
 public class SarosEclipsePlugin implements Plugin<Project> {
   private static final String EXTENSION_NAME = "sarosEclipse";
+  private static final String PLUGIN_VERSION_CHANGE_TASK_NAME = "changeEclipsePluginVersion";
 
   /**
    * Method which is called when the plugin is integrated in a gradle build (e.g. with {@code apply
@@ -24,7 +27,34 @@ public class SarosEclipsePlugin implements Plugin<Project> {
     // don't create custom tasks.
     SarosEclipseExtension e =
         project.getExtensions().create(EXTENSION_NAME, SarosEclipseExtension.class);
-    project.afterEvaluate(p -> configureEclipseAfterEvaluate(p, e));
+    project.afterEvaluate(
+        p -> {
+          configureEclipseAfterEvaluate(p, e);
+          createPluginVersionChangeTask(p, e);
+        });
+  }
+
+  private void createPluginVersionChangeTask(Project p, SarosEclipseExtension e) {
+    String qualifier = e.getPluginVersionQualifier();
+    if (e.getPluginVersionQualifier() == null || qualifier.isEmpty()) return;
+
+    p.getTasks()
+        .register(
+            PLUGIN_VERSION_CHANGE_TASK_NAME,
+            (task) -> {
+              task.getInputs().property("versionQualifier", qualifier);
+
+              task.doLast(
+                  (t) -> {
+                    methodRequiresManifest("set version qualifier", e);
+                    new EclipseVersionConfigurator(e.getManifest()).addQualifier(qualifier);
+                  });
+            });
+
+    Task jarTask = p.getTasks().findByPath("jar");
+    if (jarTask == null)
+      throw new GradleException("Unable to find jar task in project " + p.getName());
+    jarTask.dependsOn(PLUGIN_VERSION_CHANGE_TASK_NAME);
   }
 
   /**
@@ -40,12 +70,12 @@ public class SarosEclipsePlugin implements Plugin<Project> {
     }
 
     if (e.isCreateBundleJar()) {
-      methodRequiresManifest("createBundleJar", e);
+      methodRequiresManifest("create bundle jar", e);
       new JarConfigurator(p).createBundleJar(e.getManifest());
     }
 
     if (e.isAddDependencies()) {
-      methodRequiresManifest("addDependencies", e);
+      methodRequiresManifest("add dependencies", e);
       new OsgiDependencyConfigurator(p)
           .addDependencies(
               e.getManifest(), e.getExcludeManifestDependencies(), e.getEclipseVersion());
@@ -55,7 +85,7 @@ public class SarosEclipsePlugin implements Plugin<Project> {
   private void methodRequiresManifest(String methodName, SarosEclipseExtension e) {
     if (e.getManifest() == null)
       throw new GradleException(
-          "Unable to apply method "
+          "Unable to "
               + methodName
               + " as long as no manifest is provided. Please set the manifest before calling "
               + methodName
