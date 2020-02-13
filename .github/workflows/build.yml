@@ -42,6 +42,7 @@ jobs:
       run: |
         ./gradlew \
           -PskipTestSuites=true \
+          -PaggregateTestResults=true \
           -DmaxParallelForks=4 \
           --no-daemon \
           --parallel \
@@ -76,3 +77,18 @@ jobs:
       with:
         name: saros-lsp-${{ github.sha }}
         path: build/distribution/lsp
+
+    # Failure-Case
+    - name: Check test report
+      id: check-report
+      if: failure()
+      run: |
+        [ -d 'build/reports/allTests' ] && echo "::set-output name=report-exist::true" || echo "::set-output name=report-exist::false"
+      shell: 'bash'
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v1
+      if: failure() && steps.check-report.outputs.report-exist == 'true'
+      with:
+        name: test-results-${{ github.sha }}
+        path: build/reports/allTests
