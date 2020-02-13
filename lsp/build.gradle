@@ -18,8 +18,9 @@ sourceSets {
 }
 
 jar {
+  String jarVersion = '0.1.0' + versionQualifier
   manifest {
-    attributes 'Main-Class': 'saros.lsp.SarosLauncher'
+    attributes 'Main-Class': 'saros.lsp.SarosLauncher', 'Implementation-Version': jarVersion
   }
   from {
     configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
