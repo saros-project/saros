@@ -49,7 +49,7 @@ jobs:
         ./gradlew \
           -PskipTestSuites=true \
           -PaggregateTestResults=true \
-          -PversionQualifier=$GITHUB_SHA \
+          -PversionQualifier=DEV-$(git rev-parse --short=10 $GITHUB_SHA) \
           -DmaxParallelForks=4 \
           --no-daemon \
           --parallel \
