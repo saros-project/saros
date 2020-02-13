@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  push:
+    paths-ignore:
+    - 'docs/**'
+  pull_request:
+    paths-ignore:
+    - 'docs/**'
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+
+  formatter:
+    runs-on: ubuntu-latest
+    name: Check java format
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - uses: m273d15/java-format-action@v1.1
+      with:
+        version: '1.6'
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Pre-Build
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    # Build
+    - name: Build and test with Gradle
+      run: |
+        ./gradlew \
+          -PskipTestSuites=true \
+          -DmaxParallelForks=4 \
+          --no-daemon \
+          --parallel \
+          sarosEclipse sarosIntellij sarosServer sarosLsp
