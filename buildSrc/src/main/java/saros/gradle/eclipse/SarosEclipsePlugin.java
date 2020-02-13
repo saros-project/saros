@@ -36,7 +36,7 @@ public class SarosEclipsePlugin implements Plugin<Project> {
 
   private void createPluginVersionChangeTask(Project p, SarosEclipseExtension e) {
     String qualifier = e.getPluginVersionQualifier();
-    if (e.getPluginVersionQualifier() == null || qualifier.isEmpty()) return;
+    if (qualifier == null || qualifier.trim().isEmpty()) return;
 
     p.getTasks()
         .register(
