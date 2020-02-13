@@ -35,6 +35,14 @@ jobs:
       with:
         java-version: 1.8
 
+    - name: Determine short sha
+      id: short-sha
+      run: |
+        short_sha=$(git rev-parse --short=10 $GITHUB_SHA)
+        echo "::set-output name=short_sha::$short_sha"
+        echo "::set-env name=SHORT_SHA::$short_sha"
+      shell: 'bash'
+
     # Uncomment <depends> entries in order to make Saros/I installable in all JetBrains IDEs
     - name: Prepare Saros/I plugin.xml
       run: |
@@ -47,7 +55,7 @@ jobs:
         ./gradlew \
           -PskipTestSuites=true \
           -PaggregateTestResults=true \
-          -PversionQualifier=DEV-$(git rev-parse --short=10 $GITHUB_SHA) \
+          -PversionQualifier=DEV-$SHORT_SHA \
           -DmaxParallelForks=4 \
           --no-daemon \
           --parallel \
@@ -59,28 +67,28 @@ jobs:
       uses: actions/upload-artifact@v1
       if: success() && github.ref == 'refs/heads/master'
       with:
-        name: saros-eclipse-dev-${{ github.sha }}
+        name: saros-eclipse-dev-${{ steps.short-sha.outputs.short_sha }}
         path: build/distribution/eclipse
 
     - name: Upload intellij build
       uses: actions/upload-artifact@v1
       if: success() && github.ref == 'refs/heads/master'
       with:
-        name: saros-intellij-dev-${{ github.sha }}
+        name: saros-intellij-dev-${{ steps.short-sha.outputs.short_sha }}
         path: build/distribution/intellij
 
     - name: Upload server build
       uses: actions/upload-artifact@v1
       if: success() && github.ref == 'refs/heads/master'
       with:
-        name: saros-server-dev-${{ github.sha }}
+        name: saros-server-dev-${{ steps.short-sha.outputs.short_sha }}
         path: build/distribution/server
 
     - name: Upload lsp build
       uses: actions/upload-artifact@v1
       if: success() && github.ref == 'refs/heads/master'
       with:
-        name: saros-lsp-dev-${{ github.sha }}
+        name: saros-lsp-dev-${{ steps.short-sha.outputs.short_sha }}
         path: build/distribution/lsp
 
     # Failure-Case
