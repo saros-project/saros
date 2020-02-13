@@ -108,6 +108,7 @@ configure(projectsToConfigure) { projectToConf ->
 
   projectToConf.ext.intellijHome = projectToConf.hasProperty('intellijHome') ? intellijHome : System.getenv('INTELLIJ_HOME')
   projectToConf.ext.intellijSandboxDir = System.getenv('SAROS_INTELLIJ_SANDBOX')
+  projectToConf.ext.versionQualifier = projectToConf.hasProperty('versionQualifier') ? '.' + versionQualifier : ''
 }
 
 // remove all build dirs. The frontend package has no build directory
