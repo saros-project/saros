@@ -59,28 +59,28 @@ jobs:
       uses: actions/upload-artifact@v1
       if: success() && github.ref == 'refs/heads/master'
       with:
-        name: saros-eclipse-${{ github.sha }}
+        name: saros-eclipse-dev-${{ github.sha }}
         path: build/distribution/eclipse
 
     - name: Upload intellij build
       uses: actions/upload-artifact@v1
       if: success() && github.ref == 'refs/heads/master'
       with:
-        name: saros-intellij-${{ github.sha }}
+        name: saros-intellij-dev-${{ github.sha }}
         path: build/distribution/intellij
 
     - name: Upload server build
       uses: actions/upload-artifact@v1
       if: success() && github.ref == 'refs/heads/master'
       with:
-        name: saros-server-${{ github.sha }}
+        name: saros-server-dev-${{ github.sha }}
         path: build/distribution/server
 
     - name: Upload lsp build
       uses: actions/upload-artifact@v1
       if: success() && github.ref == 'refs/heads/master'
       with:
-        name: saros-lsp-${{ github.sha }}
+        name: saros-lsp-dev-${{ github.sha }}
         path: build/distribution/lsp
 
     # Failure-Case
