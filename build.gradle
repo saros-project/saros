@@ -109,6 +109,20 @@ configure(projectsToConfigure) { projectToConf ->
   projectToConf.ext.intellijHome = projectToConf.hasProperty('intellijHome') ? intellijHome : System.getenv('INTELLIJ_HOME')
   projectToConf.ext.intellijSandboxDir = System.getenv('SAROS_INTELLIJ_SANDBOX')
   projectToConf.ext.versionQualifier = projectToConf.hasProperty('versionQualifier') ? '.' + versionQualifier : ''
+
+  if (project.hasProperty('aggregateTestResults') && aggregateTestResults.equalsIgnoreCase("true")) {
+    task copyReport(type: Copy) {
+      from "build/reports/tests/test"
+      into "$rootDir/build/reports/allTests/${projectToConf.name}"
+    }
+    test.finalizedBy(copyReport)
+  }
+}
+
+task aggregatedTestReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/allTests")
+    def testProjects = (projectsToConfigure - project(':saros.stf') - project(':saros.stf.test'))
+    reportOn testProjects*.test.binResultsDir
 }
 
 // remove all build dirs. The frontend package has no build directory
