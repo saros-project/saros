@@ -56,7 +56,6 @@ class IntellijConfigurator {
   private void configureDefaultParams(
       IntelliJPluginExtension intellijExtension, SarosIntellijExtension sarosExtension) {
     intellijExtension.setUpdateSinceUntilBuild(false);
-    intellijExtension.setPluginName(sarosExtension.getPluginName());
   }
 
   /**

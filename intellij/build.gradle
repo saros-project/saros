@@ -6,6 +6,10 @@ sarosIntellij {
   intellijVersion = 'IC-2019.3'
 }
 
+intellij {
+  pluginName = 'saros-intellij'
+}
+
 runIde {
   // set heap size for the test JVM(s)
   minHeapSize = "128m"
