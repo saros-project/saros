@@ -21,7 +21,6 @@ public class SarosIntellijExtension {
   private File sandboxBaseDir;
   private File localIntellijHome;
   private String intellijVersion;
-  private String pluginName = "Saros";
 
   /**
    * Set directory which contains the intellij sandbox directories.
@@ -63,18 +62,5 @@ public class SarosIntellijExtension {
 
   public String getIntellijVersion() {
     return intellijVersion;
-  }
-
-  /**
-   * Set the plugin name which is used in the build plugin.
-   *
-   * @param pluginName Name of the Intellij IDEA plugin
-   */
-  public void setPluginName(String pluginName) {
-    this.pluginName = pluginName;
-  }
-
-  public String getPluginName() {
-    return pluginName;
   }
 }
