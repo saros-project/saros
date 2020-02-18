@@ -1,3 +1,7 @@
+configurations {
+  plain
+}
+
 sarosEclipse {
   manifest = file('META-INF/MANIFEST.MF')
   createBundleJar = true
@@ -24,17 +28,30 @@ dependencies {
   releaseDep files('libs/smackx-3.4.1.jar')
 
   compile configurations.releaseDep
+  plain configurations.compile
   testCompile configurations.testConfig
 }
 
 sourceSets.main.java.srcDirs = ['src', 'patches']
 sourceSets.test.java.srcDir 'test/junit'
 
+// Jar tasks
+
 task testJar(type: Jar) {
   classifier = 'tests'
   from sourceSets.test.output
 }
 
+// Jar containing only the core code (the default jar is an osgi bundle
+// containing a lib dir with all dependency jars)
+task plainJar(type: Jar) {
+  manifest {
+    from 'META-INF/MANIFEST.MF'
+  }
+  from sourceSets.main.output
+}
+
 artifacts {
   testing testJar
+  plain plainJar
 }
