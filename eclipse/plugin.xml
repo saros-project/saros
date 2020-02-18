@@ -1469,12 +1469,4 @@
          </adapter>
       </factory>
    </extension>
-   <extension
-         point="org.eclipse.ui.contexts">
-      <context
-            id="Saros.whiteboard"
-            name="name"
-            parentId="org.eclipse.ui.contexts.window">
-      </context>
-   </extension>
 </plugin>
