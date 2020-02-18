@@ -1,7 +1,7 @@
 # How to contribute to Saros
 
 Thank you for reading this!
-:tada: We are always searching for new contributors and are delighted by your interest in Saros :tada:
+:tada: We are always searching for new contributors and are delighted by your interest in Saros. :tada:
 
 This is just a short overview for getting started. If you are searching for more information, take a look at our [contribution documentation](https://www.saros-project.org/contribute/) or just ask on our [developer Gitter channel](https://gitter.im/saros-project/saros).
 
@@ -28,8 +28,8 @@ We use the common [GitHub fork workflow](https://guides.github.com/activities/fo
 ### Guidelines
 In order to speed up the review, please make sure that your pull-request and the commits comply with:
 
-* our [guidelines](https://www.saros-project.org/contribute/guidelines.html).
-* the Google Java Format (more information [here](https://www.saros-project.org/contribute/development-environment.html#google-java-format))
+* our [guidelines](https://www.saros-project.org/contribute/guidelines.html) and
+* the Google Java Format (more information [here](https://www.saros-project.org/contribute/development-environment.html#google-java-format)).
 
 ## How to report a bug
 
