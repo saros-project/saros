@@ -122,7 +122,6 @@ task cleanGenerateLibAll {
   doLast {
     project(':saros.eclipse').file('lib').deleteDir()
     project(':saros.core').file('lib').deleteDir()
-    project(':saros.whiteboard').file('lib').deleteDir()
     project(':saros.stf').file('lib').deleteDir()
     project(':saros.stf.test').file('lib').deleteDir()
   }
@@ -133,23 +132,19 @@ task generateLibAll(dependsOn:['cleanGenerateLibAll',
                                ':saros.core:generateLib',
                                ':saros.eclipse:generateLib',
                                ':saros.stf:generateLib',
-                               ':saros.stf.test:generateLib',
-                               ':saros.whiteboard:generateLib'])
+                               ':saros.stf.test:generateLib'])
 
 task sarosEclipse(type: Copy, dependsOn: [
   ':saros.picocontainer:test',
   ':saros.core:test',
   ':saros.eclipse:test',
-  ':saros.eclipse:jar',
-  ':saros.whiteboard:test',
-  ':saros.whiteboard:jar'
+  ':saros.eclipse:jar'
   ]) {
   group 'Delivery'
   description 'Builds and tests all modules required by Saros for Eclipse'
 
   from project(':saros.core').jar
   from project(':saros.eclipse').jar
-  from project(':saros.whiteboard').jar
   into 'build/distribution/eclipse'
 }
 

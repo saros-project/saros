@@ -3,7 +3,7 @@ plugins {
 }
 
 String prefix = 'saros.'
-List projectDirs = ['core', 'eclipse', 'whiteboard', 'intellij', 'server', 'lsp', 'stf', 'stf.test'].each { dir ->
+List projectDirs = ['core', 'eclipse', 'intellij', 'server', 'lsp', 'stf', 'stf.test'].each { dir ->
   String projectName = prefix + dir
   include projectName
   project(":$projectName").projectDir = file(dir)
