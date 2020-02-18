@@ -49,6 +49,7 @@ task plainJar(type: Jar) {
     from 'META-INF/MANIFEST.MF'
   }
   from sourceSets.main.output
+  classifier = 'plain'
 }
 
 artifacts {
