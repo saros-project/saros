@@ -17,7 +17,7 @@ runIde {
 }
 
 dependencies {
-  compile project(':saros.core')
+  compile project(path: ':saros.core', configuration: 'plain')
 
   compile 'org.easytesting:fest-assert:1.2'
   compile 'org.easytesting:fest-reflect:1.2'
