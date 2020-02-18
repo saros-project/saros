@@ -5,6 +5,9 @@ on:
     # Temporary restriction: Run only stf tests on branches that work on stf
     branches:    
       - 'pr/stf/*'
+  # Trigger for chatops
+  repository_dispatch:
+    types: [run-stf-command]
 
 # Restriction when STF has stable results
 #    paths:
