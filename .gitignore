@@ -24,14 +24,12 @@ buildSrc/.gradle
 /stf/src/saros/stf/client/configuration.properties
 /eclipse/lib
 /core/lib
-/whiteboard/lib
 /stf/lib
 /stf.test/lib
 /eclipse/build
 /core/build
 /core/picocontainer/build
 /server/build
-/whiteboard/build
 /intellij/build
 /stf/build
 /stf.test/build
@@ -39,7 +37,6 @@ buildSrc/.gradle
 /core/.classpath
 /core/picocontainer/.classpath
 /server/.classpath
-/whiteboard/.classpath
 /intellij/.classpath
 /stf/.classpath
 /stf.test/.classpath
@@ -47,11 +44,6 @@ buildSrc/.gradle
 /core/.project
 /core/picocontainer/.project
 /server/.project
-/whiteboard/.project
-/whiteboard/frontend/package-lock.json
-/whiteboard/frontend/node_modules/
-/whiteboard/frontend/bower_components/
-/whiteboard/frontend/dist/
 /intellij/.project
 /stf/.project
 /stf.test/.project

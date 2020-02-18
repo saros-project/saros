@@ -375,13 +375,6 @@ Public License instead of this License.
          unpack="false"/>
 
    <plugin
-         id="saros.whiteboard"
-         download-size="0"
-         install-size="0"
-         version="0.1.0"
-         unpack="false"/>
-
-   <plugin
          id="saros.core"
          download-size="0"
          install-size="0"

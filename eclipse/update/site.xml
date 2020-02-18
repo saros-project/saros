@@ -7,7 +7,6 @@
       <category name="DPP"/>
    </feature>
    <archive path="plugins/saros_14.10.31.jar" url="http://downloads.sourceforge.net/dpp/saros_14.10.31.jar?use_mirror=dfn"/>
-   <archive path="plugins/saros.whiteboard_14.10.31.jar" url="http://downloads.sourceforge.net/dpp/saros.whiteboard_14.10.31.jar?use_mirror=dfn"/>
    <archive path="plugins/saros.core_0.1.0.jar" url="http://downloads.sourceforge.net/dpp/saros.core_0.1.0.jar?use_mirror=dfn"/>
    <category-def name="DPP" label="DPP"/>
 </site>
