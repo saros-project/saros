@@ -3,11 +3,13 @@
 Thank you for reading this!
 :tada: We are always searching for new contributors and are delighted by your interest in Saros :tada:
 
-This is just a short overview for getting started, if you are searching for more information take a look at our [contribution documentation](https://www.saros-project.org/contribute/) or just [ask](https://gitter.im/saros-project/saros).
+This is just a short overview for getting started. If you are searching for more information, take a look at our [contribution documentation](https://www.saros-project.org/contribute/) or just ask on our [developer Gitter channel](https://gitter.im/saros-project/saros).
 
 ## How to find something todo?
 
-You can [ask us](https://gitter.im/saros-project/saros) or you pick up an issue that should be [easy to start with](https://github.com/saros-project/saros/contribute), comment on the issue (that you want to fix the issue and how you plan to do it) and start your work on Saros. Don't hesitate to ask :wink:
+You can [ask us](https://gitter.im/saros-project/saros) or pick an issue yourself. If this is your first time contributing to Saros, you should consider choosing one that should be [easy to start with](https://github.com/saros-project/saros/contribute).
+
+If you have found an issue that you would like to work on, please first comment on the corresponding issue stating such intentions and you plans on how to resolve the issue. This gives us an opportunity to discuss the issue and your solution approach. Furthermore, it helps avoiding situations where multiple developers are separately working on the same issue. (If another developer has already state their intentions on working on an issue, don't feel dissuaded from still commenting on the issue. Maybe they have changed their mind since then or you can cooperate on solving the issue. :wink:)
 
 ## How to submit changes
 
@@ -17,8 +19,8 @@ In order to start with developing Saros you just need:
 * a **git** installation and
 * a **JDK 8** installation.
 
-Clone the repository (`git clone https://github.com/saros-project/saros.git`) and buidl Saros via your IDE (more information [here](https://www.saros-project.org/contribute/development-environment.html))
-or via CLI `./gradlew sarosEclipse sarosIntellij sarosServer` (more information [here](https://www.saros-project.org/contribute/development-environment.html#develop-without-an-ide)).
+Clone the repository (`git clone https://github.com/saros-project/saros.git`) and build Saros via your IDE (more information [here](https://www.saros-project.org/contribute/development-environment.html))
+or via CLI (more information [here](https://www.saros-project.org/contribute/development-environment.html#develop-without-an-ide)).
 
 ### Development Process
 We use the common [GitHub fork workflow](https://guides.github.com/activities/forking/) and review each pull-request (more information [here](https://www.saros-project.org/contribute/processes/development.html)).
@@ -35,4 +37,4 @@ Open the ["new issue" page](https://github.com/saros-project/saros/issues/new/ch
 
 ## Where can I ask for help?
 
-You will find help our [gitter channel](https://gitter.im/saros-project/saros).
+You can get help on our [developer Gitter channel](https://gitter.im/saros-project/saros) or [developer mailing list](https://groups.google.com/forum/#!forum/saros-devel).
