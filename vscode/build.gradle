@@ -14,29 +14,20 @@ version = packageJson.version
 def vscePath = './node_modules/vsce/out/vsce'
 
 node {
-    version = '10.14.1'
-    npmVersion = '6.4.1'
-    download = true
+  version = '10.14.1'
+  npmVersion = '6.4.1'
+  download = true
 }
 
-
-// npm_run_compile {
-    // inputs.files fileTree(
-    //   dir: "src",
-    //   excludes: ["bin/**", "node_modules/**"])
-    // inputs.file 'package.json'
-    // inputs.file 'package-lock.json'
-    // inputs.file 'tsconfig.json'
-    // outputs.dir 'out'
-// }
-
 npmInstall {
-		inputs.files fileTree("./")
+  inputs.files fileTree(projectDir)
 }
 
 task copyLsp(type: Copy) {
-  from("$rootProject.projectDir/build/distribution/lsp")
-  into('dist')
+  doFirst {
+    from("$rootDir/build/distribution/lsp")
+    into('dist')
+  }  
 }
 
 task buildExtension(dependsOn: [
@@ -45,16 +36,16 @@ task buildExtension(dependsOn: [
   'npm_run_webpack'
   ]) {
   group 'VS Code'
-	description 'Builds the extension'
+  description 'Builds the extension'
 }
 
 task runExtension(type: Exec, dependsOn: [
   'buildExtension'
 ]) {  
   group 'VS Code'
-	description 'Builds and runs the extension'
+  description 'Builds and runs the extension'
 
-  def execArgs = "code --extensionDevelopmentPath=${file('./').absolutePath}"
+  def execArgs = "code --extensionDevelopmentPath=${projectDir.absolutePath}"
 
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
     executable = 'cmd'
@@ -64,48 +55,47 @@ task runExtension(type: Exec, dependsOn: [
     args = [execArgs]
   }
 
-  workingDir = file('./out').absolutePath
+  workingDir = file('./dist').absolutePath
 }
 
 task packageExtension(type: NodeTask, dependsOn: [
   'copyLsp'  
 ]) {
   group 'VS Code'
-	description 'Packages the extension'
+  description 'Packages the extension'
 
-  delete 'vsix/*'
-  file('./vsix').mkdirs()
+  doFirst {
+    delete 'vsix/*'
+    file('./vsix').mkdirs()
+  }
   
   ext.archiveName = "$project.name-${project.version}.vsix"
-  ext.destPath = "./vsix/$archiveName"
+  ext.destPath = "./vsix"
   
   script = file(vscePath)
-	args = ['package', '--out', destPath]
-  // execOverrides {
-	// 	workingDir = file('./')
-	// }
+  args = ['package', '--out', destPath]
 }
 
 task publishExtension(type: NodeTask, dependsOn: [
   'copyLsp'
 ]) {
   group 'VS Code'
-	description 'Publishes the extension'
+  description 'Publishes the extension'
   
   script = file(vscePath)
-	args = ['publish', 'patch']
+  args = ['publish', 'patch']
   execOverrides {
-		workingDir = file('./')
+    workingDir = file('./')
 	}
 }
 
 task unpublishExtension(type: NodeTask) {
   group 'VS Code'
-	description 'Unpublishes the extension'
+  description 'Unpublishes the extension'
   
   script = file(vscePath)
-	args = ['unpublish', "${packageJson.publisher}.${packageJson.name}"]
+  args = ['unpublish', "${packageJson.publisher}.${packageJson.name}"]
   execOverrides {
-		workingDir = file('./')
-	}
+    workingDir = file('./')
+  }
 }
