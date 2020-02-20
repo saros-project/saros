@@ -208,7 +208,7 @@ task sarosVSCode(type: Copy, dependsOn: [
   into 'build/distribution/vscode'
 }
 
-task prepareVSCode(dependsOn: [
+task buildVSCode(dependsOn: [
   'sarosLsp',
   'saros.vscode:buildExtension'
 ]) {
