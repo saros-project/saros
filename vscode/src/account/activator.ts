@@ -1,5 +1,5 @@
-import { SarosExtension } from "../core/saros-extension";
-import { commands } from "vscode";
+import {commands} from 'vscode';
+import {SarosExtension} from '../core';
 
 /**
  * Activation function of the account module.
@@ -8,13 +8,13 @@ import { commands } from "vscode";
  * @param {SarosExtension} extension - The instance of the extension
  */
 export function activateAccounts(extension: SarosExtension) {
-    commands.registerCommand('saros.account.add', () => {
-        extension.onReady()
-        .then(resolve => {
-            return extension.client.addAccount('foo@bar.com');
+  commands.registerCommand('saros.account.add', () => {
+    extension.onReady()
+        .then(() => {
+          return extension.client.addAccount();
         })
-        .then(r => {
-            console.log('Response was: ' + r.response);
+        .then((r) => {
+          console.log('Response was: ' + r.response);
         });
-    });
+  });
 }
