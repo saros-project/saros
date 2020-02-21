@@ -25,6 +25,7 @@
       <module name="saros.server_main" target="1.8" />
       <module name="saros.server_test" target="1.8" />
       <module name="saros.stf.test_main" target="1.8" />
+      <module name="saros.stf.test_stfFlakyAndFailingTest" target="1.8" />
       <module name="saros.stf.test_stfTest" target="1.8" />
       <module name="saros.stf.test_test" target="1.8" />
       <module name="saros.stf_main" target="1.8" />
