@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.runtime.FilesystemRunner;
 
@@ -52,8 +53,10 @@ public class ProjectAPI {
    * @param project the project in which to open the editor
    * @param virtualFile file for which to open an editor
    * @param activate activate editor after opening
-   * @return Editor managing the passed file
+   * @return text editor managing the passed file or <code>null</code> if the opened editor is not a
+   *     text editor
    */
+  @Nullable
   public static Editor openEditor(
       @NotNull Project project, @NotNull VirtualFile virtualFile, final boolean activate) {
 

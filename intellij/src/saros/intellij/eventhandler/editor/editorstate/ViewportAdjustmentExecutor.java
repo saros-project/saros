@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.editor.text.LineRange;
@@ -22,6 +23,8 @@ import saros.intellij.runtime.EDTExecutor;
  * adjustment once the corresponding editor is selected.
  */
 public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeHandler {
+  private static final Logger log = Logger.getLogger(ViewportAdjustmentExecutor.class);
+
   private final LocalEditorManipulator localEditorManipulator;
 
   private static final Map<String, QueuedViewPortChange> queuedViewPortChanges =
@@ -79,6 +82,14 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
 
     } else {
       editor = ProjectAPI.openEditor(project, virtualFile, false);
+
+      if (editor == null) {
+        log.warn(
+            "Failed to apply queued viewport change as no text editor could be obtained for "
+                + virtualFile);
+
+        return;
+      }
     }
 
     EDTExecutor.invokeAndWait(
