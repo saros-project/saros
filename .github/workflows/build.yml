@@ -1,3 +1,4 @@
+# Has to be the same name as in build_doc in order to require the same check in GitHub
 name: Build
 
 on:
