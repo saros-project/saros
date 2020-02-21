@@ -153,7 +153,9 @@ public class LocalEditorHandler {
   }
 
   /**
-   * Removes a file from the editorPool and calls {@link EditorManager#generateEditorClosed(SPath)}
+   * Removes a file from the editorPool and calls {@link EditorManager#generateEditorClosed(SPath)}.
+   *
+   * <p>Does nothing if the file is not shared.
    *
    * @param project the project in which to close the editor
    * @param virtualFile the file for which to close the editor
