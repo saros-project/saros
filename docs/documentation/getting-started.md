@@ -29,26 +29,15 @@ To get familiar with this concept check out our comic:
 
 ### Step 1: Connecting
 
-You need an **XMPP account** to use Saros.
+You first need an **XMPP account** to use Saros.
 
-1.  You can **create a new account** within Saros by using the
-    FU-Berlin servers.
-  - **Note:** Due to abuse by spammers, we had to disable in-band registration.
-    As a consequence, the "Create New Account..." button currently no longer works.
-    Instead, to create an account on our XMPP server, you can **visit our [signup page](https://saros-con.imp.fu-berlin.de:5280/register/new)**.
-2.  You can **use an existing account.**
-    For example your Google mail address. **This is a
-    valid XMPP accounts**.
-    To use your Google account you have to allow less secure apps access
-    your account, see [here](https://support.google.com/accounts/answer/6010255?hl=en).
-    Unfortunately, gmx and web.de accounts do not work currently.
-     
+1.  You can **create a new account** on our XMPP server using our **[signup page](https://saros-con.imp.fu-berlin.de:5280/register/new)**.
+  - Note: Due to abuse by spammers, we had to disable in-band registration and from within Saros.
+2.  You can **use an existing account** or [setup your own XMPP server](setup-xmpp.md).
+  - Please note that your mileage may vary depending on the XMPP server settings, such as bandwidth restrictions or feature supports.
 
-To do that simply start the *Saros Configuration* wizard (*Menu &gt;
-Saros &gt; Start Saros Configuration*)
-
-![Connecting to Server](images/1_GettingStartedCreateAccount_0.png){:class="img-fluid"}
-
+Now you can start the *Saros Configuration* wizard (*Menu &gt;
+Saros &gt; Start Saros Configuration*) to configure your account in Saros and connect.
 
 ### Step 2: Adding Contacts
 
@@ -74,12 +63,8 @@ computer of your invited contacts.
 #### Start a Session ([host](#the-host))
 
 1.  Right-click on...
-    a.  a **project** in your **Package Explorer** and select *Share
-        With*
-        or
-    b.  a **contact** in the **Saros View** and select *Work Together
-        on*
-
+  - a **project** in your **Package Explorer** and select *Share With* or
+  - a **contact** in the **Saros View** and select *Work Together on*
 2.  Wait for your contacts to accept the **session invitation**
 
 Want to know more about the Saros host role? Check out our comic
@@ -90,10 +75,8 @@ Want to know more about the Saros host role? Check out our comic
 1.  Wait for a **session invitation** to appear on your screen
 2.  Click *Accept* to **accept the invitation**
 3.  Tell Saros **where to save the incoming project**:
-    a.  You can create a **new project**, or
-    b.  synchronize with an **already existing project** on
-        your computer.
-
+  - You can create a **new project**, or
+  - synchronize with an **already existing project** on your computer.
 4.  Select *Finish* and wait for the project to be copied to your
     computer
 
@@ -259,7 +242,7 @@ doing:
 
 {% capture intellij %}
 
-**This page contains information partially specific to the current release `0.2.1`.<br>
+**This page contains information partially specific to the current release `0.2.2`.<br>
 For information on previous releases, you can have a look at the corresponding [release notes](../releases/index.md).**
 
 The development of the Saros/I plugin is still in the alpha stages, so expect it to be a bit rough around the edges.
@@ -296,7 +279,7 @@ For more complex modules, it is advised to share the module structure some other
 
 ## Compatibility
 
-The current release `0.2.1` is not compatible with the previous Saros/I releases (`0.1.0` or `0.2.0`) or other Saros plugins (like Saros/E).
+The current release `0.2.2` is not compatible with the previous Saros/I releases (`0.1.0`, `0.2.0`, or `0.2.1`) or other Saros plugins (like Saros/E).
 
 
 ## How to Use Saros/I
@@ -317,7 +300,7 @@ To use it, you will first have to create an account using the [signup page](http
 
 - In the top bar of the Saros view, click the "Connect" button (![connect icon](images/icons-i/connect.png)).
 - Choose "Add account..." from the pop-up menu.
-- Enter the fully qualified user name (`USER_NAME@YOUR.DOMIAN`).
+- Enter the fully qualified user name (`USER_NAME@YOUR.DOMIAN`) of the account you would like to add.
   - If the basic Saros XMPP server is used, the domain would be `@saros-con.imp.fu-berlin.de`.
 - Click OK.
 - Enter your password.
@@ -336,25 +319,43 @@ Saros/E does not permit the deletion of the currently chosen account.
 If you only added one account and would like to remove it, you will have to add a second account (for example with random values) and choose this new account as the default.
 You can then delete the first account, add a new account with the right values, choose it as the correct default and delete the temporary account entry.
 
+### Connecting to an XMPP Account
+
+- Click the "Connect" button (![connect icon](images/icons-i/connect.png)).
+- Choose the account you would like to connect to from the pop-up menu.
+
+### Adding a Contact to an XMPP Account
+
+- Connect to the XMPP account you would like to add a contact to.
+- Click the "Add Contact" button (![add contact icon](images/icons-i/add_contact.png)).
+- Enter the fully qualified user name (`USER_NAME@YOUR.DOMIAN`) of the contact you would like to add.
+    - If the basic Saros XMPP server is used, the domain would be `@saros-con.imp.fu-berlin.de`.
+- Click "OK".
+- Enter a nickname for the contact (optional).
+- Click "OK".
+    - An additional dialog will be shown if the server does support user status requests. This does not impact the contact addition process, which can still completed by simply clicking "OK".
+
+Once the other user has accepted your contact request, they will request you adding them as a contact as well.
+This will automatically be displayed by the plugin as a dialog when you are connected to the account.
 
 ### Starting a Session - Host
 
-- Click the "Connect" button (![connect icon](images/icons-i/connect.png)).
-- Choose an account.
+- Connect to the XMPP account you would like to use.
 - Choose the section "Contacts" in the window on the left side of the Saros view.
 - Choose a friend that is online.
 - Right-click the name of that friend. This will open a list of all open projects. Each project contains a list of its shareable modules.
   - If the module you would like to share is not listed, it most likely does not adhere to the mentioned restrictions (see [module restrictions](#module-restrictions)).
 - Choose the module that is supposed to be shared from the displayed list of modules.
 
-- Alternatively, select a module in the project view and right-click it.
+*Alternatively:*
+
+- Select a module in the project view and right-click it.
 - Select "Share With..." from the options (or use the keyboard-shortcut 's').
 - Select a user from the list (or use their number as the keyboard-shortcut).
 
 ### Starting a Session - Client
 
-- Click the "Connect" button (![connect icon](images/icons-i/connect.png)).
-- Choose an account.
+- Connect to the XMPP account you would like to use.
 - Wait until the host invites you to join their session.
 - After the host invited you, the session negotiation will open.
 - Click "Next". This will open the project negotiation.
@@ -373,7 +374,6 @@ You can then delete the first account, add a new account with the right values, 
 
 ### Changing User Colors
 
-
 - Open the [IntelliJ settings/preferences menu](https://www.jetbrains.com/help/idea/settings-preferences-dialog.html).
 - Navigate to `"Editor" > "Color Scheme" > "Saros"`.
 - Select the color scheme to change the colors for.
@@ -388,7 +388,9 @@ You can then delete the first account, add a new account with the right values, 
 - Click the "Follow" button (![follow icon](images/icons-i/follow.png)).
 - Select the user to follow from the list and click the entry.
 
-- Alternatively, select another participant in the list of session participants in the session view (on the left) and right-click their name.
+*Alternatively:*
+
+- Select another participant in the list of session participants in the session view (on the left) and right-click their name.
 - Click the option "Follow participant".
 
 ### Leaving the Follow Mode
@@ -407,13 +409,18 @@ To resolve the desynchronization:
   - **WARNING** As stated in the dialog, this will replace the content of the affected file(s) with the content of the corresponding file(s) on the host's side.
   This might override recent changes to the local files. To avoid data-loss, consider making a backup of the affected files/changes before executing the synchronization recovery.
 
-### Leaving a Session
+### Leaving a Session - Host
+
+- Click on the "Terminate session" button (![terminate session icon](images/icons-i/terminate_session.png)).
+- Select "OK".
+    - As you are the host of the session, this will cause the session to end, kicking all other participants.
+
+### Leaving a Session - Client
 
 - Click on the "Leave session" button (![leave session icon](images/icons-i/leave_session.png)).
 - Select "OK".
-  - If you are the host of the session, this will cause the session to end, kicking all other participants.
 
-### Disconnecting from the XMPP-Server
+### Disconnecting From the XMPP Server
 
 - Click on the "Connect" button (![connect icon](images/icons-i/connect.png)).
 - Choose "Disconnect server".
@@ -477,10 +484,12 @@ There are some bugs in the alpha version of Saros/I that we are already aware of
 - [#116](https://github.com/saros-project/saros/issues/116) - The position of local text selection is not updated correctly for closed files when text edits are received through Saros.
 - [#223](https://github.com/saros-project/saros/issues/223) - Deleting and then re-creating a file with the same name (or moving a file and then moving it back, etc.) causes the session to desynchronize irreparably, requiring a session restart.
 - [#683](https://github.com/saros-project/saros/issues/683) - Creating a file with an unknown file extension (or without a file extension) leads to a session desynchronization. Opening the file on the other side, choosing a file type, and then running the recovery might repair the session, but the state could also be irreparable, requiring a session restart.
-- [#684](https://github.com/saros-project/saros/issues/683) - Renaming the content root of the shared module leads to the content being deleted for all other participants.
 - [#698](https://github.com/saros-project/saros/issues/698) - Creating a submodule in a shared directory leads to a session desync.
 - [#699](https://github.com/saros-project/saros/issues/699) - Which resource are marked as excluded is not shared between participants.
 - [#707](https://github.com/saros-project/saros/issues/707) - Client line endings are overwritten with host line endings when starting a session.
+- [#711](https://github.com/saros-project/saros/issues/711) - Opening a non-text-editor for shared resources leads to user-visible error.
+- [#821](https://github.com/saros-project/saros/issues/821) - Changing XMPP accounts during a session freezes/blocks the IDE.
+- [#822](https://github.com/saros-project/saros/issues/822) - The state of the Saros view is not reset correctly when the the host is unexpectedly disconnected from the XMPP server.
 
 ### Report a Bug
 

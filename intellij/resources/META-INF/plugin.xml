@@ -11,10 +11,11 @@
     <change-notes>
         <![CDATA[
         <ul>
-            <li>Allow project module to be shared</li>
-            <li>Honor excluded resources</li>
-            <li>Fixed <a href="https://github.com/saros-project/saros/issues/696">#696</a> - Color settings page not loading on the Windows platform</li>
-            <li>Fixed <a href="https://github.com/saros-project/saros/issues/703">#703</a> - Fix "Use existing module" option failing on the Windows platform</li>
+            <li>Allow users to add contacts to the connected XMPP account through the plugin</li>
+            <li>Show specific icon for terminating the running session as the host</li>
+            <li>Fix <a href="https://github.com/saros-project/saros/pull/684">#684</a> - Allow the shared module to be moved without breaking the session</li>
+            <li>Fix <a href="https://github.com/saros-project/saros/pull/703">#703</a> - Fix "Use existing module" option failing on the Windows platform when used with multi-drive setups</li>
+            <li>Fix <a href="https://github.com/saros-project/saros/pull/819">#819</a> - Only attribute undoable action to modified editor</li>
         </ul>
         <br>
         This list only refers to changes included in the latest release.
@@ -24,7 +25,7 @@
         ]]>
     </change-notes>
 
-    <version>0.2.1</version>
+    <version>0.2.2</version>
 
     <vendor url="https://www.saros-project.org" email="saros-devel@googlegroups.com">
         Saros Project

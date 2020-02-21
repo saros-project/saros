@@ -8,17 +8,15 @@ buildscript
   }
 }
 
-plugins {
-  id 'com.gradle.build-scan' version '2.4.1'
-}
-
 // Use gradle scan plugin and service in order to visualize build/test failures
-buildScan {
- termsOfServiceUrl = 'https://gradle.com/terms-of-service'
- termsOfServiceAgree = 'yes'
- publishOnFailure()
-}
 
+if (project.hasProperty('useBuildScan') && useBuildScan.equalsIgnoreCase("true")) {
+  buildScan {
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
+    publishOnFailure()
+  }
+}
 
 // Adjust Intellij module configuration for all sub-projects
 configure(subprojects) {projectToConf->
@@ -124,7 +122,6 @@ task cleanGenerateLibAll {
   doLast {
     project(':saros.eclipse').file('lib').deleteDir()
     project(':saros.core').file('lib').deleteDir()
-    project(':saros.whiteboard').file('lib').deleteDir()
     project(':saros.stf').file('lib').deleteDir()
     project(':saros.stf.test').file('lib').deleteDir()
   }
@@ -135,23 +132,19 @@ task generateLibAll(dependsOn:['cleanGenerateLibAll',
                                ':saros.core:generateLib',
                                ':saros.eclipse:generateLib',
                                ':saros.stf:generateLib',
-                               ':saros.stf.test:generateLib',
-                               ':saros.whiteboard:generateLib'])
+                               ':saros.stf.test:generateLib'])
 
 task sarosEclipse(type: Copy, dependsOn: [
   ':saros.picocontainer:test',
   ':saros.core:test',
   ':saros.eclipse:test',
-  ':saros.eclipse:jar',
-  ':saros.whiteboard:test',
-  ':saros.whiteboard:jar'
+  ':saros.eclipse:jar'
   ]) {
   group 'Delivery'
   description 'Builds and tests all modules required by Saros for Eclipse'
 
   from project(':saros.core').jar
   from project(':saros.eclipse').jar
-  from project(':saros.whiteboard').jar
   into 'build/distribution/eclipse'
 }
 
@@ -170,6 +163,18 @@ task sarosServer(type: Copy, dependsOn: [
 
   from project(':saros.server').jar
   into 'build/distribution/server'
+}
+
+task sarosLsp(type: Copy, dependsOn: [
+  ':saros.core:test',
+  ':saros.lsp:test',
+  ':saros.lsp:jar'
+  ]) {
+  group 'Delivery'
+  description 'Builds and tests all modules required by the Saros Language Server'
+
+  from project(':saros.lsp').jar
+  into 'build/distribution/lsp'
 }
 
 task sarosIntellij(type: Copy, dependsOn: [

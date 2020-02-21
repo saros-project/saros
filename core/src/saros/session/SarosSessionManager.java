@@ -36,7 +36,6 @@ import saros.communication.connection.IConnectionStateListener;
 import saros.context.IContainerContext;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.monitoring.IProgressMonitor;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
 import saros.negotiation.AbstractOutgoingProjectNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
@@ -750,17 +749,6 @@ public class SarosSessionManager implements ISarosSessionManager {
   @Override
   public void removeSessionLifecycleListener(ISessionLifecycleListener listener) {
     sessionLifecycleListeners.remove(listener);
-  }
-
-  @Override
-  public void postOutgoingInvitationCompleted(IProgressMonitor monitor, User user) {
-    try {
-      for (ISessionLifecycleListener listener : sessionLifecycleListeners) {
-        listener.postOutgoingInvitationCompleted(session, user, monitor);
-      }
-    } catch (RuntimeException e) {
-      log.error("Internal error in notifying listener" + " of an outgoing invitation: ", e);
-    }
   }
 
   @Override

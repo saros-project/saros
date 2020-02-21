@@ -185,9 +185,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
       monitor.done();
 
-      // Whiteboard is using this listener
-      sessionManager.postOutgoingInvitationCompleted(monitor, newUser);
-
     } catch (Exception e) {
       exception = e;
     } finally {

@@ -18,6 +18,8 @@
       <module name="saros.eclipse_test" target="1.8" />
       <module name="saros.intellij_main" target="1.8" />
       <module name="saros.intellij_test" target="1.8" />
+      <module name="saros.lsp_main" target="1.8" />
+      <module name="saros.lsp_test" target="1.8" />
       <module name="saros.picocontainer_main" target="1.8" />
       <module name="saros.picocontainer_test" target="1.8" />
       <module name="saros.server_main" target="1.8" />
@@ -27,8 +29,6 @@
       <module name="saros.stf.test_test" target="1.8" />
       <module name="saros.stf_main" target="1.8" />
       <module name="saros.stf_test" target="1.8" />
-      <module name="saros.whiteboard_main" target="1.8" />
-      <module name="saros.whiteboard_test" target="1.8" />
       <module name="saros_buildSrc_main" target="1.8" />
       <module name="saros_buildSrc_test" target="1.8" />
     </bytecodeTargetLevel>

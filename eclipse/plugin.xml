@@ -726,6 +726,12 @@
                   commandId="saros.ui.commands.CreateXMPPAccount"
                   icon="icons/elcl16/xmpp_create_account_tsk.png"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="saros.ui.definitions.isCreateXMPPAccountEnabled">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="saros.ui.commands.AddXMPPAccount"
@@ -1462,13 +1468,5 @@
                type="saros.session.User">
          </adapter>
       </factory>
-   </extension>
-   <extension
-         point="org.eclipse.ui.contexts">
-      <context
-            id="Saros.whiteboard"
-            name="name"
-            parentId="org.eclipse.ui.contexts.window">
-      </context>
    </extension>
 </plugin>

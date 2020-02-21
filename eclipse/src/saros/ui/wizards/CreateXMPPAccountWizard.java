@@ -1,23 +1,10 @@
 package saros.ui.wizards;
 
-import java.lang.reflect.InvocationTargetException;
-import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Registration;
-import org.jivesoftware.smack.packet.XMPPError;
 import saros.SarosPluginContext;
 import saros.account.XMPPAccount;
-import saros.account.XMPPAccountStore;
-import saros.communication.connection.ConnectionHandler;
-import saros.net.util.XMPPUtils;
-import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
-import saros.ui.util.SWTUtils;
-import saros.ui.util.XMPPConnectionSupport;
 import saros.ui.wizards.pages.CreateXMPPAccountWizardPage;
 
 /**
@@ -33,16 +20,24 @@ import saros.ui.wizards.pages.CreateXMPPAccountWizardPage;
 /**
  * A wizard that is used to create XMPP accounts.
  *
+ * <p><b>This Dialog is disabled due to missing Captcha Support! see {@link
+ * #CREATE_DIALOG_ENABLED}</b>
+ *
  * @author rdjemili
  * @author coezbek
  * @author bkahlert
  */
 public class CreateXMPPAccountWizard extends Wizard {
-  private static final Logger log = Logger.getLogger(CreateXMPPAccountWizard.class);
 
-  @Inject private XMPPAccountStore accountStore;
-
-  @Inject private ConnectionHandler connectionHandler;
+  /**
+   * This Registration logic just works for Servers without Captchas. Defacto it is broken as the
+   * Saros server and all other public XMPP servers use Captchas. See issue #787 for more details.
+   *
+   * <p>TODO After Update to Smack 4 or higher add Captcha Support and enable this Dialog again.
+   *
+   * <p>see commit 37d4679a0673e536d304a69df9fc62e97d6c143a for removed code
+   */
+  public static final boolean CREATE_DIALOG_ENABLED = false;
 
   private final CreateXMPPAccountWizardPage createXMPPAccountPage;
 
@@ -82,71 +77,7 @@ public class CreateXMPPAccountWizard extends Wizard {
    */
   @Override
   public boolean performFinish() {
-    cachedServer = getServer();
-    cachedUsername = getUsername();
-    cachedPassword = getPassword();
-
-    try {
-      // fork a new thread to prevent the GUI from hanging
-      getContainer()
-          .run(
-              true,
-              false,
-              new IRunnableWithProgress() {
-                @Override
-                public void run(IProgressMonitor monitor) throws InvocationTargetException {
-
-                  monitor.beginTask("Registering account...", IProgressMonitor.UNKNOWN);
-
-                  try {
-                    Registration registration =
-                        XMPPUtils.createAccount(cachedServer, cachedUsername, cachedPassword);
-
-                    if (registration != null)
-                      createAndThrowXMPPException(registration, cachedUsername);
-
-                    log.debug(
-                        "Account creation succeeded: username="
-                            + cachedUsername
-                            + ", server="
-                            + cachedServer);
-                  } catch (XMPPException e) {
-                    throw new InvocationTargetException(e);
-                  } finally {
-                    monitor.done();
-                  }
-                }
-              });
-    } catch (InvocationTargetException e) {
-      log.error(e.getCause().getMessage(), e.getCause());
-
-      String message = null;
-      Throwable t = e.getCause();
-
-      if (t instanceof XMPPException) message = getErrorMessage((XMPPException) t, cachedServer);
-
-      if (message == null && t != null) message = t.getMessage();
-
-      createXMPPAccountPage.setErrorMessage(message);
-
-      // Leave the wizard open
-      return false;
-    } catch (InterruptedException e) {
-      log.error("uninterruptible context was interrupted", e);
-      createXMPPAccountPage.setErrorMessage(e.getMessage());
-      return false;
-    }
-
-    // add account to the accountStore
-    this.createdXMPPAccount =
-        accountStore.createAccount(
-            cachedUsername, cachedPassword, cachedServer.toLowerCase(), "", 0, true, true);
-
-    if (createXMPPAccountPage.useNow())
-      SWTUtils.runSafeSWTAsync(
-          log, () -> XMPPConnectionSupport.getInstance().connect(createdXMPPAccount, true, false));
-
-    return true;
+    return false;
   }
 
   /*
@@ -199,50 +130,5 @@ public class CreateXMPPAccountWizard extends Wizard {
    */
   public XMPPAccount getCreatedXMPPAccount() {
     return createdXMPPAccount;
-  }
-
-  private String getErrorMessage(XMPPException e, String server) {
-    String message = null;
-    XMPPError error = e.getXMPPError();
-
-    if (error == null) return null;
-
-    if (error.getCode() == 409) message = "The XMPP account already exists.";
-    else
-      message =
-          "An unknown error occurred. Please register on "
-              + ("saros-con.imp.fu-berlin.de".equals(server)
-                  ? ("our website:" + " https://saros-con.imp.fu-berlin.de:5280/register/")
-                  : "the provider's website.");
-
-    return message;
-  }
-
-  private void createAndThrowXMPPException(Registration registration, String username)
-      throws XMPPException {
-
-    final String errorMessage;
-
-    if (registration.getError() != null) {
-      errorMessage = "No in-band registration. Please create account on provider's website.";
-    } else if (registration.getAttributes().containsKey("registered")) {
-      errorMessage = "Account " + username + " already exists on the server.";
-    } else if (!registration.getAttributes().containsKey("username")) {
-      if (registration.getInstructions() != null) {
-        errorMessage =
-            "Registration via Saros not possible.\n\n"
-                + "Please follow these instructions:\n"
-                + registration.getInstructions();
-      } else {
-        errorMessage =
-            "Registration via Saros not possible.\n\n"
-                + "Please see the server's web site for\n"
-                + "information on how to create an account.";
-      }
-    } else {
-      errorMessage = "No in-band registration. Please create account on provider's website.";
-    }
-
-    throw new XMPPException(errorMessage);
   }
 }

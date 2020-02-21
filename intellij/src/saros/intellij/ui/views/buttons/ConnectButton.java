@@ -33,9 +33,11 @@ public class ConnectButton extends AbstractToolbarButton {
       Boolean.getBoolean("saros.intellij.ENABLE_CONFIGURE_ACCOUNTS");
 
   private final JPopupMenu popupMenu;
-  private JMenuItem menuItemAdd;
-  private JMenuItem configure;
-  private JMenuItem disconnect;
+
+  private final JMenuItem addAccountItem;
+  private final JMenuItem createAccountItem;
+  private final JMenuItem configureAccountItem;
+  private final JMenuItem disconnectItem;
 
   private final AbstractSarosAction disconnectAction;
   private final ConnectServerAction connectAction;
@@ -69,13 +71,15 @@ public class ConnectButton extends AbstractToolbarButton {
 
     popupMenu = new JBPopupMenu();
 
+    addAccountItem = createAddAccountMenuItem();
+    createAccountItem = createCreateAccountMenuItem();
+    configureAccountItem = createConfigureAccountMenuItem();
+    disconnectItem = createDisconnectMenuItem();
+
     popupMenu.setForeground(FOREGROUND_COLOR);
     popupMenu.setBackground(BACKGROUND_COLOR);
 
-    createDisconnectMenuItem();
-    createAddAccountMenuItem();
-    createConfigureAccountMenuItem();
-    createMenuItems();
+    addMenuItems();
 
     addActionListener(
         actionEvent -> {
@@ -83,7 +87,7 @@ public class ConnectButton extends AbstractToolbarButton {
             XMPPAccount account = createNewAccount();
 
             if (account != null) {
-              createMenuItems();
+              addMenuItems();
 
               askToConnectToAccount(account);
 
@@ -95,25 +99,75 @@ public class ConnectButton extends AbstractToolbarButton {
         });
   }
 
+  private JMenuItem createAddAccountMenuItem() {
+    JMenuItem addAccountItem = getPreconfiguredMenuItem(Messages.ConnectButton_add_account);
+
+    addAccountItem.addActionListener(
+        actionEvent -> {
+          XMPPAccount account = createNewAccount();
+
+          if (account == null) {
+            return;
+          }
+
+          addMenuItems();
+
+          askToConnectToAccount(account);
+        });
+
+    return addAccountItem;
+  }
+
+  private JMenuItem createCreateAccountMenuItem() {
+    JMenuItem createAccountItem = getPreconfiguredMenuItem(Messages.ConnectButton_create_account);
+
+    createAccountItem.addActionListener(
+        (actionEvent) ->
+            SafeDialogUtils.showInfo(
+                project,
+                Messages.ConnectButton_create_account_message,
+                Messages.ConnectButton_create_account_title));
+
+    return createAccountItem;
+  }
+
+  private JMenuItem createConfigureAccountMenuItem() {
+    JMenuItem configureAccountItem =
+        getPreconfiguredMenuItem(Messages.ConnectButton_configure_accounts);
+
+    configureAccountItem.addActionListener(actionEvent -> configureAccounts.execute());
+
+    return configureAccountItem;
+  }
+
+  private JMenuItem createDisconnectMenuItem() {
+    JMenuItem disconnectItem = getPreconfiguredMenuItem(Messages.ConnectButton_disconnect);
+
+    disconnectItem.addActionListener(actionEvent -> disconnectAction.execute());
+
+    return disconnectItem;
+  }
+
   @Override
   public void dispose() {
     // NOP
   }
 
-  private void createMenuItems() {
+  private void addMenuItems() {
     popupMenu.removeAll();
     for (XMPPAccount account : accountStore.getAllAccounts()) {
       createAccountMenuItem(account);
     }
 
     popupMenu.addSeparator();
-    popupMenu.add(menuItemAdd);
+    popupMenu.add(addAccountItem);
+    popupMenu.add(createAccountItem);
 
     if (ENABLE_CONFIGURE_ACCOUNTS) {
-      popupMenu.add(configure);
+      popupMenu.add(configureAccountItem);
     }
 
-    popupMenu.add(disconnect);
+    popupMenu.add(disconnectItem);
   }
 
   private void createAccountMenuItem(XMPPAccount account) {
@@ -123,52 +177,11 @@ public class ConnectButton extends AbstractToolbarButton {
   }
 
   private JMenuItem createMenuItemForUser(final String userName) {
-    JMenuItem accountItem = new JBMenuItem(userName);
-
-    accountItem.setForeground(FOREGROUND_COLOR);
-    accountItem.setBackground(BACKGROUND_COLOR);
+    JMenuItem accountItem = getPreconfiguredMenuItem(userName);
 
     accountItem.addActionListener(actionEvent -> connectAction.executeWithUser(userName));
 
     return accountItem;
-  }
-
-  private void createDisconnectMenuItem() {
-    disconnect = new JBMenuItem(Messages.ConnectButton_disconnect);
-
-    disconnect.setForeground(FOREGROUND_COLOR);
-    disconnect.setBackground(BACKGROUND_COLOR);
-
-    disconnect.addActionListener(actionEvent -> disconnectAction.execute());
-  }
-
-  private void createConfigureAccountMenuItem() {
-    configure = new JBMenuItem(Messages.ConnectButton_configure_accounts);
-
-    configure.setForeground(FOREGROUND_COLOR);
-    configure.setBackground(BACKGROUND_COLOR);
-
-    configure.addActionListener(actionEvent -> configureAccounts.execute());
-  }
-
-  private void createAddAccountMenuItem() {
-    menuItemAdd = new JBMenuItem(Messages.ConnectButton_add_account);
-
-    menuItemAdd.setForeground(FOREGROUND_COLOR);
-    menuItemAdd.setBackground(BACKGROUND_COLOR);
-
-    menuItemAdd.addActionListener(
-        actionEvent -> {
-          XMPPAccount account = createNewAccount();
-
-          if (account == null) {
-            return;
-          }
-
-          createMenuItems();
-
-          askToConnectToAccount(account);
-        });
   }
 
   private void askToConnectToAccount(@NotNull XMPPAccount account) {
@@ -367,5 +380,14 @@ public class ConnectButton extends AbstractToolbarButton {
         MessageFormat.format(
             Messages.ConnectButton_account_creation_failed_message, e.getMessage()),
         Messages.ConnectButton_account_creation_failed_title);
+  }
+
+  private JMenuItem getPreconfiguredMenuItem(String text) {
+    JMenuItem jMenuItem = new JBMenuItem(text);
+
+    jMenuItem.setForeground(FOREGROUND_COLOR);
+    jMenuItem.setBackground(BACKGROUND_COLOR);
+
+    return jMenuItem;
   }
 }

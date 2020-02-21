@@ -13,8 +13,6 @@ import saros.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorer
 import saros.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
 import saros.stf.server.rmi.superbot.component.view.saros.ISarosView;
 import saros.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
-import saros.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
-import saros.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
 
 public final class Views extends StfRemoteObject implements IViews {
 
@@ -30,14 +28,6 @@ public final class Views extends StfRemoteObject implements IViews {
     RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_ID);
     bot.viewByTitle(VIEW_SAROS).show();
     return SarosView.getInstance().setView(bot.viewByTitle(VIEW_SAROS));
-  }
-
-  @Override
-  public ISarosWhiteboardView sarosWhiteboardView() throws RemoteException {
-    SWTWorkbenchBot bot = new SWTWorkbenchBot();
-    RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_WHITEBOARD_ID);
-    bot.viewByTitle(VIEW_SAROS_WHITEBOARD).show();
-    return SarosWhiteboardView.getInstance().setView(bot.viewByTitle(VIEW_SAROS_WHITEBOARD), bot);
   }
 
   @Override

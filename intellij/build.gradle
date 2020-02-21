@@ -6,6 +6,10 @@ sarosIntellij {
   intellijVersion = 'IC-2019.3'
 }
 
+intellij {
+  pluginName = 'saros-intellij'
+}
+
 runIde {
   // set heap size for the test JVM(s)
   minHeapSize = "128m"
@@ -13,7 +17,7 @@ runIde {
 }
 
 dependencies {
-  compile project(':saros.core')
+  compile project(path: ':saros.core', configuration: 'plain')
 
   compile 'org.easytesting:fest-assert:1.2'
   compile 'org.easytesting:fest-reflect:1.2'

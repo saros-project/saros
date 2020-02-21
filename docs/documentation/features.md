@@ -51,8 +51,3 @@ editing activities of your team members.
 Saros frequently checks if your copy became out of sync with the host's
 copy. In that case, Saros allows you to easily recover from this
 inconsistency.
-
-## Whiteboard
-
-Saros provides a concurrent drawing tool for communicating topics
-graphically.

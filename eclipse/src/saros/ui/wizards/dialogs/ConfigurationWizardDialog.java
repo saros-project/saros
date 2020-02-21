@@ -28,25 +28,25 @@ public class ConfigurationWizardDialog extends WizardDialog {
 
   @Override
   protected void createButtonsForButtonBar(Composite parent) {
+    if (CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED) {
+      /*
+       * TODO move this button to the left most edge ... may require layout
+       * changes in the parent or further method overrides ... see JFace
+       * source code
+       */
+      createAccountButton =
+          createButton(parent, IDialogConstants.CLIENT_ID, "Create Account...", false);
 
-    /*
-     * TODO move this button to the left most edge ... may require layout
-     * changes in the parent or further method overrides ... see JFace
-     * source code
-     */
-    createAccountButton =
-        createButton(parent, IDialogConstants.CLIENT_ID, "Create Account...", false);
+      createAccountButton.addSelectionListener(
+          new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+              openCreateXMPPAccountWizard();
+            }
+          });
 
-    createAccountButton.addSelectionListener(
-        new SelectionAdapter() {
-          @Override
-          public void widgetSelected(SelectionEvent e) {
-            openCreateXMPPAccountWizard();
-          }
-        });
-
-    setButtonLayoutData(createAccountButton);
-
+      setButtonLayoutData(createAccountButton);
+    }
     super.createButtonsForButtonBar(parent);
   }
 

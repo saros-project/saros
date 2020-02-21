@@ -5,6 +5,7 @@ import saros.Saros;
 import saros.SarosPluginContext;
 import saros.communication.connection.ConnectionHandler;
 import saros.repackaged.picocontainer.annotations.Inject;
+import saros.ui.wizards.CreateXMPPAccountWizard;
 
 /**
  * Adds tests to a running Saros plugin. Currently only supports several network connection and
@@ -24,6 +25,9 @@ public class SarosPropertyTester extends PropertyTester {
 
       if ("isConnected".equals(property)) {
         return connectionHandler.isConnected();
+      }
+      if ("isCreateXMPPAccountEnabled".equals(property)) {
+        return CreateXMPPAccountWizard.CREATE_DIALOG_ENABLED;
       }
     }
     return false;

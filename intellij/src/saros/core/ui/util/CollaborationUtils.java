@@ -127,15 +127,15 @@ public class CollaborationUtils {
         reallyLeave =
             DialogUtils.showConfirm(
                 project,
-                Messages.CollaborationUtils_confirm_closing,
-                Messages.CollaborationUtils_confirm_closing_text);
+                Messages.CollaborationUtils_confirm_closing_title,
+                Messages.CollaborationUtils_confirm_closing_message);
       }
     } else {
       reallyLeave =
           DialogUtils.showConfirm(
               project,
-              Messages.CollaborationUtils_confirm_leaving,
-              Messages.CollaborationUtils_confirm_leaving_text);
+              Messages.CollaborationUtils_confirm_leaving_title,
+              Messages.CollaborationUtils_confirm_leaving_message);
     }
 
     if (!reallyLeave) {
@@ -190,8 +190,8 @@ public class CollaborationUtils {
             }
 
             NotificationPanel.showError(
-                Messages.CollaborationUtils_insufficient_privileges_text,
-                Messages.CollaborationUtils_insufficient_privileges);
+                Messages.CollaborationUtils_insufficient_privileges_message,
+                Messages.CollaborationUtils_insufficient_privileges_title);
           }
         });
   }
