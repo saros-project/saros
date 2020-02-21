@@ -70,8 +70,10 @@ public class LocalEditorHandler {
   }
 
   /**
-   * Opens an editor for the passed virtualFile, adds it to the pool of currently open editors and
-   * calls {@link EditorManager#startEditor(Editor)} with it.
+   * Opens an editor for the passed virtualFile.
+   *
+   * <p>If the editor is a text editor, it is also added to the pool of currently open editors and
+   * {@link EditorManager#startEditor(Editor)} is called with it.
    *
    * <p><b>Note:</b> This only works for shared resources that belong to the given module.
    *
@@ -79,7 +81,7 @@ public class LocalEditorHandler {
    * @param project module the file belongs to
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not belong
-   *     to a shared module
+   *     to a shared module or can not be represented by a text editor
    */
   @Nullable
   public Editor openEditor(
@@ -101,8 +103,10 @@ public class LocalEditorHandler {
   }
 
   /**
-   * Opens an editor for the passed virtualFile, adds it to the pool of currently open editors and
-   * calls {@link EditorManager#startEditor(Editor)} with it.
+   * Opens an editor for the passed virtualFile.
+   *
+   * <p>If the editor is a text editor, it is also added to the pool of currently open editors and
+   * {@link EditorManager#startEditor(Editor)} is called with it.
    *
    * <p><b>Note:</b> This only works for shared resources.
    *
@@ -113,7 +117,7 @@ public class LocalEditorHandler {
    * @param path saros resource representation of the file
    * @param activate activate editor after opening
    * @return the opened <code>Editor</code> or <code>null</code> if the given file does not exist or
-   *     does not belong to a shared module
+   *     does not belong to a shared module or can not be represented by a text editor
    */
   @Nullable
   private Editor openEditor(
@@ -133,6 +137,12 @@ public class LocalEditorHandler {
     Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
+
+    if (editor == null) {
+      LOG.debug("Ignoring non-text editor for file " + virtualFile);
+
+      return null;
+    }
 
     editorPool.add(path, editor);
     manager.startEditor(editor);

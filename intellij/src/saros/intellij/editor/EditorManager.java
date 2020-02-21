@@ -396,7 +396,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Adds all currently open editors belonging to the passed project to the pool of open editors.
+   * Adds all currently open text editors belonging to the passed project to the pool of open
+   * editors.
    *
    * @param project the added project
    */
@@ -437,7 +438,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         Editor editor = localEditorHandler.openEditor(openFile, project, false);
 
-        openFileMapping.put(path, editor);
+        if (editor != null) {
+          openFileMapping.put(path, editor);
+        }
       }
 
     } finally {
@@ -999,7 +1002,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @see #openEditor(SPath, boolean)
    * @see #startEditor(Editor)
    */
-  public void addEditorMapping(SPath file, Editor editor) {
+  public void addEditorMapping(@NotNull SPath file, @NotNull Editor editor) {
     startEditor(editor);
     editorPool.add(file, editor);
   }

@@ -50,15 +50,17 @@ public class LocalEditorManipulator {
   }
 
   /**
-   * Opens an editor for the passed virtualFile, adds it to the pool of currently open editors and
-   * calls {@link EditorManager#startEditor(Editor)} with it.
+   * Opens an editor for the passed virtualFile.
+   *
+   * <p>If the editor is a text editor, it is also added to the pool of currently open editors and
+   * {@link EditorManager#startEditor(Editor)} is called with it.
    *
    * <p><b>Note:</b> This does only work for shared resources.
    *
    * @param path path of the file to open
    * @param activate activate editor after opening
    * @return the editor for the given path, or <code>null</code> if the file does not exist or is
-   *     not shared
+   *     not shared or can not be represented by a text editor
    */
   public Editor openEditor(@NotNull SPath path, boolean activate) {
     if (!sarosSession.isShared(path.getResource())) {
@@ -82,6 +84,12 @@ public class LocalEditorManipulator {
     Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
+
+    if (editor == null) {
+      LOG.debug("Ignoring non-text editor for file " + virtualFile);
+
+      return null;
+    }
 
     manager.startEditor(editor);
     editorPool.add(path, editor);
@@ -372,6 +380,12 @@ public class LocalEditorManipulator {
     Editor editor = null;
     if (ProjectAPI.isOpen(project, virtualFile)) {
       editor = ProjectAPI.openEditor(project, virtualFile, false);
+
+      if (editor == null) {
+        LOG.warn("Could not obtain text editor for open, recovered file " + virtualFile);
+
+        return;
+      }
     }
 
     annotationManager.addContributionAnnotation(source, file, 0, documentLength, editor);

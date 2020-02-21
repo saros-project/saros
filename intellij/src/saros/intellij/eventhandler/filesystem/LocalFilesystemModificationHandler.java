@@ -1070,9 +1070,18 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * resource move is executed, meaning the new resource does not exist yet. The editor for the old
    * resource does however already exist. As the existing editor will be used for the new resource
    * once it is moved, we have to add the mapping for the new file onto the "old" editor manually.
+   *
+   * <p>Does nothing besides opening the editor if the moved file is not represented by a text
+   * editor.
    */
   private void setUpMovedEditorState(@NotNull VirtualFile oldFile, @NotNull SPath newFilePath) {
     Editor editor = ProjectAPI.openEditor(project, oldFile, false);
+
+    if (editor == null) {
+      LOG.debug("Ignoring non-text editor of moved file " + oldFile);
+
+      return;
+    }
 
     editorManager.addEditorMapping(newFilePath, editor);
   }
