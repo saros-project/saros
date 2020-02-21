@@ -9,9 +9,11 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
+import saros.stf.test.categories.FlakyTests;
 
 @TestLink(id = "Saros-44_simple_follow_mode_2")
 public class SimpleFollowModeIITest extends StfTestCase {
@@ -24,6 +26,7 @@ public class SimpleFollowModeIITest extends StfTestCase {
     select(ALICE, BOB);
   }
 
+  @Category(FlakyTests.class)
   @Test
   public void testSimpleFollowMode() throws Exception {
     Util.setUpSessionWithProjectAndFile("foo", "readme.txt", fileContent, ALICE, BOB);

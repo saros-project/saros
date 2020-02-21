@@ -9,11 +9,13 @@ import static saros.stf.client.tester.SarosTester.CARL;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.tester.AbstractTester;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
+import saros.stf.test.categories.FailingTests;
 
 @TestLink(id = "Saros-131_create_same_file_at_once")
 public class CreateSameFileAtOnceTest extends StfTestCase {
@@ -29,6 +31,7 @@ public class CreateSameFileAtOnceTest extends StfTestCase {
     CARL.controlBot().getNetworkManipulator().unblockOutgoingSessionPackets();
   }
 
+  @Category(FailingTests.class)
   @Test
   public void testCreateSameFileAtOnce() throws Exception {
     ALICE.superBot().internal().createProject("foo");

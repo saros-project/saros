@@ -8,9 +8,11 @@ import java.util.List;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import saros.stf.annotation.TestLink;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
+import saros.stf.test.categories.FlakyTests;
 
 @TestLink(id = "Saros-44_simple_follow_mode_1")
 public class SimpleFollowModeITest extends StfTestCase {
@@ -23,6 +25,7 @@ public class SimpleFollowModeITest extends StfTestCase {
     select(ALICE, BOB);
   }
 
+  @Category(FlakyTests.class)
   @Test
   public void testSimpleFollowMode() throws Exception {
     Util.setUpSessionWithProjectAndFile("foo", "readme.txt", fileContent, ALICE, BOB);
