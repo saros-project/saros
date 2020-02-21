@@ -181,14 +181,35 @@ $mobile-width: 690px;
   }
 }
 
+@media screen and (max-width: 800px) {
+  .sidenav {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+  }
+  // overwrite bootstrap column wrap rule
+  .col-md-3 {
+      -ms-flex: none;
+      flex: none;
+      max-width: none;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  .sidenav {
+    position: fixed !important;
+  }
+}
+
 .main-content, .sidenav, .toc-bar {
   margin-top: 40px;
 }
 
-.sidenav, .toc-bar {
-  position: -webkit-sticky;
-  position: sticky;
+.toc-bar, .sidenav {
   padding-top: 30px;
+}
+
+.toc-bar {
+  position: fixed;
 }
 
 .sidenav ul, .toc-bar ul {
