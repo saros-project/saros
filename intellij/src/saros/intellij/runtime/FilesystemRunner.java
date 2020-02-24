@@ -1,4 +1,4 @@
-package saros.intellij.filesystem;
+package saros.intellij.runtime;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** Provides centralized methods for synchronized write and read actions. */
-public class Filesystem {
+public class FilesystemRunner {
 
   private static final Application application;
 
@@ -18,7 +18,7 @@ public class Filesystem {
     application = ApplicationManager.getApplication();
   }
 
-  private Filesystem() {
+  private FilesystemRunner() {
     // NOP
   }
 

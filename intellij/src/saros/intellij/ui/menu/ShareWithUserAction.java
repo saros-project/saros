@@ -14,8 +14,8 @@ import org.apache.log4j.Logger;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IResource;
 import saros.intellij.context.SharedIDEContext;
-import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
+import saros.intellij.runtime.FilesystemRunner;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.util.NotificationPanel;
@@ -90,7 +90,8 @@ public class ShareWithUserAction extends AnAction {
   private IResource getModuleForVirtualFile(VirtualFile virtualFile, Project project) {
     ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
 
-    Module module = Filesystem.runReadAction(() -> projectFileIndex.getModuleForFile(virtualFile));
+    Module module =
+        FilesystemRunner.runReadAction(() -> projectFileIndex.getModuleForFile(virtualFile));
 
     if (module == null) {
       // FIXME: Find way to select moduleName for non-module based IDEAs (Webstorm)

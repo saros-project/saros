@@ -44,9 +44,9 @@ import saros.intellij.editor.ProjectAPI;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
-import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
+import saros.intellij.runtime.FilesystemRunner;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
@@ -662,7 +662,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     }
 
     Module module =
-        Filesystem.runReadAction(() -> ModuleUtil.findModuleForFile(virtualFile, project));
+        FilesystemRunner.runReadAction(() -> ModuleUtil.findModuleForFile(virtualFile, project));
 
     if (module == null) {
       return false;
@@ -732,7 +732,8 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     if (newPathIsShared) {
       Module targetModule =
-          Filesystem.runReadAction(() -> ModuleUtil.findModuleForFile(newBaseParent, project));
+          FilesystemRunner.runReadAction(
+              () -> ModuleUtil.findModuleForFile(newBaseParent, project));
 
       if (targetModule != null) {
         VirtualFile moduleFile = targetModule.getModuleFile();

@@ -9,7 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.intellij.filesystem.Filesystem;
+import saros.intellij.runtime.FilesystemRunner;
 
 /**
  * Wrapper for interacting with the Intellij document API.
@@ -37,7 +37,7 @@ public class DocumentAPI {
       return null;
     }
 
-    return Filesystem.runReadAction(() -> fileDocumentManager.getDocument(virtualFile));
+    return FilesystemRunner.runReadAction(() -> fileDocumentManager.getDocument(virtualFile));
   }
 
   /**
@@ -58,13 +58,13 @@ public class DocumentAPI {
    * @param document the document to save.
    */
   public static void saveDocument(final Document document) {
-    Filesystem.runWriteAction(
+    FilesystemRunner.runWriteAction(
         () -> fileDocumentManager.saveDocument(document), ModalityState.NON_MODAL);
   }
 
   /** Saves all documents in the UI thread. */
   public static void saveAllDocuments() {
-    Filesystem.runWriteAction(fileDocumentManager::saveAllDocuments, ModalityState.NON_MODAL);
+    FilesystemRunner.runWriteAction(fileDocumentManager::saveAllDocuments, ModalityState.NON_MODAL);
   }
 
   /**
@@ -103,7 +103,7 @@ public class DocumentAPI {
               false);
         };
 
-    Filesystem.runWriteAction(insertCommand, ModalityState.defaultModalityState());
+    FilesystemRunner.runWriteAction(insertCommand, ModalityState.defaultModalityState());
   }
 
   /**
@@ -138,6 +138,6 @@ public class DocumentAPI {
               false);
         };
 
-    Filesystem.runWriteAction(deletionCommand, ModalityState.defaultModalityState());
+    FilesystemRunner.runWriteAction(deletionCommand, ModalityState.defaultModalityState());
   }
 }

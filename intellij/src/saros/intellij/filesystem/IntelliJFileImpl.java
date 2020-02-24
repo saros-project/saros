@@ -17,6 +17,7 @@ import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.intellij.runtime.FilesystemRunner;
 
 public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
 
@@ -97,7 +98,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   @Override
   public void delete(final int updateFlags) throws IOException {
 
-    Filesystem.runWriteAction(
+    FilesystemRunner.runWriteAction(
         new ThrowableComputable<Void, IOException>() {
 
           @Override
@@ -168,7 +169,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   public void setContents(final InputStream input, final boolean force, final boolean keepHistory)
       throws IOException {
 
-    Filesystem.runWriteAction(
+    FilesystemRunner.runWriteAction(
         new ThrowableComputable<Void, IOException>() {
 
           @Override
@@ -221,7 +222,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   @Override
   public void create(@Nullable final InputStream input, final boolean force) throws IOException {
 
-    Filesystem.runWriteAction(
+    FilesystemRunner.runWriteAction(
         new ThrowableComputable<Void, IOException>() {
 
           @Override

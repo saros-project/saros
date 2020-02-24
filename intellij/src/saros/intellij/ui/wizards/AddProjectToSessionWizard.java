@@ -34,10 +34,10 @@ import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.DocumentAPI;
-import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.negotiation.ModuleConfiguration;
 import saros.intellij.negotiation.ModuleConfigurationInitializer;
+import saros.intellij.runtime.FilesystemRunner;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.NotificationPanel;
 import saros.intellij.ui.widgets.progress.ProgessMonitorAdapter;
@@ -429,7 +429,7 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     Module module =
-        Filesystem.runWriteAction(
+        FilesystemRunner.runWriteAction(
             new ThrowableComputable<Module, IOException>() {
 
               @Override

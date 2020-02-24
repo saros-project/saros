@@ -18,6 +18,7 @@ import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
+import saros.intellij.runtime.FilesystemRunner;
 
 public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder {
 
@@ -57,7 +58,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
 
     for (final VirtualFile child : children) {
 
-      if (!Filesystem.runReadAction(() -> moduleFileIndex.isInContent(child))) {
+      if (!FilesystemRunner.runReadAction(() -> moduleFileIndex.isInContent(child))) {
 
         continue;
       }
@@ -151,7 +152,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   @Override
   public void delete(final int updateFlags) throws IOException {
 
-    Filesystem.runWriteAction(
+    FilesystemRunner.runWriteAction(
         new ThrowableComputable<Void, IOException>() {
 
           @Override
@@ -204,7 +205,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   @Override
   public void create(final boolean force, final boolean local) throws IOException {
 
-    Filesystem.runWriteAction(
+    FilesystemRunner.runWriteAction(
         new ThrowableComputable<Void, IOException>() {
 
           @Override
