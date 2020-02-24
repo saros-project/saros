@@ -53,6 +53,29 @@ public class DocumentAPI {
   }
 
   /**
+   * Returns whether the document corresponding to the given file has unsaved changes.
+   *
+   * <p>Resources that don't have a matching document (i.e. that can't be opened in a text editor)
+   * are always seen as unmodified.
+   *
+   * @param file the file to check for unsaved changes
+   * @return whether the document corresponding to the given file has unsaved changes
+   */
+  public static boolean hasUnsavedChanges(@NotNull VirtualFile file) {
+    return fileDocumentManager.isFileModified(file);
+  }
+
+  /**
+   * Returns whether the given document has unsaved changes.
+   *
+   * @param document the document to check for unsaved changes
+   * @return whether the given document has unsaved changes
+   */
+  public static boolean hasUnsavedChanges(@NotNull Document document) {
+    return fileDocumentManager.isDocumentUnsaved(document);
+  }
+
+  /**
    * Saves the given document in the UI thread.
    *
    * @param document the document to save.

@@ -179,6 +179,10 @@ public class LocalEditorHandler {
   /**
    * Saves the document under path, thereby flushing its contents to disk.
    *
+   * <p>Does nothing if there is no unsaved document content for the given resource. This is the
+   * case if the resource document has not been modified or the resource can not be opened as a
+   * document.
+   *
    * @param path the path for the document to save
    * @see Document
    */
@@ -186,22 +190,33 @@ public class LocalEditorHandler {
 
     Document document = editorPool.getDocument(path);
 
+    if (document != null) {
+      if (DocumentAPI.hasUnsavedChanges(document)) {
+
+        DocumentAPI.saveDocument(document);
+      }
+
+      return;
+    }
+
+    VirtualFile file = VirtualFileConverter.convertToVirtualFile(path);
+
+    if (file == null || !file.exists()) {
+      LOG.warn("Failed to save document for " + path + " - could not get a valid VirtualFile");
+
+      return;
+    }
+
+    if (!DocumentAPI.hasUnsavedChanges(file)) {
+      return;
+    }
+
+    document = DocumentAPI.getDocument(file);
+
     if (document == null) {
-      VirtualFile file = VirtualFileConverter.convertToVirtualFile(path);
+      LOG.warn("Failed to save document for " + file + " - could not get a matching Document");
 
-      if (file == null || !file.exists()) {
-        LOG.warn("Failed to save document for " + path + " - could not get a valid VirtualFile");
-
-        return;
-      }
-
-      document = DocumentAPI.getDocument(file);
-
-      if (document == null) {
-        LOG.warn("Failed to save document for " + file + " - could not get a matching Document");
-
-        return;
-      }
+      return;
     }
 
     DocumentAPI.saveDocument(document);
