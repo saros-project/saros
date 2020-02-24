@@ -745,7 +745,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       }
     }
 
-    boolean fileIsOpen = ProjectAPI.isOpen(project, oldFile);
+    boolean isOpenInTextEditor = ProjectAPI.isOpenInTextEditor(project, oldFile);
 
     IPath relativePath = getRelativePath(oldBaseParent, oldFile);
 
@@ -803,7 +803,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               fileContent,
               encoding);
 
-      if (fileIsOpen) {
+      if (isOpenInTextEditor) {
         setUpMovedEditorState(oldFile, newFilePath);
       }
 
@@ -832,14 +832,14 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     dispatchActivity(activity);
 
-    if (oldPathIsShared && fileIsOpen) {
+    if (oldPathIsShared && isOpenInTextEditor) {
       EditorActivity closeOldEditorActivity =
           new EditorActivity(user, EditorActivity.Type.CLOSED, oldFilePath);
 
       dispatchActivity(closeOldEditorActivity);
     }
 
-    if (newPathIsShared && fileIsOpen) {
+    if (newPathIsShared && isOpenInTextEditor) {
       SPath newFilePath =
           new SPath(
               newParentPath.getProject(),

@@ -2,8 +2,10 @@ package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -45,6 +47,27 @@ public class ProjectAPI {
     }
 
     return isOpen(project, file);
+  }
+
+  /**
+   * Returns whether there is an open text editor for the given file.
+   *
+   * @param project the project in which to check
+   * @param file the file to check
+   * @return whether there is an open text editor for the given file
+   */
+  public static boolean isOpenInTextEditor(@NotNull Project project, @NotNull VirtualFile file) {
+    FileEditorManager fileEditorManager = getFileEditorManager(project);
+
+    FileEditor[] fileEditors = EDTExecutor.invokeAndWait(() -> fileEditorManager.getEditors(file));
+
+    for (FileEditor fileEditor : fileEditors) {
+      if (fileEditor instanceof TextEditor) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
