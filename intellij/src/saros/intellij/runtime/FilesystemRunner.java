@@ -44,16 +44,12 @@ public class FilesystemRunner {
     final AtomicReference<Throwable> throwable = new AtomicReference<>();
 
     application.invokeAndWait(
-        new Runnable() {
+        () -> {
+          try {
+            result.set(application.runWriteAction(computation));
 
-          @Override
-          public void run() {
-            try {
-              result.set(application.runWriteAction(computation));
-
-            } catch (Throwable t) {
-              throwable.set(t);
-            }
+          } catch (Throwable t) {
+            throwable.set(t);
           }
         },
         chosenModalityState);
@@ -84,15 +80,7 @@ public class FilesystemRunner {
     final ModalityState chosenModalityState =
         modalityState != null ? modalityState : ModalityState.defaultModalityState();
 
-    application.invokeAndWait(
-        new Runnable() {
-
-          @Override
-          public void run() {
-            application.runWriteAction(runnable);
-          }
-        },
-        chosenModalityState);
+    application.invokeAndWait(() -> application.runWriteAction(runnable), chosenModalityState);
   }
 
   /** @see Application#runReadAction(Computable computation) */
