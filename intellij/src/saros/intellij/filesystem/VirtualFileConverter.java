@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import saros.activities.SPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
+import saros.intellij.runtime.FilesystemRunner;
 
 /**
  * Provides static methods to convert VirtualFiles to Saros resource objects or Saros resources
@@ -58,7 +59,7 @@ public class VirtualFileConverter {
       @NotNull Project project, @NotNull VirtualFile virtualFile) {
 
     Module module =
-        Filesystem.runReadAction(() -> ModuleUtil.findModuleForFile(virtualFile, project));
+        FilesystemRunner.runReadAction(() -> ModuleUtil.findModuleForFile(virtualFile, project));
 
     if (module == null) {
       log.debug(

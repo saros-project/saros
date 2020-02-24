@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import saros.intellij.filesystem.Filesystem;
+import saros.intellij.runtime.FilesystemRunner;
 
 /** Static utility class for interacting with the project-level Intellij editor API. */
 public class ProjectAPI {
@@ -55,7 +55,7 @@ public class ProjectAPI {
    */
   public static Editor openEditor(
       @NotNull Project project, @NotNull VirtualFile virtualFile, final boolean activate) {
-    return Filesystem.runReadAction(
+    return FilesystemRunner.runReadAction(
         () ->
             getFileEditorManager(project)
                 .openTextEditor(new OpenFileDescriptor(project, virtualFile), activate));
@@ -68,7 +68,7 @@ public class ProjectAPI {
    * @param virtualFile the file whose editor to close
    */
   public static void closeEditor(@NotNull Project project, @NotNull final VirtualFile virtualFile) {
-    Filesystem.runReadAction(() -> getFileEditorManager(project).closeFile(virtualFile));
+    FilesystemRunner.runReadAction(() -> getFileEditorManager(project).closeFile(virtualFile));
   }
 
   /**
@@ -118,6 +118,6 @@ public class ProjectAPI {
    */
   public static boolean isExcluded(@NotNull Project project, @NotNull VirtualFile virtualFile) {
     ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
-    return Filesystem.runReadAction(() -> projectFileIndex.isExcluded(virtualFile));
+    return FilesystemRunner.runReadAction(() -> projectFileIndex.isExcluded(virtualFile));
   }
 }

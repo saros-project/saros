@@ -41,9 +41,9 @@ import saros.intellij.context.SharedIDEContext;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
-import saros.intellij.filesystem.Filesystem;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.runtime.FilesystemRunner;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
@@ -408,7 +408,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     Set<VirtualFile> openFiles = new HashSet<>();
 
     for (VirtualFile openFile : ProjectAPI.getOpenFiles(intellijProject)) {
-      if (Filesystem.runReadAction(() -> moduleFileIndex.isInContent(openFile))) {
+      if (FilesystemRunner.runReadAction(() -> moduleFileIndex.isInContent(openFile))) {
         openFiles.add(openFile);
       }
     }
@@ -596,7 +596,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   @Override
   public String getContent(final SPath path) {
-    return Filesystem.runReadAction(
+    return FilesystemRunner.runReadAction(
         () -> {
           VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
 
