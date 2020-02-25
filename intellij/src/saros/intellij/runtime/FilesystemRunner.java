@@ -62,9 +62,4 @@ public class FilesystemRunner {
   public static <T> T runReadAction(@NotNull Computable<T> computation) {
     return application.runReadAction(computation);
   }
-
-  /** @see Application#runReadAction(Runnable runnable) */
-  public static void runReadAction(@NotNull final Runnable runnable) {
-    application.runReadAction(runnable);
-  }
 }
