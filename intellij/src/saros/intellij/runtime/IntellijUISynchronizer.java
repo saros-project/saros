@@ -11,9 +11,9 @@ import saros.synchronize.UISynchronizer;
  * Class implements the {@link UISynchronizer} with {@link Application#invokeLater(Runnable)} and
  * {@link Application#invokeAndWait(Runnable, ModalityState)}.
  */
-public class IntelliJSynchronizer implements UISynchronizer {
+public class IntellijUISynchronizer implements UISynchronizer {
 
-  private static final Logger log = Logger.getLogger(IntelliJSynchronizer.class);
+  private static final Logger log = Logger.getLogger(IntellijUISynchronizer.class);
 
   @Override
   public void asyncExec(Runnable runnable) {
