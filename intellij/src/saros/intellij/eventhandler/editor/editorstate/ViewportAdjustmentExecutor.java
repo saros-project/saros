@@ -1,6 +1,6 @@
 package saros.intellij.eventhandler.editor.editorstate;
 
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
@@ -15,6 +15,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.ProjectAPI;
+import saros.intellij.runtime.EDTExecutor;
 
 /**
  * Queues viewport adjustments for editors that are not currently visible and executes the queued
@@ -80,8 +81,9 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
       editor = ProjectAPI.openEditor(project, virtualFile, false);
     }
 
-    ApplicationManager.getApplication()
-        .invokeAndWait(() -> localEditorManipulator.adjustViewport(editor, range, selection));
+    EDTExecutor.invokeAndWait(
+        () -> localEditorManipulator.adjustViewport(editor, range, selection),
+        ModalityState.defaultModalityState());
   }
 
   /**

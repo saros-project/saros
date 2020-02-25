@@ -1,6 +1,5 @@
 package saros.intellij.ui.views.buttons;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +12,7 @@ import saros.activities.SPath;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.concurrent.watchdog.IsInconsistentObservable;
 import saros.filesystem.IResource;
+import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.actions.ConsistencyAction;
 import saros.intellij.ui.util.DialogUtils;
@@ -184,7 +184,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
 
     LOG.debug("Inconsistency indicator goes: " + (isInconsistent ? "on" : "off"));
 
-    ApplicationManager.getApplication().invokeLater(() -> setInconsistent(isInconsistent));
+    EDTExecutor.invokeLater(() -> setInconsistent(isInconsistent));
 
     if (!isInconsistent) {
       if (!previouslyInConsistentState) {
@@ -207,22 +207,16 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
 
     final String files = createInconsistentPathsMessage(paths);
 
-    ApplicationManager.getApplication()
-        .invokeLater(
-            () -> {
-              if (files.isEmpty()) {
-                NotificationPanel.showWarning(
-                    Messages.ConsistencyButton_message_inconsistency_detected_no_files,
-                    Messages.ConsistencyButton_title_inconsistency_detected);
+    if (files.isEmpty()) {
+      NotificationPanel.showWarning(
+          Messages.ConsistencyButton_message_inconsistency_detected_no_files,
+          Messages.ConsistencyButton_title_inconsistency_detected);
 
-                return;
-              }
-
-              NotificationPanel.showWarning(
-                  MessageFormat.format(
-                      Messages.ConsistencyButton_message_inconsistency_detected, files),
-                  Messages.ConsistencyButton_title_inconsistency_detected);
-            });
+    } else {
+      NotificationPanel.showWarning(
+          MessageFormat.format(Messages.ConsistencyButton_message_inconsistency_detected, files),
+          Messages.ConsistencyButton_title_inconsistency_detected);
+    }
   }
 
   private String createConfirmationMessage(Set<SPath> paths) {

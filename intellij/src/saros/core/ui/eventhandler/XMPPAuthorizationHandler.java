@@ -1,8 +1,8 @@
 package saros.core.ui.eventhandler;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import java.text.MessageFormat;
+import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.DialogUtils;
 import saros.intellij.ui.util.UIProjectUtils;
@@ -22,9 +22,7 @@ public class XMPPAuthorizationHandler {
         public void subscriptionRequestReceived(final JID jid) {
 
           projectUtils.runWithProject(
-              project ->
-                  ApplicationManager.getApplication()
-                      .invokeLater(() -> handleAuthorizationRequest(project, jid)));
+              project -> EDTExecutor.invokeLater(() -> handleAuthorizationRequest(project, jid)));
         }
       };
 

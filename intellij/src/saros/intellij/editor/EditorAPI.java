@@ -1,7 +1,5 @@
 package saros.intellij.editor;
 
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -11,6 +9,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
 import saros.editor.text.LineRange;
+import saros.intellij.runtime.EDTExecutor;
 
 /**
  * IntellJ editor API. An Editor is a window for editing source files.
@@ -18,8 +17,6 @@ import saros.editor.text.LineRange;
  * <p>Performs IntelliJ editor related actions in the UI thread.
  */
 public class EditorAPI {
-
-  private static final Application application = ApplicationManager.getApplication();
 
   private EditorAPI() {
     // NOP
@@ -40,7 +37,7 @@ public class EditorAPI {
    * @see LogicalPosition
    */
   static void scrollToViewPortCenter(final Editor editor, final int line) {
-    application.invokeAndWait(
+    EDTExecutor.invokeAndWait(
         () -> {
           LogicalPosition logicalPosition = new LogicalPosition(line, 0);
 
