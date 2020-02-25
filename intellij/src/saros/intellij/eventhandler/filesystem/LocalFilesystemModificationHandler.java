@@ -1,6 +1,5 @@
 package saros.intellij.eventhandler.filesystem;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -46,6 +45,7 @@ import saros.intellij.eventhandler.IApplicationEventHandler;
 import saros.intellij.eventhandler.editor.document.LocalDocumentModificationHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
 import saros.intellij.project.filesystem.IntelliJPathImpl;
+import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.runtime.FilesystemRunner;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityProducer;
@@ -149,20 +149,18 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
   @Override
   public void initialize() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> session.addActivityProducer(LocalFilesystemModificationHandler.this),
-            ModalityState.defaultModalityState());
+    EDTExecutor.invokeAndWait(
+        () -> session.addActivityProducer(LocalFilesystemModificationHandler.this),
+        ModalityState.defaultModalityState());
 
     setEnabled(true);
   }
 
   @Override
   public void dispose() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> session.removeActivityProducer(LocalFilesystemModificationHandler.this),
-            ModalityState.defaultModalityState());
+    EDTExecutor.invokeAndWait(
+        () -> session.removeActivityProducer(LocalFilesystemModificationHandler.this),
+        ModalityState.defaultModalityState());
 
     disposed = true;
     setEnabled(false);

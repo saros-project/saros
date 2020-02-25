@@ -5,11 +5,15 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.ThrowableComputable;
-import java.util.concurrent.atomic.AtomicReference;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-/** Provides centralized methods for synchronized write and read actions. */
+/**
+ * Provides centralized methods for synchronized write and read actions.
+ *
+ * <p>Write actions are executed on the event dispatcher thread (EDT).
+ *
+ * @see EDTExecutor
+ */
 public class FilesystemRunner {
 
   private static final Application application;
@@ -31,38 +35,12 @@ public class FilesystemRunner {
    *
    * @see Application#runWriteAction(Runnable)
    */
-  @SuppressWarnings("unchecked")
   public static <T, E extends Throwable> T runWriteAction(
-      @NotNull final ThrowableComputable<T, E> computation,
-      @Nullable final ModalityState modalityState)
+      @NotNull ThrowableComputable<T, E> computation, @NotNull ModalityState modalityState)
       throws E {
 
-    final ModalityState chosenModalityState =
-        modalityState != null ? modalityState : ModalityState.defaultModalityState();
-
-    final AtomicReference<T> result = new AtomicReference<>();
-    final AtomicReference<Throwable> throwable = new AtomicReference<>();
-
-    application.invokeAndWait(
-        () -> {
-          try {
-            result.set(application.runWriteAction(computation));
-
-          } catch (Throwable t) {
-            throwable.set(t);
-          }
-        },
-        chosenModalityState);
-
-    final Throwable t = throwable.get();
-
-    if (t == null) return result.get();
-
-    if (t instanceof Error) throw (Error) t;
-
-    if (t instanceof RuntimeException) throw (RuntimeException) t;
-
-    throw (E) t;
+    return EDTExecutor.invokeAndWait(
+        (ThrowableComputable<T, E>) () -> application.runWriteAction(computation), modalityState);
   }
 
   /**
@@ -75,16 +53,13 @@ public class FilesystemRunner {
    * @see Application#runWriteAction(Runnable)
    */
   public static void runWriteAction(
-      @NotNull final Runnable runnable, @Nullable final ModalityState modalityState) {
+      @NotNull Runnable runnable, @NotNull ModalityState modalityState) {
 
-    final ModalityState chosenModalityState =
-        modalityState != null ? modalityState : ModalityState.defaultModalityState();
-
-    application.invokeAndWait(() -> application.runWriteAction(runnable), chosenModalityState);
+    EDTExecutor.invokeAndWait(() -> application.runWriteAction(runnable), modalityState);
   }
 
   /** @see Application#runReadAction(Computable computation) */
-  public static <T> T runReadAction(@NotNull final Computable<T> computation) {
+  public static <T> T runReadAction(@NotNull Computable<T> computation) {
     return application.runReadAction(computation);
   }
 

@@ -6,12 +6,13 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.InputValidator;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.TextRange;
-import java.util.concurrent.atomic.AtomicReference;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.SarosPluginContext;
 import saros.exceptions.IllegalAWTContextException;
+import saros.intellij.runtime.EDTExecutor;
 
 /**
  * Dialog helper used to show messages in safe manner by starting it on the AWT event dispatcher
@@ -71,26 +72,18 @@ public class SafeDialogUtils {
 
     LOG.info("Showing input dialog: " + title + " - " + message + " - " + initialValue);
 
-    final AtomicReference<String> response = new AtomicReference<>();
-
-    application.invokeAndWait(
-        () -> {
-          String option =
-              Messages.showInputDialog(
-                  project,
-                  message,
-                  title,
-                  Messages.getQuestionIcon(),
-                  initialValue,
-                  inputValidator,
-                  selection);
-          if (option != null) {
-            response.set(option);
-          }
-        },
+    return EDTExecutor.invokeAndWait(
+        (Computable<String>)
+            () ->
+                Messages.showInputDialog(
+                    project,
+                    message,
+                    title,
+                    Messages.getQuestionIcon(),
+                    initialValue,
+                    inputValidator,
+                    selection),
         ModalityState.defaultModalityState());
-
-    return response.get();
   }
 
   /**
@@ -133,7 +126,7 @@ public class SafeDialogUtils {
   public static void showInfo(Project project, final String message, final String title) {
     LOG.info("Showing info dialog: " + title + " - " + message);
 
-    application.invokeLater(
+    EDTExecutor.invokeLater(
         () -> Messages.showInfoMessage(project, message, title),
         ModalityState.defaultModalityState());
   }
@@ -148,7 +141,7 @@ public class SafeDialogUtils {
   public static void showError(Project project, final String message, final String title) {
     LOG.info("Showing error dialog: " + title + " - " + message);
 
-    application.invokeLater(
+    EDTExecutor.invokeLater(
         () -> Messages.showErrorDialog(project, message, title),
         ModalityState.defaultModalityState());
   }
@@ -177,20 +170,10 @@ public class SafeDialogUtils {
 
     LOG.info("Showing password dialog: " + title + " - " + message);
 
-    final AtomicReference<String> response = new AtomicReference<>();
-
-    application.invokeAndWait(
-        () -> {
-          String option =
-              Messages.showPasswordDialog(project, message, title, Messages.getQuestionIcon());
-
-          if (option != null) {
-            response.set(option);
-          }
-        },
+    return EDTExecutor.invokeAndWait(
+        (Computable<String>)
+            () -> Messages.showPasswordDialog(project, message, title, Messages.getQuestionIcon()),
         ModalityState.defaultModalityState());
-
-    return response.get();
   }
 
   /**
@@ -217,18 +200,11 @@ public class SafeDialogUtils {
 
     LOG.info("Showing yes/no dialog: " + title + " - " + message);
 
-    final AtomicReference<Integer> response = new AtomicReference<>();
-
-    application.invokeAndWait(
-        () -> {
-          Integer option =
-              Messages.showYesNoDialog(project, message, title, Messages.getQuestionIcon());
-
-          response.set(option);
-        },
-        ModalityState.defaultModalityState());
-
-    Integer result = response.get();
+    Integer result =
+        EDTExecutor.invokeAndWait(
+            (Computable<Integer>)
+                () -> Messages.showYesNoDialog(project, message, title, Messages.getQuestionIcon()),
+            ModalityState.defaultModalityState());
 
     switch (result) {
       case Messages.YES:
@@ -260,7 +236,7 @@ public class SafeDialogUtils {
 
     LOG.info("Showing non-blocking yes/no dialog: " + title + " - " + message);
 
-    application.invokeLater(
+    EDTExecutor.invokeLater(
         () -> {
           int option =
               Messages.showYesNoDialog(project, message, title, Messages.getQuestionIcon());

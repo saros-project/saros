@@ -6,9 +6,9 @@ import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.application.ApplicationManager;
 import org.apache.log4j.Logger;
 import saros.SarosPluginContext;
+import saros.intellij.runtime.EDTExecutor;
 import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Class uses Intellij API to show notifications */
@@ -54,8 +54,8 @@ public class NotificationPanel {
           final Notification notification =
               GROUP_DISPLAY_ID_INFO.createNotification(
                   title, message, notificationType, URL_OPENING_LISTENER);
-          ApplicationManager.getApplication()
-              .invokeLater(() -> Notifications.Bus.notify(notification, project));
+
+          EDTExecutor.invokeLater(() -> Notifications.Bus.notify(notification, project));
         });
   }
 

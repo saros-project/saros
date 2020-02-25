@@ -1,6 +1,5 @@
 package saros.intellij.project;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,6 +21,7 @@ import saros.intellij.editor.SelectedEditorStateSnapshot;
 import saros.intellij.editor.SelectedEditorStateSnapshotFactory;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.eventhandler.IApplicationEventHandler.ApplicationEventHandlerType;
+import saros.intellij.runtime.EDTExecutor;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
@@ -46,18 +46,15 @@ public class SharedResourcesManager implements Startable {
 
   @Override
   public void start() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> sarosSession.addActivityConsumer(consumer, Priority.ACTIVE),
-            ModalityState.defaultModalityState());
+    EDTExecutor.invokeAndWait(
+        () -> sarosSession.addActivityConsumer(consumer, Priority.ACTIVE),
+        ModalityState.defaultModalityState());
   }
 
   @Override
   public void stop() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> sarosSession.removeActivityConsumer(consumer),
-            ModalityState.defaultModalityState());
+    EDTExecutor.invokeAndWait(
+        () -> sarosSession.removeActivityConsumer(consumer), ModalityState.defaultModalityState());
   }
 
   public SharedResourcesManager(

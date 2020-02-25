@@ -1,6 +1,5 @@
 package saros.intellij.editor;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -43,6 +42,7 @@ import saros.intellij.eventhandler.IProjectEventHandler.ProjectEventHandlerType;
 import saros.intellij.eventhandler.editor.editorstate.ViewportAdjustmentExecutor;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.filesystem.VirtualFileConverter;
+import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.runtime.FilesystemRunner;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.AbstractActivityConsumer;
@@ -892,8 +892,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   private void executeInUIThreadSynchronous(Runnable runnable) {
-    ApplicationManager.getApplication()
-        .invokeAndWait(runnable, ModalityState.defaultModalityState());
+    EDTExecutor.invokeAndWait(runnable, ModalityState.defaultModalityState());
   }
 
   @Override
