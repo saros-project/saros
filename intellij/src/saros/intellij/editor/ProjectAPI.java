@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.runtime.FilesystemRunner;
 
 /** Static utility class for interacting with the project-level Intellij editor API. */
@@ -55,10 +56,13 @@ public class ProjectAPI {
    */
   public static Editor openEditor(
       @NotNull Project project, @NotNull VirtualFile virtualFile, final boolean activate) {
-    return FilesystemRunner.runReadAction(
+
+    FileEditorManager fileEditorManager = getFileEditorManager(project);
+
+    return EDTExecutor.invokeAndWait(
         () ->
-            getFileEditorManager(project)
-                .openTextEditor(new OpenFileDescriptor(project, virtualFile), activate));
+            fileEditorManager.openTextEditor(
+                new OpenFileDescriptor(project, virtualFile), activate));
   }
 
   /**
@@ -68,7 +72,9 @@ public class ProjectAPI {
    * @param virtualFile the file whose editor to close
    */
   public static void closeEditor(@NotNull Project project, @NotNull final VirtualFile virtualFile) {
-    FilesystemRunner.runReadAction(() -> getFileEditorManager(project).closeFile(virtualFile));
+    FileEditorManager fileEditorManager = getFileEditorManager(project);
+
+    EDTExecutor.invokeAndWait(() -> fileEditorManager.closeFile(virtualFile));
   }
 
   /**
@@ -89,7 +95,9 @@ public class ProjectAPI {
    * @return the currently selected editor
    */
   public static Editor getActiveEditor(@NotNull Project project) {
-    return getFileEditorManager(project).getSelectedTextEditor();
+    FileEditorManager fileEditorManager = getFileEditorManager(project);
+
+    return EDTExecutor.invokeAndWait(fileEditorManager::getSelectedTextEditor);
   }
 
   /**
