@@ -20,7 +20,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.security,
  org.junit;resolution:=optional,
  org.eclipse.jdt.launching;resolution:=optional,
- org.eclipse.core.net;resolution:=optional,
  saros.core
 Bundle-ActivationPolicy: lazy
 Export-Package: saros;
@@ -130,5 +129,4 @@ Export-Package: saros;
  saros.util;uses:="org.eclipse.core.resources,org.jivesoftware.smack.packet"
 Bundle-Vendor: Saros Project
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: org.eclipse.core.filesystem,
- org.eclipse.core.net.proxy
+Import-Package: org.eclipse.core.filesystem

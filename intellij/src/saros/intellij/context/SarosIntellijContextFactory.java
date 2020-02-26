@@ -1,8 +1,6 @@
 package saros.intellij.context;
 
 import java.util.Arrays;
-import saros.communication.connection.IProxyResolver;
-import saros.communication.connection.NullProxyResolver;
 import saros.context.AbstractContextFactory;
 import saros.context.IContextKeyBindings;
 import saros.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
@@ -71,9 +69,6 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
       // IDE-specific classes for the HTML GUI
       Component.create(ICollaborationUtils.class, IntellijCollaborationUtilsImpl.class),
       Component.create(IWorkspaceRoot.class, IntelliJWorkspaceRootImpl.class),
-
-      // Proxy Support for the XMPP server connection
-      Component.create(IProxyResolver.class, NullProxyResolver.class),
     };
   }
 
