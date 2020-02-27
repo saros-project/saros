@@ -3,10 +3,9 @@ package saros.net.internal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -42,8 +41,8 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
 
   private final DispatchThreadContext dispatchThreadContext;
 
-  private final Map<PacketListener, PacketFilter> listeners =
-      Collections.synchronizedMap(new HashMap<PacketListener, PacketFilter>());
+  private final ConcurrentMap<PacketListener, PacketFilter> packetListeners =
+      new ConcurrentHashMap<>();
 
   private final CopyOnWriteArrayList<ITransferListener> transferListeners =
       new CopyOnWriteArrayList<>();
@@ -89,13 +88,11 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
     this.parser = new MXParser();
 
     connectionService.addListener(connectionListener);
-    dataTransferManager.addConnectionListener(
-        new IByteStreamConnectionListener() {
+
+    dataTransferManager.addPacketConnectionListener(
+        new IPacketConnectionListener() {
           @Override
-          public void connectionChanged(
-              final String connectionId,
-              final IByteStreamConnection connection,
-              final boolean incomingRequest) {
+          public void connectionEstablished(final IPacketConnection connection) {
             connection.setBinaryXMPPExtensionReceiver(XMPPReceiver.this);
           }
         });
@@ -103,12 +100,12 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
 
   @Override
   public void addPacketListener(PacketListener listener, PacketFilter filter) {
-    listeners.put(listener, filter);
+    packetListeners.put(listener, filter);
   }
 
   @Override
   public void removePacketListener(PacketListener listener) {
-    listeners.remove(listener);
+    packetListeners.remove(listener);
   }
 
   @Override
@@ -179,12 +176,8 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
    * @sarosThread must be called from the Dispatch Thread
    */
   private void forwardPacket(Packet packet) {
-    Map<PacketListener, PacketFilter> copy;
 
-    synchronized (listeners) {
-      copy = new HashMap<PacketListener, PacketFilter>(listeners);
-    }
-    for (Entry<PacketListener, PacketFilter> entry : copy.entrySet()) {
+    for (Entry<PacketListener, PacketFilter> entry : packetListeners.entrySet()) {
       PacketListener listener = entry.getKey();
       PacketFilter filter = entry.getValue();
 
@@ -248,6 +241,7 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
     String namespace = description.getNamespace();
     // IQ provider?
 
+    // FIXME to make this method general purpose we have to manage our own provider space
     PacketExtensionProvider provider =
         (PacketExtensionProvider)
             ProviderManager.getInstance().getExtensionProvider(name, namespace);

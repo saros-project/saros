@@ -47,6 +47,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
   private static final Logger log = Logger.getLogger(XMPPTransmitter.class);
 
+  private static final String DEFAULT_CONNECTION_ID = "default";
+
   /** size in bytes that a packet extension must exceed to be compressed */
   private static final int PACKET_EXTENSION_COMPRESS_THRESHOLD =
       Integer.getInteger("saros.net.transmitter.PACKET_EXTENSION_COMPRESS_THRESHOLD", 32);
@@ -76,20 +78,26 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
   }
 
   @Override
-  public void send(String connectionID, JID recipient, PacketExtension extension)
+  public void send(final String connectionID, final JID recipient, final PacketExtension extension)
       throws IOException {
 
     final JID currentLocalJid = localJid;
 
     if (currentLocalJid == null) throw new IOException("not connected to a XMPP server");
 
-    IByteStreamConnection connection = dataManager.getConnection(connectionID, recipient);
+    final String connectionIdToUse = connectionID == null ? DEFAULT_CONNECTION_ID : connectionID;
+
+    IPacketConnection connection = dataManager.getPacketConnection(connectionIdToUse, recipient);
 
     if (connectionID != null && connection == null)
       throw new IOException(
           "not connected to " + recipient + " [connection identifier=" + connectionID + "]");
 
-    if (connection == null) connection = dataManager.connect(recipient);
+    if (connection == null) {
+      log.warn("using default connection id - possibility reconnecting");
+      dataManager.connect(connectionIdToUse, recipient);
+      connection = dataManager.getPacketConnection(connectionIdToUse, recipient);
+    }
 
     /*
      * The TransferDescription can be created out of the session, the name
@@ -189,12 +197,12 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
   }
 
   private void sendPacketExtension(
-      final IByteStreamConnection connection, final TransferDescription description, byte[] payload)
+      final IPacketConnection connection, final TransferDescription description, byte[] payload)
       throws IOException {
 
     boolean sendPacket = true;
 
-    final String connectionId = connection.getConnectionID();
+    final String connectionId = connection.getId();
     for (IPacketInterceptor packetInterceptor : packetInterceptors)
       sendPacket &= packetInterceptor.sendPacket(connectionId, description, payload);
 

@@ -16,4 +16,12 @@ public interface ByteStream {
   public int getReadTimeout() throws IOException;
 
   public void setReadTimeout(int timeout) throws IOException;
+
+  public Object getLocalAddress();
+
+  public Object getRemoteAddress();
+
+  public StreamMode getMode();
+
+  public String getId();
 }

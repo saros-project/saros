@@ -1,12 +1,26 @@
 package saros.net;
 
 import java.io.IOException;
-import saros.net.internal.IByteStreamConnection;
 import saros.net.stream.StreamMode;
-import saros.net.xmpp.JID;
 
-// TODO Javadoc
-
+/**
+ * The connection manager is responsible for establishing connections to remote addresses.
+ *
+ * <p>It offers support for two connection types.
+ *
+ * <ol>
+ *   <li>Establishing a connection using {@link #connect(String, Object)} to establish a connection
+ *       which is needed in conjunction with the {@link ITransmitter transmitter} and {@link
+ *       IReceiver receiver} in order to send and receive related packages.
+ *   <li>Establishing a connection using {@link #connectStream(String, Object)} to establish a
+ *       {@link IStreamConnection connection} that can be used for custom purposes. In order to get
+ *       notified about such a connection on the remote side you have to install a {@link
+ *       IStreamConnectionListener}.
+ * </ol>
+ *
+ * <p><b>Note</b>: Stream connections must be closed by calling {@link IStreamConnection#close()
+ * close} on the given connection.
+ */
 public interface IConnectionManager {
 
   public static final int IBB_SERVICE = 1;
@@ -21,24 +35,40 @@ public interface IConnectionManager {
    */
   public void setServices(int serviceMask);
 
-  /** @deprecated */
-  @Deprecated
-  public IByteStreamConnection connect(JID peer) throws IOException;
+  public void addStreamConnectionListener(final IStreamConnectionListener listener);
 
-  public IByteStreamConnection connect(String connectionID, JID peer) throws IOException;
+  public void removeStreamConnectionListener(final IStreamConnectionListener listener);
 
   /**
-   * @deprecated Disconnects {@link IByteStreamConnection} with the specified peer
-   * @param peer {@link JID} of the peer to disconnect the {@link IByteStreamConnection}
+   * Connects to the given address using the given stream ID.
+   *
+   * @param id the ID of the stream
+   * @param address the remote address to connect to
+   * @return the stream connection
+   * @throws IOException if an I/O error occurs or such a stream already exists
    */
-  @Deprecated
-  public boolean closeConnection(JID peer);
+  public IStreamConnection connectStream(String id, Object address) throws IOException;
 
-  public boolean closeConnection(String connectionIdentifier, JID peer);
+  /**
+   * Connects to the given address using the given ID.
+   *
+   * @param id
+   * @param address
+   * @throws IOException if an I/O error occurs
+   */
+  public void connect(String id, Object address) throws IOException;
 
-  /** @deprecated */
-  @Deprecated
-  public StreamMode getTransferMode(JID jid);
+  /**
+   * Closes the given connection.
+   *
+   * @param id the ID of the connection
+   * @param address the remote address
+   * @return <code>true</code> if the connection was closed, <code>false</code> if no such
+   *     connection exists
+   */
+  // TODO rename to close
+  public boolean closeConnection(String id, Object address);
 
-  public StreamMode getTransferMode(String connectionID, JID jid);
+  // TODO RENAME
+  public StreamMode getTransferMode(String connectionID, Object address);
 }

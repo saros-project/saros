@@ -15,7 +15,8 @@ import saros.activities.IActivity;
 import saros.activities.NOPActivity;
 import saros.net.IPacketInterceptor;
 import saros.net.internal.BinaryXMPPExtension;
-import saros.net.internal.IByteStreamConnection;
+import saros.net.internal.IConnection;
+import saros.net.internal.IPacketConnection;
 import saros.net.internal.TransferDescription;
 import saros.net.internal.XMPPReceiver;
 import saros.net.xmpp.JID;
@@ -317,10 +318,10 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
       return;
     }
 
-    IByteStreamConnection connection =
-        getDataTransferManager().getConnection(ISarosSession.SESSION_CONNECTION_ID, jid);
+    IConnection connection =
+        getDataTransferManager().getPacketConnection(ISarosSession.SESSION_CONNECTION_ID, jid);
 
-    while (!pendingOutgoingPackets.isEmpty()) {
+    while (!pendingOutgoingPackets.isEmpty() && connection instanceof IPacketConnection) {
       try {
         OutgoingPacketHolder holder = pendingOutgoingPackets.remove();
 
@@ -330,7 +331,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
                 + ", payload length: "
                 + holder.payload.length);
 
-        connection.send(holder.description, holder.payload);
+        ((IPacketConnection) connection).send(holder.description, holder.payload);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }

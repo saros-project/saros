@@ -30,9 +30,24 @@ public class BinaryChannelConnectionTest {
     private InputStream in;
     private OutputStream out;
 
-    public PipedBytestreamSession(PipedInputStream in, PipedOutputStream out) {
+    private JID local;
+    private JID remote;
+    private String id;
+    private StreamMode mode;
+
+    public PipedBytestreamSession(
+        PipedInputStream in,
+        PipedOutputStream out,
+        JID local,
+        JID remote,
+        String id,
+        StreamMode mode) {
       this.in = in;
       this.out = out;
+      this.local = local;
+      this.remote = remote;
+      this.id = id;
+      this.mode = mode;
     }
 
     @Override
@@ -60,20 +75,25 @@ public class BinaryChannelConnectionTest {
     public void setReadTimeout(int timeout) throws IOException {
       // NOP
     }
-  }
-
-  private static class StreamConnectionListener implements IByteStreamConnectionListener {
 
     @Override
-    public void connectionClosed(String connectionIdentifier, IByteStreamConnection connection) {
-      // NOP
-
+    public Object getLocalAddress() {
+      return local;
     }
 
     @Override
-    public void connectionChanged(
-        String connectionIdentifier, IByteStreamConnection connection, boolean incomingRequest) {
-      // NOP
+    public Object getRemoteAddress() {
+      return remote;
+    }
+
+    @Override
+    public StreamMode getMode() {
+      return mode;
+    }
+
+    @Override
+    public String getId() {
+      return id;
     }
   }
 
@@ -95,8 +115,12 @@ public class BinaryChannelConnectionTest {
     aliceOut.connect(bobIn);
     aliceIn.connect(bobOut);
 
-    aliceStream = new PipedBytestreamSession(aliceIn, aliceOut);
-    bobStream = new PipedBytestreamSession(bobIn, bobOut);
+    aliceStream =
+        new PipedBytestreamSession(
+            aliceIn, aliceOut, aliceJID, bobJID, "junit", StreamMode.SOCKS5_DIRECT);
+    bobStream =
+        new PipedBytestreamSession(
+            bobIn, bobOut, bobJID, aliceJID, "junit", StreamMode.SOCKS5_DIRECT);
   }
 
   private volatile byte[] receivedBytes;
@@ -108,23 +132,9 @@ public class BinaryChannelConnectionTest {
 
     final CountDownLatch received = new CountDownLatch(2);
 
-    BinaryChannelConnection alice =
-        new BinaryChannelConnection(
-            aliceJID,
-            bobJID,
-            "junit",
-            aliceStream,
-            StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener());
+    BinaryChannelConnection alice = new BinaryChannelConnection(aliceStream, null);
 
-    BinaryChannelConnection bob =
-        new BinaryChannelConnection(
-            bobJID,
-            aliceJID,
-            "junit",
-            bobStream,
-            StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener());
+    BinaryChannelConnection bob = new BinaryChannelConnection(bobStream, null);
 
     bob.setBinaryXMPPExtensionReceiver(
         (e) -> {
@@ -184,23 +194,9 @@ public class BinaryChannelConnectionTest {
 
     final CountDownLatch received = new CountDownLatch(1);
 
-    BinaryChannelConnection alice =
-        new BinaryChannelConnection(
-            aliceJID,
-            bobJID,
-            "junit",
-            aliceStream,
-            StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener());
+    BinaryChannelConnection alice = new BinaryChannelConnection(aliceStream, null);
 
-    BinaryChannelConnection bob =
-        new BinaryChannelConnection(
-            bobJID,
-            aliceJID,
-            "junit",
-            bobStream,
-            StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener());
+    BinaryChannelConnection bob = new BinaryChannelConnection(bobStream, null);
 
     bob.setBinaryXMPPExtensionReceiver(
         (e) -> {
@@ -249,23 +245,9 @@ public class BinaryChannelConnectionTest {
 
     final CountDownLatch received = new CountDownLatch((int) packetsToSend);
 
-    BinaryChannelConnection alice =
-        new BinaryChannelConnection(
-            aliceJID,
-            bobJID,
-            "junit",
-            aliceStream,
-            StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener());
+    BinaryChannelConnection alice = new BinaryChannelConnection(aliceStream, null);
 
-    BinaryChannelConnection bob =
-        new BinaryChannelConnection(
-            bobJID,
-            aliceJID,
-            "junit",
-            bobStream,
-            StreamMode.SOCKS5_DIRECT,
-            new StreamConnectionListener());
+    BinaryChannelConnection bob = new BinaryChannelConnection(bobStream, null);
 
     bob.setBinaryXMPPExtensionReceiver(
         (e) -> {

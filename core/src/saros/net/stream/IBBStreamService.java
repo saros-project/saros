@@ -9,9 +9,6 @@ import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.ibb.InBandBytestreamManager;
-import saros.net.internal.BinaryChannelConnection;
-import saros.net.internal.IByteStreamConnection;
-import saros.net.internal.IByteStreamConnectionListener;
 import saros.net.xmpp.JID;
 
 /**
@@ -24,7 +21,8 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
   private static final Logger LOG = Logger.getLogger(IBBStreamService.class);
 
   private volatile InBandBytestreamManager manager;
-  private volatile IByteStreamConnectionListener connectionListener;
+  private volatile IStreamServiceListener connectionListener;
+
   private JID localAddress;
 
   public IBBStreamService() {
@@ -32,7 +30,7 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
   }
 
   @Override
-  public IByteStreamConnection connect(String connectionID, JID remoteAddress)
+  public ByteStream connect(String connectionID, JID remoteAddress)
       throws IOException, InterruptedException {
 
     if (connectionID == null) throw new NullPointerException("connectionID is null");
@@ -49,7 +47,7 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
     LOG.debug("establishing IBB bytestream to: " + remoteAddress);
 
     final BytestreamManager currentManager = manager;
-    final IByteStreamConnectionListener currentConnectionListener = connectionListener;
+    final IStreamServiceListener currentConnectionListener = connectionListener;
 
     if (currentManager == null || currentConnectionListener == null)
       throw new IOException(this + " is not initialized");
@@ -62,18 +60,12 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
       throw new IOException(e);
     }
 
-    return new BinaryChannelConnection(
-        localAddress,
-        remoteAddress,
-        connectionID,
-        new XMPPByteStreamAdapter(session),
-        StreamMode.IBB,
-        currentConnectionListener);
+    return new XMPPByteStreamAdapter(
+        localAddress, remoteAddress, session, connectionID, StreamMode.IBB);
   }
 
   @Override
-  public synchronized void initialize(
-      Connection connection, IByteStreamConnectionListener listener) {
+  public synchronized void initialize(Connection connection, IStreamServiceListener listener) {
     localAddress = new JID(connection.getUser());
     connectionListener = listener;
     manager = InBandBytestreamManager.getByteStreamManager(connection);
@@ -96,11 +88,12 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
 
     LOG.debug("accepting IBB bytestream from: " + request.getFrom());
 
-    final IByteStreamConnectionListener currentConnectionListener = connectionListener;
+    final IStreamServiceListener currentConnectionListener = connectionListener;
 
     if (currentConnectionListener == null) {
       LOG.warn(this + " is not initialized, rejecting connection...");
       request.reject();
+      return;
     }
 
     final BytestreamSession session;
@@ -120,28 +113,15 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
       return;
     }
 
-    final IByteStreamConnection connection;
+    final ByteStream byteStream =
+        new XMPPByteStreamAdapter(
+            localAddress,
+            new JID(request.getFrom()),
+            session,
+            request.getSessionID(),
+            StreamMode.IBB);
 
-    try {
-      connection =
-          new BinaryChannelConnection(
-              localAddress,
-              new JID(request.getFrom()),
-              request.getSessionID(),
-              new XMPPByteStreamAdapter(session),
-              StreamMode.IBB,
-              connectionListener);
-    } catch (IOException e) {
-      LOG.error("failed to initialize connection for IBB stream", e);
-      try {
-        session.close();
-      } catch (IOException ignore) {
-        LOG.error(ignore);
-      }
-      return;
-    }
-
-    connectionListener.connectionChanged(request.getSessionID(), connection, true);
+    currentConnectionListener.connectionEstablished(byteStream);
   }
 
   // ***************** BytestreamListener interface impl end
