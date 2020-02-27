@@ -57,14 +57,15 @@ class StfTest extends Test {
             failedTests.each { logger.lifecycle(it) }
         }
     }
+
+    this.include('**/stf/test/**/*Test.*')
+    this.exclude('**/stf/test/stf/**')
   }
 }
 
 task stfTest (type: StfTest, dependsOn: [':saros.eclipse:build']) {
     testClassesDirs = sourceSets.stfTest.output.classesDirs
     classpath = sourceSets.stfTest.runtimeClasspath
-    include '**/stf/test/**/*Test.*'
-    exclude '**/stf/test/stf/**'
 
     useJUnit {
         excludeCategories 'saros.stf.test.categories.FlakyTests', 'saros.stf.test.categories.FailingTests'
@@ -75,7 +76,7 @@ task stfFlakyAndFailingTest (type: StfTest, dependsOn: [':saros.eclipse:build'])
     testClassesDirs = sourceSets.stfFlakyAndFailingTest.output.classesDirs
     classpath = sourceSets.stfFlakyAndFailingTest.runtimeClasspath
     ignoreFailures = true
-    include '**/stf/test/**/*Test.*'
+    
     useJUnit {
         includeCategories 'saros.stf.test.categories.FlakyTests', 'saros.stf.test.categories.FailingTests'
     }
