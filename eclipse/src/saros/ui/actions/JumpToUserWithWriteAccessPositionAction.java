@@ -1,12 +1,8 @@
 package saros.ui.actions;
 
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
@@ -17,27 +13,17 @@ import saros.ui.ImageManager;
 import saros.ui.Messages;
 import saros.ui.util.selection.SelectionUtils;
 import saros.ui.util.selection.retriever.SelectionRetrieverFactory;
-import saros.util.ThreadUtils;
 
-/** Action which triggers the viewport of the local user to be changed to a local user's one. */
 @Component(module = "action")
 public class JumpToUserWithWriteAccessPositionAction extends Action implements Disposable {
 
   public static final String ACTION_ID = JumpToUserWithWriteAccessPositionAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(JumpToUserWithWriteAccessPositionAction.class);
+  @Inject private ISarosSessionManager sessionManager;
 
-  protected ISelectionListener selectionListener =
-      new ISelectionListener() {
-        @Override
-        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-          updateEnablement();
-        }
-      };
+  @Inject private EditorManager editorManager;
 
-  @Inject protected ISarosSessionManager sessionManager;
-
-  @Inject protected EditorManager editorManager;
+  private final ISelectionListener selectionListener = (part, selection) -> updateEnablement();
 
   public JumpToUserWithWriteAccessPositionAction() {
     super(Messages.JumpToUserWithWriteAccessPositionAction_title);
@@ -52,43 +38,32 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements D
     updateEnablement();
   }
 
-  public void updateEnablement() {
-    try {
-      List<User> participants =
-          SelectionRetrieverFactory.getSelectionRetriever(User.class).getSelection();
-      setEnabled(
-          sessionManager.getSession() != null
-              && participants.size() == 1
-              && !participants.get(0).equals(sessionManager.getSession().getLocalUser()));
-    } catch (NullPointerException e) {
-      this.setEnabled(false);
-    } catch (Exception e) {
-      if (!PlatformUI.getWorkbench().isClosing())
-        LOG.error("Unexpected error while updating enablement", e); // $NON-NLS-1$
-    }
+  private void updateEnablement() {
+    setEnabled(getTarget() != null);
   }
 
-  /** @review runSafe OK */
   @Override
   public void run() {
-    ThreadUtils.runSafeSync(
-        LOG,
-        new Runnable() {
-          @Override
-          public void run() {
-            List<User> participants =
-                SelectionRetrieverFactory.getSelectionRetriever(User.class).getSelection();
-            if (participants.size() == 1) {
-              editorManager.jumpToUser(participants.get(0));
-            } else {
-              LOG.warn("More than one participant selected."); // $NON-NLS-1$
-            }
-          }
-        });
+
+    final User target = getTarget();
+
+    if (target == null) return;
+
+    editorManager.jumpToUser(target);
   }
 
   @Override
   public void dispose() {
     SelectionUtils.getSelectionService().removeSelectionListener(selectionListener);
+  }
+
+  private User getTarget() {
+    final List<User> users =
+        SelectionRetrieverFactory.getSelectionRetriever(User.class).getSelection();
+
+    if (users.size() == 1 && !users.get(0).isLocal() && sessionManager.getSession() != null)
+      return users.get(0);
+
+    return null;
   }
 }
