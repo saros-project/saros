@@ -4,7 +4,6 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import saros.communication.connection.IProxyResolver;
 import saros.context.CoreContextFactory;
 import saros.context.IContainerContext;
 import saros.context.IContextFactory;
@@ -32,7 +31,6 @@ public class SarosCoreContextFactoryTest {
     // mock dependencies normally provided by the surrounding system (e.g.
     // an IDE plugin)
     Class<?>[] dependencies = {
-      IProxyResolver.class,
       IRemoteProgressIndicatorFactory.class,
       IContainerContext.class,
       Preferences.class,

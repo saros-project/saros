@@ -474,7 +474,6 @@ These are features that are part of the functionality provided by Saros/E but ar
 
 - Partial sharing
 - Saros help entry in menu-bar
-- Whiteboard
 - Chat
 
 ## Known Bugs

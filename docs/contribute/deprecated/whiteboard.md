@@ -1,10 +1,16 @@
 ---
-title: Saros HTML Whiteboard
+title: Saros Whiteboard (deprecated)
 ---
 
-The Saros Whiteboard was designed to enable Saros users to communicate ideas graphically.
+The Saros Whiteboard was designed to enable Saros users to communicate ideas graphically
+via a synchronized sketching tool. The first implementation was based on the Saros/E plugin.
+In order to provide an approach that can be re-used in Saros/I we developed an HTML-GUI version
+of the whiteboard.
+However, the HTML Whiteboard was not deliverable, because of the reasons described in [HTML-GUI](html-gui.md).
 
-## Developing the Whiteboard
+The last commit that contains both whiteboard approaches is [`e257a06164dce14041d3cf3536329090e2faa2c1`](https://github.com/saros-project/saros/commit/e257a06164dce14041d3cf3536329090e2faa2c1).
+
+## Developing the HTML Whiteboard
 
 ### Setup
 First of all, the view has to be un-commented from `saros.whiteboard/plugin.xml`, the view has the following id: `saros.whiteboard.ui.HTMLWhiteboardView`.

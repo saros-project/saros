@@ -13,8 +13,8 @@
     {% assign link_id = (link.title | strip | replace:'/','-' | replace:' ','-') %}
     <li class="nav-item">
 
-        {% for sublink in link.sublinks %}
         {% assign collapse_state = '' %}
+        {% for sublink in link.sublinks %}
         {% if page.url contains sublink.url %}
         {% assign collapse_state = 'show' %}
         {% endif %}

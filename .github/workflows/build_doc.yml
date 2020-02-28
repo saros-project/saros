@@ -1,0 +1,30 @@
+# Has to be the same name as in build in order to require the same check in GitHub
+name: Build
+
+on:
+  push:
+    paths:
+    - 'docs/**'
+  pull_request:
+    paths:
+    - 'docs/**'
+
+jobs:
+
+  formatter:
+    runs-on: ubuntu-latest
+    steps:
+      # NOP job needed to also have a formatter stage for doc builds
+      - name: NOP
+        run: echo "NOP"
+        shell: 'bash'
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Building jekyll documentation
+        uses: agentd00nut/jekyll-build-optional-deploy-gh-pages@v1
+        env:
+          JEKYLL_ROOT: "docs/"
+          DEPLOY_SITE: "false"

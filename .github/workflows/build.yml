@@ -1,3 +1,4 @@
+# Has to be the same name as in build_doc in order to require the same check in GitHub
 name: Build
 
 on:
@@ -12,7 +13,6 @@ jobs:
 
   formatter:
     runs-on: ubuntu-latest
-    name: Check java format
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -45,6 +45,7 @@ jobs:
 
     # Uncomment <depends> entries in order to make Saros/I installable in all JetBrains IDEs
     - name: Prepare Saros/I plugin.xml
+      if: github.ref == 'refs/heads/master'
       run: |
         sed -i 's/<!--depends/<depends/g' intellij/resources/META-INF/plugin.xml
         sed -i 's/depends-->/depends>/g' intellij/resources/META-INF/plugin.xml
@@ -54,6 +55,7 @@ jobs:
       run: |
         ./gradlew \
           -PskipTestSuites=true \
+          -PuseBuildScan=true \
           -PaggregateTestResults=true \
           -PversionQualifier=DEV-$SHORT_SHA \
           -DmaxParallelForks=4 \

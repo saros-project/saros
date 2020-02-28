@@ -8,8 +8,6 @@ import org.osgi.service.prefs.Preferences;
 import saros.awareness.AwarenessInformationCollector;
 import saros.communication.SkypeManager;
 import saros.communication.chat.muc.negotiation.MUCNegotiationManager;
-import saros.communication.connection.IProxyResolver;
-import saros.communication.connection.Socks5ProxyResolver;
 import saros.context.AbstractContextFactory;
 import saros.context.IContextKeyBindings;
 import saros.editor.EditorManager;
@@ -98,9 +96,6 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
 
       // SWT EDT support
       Component.create(UISynchronizer.class, EclipseSWTSynchronizer.class),
-
-      // Proxy Support for the XMPP server connection
-      Component.create(IProxyResolver.class, Socks5ProxyResolver.class),
 
       // Remote progress indication
       Component.create(
