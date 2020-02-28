@@ -59,7 +59,7 @@ function aggregate_test_results {
     cp -r "stf.test/build/reports/tests" "$result_dir/reports"
     cp "$ws_dir"/*.log "$result_dir/"
 
-    for ws in `ls -1 $ws_dir`; do
+    for ws in $(ls -1 "$ws_dir" | grep "workspace_" ) ; do
       user_name=$(echo $ws | awk -F_ '{print tolower($2)}') # workspace_ALICE -> alice
       echo "::Copy test results of $user_name"
       user_result_dir="$result_dir/$user_name"
