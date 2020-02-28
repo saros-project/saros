@@ -14,7 +14,7 @@ import saros.concurrent.jupiter.internal.text.DeleteOperation;
 import saros.concurrent.jupiter.internal.text.ITextOperation;
 import saros.editor.IEditorManager;
 import saros.editor.text.LineRange;
-import saros.editor.text.TextSelection;
+import saros.editor.text.OldTextSelection;
 import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.IntelliJProjectImpl;
@@ -216,9 +216,9 @@ public class LocalEditorManipulator {
    *     null</code>
    * @param selection text selection of the followed user; can be <code>null</code> if range is not
    *     <code>null</code>
-   * @see IEditorManager#adjustViewport(SPath, LineRange, TextSelection)
+   * @see IEditorManager#adjustViewport(SPath, LineRange, OldTextSelection)
    */
-  public void adjustViewport(@NotNull Editor editor, LineRange range, TextSelection selection) {
+  public void adjustViewport(@NotNull Editor editor, LineRange range, OldTextSelection selection) {
     if (selection == null && range == null) {
       VirtualFile file = DocumentAPI.getVirtualFile(editor.getDocument());
 

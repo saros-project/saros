@@ -3,7 +3,7 @@ package saros.editor;
 import java.util.Set;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
-import saros.editor.text.TextSelection;
+import saros.editor.text.OldTextSelection;
 import saros.filesystem.IProject;
 import saros.session.User;
 
@@ -77,7 +77,7 @@ public interface IEditorManager {
    * @param range viewport of the followed user. Can be <code>null</code>.
    * @param selection text selection of the followed user. Can be <code>null</code>.
    */
-  void adjustViewport(SPath path, LineRange range, TextSelection selection);
+  void adjustViewport(SPath path, LineRange range, OldTextSelection selection);
 
   /**
    * Locally opens the editor that the User {@code target} has currently open, adjusts the viewport,

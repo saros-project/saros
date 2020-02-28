@@ -36,7 +36,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
-import saros.editor.text.TextSelection;
+import saros.editor.text.OldTextSelection;
 import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.ui.dialogs.WarningMessageDialog;
@@ -271,24 +271,24 @@ public class EditorAPI {
    * Returns the current text selection for given editor.
    *
    * @param editorPart the editorPart for which to get the text selection.
-   * @return the current text selection. Returns {@link TextSelection#emptySelection()} if no text
-   *     selection exists.
+   * @return the current text selection. Returns {@link OldTextSelection#emptySelection()} if no
+   *     text selection exists.
    */
-  public static TextSelection getSelection(IEditorPart editorPart) {
+  public static OldTextSelection getOldSelection(IEditorPart editorPart) {
     if (!(editorPart instanceof ITextEditor)) {
-      return TextSelection.emptySelection();
+      return OldTextSelection.emptySelection();
     }
 
     ITextEditor textEditor = (ITextEditor) editorPart;
     ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
 
     if (selectionProvider == null) {
-      return TextSelection.emptySelection();
+      return OldTextSelection.emptySelection();
     }
 
     ITextSelection jfaceSelection = (ITextSelection) selectionProvider.getSelection();
 
-    return new TextSelection(jfaceSelection.getOffset(), jfaceSelection.getLength());
+    return new OldTextSelection(jfaceSelection.getOffset(), jfaceSelection.getLength());
   }
 
   /** Enables/disables the ability to edit the document in given editor. */

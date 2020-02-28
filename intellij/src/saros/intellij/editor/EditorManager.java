@@ -33,7 +33,7 @@ import saros.editor.SharedEditorListenerDispatch;
 import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
-import saros.editor.text.TextSelection;
+import saros.editor.text.OldTextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.intellij.context.SharedIDEContext;
@@ -823,7 +823,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           }
 
           LineRange viewport = remoteActiveEditor.getViewport();
-          TextSelection textSelection = remoteActiveEditor.getSelection();
+          OldTextSelection textSelection = remoteActiveEditor.getSelection();
 
           localEditorManipulator.adjustViewport(newEditor, viewport, textSelection);
         });
@@ -939,11 +939,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @param path {@inheritDoc}
    * @param range {@inheritDoc}
    * @param selection {@inheritDoc}
-   * @see LocalEditorManipulator#adjustViewport(Editor, LineRange, TextSelection)
+   * @see LocalEditorManipulator#adjustViewport(Editor, LineRange, OldTextSelection)
    */
   @Override
   public void adjustViewport(
-      @NotNull final SPath path, final LineRange range, final TextSelection selection) {
+      @NotNull final SPath path, final LineRange range, final OldTextSelection selection) {
 
     Set<String> visibleFilePaths = new HashSet<>();
 

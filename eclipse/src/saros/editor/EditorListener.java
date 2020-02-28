@@ -20,6 +20,7 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.ui.IEditorPart;
 import saros.editor.internal.EditorAPI;
 import saros.editor.text.LineRange;
+import saros.editor.text.OldTextSelection;
 
 /**
  * Listener for tracking the selection and viewport of an IEditorPart and reporting any changes to
@@ -202,7 +203,7 @@ public class EditorListener {
       lastSelection = selection;
 
       manager.generateSelection(
-          part, new saros.editor.text.TextSelection(selection.getOffset(), selection.getLength()));
+          part, new OldTextSelection(selection.getOffset(), selection.getLength()));
     }
   }
 
