@@ -17,7 +17,7 @@ import saros.activities.SPath;
 import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
 import saros.editor.text.LineRange;
-import saros.editor.text.TextSelection;
+import saros.editor.text.OldTextSelection;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IProject;
@@ -100,7 +100,7 @@ public class UserEditorStateTest {
     activate(pathA);
     select(pathA, 5, 15);
 
-    TextSelection s = state.getEditorState(pathA).getSelection();
+    OldTextSelection s = state.getEditorState(pathA).getSelection();
 
     assertEquals("selection offset should be set", 5, s.getOffset());
     assertEquals("selection length should be set", 15, s.getLength());
@@ -166,7 +166,7 @@ public class UserEditorStateTest {
     view(pathB, 7, 8);
 
     EditorState stateA = state.getEditorState(pathA);
-    TextSelection selectionA = stateA.getSelection();
+    OldTextSelection selectionA = stateA.getSelection();
 
     assertEquals(1, selectionA.getOffset());
     assertEquals(2, selectionA.getLength());
@@ -177,7 +177,7 @@ public class UserEditorStateTest {
     assertEquals(4, viewportA.getNumberOfLines());
 
     EditorState stateB = state.getEditorState(pathB);
-    TextSelection selectionB = stateB.getSelection();
+    OldTextSelection selectionB = stateB.getSelection();
 
     assertEquals(5, selectionB.getOffset());
     assertEquals(6, selectionB.getLength());

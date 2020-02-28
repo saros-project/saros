@@ -1,11 +1,11 @@
 package saros.editor.text;
 
 /** Container to hold text selection values. */
-public class TextSelection {
+public class OldTextSelection {
   private final int offset;
   private final int length;
 
-  private TextSelection() {
+  private OldTextSelection() {
     this(-1, -1);
   }
 
@@ -16,7 +16,7 @@ public class TextSelection {
    * @param offset the offset of the range. selection is empty if negative
    * @param length the length of the range. selection is empty if negative
    */
-  public TextSelection(int offset, int length) {
+  public OldTextSelection(int offset, int length) {
     this.offset = offset;
     this.length = length;
   }
@@ -50,7 +50,7 @@ public class TextSelection {
   }
 
   /** Returns an empty text selection. */
-  public static TextSelection emptySelection() {
-    return new TextSelection();
+  public static OldTextSelection emptySelection() {
+    return new OldTextSelection();
   }
 }

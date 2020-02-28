@@ -9,7 +9,7 @@ import saros.activities.SPath;
 import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
 import saros.editor.text.LineRange;
-import saros.editor.text.TextSelection;
+import saros.editor.text.OldTextSelection;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
 
@@ -72,8 +72,8 @@ public class UserEditorState {
             return;
           }
 
-          TextSelection selection =
-              new TextSelection(
+          OldTextSelection selection =
+              new OldTextSelection(
                   textSelectionActivity.getOffset(), textSelectionActivity.getLength());
 
           updateEditorState(path).setSelection(selection);

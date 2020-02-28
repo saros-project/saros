@@ -17,7 +17,7 @@ import saros.editor.IFollowModeListener.Reason;
 import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
-import saros.editor.text.TextSelection;
+import saros.editor.text.OldTextSelection;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
@@ -169,7 +169,8 @@ public class FollowModeManager implements Startable {
 
         @Override
         public void receive(TextSelectionActivity activity) {
-          TextSelection selection = new TextSelection(activity.getOffset(), activity.getLength());
+          OldTextSelection selection =
+              new OldTextSelection(activity.getOffset(), activity.getLength());
 
           editorManager.adjustViewport(activity.getPath(), followeeRange(), selection);
         }
@@ -373,7 +374,7 @@ public class FollowModeManager implements Startable {
     return userEditorStateManager.getState(currentlyFollowedUser).getActiveEditorState();
   }
 
-  private TextSelection followeeSelection() {
+  private OldTextSelection followeeSelection() {
     EditorState editor = followeeEditor();
     return (editor != null) ? editor.getSelection() : null;
   }

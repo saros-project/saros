@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.editor.text.LineRange;
-import saros.editor.text.TextSelection;
+import saros.editor.text.OldTextSelection;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.ProjectAPI;
 import saros.intellij.runtime.EDTExecutor;
@@ -72,7 +72,7 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
     }
 
     LineRange range = queuedViewPortChange.getRange();
-    TextSelection selection = queuedViewPortChange.getSelection();
+    OldTextSelection selection = queuedViewPortChange.getSelection();
     Editor queuedEditor = queuedViewPortChange.getEditor();
 
     Editor editor;
@@ -111,7 +111,7 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
       @NotNull String path,
       @Nullable Editor editor,
       @Nullable LineRange range,
-      @Nullable TextSelection selection) {
+      @Nullable OldTextSelection selection) {
 
     QueuedViewPortChange requestedViewportChange =
         new QueuedViewPortChange(editor, range, selection);
@@ -123,10 +123,10 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
   private static class QueuedViewPortChange {
     private final Editor editor;
     private final LineRange range;
-    private final TextSelection selection;
+    private final OldTextSelection selection;
 
     QueuedViewPortChange(
-        @Nullable Editor editor, @Nullable LineRange range, @Nullable TextSelection selection) {
+        @Nullable Editor editor, @Nullable LineRange range, @Nullable OldTextSelection selection) {
       this.editor = editor;
       this.range = range;
       this.selection = selection;
@@ -143,7 +143,7 @@ public class ViewportAdjustmentExecutor extends AbstractLocalEditorStatusChangeH
     }
 
     @Nullable
-    TextSelection getSelection() {
+    OldTextSelection getSelection() {
       return selection;
     }
   }

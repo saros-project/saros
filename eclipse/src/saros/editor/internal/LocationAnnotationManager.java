@@ -23,7 +23,7 @@ import saros.editor.annotations.SelectionAnnotation;
 import saros.editor.annotations.SelectionFillUpAnnotation;
 import saros.editor.annotations.ViewportAnnotation;
 import saros.editor.text.LineRange;
-import saros.editor.text.TextSelection;
+import saros.editor.text.OldTextSelection;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.session.User;
 import saros.ui.util.SWTUtils;
@@ -192,7 +192,7 @@ public class LocationAnnotationManager {
    * @param editorPart {@link IEditorPart} that displays the opened document of which the
    *     annotations should be updated.
    */
-  public void setSelection(IEditorPart editorPart, TextSelection selection, User source) {
+  public void setSelection(IEditorPart editorPart, OldTextSelection selection, User source) {
 
     if (!(editorPart instanceof ITextEditor)) return;
 
