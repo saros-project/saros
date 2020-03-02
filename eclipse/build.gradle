@@ -41,7 +41,6 @@ jar {
     include '*.properties'
     include 'readme.html'
     include 'plugin.xml'
-    include 'version.comp'
     include 'LICENSE'
     include 'CHANGELOG'
   }

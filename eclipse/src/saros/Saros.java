@@ -1,10 +1,7 @@
 package saros;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
@@ -20,7 +17,6 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 import saros.annotations.Component;
 import saros.util.ThreadUtils;
-import saros.versioning.VersionManager;
 
 /**
  * The main plug-in of Saros.
@@ -42,8 +38,6 @@ public class Saros extends AbstractUIPlugin {
 
   /** This is the Bundle-SymbolicName (a.k.a the pluginID) */
   public static final String PLUGIN_ID = "saros.eclipse"; // $NON-NLS-1$
-
-  private static final String VERSION_COMPATIBILITY_PROPERTY_FILE = "version.comp"; // $NON-NLS-1$
 
   private final IWorkbenchListener workbenchShutdownListener =
       new IWorkbenchListener() {
@@ -132,10 +126,6 @@ public class Saros extends AbstractUIPlugin {
     lifecycle.start();
 
     isLifecycleStarted = true;
-
-    initVersionCompatibilityChart(
-        VERSION_COMPATIBILITY_PROPERTY_FILE,
-        lifecycle.getSarosContext().getComponent(VersionManager.class));
 
     getWorkbench().addWorkbenchListener(workbenchShutdownListener);
     isInitialized = true;
@@ -296,36 +286,6 @@ public class Saros extends AbstractUIPlugin {
     }
 
     log = Logger.getLogger(this.getClass());
-  }
-
-  private void initVersionCompatibilityChart(
-      final String filename, final VersionManager versionManager) {
-
-    if (versionManager == null) {
-      log.error("no version manager component available");
-      return;
-    }
-
-    final InputStream in = Saros.class.getClassLoader().getResourceAsStream(filename);
-
-    final Properties chart = new Properties();
-
-    if (in == null) {
-      log.warn("could not find compatibility property file: " + filename);
-      return;
-    }
-
-    try {
-      chart.load(in);
-    } catch (IOException e) {
-      log.warn("could not read compatibility property file: " + filename, e);
-
-      return;
-    } finally {
-      IOUtils.closeQuietly(in);
-    }
-
-    versionManager.setCompatibilityChart(chart);
   }
 
   private String getPlatformInformation() {
