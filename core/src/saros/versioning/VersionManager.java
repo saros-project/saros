@@ -1,12 +1,7 @@
 package saros.versioning;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Random;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
@@ -40,15 +35,6 @@ public class VersionManager {
   private static final Random ID_GENERATOR = new Random();
 
   private static final Logger LOG = Logger.getLogger(VersionManager.class);
-
-  /**
-   * The compatibilityChart should contain for each version the list of all versions which should be
-   * compatible with the given one. If no entry exists for the version run by a user, the
-   * VersionManager will only return {@link Compatibility#OK} if and only if the version information
-   * are {@link Version#equals(Object)} to each other.
-   */
-  private volatile Map<Version, List<Version>> compatibilityChart =
-      new HashMap<Version, List<Version>>();
 
   private final Version localVersion;
   private final ITransmitter transmitter;
@@ -124,8 +110,6 @@ public class VersionManager {
     if (this.localVersion == Version.INVALID)
       throw new IllegalArgumentException("version string is malformed: " + version);
 
-    setCompatibilityChart(null);
-
     this.receiver = receiver;
     this.transmitter = transmitter;
 
@@ -156,7 +140,6 @@ public class VersionManager {
    */
 
   public VersionCompatibilityResult determineVersionCompatibility(final JID rqJID) {
-
     VersionExchangeExtension versionExchangeResponse = queryRemoteVersionDetails(rqJID, 10000);
 
     if (versionExchangeResponse == null) return null;
@@ -202,60 +185,6 @@ public class VersionManager {
     }
 
     return new VersionCompatibilityResult(compatibility, localVersion, remoteVersion);
-  }
-
-  /**
-   * Sets an compatibility char that contains additional version information. The chart should be
-   * loaded from a property file which must use the following syntax:
-   *
-   * <pre>
-   *     <tt>local_version = remote_version { & remote_version }</tt>
-   * </pre>
-   *
-   * @param chart the chart to set or <code>null</code> to reset the compatibility chart
-   */
-  public void setCompatibilityChart(Properties chart) {
-
-    final Map<Version, List<Version>> newCompatibilityChart = new HashMap<Version, List<Version>>();
-
-    if (chart == null) chart = new Properties(); // dummy
-
-    for (final Object versionKey : chart.keySet()) {
-      final Version version = Version.parseVersion(versionKey.toString());
-
-      if (version == Version.INVALID) continue;
-
-      final List<Version> compatibleVersions = new ArrayList<Version>();
-
-      for (final String compatibleVersionString : chart.get(versionKey).toString().split("&")) {
-
-        final Version compatibleVersion = Version.parseVersion(compatibleVersionString.trim());
-
-        if (compatibleVersion != Version.INVALID) compatibleVersions.add(compatibleVersion);
-      }
-
-      if (!compatibleVersions.contains(version)) compatibleVersions.add(version);
-
-      newCompatibilityChart.put(version, compatibleVersions);
-    }
-
-    final Version currentVersion = localVersion;
-
-    List<Version> currentCompatibleVersions = newCompatibilityChart.get(currentVersion);
-
-    if (currentCompatibleVersions == null) {
-      currentCompatibleVersions = new ArrayList<Version>();
-      newCompatibilityChart.put(currentVersion, currentCompatibleVersions);
-    }
-
-    if (!currentCompatibleVersions.contains(currentVersion))
-      currentCompatibleVersions.add(currentVersion);
-
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("current version compatibility chart: " + newCompatibilityChart);
-    }
-
-    this.compatibilityChart = newCompatibilityChart;
   }
 
   private VersionExchangeExtension queryRemoteVersionDetails(final JID rqJID, final long timeout) {
@@ -310,20 +239,7 @@ public class VersionManager {
 
   // package protected only for testing purposes !
   Compatibility determineCompatibility(Version localVersion, Version remoteVersion) {
-
     Compatibility compatibility = Compatibility.valueOf(localVersion.compareTo(remoteVersion));
-
-    final Map<Version, List<Version>> currentChart = compatibilityChart;
-
-    // remote version is lower than our version
-    if (compatibility == Compatibility.TOO_NEW && currentChart != null) {
-
-      List<Version> compatibleVersions = currentChart.get(localVersion);
-
-      assert compatibleVersions != null;
-
-      if (compatibleVersions.contains(remoteVersion)) compatibility = Compatibility.OK;
-    }
 
     return compatibility;
   }
