@@ -65,7 +65,7 @@ public class ContactSelectionWizardPage extends WizardPage {
   /** This listener update the page completion if someone's presence changed. */
   private final IContactsUpdate contactsUpdate =
       (contact, type) -> {
-        if (type != UpdateType.FEATURE_SUPPORT) return;
+        if (type != UpdateType.STATUS) return;
 
         SWTUtils.runSafeSWTAsync(
             log,
