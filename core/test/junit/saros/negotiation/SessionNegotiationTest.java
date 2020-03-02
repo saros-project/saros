@@ -1,7 +1,6 @@
 package saros.negotiation;
 
 import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -10,7 +9,6 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.fail;
 
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,7 +26,6 @@ import saros.net.IConnectionManager;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.preferences.IPreferenceStore;
 import saros.session.ISarosSession;
@@ -37,6 +34,10 @@ import saros.session.User;
 import saros.test.fakes.net.FakeConnectionFactory;
 import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
 import saros.test.fakes.net.ThreadedReceiver;
+import saros.test.mocks.SarosMocks;
+import saros.versioning.Compatibility;
+import saros.versioning.Version;
+import saros.versioning.VersionCompatibilityResult;
 import saros.versioning.VersionManager;
 
 public class SessionNegotiationTest {
@@ -62,13 +63,7 @@ public class SessionNegotiationTest {
   private ITransmitter aliceTransmitter;
   private ITransmitter bobTransmitter;
 
-  private VersionManager aliceVersionManager;
-
-  @SuppressWarnings("unused")
-  /*
-   * needs to be present as it is indirectly accessed through fake network I/O
-   */
-  private VersionManager bobVersionManager;
+  private VersionManager versionManager;
 
   private IConnectionManager aliceConnectionManager;
   private IConnectionManager bobConnectionManager;
@@ -104,11 +99,16 @@ public class SessionNegotiationTest {
 
     replay(aliceConnectionManager, bobConnectionManager);
 
-    aliceVersionManager = new VersionManager("47.11.8015.TEST", aliceReceiver, aliceTransmitter);
+    aliceXMPPContactsService = SarosMocks.contactsServiceMockFor(BOB);
 
-    bobVersionManager = new VersionManager("47.11.8015.TEST", bobReceiver, bobTransmitter);
+    VersionCompatibilityResult compatibilityResult =
+        createNiceMock(VersionCompatibilityResult.class);
+    expect(compatibilityResult.getLocalVersion()).andReturn(Version.INVALID);
+    expect(compatibilityResult.getCompatibility()).andReturn(Compatibility.OK);
 
-    aliceXMPPContactsService = contactsServiceMockFor(BOB);
+    versionManager = createNiceMock(VersionManager.class);
+    expect(versionManager.determineVersionCompatibility(anyObject(JID.class)))
+        .andReturn(compatibilityResult);
 
     aliceSession = createNiceMock(ISarosSession.class);
 
@@ -134,21 +134,7 @@ public class SessionNegotiationTest {
         .andReturn(bobSession)
         .once();
 
-    replay(aliceSessionManager, bobSessionManager);
-  }
-
-  private XMPPContactsService contactsServiceMockFor(final JID jid) {
-    XMPPContact contactMock = createMock(XMPPContact.class);
-    expect(contactMock.getSarosJid()).andStubReturn(Optional.of(jid));
-    replay(contactMock);
-
-    XMPPContactsService contactsServiceMock = createMock(XMPPContactsService.class);
-
-    expect(contactsServiceMock.getContact(anyObject(String.class)))
-        .andStubReturn(Optional.of(contactMock));
-    replay(contactsServiceMock);
-
-    return contactsServiceMock;
+    replay(aliceSessionManager, bobSessionManager, compatibilityResult, versionManager);
   }
 
   @After
@@ -168,7 +154,7 @@ public class SessionNegotiationTest {
             aliceSessionManager,
             aliceSession,
             new SessionNegotiationHookManager(),
-            aliceVersionManager,
+            versionManager,
             aliceXMPPContactsService,
             aliceTransmitter,
             aliceReceiver);
