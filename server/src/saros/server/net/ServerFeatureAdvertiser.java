@@ -1,46 +1,19 @@
 package saros.server.net;
 
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import saros.annotations.Component;
-import saros.net.ConnectionState;
-import saros.net.ResourceFeature;
-import saros.net.xmpp.IConnectionListener;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.preferences.PreferenceConstants;
+import saros.versioning.VersionManager;
 
 /** Instructs the network layer to advertise this Saros instance as a server. */
 @Component(module = "server")
 public class ServerFeatureAdvertiser {
 
-  private static final Logger log = Logger.getLogger(ServerFeatureAdvertiser.class);
-
-  private IConnectionListener connectionListener =
-      new IConnectionListener() {
-        /** Configures server feature advertising for newly established connections. */
-        @Override
-        public void connectionStateChanged(Connection connection, ConnectionState newState) {
-
-          if (newState == ConnectionState.CONNECTING) {
-            advertiseServerFeature(connection);
-          }
-        }
-      };
-
   /**
    * Initializes the ServerFeatureAdvertiser.
    *
-   * @param connectionService service to listen for new connections with
+   * @param versionManager to add info
    */
-  public ServerFeatureAdvertiser(XMPPConnectionService connectionService) {
-    connectionService.addListener(connectionListener);
-  }
-
-  private static void advertiseServerFeature(Connection connection) {
-    log.info("Starting to advertise ourselves as server");
-
-    ServiceDiscoveryManager discoveryManager = ServiceDiscoveryManager.getInstanceFor(connection);
-
-    discoveryManager.addFeature(ResourceFeature.SAROS_SERVER.getIdentifier());
+  public ServerFeatureAdvertiser(VersionManager versionManager) {
+    versionManager.setLocalInfo(PreferenceConstants.SERVER_SUPPORT, Boolean.TRUE.toString());
   }
 }

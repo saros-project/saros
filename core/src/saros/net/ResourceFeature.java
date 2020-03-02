@@ -5,9 +5,7 @@ import java.util.Optional;
 /** Identifier of Saros Resource Features */
 public enum ResourceFeature {
   /** Saros Support */
-  SAROS("saros"),
-  /** Saros Server Support */
-  SAROS_SERVER("saros.server");
+  SAROS("saros");
 
   private final String identifier;
 

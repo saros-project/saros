@@ -18,6 +18,8 @@ public class PreferenceConstants {
 
   public static final String SKYPE_USERNAME = "skypename";
 
+  public static final String SERVER_SUPPORT = "server_support";
+
   public static final String CONCURRENT_UNDO = "concurrent_undo";
 
   public static final String SMACK_DEBUG_MODE = "smack_debug_mode";

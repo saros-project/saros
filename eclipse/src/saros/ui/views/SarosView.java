@@ -44,7 +44,6 @@ import org.eclipse.ui.part.ViewPart;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
-import saros.net.ResourceFeature;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.ContactStatus.Type;
 import saros.net.xmpp.contact.IContactsUpdate;
@@ -52,6 +51,7 @@ import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.net.xmpp.roster.RosterTracker;
 import saros.preferences.EclipsePreferenceConstants;
+import saros.preferences.PreferenceConstants;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -91,6 +91,7 @@ import saros.ui.widgets.chat.ChatRoomsComposite;
 import saros.ui.widgets.viewer.ViewerComposite;
 import saros.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
 import saros.util.CoreUtils;
+import saros.versioning.VersionManager;
 
 /**
  * @JTourBusStop 1, The Interface Tour:
@@ -235,6 +236,8 @@ public class SarosView extends ViewPart {
   @Inject protected RosterTracker rosterTracker;
 
   @Inject private XMPPContactsService contactsService;
+
+  @Inject private VersionManager versionManager;
 
   private static volatile boolean showBalloonNotifications;
   private volatile boolean playAvailableSound;
@@ -481,7 +484,9 @@ public class SarosView extends ViewPart {
 
             // TODO: Currently only Saros/S is known to have a working JoinSessionRequestHandler,
             //       remove this once the situation changes / change this to it's own feature.
-            if (contact.hasFeatureSupport(ResourceFeature.SAROS_SERVER)) {
+            if (versionManager
+                .getRemoteInfo(contact, PreferenceConstants.SERVER_SUPPORT)
+                .isPresent()) {
               manager.add(getAction(RequestSessionInviteAction.ACTION_ID));
               manager.add(new Separator());
             }
