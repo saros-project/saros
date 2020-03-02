@@ -34,8 +34,12 @@ import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
 public class VersionManagerTest {
 
   private ITransmitter aliceTransmitter;
-  private IReceiver aliceReceiver;
+  private ITransmitter bobTransmitter;
 
+  private IReceiver aliceReceiver;
+  private IReceiver bobReceiver;
+
+  private VersionManager versionManagerRemote;
   private VersionManager versionManagerLocal;
 
   private final JID aliceJID = new JID("alice@alice.com/Saros");
@@ -47,11 +51,17 @@ public class VersionManagerTest {
         FakeConnectionFactory.createConnections(aliceJID, bobJID).get();
 
     aliceReceiver = result.getReceiver(aliceJID);
+    bobReceiver = result.getReceiver(bobJID);
+
     aliceTransmitter = result.getTransmitter(aliceJID);
+    bobTransmitter = result.getTransmitter(bobJID);
   }
 
   private void init(Version local, Version remote) {
+
     versionManagerLocal = new VersionManager(local.toString(), aliceReceiver, aliceTransmitter);
+
+    versionManagerRemote = new VersionManager(remote.toString(), bobReceiver, bobTransmitter);
   }
 
   @Test
@@ -90,7 +100,7 @@ public class VersionManagerTest {
 
     VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
-    assertEquals(Compatibility.TOO_OLD, result.getCompatibility());
+    assertEquals(Compatibility.OLDER, result.getCompatibility());
   }
 
   @Test
@@ -103,6 +113,6 @@ public class VersionManagerTest {
 
     VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
-    assertEquals(Compatibility.TOO_NEW, result.getCompatibility());
+    assertEquals(Compatibility.NEWER, result.getCompatibility());
   }
 }

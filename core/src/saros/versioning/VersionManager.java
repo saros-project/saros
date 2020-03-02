@@ -1,7 +1,6 @@
 package saros.versioning;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.Random;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
@@ -20,16 +19,16 @@ import saros.net.xmpp.JID;
 /**
  * Component for figuring out whether two Saros plug-in instances with known Version are compatible.
  *
- * <p>This class does not use a {@link Comparator#compare(Object, Object)}, because results might
- * not be symmetrical (we only note whether current Version is A is compatible with older versions,
- * but not whether the older versions from their perspective are compatible with us) and transitive
- * (if Version A is too old for B, Version B too old for C, then A might be still OK for C).
+ * <p>This class compares if local and remote version (not checking qualifier) are the same.
+ *
+ * <p>If you want to implement backward compatibility in a later version, as a suggestion:
+ * acknowledge same major.minor version as compatible. Alternatively add a `backwards_compatibility`
+ * key with the last working version as value and add a check for it.
  */
 @Component(module = "core")
 public class VersionManager {
 
   private static final String VERSION_KEY = "version";
-  private static final String COMPATIBILITY_KEY = "compatibility";
   private static final String ID_KEY = "id";
 
   private static final Random ID_GENERATOR = new Random();
@@ -64,26 +63,18 @@ public class VersionManager {
           createResponseData:
           {
             versionExchangeResponse.set(VERSION_KEY, localVersion.toString());
-            versionExchangeResponse.set(
-                COMPATIBILITY_KEY, String.valueOf(Compatibility.UNKNOWN.getCode()));
 
             String remoteVersionString = versionExchangeRequest.get(VERSION_KEY);
-
             if (remoteVersionString == null) {
               LOG.warn("remote version string not found in version exchange data");
               break createResponseData;
             }
 
             Version remoteVersion = Version.parseVersion(remoteVersionString);
-
             if (remoteVersion == Version.INVALID) {
               LOG.warn("remote version string is invalid: " + remoteVersionString);
               break createResponseData;
             }
-
-            versionExchangeResponse.set(
-                COMPATIBILITY_KEY,
-                String.valueOf(determineCompatibility(localVersion, remoteVersion).getCode()));
 
             versionExchangeResponse.set(ID_KEY, versionExchangeRequest.get(ID_KEY));
           }
@@ -144,51 +135,30 @@ public class VersionManager {
 
     if (versionExchangeResponse == null) return null;
 
-    Compatibility remoteCompatibility = Compatibility.UNKNOWN;
     Compatibility compatibility = Compatibility.UNKNOWN;
     Version remoteVersion = Version.INVALID;
 
     determineCompatibility:
     {
       String remoteVersionString = versionExchangeResponse.get(VERSION_KEY);
-
       if (remoteVersionString == null) {
         LOG.warn("remote version string not found in version exchange data");
         break determineCompatibility;
       }
 
       remoteVersion = Version.parseVersion(remoteVersionString);
-
       if (remoteVersion == Version.INVALID) {
         LOG.warn("remote version string is invalid: " + remoteVersionString);
         break determineCompatibility;
       }
 
-      String compatibilityString = versionExchangeResponse.get(COMPATIBILITY_KEY);
-
-      if (compatibilityString == null) {
-        LOG.warn("remote compatibility string not found in version exchange data");
-        break determineCompatibility;
-      }
-
-      try {
-        remoteCompatibility = Compatibility.fromCode(Integer.valueOf(compatibilityString));
-      } catch (NumberFormatException e) {
-        LOG.warn("remote compatibility string contains non numerical characters");
-      }
-
       compatibility = determineCompatibility(localVersion, remoteVersion);
-
-      // believe what the remote side told us in case we are too old
-      if (compatibility == Compatibility.TOO_OLD && remoteCompatibility == Compatibility.OK)
-        compatibility = Compatibility.OK;
     }
 
     return new VersionCompatibilityResult(compatibility, localVersion, remoteVersion);
   }
 
   private VersionExchangeExtension queryRemoteVersionDetails(final JID rqJID, final long timeout) {
-
     assert rqJID.isResourceQualifiedJID();
 
     final String exchangeID = String.valueOf(ID_GENERATOR.nextInt());
