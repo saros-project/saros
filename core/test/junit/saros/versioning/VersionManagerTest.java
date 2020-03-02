@@ -27,7 +27,7 @@ import java.util.HashMap;
 import org.jivesoftware.smack.packet.IQ;
 import org.junit.Before;
 import org.junit.Test;
-import saros.communication.extensions.VersionExchangeExtension;
+import saros.communication.extensions.InfoExchangeExtension;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
@@ -66,9 +66,9 @@ public class VersionManagerTest {
 
     HashMap<String, String> info = new HashMap<>();
     info.put(VersionManager.VERSION_KEY, remote.toString());
-    VersionExchangeExtension versionExchangeResponse = new VersionExchangeExtension(info);
+    InfoExchangeExtension versionExchangeResponse = new InfoExchangeExtension(info);
 
-    IQ reply = VersionExchangeExtension.PROVIDER.createIQ(versionExchangeResponse);
+    IQ reply = InfoExchangeExtension.PROVIDER.createIQ(versionExchangeResponse);
     reply.setType(IQ.Type.SET);
     reply.setTo(aliceJID.getRAW());
     aliceReceiver.processPacket(reply);

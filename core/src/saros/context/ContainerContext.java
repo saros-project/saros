@@ -8,6 +8,7 @@ import saros.communication.extensions.ActivitiesExtension;
 import saros.communication.extensions.CancelInviteExtension;
 import saros.communication.extensions.CancelProjectNegotiationExtension;
 import saros.communication.extensions.ConnectionEstablishedExtension;
+import saros.communication.extensions.InfoExchangeExtension;
 import saros.communication.extensions.InvitationAcceptedExtension;
 import saros.communication.extensions.InvitationAcknowledgedExtension;
 import saros.communication.extensions.InvitationCompletedExtension;
@@ -26,7 +27,6 @@ import saros.communication.extensions.StartActivityQueuingResponse;
 import saros.communication.extensions.UserFinishedProjectNegotiationExtension;
 import saros.communication.extensions.UserListExtension;
 import saros.communication.extensions.UserListReceivedExtension;
-import saros.communication.extensions.VersionExchangeExtension;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.repackaged.picocontainer.ComponentMonitor;
@@ -113,8 +113,8 @@ public class ContainerContext implements IContainerContext {
      */
 
     try {
-      // Version exchange extension used in session negotiation
-      Class.forName(VersionExchangeExtension.class.getName());
+      // Info exchange extension used outside of Session
+      Class.forName(InfoExchangeExtension.class.getName());
 
       // Session negotiation extensions
       Class.forName(CancelInviteExtension.class.getName());
