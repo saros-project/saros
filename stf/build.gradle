@@ -26,11 +26,7 @@ dependencies {
 
     compile project(path: ':saros.eclipse', configuration: 'testing')
 
-    releaseDep fileTree('libs'){
-        include '*.jar'
-        exclude 'org.eclipse.draw2d*.jar'
-        exclude 'org.eclipse.ged*.jar'
-    }
+    releaseDep fileTree('libs')
     compile configurations.releaseDep
 }
 

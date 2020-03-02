@@ -6,9 +6,11 @@ import static saros.stf.client.tester.SarosTester.BOB;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import saros.stf.client.StfTestCase;
 import saros.stf.client.util.EclipseTestThread;
 import saros.stf.client.util.Util;
+import saros.stf.test.categories.FlakyTests;
 
 public class AddMultipleFilesTest extends StfTestCase {
 
@@ -30,6 +32,7 @@ public class AddMultipleFilesTest extends StfTestCase {
    * scenario: multiple users add files per drag and drop at the same time.
    */
 
+  @Category(FlakyTests.class)
   @Test
   public void testAddMultipleFilesSimultaneouslyTest() throws Exception {
     Util.setUpSessionWithProjectAndFile("foo", "main", "main", ALICE, BOB);

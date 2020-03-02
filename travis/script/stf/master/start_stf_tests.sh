@@ -6,4 +6,10 @@
 echo "STARTING REGRESSION: TIMEOUT IS 60 MINUTES"
 cd $WORKSPACE
 
-timeout -t 3600 ./gradlew --stacktrace --no-daemon -Dstf.client.configuration.files=/home/ci/saros_src/travis/config/stf_config -PskipSTFTests=false -PuseBuildScan=true cleanAll :saros.stf.test:stfTest
+timeout -t 3600 ./gradlew \
+  --stacktrace \
+  --no-daemon \
+  -Dstf.client.configuration.files=/home/ci/saros_src/travis/config/stf_config \
+  -PskipSTFTests=false \
+  -PuseBuildScan=true \
+  cleanAll :saros.stf.test:stfTest :saros.stf.test:stfFlakyAndFailingTest

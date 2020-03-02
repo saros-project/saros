@@ -6,10 +6,14 @@ sarosEclipse {
 
 configurations {
     stfTest
+    stfFlakyAndFailingTest
 }
 
 sourceSets {
     stfTest {
+        java.srcDir 'test'
+    }
+    stfFlakyAndFailingTest {
         java.srcDir 'test'
     }
 }
@@ -21,37 +25,59 @@ dependencies {
     // TODO: The custom saros eclipse plugin adds all dependencies to implementation
     stfTestCompile configurations.implementation
     testCompile configurations.stfTestCompile // for running the tests in eclipse
+
+    stfFlakyAndFailingTestCompile project(':saros.stf')
+    stfFlakyAndFailingTestCompile project(path: ':saros.stf', configuration: 'testing')
+    stfFlakyAndFailingTestCompile configurations.testConfig
+    stfFlakyAndFailingTestCompile configurations.implementation
+    testCompile configurations.stfFlakyAndFailingTestCompile // for running the tests in eclipse
 }
 
-// TODO move into buildSrc
-task stfTest (type: Test, dependsOn: [':saros.eclipse:build']) {
-    group 'Verification'
-    description 'Runs the stf tests. Requires a corresponding test environment'
-
-    testClassesDirs = sourceSets.stfTest.output.classesDirs
-
+class StfTest extends Test {
+  StfTest() {
+    this.setGroup('Verification')
+    this.setDescription('Runs the stf tests. Requires a corresponding test environment')
     systemProperty 'saros.stf.client.configuration.files', System.getProperty('stf.client.configuration.files', '')
 
+    this.testLogging{ loggingContainer ->
+        loggingContainer.setShowStandardStreams(true)
+        loggingContainer.setEvents(['started', 'passed', 'skipped', 'failed', 'standardOut', 'standardError'])
+    }
+
+    List<String> failedTests = new ArrayList<String>();
+    this.afterTest { descriptor, result ->
+        if( result.resultType == org.gradle.api.tasks.testing.TestResult.ResultType.FAILURE ){
+            failedTests << "${descriptor.className}.${descriptor.name}"
+        }
+    }
+
+    this.afterSuite { suite, result ->
+        if ( !suite.parent && !failedTests.isEmpty() ) {
+            logger.lifecycle("Failed tests:")
+            failedTests.each { logger.lifecycle(it) }
+        }
+    }
+
+    this.include('**/stf/test/**/*Test.*')
+    this.exclude('**/stf/test/stf/**')
+  }
+}
+
+task stfTest (type: StfTest, dependsOn: [':saros.eclipse:build']) {
+    testClassesDirs = sourceSets.stfTest.output.classesDirs
     classpath = sourceSets.stfTest.runtimeClasspath
 
-    testLogging {
-        showStandardStreams = true
-        events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+    useJUnit {
+        excludeCategories 'saros.stf.test.categories.FlakyTests', 'saros.stf.test.categories.FailingTests'
     }
-    // Print summary of failed tests
-    ext.failedStfTests = []
-    afterTest { descriptor, result ->
-        if(result.resultType == org.gradle.api.tasks.testing.TestResult.ResultType.FAILURE){
-            ext.failedStfTests << "${descriptor.className}.${descriptor.name}"
-        }
-    }
-    afterSuite { suite, result ->
-        if (!suite.parent && !ext.failedStfTests.isEmpty()) {
-            logger.lifecycle("Failed tests:")
-            ext.failedStfTests.each { logger.lifecycle(it) }
-        }
-    }
+}
 
-    include '**/stf/test/**/*Test.*'
-    exclude '**/stf/test/stf/**'
+task stfFlakyAndFailingTest (type: StfTest, dependsOn: [':saros.eclipse:build']) {
+    testClassesDirs = sourceSets.stfFlakyAndFailingTest.output.classesDirs
+    classpath = sourceSets.stfFlakyAndFailingTest.runtimeClasspath
+    ignoreFailures = true
+    
+    useJUnit {
+        includeCategories 'saros.stf.test.categories.FlakyTests', 'saros.stf.test.categories.FailingTests'
+    }
 }

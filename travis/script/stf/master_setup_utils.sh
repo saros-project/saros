@@ -8,7 +8,7 @@ function start_container_master()
 {
   echo "Starting stf master container: $stf_master_name"
   docker run -dt --name $stf_master_name \
-    -v $ws_dir:/home/ci/saros_src \
+    -v $ws_dir:$CONTAINER_SRC \
     -v $STF_HOST_WS:$STF_CONTAINER_WS \
     --net=$stf_network_name \
     --net-alias=$stf_master_name \
