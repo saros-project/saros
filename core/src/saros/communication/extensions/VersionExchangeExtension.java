@@ -1,6 +1,7 @@
 package saros.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import saros.misc.xstream.XStreamExtensionProvider;
@@ -19,30 +20,19 @@ public class VersionExchangeExtension {
   public static final Provider PROVIDER = new Provider();
 
   @XStreamAlias("data")
-  private final Map<String, String> data = new HashMap<String, String>();
+  private final Map<String, String> data;
 
-  /**
-   * Associates the specified value with the specified key.
-   *
-   * @param key key with which the specified value is to be associated
-   * @param value value to be associated with the specified key
-   * @return the previous value associated with key, or <code>null</code> if there was no mapping
-   *     for key
-   */
-  public String set(String key, String value) {
-    return data.put(key, value);
+  public VersionExchangeExtension(Map<String, String> data) {
+    if (data == null) this.data = Collections.emptyMap();
+    else this.data = new HashMap<>(data);
   }
-
   /**
-   * Returns the value to which the specified key is mapped, or null if this map contains no mapping
-   * for the key.
+   * Returns the data map.
    *
-   * @param key the key whose associated value is to be returned
-   * @return the value to which the specified key is mapped, or null if this map contains no mapping
-   *     for the key
+   * @return data map
    */
-  public String get(String key) {
-    return data.get(key);
+  public Map<String, String> getData() {
+    return Collections.unmodifiableMap(data);
   }
 
   public static class Provider extends XStreamExtensionProvider<VersionExchangeExtension> {

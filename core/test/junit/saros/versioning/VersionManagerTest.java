@@ -23,23 +23,23 @@ package saros.versioning;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import org.jivesoftware.smack.packet.IQ;
 import org.junit.Before;
 import org.junit.Test;
+import saros.communication.extensions.VersionExchangeExtension;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.test.fakes.net.FakeConnectionFactory;
 import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
+import saros.test.mocks.SarosMocks;
 
 public class VersionManagerTest {
 
   private ITransmitter aliceTransmitter;
-  private ITransmitter bobTransmitter;
-
   private IReceiver aliceReceiver;
-  private IReceiver bobReceiver;
-
-  private VersionManager versionManagerRemote;
   private VersionManager versionManagerLocal;
 
   private final JID aliceJID = new JID("alice@alice.com/Saros");
@@ -51,17 +51,23 @@ public class VersionManagerTest {
         FakeConnectionFactory.createConnections(aliceJID, bobJID).get();
 
     aliceReceiver = result.getReceiver(aliceJID);
-    bobReceiver = result.getReceiver(bobJID);
-
     aliceTransmitter = result.getTransmitter(aliceJID);
-    bobTransmitter = result.getTransmitter(bobJID);
   }
 
   private void init(Version local, Version remote) {
+    XMPPContactsService aliceContactsService = SarosMocks.contactsServiceMockFor(bobJID);
 
-    versionManagerLocal = new VersionManager(local.toString(), aliceReceiver, aliceTransmitter);
+    versionManagerLocal =
+        new VersionManager(local.toString(), aliceReceiver, aliceTransmitter, aliceContactsService);
 
-    versionManagerRemote = new VersionManager(remote.toString(), bobReceiver, bobTransmitter);
+    HashMap<String, String> info = new HashMap<>();
+    info.put(VersionManager.VERSION_KEY, remote.toString());
+    VersionExchangeExtension versionExchangeResponse = new VersionExchangeExtension(info);
+
+    IQ reply = VersionExchangeExtension.PROVIDER.createIQ(versionExchangeResponse);
+    reply.setType(IQ.Type.SET);
+    reply.setTo(aliceJID.getRAW());
+    aliceReceiver.processPacket(reply);
   }
 
   @Test
@@ -79,7 +85,6 @@ public class VersionManagerTest {
 
   @Test
   public void testVersionsSameOnlyQualifierDiffers() {
-
     Version local = Version.parseVersion("1.1.1.r1");
     Version remote = Version.parseVersion("1.1.1.r2");
 
@@ -91,8 +96,7 @@ public class VersionManagerTest {
   }
 
   @Test
-  public void testlocalVersionsTooOld() {
-
+  public void testlocalVersionOlder() {
     Version local = Version.parseVersion("1.1.1.r1");
     Version remote = Version.parseVersion("1.1.2.r1");
 
@@ -104,8 +108,7 @@ public class VersionManagerTest {
   }
 
   @Test
-  public void testlocalVersionsTooNew() {
-
+  public void testlocalVersionNewer() {
     Version local = Version.parseVersion("1.1.2.r1");
     Version remote = Version.parseVersion("1.1.1.r1");
 
