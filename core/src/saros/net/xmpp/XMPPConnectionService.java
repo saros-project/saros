@@ -16,7 +16,11 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
+import org.jivesoftware.smackx.entitycaps.EntityCapsManager;
+import org.jivesoftware.smackx.entitycaps.packet.CapsExtension;
 import saros.annotations.Component;
 import saros.net.ConnectionState;
 import saros.net.stun.IStunService;
@@ -34,6 +38,9 @@ import saros.util.ThreadUtils;
  */
 @Component(module = "net")
 public class XMPPConnectionService {
+  public static final String XMPP_CLIENT_IDENTIFIER = "https://saros-project.org";
+  private static final String CAPS_HASH_ALGORITHM = "sha-1";
+
   private static final Logger log = Logger.getLogger(XMPPConnectionService.class);
 
   // DO NOT CHANGE THE CONTENT OF THIS STRING, NEVER NEVER NEVER !!!
@@ -239,6 +246,10 @@ public class XMPPConnectionService {
 
     Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
 
+    ServiceDiscoveryManager.setIdentityName(XMPP_CLIENT_IDENTIFIER);
+    // send presence manual after Login, because automatic doesn't use caps extension
+    connectionConfiguration.setSendPresence(false);
+
     connection = new XMPPConnection(connectionConfiguration);
 
     try {
@@ -253,6 +264,8 @@ public class XMPPConnectionService {
       connection.addConnectionListener(smackConnectionListener);
 
       connection.login(username, password, resource);
+
+      sendAvailablePresenceWithClientIdentifier();
 
       localJID = new JID(connection.getUser());
 
@@ -270,6 +283,15 @@ public class XMPPConnectionService {
       localJID = null;
       throw (e);
     }
+  }
+
+  private void sendAvailablePresenceWithClientIdentifier() {
+    String version = EntityCapsManager.getInstanceFor(connection).getCapsVersion();
+    CapsExtension caps = new CapsExtension(XMPP_CLIENT_IDENTIFIER, version, CAPS_HASH_ALGORITHM);
+
+    Presence presence = new Presence(Presence.Type.available);
+    presence.addExtension(caps);
+    connection.sendPacket(presence);
   }
 
   /**

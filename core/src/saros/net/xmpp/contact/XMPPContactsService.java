@@ -2,7 +2,6 @@ package saros.net.xmpp.contact;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,18 +11,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket.ItemStatus;
+import org.jivesoftware.smackx.entitycaps.EntityCapsManager;
+import org.jivesoftware.smackx.entitycaps.packet.CapsExtension;
 import saros.exceptions.OperationCanceledException;
 import saros.net.ConnectionState;
-import saros.net.ResourceFeature;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
@@ -57,7 +57,6 @@ public class XMPPContactsService implements Disposable {
   private static final Logger log = Logger.getLogger(XMPPContactsService.class);
 
   private final List<IContactsUpdate> updateListeners = new CopyOnWriteArrayList<>();
-  private final DiscoveryService discoveryService = new DiscoveryService();
 
   /**
    * Single-Threaded Executor to off-load work and providing thread-safety by being the only Thread
@@ -282,7 +281,6 @@ public class XMPPContactsService implements Disposable {
   @Override
   public void dispose() {
     contactsExecutor.shutdownNow();
-    discoveryService.stop();
   }
 
   private void connectionChanged(Connection connection, ConnectionState state) {
@@ -294,7 +292,6 @@ public class XMPPContactsService implements Disposable {
       }
 
       roster.addRosterListener(rosterListener);
-      discoveryService.connectionChanged(connection);
       contacts.clear();
     } else if (state == ConnectionState.CONNECTED) {
       /* The roster provided list is probably empty after connection start, and we get contacts
@@ -304,7 +301,6 @@ public class XMPPContactsService implements Disposable {
     } else if (state == ConnectionState.DISCONNECTING || state == ConnectionState.ERROR) {
       if (roster != null) roster.removeRosterListener(rosterListener);
       roster = null;
-      discoveryService.connectionChanged(null);
 
       contacts.getAll().forEach(XMPPContact::removeResources);
       notifyListeners(null, UpdateType.NOT_CONNECTED);
@@ -337,7 +333,6 @@ public class XMPPContactsService implements Disposable {
         continue;
       }
 
-      discoveryService.removeResources(removedContact.getResources());
       removedContact.removeResources();
       removedContact.setBaseStatus(ContactStatus.TYPE_REMOVED);
       notifyListeners(removedContact, UpdateType.REMOVED);
@@ -395,7 +390,6 @@ public class XMPPContactsService implements Disposable {
       return;
     }
 
-    discoveryService.removeResources(contact.getResources());
     contact.removeResources();
     contact.setBaseStatus(ContactStatus.TYPE_SUBSCRIPTION_CANCELED);
     notifyListeners(contact, UpdateType.STATUS);
@@ -416,33 +410,22 @@ public class XMPPContactsService implements Disposable {
     } else {
       status = ContactStatus.TYPE_AVAILABLE;
     }
-    if (contact.setResourceStatus(fullJid, status)) notifyListeners(contact, UpdateType.STATUS);
+    if (contact.setResourceStatus(fullJid, status, isSarosClient(presence)))
+      notifyListeners(contact, UpdateType.STATUS);
+  }
 
-    discoveryService.queryFeatureSupport(
-        fullJid, createFeatureQueryResultHandler(fullJid, contact));
+  private boolean isSarosClient(Presence presence) {
+    PacketExtension caps = presence.getExtension(EntityCapsManager.NAMESPACE);
+    if (caps != null) {
+      String identity = ((CapsExtension) caps).getNode();
+      return XMPPConnectionService.XMPP_CLIENT_IDENTIFIER.equals(identity);
+    }
+
+    return false;
   }
 
   private void handleContactResourceUnavailable(XMPPContact contact, JID fullJid) {
-    discoveryService.removeResources(Collections.singletonList(fullJid));
     if (contact.removeResource(fullJid)) notifyListeners(contact, UpdateType.STATUS);
-  }
-
-  /**
-   * Consumer to be called by DiscoveryService after a positive query.
-   *
-   * @param fullJid
-   * @param contact
-   * @return Consumer to be called after a positive query
-   */
-  private Consumer<EnumSet<ResourceFeature>> createFeatureQueryResultHandler(
-      JID fullJid, XMPPContact contact) {
-    return features -> {
-      contactsExecutor.execute(
-          () -> {
-            if (contact.setFeatureSupport(fullJid, features))
-              notifyListeners(contact, UpdateType.FEATURE_SUPPORT);
-          });
-    };
   }
 
   private void notifyListeners(XMPPContact contact, UpdateType updateType) {

@@ -6,12 +6,10 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import saros.SarosConstants;
 import saros.account.XMPPAccount;
 import saros.net.ConnectionState;
 import saros.net.IConnectionManager;
-import saros.net.ResourceFeature;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
@@ -51,12 +49,6 @@ public class ConnectionHandler {
 
         @Override
         public void connectionStateChanged(Connection connection, ConnectionState state) {
-
-          if (state == ConnectionState.CONNECTING) {
-            ServiceDiscoveryManager.getInstanceFor(connection)
-                .addFeature(ResourceFeature.SAROS.getIdentifier());
-          }
-
           final Exception error =
               state == ConnectionState.ERROR ? connectionService.getConnectionError() : null;
 
