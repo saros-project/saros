@@ -25,6 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.converters.basic.BooleanConverter;
+import com.thoughtworks.xstream.converters.extended.NamedMapConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -99,6 +100,27 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
 
     xstream.registerConverter(BooleanConverter.BINARY);
     xstream.registerConverter(new UrlEncodingStringConverter());
+
+    /*
+     * set map conversion format to
+     * <map><entry key="#key>" value="#value"/></map>
+     * instead of
+     * <map><entry><string>#key</string><string>#value</string></entry></map>
+     *
+     * breaks parsing compatibility with older clients if changed
+     */
+    xstream.registerConverter(
+        new NamedMapConverter(
+            xstream.getMapper(),
+            "entry",
+            "key",
+            String.class,
+            "value",
+            String.class,
+            true,
+            true,
+            xstream.getConverterLookup()));
+
     xstream.processAnnotations(XStreamPacketExtension.class);
     xstream.processAnnotations(classes);
     xstream.alias(elementName, XStreamPacketExtension.class);
