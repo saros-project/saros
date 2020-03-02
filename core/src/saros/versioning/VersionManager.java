@@ -66,7 +66,7 @@ public class VersionManager {
 
   private final IContactsUpdate contactsUpdateListener =
       (contact, updateType) -> {
-        if (updateType == UpdateType.STATUS || updateType == UpdateType.FEATURE_SUPPORT) {
+        if (updateType == UpdateType.STATUS) {
           if (contact.map(c -> c.getStatus().isOnline()).orElse(false)) sendInfo(contact.get());
           else contact.ifPresent(remoteInfo::remove);
         } else if (updateType == UpdateType.REMOVED) {

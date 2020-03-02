@@ -20,8 +20,6 @@ public interface IContactsUpdate {
     REMOVED,
     /** Contact changed {@link ContactStatus} and maybe Saros support */
     STATUS,
-    /** Contact changed Feature support */
-    FEATURE_SUPPORT,
     /** Contact group mapping has changed */
     GROUP_MAPPING
   }
