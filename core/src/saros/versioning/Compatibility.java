@@ -17,10 +17,10 @@ public enum Compatibility {
    *
    * <p>The user should be told to upgrade
    */
-  TOO_OLD(1) {
+  OLDER(1) {
     @Override
     public Compatibility invert() {
-      return TOO_NEW;
+      return NEWER;
     }
   },
   /**
@@ -28,10 +28,10 @@ public enum Compatibility {
    *
    * <p>The user should be told to tell the peer to update.
    */
-  TOO_NEW(2) {
+  NEWER(2) {
     @Override
     public Compatibility invert() {
-      return TOO_OLD;
+      return OLDER;
     }
   },
 
@@ -61,7 +61,6 @@ public enum Compatibility {
   }
 
   public static Compatibility fromCode(int code) {
-
     for (Compatibility compatibility : Compatibility.values()) {
       if (compatibility.getCode() == code) return compatibility;
     }
@@ -76,12 +75,12 @@ public enum Compatibility {
   public static Compatibility valueOf(int comparison) {
     switch (Integer.signum(comparison)) {
       case -1:
-        return TOO_OLD;
+        return OLDER;
       case 0:
         return OK;
       case 1:
       default:
-        return TOO_NEW;
+        return NEWER;
     }
   }
 }
