@@ -11,7 +11,7 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import saros.SarosPluginContext;
 import saros.communication.SkypeManager;
-import saros.net.xmpp.JID;
+import saros.net.xmpp.contact.XMPPContact;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.ui.ImageManager;
 import saros.ui.Messages;
@@ -56,8 +56,8 @@ public class SkypeAction extends Action implements Disposable {
 
     setEnabled(false);
 
-    final List<JID> contacts =
-        SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
+    final List<XMPPContact> contacts =
+        SelectionRetrieverFactory.getSelectionRetriever(XMPPContact.class).getSelection();
 
     if (contacts.size() != 1) return;
 
@@ -72,8 +72,8 @@ public class SkypeAction extends Action implements Disposable {
   @Override
   public void run() {
 
-    final List<JID> participants =
-        SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
+    final List<XMPPContact> participants =
+        SelectionRetrieverFactory.getSelectionRetriever(XMPPContact.class).getSelection();
 
     if (participants.size() != 1) return;
 
