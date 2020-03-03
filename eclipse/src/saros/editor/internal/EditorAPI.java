@@ -39,7 +39,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
-import saros.editor.text.OldTextSelection;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.filesystem.EclipseFileImpl;
@@ -270,30 +269,6 @@ public class EditorAPI {
     }
 
     return resource;
-  }
-
-  /**
-   * Returns the current text selection for given editor.
-   *
-   * @param editorPart the editorPart for which to get the text selection.
-   * @return the current text selection. Returns {@link OldTextSelection#emptySelection()} if no
-   *     text selection exists.
-   */
-  public static OldTextSelection getOldSelection(IEditorPart editorPart) {
-    if (!(editorPart instanceof ITextEditor)) {
-      return OldTextSelection.emptySelection();
-    }
-
-    ITextEditor textEditor = (ITextEditor) editorPart;
-    ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
-
-    if (selectionProvider == null) {
-      return OldTextSelection.emptySelection();
-    }
-
-    ITextSelection jfaceSelection = (ITextSelection) selectionProvider.getSelection();
-
-    return new OldTextSelection(jfaceSelection.getOffset(), jfaceSelection.getLength());
   }
 
   // TODO move text position/offset calculation logic to a separate class; see PR #862
