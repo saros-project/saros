@@ -2,6 +2,7 @@ package saros.intellij.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
@@ -16,6 +17,8 @@ import saros.intellij.runtime.FilesystemRunner;
 
 /** Static utility class for interacting with the project-level Intellij editor API. */
 public class ProjectAPI {
+  private static final EditorFactory editorFactory = EditorFactory.getInstance();
+
   private ProjectAPI() {
     // NOP
   }
@@ -153,5 +156,38 @@ public class ProjectAPI {
   public static boolean isExcluded(@NotNull Project project, @NotNull VirtualFile virtualFile) {
     ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
     return FilesystemRunner.runReadAction(() -> projectFileIndex.isExcluded(virtualFile));
+  }
+
+  /**
+   * Instantiates and returns a background editor for the given document. When no longer needed, the
+   * editor <b>must</b> be released using {@link #releaseBackgroundEditor(Editor)}.
+   *
+   * <p><b>NOTE:</b> This method is only meant to allow optimized access to the editor API for
+   * resources that are currently not open in an editor. Editors obtained through this method are
+   * not actually visible to the user.
+   *
+   * <p>To open user-visible editors, use {@link ProjectAPI#openEditor(Project, VirtualFile,
+   * boolean)} instead.
+   *
+   * @param document the document to open a background editor for
+   * @return a background editor for the given document
+   */
+  @NotNull
+  public static Editor createBackgroundEditor(@NotNull Document document) {
+    return EDTExecutor.invokeAndWait(() -> editorFactory.createEditor(document));
+  }
+
+  /**
+   * Releases the given editor. This should be called on any background editor that is no longer
+   * needed/will no longer be used to dispose it correctly.
+   *
+   * <p><b>NOTE:</b> This method must only be called for background editors that were obtained using
+   * {@link #createBackgroundEditor(Document)}.
+   *
+   * @param editor the background editor to release
+   * @see EditorFactory#releaseEditor(Editor)
+   */
+  public static void releaseBackgroundEditor(@NotNull Editor editor) {
+    EDTExecutor.invokeAndWait(() -> editorFactory.releaseEditor(editor));
   }
 }

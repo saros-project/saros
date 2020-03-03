@@ -15,6 +15,7 @@ import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.intellij.context.SharedIDEContext;
+import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.LocalEditorManipulator;
 import saros.intellij.editor.SelectedEditorStateSnapshot;
@@ -38,6 +39,7 @@ public class SharedResourcesManager implements Startable {
   private static final boolean LOCAL = false;
 
   private final ISarosSession sarosSession;
+  private final EditorManager editorManager;
   private final SharedIDEContext sharedIDEContext;
   private final LocalEditorHandler localEditorHandler;
   private final LocalEditorManipulator localEditorManipulator;
@@ -59,6 +61,7 @@ public class SharedResourcesManager implements Startable {
 
   public SharedResourcesManager(
       ISarosSession sarosSession,
+      EditorManager editorManager,
       LocalEditorHandler localEditorHandler,
       LocalEditorManipulator localEditorManipulator,
       AnnotationManager annotationManager,
@@ -66,6 +69,7 @@ public class SharedResourcesManager implements Startable {
       SelectedEditorStateSnapshotFactory selectedEditorStateSnapshotFactory) {
 
     this.sarosSession = sarosSession;
+    this.editorManager = editorManager;
     this.localEditorHandler = localEditorHandler;
     this.localEditorManipulator = localEditorManipulator;
     this.annotationManager = annotationManager;
@@ -213,6 +217,8 @@ public class SharedResourcesManager implements Startable {
 
     localEditorManipulator.closeEditor(oldPath);
 
+    cleanUpBackgroundEditorPool(oldPath);
+
     annotationManager.updateAnnotationPath(oldFile, newFile);
 
     try {
@@ -255,6 +261,8 @@ public class SharedResourcesManager implements Startable {
     if (localEditorHandler.isOpenEditor(path)) {
       localEditorManipulator.closeEditor(path);
     }
+
+    cleanUpBackgroundEditorPool(path);
 
     try {
       setFilesystemModificationHandlerEnabled(false);
@@ -353,5 +361,14 @@ public class SharedResourcesManager implements Startable {
   private void setFilesystemModificationHandlerEnabled(boolean enabled) {
     sharedIDEContext.setApplicationEventHandlersEnabled(
         ApplicationEventHandlerType.LOCAL_FILESYSTEM_MODIFICATION_HANDLER, enabled);
+  }
+
+  /**
+   * Releases and drops the held background editor for the deleted file if present.
+   *
+   * @param deletedFilePath the deleted file
+   */
+  private void cleanUpBackgroundEditorPool(@NotNull SPath deletedFilePath) {
+    editorManager.removeBackgroundEditorForPath(deletedFilePath);
   }
 }

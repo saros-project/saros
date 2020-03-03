@@ -537,6 +537,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         private void startSession() {
           assert editorPool.getEditors().isEmpty() : "EditorPool was not correctly reset!";
 
+          if (!backgroundEditorPool.isEmpty()) {
+            log.warn(
+                "BackgroundEditorPool already contains entries at session start! Possible memory leak.");
+          }
+
           session.getStopManager().addBlockable(stopManagerListener);
 
           hasWriteAccess = session.hasWriteAccess();
@@ -556,6 +561,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           // again
           unlockAllEditors();
           editorPool.clear();
+          backgroundEditorPool.clear();
 
           session.removeListener(sessionListener);
           session.removeActivityProducer(EditorManager.this);
@@ -575,7 +581,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private SharedIDEContext sharedIDEContext;
 
   /* Session state */
-  private final EditorPool editorPool = new EditorPool();
+  private final BackgroundEditorPool backgroundEditorPool = new BackgroundEditorPool();
+  private final EditorPool editorPool = new EditorPool(backgroundEditorPool);
 
   private final SharedEditorListenerDispatch editorListenerDispatch =
       new SharedEditorListenerDispatch();
@@ -647,6 +654,18 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   public void replaceAllEditorsForPath(SPath oldPath, SPath newPath) {
     editorPool.replacePath(oldPath, newPath);
+  }
+
+  /**
+   * Removes the given resource from the background editor pool if present.
+   *
+   * <p>This should be used to drop background editors for resources that are no longer available,
+   * i.e. were moved or removed.
+   *
+   * @param path the resource to remove from the background editor pool if present
+   */
+  public void removeBackgroundEditorForPath(@NotNull SPath path) {
+    backgroundEditorPool.dropBackgroundEditor(path);
   }
 
   EditorPool getEditorPool() {
