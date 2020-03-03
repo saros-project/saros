@@ -6,14 +6,10 @@ sarosEclipse {
 
 configurations {
     stfTest
-    stfFlakyAndFailingTest
 }
 
 sourceSets {
     stfTest {
-        java.srcDir 'test'
-    }
-    stfFlakyAndFailingTest {
         java.srcDir 'test'
     }
 }
@@ -25,12 +21,6 @@ dependencies {
     // TODO: The custom saros eclipse plugin adds all dependencies to implementation
     stfTestCompile configurations.implementation
     testCompile configurations.stfTestCompile // for running the tests in eclipse
-
-    stfFlakyAndFailingTestCompile project(':saros.stf')
-    stfFlakyAndFailingTestCompile project(path: ':saros.stf', configuration: 'testing')
-    stfFlakyAndFailingTestCompile configurations.testConfig
-    stfFlakyAndFailingTestCompile configurations.implementation
-    testCompile configurations.stfFlakyAndFailingTestCompile // for running the tests in eclipse
 }
 
 class StfTest extends Test {
@@ -73,8 +63,8 @@ task stfTest (type: StfTest, dependsOn: [':saros.eclipse:build']) {
 }
 
 task stfFlakyAndFailingTest (type: StfTest, dependsOn: [':saros.eclipse:build']) {
-    testClassesDirs = sourceSets.stfFlakyAndFailingTest.output.classesDirs
-    classpath = sourceSets.stfFlakyAndFailingTest.runtimeClasspath
+    testClassesDirs = sourceSets.stfTest.output.classesDirs
+    classpath = sourceSets.stfTest.runtimeClasspath
     ignoreFailures = true
     
     useJUnit {
