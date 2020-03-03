@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -23,7 +24,7 @@ import saros.editor.annotations.SelectionAnnotation;
 import saros.editor.annotations.SelectionFillUpAnnotation;
 import saros.editor.annotations.ViewportAnnotation;
 import saros.editor.text.LineRange;
-import saros.editor.text.OldTextSelection;
+import saros.editor.text.TextSelection;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.session.User;
 import saros.ui.util.SWTUtils;
@@ -192,7 +193,7 @@ public class LocationAnnotationManager {
    * @param editorPart {@link IEditorPart} that displays the opened document of which the
    *     annotations should be updated.
    */
-  public void setSelection(IEditorPart editorPart, OldTextSelection selection, User source) {
+  public void setSelection(IEditorPart editorPart, TextSelection selection, User source) {
 
     if (!(editorPart instanceof ITextEditor)) return;
 
@@ -211,8 +212,10 @@ public class LocationAnnotationManager {
       return;
     }
 
-    int offset = selection.getOffset();
-    int length = selection.getLength();
+    ITextSelection offsetSelection = EditorAPI.calculateOffsets(editorPart, selection);
+
+    int offset = offsetSelection.getOffset();
+    int length = offsetSelection.getLength();
     boolean isCursor = length == 0;
 
     // TODO For better performance: Currently, all selection-related

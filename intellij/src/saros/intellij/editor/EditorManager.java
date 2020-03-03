@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ import saros.editor.SharedEditorListenerDispatch;
 import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
-import saros.editor.text.OldTextSelection;
+import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.intellij.context.SharedIDEContext;
@@ -201,12 +202,53 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           log.debug("Text selection activity received: " + path + ", " + selection);
 
           User user = selection.getSource();
-          int start = selection.getOffset();
-          int end = start + selection.getLength();
 
           Editor editor = editorPool.getEditor(path);
 
-          annotationManager.addSelectionAnnotation(user, file, start, end, editor);
+          // Editor used for position calculation
+          Editor calcEditor = editor;
+
+          if (calcEditor == null) {
+            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+
+            if (virtualFile == null) {
+              log.warn(
+                  "Could not apply selection "
+                      + selection
+                      + " as no virtual file could be obtained for resource "
+                      + path);
+
+              return;
+            }
+
+            Document document = DocumentAPI.getDocument(virtualFile);
+
+            if (document == null) {
+              log.warn(
+                  "Could not apply selection "
+                      + selection
+                      + " as no document could be obtained for resource "
+                      + virtualFile);
+
+              return;
+            }
+
+            calcEditor = backgroundEditorPool.getBackgroundEditor(path, document);
+          }
+
+          TextSelection textSelection = selection.getSelection();
+
+          if (textSelection.isEmpty()) {
+            annotationManager.removeSelectionAnnotation(user, file);
+
+          } else {
+            Pair<Integer, Integer> offsets = EditorAPI.calculateOffsets(calcEditor, textSelection);
+
+            int start = offsets.first;
+            int end = offsets.second;
+
+            annotationManager.addSelectionAnnotation(user, file, start, end, editor);
+          }
 
           editorListenerDispatch.textSelectionChanged(selection);
         }
@@ -361,12 +403,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   private void sendSelectionInformation(
       @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
 
-    Pair<Integer, Integer> localSelectionOffsets = EditorAPI.getLocalSelectionOffsets(editor);
-    int selectionStartOffset = localSelectionOffsets.first;
-    int selectionLength = localSelectionOffsets.second;
+    TextSelection selection = EditorAPI.getSelection(editor);
 
-    TextSelectionActivity setSelection =
-        new TextSelectionActivity(user, selectionStartOffset, selectionLength, path);
+    TextSelectionActivity setSelection = new TextSelectionActivity(user, selection, path);
 
     fireActivity(setSelection);
   }
@@ -739,11 +778,21 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * outside the editor package. If you still need to access this method, please consider whether
    * your class should rather be located in the editor package.
    */
+  // TODO handle TextRange.EMPTY_RANGE separately? Could represent no valid selection for editor
   public void generateSelection(SPath path, SelectionEvent newSelection) {
-    int offset = newSelection.getNewRange().getStartOffset();
-    int length = newSelection.getNewRange().getLength();
+    TextRange newSelectionRange = newSelection.getNewRange();
 
-    fireActivity(new TextSelectionActivity(session.getLocalUser(), offset, length, path));
+    Editor editor = newSelection.getEditor();
+
+    if (editor != null && newSelectionRange != null) {
+      int startOffset = newSelectionRange.getStartOffset();
+      int endOffset = newSelectionRange.getEndOffset();
+
+      TextSelection selection =
+          EditorAPI.calculateSelectionPosition(editor, startOffset, endOffset);
+
+      fireActivity(new TextSelectionActivity(session.getLocalUser(), selection, path));
+    }
   }
 
   /**
@@ -842,7 +891,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           }
 
           LineRange viewport = remoteActiveEditor.getViewport();
-          OldTextSelection textSelection = remoteActiveEditor.getSelection();
+          TextSelection textSelection = remoteActiveEditor.getSelection();
 
           localEditorManipulator.adjustViewport(newEditor, viewport, textSelection);
         });
@@ -958,11 +1007,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @param path {@inheritDoc}
    * @param range {@inheritDoc}
    * @param selection {@inheritDoc}
-   * @see LocalEditorManipulator#adjustViewport(Editor, LineRange, OldTextSelection)
+   * @see LocalEditorManipulator#adjustViewport(Editor, LineRange, TextSelection)
    */
   @Override
   public void adjustViewport(
-      @NotNull final SPath path, final LineRange range, final OldTextSelection selection) {
+      @NotNull final SPath path,
+      @Nullable final LineRange range,
+      @Nullable final TextSelection selection) {
 
     Set<String> visibleFilePaths = new HashSet<>();
 

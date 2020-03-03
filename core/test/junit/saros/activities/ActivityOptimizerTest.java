@@ -8,6 +8,8 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import saros.editor.text.TextPosition;
+import saros.editor.text.TextSelection;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.net.xmpp.JID;
@@ -49,21 +51,24 @@ public class ActivityOptimizerTest {
 
     SPath barbarSPath = new SPath(barProject, barPath);
 
-    TextSelectionActivity tsChange0 = new TextSelectionActivity(alice, 0, 1, foofooSPath);
+    TextSelection selection1 = new TextSelection(new TextPosition(0, 0), new TextPosition(1, 1));
+    TextSelection selection2 = new TextSelection(new TextPosition(1, 1), new TextPosition(1, 1));
 
-    TextSelectionActivity tsChange1 = new TextSelectionActivity(alice, 1, 1, foofooSPath);
+    TextSelectionActivity tsChange0 = new TextSelectionActivity(alice, selection1, foofooSPath);
 
-    TextSelectionActivity tsChange2 = new TextSelectionActivity(alice, 0, 1, foobarSPath);
+    TextSelectionActivity tsChange1 = new TextSelectionActivity(alice, selection2, foofooSPath);
 
-    TextSelectionActivity tsChange3 = new TextSelectionActivity(alice, 1, 1, foobarSPath);
+    TextSelectionActivity tsChange2 = new TextSelectionActivity(alice, selection1, foobarSPath);
 
-    TextSelectionActivity tsChange4 = new TextSelectionActivity(alice, 0, 1, barfooSPath);
+    TextSelectionActivity tsChange3 = new TextSelectionActivity(alice, selection2, foobarSPath);
 
-    TextSelectionActivity tsChange5 = new TextSelectionActivity(alice, 1, 1, barfooSPath);
+    TextSelectionActivity tsChange4 = new TextSelectionActivity(alice, selection1, barfooSPath);
 
-    TextSelectionActivity tsChange6 = new TextSelectionActivity(alice, 0, 1, barbarSPath);
+    TextSelectionActivity tsChange5 = new TextSelectionActivity(alice, selection2, barfooSPath);
 
-    TextSelectionActivity tsChange7 = new TextSelectionActivity(alice, 1, 1, barbarSPath);
+    TextSelectionActivity tsChange6 = new TextSelectionActivity(alice, selection1, barbarSPath);
+
+    TextSelectionActivity tsChange7 = new TextSelectionActivity(alice, selection2, barbarSPath);
 
     // --------------------------------------------------------------------------------
 
@@ -83,7 +88,7 @@ public class ActivityOptimizerTest {
 
     ViewportActivity vpChange7 = new ViewportActivity(alice, 1, 1, barbarSPath);
 
-    List<IActivity> activities = new ArrayList<IActivity>();
+    List<IActivity> activities = new ArrayList<>();
 
     activities.add(tsChange0);
     activities.add(nop);

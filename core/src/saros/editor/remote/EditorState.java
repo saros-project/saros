@@ -2,14 +2,14 @@ package saros.editor.remote;
 
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
-import saros.editor.text.OldTextSelection;
+import saros.editor.text.TextSelection;
 
 /** Represents the current status of an editor. */
 public class EditorState {
 
   private final SPath path;
 
-  private OldTextSelection selection;
+  private TextSelection selection;
 
   private LineRange viewport;
 
@@ -17,7 +17,7 @@ public class EditorState {
     this.path = path;
   }
 
-  EditorState(SPath path, LineRange viewport, OldTextSelection selection) {
+  EditorState(SPath path, LineRange viewport, TextSelection selection) {
     this.path = path;
     this.viewport = viewport;
     this.selection = selection;
@@ -48,11 +48,11 @@ public class EditorState {
    * Returns the selection in the editor described by this state object or <code>null</code> if
    * there is no selection in the editor.
    */
-  public OldTextSelection getSelection() {
+  public TextSelection getSelection() {
     return selection;
   }
 
-  void setSelection(OldTextSelection selection) {
+  void setSelection(TextSelection selection) {
     this.selection = selection;
   }
 }

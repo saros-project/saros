@@ -15,7 +15,7 @@ import saros.activities.TextEditActivity;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.text.LineRange;
-import saros.editor.text.OldTextSelection;
+import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
@@ -60,7 +60,7 @@ public class ServerEditorManager implements IEditorManager {
   }
 
   @Override
-  public void adjustViewport(SPath path, LineRange range, OldTextSelection selection) {
+  public void adjustViewport(SPath path, LineRange range, TextSelection selection) {
     throw new UnsupportedOperationException();
   }
 

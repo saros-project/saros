@@ -1,13 +1,12 @@
-/** */
 package saros.editor;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.IViewportListener;
 import org.eclipse.jface.text.TextEvent;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
@@ -20,7 +19,7 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.ui.IEditorPart;
 import saros.editor.internal.EditorAPI;
 import saros.editor.text.LineRange;
-import saros.editor.text.OldTextSelection;
+import saros.editor.text.TextSelection;
 
 /**
  * Listener for tracking the selection and viewport of an IEditorPart and reporting any changes to
@@ -36,7 +35,7 @@ public class EditorListener {
 
   protected IEditorPart part;
 
-  protected ITextSelection lastSelection = TextSelection.emptySelection();
+  protected ITextSelection lastSelection = org.eclipse.jface.text.TextSelection.emptySelection();
 
   private LineRange lastViewport;
 
@@ -202,8 +201,24 @@ public class EditorListener {
     if (!lastSelection.equals(selection)) {
       lastSelection = selection;
 
-      manager.generateSelection(
-          part, new OldTextSelection(selection.getOffset(), selection.getLength()));
+      IDocument document = viewer.getDocument();
+
+      if (document == null) {
+        log.warn(
+            "Could not calculate selection positions for "
+                + viewer
+                + " as no document could be obtained. Dropped selection: "
+                + selection);
+
+        return;
+      }
+
+      int offset = selection.getOffset();
+      int length = selection.getLength();
+
+      TextSelection textSelection = EditorAPI.calculateSelection(document, offset, length);
+
+      manager.generateSelection(part, textSelection);
     }
   }
 
