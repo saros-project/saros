@@ -69,10 +69,7 @@ public class AnnotationManager implements Disposable {
   public void addSelectionAnnotation(
       @NotNull User user, @NotNull IFile file, int start, int end, @Nullable Editor editor) {
 
-    List<SelectionAnnotation> currentSelectionAnnotation =
-        selectionAnnotationStore.removeAnnotations(user, file);
-
-    currentSelectionAnnotation.forEach(this::removeRangeHighlighter);
+    removeSelectionAnnotation(user, file);
 
     checkRange(start, end);
 
@@ -100,6 +97,19 @@ public class AnnotationManager implements Disposable {
         new SelectionAnnotation(user, file, editor, Collections.singletonList(annotationRange));
 
     selectionAnnotationStore.addAnnotation(selectionAnnotation);
+  }
+
+  /**
+   * Removes the current selection annotation for the given file and user combination if present.
+   *
+   * @param user the user the annotation belongs to
+   * @param file the file the annotation belongs to
+   */
+  public void removeSelectionAnnotation(@NotNull User user, @NotNull IFile file) {
+    List<SelectionAnnotation> currentSelectionAnnotation =
+        selectionAnnotationStore.removeAnnotations(user, file);
+
+    currentSelectionAnnotation.forEach(this::removeRangeHighlighter);
   }
 
   /**
