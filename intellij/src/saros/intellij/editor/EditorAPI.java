@@ -88,25 +88,6 @@ public class EditorAPI {
   }
 
   /**
-   * Returns the offset and length of the local selection for the given editor.
-   *
-   * <p>The values are returned as a {@link Pair}. The first value is the starting offset of the
-   * selection and the second value is the length of the selection.
-   *
-   * @param editor the editor to get the local selection offsets for.
-   * @return a Pair containing the local selection offset and length for the given editor.
-   */
-  @NotNull
-  static Pair<Integer, Integer> getLocalSelectionOffsets(@NotNull Editor editor) {
-    int selectionStartOffset = editor.getSelectionModel().getSelectionStart();
-    int selectionEndOffset = editor.getSelectionModel().getSelectionEnd();
-
-    int selectionLength = selectionEndOffset - selectionStartOffset;
-
-    return new Pair<>(selectionStartOffset, selectionLength);
-  }
-
-  /**
    * Returns the current selection in the given editor.
    *
    * @param editor the editor to get the selection for
@@ -232,28 +213,5 @@ public class EditorAPI {
    */
   private static int calculateLineOffset(@NotNull Editor editor, int lineNumber) {
     return editor.logicalPositionToOffset(new LogicalPosition(lineNumber, 0, true));
-  }
-
-  /**
-   * Returns the logical line range of the section represented by the given offsets for the given
-   * editor.
-   *
-   * @param editor the editor to get the line range for
-   * @param startOffset the start offset of the section
-   * @param endOffset the end offset of the section
-   * @return the logical line range of the section represented by the given offsets for the given
-   *     editor
-   * @see LogicalPosition
-   */
-  @NotNull
-  static LineRange getLineRange(@NotNull Editor editor, int startOffset, int endOffset) {
-    assert startOffset <= endOffset;
-
-    int startLine = editor.offsetToLogicalPosition(startOffset).line;
-    int endLine = editor.offsetToLogicalPosition(endOffset).line;
-
-    int rangeLength = endLine - startLine;
-
-    return new LineRange(startLine, rangeLength);
   }
 }
