@@ -1,12 +1,15 @@
 package saros.editor.internal;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
@@ -37,6 +40,8 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
 import saros.editor.text.OldTextSelection;
+import saros.editor.text.TextPosition;
+import saros.editor.text.TextSelection;
 import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.ui.dialogs.WarningMessageDialog;
@@ -289,6 +294,276 @@ public class EditorAPI {
     ITextSelection jfaceSelection = (ITextSelection) selectionProvider.getSelection();
 
     return new OldTextSelection(jfaceSelection.getOffset(), jfaceSelection.getLength());
+  }
+
+  // TODO move text position/offset calculation logic to a separate class; see PR #862
+  /**
+   * Returns the line base selection values for the given editor part.
+   *
+   * <p>The given editor part must not be <code>null</code>.
+   *
+   * @param editorPart the editorPart for which to get the text selection
+   * @return the line base selection values for the given editor part or {@link
+   *     TextSelection#EMPTY_SELECTION} if the given editor part is is <code>null</code> or not a
+   *     text editor, the editor does not have a valid selection provider or document provider, a
+   *     valid IDocument could not be obtained form the document provider, or the correct line
+   *     numbers or in-lin offsets could not be calculated
+   */
+  public static TextSelection getSelection(IEditorPart editorPart) {
+    if (!(editorPart instanceof ITextEditor)) {
+      return TextSelection.EMPTY_SELECTION;
+    }
+
+    ITextEditor textEditor = (ITextEditor) editorPart;
+    ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
+
+    if (selectionProvider == null) {
+      return TextSelection.EMPTY_SELECTION;
+    }
+
+    IDocumentProvider documentProvider = textEditor.getDocumentProvider();
+
+    if (documentProvider == null) {
+      return TextSelection.EMPTY_SELECTION;
+    }
+
+    IDocument document = documentProvider.getDocument(editorPart.getEditorInput());
+
+    if (document == null) {
+      return TextSelection.EMPTY_SELECTION;
+    }
+
+    ITextSelection textSelection = (ITextSelection) selectionProvider.getSelection();
+    int offset = textSelection.getOffset();
+    int length = textSelection.getLength();
+
+    return calculateSelection(document, offset, length);
+  }
+
+  /**
+   * Calculates the line based selection values for the given text based selection offset and length
+   * in the given document.
+   *
+   * <p>An empty selection is represented by both the offset and length having the value -1. In any
+   * other case, the offset and length must both be greater or equal to zero.
+   *
+   * <p>The given editor part must not be <code>null</code>.
+   *
+   * @param editorPart the editor part the selection belongs to
+   * @param offset the text based offset of the selection
+   * @param length the text based length of the selection
+   * @return the line based selection values for the given text offset based selection in the given
+   *     document or {@link TextSelection#EMPTY_SELECTION} if the given editor part is not a text
+   *     editor, the editor does not have a valid document provider, a valid IDocument could not be
+   *     obtained form the document provider, the correct line numbers or in-line offsets could not
+   *     be calculated, or the given offset and length have the value -1
+   * @throws NullPointerException if the given editor part is <code>null</code>
+   * @throws IllegalArgumentException if one but not both of selection and length is set to -1 or
+   *     any negative value besides -1 is passed
+   * @see TextSelection
+   * @see ITextSelection
+   */
+  public static TextSelection calculateSelection(IEditorPart editorPart, int offset, int length) {
+    Objects.requireNonNull(editorPart, "The given editor part must not be null");
+
+    if (!(editorPart instanceof ITextEditor)) {
+      return TextSelection.EMPTY_SELECTION;
+    }
+
+    ITextEditor textEditor = (ITextEditor) editorPart;
+
+    IDocumentProvider documentProvider = textEditor.getDocumentProvider();
+
+    if (documentProvider == null) {
+      return TextSelection.EMPTY_SELECTION;
+    }
+
+    IDocument document = documentProvider.getDocument(editorPart.getEditorInput());
+
+    if (document == null) {
+      return TextSelection.EMPTY_SELECTION;
+    }
+
+    return calculateSelection(document, offset, length);
+  }
+
+  /**
+   * Calculates the line based selection values for the given text based selection offset and length
+   * in the given document.
+   *
+   * <p>An empty selection is represented by both the offset and length having the value -1. In any
+   * other case, the offset and length must both be greater or equal to zero.
+   *
+   * <p>The given document must not be <code>null</code>.
+   *
+   * @param document the document the selection belongs to
+   * @param offset the text based offset of the selection
+   * @param length the text based length of the selection
+   * @return the line based selection values for the given text offset based selection in the given
+   *     document or {@link TextSelection#EMPTY_SELECTION} if the correct line numbers or in-line
+   *     offsets could not be calculated or the given offset and length have the value -1
+   * @throws NullPointerException if the given document is <code>null</code>
+   * @throws IllegalArgumentException if one but not both of selection and length is set to -1 or
+   *     any negative value besides -1 is passed
+   * @see TextSelection
+   * @see ITextSelection
+   */
+  public static TextSelection calculateSelection(IDocument document, int offset, int length) {
+    Objects.requireNonNull(document, "The given document must not be null");
+
+    if (offset == -1 && length == -1) {
+      return TextSelection.EMPTY_SELECTION;
+
+    } else if (offset < 0 || length < 0) {
+      throw new IllegalArgumentException(
+          "Invalid set of selection parameters given; must either both be -1 or both be >=0. o: "
+              + offset
+              + ", l: "
+              + length);
+    }
+
+    int endOffset = offset + length;
+
+    int startLine;
+    int startLineOffset;
+
+    try {
+      /*
+       * Explicitly does not use textSelection.getStartLine() to obtain the start line number as
+       * this call also uses IDocument.getLineOfOffset(...) but simply drops the thrown exception.
+       */
+      startLine = document.getLineOfOffset(offset);
+      startLineOffset = document.getLineOffset(startLine);
+
+    } catch (BadLocationException e) {
+      log.warn(
+          "Could not calculate the start line or start line offset for the given start offset "
+              + offset
+              + " in the document "
+              + document,
+          e);
+
+      return TextSelection.EMPTY_SELECTION;
+    }
+
+    int startInLineOffset = offset - startLineOffset;
+    TextPosition startPosition = new TextPosition(startLine, startInLineOffset);
+
+    // Skip second part of calculation if no selection is present
+    if (endOffset == offset) {
+      return new TextSelection(startPosition, startPosition);
+    }
+
+    int endLine;
+    int endLineOffset;
+
+    try {
+      /*
+       * Explicitly does not use textSelection.getEndLine() to obtain the start line number as this
+       * call also uses IDocument.getLineOfOffset(...) but simply drops the thrown exception.
+       */
+      endLine = document.getLineOfOffset(endOffset);
+
+      // Skip line offset calculation if end is in same line as start
+      if (endLine == startLine) {
+        endLineOffset = startLineOffset;
+
+      } else {
+        endLineOffset = document.getLineOffset(endLine);
+      }
+
+    } catch (BadLocationException e) {
+      log.warn(
+          "Could not calculate the end line or end line offset for the given end offset "
+              + endOffset
+              + " in the document "
+              + document,
+          e);
+
+      return TextSelection.EMPTY_SELECTION;
+    }
+
+    int endInLineOffset = endOffset - endLineOffset;
+    TextPosition endPosition = new TextPosition(endLine, endInLineOffset);
+
+    return new TextSelection(startPosition, endPosition);
+  }
+
+  /**
+   * Calculates the text based offsets in the given editor part for the given text selection.
+   *
+   * <p>The given editor part must not be <code>null</code> and the given text selection must not be
+   * <code>null</code> and must not be empty.
+   *
+   * @param editorPart the local editor part
+   * @param selection the text selection
+   * @return the absolute offsets in the given editor part for the given text selection or {@link
+   *     org.eclipse.jface.text.TextSelection#emptySelection()} if the given editor is not a text
+   *     editor, the editor does not have a valid document provider, a valid IDocument could not be
+   *     obtained form the document provider, or the line offsets could not be calculated
+   * @throws NullPointerException if the given editor part or selection is <code>null</code>
+   * @throws IllegalArgumentException if the given text selection is empty
+   */
+  public static ITextSelection calculateOffsets(IEditorPart editorPart, TextSelection selection) {
+
+    Objects.requireNonNull(editorPart, "The given editor part must not be null");
+    Objects.requireNonNull(selection, "The given selection must not be null");
+
+    if (selection.isEmpty()) {
+      throw new IllegalArgumentException("The given text selection must not be empty");
+    }
+
+    if (!(editorPart instanceof ITextEditor)) {
+      return org.eclipse.jface.text.TextSelection.emptySelection();
+    }
+
+    ITextEditor textEditor = (ITextEditor) editorPart;
+
+    IDocumentProvider documentProvider = textEditor.getDocumentProvider();
+
+    if (documentProvider == null) {
+      return org.eclipse.jface.text.TextSelection.emptySelection();
+    }
+
+    IDocument document = documentProvider.getDocument(textEditor.getEditorInput());
+
+    if (document == null) {
+      return org.eclipse.jface.text.TextSelection.emptySelection();
+    }
+
+    TextPosition startPosition = selection.getStartPosition();
+    TextPosition endPosition = selection.getEndPosition();
+
+    int startLineOffset;
+    int endLineOffset;
+
+    try {
+      startLineOffset = document.getLineOffset(startPosition.getLineNumber());
+
+      if (endPosition.getLineNumber() == startPosition.getLineNumber()) {
+        endLineOffset = startLineOffset;
+
+      } else {
+        endLineOffset = document.getLineOffset(endPosition.getLineNumber());
+      }
+
+    } catch (BadLocationException e) {
+      log.warn(
+          "Could not calculate the line offset for the given selection "
+              + selection
+              + " in the document "
+              + document,
+          e);
+
+      return org.eclipse.jface.text.TextSelection.emptySelection();
+    }
+
+    int startOffset = startLineOffset + startPosition.getInLineOffset();
+
+    int endOffset = endLineOffset + endPosition.getInLineOffset();
+    int length = endOffset - startOffset;
+
+    return new org.eclipse.jface.text.TextSelection(startOffset, length);
   }
 
   /** Enables/disables the ability to edit the document in given editor. */
