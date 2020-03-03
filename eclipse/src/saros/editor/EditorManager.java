@@ -52,7 +52,7 @@ import saros.editor.internal.SafePartListener2;
 import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
-import saros.editor.text.OldTextSelection;
+import saros.editor.text.TextSelection;
 import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.IProject;
 import saros.filesystem.ResourceAdapterFactory;
@@ -127,7 +127,7 @@ public class EditorManager implements IEditorManager {
 
   private Set<SPath> openEditorPaths = new HashSet<SPath>();
 
-  private OldTextSelection localSelection;
+  private TextSelection localSelection;
 
   private LineRange localViewport;
 
@@ -198,8 +198,7 @@ public class EditorManager implements IEditorManager {
           SPath path = activity.getPath();
           User user = activity.getSource();
 
-          OldTextSelection textSelection =
-              new OldTextSelection(activity.getOffset(), activity.getLength());
+          TextSelection textSelection = activity.getSelection();
 
           for (IEditorPart editorPart : editorPool.getEditors(path)) {
             locationAnnotationManager.setSelection(editorPart, textSelection, user);
@@ -295,11 +294,9 @@ public class EditorManager implements IEditorManager {
           }
 
           if (localSelection != null) {
-            int offset = localSelection.getOffset();
-            int length = localSelection.getLength();
-
             activityDelayer.fireActivity(
-                new TextSelectionActivity(localUser, offset, length, locallyActiveEditor));
+                new TextSelectionActivity(localUser, localSelection, locallyActiveEditor));
+
           } else {
             log.warn("No selection for locallyActivateEditor: " + locallyActiveEditor);
           }
@@ -529,14 +526,14 @@ public class EditorManager implements IEditorManager {
   }
 
   /**
-   * Fires an update of the given {@link OldTextSelection} for the given {@link IEditorPart} so that
+   * Fires an update of the given {@link TextSelection} for the given {@link IEditorPart} so that
    * all remote parties know that the user selected some text in the given part.
    *
    * @param part The IEditorPart for which to generate a TextSelectionActivity
    * @param newSelection The ITextSelection in the given part which represents the currently
    *     selected text in editor.
    */
-  void generateSelection(IEditorPart part, OldTextSelection newSelection) {
+  void generateSelection(IEditorPart part, TextSelection newSelection) {
 
     SPath path = EditorAPI.getEditorPath(part);
     if (path == null) {
@@ -546,11 +543,8 @@ public class EditorManager implements IEditorManager {
 
     if (path.equals(locallyActiveEditor)) localSelection = newSelection;
 
-    int offset = newSelection.getOffset();
-    int length = newSelection.getLength();
-
     activityDelayer.fireActivity(
-        new TextSelectionActivity(session.getLocalUser(), offset, length, path));
+        new TextSelectionActivity(session.getLocalUser(), newSelection, path));
   }
 
   /**
@@ -718,7 +712,8 @@ public class EditorManager implements IEditorManager {
       if (viewer.getTopIndexStartOffset() <= cursorOffset
           && cursorOffset <= viewer.getBottomIndexEndOffset()) {
 
-        OldTextSelection selection = new OldTextSelection(cursorOffset, 0);
+        TextSelection selection = EditorAPI.calculateSelection(editorPart, cursorOffset, 0);
+
         locationAnnotationManager.setSelection(editorPart, selection, user);
       }
     }
@@ -729,7 +724,7 @@ public class EditorManager implements IEditorManager {
 
   @Override
   public void adjustViewport(
-      final SPath path, final LineRange range, final OldTextSelection selection) {
+      final SPath path, final LineRange range, final TextSelection selection) {
 
     if (path == null) throw new IllegalArgumentException("path must not be null");
 
@@ -859,7 +854,7 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    OldTextSelection selection = EditorAPI.getOldSelection(editorPart);
+    TextSelection selection = EditorAPI.getSelection(editorPart);
 
     // Set (and thus send) in this order:
     generateEditorActivated(editorPath);
@@ -1331,7 +1326,7 @@ public class EditorManager implements IEditorManager {
         locationAnnotationManager.setViewportForUser(user, editorPart, lineRange);
       }
 
-      OldTextSelection selection = remoteEditor.getSelection();
+      TextSelection selection = remoteEditor.getSelection();
       if (selection != null) {
         locationAnnotationManager.setSelection(editorPart, selection, user);
       }
@@ -1464,7 +1459,7 @@ public class EditorManager implements IEditorManager {
 
     final SPath path = activeEditor.getPath();
     final LineRange viewport = activeEditor.getViewport();
-    final OldTextSelection selection = activeEditor.getSelection();
+    final TextSelection selection = activeEditor.getSelection();
 
     // TODO So jumping to a user's position based on his/her selection is
     // not an option?
@@ -1553,7 +1548,7 @@ public class EditorManager implements IEditorManager {
    * @param range viewport of the followed user. Can be <code>null</code>.
    * @param selection text selection of the followed user. Can be <code>null</code>.
    */
-  private void adjustViewport(IEditorPart editorPart, LineRange range, OldTextSelection selection) {
+  private void adjustViewport(IEditorPart editorPart, LineRange range, TextSelection selection) {
     ITextViewer viewer = EditorAPI.getViewer(editorPart);
     if (viewer == null) return;
 
@@ -1568,20 +1563,9 @@ public class EditorManager implements IEditorManager {
     int selectionTop = 0;
     int selectionBottom = 0;
 
-    if (selection != null) {
-      try {
-        selectionTop = document.getLineOfOffset(selection.getOffset());
-        selectionBottom = document.getLineOfOffset(selection.getOffset() + selection.getLength());
-      } catch (BadLocationException e) {
-        // should never be reached
-        log.error(
-            "Invalid line selection: offset: "
-                + selection.getOffset()
-                + ", length: "
-                + selection.getLength());
-
-        selection = null;
-      }
+    if (selection != null && !selection.isEmpty()) {
+      selectionTop = selection.getStartPosition().getLineNumber();
+      selectionBottom = selection.getEndPosition().getLineNumber();
     }
 
     if (range != null) {

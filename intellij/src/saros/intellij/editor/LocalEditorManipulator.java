@@ -8,13 +8,14 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.activities.SPath;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.text.DeleteOperation;
 import saros.concurrent.jupiter.internal.text.ITextOperation;
 import saros.editor.IEditorManager;
 import saros.editor.text.LineRange;
-import saros.editor.text.OldTextSelection;
+import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.intellij.editor.annotations.AnnotationManager;
 import saros.intellij.filesystem.IntelliJProjectImpl;
@@ -216,10 +217,12 @@ public class LocalEditorManipulator {
    *     null</code>
    * @param selection text selection of the followed user; can be <code>null</code> if range is not
    *     <code>null</code>
-   * @see IEditorManager#adjustViewport(SPath, LineRange, OldTextSelection)
+   * @see IEditorManager#adjustViewport(SPath, LineRange, TextSelection)
    */
-  public void adjustViewport(@NotNull Editor editor, LineRange range, OldTextSelection selection) {
-    if (selection == null && range == null) {
+  public void adjustViewport(
+      @NotNull Editor editor, @Nullable LineRange range, @Nullable TextSelection selection) {
+
+    if ((selection == null || selection.isEmpty()) && range == null) {
       VirtualFile file = DocumentAPI.getVirtualFile(editor.getDocument());
 
       log.warn(
@@ -243,13 +246,8 @@ public class LocalEditorManipulator {
       remoteEndLine = range.getStartLine() + range.getNumberOfLines();
 
     } else {
-      int startOffset = selection.getOffset();
-      int endOffset = selection.getOffset() + selection.getLength();
-
-      LineRange selectionRange = EditorAPI.getLineRange(editor, startOffset, endOffset);
-
-      remoteStartLine = selectionRange.getStartLine();
-      remoteEndLine = selectionRange.getStartLine() + selectionRange.getNumberOfLines();
+      remoteStartLine = selection.getStartPosition().getLineNumber();
+      remoteEndLine = selection.getEndPosition().getLineNumber();
     }
 
     if (localStartLine <= remoteStartLine && localEndLine >= remoteEndLine) {

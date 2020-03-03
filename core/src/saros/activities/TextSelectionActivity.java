@@ -21,26 +21,50 @@ package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import java.util.Objects;
+import saros.editor.text.TextPosition;
+import saros.editor.text.TextSelection;
 import saros.session.User;
 
 @XStreamAlias("textSelectionActivity")
 public class TextSelectionActivity extends AbstractResourceActivity {
 
-  @XStreamAlias("o")
+  @XStreamAlias("sl")
   @XStreamAsAttribute
-  protected final int offset;
+  private final int startLine;
 
-  @XStreamAlias("l")
+  @XStreamAlias("so")
   @XStreamAsAttribute
-  protected final int length;
+  private final int startInLineOffset;
 
-  public TextSelectionActivity(User source, int offset, int length, SPath path) {
+  @XStreamAlias("el")
+  @XStreamAsAttribute
+  private final int endLine;
+
+  @XStreamAlias("eo")
+  @XStreamAsAttribute
+  private final int endInLineOffset;
+
+  /**
+   * Instantiates a new text selection activity.
+   *
+   * @param source the user that created the selection
+   * @param selection the text selection
+   * @param path the resource the text was selected in
+   * @throws IllegalArgumentException if the source or path is <code>null</code>
+   */
+  public TextSelectionActivity(User source, TextSelection selection, SPath path) {
     super(source, path);
 
     if (path == null) throw new IllegalArgumentException("path must not be null");
 
-    this.offset = offset;
-    this.length = length;
+    TextPosition startPosition = selection.getStartPosition();
+    this.startLine = startPosition.getLineNumber();
+    this.startInLineOffset = startPosition.getInLineOffset();
+
+    TextPosition endPosition = selection.getEndPosition();
+    this.endLine = endPosition.getLineNumber();
+    this.endInLineOffset = endPosition.getInLineOffset();
   }
 
   @Override
@@ -48,21 +72,21 @@ public class TextSelectionActivity extends AbstractResourceActivity {
     return super.isValid() && (getPath() != null);
   }
 
-  public int getLength() {
-    return this.length;
-  }
+  /**
+   * Returns the text selection contained in this activity.
+   *
+   * @return the text selection contained in the activity
+   */
+  public TextSelection getSelection() {
+    TextPosition startPosition = new TextPosition(startLine, startInLineOffset);
+    TextPosition endPosition = new TextPosition(endLine, endInLineOffset);
 
-  public int getOffset() {
-    return this.offset;
+    return new TextSelection(startPosition, endPosition);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + length;
-    result = prime * result + offset;
-    return result;
+    return Objects.hash(super.hashCode(), startLine, startInLineOffset, endLine, endInLineOffset);
   }
 
   @Override
@@ -73,18 +97,22 @@ public class TextSelectionActivity extends AbstractResourceActivity {
 
     TextSelectionActivity other = (TextSelectionActivity) obj;
 
-    if (this.offset != other.offset) return false;
-    if (this.length != other.length) return false;
-
-    return true;
+    return this.startLine == other.startLine
+        && this.startInLineOffset == other.startInLineOffset
+        && this.endLine == other.endLine
+        && this.endInLineOffset == other.endInLineOffset;
   }
 
   @Override
   public String toString() {
-    return "TextSelectionActivity(offset: "
-        + offset
-        + ", length: "
-        + length
+    return "TextSelectionActivity(start line: "
+        + startLine
+        + ", in-line offset: "
+        + startInLineOffset
+        + ", end line: "
+        + endLine
+        + ", in-line offset: "
+        + endInLineOffset
         + ", src: "
         + getSource()
         + ", path: "

@@ -10,6 +10,7 @@ import saros.activities.TextSelectionActivity;
 import saros.annotations.Component;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
+import saros.editor.text.TextSelection;
 import saros.net.xmpp.JID;
 import saros.session.ISarosSession;
 import saros.session.User;
@@ -57,17 +58,15 @@ public class SelectionCollector extends AbstractStatisticCollector {
   private static class SelectionEvent {
     private long time;
     private SPath path;
-    private int offset;
-    private int length;
+    private TextSelection selection;
     private boolean withinFile;
     private boolean gestured;
 
     public SelectionEvent(
-        long time, SPath path, int offset, int length, boolean withinFile, boolean gestured) {
+        long time, SPath path, TextSelection selection, boolean withinFile, boolean gestured) {
       this.time = time;
       this.path = path;
-      this.offset = offset;
-      this.length = length;
+      this.selection = selection;
       this.withinFile = withinFile;
       this.gestured = gestured;
     }
@@ -115,6 +114,8 @@ public class SelectionCollector extends AbstractStatisticCollector {
             int offset = textEdit.getOffset();
             SPath filePath = textEdit.getPath();
 
+            // TODO adjust once text edits are migrated to new position logic
+            /*
             if (!currentUser.equals(user)
                 && selection.offset <= offset
                 && (selection.offset + selection.length) >= offset
@@ -123,6 +124,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
               selection.gestured = true;
               break;
             }
+             */
           }
         }
 
@@ -144,8 +146,10 @@ public class SelectionCollector extends AbstractStatisticCollector {
           // details of the occurred selection
           long time = System.currentTimeMillis();
           SPath path = selection.getPath();
-          int offset = selection.getOffset();
-          int length = selection.getLength();
+
+          TextSelection textSelection = selection.getSelection();
+          boolean hasSelection =
+              !textSelection.getStartPosition().equals(textSelection.getEndPosition());
 
           boolean withinFile = false;
           boolean gestured = false;
@@ -161,13 +165,13 @@ public class SelectionCollector extends AbstractStatisticCollector {
           }
 
           SelectionEvent currentSelection =
-              new SelectionEvent(time, path, offset, length, withinFile, gestured);
+              new SelectionEvent(time, path, textSelection, withinFile, gestured);
 
           /**
            * check if the selection was made by a user with {@link User.Permission#READONLY_ACCESS}
            * and has a length of more than 0
            */
-          if (length > 0 && source.hasReadOnlyAccess()) {
+          if (hasSelection && source.hasReadOnlyAccess()) {
             userWithReadOnlyAccessSelectionEvents.add(currentSelection);
             /*
              * check if there is already a selection stored for this user

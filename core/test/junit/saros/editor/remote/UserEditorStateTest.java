@@ -17,7 +17,8 @@ import saros.activities.SPath;
 import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
 import saros.editor.text.LineRange;
-import saros.editor.text.OldTextSelection;
+import saros.editor.text.TextPosition;
+import saros.editor.text.TextSelection;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IProject;
@@ -47,7 +48,6 @@ public class UserEditorStateTest {
     pathA = new SPath(project, pathMockA);
     pathB = new SPath(project, pathMockB);
 
-    /** */
     source = EasyMock.createMock(User.class);
     EasyMock.replay(source);
   }
@@ -82,7 +82,9 @@ public class UserEditorStateTest {
         "user state should not exist before activity reception",
         state.getOpenEditors().contains(pathA));
 
-    select(pathA, 5, 15);
+    // Selection values were chosen at "random"
+    TextSelection selection = new TextSelection(new TextPosition(5, 15), new TextPosition(20, 1));
+    select(pathA, selection);
     view(pathA, 10, 30);
 
     assertFalse(
@@ -98,19 +100,20 @@ public class UserEditorStateTest {
   @Test
   public void testUpdateSelections() {
     activate(pathA);
-    select(pathA, 5, 15);
 
-    OldTextSelection s = state.getEditorState(pathA).getSelection();
+    TextSelection selection1 = new TextSelection(new TextPosition(5, 3), new TextPosition(8, 15));
+    select(pathA, selection1);
 
-    assertEquals("selection offset should be set", 5, s.getOffset());
-    assertEquals("selection length should be set", 15, s.getLength());
+    TextSelection stateSelection = state.getEditorState(pathA).getSelection();
 
-    select(pathA, 8, 38);
+    assertEquals("selection should be set", selection1, stateSelection);
 
-    s = state.getEditorState(pathA).getSelection();
+    TextSelection selection2 = new TextSelection(new TextPosition(0, 7), new TextPosition(34, 15));
+    select(pathA, selection2);
 
-    assertEquals("selection offset should be updated", 8, s.getOffset());
-    assertEquals("selection length should be updated", 38, s.getLength());
+    stateSelection = state.getEditorState(pathA).getSelection();
+
+    assertEquals("selection should be updated", selection2, stateSelection);
   }
 
   @Test
@@ -159,33 +162,34 @@ public class UserEditorStateTest {
     activate(pathA);
     activate(pathB);
 
-    select(pathA, 1, 2);
+    // Selection values were chosen at "random"
+    TextSelection selectionA = new TextSelection(new TextPosition(1, 0), new TextPosition(2, 3));
+    select(pathA, selectionA);
     view(pathA, 3, 4);
 
-    select(pathB, 5, 6);
+    TextSelection selectionB = new TextSelection(new TextPosition(5, 4), new TextPosition(6, 1));
+    select(pathB, selectionB);
     view(pathB, 7, 8);
 
     EditorState stateA = state.getEditorState(pathA);
-    OldTextSelection selectionA = stateA.getSelection();
+    TextSelection selectionStateA = stateA.getSelection();
 
-    assertEquals(1, selectionA.getOffset());
-    assertEquals(2, selectionA.getLength());
+    assertEquals("selection should be set for first resource", selectionA, selectionStateA);
 
     LineRange viewportA = stateA.getViewport();
 
-    assertEquals(3, viewportA.getStartLine());
-    assertEquals(4, viewportA.getNumberOfLines());
+    assertEquals("viewport should be set for first resource", 3, viewportA.getStartLine());
+    assertEquals("viewport should be set for first resource", 4, viewportA.getNumberOfLines());
 
     EditorState stateB = state.getEditorState(pathB);
-    OldTextSelection selectionB = stateB.getSelection();
+    TextSelection selectionStateB = stateB.getSelection();
 
-    assertEquals(5, selectionB.getOffset());
-    assertEquals(6, selectionB.getLength());
+    assertEquals("selection should be set for second resource", selectionB, selectionStateB);
 
     LineRange viewportB = stateB.getViewport();
 
-    assertEquals(7, viewportB.getStartLine());
-    assertEquals(8, viewportB.getNumberOfLines());
+    assertEquals("viewport should be set for second resource", 7, viewportB.getStartLine());
+    assertEquals("viewport should be set for second resource", 8, viewportB.getNumberOfLines());
   }
 
   private void close(SPath path) {
@@ -200,7 +204,7 @@ public class UserEditorStateTest {
     state.consumer.exec(new ViewportActivity(source, start, length, path));
   }
 
-  private void select(SPath path, int offset, int length) {
-    state.consumer.exec(new TextSelectionActivity(source, offset, length, path));
+  private void select(SPath path, TextSelection selection) {
+    state.consumer.exec(new TextSelectionActivity(source, selection, path));
   }
 }
