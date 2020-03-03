@@ -17,20 +17,28 @@ import saros.activities.SPath;
  */
 class EditorPool {
   private final Map<SPath, Editor> editors;
+  private final BackgroundEditorPool backgroundEditorPool;
 
-  EditorPool() {
+  EditorPool(BackgroundEditorPool backgroundEditorPool) {
     this.editors = new HashMap<>();
+
+    this.backgroundEditorPool = backgroundEditorPool;
   }
 
   /**
    * Adds the given <code>SPath</code> <code>Editor</code> mapping to the editor pool.
    *
+   * <p>Also closes any existing background editors for the file as they are no longer needed.
+   *
    * @param file the path for the file
    * @param editor the editor for the file
+   * @see BackgroundEditorPool
    */
   void add(@NotNull SPath file, @NotNull Editor editor) {
 
     editors.put(file, editor);
+
+    backgroundEditorPool.dropBackgroundEditor(file);
   }
 
   /**

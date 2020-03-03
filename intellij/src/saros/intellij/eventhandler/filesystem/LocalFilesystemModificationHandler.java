@@ -471,6 +471,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         new FileActivity(user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, path, null, null, null);
 
     cleanUpDeletedFileState(path);
+    cleanUpBackgroundEditorPool(path);
 
     dispatchActivity(activity);
   }
@@ -783,6 +784,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               encoding);
 
       updateMovedFileState(oldFilePath, newFilePath);
+      cleanUpBackgroundEditorPool(oldFilePath);
 
     } else if (newPathIsShared) {
       // moved file into shared module
@@ -814,6 +816,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, oldFilePath, null, null, null);
 
       cleanUpDeletedFileState(oldFilePath);
+      cleanUpBackgroundEditorPool(oldFilePath);
 
     } else {
       // neither source nor destination are shared
@@ -1050,6 +1053,15 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     editorManager.removeAllEditorsForPath(deletedFilePath);
 
     annotationManager.removeAnnotations(deletedFilePath.getFile());
+  }
+
+  /**
+   * Releases and drops the held background editor for the deleted file if present.
+   *
+   * @param deletedFilePath the deleted file
+   */
+  private void cleanUpBackgroundEditorPool(@NotNull SPath deletedFilePath) {
+    editorManager.removeBackgroundEditorForPath(deletedFilePath);
   }
 
   /**
