@@ -15,8 +15,6 @@ public class EclipsePreferenceConstants {
 
   public static final String ENABLE_BALLOON_NOTIFICATION = "enable_balloon_notification";
 
-  public static final String SERVER_ACTIVATED = "server_activated";
-
   /*
    * Preferences of the feedback preferences page
    *
