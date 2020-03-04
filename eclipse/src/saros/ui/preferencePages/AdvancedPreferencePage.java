@@ -69,14 +69,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage
               getFieldEditorParent()));
     }
 
-    if (Boolean.getBoolean("saros.server.SUPPORTED")) {
-      addField(
-          new BooleanFieldEditor(
-              EclipsePreferenceConstants.SERVER_ACTIVATED,
-              Messages.AdvancedPreferencePage_activate_server,
-              getFieldEditorParent()));
-    }
-
     addField(
         new BooleanFieldEditor(
             PreferenceConstants.INSTANT_SESSION_START_PREFERRED,

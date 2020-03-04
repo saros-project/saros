@@ -21,8 +21,6 @@ import saros.communication.extensions.PingExtension;
 import saros.communication.extensions.PongExtension;
 import saros.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import saros.communication.extensions.ProjectNegotiationOfferingExtension;
-import saros.communication.extensions.SessionStatusRequestExtension;
-import saros.communication.extensions.SessionStatusResponseExtension;
 import saros.communication.extensions.StartActivityQueuingRequest;
 import saros.communication.extensions.StartActivityQueuingResponse;
 import saros.communication.extensions.UserFinishedProjectNegotiationExtension;
@@ -149,8 +147,6 @@ public class ContainerContext implements IContainerContext {
       // Server extensions
       Class.forName(JoinSessionRequestExtension.class.getName());
       Class.forName(JoinSessionRejectedExtension.class.getName());
-      Class.forName(SessionStatusRequestExtension.class.getName());
-      Class.forName(SessionStatusResponseExtension.class.getName());
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
