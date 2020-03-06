@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.jivesoftware.smack.packet.PacketExtension;
 import saros.activities.IActivity;
 import saros.activities.NOPActivity;
 import saros.net.IPacketInterceptor;
+import saros.net.ITransmitter;
 import saros.net.internal.BinaryXMPPExtension;
-import saros.net.internal.IByteStreamConnection;
-import saros.net.internal.TransferDescription;
 import saros.net.internal.XMPPReceiver;
 import saros.net.xmpp.JID;
 import saros.session.IActivityConsumer;
@@ -47,8 +47,8 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
   }
 
   private static class OutgoingPacketHolder {
-    public TransferDescription description;
-    public byte[] payload;
+    public String connectionId;
+    public PacketExtension extension;
   }
 
   private ConcurrentHashMap<Integer, CountDownLatch> synchronizeRequests =
@@ -126,39 +126,36 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
         @Override
         public boolean sendPacket(
-            final String connectionID,
-            final TransferDescription description,
-            final byte[] payload) {
+            final String connectionId, final JID recipient, final PacketExtension extension) {
 
-          if (!ISarosSession.SESSION_CONNECTION_ID.equals(connectionID)) return true;
+          if (!ISarosSession.SESSION_CONNECTION_ID.equals(connectionId)) return true;
 
-          JID jid = description.getRecipient();
-          LOG.trace("intercepting outgoing packet to: " + jid);
+          LOG.trace("intercepting outgoing packet to: " + recipient);
 
-          discardOutgoingSessionPackets.putIfAbsent(jid, false);
+          discardOutgoingSessionPackets.putIfAbsent(recipient, false);
 
-          boolean discard = discardOutgoingSessionPackets.get(jid);
+          boolean discard = discardOutgoingSessionPackets.get(recipient);
 
           if (discard) {
-            LOG.trace("discarding outgoing packet: " + description);
+            LOG.trace("discarding outgoing packet: " + extension);
             return false;
           }
 
-          blockOutgoingSessionPackets.putIfAbsent(jid, false);
+          blockOutgoingSessionPackets.putIfAbsent(recipient, false);
 
-          boolean blockOutgoingPackets = blockOutgoingSessionPackets.get(jid);
+          boolean blockOutgoingPackets = blockOutgoingSessionPackets.get(recipient);
 
           if (blockOutgoingPackets || blockAllOutgoingSessionPackets) {
 
             blockedOutgoingSessionPackets.putIfAbsent(
-                jid, new ConcurrentLinkedQueue<OutgoingPacketHolder>());
+                recipient, new ConcurrentLinkedQueue<OutgoingPacketHolder>());
 
             OutgoingPacketHolder holder = new OutgoingPacketHolder();
-            holder.description = description;
-            holder.payload = payload;
+            holder.connectionId = connectionId;
+            holder.extension = extension;
 
-            LOG.trace("queuing outgoing packet: " + description);
-            blockedOutgoingSessionPackets.get(jid).add(holder);
+            LOG.trace("queuing outgoing packet: " + extension);
+            blockedOutgoingSessionPackets.get(recipient).add(holder);
             return false;
           }
 
@@ -317,8 +314,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
       return;
     }
 
-    IByteStreamConnection connection =
-        getDataTransferManager().getConnection(ISarosSession.SESSION_CONNECTION_ID, jid);
+    final ITransmitter transmitter = getTransmitter();
 
     while (!pendingOutgoingPackets.isEmpty()) {
       try {
@@ -326,11 +322,13 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
         LOG.trace(
             "sending blocked packet: "
-                + holder.description
-                + ", payload length: "
-                + holder.payload.length);
+                + holder.extension
+                + ", connection id: "
+                + holder.connectionId
+                + ", recipient: "
+                + jid);
 
-        connection.send(holder.description, holder.payload);
+        transmitter.send(holder.connectionId, jid, holder.extension);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
       }
