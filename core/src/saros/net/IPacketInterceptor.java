@@ -1,7 +1,8 @@
 package saros.net;
 
+import org.jivesoftware.smack.packet.PacketExtension;
 import saros.net.internal.BinaryXMPPExtension;
-import saros.net.internal.TransferDescription;
+import saros.net.xmpp.JID;
 
 /**
  * An interface for intercepting packages that are about to send or dispatched via the {@link
@@ -21,11 +22,11 @@ public interface IPacketInterceptor {
   /**
    * This method is called before the {@link ITransmitter} is sending the packet.
    *
-   * @param connectID
-   * @param description
-   * @param payload
+   * @param connectId
+   * @param recipient
+   * @param extension
    * @return <code>true</code> if the packet should be send, <code>false</code> if the packet should
    *     be dropped
    */
-  public boolean sendPacket(String connectID, TransferDescription description, byte[] payload);
+  public boolean sendPacket(String connectId, JID recipient, PacketExtension extension);
 }

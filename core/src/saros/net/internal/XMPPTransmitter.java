@@ -79,6 +79,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
   public void send(String connectionID, JID recipient, PacketExtension extension)
       throws IOException {
 
+    boolean sendPacket = true;
+
+    for (IPacketInterceptor packetInterceptor : packetInterceptors)
+      sendPacket &= packetInterceptor.sendPacket(connectionID, recipient, extension);
+
+    if (!sendPacket) return;
+
     final JID currentLocalJid = localJid;
 
     if (currentLocalJid == null) throw new IOException("not connected to a XMPP server");
@@ -191,14 +198,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
   private void sendPacketExtension(
       final IByteStreamConnection connection, final TransferDescription description, byte[] payload)
       throws IOException {
-
-    boolean sendPacket = true;
-
-    final String connectionId = connection.getConnectionID();
-    for (IPacketInterceptor packetInterceptor : packetInterceptors)
-      sendPacket &= packetInterceptor.sendPacket(connectionId, description, payload);
-
-    if (!sendPacket) return;
 
     if (log.isTraceEnabled())
       log.trace(
