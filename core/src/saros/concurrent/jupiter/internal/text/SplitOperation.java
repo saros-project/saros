@@ -185,7 +185,10 @@ public class SplitOperation implements Operation {
       // Ins(2,"ab") + Ins(4,"cd") -> Ins(2,"abcd")
       if (insert1.getPosition() + insert1.getTextLength() == insert2.getPosition()) {
         return new InsertOperation(insert1.getPosition(), insert1.getText() + insert2.getText());
-      } else if (insert1.getPosition() == insert2.getPosition() + insert2.getTextLength()) {
+      }
+
+      // Ins(2,"cd") + Ins(2,"ab") -> Ins(2,"abcd")
+      if (insert1.getPosition() == insert2.getPosition()) {
         return new InsertOperation(insert2.getPosition(), insert2.getText() + insert1.getText());
       }
 
