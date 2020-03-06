@@ -59,8 +59,8 @@ public class SplitOperationTest {
     TextEditActivity expected1 = new TextEditActivity(source, 4, "0abcd", "", path);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
-    // vice versa
-    Operation split2 = S(I(6, "0ab"), I(4, "cd"));
+    // Ins(4,"0ab") + Ins(4,"cd") -> Ins(4,"cd0ab")
+    Operation split2 = S(I(4, "0ab"), I(4, "cd"));
     TextEditActivity expected2 = new TextEditActivity(source, 4, "cd0ab", "", path);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
   }
