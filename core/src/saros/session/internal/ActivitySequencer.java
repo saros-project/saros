@@ -499,9 +499,16 @@ public class ActivitySequencer implements Startable {
 
       if (it.hasNext() && currentFileActivitySize < maxFileActivitySize) continue;
 
+      /* ensure to make a copy of the list otherwise the content will be removed later in the loop.
+       * If the marshalling is delayed in the ITransmitter this would cause errors.
+       */
+
       final PacketExtension activityPacketExtension =
           ActivitiesExtension.PROVIDER.create(
-              new ActivitiesExtension(currentSessionID, activitiesToMarshall, sequenceNumber));
+              new ActivitiesExtension(
+                  currentSessionID,
+                  new ArrayList<IActivity>(activitiesToMarshall),
+                  sequenceNumber));
 
       if (LOG.isTraceEnabled()) {
         LOG.trace(
@@ -525,12 +532,6 @@ public class ActivitySequencer implements Startable {
         return;
       } finally {
         sequenceNumber += activitiesToMarshall.size();
-
-        /*
-         * ensure to clear the list here as the ActivitiesExtension only
-         * holds a reference to the list and so cannot be deleted until
-         * the extension was sent
-         */
         activitiesToMarshall.clear();
         currentFileActivitySize = 0;
       }
