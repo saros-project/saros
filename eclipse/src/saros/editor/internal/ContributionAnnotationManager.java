@@ -1,12 +1,12 @@
 package saros.editor.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -39,26 +39,11 @@ import saros.ui.util.SWTUtils;
 // <p>TODO Move responsibilities from EditorManager to here
 public class ContributionAnnotationManager {
 
-  private static final class History {
-    private final LinkedList<HistoryEntry> entries = new LinkedList<>();
-    private int currentInsertStamp = 0;
-  }
-
-  private static final class HistoryEntry {
-    private ContributionAnnotation annotation;
-    private int insertStamp;
-
-    private HistoryEntry(final ContributionAnnotation annotation, final int insertStamp) {
-      this.annotation = annotation;
-      this.insertStamp = insertStamp;
-    }
-  }
-
   private static final Logger log = Logger.getLogger(ContributionAnnotationManager.class);
 
-  static final int MAX_HISTORY_LENGTH = 20;
+  private final Map<User, ContributionAnnotationHistory> sourceToHistory = new HashMap<>();
 
-  private final Map<User, History> sourceToHistory = new HashMap<>();
+  static final int MAX_HISTORY_LENGTH = 20;
 
   private final ISarosSession sarosSession;
 
@@ -242,8 +227,9 @@ public class ContributionAnnotationManager {
   }
 
   /** Get the history of the given user. If no history is available a new one is created. */
-  private History getHistory(final User user) {
-    return sourceToHistory.computeIfAbsent(user, u -> new History());
+  private ContributionAnnotationHistory getHistory(final User user) {
+    return sourceToHistory.computeIfAbsent(
+        user, u -> new ContributionAnnotationHistory(MAX_HISTORY_LENGTH));
   }
 
   /**
@@ -253,17 +239,14 @@ public class ContributionAnnotationManager {
   private void addContributionAnnotation(
       final ContributionAnnotation annotation, final Position position) {
 
-    final History history = getHistory(annotation.getSource());
+    final ContributionAnnotationHistory history = getHistory(annotation.getSource());
 
-    final List<HistoryEntry> removedEntries = removeHistoryEntries(history);
+    final List<ContributionAnnotationHistory.Entry> removedEntries = removeHistoryEntries(history);
 
-    final HistoryEntry newEntry = new HistoryEntry(annotation, history.currentInsertStamp);
-
-    history.currentInsertStamp = (history.currentInsertStamp + 1) % MAX_HISTORY_LENGTH;
-
-    history.entries.add(newEntry);
+    history.addNewEntry(annotation);
 
     if (removedEntries.isEmpty()) {
+      System.out.println("EMPTY");
       annotation.getModel().addAnnotation(annotation, position);
       return;
     }
@@ -271,31 +254,34 @@ public class ContributionAnnotationManager {
     // TODO OPTIMIZE it is usually 2 annotations after the queue is full
     annotation.getModel().addAnnotation(annotation, position);
 
-    for (final HistoryEntry entry : removedEntries)
-      entry.annotation.getModel().removeAnnotation(entry.annotation);
+    for (final ContributionAnnotationHistory.Entry entry : removedEntries) {
+      entry.getAnnotations().get(0).getModel().removeAnnotation(entry.getAnnotations().get(0));
+      System.out.println("RM");
+    }
   }
 
   /**
    * Removes entries from the history based on the history current insert stamp. This method <b>DOES
    * NOT</b> alter the annotation model the removed annotations in the history belong to!
    */
-  private List<HistoryEntry> removeHistoryEntries(final History history) {
+  private List<ContributionAnnotationHistory.Entry> removeHistoryEntries(
+      final ContributionAnnotationHistory history) {
 
-    final List<HistoryEntry> removedEntries = new ArrayList<>();
+    final List<ContributionAnnotationHistory.Entry> removedEntries = new ArrayList<>();
 
-    final int insertStampToRemove = history.currentInsertStamp;
+    final int insertStampToRemove = history.getCurrentInsertStamp();
 
     /* the logic assumes that the entry order does not change during lifetime
      * i.e if we have a history of size 4 the list must look like this regarding the insert stamps
      * 0 0 0 1 2 3 3 3 0 1 1 1 2 2 2 2 3 0 1 1 1 1 1 2 3 ... and so on
      */
 
-    final Iterator<HistoryEntry> it = history.entries.iterator();
+    final Iterator<ContributionAnnotationHistory.Entry> it = history.getEntries().iterator();
 
     while (it.hasNext()) {
-      final HistoryEntry entry = it.next();
+      final ContributionAnnotationHistory.Entry entry = it.next();
 
-      if (entry.insertStamp != insertStampToRemove) break;
+      if (entry.getInsertStamp() != insertStampToRemove) break;
 
       removedEntries.add(entry);
       it.remove();
@@ -313,25 +299,29 @@ public class ContributionAnnotationManager {
 
     final User user = oldAnnotation.getSource();
 
-    final History history = getHistory(user);
+    final ContributionAnnotationHistory history = getHistory(user);
 
     /* update the history entry, e.g we want to modify annotation D
      * pre: A, B, C, D, E, F, G
      * post: A, B, C, D_0, D_1, ..., D_N, E, F, G
      *
      */
-    for (final ListIterator<HistoryEntry> lit = history.entries.listIterator(); lit.hasNext(); ) {
+    for (final ListIterator<ContributionAnnotationHistory.Entry> lit =
+            history.getEntries().listIterator();
+        lit.hasNext(); ) {
 
-      final HistoryEntry entry = lit.next();
+      final ContributionAnnotationHistory.Entry entry = lit.next();
 
-      if (entry.annotation.equals(oldAnnotation)) {
+      if (entry.getAnnotations().get(0).equals(oldAnnotation)) {
 
         // see JavaDoc remove must be called BEFORE add
         lit.remove();
 
         for (int i = 0; i < newAnnotations.length; i++) {
           assert oldAnnotation.getSource().equals(newAnnotations[i].getSource());
-          lit.add(new HistoryEntry(newAnnotations[i], entry.insertStamp));
+          lit.add(
+              new ContributionAnnotationHistory.Entry(
+                  Arrays.asList(newAnnotations[i]), entry.getInsertStamp()));
         }
 
         return;
@@ -358,7 +348,7 @@ public class ContributionAnnotationManager {
    * the given user. The entries of the history are removed as well.
    */
   private void removeAnnotationsForUser(final User user) {
-    final History history = sourceToHistory.get(user);
+    final ContributionAnnotationHistory history = sourceToHistory.get(user);
 
     if (history != null) removeFromHistoryAndAnnotationModel(Collections.singletonList(history));
   }
@@ -367,18 +357,19 @@ public class ContributionAnnotationManager {
    * Removes all annotations from all annotation models of the given histories. The entries of the
    * histories are removed as well.
    */
-  private void removeFromHistoryAndAnnotationModel(final Collection<History> histories) {
+  private void removeFromHistoryAndAnnotationModel(
+      final Collection<ContributionAnnotationHistory> histories) {
 
     final Set<IAnnotationModel> annotationModels = new HashSet<>();
     final Set<User> users = new HashSet<>();
 
-    for (final History history : histories) {
-      while (!history.entries.isEmpty()) {
+    for (final ContributionAnnotationHistory history : histories) {
+      while (!history.getEntries().isEmpty()) {
 
-        final HistoryEntry entry = history.entries.poll();
+        final ContributionAnnotationHistory.Entry entry = history.getEntries().poll();
 
-        annotationModels.add(entry.annotation.getModel());
-        users.add(entry.annotation.getSource());
+        annotationModels.add(entry.getAnnotations().get(0).getModel());
+        users.add(entry.getAnnotations().get(0).getSource());
       }
     }
 

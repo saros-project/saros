@@ -40,6 +40,8 @@ public class ContributionAnnotationManagerTest {
 
   private Capture<ISessionListener> sessionListenerCapture;
 
+  private static final int MAX_HISTORY_LENGTH = ContributionAnnotationManager.MAX_HISTORY_LENGTH;
+
   @Before
   public void setUp() {
     store = new PreferenceStore();
@@ -79,14 +81,13 @@ public class ContributionAnnotationManagerTest {
 
     AnnotationModel model = new AnnotationModel();
 
-    for (int i = 0; i <= ContributionAnnotationManager.MAX_HISTORY_LENGTH; i++)
-      manager.insertAnnotation(model, i, 1, alice);
+    for (int i = 0; i <= MAX_HISTORY_LENGTH + 1; i++) manager.insertAnnotation(model, i, 1, alice);
 
-    assertEquals(ContributionAnnotationManager.MAX_HISTORY_LENGTH, getAnnotationCount(model));
+    assertEquals(MAX_HISTORY_LENGTH, getAnnotationCount(model));
 
-    manager.insertAnnotation(model, ContributionAnnotationManager.MAX_HISTORY_LENGTH + 1, 1, alice);
+    manager.insertAnnotation(model, MAX_HISTORY_LENGTH, 1, alice);
 
-    assertEquals(ContributionAnnotationManager.MAX_HISTORY_LENGTH, getAnnotationCount(model));
+    assertEquals(MAX_HISTORY_LENGTH, getAnnotationCount(model));
 
     assertFalse(
         "oldest annotation was not removed",
@@ -99,12 +100,11 @@ public class ContributionAnnotationManagerTest {
 
     AnnotationModel model = new AnnotationModel();
 
-    for (int i = 0; i <= ContributionAnnotationManager.MAX_HISTORY_LENGTH; i++)
-      manager.insertAnnotation(model, i, 1, alice);
+    for (int i = 0; i <= MAX_HISTORY_LENGTH; i++) manager.insertAnnotation(model, i, 1, alice);
 
     manager.refreshAnnotations(model);
 
-    manager.insertAnnotation(model, ContributionAnnotationManager.MAX_HISTORY_LENGTH + 1, 1, alice);
+    manager.insertAnnotation(model, MAX_HISTORY_LENGTH + 1, 1, alice);
 
     assertFalse(
         "oldest annotation was not removed after refresh",
@@ -128,27 +128,27 @@ public class ContributionAnnotationManagerTest {
 
     int startIndex = 100;
 
-    for (int i = 0; i < ContributionAnnotationManager.MAX_HISTORY_LENGTH - 1; i++, startIndex++)
+    for (int i = 0; i < MAX_HISTORY_LENGTH - 1; i++, startIndex++)
       manager.insertAnnotation(model, startIndex, 1, alice);
 
     assertEquals(
         "splitted annotions should count as one annotion for the history",
-        4 + ContributionAnnotationManager.MAX_HISTORY_LENGTH - 1,
+        4 + MAX_HISTORY_LENGTH - 1,
         getAnnotationCount(model));
 
     manager.insertAnnotation(model, startIndex++, 1, alice);
 
     assertEquals(
         "splitted annotions are not correctly removed from the history",
-        4 + ContributionAnnotationManager.MAX_HISTORY_LENGTH - 1 - 1,
+        4 + MAX_HISTORY_LENGTH - 1 - 1,
         getAnnotationCount(model));
 
-    for (int i = 0; i < ContributionAnnotationManager.MAX_HISTORY_LENGTH; i++, startIndex++)
+    for (int i = 0; i < MAX_HISTORY_LENGTH; i++, startIndex++)
       manager.insertAnnotation(model, startIndex, 1, bob);
 
     assertEquals(
         "splitted annotions are not correctly removed from the history",
-        2 * ContributionAnnotationManager.MAX_HISTORY_LENGTH,
+        2 * MAX_HISTORY_LENGTH,
         getAnnotationCount(model));
   }
 
@@ -195,11 +195,10 @@ public class ContributionAnnotationManagerTest {
     final AnnotationModel model = new AnnotationModel();
 
     for (final User user : users)
-      for (int i = 0; i < ContributionAnnotationManager.MAX_HISTORY_LENGTH; i++, idx++)
+      for (int i = 0; i < MAX_HISTORY_LENGTH; i++, idx++)
         manager.insertAnnotation(model, idx, 1, user);
 
-    assertEquals(
-        ContributionAnnotationManager.MAX_HISTORY_LENGTH * users.size(), getAnnotationCount(model));
+    assertEquals(MAX_HISTORY_LENGTH * users.size(), getAnnotationCount(model));
 
     store.setValue(EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS, false);
 
@@ -219,11 +218,10 @@ public class ContributionAnnotationManagerTest {
     final AnnotationModel model = new AnnotationModel();
 
     for (final User user : users)
-      for (int i = 0; i < ContributionAnnotationManager.MAX_HISTORY_LENGTH; i++, idx++)
+      for (int i = 0; i < MAX_HISTORY_LENGTH; i++, idx++)
         manager.insertAnnotation(model, idx, 1, user);
 
-    assertEquals(
-        ContributionAnnotationManager.MAX_HISTORY_LENGTH * users.size(), getAnnotationCount(model));
+    assertEquals(MAX_HISTORY_LENGTH * users.size(), getAnnotationCount(model));
 
     final ISessionListener sessionListener = sessionListenerCapture.getValue();
 
@@ -232,9 +230,7 @@ public class ContributionAnnotationManagerTest {
     while (!users.isEmpty()) {
       sessionListener.userLeft(users.remove(0));
 
-      assertEquals(
-          ContributionAnnotationManager.MAX_HISTORY_LENGTH * users.size(),
-          getAnnotationCount(model));
+      assertEquals(MAX_HISTORY_LENGTH * users.size(), getAnnotationCount(model));
     }
   }
 
@@ -263,11 +259,10 @@ public class ContributionAnnotationManagerTest {
     final AnnotationModel model = new AnnotationModel();
 
     for (final User user : users)
-      for (int i = 0; i < ContributionAnnotationManager.MAX_HISTORY_LENGTH; i++, idx++)
+      for (int i = 0; i < MAX_HISTORY_LENGTH; i++, idx++)
         manager.insertAnnotation(model, idx, 1, user);
 
-    assertEquals(
-        ContributionAnnotationManager.MAX_HISTORY_LENGTH * users.size(), getAnnotationCount(model));
+    assertEquals(MAX_HISTORY_LENGTH * users.size(), getAnnotationCount(model));
 
     manager.dispose();
 
