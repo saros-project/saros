@@ -2,6 +2,7 @@ package saros.editor.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,84 +27,59 @@ public class ContributionAnnotationHistoryTest {
   }
 
   @Test
-  public void testRemoveHistoryEntriesWithEmptyHistory() {
-    Pair<IAnnotationModel, List<ContributionAnnotation>> annotationsToRemove =
-        history.removeHistoryEntry();
+  public void testAddEntriesUntilMaxLength() {
+    Pair<IAnnotationModel, List<ContributionAnnotation>> annotationsToRemove;
 
-    assertNull(annotationsToRemove);
-  }
-
-  @Test
-  public void testAddEntries() {
-    final int nrOfEnries = 3;
-    fillHistory(nrOfEnries, testModel);
-
-    assertEquals(nrOfEnries, history.queue.size());
-  }
-
-  @Test
-  public void testRemoveHistoryEntriesWithPartiallyFilledHistory() {
-    final int nrOfEnries = 3;
-    fillHistory(nrOfEnries, testModel);
-
-    Pair<IAnnotationModel, List<ContributionAnnotation>> annotationsToRemove =
-        history.removeHistoryEntry();
-
-    assertNull(annotationsToRemove);
-    assertEquals(nrOfEnries, history.queue.size());
-  }
-
-  @Test
-  public void testRemoveHistoryEntriesWithFilledHistory() {
-    final int nrOfEnries = MAX_HISTORY_LENGTH - 1;
-    fillHistory(nrOfEnries, testModel);
-
-    Pair<IAnnotationModel, List<ContributionAnnotation>> annotationsToRemove =
-        history.removeHistoryEntry();
-
-    assertNull(annotationsToRemove);
-    assertEquals(nrOfEnries, history.queue.size());
-  }
-
-  @Test
-  public void testRemoveHistoryEntriesWithOverfilledHistory() {
-    final int nrOfEnries = MAX_HISTORY_LENGTH;
-    fillHistory(nrOfEnries, testModel);
-
-    Pair<IAnnotationModel, List<ContributionAnnotation>> annotationsToRemove =
-        history.removeHistoryEntry();
-
-    assertEquals(1, annotationsToRemove.getRight().size());
-    assertEquals(MAX_HISTORY_LENGTH - 1, history.queue.size());
-  }
-
-  @Test
-  public void testRemoveHistoryEntriesWithMultipleModels() {
-    AnnotationModel testModel2 = new AnnotationModel();
-
-    fillHistory(1, testModel2);
-    fillHistory(MAX_HISTORY_LENGTH - 1, testModel);
-
-    Pair<IAnnotationModel, List<ContributionAnnotation>> annotationsToRemove =
-        history.removeHistoryEntry();
-
-    assertEquals(testModel2, annotationsToRemove.getLeft());
-
-    fillHistory(1, testModel);
-    annotationsToRemove = history.removeHistoryEntry();
-
-    assertEquals(testModel, annotationsToRemove.getLeft());
-  }
-
-  private void fillHistory(int numberOfEntries, AnnotationModel model) {
-    for (int i = 0; i < numberOfEntries; i++) {
-      history.addNewEntry(createDummyAnnotation(model));
+    for (int i = 0; i < MAX_HISTORY_LENGTH; i++) {
+      annotationsToRemove = history.addNewEntry(createDummyAnnotation(testModel));
+      assertNull(annotationsToRemove);
     }
+
+    assertEquals(MAX_HISTORY_LENGTH, history.getSize());
   }
 
-  private List<ContributionAnnotation> createDummyAnnotation(AnnotationModel model) {
-    User dummyUser = new User(new JID("alice@test"), false, false, null);
-    ContributionAnnotation dummyAnnotation = new ContributionAnnotation(dummyUser, model);
+  @Test
+  public void testAddEntryExceedingMaxLength() {
+    Pair<IAnnotationModel, List<ContributionAnnotation>> annotationsToRemove;
+
+    final List<ContributionAnnotation> firstEntry = createDummyAnnotation(testModel);
+    annotationsToRemove = history.addNewEntry(firstEntry);
+    assertNull(annotationsToRemove);
+
+    for (int i = 1; i < MAX_HISTORY_LENGTH; i++) {
+      annotationsToRemove = history.addNewEntry(createDummyAnnotation(testModel));
+      assertNull(annotationsToRemove);
+    }
+
+    assertEquals(MAX_HISTORY_LENGTH, history.getSize());
+
+    annotationsToRemove = history.addNewEntry(createDummyAnnotation(testModel));
+    assertSame(annotationsToRemove.getRight(), firstEntry);
+  }
+
+  @Test
+  public void testAddEntryWithMultipleModels() {
+    final AnnotationModel testModel2 = new AnnotationModel();
+
+    Pair<IAnnotationModel, List<ContributionAnnotation>> annotationsToRemove =
+        history.addNewEntry(createDummyAnnotation(testModel2));
+    assertNull(annotationsToRemove);
+
+    for (int i = 1; i < MAX_HISTORY_LENGTH; i++) {
+      annotationsToRemove = history.addNewEntry(createDummyAnnotation(testModel));
+      assertNull(annotationsToRemove);
+    }
+
+    annotationsToRemove = history.addNewEntry(createDummyAnnotation(testModel));
+    assertSame(testModel2, annotationsToRemove.getLeft());
+
+    annotationsToRemove = history.addNewEntry(createDummyAnnotation(testModel));
+    assertSame(testModel, annotationsToRemove.getLeft());
+  }
+
+  private List<ContributionAnnotation> createDummyAnnotation(final AnnotationModel model) {
+    final User dummyUser = new User(new JID("alice@test"), false, false, null);
+    final ContributionAnnotation dummyAnnotation = new ContributionAnnotation(dummyUser, model);
     return Arrays.asList(dummyAnnotation);
   }
 }

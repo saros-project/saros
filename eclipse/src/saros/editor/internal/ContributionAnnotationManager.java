@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -55,7 +56,7 @@ public class ContributionAnnotationManager {
   private final ISessionListener sessionListener =
       new ISessionListener() {
         @Override
-        public void userLeft(User user) {
+        public void userLeft(final User user) {
           removeAnnotationsForUser(user);
         }
       };
@@ -84,7 +85,7 @@ public class ContributionAnnotationManager {
       };
 
   public ContributionAnnotationManager(
-      ISarosSession sarosSession, IPreferenceStore preferenceStore) {
+      final ISarosSession sarosSession, final IPreferenceStore preferenceStore) {
 
     this.sarosSession = sarosSession;
     this.preferenceStore = preferenceStore;
@@ -96,7 +97,7 @@ public class ContributionAnnotationManager {
   }
 
   /**
-   * Inserts a contribution annotation to given model if there is not already a contribution
+   * Inserts contribution annotations to given model if there is not already a contribution
    * annotation at given position. This method should be called after the text has changed.
    *
    * @param model to add the annotation to.
@@ -104,26 +105,81 @@ public class ContributionAnnotationManager {
    * @param length length of the annotation.
    * @param source of the annotation.
    */
-  public void insertAnnotation(IAnnotationModel model, int offset, int length, User source) {
+  public void insertAnnotation(
+      final IAnnotationModel model, final int offset, final int length, final User source) {
 
-    if (!contribtionAnnotationsEnabled) return;
+    // Return if length == 0, (called after a deletion was performed)
+    if (!contribtionAnnotationsEnabled || length <= 0) return;
 
-    if (length < 0) // why is 0 len allowed ?
-    return;
+    final ContributionAnnotationHistory history = getHistory(source);
 
-    /* Return early if there already is an annotation at that offset */
-    for (Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext(); ) {
-      Annotation annotation = it.next();
+    final Map<ContributionAnnotation, Position> annotationsToAdd =
+        createAnnotationsForContributionRange(model, offset, length, source);
 
-      if (annotation instanceof ContributionAnnotation
-          && model.getPosition(annotation).includes(offset)
-          && ((ContributionAnnotation) annotation).getSource().equals(source)) {
-        return;
+    final Pair<IAnnotationModel, List<ContributionAnnotation>> annotationsToRemove =
+        history.addNewEntry(new ArrayList<>(annotationsToAdd.keySet()));
+
+    // Case 1: An insert operation is performed and the history is full
+    if (annotationsToRemove != null) {
+      final IAnnotationModel annotationsToRemoveModel = annotationsToRemove.getLeft();
+
+      if (annotationsToRemoveModel.equals(model)) {
+        annotationModelHelper.replaceAnnotationsInModel(
+            annotationsToRemoveModel, annotationsToRemove.getRight(), annotationsToAdd);
+      } else {
+        annotationModelHelper.replaceAnnotationsInModel(
+            annotationsToRemoveModel, annotationsToRemove.getRight(), Collections.emptyMap());
+        annotationModelHelper.replaceAnnotationsInModel(
+            model, Collections.emptyList(), annotationsToAdd);
       }
     }
+    // Case 2: An insert operation is performed and the history is not full
+    else {
+      annotationModelHelper.replaceAnnotationsInModel(
+          model, Collections.emptyList(), annotationsToAdd);
+    }
+  }
 
-    addContributionAnnotation(
-        new ContributionAnnotation(source, model), new Position(offset, length));
+  /**
+   * Creates contribution annotations with length 1 for each char contained in the range defined by
+   * {@code offset} and {@code length}.
+   *
+   * @param model the model that is assigned to the created contribution annotations.
+   * @param offset start of the annotation range.
+   * @param length length of the annotation range.
+   * @param source of the annotation.
+   * @return a map containing the annotations and their positions
+   */
+  private Map<ContributionAnnotation, Position> createAnnotationsForContributionRange(
+      final IAnnotationModel model, final int offset, final int length, final User source) {
+
+    final Map<ContributionAnnotation, Position> annotationsToAdd = new HashMap<>();
+
+    for (int i = 0; i < length; i++) {
+      final Pair<ContributionAnnotation, Position> positionedAnnotation =
+          createPositionedAnnotation(model, offset + i, source);
+      if (positionedAnnotation == null) continue;
+
+      annotationsToAdd.put(positionedAnnotation.getKey(), positionedAnnotation.getValue());
+    }
+
+    return annotationsToAdd;
+  }
+
+  /**
+   * Creates a contribution annotations with length 1 at position {@code offset}.
+   *
+   * @param model to add the annotation to.
+   * @param offset start of the annotation to add.
+   * @param source of the annotation.
+   * @return a pair containing the annotation and its position.
+   */
+  private Pair<ContributionAnnotation, Position> createPositionedAnnotation(
+      final IAnnotationModel model, final int offset, final User source) {
+    final int ANNOTATION_LENGTH = 1;
+
+    return new ImmutablePair<ContributionAnnotation, Position>(
+        new ContributionAnnotation(source, model), new Position(offset, ANNOTATION_LENGTH));
   }
 
   /**
@@ -131,18 +187,18 @@ public class ContributionAnnotationManager {
    *
    * @param model the annotation model that should be refreshed
    */
-  public void refreshAnnotations(IAnnotationModel model) {
+  public void refreshAnnotations(final IAnnotationModel model) {
 
-    List<Annotation> annotationsToRemove = new ArrayList<Annotation>();
-    Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
+    final List<Annotation> annotationsToRemove = new ArrayList<Annotation>();
+    final Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
 
-    for (Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext(); ) {
+    for (final Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext(); ) {
 
-      Annotation annotation = it.next();
+      final Annotation annotation = it.next();
 
       if (!(annotation instanceof ContributionAnnotation)) continue;
 
-      Position position = model.getPosition(annotation);
+      final Position position = model.getPosition(annotation);
 
       if (position == null) {
         log.warn("annotation could not be found in the current model: " + annotation);
@@ -157,9 +213,9 @@ public class ContributionAnnotationManager {
        */
       annotationsToRemove.add(annotation);
 
-      ContributionAnnotation annotationToReplace = (ContributionAnnotation) annotation;
-      User source = annotationToReplace.getSource();
-      ContributionAnnotation annotationToAdd = new ContributionAnnotation(source, model);
+      final ContributionAnnotation annotationToReplace = (ContributionAnnotation) annotation;
+      final User source = annotationToReplace.getSource();
+      final ContributionAnnotation annotationToAdd = new ContributionAnnotation(source, model);
 
       annotationsToAdd.put(annotationToAdd, position);
 
@@ -181,33 +237,6 @@ public class ContributionAnnotationManager {
   private ContributionAnnotationHistory getHistory(final User user) {
     return sourceToHistory.computeIfAbsent(
         user, u -> new ContributionAnnotationHistory(MAX_HISTORY_LENGTH));
-  }
-
-  /**
-   * Add a contribution annotation to the annotation model and store it into the history of the
-   * associated user. Old entries are removed from the history and the annotation model.
-   */
-  private void addContributionAnnotation(
-      final ContributionAnnotation annotation, final Position position) {
-
-    final ContributionAnnotationHistory history = getHistory(annotation.getSource());
-
-    final Pair<IAnnotationModel, List<ContributionAnnotation>> annotationToRemove =
-        history.removeHistoryEntry();
-
-    history.addNewEntry(annotation);
-
-    if (annotationToRemove == null) {
-      annotation.getModel().addAnnotation(annotation, position);
-      return;
-    }
-
-    // TODO OPTIMIZE it is usually 2 annotations after the queue is full
-    annotation.getModel().addAnnotation(annotation, position);
-
-    for (ContributionAnnotation a : annotationToRemove.getRight()) {
-      annotationToRemove.getLeft().removeAnnotation(a);
-    }
   }
 
   /**
@@ -239,8 +268,8 @@ public class ContributionAnnotationManager {
     final Set<User> users = new HashSet<>();
 
     for (final ContributionAnnotationHistory history : histories) {
-      List<ContributionAnnotation> allAnnotationsInHistory = history.clear();
-      for (ContributionAnnotation annotation : allAnnotationsInHistory) {
+      final List<ContributionAnnotation> allAnnotationsInHistory = history.clear();
+      for (final ContributionAnnotation annotation : allAnnotationsInHistory) {
         annotationModels.add(annotation.getModel());
         users.add(annotation.getSource());
       }

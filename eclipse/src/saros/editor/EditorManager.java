@@ -1074,9 +1074,6 @@ public class EditorManager implements IEditorManager {
           contributionAnnotationManager.insertAnnotation(model, offset, text.length(), source);
         }
       }
-
-      IAnnotationModel model = provider.getAnnotationModel(input);
-      contributionAnnotationManager.insertAnnotation(model, offset, text.length(), source);
     } finally {
       provider.disconnect(input);
     }
