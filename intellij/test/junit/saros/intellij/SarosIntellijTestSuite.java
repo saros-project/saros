@@ -6,6 +6,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
   saros.intellij.context.TestSuite.class,
+  saros.intellij.editor.TestSuite.class,
   saros.intellij.eventhandler.editor.document.TestSuite.class,
   saros.intellij.project.filesystem.TestSuite.class,
 })
