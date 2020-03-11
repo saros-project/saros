@@ -21,7 +21,12 @@ import saros.concurrent.jupiter.test.util.PathFake;
 import saros.filesystem.IProject;
 import saros.session.User;
 
-/** testing SplitOperation.toTextEdit() */
+/**
+ * Tests the logic that combines the contained operations if possible when creating text activities
+ * from split operations.
+ *
+ * @see SplitOperation#toTextEdit(SPath, User)
+ */
 public class SplitOperationTest {
 
   protected IProject project;
@@ -72,6 +77,7 @@ public class SplitOperationTest {
     TextEditActivity expected1 = new TextEditActivity(source, 5, "", "abcde", path);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
+    // Del(5,"cde") + Del(5,"ab") -> Del(5,"cdeab")
     Operation split2 = S(D(5, "cde"), D(5, "ab"));
     TextEditActivity expected2 = new TextEditActivity(source, 5, "", "cdeab", path);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
@@ -84,6 +90,7 @@ public class SplitOperationTest {
     TextEditActivity expected1 = new TextEditActivity(source, 5, "", "cd", path);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
+    // Ins(5,"abcde") + Del(5,"abcd") -> Ins(5,"e")
     Operation split2 = S(I(5, "abcde"), D(5, "abcd"));
     TextEditActivity expected2 = new TextEditActivity(source, 5, "e", "", path);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
@@ -110,7 +117,7 @@ public class SplitOperationTest {
     // Split(Split(A,B), Split(C,D)) with B and C can be combined
     Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), D(15, "xyz")));
 
-    List<TextEditActivity> expected = new LinkedList<TextEditActivity>();
+    List<TextEditActivity> expected = new LinkedList<>();
     expected.add(new TextEditActivity(source, 8, "", "uvw", path));
     expected.add(new TextEditActivity(source, 2, "e", "", path));
     expected.add(new TextEditActivity(source, 15, "", "xyz", path));
@@ -123,7 +130,7 @@ public class SplitOperationTest {
     // Split(Split(A,B), Split(C,D)) with B, C and D can be combined
     Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), I(3, "xyz")));
 
-    List<TextEditActivity> expected = new LinkedList<TextEditActivity>();
+    List<TextEditActivity> expected = new LinkedList<>();
     expected.add(new TextEditActivity(source, 8, "", "uvw", path));
     expected.add(new TextEditActivity(source, 2, "exyz", "", path));
 
@@ -135,7 +142,7 @@ public class SplitOperationTest {
     // Split(Split(A,B), Split(C,D)) with A, B, C and D can be combined
     Operation split = S(S(D(8, "abc"), D(8, "defg")), S(I(8, "1234"), I(12, "56")));
 
-    List<TextEditActivity> expected = new LinkedList<TextEditActivity>();
+    List<TextEditActivity> expected = new LinkedList<>();
     expected.add(new TextEditActivity(source, 8, "123456", "abcdefg", path));
 
     assertEquals(expected, split.toTextEdit(path, source));
