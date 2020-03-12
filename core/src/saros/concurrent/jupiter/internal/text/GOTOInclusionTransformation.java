@@ -135,10 +135,13 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
       }
     } else if (op instanceof DeleteOperation) {
       int pos = ((DeleteOperation) op).getPosition();
+      int length = ((DeleteOperation) op).getTextLength();
       if (index <= pos) {
         return index;
+      } else if (index > pos + length) {
+        return index - length;
       } else {
-        return index - ((DeleteOperation) op).getTextLength();
+        return pos;
       }
     } else {
       throw new IllegalArgumentException("Unsupported Operation type: " + op);
