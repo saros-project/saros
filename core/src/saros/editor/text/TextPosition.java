@@ -3,7 +3,7 @@ package saros.editor.text;
 import java.util.Objects;
 
 /** Immutable representation of a text position through a line number and an in-line offset. */
-public class TextPosition {
+public class TextPosition implements Comparable<TextPosition> {
   private final int lineNumber;
   private final int inLineOffset;
 
@@ -79,6 +79,19 @@ public class TextPosition {
    */
   public boolean isValid() {
     return this != INVALID_TEXT_POSITION;
+  }
+
+  @Override
+  public int compareTo(TextPosition other) {
+    if (lineNumber < other.lineNumber) {
+      return -1;
+    }
+
+    if (lineNumber > other.lineNumber) {
+      return 1;
+    }
+
+    return Integer.compare(inLineOffset, other.inLineOffset);
   }
 
   @Override
