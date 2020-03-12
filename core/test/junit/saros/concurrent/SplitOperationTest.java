@@ -69,6 +69,11 @@ public class SplitOperationTest {
     Operation split2 = S(D(5, "cde"), D(5, "ab"));
     TextEditActivity expected2 = T(source, 5, "", "cdeab", path);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
+
+    // Del((0,7),"cde") + Del((0,5),"ab") -> Del((0,5),"abcde")
+    Operation split3 = S(D(7, "cde"), D(5, "ab"));
+    TextEditActivity expected3 = T(source, 5, "", "abcde", path);
+    assertEquals(Collections.singletonList(expected3), split3.toTextEdit(path, source));
   }
 
   @Test
