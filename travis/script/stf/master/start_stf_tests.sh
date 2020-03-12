@@ -12,4 +12,4 @@ timeout -t 3600 ./gradlew \
   -Dstf.client.configuration.files=/home/ci/saros_src/travis/config/stf_config \
   -PskipSTFTests=false \
   -PuseBuildScan=true \
-  cleanAll :saros.stf.test:stfTest :saros.stf.test:stfFlakyAndFailingTest
+  cleanAll :saros.stf.test:stfTest :saros.stf.test:stfFlakyTest

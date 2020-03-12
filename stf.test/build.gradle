@@ -58,16 +58,16 @@ task stfTest (type: StfTest, dependsOn: [':saros.eclipse:build']) {
     classpath = sourceSets.stfTest.runtimeClasspath
 
     useJUnit {
-        excludeCategories 'saros.stf.test.categories.FlakyTests', 'saros.stf.test.categories.FailingTests'
+        excludeCategories 'saros.stf.test.categories.FlakyTests'
     }
 }
 
-task stfFlakyAndFailingTest (type: StfTest, dependsOn: [':saros.eclipse:build']) {
+task stfFlakyTest (type: StfTest, dependsOn: [':saros.eclipse:build']) {
     testClassesDirs = sourceSets.stfTest.output.classesDirs
     classpath = sourceSets.stfTest.runtimeClasspath
     ignoreFailures = true
-    
+
     useJUnit {
-        includeCategories 'saros.stf.test.categories.FlakyTests', 'saros.stf.test.categories.FailingTests'
+        includeCategories 'saros.stf.test.categories.FlakyTests'
     }
 }
