@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import saros.activities.TextEditActivity;
+import saros.editor.text.TextPositionUtils;
 import saros.filesystem.IFile;
 
 /** Representation of an open file on the server. Used by {@link ServerEditorManager}. */
@@ -47,11 +48,14 @@ public class Editor {
    * @param edit the text edit operation to apply
    */
   public void applyTextEdit(TextEditActivity edit) {
+    int startOffset =
+        TextPositionUtils.calculateOffset(content.toString(), edit.getStartPosition());
+
     if (edit.getReplacedText().length() > 0) {
-      content.delete(edit.getOffset(), edit.getReplacedText().length());
+      content.delete(startOffset, edit.getReplacedText().length());
     }
-    if (edit.getText().length() > 0) {
-      content.insert(edit.getOffset(), edit.getText());
+    if (edit.getNewText().length() > 0) {
+      content.insert(startOffset, edit.getNewText());
     }
   }
 

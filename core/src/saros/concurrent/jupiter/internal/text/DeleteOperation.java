@@ -26,10 +26,12 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
+import saros.editor.text.TextPosition;
 import saros.misc.xstream.UrlEncodingStringConverter;
 import saros.session.User;
 
@@ -40,34 +42,96 @@ import saros.session.User;
 @XStreamAlias("deleteOp")
 public class DeleteOperation implements ITextOperation {
 
-  /** the text to be deleted. */
+  /** The text to be deleted. */
   @XStreamConverter(UrlEncodingStringConverter.class)
-  private String text;
+  private String replacedText;
 
-  /** the position in the document where the text is to be deleted. */
-  @XStreamAsAttribute private int position;
+  @XStreamAsAttribute
+  @XStreamAlias("sl")
+  private final int startLine;
 
-  /** @param text the text to be deleted */
-  public DeleteOperation(int position, String text) {
-    if (position < 0) {
-      throw new IllegalArgumentException("position index must be >= 0");
+  @XStreamAsAttribute
+  @XStreamAlias("so")
+  private final int startInLineOffset;
+
+  @XStreamAsAttribute
+  @XStreamAlias("ld")
+  private final int lineDelta;
+
+  /**
+   * The offset delta in the last modified line for the operation.
+   *
+   * <p>If the operation text does not contain any line breaks (lineDelta=0), this is the relative
+   * offset delta to the start of the operation.
+   *
+   * <p>If the operation text does contain line breaks (lineDelta>0), this is the (absolute) in-line
+   * offset in the last line of the operation text.
+   */
+  @XStreamAsAttribute
+  @XStreamAlias("od")
+  private final int offsetDelta;
+
+  /**
+   * Instantiates a new delete operation using the given parameters.
+   *
+   * @param startPosition the start position of the delete operation
+   * @param lineDelta how many lines are deleted by the operation
+   * @param offsetDelta the offset delta in the last modified line
+   * @param replacedText the text removed by this operation
+   */
+  public DeleteOperation(
+      TextPosition startPosition, int lineDelta, int offsetDelta, String replacedText) {
+    if (startPosition == null || !startPosition.isValid()) {
+      throw new IllegalArgumentException("The given start position must be valid");
     }
-    this.position = position;
 
-    if (text == null) {
-      throw new IllegalArgumentException("text may not be null");
+    if (lineDelta < 0) {
+      throw new IllegalArgumentException("The given line delta must not be negative");
     }
-    this.text = text;
+    if (offsetDelta < 0) {
+      throw new IllegalArgumentException("The given offset delta must not be negative");
+    }
+
+    if (replacedText == null) {
+      throw new IllegalArgumentException("The given text must not be null");
+    }
+
+    this.startLine = startPosition.getLineNumber();
+    this.startInLineOffset = startPosition.getInLineOffset();
+
+    this.lineDelta = lineDelta;
+    this.offsetDelta = offsetDelta;
+
+    this.replacedText = replacedText;
   }
 
   @Override
-  public int getPosition() {
-    return this.position;
+  public TextPosition getStartPosition() {
+    return new TextPosition(startLine, startInLineOffset);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>For delete operations, this is the position the deleted text ended before it was deleted.
+   */
+  @Override
+  public TextPosition getEndPosition() {
+    if (lineDelta == 0) {
+      return new TextPosition(startLine, startInLineOffset + offsetDelta);
+    } else {
+      return new TextPosition(startLine + lineDelta, offsetDelta);
+    }
   }
 
   @Override
-  public int getTextLength() {
-    return this.text.length();
+  public int getLineDelta() {
+    return lineDelta;
+  }
+
+  @Override
+  public int getOffsetDelta() {
+    return offsetDelta;
   }
 
   /**
@@ -77,16 +141,21 @@ public class DeleteOperation implements ITextOperation {
    */
   @Override
   public String getText() {
-    return this.text;
+    return this.replacedText;
   }
 
-  /** {@inheritDoc} */
   @Override
   public String toString() {
-    return "Delete("
-        + this.position
-        + ",'"
-        + StringEscapeUtils.escapeJava(StringUtils.abbreviate(this.text, 150))
+    return "Delete(start line: "
+        + startLine
+        + ", offset: "
+        + startInLineOffset
+        + ", line delta: "
+        + lineDelta
+        + ", offset delta: "
+        + offsetDelta
+        + ", text: '"
+        + StringEscapeUtils.escapeJava(StringUtils.abbreviate(replacedText, 150))
         + "')";
   }
 
@@ -96,36 +165,37 @@ public class DeleteOperation implements ITextOperation {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     DeleteOperation other = (DeleteOperation) obj;
-    if (position != other.position) return false;
-    if (text == null) {
-      if (other.text != null) return false;
-    } else if (!text.equals(other.text)) return false;
-    return true;
+
+    return this.startLine == other.startLine
+        && this.startInLineOffset == other.startInLineOffset
+        && this.lineDelta == other.lineDelta
+        && this.offsetDelta == other.offsetDelta
+        && Objects.equals(this.replacedText, other.replacedText);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + position;
-    result = prime * result + ((text == null) ? 0 : text.hashCode());
-    return result;
+    return Objects.hash(startLine, startInLineOffset, lineDelta, offsetDelta, replacedText);
   }
 
   @Override
   public List<TextEditActivity> toTextEdit(SPath path, User source) {
-    return Collections.singletonList(
-        new TextEditActivity(source, getPosition(), "", getText(), path));
+    TextPosition startPosition = getStartPosition();
+
+    TextEditActivity textEditActivity =
+        new TextEditActivity(
+            source, startPosition, 0, 0, "", lineDelta, offsetDelta, replacedText, path);
+
+    return Collections.singletonList(textEditActivity);
   }
 
   @Override
   public List<ITextOperation> getTextOperations() {
-    return Collections.singletonList((ITextOperation) this);
+    return Collections.singletonList(this);
   }
 
-  /** {@inheritDoc} */
   @Override
   public ITextOperation invert() {
-    return new InsertOperation(getPosition(), getText());
+    return new InsertOperation(getStartPosition(), lineDelta, offsetDelta, getText());
   }
 }

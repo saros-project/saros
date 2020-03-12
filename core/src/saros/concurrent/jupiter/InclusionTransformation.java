@@ -20,6 +20,8 @@
  */
 package saros.concurrent.jupiter;
 
+import saros.editor.text.TextPosition;
+
 /** Interface for inclusion transformation functions. */
 public interface InclusionTransformation {
 
@@ -32,15 +34,15 @@ public interface InclusionTransformation {
    * @param param an additional parameter depending on the implementation.
    * @return the transformed operation <var>op1'</var>
    */
-  public Operation transform(Operation op1, Operation op2, Object param);
+  Operation transform(Operation op1, Operation op2, Object param);
 
   /**
-   * Transforms an index against the given operation.
+   * Transforms a text position against the given operation.
    *
-   * @param index the index to be transformed
+   * @param textPosition the text position to be transformed
    * @param op the Operation to be transformed
    * @param param an additional implementation dependent parameter
    * @return the transformed index
    */
-  public int transformIndex(int index, Operation op, Object param);
+  TextPosition transformIndex(TextPosition textPosition, Operation op, Object param);
 }

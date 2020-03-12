@@ -13,6 +13,7 @@ import saros.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
 import saros.concurrent.jupiter.internal.text.SplitOperation;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
 
+// TODO add more test cases covering complex (multi-line) cases
 public class GOTOInclusionTransformationTest extends JupiterTestCase {
 
   protected InclusionTransformation inclusion = new GOTOInclusionTransformation();

@@ -50,7 +50,7 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
     String newText = event.getNewFragment().toString();
     String replacedText = event.getOldFragment().toString();
 
-    editorManager.generateTextEdit(event.getOffset(), newText, replacedText, path);
+    editorManager.generateTextEdit(event.getOffset(), newText, replacedText, path, document);
   }
 
   @Override

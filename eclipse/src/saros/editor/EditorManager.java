@@ -52,6 +52,7 @@ import saros.editor.internal.SafePartListener2;
 import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
+import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.filesystem.EclipseFileImpl;
 import saros.filesystem.IProject;
@@ -602,8 +603,11 @@ public class EditorManager implements IEditorManager {
       replacedText = sb.toString();
     }
 
+    TextPosition startPosition = EditorAPI.calculatePosition(document, offset);
+
     TextEditActivity textEdit =
-        new TextEditActivity(session.getLocalUser(), offset, text, replacedText, path);
+        TextEditActivity.buildTextEditActivity(
+            session.getLocalUser(), startPosition, text, replacedText, path);
 
     if (!hasWriteAccess || isLocked) {
       /**
@@ -678,16 +682,42 @@ public class EditorManager implements IEditorManager {
 
     User user = textEdit.getSource();
 
-    /*
-     * Disable documentListener temporarily to avoid being notified of the
-     * change, otherwise this would lead to an infinite activity sending,
-     * crashing the application
-     */
-    editorPool.setDocumentListenerEnabled(false);
+    FileEditorInput input = new FileEditorInput(file);
+    IDocumentProvider provider = EditorAPI.connect(input);
 
-    replaceText(path, textEdit.getOffset(), textEdit.getReplacedText(), textEdit.getText(), user);
+    if (provider == null) {
+      // TODO Trigger a consistency recovery
+      return;
+    }
 
-    editorPool.setDocumentListenerEnabled(true);
+    try {
+      IDocument doc = provider.getDocument(input);
+      if (doc == null) {
+        log.error(
+            "Could not connect document provider for file: " + file.toString(), new StackTrace());
+        // TODO Trigger a consistency recovery
+        return;
+      }
+
+      int offset = EditorAPI.calculateOffset(doc, textEdit.getStartPosition());
+
+      String replacedText = textEdit.getReplacedText();
+      String text = textEdit.getNewText();
+
+      /*
+       * Disable documentListener temporarily to avoid being notified of the
+       * change, otherwise this would lead to an infinite activity sending,
+       * crashing the application
+       */
+      editorPool.setDocumentListenerEnabled(false);
+
+      replaceText(path, offset, replacedText, text, user, doc);
+
+      editorPool.setDocumentListenerEnabled(true);
+
+    } finally {
+      provider.disconnect(input);
+    }
 
     /*
      * TODO Find out whether this is actually necessary. If we receive a
@@ -707,14 +737,15 @@ public class EditorManager implements IEditorManager {
         // No text viewer for the editorPart found.
         continue;
       }
-      int cursorOffset = textEdit.getOffset() + textEdit.getText().length();
 
-      if (viewer.getTopIndexStartOffset() <= cursorOffset
-          && cursorOffset <= viewer.getBottomIndexEndOffset()) {
+      TextPosition cursorPosition = textEdit.getNewEndPosition();
+      int cursorLine = cursorPosition.getLineNumber();
 
-        TextSelection selection = EditorAPI.calculateSelection(editorPart, cursorOffset, 0);
+      if (viewer.getTopIndex() <= cursorLine && cursorLine <= viewer.getBottomIndex()) {
 
-        locationAnnotationManager.setSelection(editorPart, selection, user);
+        TextSelection cursorSelection = new TextSelection(cursorPosition, cursorPosition);
+
+        locationAnnotationManager.setSelection(editorPart, cursorSelection, user);
       }
     }
 
@@ -1008,71 +1039,56 @@ public class EditorManager implements IEditorManager {
    * @param text The text which is to be inserted at the given offset instead of the replaced text
    *     (is "" if this operation is only deleting text)
    * @param source The User who caused this change.
+   * @param doc the document for the file
    */
-  private void replaceText(SPath path, int offset, String replacedText, String text, User source) {
+  private void replaceText(
+      SPath path, int offset, String replacedText, String text, User source, IDocument doc) {
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
-    FileEditorInput input = new FileEditorInput(file);
-    IDocumentProvider provider = EditorAPI.connect(input);
+    int replacedLength = replacedText.length();
 
-    if (provider == null) {
-      // TODO Trigger a consistency recovery
+    // Check if the replaced text is really there.
+    if (log.isDebugEnabled()) {
+      String is;
+      try {
+        is = doc.get(offset, replacedLength);
+        if (!is.equals(replacedText)) {
+          log.error(
+              "replaceText should be '"
+                  + StringEscapeUtils.escapeJava(replacedText)
+                  + "' is '"
+                  + StringEscapeUtils.escapeJava(is)
+                  + "'");
+        }
+      } catch (BadLocationException e) {
+        // Ignore, because this is going to fail again just below
+      }
+    }
+
+    // Try to replace
+    try {
+      // Attention: This method also alters the annotation model if an
+      // annotation exists at the offset and the length > 1
+      doc.replace(offset, replacedLength, text);
+    } catch (BadLocationException e) {
+      log.error(
+          String.format(
+              "Could not apply TextEdit at %d-%d of document "
+                  + "with length %d.\nWas supposed to replace"
+                  + " '%s' with '%s'.",
+              offset, offset + replacedLength, doc.getLength(), replacedText, text));
       return;
     }
 
-    try {
-      IDocument doc = provider.getDocument(input);
-      if (doc == null) {
-        log.error(
-            "Could not connect document provider for file: " + file.toString(), new StackTrace());
-        // TODO Trigger a consistency recovery
-        return;
-      }
+    int length = text.length();
 
-      // Check if the replaced text is really there.
-      if (log.isDebugEnabled()) {
-        String is;
-        try {
-          is = doc.get(offset, replacedText.length());
-          if (!is.equals(replacedText)) {
-            log.error(
-                "replaceText should be '"
-                    + StringEscapeUtils.escapeJava(replacedText)
-                    + "' is '"
-                    + StringEscapeUtils.escapeJava(is)
-                    + "'");
-          }
-        } catch (BadLocationException e) {
-          // Ignore, because this is going to fail again just below
-        }
-      }
+    for (IEditorPart editorPart : editorPool.getEditors(path)) {
 
-      // Try to replace
-      try {
-        // Attention: This method also alters the annotation model if an
-        // annotation exists at the offset and the length > 1
-        doc.replace(offset, replacedText.length(), text);
-      } catch (BadLocationException e) {
-        log.error(
-            String.format(
-                "Could not apply TextEdit at %d-%d of document "
-                    + "with length %d.\nWas supposed to replace"
-                    + " '%s' with '%s'.",
-                offset, offset + replacedText.length(), doc.getLength(), replacedText, text));
-        return;
+      if (editorPart instanceof ITextEditor) {
+        ITextEditor textEditor = (ITextEditor) editorPart;
+        IAnnotationModel model =
+            textEditor.getDocumentProvider().getAnnotationModel(textEditor.getEditorInput());
+        contributionAnnotationManager.insertAnnotation(model, offset, length, source);
       }
-
-      for (IEditorPart editorPart : editorPool.getEditors(path)) {
-
-        if (editorPart instanceof ITextEditor) {
-          ITextEditor textEditor = (ITextEditor) editorPart;
-          IAnnotationModel model =
-              textEditor.getDocumentProvider().getAnnotationModel(textEditor.getEditorInput());
-          contributionAnnotationManager.insertAnnotation(model, offset, text.length(), source);
-        }
-      }
-    } finally {
-      provider.disconnect(input);
     }
   }
 
