@@ -318,53 +318,6 @@ public class EditorAPI {
   }
 
   /**
-   * Calculates the line based selection values for the given text based selection offset and length
-   * in the given document.
-   *
-   * <p>An empty selection is represented by both the offset and length having the value -1. In any
-   * other case, the offset and length must both be greater or equal to zero.
-   *
-   * <p>The given editor part must not be <code>null</code>.
-   *
-   * @param editorPart the editor part the selection belongs to
-   * @param offset the text based offset of the selection
-   * @param length the text based length of the selection
-   * @return the line based selection values for the given text offset based selection in the given
-   *     document or {@link TextSelection#EMPTY_SELECTION} if the given editor part is not a text
-   *     editor, the editor does not have a valid document provider, a valid IDocument could not be
-   *     obtained form the document provider, the correct line numbers or in-line offsets could not
-   *     be calculated, or the given offset and length have the value -1
-   * @throws NullPointerException if the given editor part is <code>null</code>
-   * @throws IllegalArgumentException if one but not both of selection and length is set to -1 or
-   *     any negative value besides -1 is passed
-   * @see TextSelection
-   * @see ITextSelection
-   */
-  public static TextSelection calculateSelection(IEditorPart editorPart, int offset, int length) {
-    Objects.requireNonNull(editorPart, "The given editor part must not be null");
-
-    if (!(editorPart instanceof ITextEditor)) {
-      return TextSelection.EMPTY_SELECTION;
-    }
-
-    ITextEditor textEditor = (ITextEditor) editorPart;
-
-    IDocumentProvider documentProvider = textEditor.getDocumentProvider();
-
-    if (documentProvider == null) {
-      return TextSelection.EMPTY_SELECTION;
-    }
-
-    IDocument document = documentProvider.getDocument(editorPart.getEditorInput());
-
-    if (document == null) {
-      return TextSelection.EMPTY_SELECTION;
-    }
-
-    return calculateSelection(document, offset, length);
-  }
-
-  /**
    * Calculates the text position for the given text based offset in the given document.
    *
    * <p>The given document must not be <code>null</code> and the given offset must not be negative.
