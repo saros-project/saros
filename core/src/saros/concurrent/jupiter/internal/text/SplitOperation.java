@@ -191,7 +191,7 @@ public class SplitOperation implements Operation {
       DeleteOperation delete = (DeleteOperation) op2;
 
       if (insert.getStartPosition().compareTo(delete.getStartPosition()) == 0) {
-        // Ins(5,"ab") + Del(5,"abcd") -> Del(5,"cd")
+        // Case 1: Ins(5,"ab") + Del(5,"abcd") -> Del(5,"cd")
         if (delete.getText().startsWith(insert.getText())) {
 
           String adjustedText = delete.getText().substring(insert.getText().length());
@@ -209,7 +209,7 @@ public class SplitOperation implements Operation {
           return new DeleteOperation(
               insert.getStartPosition(), newLineDelta, newOffsetDelta, adjustedText);
         }
-        // Ins(5,"abcd") + Del(5,"ab") -> Ins(5,"cd")
+        // Case 2: Ins(5,"abcd") + Del(5,"ab") -> Ins(5,"cd")
         else if (insert.getText().startsWith(delete.getText())) {
 
           String adjustedText = insert.getText().substring(delete.getText().length());
@@ -233,12 +233,12 @@ public class SplitOperation implements Operation {
       InsertOperation insert1 = (InsertOperation) op1;
       InsertOperation insert2 = (InsertOperation) op2;
 
-      // Ins(2,"ab") + Ins(4,"cd") -> Ins(2,"abcd")
+      // Case 1: Ins(2,"ab") + Ins(4,"cd") -> Ins(2,"abcd")
       if (insert1.getEndPosition().compareTo(insert2.getStartPosition()) == 0) {
         return concatenateInsertOperations(insert1, insert2);
       }
 
-      // Ins(4,"cd") + Ins(4,"ab") -> Ins(4,"abcd")
+      // Case 2: Ins(4,"cd") + Ins(4,"ab") -> Ins(4,"abcd")
       if (insert1.getStartPosition().compareTo(insert2.getStartPosition()) == 0) {
         return concatenateInsertOperations(insert2, insert1);
       }
@@ -247,12 +247,12 @@ public class SplitOperation implements Operation {
       DeleteOperation delete1 = (DeleteOperation) op1;
       DeleteOperation delete2 = (DeleteOperation) op2;
 
-      // Del(5,"ab") + Del(5,"cde") -> Del(5,"abcde")
+      // Case 1: Del(5,"ab") + Del(5,"cde") -> Del(5,"abcde")
       if (delete1.getStartPosition().compareTo(delete2.getStartPosition()) == 0) {
         return concatenateDeleteOperations(delete1, delete2);
       }
 
-      // Del(8,"c") + Del(6,"ab") -> Del(6,"abc")
+      // Case 2: Del(8,"c") + Del(6,"ab") -> Del(6,"abc")
       if (delete1.getStartPosition().compareTo(delete2.getEndPosition()) == 0) {
         return concatenateDeleteOperations(delete2, delete1);
       }
