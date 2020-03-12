@@ -12,6 +12,7 @@ import org.junit.runners.Suite;
   saros.concurrent.jupiter.test.puzzles.TestSuite.class,
   saros.editor.colorstorage.TestSuite.class,
   saros.editor.remote.TestSuite.class,
+  saros.editor.text.TestSuite.class,
   saros.filesystem.TestSuite.class,
   saros.misc.xstream.TestSuite.class,
   saros.monitoring.TestSuite.class,
