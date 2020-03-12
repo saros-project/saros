@@ -37,6 +37,7 @@ import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
 import saros.concurrent.jupiter.internal.text.NoOperation;
 import saros.concurrent.jupiter.internal.text.TimestampOperation;
+import saros.editor.text.TextPosition;
 import saros.session.User;
 
 /** This class implements the client-side core of the Jupiter control algorithm. */
@@ -169,15 +170,17 @@ public class Jupiter implements Algorithm {
   }
 
   @Override
-  public int[] transformIndices(Timestamp timestamp, int[] indices) throws TransformationException {
+  public TextPosition[] transformIndices(Timestamp timestamp, TextPosition[] textPositions)
+      throws TransformationException {
+
     checkPreconditions((JupiterVectorTime) timestamp);
     discardAcknowledgedOperations((JupiterVectorTime) timestamp);
-    int[] result = new int[indices.length];
-    System.arraycopy(indices, 0, result, 0, indices.length);
+    TextPosition[] result = new TextPosition[textPositions.length];
+    System.arraycopy(textPositions, 0, result, 0, textPositions.length);
     for (int i = 0; i < this.ackJupiterActivityList.size(); i++) {
       OperationWrapper wrap = this.ackJupiterActivityList.get(i);
       Operation ack = wrap.getOperation();
-      for (int k = 0; k < indices.length; k++) {
+      for (int k = 0; k < textPositions.length; k++) {
         result[k] = transformIndex(result[k], ack);
       }
     }
@@ -185,17 +188,17 @@ public class Jupiter implements Algorithm {
   }
 
   /**
-   * Transforms the given index against the operation.
+   * Transforms the given text position against the operation.
    *
-   * @param index the index to be transformed
+   * @param textPosition the text position to be transformed
    * @param op the operation to be transformed
    * @return the transformed index
    */
-  protected int transformIndex(int index, Operation op) {
+  protected TextPosition transformIndex(TextPosition textPosition, Operation op) {
     if (isClientSide()) {
-      return this.inclusion.transformIndex(index, op, Boolean.TRUE);
+      return this.inclusion.transformIndex(textPosition, op, Boolean.TRUE);
     } else {
-      return this.inclusion.transformIndex(index, op, Boolean.FALSE);
+      return this.inclusion.transformIndex(textPosition, op, Boolean.FALSE);
     }
   }
 

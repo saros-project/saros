@@ -507,11 +507,11 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
       }
 
       for (ITextOperation textOp : textOps) {
+        int offset = EditorAPI.calculateOffset(doc, textOp.getStartPosition());
+
         try {
-          if (textOp instanceof DeleteOperation)
-            doc.replace(textOp.getPosition(), textOp.getTextLength(), "");
-          if (textOp instanceof InsertOperation)
-            doc.replace(textOp.getPosition(), 0, textOp.getText());
+          if (textOp instanceof DeleteOperation) doc.replace(offset, textOp.getText().length(), "");
+          if (textOp instanceof InsertOperation) doc.replace(offset, 0, textOp.getText());
         } catch (BadLocationException e) {
           log.error("Invalid location for " + textOp);
         }

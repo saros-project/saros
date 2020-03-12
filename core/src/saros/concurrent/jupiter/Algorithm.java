@@ -2,6 +2,7 @@ package saros.concurrent.jupiter;
 
 import saros.activities.JupiterActivity;
 import saros.activities.SPath;
+import saros.editor.text.TextPosition;
 import saros.session.User;
 
 public interface Algorithm {
@@ -45,14 +46,15 @@ public interface Algorithm {
   void acknowledge(int siteId, Timestamp timestamp) throws TransformationException;
 
   /**
-   * Transform the array of indices from the state indicated by the timestamp to the current
-   * timestamp at the local site. The transformed indices are returned to the client.
+   * Transform the array of text positions from the state indicated by the timestamp to the current
+   * timestamp at the local site. The transformed text positions are returned to the client.
    *
-   * @param timestamp the timestamp at which the indices are valid
-   * @param indices the array of integer indices
-   * @return the transformed array of indices
+   * @param timestamp the timestamp at which the text positions are valid
+   * @param textPositions the array of text positions
+   * @return the transformed array of text positions
    */
-  int[] transformIndices(Timestamp timestamp, int[] indices) throws TransformationException;
+  TextPosition[] transformIndices(Timestamp timestamp, TextPosition[] textPositions)
+      throws TransformationException;
 
   /**
    * @param timestamp

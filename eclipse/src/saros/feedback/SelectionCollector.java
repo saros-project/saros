@@ -10,6 +10,7 @@ import saros.activities.TextSelectionActivity;
 import saros.annotations.Component;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
+import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.net.xmpp.JID;
 import saros.session.ISarosSession;
@@ -111,20 +112,20 @@ public class SelectionCollector extends AbstractStatisticCollector {
              * one character.
              */
             User user = textEdit.getSource();
-            int offset = textEdit.getOffset();
+            TextPosition editStartPosition = textEdit.getStartPosition();
             SPath filePath = textEdit.getPath();
 
-            // TODO adjust once text edits are migrated to new position logic
-            /*
+            TextPosition selectionStartPosition = selection.selection.getStartPosition();
+            TextPosition selectionEndPosition = selection.selection.getEndPosition();
+
             if (!currentUser.equals(user)
-                && selection.offset <= offset
-                && (selection.offset + selection.length) >= offset
+                && selectionStartPosition.compareTo(editStartPosition) <= 0
+                && selectionEndPosition.compareTo(editStartPosition) >= 0
                 && (selection.path).equals(filePath)
                 && !selection.gestured) {
               selection.gestured = true;
               break;
             }
-             */
           }
         }
 

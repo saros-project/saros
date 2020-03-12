@@ -26,16 +26,24 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
+import saros.editor.text.TextPosition;
 import saros.misc.xstream.UrlEncodingStringConverter;
 import saros.session.User;
 
 /**
  * The InsertOperation is used to hold a text together with its position index. The text is to be
  * inserted in the document model.
+ *
+ * <p>Insert operations also work with the concept of an original start line and in-line offset.
+ * These values describe the position for which the insert operation was originally intended. This
+ * concept could be extended in such a way that two origin positions could be compared to each other
+ * based on the same context. Therefore, if the two positions do not relate on the same document
+ * context, a least synchronization point (LSP) would have to be determined.
  */
 @XStreamAlias("insertOp")
 public class InsertOperation implements ITextOperation {
@@ -44,87 +52,170 @@ public class InsertOperation implements ITextOperation {
   @XStreamConverter(UrlEncodingStringConverter.class)
   private String text;
 
-  /** the position index in the document */
-  @XStreamAsAttribute private int position;
+  @XStreamAsAttribute
+  @XStreamAlias("sl")
+  private final int startLine;
+
+  @XStreamAsAttribute
+  @XStreamAlias("so")
+  private final int startInLineOffset;
+
+  @XStreamAsAttribute
+  @XStreamAlias("ld")
+  private final int lineDelta;
 
   /**
-   * the origin position index where the insert operation was originally intended. This concept
-   * could be extended in such a way that two origin positions could be compared to each other based
-   * on the same context. Therefore, if the two positions do not relate on the same document
-   * context, a least synchronization point (LSP) would have to be determined.
-   */
-  @XStreamAsAttribute private int origin;
-
-  /**
-   * Syntactic sugar for creating a new InsertOperation with the origin set to the given position.
+   * The offset delta in the last modified line for the operation.
    *
-   * @param position the position in the document
-   * @param text the text to be inserted
+   * <p>If the operation text does not contain any line breaks (lineDelta=0), this is the relative
+   * offset delta to the start of the operation.
+   *
+   * <p>If the operation text does contain line breaks (lineDelta>0), this is the (absolute) in-line
+   * offset in the last line of the operation text.
    */
-  public InsertOperation(int position, String text) {
-    this(position, text, position);
+  @XStreamAsAttribute
+  @XStreamAlias("od")
+  private final int offsetDelta;
+
+  @XStreamAsAttribute
+  @XStreamAlias("ol")
+  private final int originStartLine;
+
+  @XStreamAsAttribute
+  @XStreamAlias("oo")
+  private final int originStartInLineOffset;
+
+  /**
+   * Instantiates a new insert operation using the given parameters.
+   *
+   * <p>Uses the given start position as the origin start position.
+   *
+   * @param startPosition the start position of the insert operation
+   * @param lineDelta how many lines are added by the operation
+   * @param offsetDelta the offset delta in the last modified line
+   * @param text the text added by this operation
+   * @see #InsertOperation(TextPosition, int, int, String, TextPosition)
+   */
+  public InsertOperation(TextPosition startPosition, int lineDelta, int offsetDelta, String text) {
+    this(startPosition, lineDelta, offsetDelta, text, startPosition);
   }
 
   /**
-   * @param position the position in the document
-   * @param text the text to be inserted
-   * @param origin the origin position of this insert operation
+   * Instantiates a new insert operation using the given parameters.
+   *
+   * @param startPosition the start position of the insert operation
+   * @param lineDelta how many lines are added by the operation
+   * @param offsetDelta the offset delta in the last modified line
+   * @param text the text added by this operation
+   * @param originStartPosition the original start position the insert operation was meant for; see
+   *     {@link #getOriginStartPosition()}
+   * @see #InsertOperation(TextPosition, int, int, String, TextPosition)
    */
-  public InsertOperation(int position, String text, int origin) {
-    if (position < 0) {
-      throw new IllegalArgumentException("position index must be >= 0");
+  public InsertOperation(
+      TextPosition startPosition,
+      int lineDelta,
+      int offsetDelta,
+      String text,
+      TextPosition originStartPosition) {
+
+    if (startPosition == null || !startPosition.isValid()) {
+      throw new IllegalArgumentException("The given start position must be valid");
     }
-    this.position = position;
+    if (originStartPosition == null || !originStartPosition.isValid()) {
+      throw new IllegalArgumentException("The given origin start position must be valid");
+    }
+
+    if (lineDelta < 0) {
+      throw new IllegalArgumentException("The given line delta must not be negative");
+    }
+    if (offsetDelta < 0) {
+      throw new IllegalArgumentException("The given offset delta must not be negative");
+    }
+
     if (text == null) {
-      throw new IllegalArgumentException("text may not be null");
+      throw new IllegalArgumentException("The given text must not be null");
     }
-    this.text = text;
-    if (origin < 0) {
-      throw new IllegalArgumentException("origin index must be >= 0");
-    }
-    this.origin = origin;
-  }
 
-  /**
-   * @param position the position in the document
-   * @param text the text to be inserted
-   * @param origin the origin position of this insert operation
-   * @param isUndo flag to indicate an undo operation
-   */
-  public InsertOperation(int position, String text, int origin, boolean isUndo) {
-    this(position, text, origin);
+    this.startLine = startPosition.getLineNumber();
+    this.startInLineOffset = startPosition.getInLineOffset();
+
+    this.lineDelta = lineDelta;
+    this.offsetDelta = offsetDelta;
+
+    this.originStartLine = originStartPosition.getLineNumber();
+    this.originStartInLineOffset = originStartPosition.getInLineOffset();
+
+    this.text = text;
   }
 
   @Override
-  public int getPosition() {
-    return this.position;
+  public TextPosition getStartPosition() {
+    return new TextPosition(startLine, startInLineOffset);
   }
 
-  /** @return the text to be inserted */
+  /**
+   * {@inheritDoc}
+   *
+   * <p>For insert operations, this is the position where the inserted text ends.
+   */
+  @Override
+  public TextPosition getEndPosition() {
+    if (lineDelta == 0) {
+      return new TextPosition(startLine, startInLineOffset + offsetDelta);
+    } else {
+      return new TextPosition(startLine + lineDelta, offsetDelta);
+    }
+  }
+
+  @Override
+  public int getLineDelta() {
+    return lineDelta;
+  }
+
+  @Override
+  public int getOffsetDelta() {
+    return offsetDelta;
+  }
+
+  /**
+   * Returns the position for which the insert operation was originally intended.
+   *
+   * <p>This concept could be extended in such a way that two origin positions could be compared to
+   * each other based on the same context. Therefore, if the two positions do not relate on the same
+   * document context, a least synchronization point (LSP) would have to be determined.
+   *
+   * @return the position for which the insert operation was originally intended
+   */
+  public TextPosition getOriginStartPosition() {
+    return new TextPosition(originStartLine, originStartInLineOffset);
+  }
+
+  /**
+   * Returns the text to be added by the operation.
+   *
+   * @return the text to be added by the operation
+   */
   @Override
   public String getText() {
     return this.text;
   }
 
   @Override
-  public int getTextLength() {
-    return this.text.length();
-  }
-
-  /** @return the origin position */
-  public int getOrigin() {
-    return this.origin;
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public String toString() {
-    return "Insert("
-        + this.position
-        + ",'"
-        + StringEscapeUtils.escapeJava(StringUtils.abbreviate(this.text, 150))
-        + "',"
-        + this.origin
+    return "Insert(start line: "
+        + startLine
+        + ", offset: "
+        + startInLineOffset
+        + ", line delta: "
+        + lineDelta
+        + ", offset delta: "
+        + offsetDelta
+        + ", text: '"
+        + StringEscapeUtils.escapeJava(StringUtils.abbreviate(text, 150))
+        + "', origin start line: "
+        + originStartLine
+        + ", offset: "
+        + originStartInLineOffset
         + ")";
   }
 
@@ -134,38 +225,45 @@ public class InsertOperation implements ITextOperation {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     InsertOperation other = (InsertOperation) obj;
-    if (origin != other.origin) return false;
-    if (position != other.position) return false;
-    if (text == null) {
-      if (other.text != null) return false;
-    } else if (!text.equals(other.text)) return false;
-    return true;
+
+    return this.startLine == other.startLine
+        && this.startInLineOffset == other.startInLineOffset
+        && this.lineDelta == other.lineDelta
+        && this.offsetDelta == other.offsetDelta
+        && Objects.equals(this.text, other.text)
+        && this.originStartLine == other.originStartLine
+        && this.originStartInLineOffset == other.originStartInLineOffset;
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + origin;
-    result = prime * result + position;
-    result = prime * result + ((text == null) ? 0 : text.hashCode());
-    return result;
+    return Objects.hash(
+        startLine,
+        startInLineOffset,
+        lineDelta,
+        originStartInLineOffset,
+        text,
+        originStartLine,
+        originStartInLineOffset);
   }
 
   @Override
   public List<TextEditActivity> toTextEdit(SPath path, User source) {
-    return Collections.singletonList(
-        new TextEditActivity(source, getPosition(), getText(), "", path));
+    TextPosition startPosition = getStartPosition();
+
+    TextEditActivity textEditActivity =
+        new TextEditActivity(source, startPosition, lineDelta, offsetDelta, text, 0, 0, "", path);
+
+    return Collections.singletonList(textEditActivity);
   }
 
   @Override
   public List<ITextOperation> getTextOperations() {
-    return Collections.singletonList((ITextOperation) this);
+    return Collections.singletonList(this);
   }
 
-  /** {@inheritDoc} */
   @Override
   public ITextOperation invert() {
-    return new DeleteOperation(getPosition(), getText());
+    return new DeleteOperation(getStartPosition(), lineDelta, offsetDelta, getText());
   }
 }

@@ -156,7 +156,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
         @Override
         public void textEdited(TextEditActivity textEdit) {
           User user = textEdit.getSource();
-          String text = textEdit.getText();
+          String text = textEdit.getNewText();
 
           /*
            * delete whitespaces from the text because we don't want to count

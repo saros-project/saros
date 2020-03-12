@@ -43,14 +43,16 @@ public class SplitOperationTest {
     path = new SPath(project, new PathFake("path"));
   }
 
+  // TODO add more test cases dealing with different line + offset deltas
+
   @Test
   public void testInsertInsert() {
-    // Ins(4,"0ab") + Ins(7,"cd") -> Ins(4,"0abcd")
+    // Ins((0,4),"0ab") + Ins((0,7),"cd") -> Ins((0,4),"0abcd")
     Operation split1 = S(I(4, "0ab"), I(7, "cd"));
     TextEditActivity expected1 = T(source, 4, "0abcd", "", path);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
-    // Ins(4,"0ab") + Ins(4,"cd") -> Ins(4,"cd0ab")
+    // Ins((0,4),"0ab") + Ins((0,4),"cd") -> Ins((0,4),"cd0ab")
     Operation split2 = S(I(4, "0ab"), I(4, "cd"));
     TextEditActivity expected2 = T(source, 4, "cd0ab", "", path);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
@@ -58,12 +60,12 @@ public class SplitOperationTest {
 
   @Test
   public void testDeleteDelete() {
-    // Del(5,"ab") + Del(5,"cde") -> Del(5,"abcde")
+    // Del((0,5),"ab") + Del((0,5),"cde") -> Del((0,5),"abcde")
     Operation split1 = S(D(5, "ab"), D(5, "cde"));
     TextEditActivity expected1 = T(source, 5, "", "abcde", path);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
-    // Del(5,"cde") + Del(5,"ab") -> Del(5,"cdeab")
+    // Del((0,5),"cde") + Del((0,5),"ab") -> Del((0,5),"cdeab")
     Operation split2 = S(D(5, "cde"), D(5, "ab"));
     TextEditActivity expected2 = T(source, 5, "", "cdeab", path);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
@@ -71,12 +73,12 @@ public class SplitOperationTest {
 
   @Test
   public void testInsertDelete() {
-    // Ins(5,"ab") + Del(5,"abcd") -> Del(5,"cd")
+    // Ins((0,5),"ab") + Del((0,5),"abcd") -> Del((0,5),"cd")
     Operation split1 = S(I(5, "ab"), D(5, "abcd"));
     TextEditActivity expected1 = T(source, 5, "", "cd", path);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
-    // Ins(5,"abcde") + Del(5,"abcd") -> Ins(5,"e")
+    // Ins((0,5),"abcde") + Del((0,5),"abcd") -> Ins((0,5),"e")
     Operation split2 = S(I(5, "abcde"), D(5, "abcd"));
     TextEditActivity expected2 = T(source, 5, "e", "", path);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
@@ -84,7 +86,7 @@ public class SplitOperationTest {
 
   @Test
   public void testDeleteInsert() {
-    // Del(8,"abc") + Ins(8,"ghijk") -> Replace "abc" with "ghijk"
+    // Del((0,8),"abc") + Ins((0,8),"ghijk") -> Replace "abc" with "ghijk"
     Operation split1 = S(D(8, "abc"), I(8, "ghijk"));
     TextEditActivity expected1 = T(source, 8, "ghijk", "abc", path);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
@@ -92,7 +94,7 @@ public class SplitOperationTest {
 
   @Test
   public void testDelSplit() {
-    // Split(Del(8,"abc"), Split(NoOperation, Ins(8,"ghijk")
+    // Split(Del((0,8),"abc"), Split(NoOperation, Ins((0,8),"ghijk")
     Operation split = S(D(8, "abc"), S(NOP(), I(8, "ghijk")));
     TextEditActivity expected = T(source, 8, "ghijk", "abc", path);
     assertEquals(Collections.singletonList(expected), split.toTextEdit(path, source));

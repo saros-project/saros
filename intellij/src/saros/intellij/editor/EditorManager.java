@@ -34,6 +34,8 @@ import saros.editor.SharedEditorListenerDispatch;
 import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
+import saros.editor.text.TextPosition;
+import saros.editor.text.TextPositionUtils;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
@@ -136,9 +138,41 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           Operation operation = editorActivity.toOperation();
 
-          localEditorManipulator.applyTextOperations(path, operation);
+          Editor calculationEditor = editorPool.getEditor(path);
 
-          adjustAnnotationsAfterEdit(user, path.getFile(), editorPool.getEditor(path), operation);
+          if (calculationEditor == null) {
+
+            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+
+            if (virtualFile == null) {
+              log.warn(
+                  "Could not apply selection "
+                      + editorActivity
+                      + " as no virtual file could be obtained for resource "
+                      + path);
+
+              return;
+            }
+
+            Document document = DocumentAPI.getDocument(virtualFile);
+
+            if (document == null) {
+              log.warn(
+                  "Could not apply selection "
+                      + editorActivity
+                      + " as no document could be obtained for resource "
+                      + virtualFile);
+
+              return;
+            }
+
+            calculationEditor = backgroundEditorPool.getBackgroundEditor(path, document);
+          }
+
+          localEditorManipulator.applyTextOperations(path, operation, calculationEditor);
+
+          adjustAnnotationsAfterEdit(
+              user, path.getFile(), editorPool.getEditor(path), operation, calculationEditor);
 
           editorListenerDispatch.textEdited(editorActivity);
         }
@@ -161,19 +195,25 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
          * @param file the file for the given operation
          * @param editor the editor for the given file
          * @param operations the received operation
+         * @param calculationEditor an editor for the file; this might be a background editor (see
+         *     {@link BackgroundEditorPool}), so it must not be used for annotation purposes
          */
         private void adjustAnnotationsAfterEdit(
             @NotNull User user,
             @NotNull IFile file,
             @Nullable Editor editor,
-            @NotNull Operation operations) {
+            @NotNull Operation operations,
+            @NotNull Editor calculationEditor) {
 
           operations
               .getTextOperations()
               .forEach(
                   textOperation -> {
-                    int start = textOperation.getPosition();
-                    int end = textOperation.getPosition() + textOperation.getTextLength();
+                    TextPosition startPosition = textOperation.getStartPosition();
+                    TextPosition endPosition = textOperation.getEndPosition();
+
+                    int start = EditorAPI.calculateOffset(calculationEditor, startPosition);
+                    int end = EditorAPI.calculateOffset(calculationEditor, endPosition);
 
                     if (textOperation instanceof InsertOperation) {
                       if (editor == null) {
@@ -820,14 +860,31 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * outside the editor package. If you still need to access this method, please consider whether
    * your class should rather be located in the editor package.
    */
-  public void generateTextEdit(int offset, String newText, String replacedText, SPath path) {
+  public void generateTextEdit(
+      int offset,
+      @NotNull String newText,
+      @NotNull String replacedText,
+      @NotNull SPath path,
+      @NotNull Document document) {
 
     if (session == null) {
       return;
     }
 
+    Editor editor = editorPool.getEditor(path);
+
+    if (editor == null) {
+      editor = backgroundEditorPool.getBackgroundEditor(path, document);
+    }
+
+    TextPosition startPosition = EditorAPI.calculatePosition(editor, offset);
+
+    // Intellij internally always used UNIX line separators
+    String lineSeparator = TextPositionUtils.UNIX_LINE_SEPARATOR;
+
     TextEditActivity textEdit =
-        new TextEditActivity(session.getLocalUser(), offset, newText, replacedText, path);
+        TextEditActivity.buildTextEditActivity(
+            session.getLocalUser(), startPosition, newText, replacedText, path, lineSeparator);
 
     if (!hasWriteAccess || isLocked) {
       /*

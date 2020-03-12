@@ -137,43 +137,15 @@ public class LocalEditorManipulator {
    *
    * @param path the path of the file whose document should be modified
    * @param operations the operations to apply to the document
+   * @param calculationEditor an editor for the file; this might be a background editor (see {@link
+   *     BackgroundEditorPool})
    */
-  void applyTextOperations(SPath path, Operation operations) {
+  void applyTextOperations(
+      @NotNull SPath path, @NotNull Operation operations, @NotNull Editor calculationEditor) {
+
     Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
-    Document doc = editorPool.getDocument(path);
-
-    /*
-     * If the document was not opened in an editor yet, it is not in the
-     * editorPool so we have to create it temporarily here.
-     */
-    if (doc == null) {
-      VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
-
-      if (virtualFile == null || !virtualFile.exists()) {
-        log.warn(
-            "Could not apply TextOperations "
-                + operations
-                + " as the VirtualFile for path "
-                + path
-                + " does not exist or could not be found");
-
-        return;
-      }
-
-      doc = DocumentAPI.getDocument(virtualFile);
-
-      if (doc == null) {
-        log.warn(
-            "Could not apply TextOperations "
-                + operations
-                + " as the Document for VirtualFile "
-                + virtualFile
-                + " could not be found");
-
-        return;
-      }
-    }
+    Document doc = calculationEditor.getDocument();
 
     try {
       /*
@@ -183,15 +155,21 @@ public class LocalEditorManipulator {
       manager.setLocalDocumentModificationHandlersEnabled(false);
 
       for (ITextOperation op : operations.getTextOperations()) {
+        int start = EditorAPI.calculateOffset(calculationEditor, op.getStartPosition());
+        int end = EditorAPI.calculateOffset(calculationEditor, op.getEndPosition());
+
         if (op instanceof DeleteOperation) {
-          DocumentAPI.deleteText(
-              project, doc, op.getPosition(), op.getPosition() + op.getTextLength());
+          DocumentAPI.deleteText(project, doc, start, end);
+
         } else {
           boolean writePermission = doc.isWritable();
+
           if (!writePermission) {
             doc.setReadOnly(false);
           }
-          DocumentAPI.insertText(project, doc, op.getPosition(), op.getText());
+
+          DocumentAPI.insertText(project, doc, start, op.getText());
+
           if (!writePermission) {
             doc.setReadOnly(true);
           }

@@ -23,9 +23,11 @@ package saros.concurrent.jupiter.internal.text;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
+import saros.editor.text.TextPosition;
 import saros.session.User;
 
 /**
@@ -139,9 +141,31 @@ public class SplitOperation implements Operation {
       }
 
       if (isReplace(lastOp, operation)) {
-        result.add(
+        TextPosition startPosition = lastOp.getStartPosition();
+
+        int newTextLineDelta = operation.getLineDelta();
+        int newTextOffsetDelta = operation.getOffsetDelta();
+
+        String text = operation.getText();
+
+        int replacedTextLineDelta = lastOp.getLineDelta();
+        int replacedTextOffsetDelta = lastOp.getOffsetDelta();
+
+        String replacedText = lastOp.getText();
+
+        TextEditActivity textReplaceActivity =
             new TextEditActivity(
-                source, lastOp.getPosition(), operation.getText(), lastOp.getText(), path));
+                source,
+                startPosition,
+                newTextLineDelta,
+                newTextOffsetDelta,
+                text,
+                replacedTextLineDelta,
+                replacedTextOffsetDelta,
+                replacedText,
+                path);
+
+        result.add(textReplaceActivity);
         lastOp = null;
         continue;
       } else {
@@ -159,22 +183,49 @@ public class SplitOperation implements Operation {
    * @return a combined ITextOperation representing both op1 and op2 or null if the two operations
    *     cannot be combined
    */
+  // TODO finish optimization; handle other cases that can be combined
   protected ITextOperation combine(ITextOperation op1, ITextOperation op2) {
 
     if (op1 instanceof InsertOperation && op2 instanceof DeleteOperation) {
       InsertOperation insert = (InsertOperation) op1;
       DeleteOperation delete = (DeleteOperation) op2;
 
-      if (insert.getPosition() == delete.getPosition()) {
+      if (insert.getStartPosition().compareTo(delete.getStartPosition()) == 0) {
         // Ins(5,"ab") + Del(5,"abcd") -> Del(5,"cd")
         if (delete.getText().startsWith(insert.getText())) {
+
+          String adjustedText = delete.getText().substring(insert.getText().length());
+
+          int newLineDelta = delete.getLineDelta() - insert.getLineDelta();
+          int newOffsetDelta;
+
+          if (newLineDelta == 0) {
+            newOffsetDelta = delete.getOffsetDelta() - insert.getOffsetDelta();
+
+          } else {
+            newOffsetDelta = delete.getOffsetDelta();
+          }
+
           return new DeleteOperation(
-              insert.getPosition(), delete.getText().substring(insert.getTextLength()));
+              insert.getStartPosition(), newLineDelta, newOffsetDelta, adjustedText);
         }
         // Ins(5,"abcd") + Del(5,"ab") -> Ins(5,"cd")
         else if (insert.getText().startsWith(delete.getText())) {
+
+          String adjustedText = insert.getText().substring(delete.getText().length());
+
+          int newLineDelta = insert.getLineDelta() - delete.getLineDelta();
+          int newOffsetDelta;
+
+          if (newLineDelta == 0) {
+            newOffsetDelta = insert.getOffsetDelta() - delete.getOffsetDelta();
+
+          } else {
+            newOffsetDelta = insert.getOffsetDelta();
+          }
+
           return new InsertOperation(
-              insert.getPosition(), insert.getText().substring(delete.getTextLength()));
+              insert.getStartPosition(), newLineDelta, newOffsetDelta, adjustedText);
         }
       }
 
@@ -183,13 +234,13 @@ public class SplitOperation implements Operation {
       InsertOperation insert2 = (InsertOperation) op2;
 
       // Ins(2,"ab") + Ins(4,"cd") -> Ins(2,"abcd")
-      if (insert1.getPosition() + insert1.getTextLength() == insert2.getPosition()) {
-        return new InsertOperation(insert1.getPosition(), insert1.getText() + insert2.getText());
+      if (insert1.getEndPosition().compareTo(insert2.getStartPosition()) == 0) {
+        return concatenateInsertOperations(insert1, insert2);
       }
 
-      // Ins(2,"cd") + Ins(2,"ab") -> Ins(2,"abcd")
-      if (insert1.getPosition() == insert2.getPosition()) {
-        return new InsertOperation(insert2.getPosition(), insert2.getText() + insert1.getText());
+      // Ins(4,"cd") + Ins(4,"ab") -> Ins(4,"abcd")
+      if (insert1.getStartPosition().compareTo(insert2.getStartPosition()) == 0) {
+        return concatenateInsertOperations(insert2, insert1);
       }
 
     } else if (op1 instanceof DeleteOperation && op2 instanceof DeleteOperation) {
@@ -197,16 +248,81 @@ public class SplitOperation implements Operation {
       DeleteOperation delete2 = (DeleteOperation) op2;
 
       // Del(5,"ab") + Del(5,"cde") -> Del(5,"abcde")
-      if (delete1.getPosition() == delete2.getPosition()) {
-        return new DeleteOperation(delete1.getPosition(), delete1.getText() + delete2.getText());
+      if (delete1.getStartPosition().compareTo(delete2.getStartPosition()) == 0) {
+        return concatenateDeleteOperations(delete1, delete2);
       }
+
       // Del(8,"c") + Del(6,"ab") -> Del(6,"abc")
-      if (delete1.getPosition() == delete2.getPosition() + delete2.getTextLength()) {
-        return new DeleteOperation(delete2.getPosition(), delete2.getText() + delete1.getText());
+      if (delete1.getStartPosition().compareTo(delete2.getEndPosition()) == 0) {
+        return concatenateDeleteOperations(delete2, delete1);
       }
     }
     // Nothing can be combined
     return null;
+  }
+
+  /**
+   * Concatenates the given insert operations. To do so, the second operation is appended to the
+   * first.
+   *
+   * <p><b>NOTE:</b> This method does not check whether the given operations can actually be
+   * concatenated (i.e. are located seamlessly next to each other). It is expected that this has
+   * already be done by the caller.
+   *
+   * @param op1 the first operation
+   * @param op2 the second operation
+   * @return an insert operation representing the concatenation of the two given insert operations
+   */
+  private InsertOperation concatenateInsertOperations(InsertOperation op1, InsertOperation op2) {
+    int newLineDelta;
+    int newOffsetDelta;
+
+    if (op2.getLineDelta() == 0) {
+      newLineDelta = op1.getLineDelta();
+      newOffsetDelta = op1.getOffsetDelta() + op2.getOffsetDelta();
+
+    } else {
+      newLineDelta = op1.getLineDelta() + op2.getLineDelta();
+      newOffsetDelta = op2.getOffsetDelta();
+    }
+
+    String newText = op1.getText() + op2.getText();
+
+    TextPosition startPosition = op1.getStartPosition();
+
+    return new InsertOperation(startPosition, newLineDelta, newOffsetDelta, newText);
+  }
+
+  /**
+   * Concatenates the given delete operations. To do so, the second operation is appended to the
+   * first.
+   *
+   * <p><b>NOTE:</b> This method does not check whether the given operations can actually be
+   * concatenated (i.e. are located seamlessly next to each other). It is expected that this has
+   * already be done by the caller.
+   *
+   * @param op1 the first operation
+   * @param op2 the second operation
+   * @return a delete operation representing the concatenation of the two given delete operations
+   */
+  private DeleteOperation concatenateDeleteOperations(DeleteOperation op1, DeleteOperation op2) {
+    int newLineDelta;
+    int newOffsetDelta;
+
+    if (op2.getLineDelta() == 0) {
+      newLineDelta = op1.getLineDelta();
+      newOffsetDelta = op1.getOffsetDelta() + op2.getOffsetDelta();
+
+    } else {
+      newLineDelta = op1.getLineDelta() + op2.getLineDelta();
+      newOffsetDelta = op2.getOffsetDelta();
+    }
+
+    String newText = op1.getText() + op2.getText();
+
+    TextPosition startPosition = op1.getStartPosition();
+
+    return new DeleteOperation(startPosition, newLineDelta, newOffsetDelta, newText);
   }
 
   /**
@@ -224,7 +340,7 @@ public class SplitOperation implements Operation {
 
       // Del(8,"abc") + Ins(8,"ghijk") -> Replace "abc" with
       // "ghijk"
-      if (delete.getPosition() == insert.getPosition()) return true;
+      if (Objects.equals(delete.getStartPosition(), insert.getStartPosition())) return true;
     }
     return false;
   }

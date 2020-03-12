@@ -5,10 +5,12 @@ import static saros.editor.text.TextPositionUtils.UNIX_LINE_SEPARATOR;
 import static saros.editor.text.TextPositionUtils.WINDOWS_LINE_SEPARATOR;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Ignore;
 import org.junit.Test;
+import saros.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
 
 public class TextPositionUtilsTest {
 
@@ -207,6 +209,15 @@ public class TextPositionUtilsTest {
     }
   }
 
+  /**
+   * If this test fails, it could be a sign that an update of the Apache 'commons-lang3' library has
+   * caused {@link StringUtils#ordinalIndexOf(CharSequence, CharSequence, int)} to no longer
+   * correctly filters out escaped new lines.
+   *
+   * <p>If such a case, all usages of {@link StringUtils#lastIndexOf(CharSequence, CharSequence)}
+   * and {@link StringUtils#ordinalIndexOf(CharSequence, CharSequence, int)} have to be adjusted.
+   * See {@link GOTOInclusionTransformation}.
+   */
   @Test
   public void testUnixPositionCalculationEscapedLineBreaks() {
     String text;
@@ -311,6 +322,7 @@ public class TextPositionUtilsTest {
     }
   }
 
+  /** @see #testUnixPositionCalculationEscapedLineBreaks() */
   @Test
   public void testWindowsPositionCalculationEscapedLineBreaks() {
     String text;
@@ -417,6 +429,15 @@ public class TextPositionUtilsTest {
         calculatedDeltas);
   }
 
+  /**
+   * If this test fails, it could be a sign that an update of the Apache 'commons-lang3' library has
+   * caused {@link StringUtils#lastIndexOf(CharSequence, CharSequence)} to no longer correctly
+   * filters out escaped new lines.
+   *
+   * <p>If such a case, all usages of {@link StringUtils#lastIndexOf(CharSequence, CharSequence)}
+   * and {@link StringUtils#ordinalIndexOf(CharSequence, CharSequence, int)} have to be adjusted.
+   * See {@link GOTOInclusionTransformation}.
+   */
   @Test
   public void testCalculateDeltasEscapedNewLine() {
     Pair<Integer, Integer> realDeltas;
