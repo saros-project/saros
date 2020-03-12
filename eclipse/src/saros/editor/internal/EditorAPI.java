@@ -3,6 +3,8 @@ package saros.editor.internal;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -363,6 +365,88 @@ public class EditorAPI {
   }
 
   /**
+   * Calculates the text position for the given text based offset in the given document.
+   *
+   * <p>The given document must not be <code>null</code> and the given offset must not be negative.
+   *
+   * @param document the document in which to calculate the text position
+   * @param offset the offset whose text position to calculate
+   * @return the text position for the given text based offset in the given document or {@link
+   *     TextPosition#INVALID_TEXT_POSITION} if the correct line number or in-line offset could not
+   *     be calculated for the given offset
+   * @throws NullPointerException if the given document is <code>null</code>
+   * @throws IllegalArgumentException if the given offset is negative
+   */
+  public static TextPosition calculatePosition(IDocument document, int offset) {
+    Objects.requireNonNull(document, "The given document must not be null");
+
+    if (offset < 0) {
+      throw new IllegalArgumentException("The given offset must not be negative");
+    }
+
+    return calculatePositionInternal(document, offset, null).getLeft();
+  }
+
+  /**
+   * Calculates the text position for the given text based offset in the given document.
+   *
+   * <p>This method is used for performance optimization. It accepts a pair containing a line number
+   * and the start offset of that line and also returns the calculated line number and start offset
+   * of that line. This information can be used to skip calculations of line start offsets when
+   * multiple text positions are located in the same line.
+   *
+   * <p>This method does not validate the input. The input is expected to be validated beforehand by
+   * the caller.
+   *
+   * @param document the document in which to calculate the text position
+   * @param offset the offset whose text position to calculate
+   * @param knownLineStartOffset a pair containing a line number and the offset of the start of that
+   *     line or <code>null</code> if no such pair is known
+   * @return a pair containing the text position for the given text based offset in the given
+   *     document and the line start offset or {@link TextPosition#INVALID_TEXT_POSITION} and <code>
+   *     null</code> if the correct line number or in-line offset could not be calculated for the
+   *     given offset
+   * @throws NullPointerException if the given document is <code>null</code>
+   */
+  private static Pair<TextPosition, Pair<Integer, Integer>> calculatePositionInternal(
+      IDocument document, int offset, Pair<Integer, Integer> knownLineStartOffset) {
+
+    int lineNumber;
+    int lineStartOffset;
+
+    try {
+      /*
+       * Explicitly does not use textSelection.getStartLine() to obtain the start line number as
+       * this call also uses IDocument.getLineOfOffset(...) but simply drops the thrown exception.
+       */
+      lineNumber = document.getLineOfOffset(offset);
+
+      if (knownLineStartOffset != null && knownLineStartOffset.getLeft() == lineNumber) {
+        lineStartOffset = knownLineStartOffset.getRight();
+
+      } else {
+        lineStartOffset = document.getLineOffset(lineNumber);
+      }
+
+    } catch (BadLocationException e) {
+      log.warn(
+          "Could not calculate the start line or start line offset for the given start offset "
+              + offset
+              + " in the document "
+              + document,
+          e);
+
+      return new ImmutablePair<>(TextPosition.INVALID_TEXT_POSITION, null);
+    }
+
+    int inLineOffset = offset - lineStartOffset;
+
+    TextPosition textPosition = new TextPosition(lineNumber, inLineOffset);
+
+    return new ImmutablePair<>(textPosition, new ImmutablePair<>(lineNumber, lineStartOffset));
+  }
+
+  /**
    * Calculates the line based selection values for the given text based selection offset and length
    * in the given document.
    *
@@ -399,69 +483,83 @@ public class EditorAPI {
 
     int endOffset = offset + length;
 
-    int startLine;
-    int startLineOffset;
+    Pair<TextPosition, Pair<Integer, Integer>> startPositionResult =
+        calculatePositionInternal(document, offset, null);
 
-    try {
-      /*
-       * Explicitly does not use textSelection.getStartLine() to obtain the start line number as
-       * this call also uses IDocument.getLineOfOffset(...) but simply drops the thrown exception.
-       */
-      startLine = document.getLineOfOffset(offset);
-      startLineOffset = document.getLineOffset(startLine);
+    TextPosition startPosition = startPositionResult.getLeft();
 
-    } catch (BadLocationException e) {
-      log.warn(
-          "Could not calculate the start line or start line offset for the given start offset "
-              + offset
-              + " in the document "
-              + document,
-          e);
-
+    if (!startPosition.isValid()) {
       return TextSelection.EMPTY_SELECTION;
     }
-
-    int startInLineOffset = offset - startLineOffset;
-    TextPosition startPosition = new TextPosition(startLine, startInLineOffset);
 
     // Skip second part of calculation if no selection is present
     if (endOffset == offset) {
       return new TextSelection(startPosition, startPosition);
     }
 
-    int endLine;
-    int endLineOffset;
+    Pair<Integer, Integer> knownLineStartOffset = startPositionResult.getRight();
+
+    Pair<TextPosition, Pair<Integer, Integer>> endPositionResult =
+        calculatePositionInternal(document, endOffset, knownLineStartOffset);
+    TextPosition endPosition = endPositionResult.getLeft();
+
+    return new TextSelection(startPosition, endPosition);
+  }
+
+  /**
+   * Calculates the text based offset in the given editor part for the given text position.
+   *
+   * <p>The given editor part must not be <code>null</code> and the given text selection must not be
+   * <code>null</code> and must not be empty.
+   *
+   * @param document the document in which to calculate the offset
+   * @param textPosition the text position whose offset to calculate
+   * @return the absolute offset in the given document for the given position or <code>-1</code> if
+   *     the line start offset could not be calculated
+   * @throws NullPointerException if the given document or text position is <code>null</code>
+   * @throws IllegalArgumentException if the given text position is not valid
+   */
+  public static int calculateOffset(IDocument document, TextPosition textPosition) {
+    Objects.requireNonNull(document, "The given document must not be null");
+    Objects.requireNonNull(textPosition, "The given text position must not be null");
+
+    if (!textPosition.isValid()) {
+      throw new IllegalArgumentException("The given text position must not be invalid");
+    }
+
+    return calculateOffsetInternal(document, textPosition);
+  }
+
+  /**
+   * Calculates the text based offset in the given editor part for the given text position.
+   *
+   * <p>This method does not validate the input. The input is expected to be validated beforehand by
+   * the caller.
+   *
+   * @param document the document in which to calculate the offset
+   * @param textPosition the text position whose offset to calculate
+   * @return the absolute offset in the given document for the given position or <code>-1</code> if
+   *     the line start offset could not be calculated
+   * @throws NullPointerException if the given document or text position is <code>null</code>
+   */
+  private static int calculateOffsetInternal(IDocument document, TextPosition textPosition) {
+    int lineOffset;
 
     try {
-      /*
-       * Explicitly does not use textSelection.getEndLine() to obtain the start line number as this
-       * call also uses IDocument.getLineOfOffset(...) but simply drops the thrown exception.
-       */
-      endLine = document.getLineOfOffset(endOffset);
-
-      // Skip line offset calculation if end is in same line as start
-      if (endLine == startLine) {
-        endLineOffset = startLineOffset;
-
-      } else {
-        endLineOffset = document.getLineOffset(endLine);
-      }
+      lineOffset = document.getLineOffset(textPosition.getLineNumber());
 
     } catch (BadLocationException e) {
       log.warn(
-          "Could not calculate the end line or end line offset for the given end offset "
-              + endOffset
+          "Could not calculate the line offset for the given text position "
+              + textPosition
               + " in the document "
               + document,
           e);
 
-      return TextSelection.EMPTY_SELECTION;
+      return -1;
     }
 
-    int endInLineOffset = endOffset - endLineOffset;
-    TextPosition endPosition = new TextPosition(endLine, endInLineOffset);
-
-    return new TextSelection(startPosition, endPosition);
+    return lineOffset + textPosition.getInLineOffset();
   }
 
   /**
@@ -480,7 +578,6 @@ public class EditorAPI {
    * @throws IllegalArgumentException if the given text selection is empty
    */
   public static ITextSelection calculateOffsets(IEditorPart editorPart, TextSelection selection) {
-
     Objects.requireNonNull(editorPart, "The given editor part must not be null");
     Objects.requireNonNull(selection, "The given selection must not be null");
 
@@ -507,35 +604,34 @@ public class EditorAPI {
     }
 
     TextPosition startPosition = selection.getStartPosition();
-    TextPosition endPosition = selection.getEndPosition();
 
-    int startLineOffset;
-    int endLineOffset;
+    int startOffset = calculateOffsetInternal(document, startPosition);
 
-    try {
-      startLineOffset = document.getLineOffset(startPosition.getLineNumber());
-
-      if (endPosition.getLineNumber() == startPosition.getLineNumber()) {
-        endLineOffset = startLineOffset;
-
-      } else {
-        endLineOffset = document.getLineOffset(endPosition.getLineNumber());
-      }
-
-    } catch (BadLocationException e) {
-      log.warn(
-          "Could not calculate the line offset for the given selection "
-              + selection
-              + " in the document "
-              + document,
-          e);
-
+    if (startOffset == -1) {
       return org.eclipse.jface.text.TextSelection.emptySelection();
     }
 
-    int startOffset = startLineOffset + startPosition.getInLineOffset();
+    TextPosition endPosition = selection.getEndPosition();
 
-    int endOffset = endLineOffset + endPosition.getInLineOffset();
+    if (startPosition.equals(endPosition)) {
+      return new org.eclipse.jface.text.TextSelection(startOffset, 0);
+    }
+
+    int endOffset;
+
+    if (endPosition.getLineNumber() == startPosition.getLineNumber()) {
+      int endLineOffset = startOffset - startPosition.getInLineOffset();
+
+      endOffset = endLineOffset + endPosition.getInLineOffset();
+
+    } else {
+      endOffset = calculateOffsetInternal(document, endPosition);
+
+      if (endOffset == -1) {
+        return org.eclipse.jface.text.TextSelection.emptySelection();
+      }
+    }
+
     int length = endOffset - startOffset;
 
     return new org.eclipse.jface.text.TextSelection(startOffset, length);

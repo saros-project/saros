@@ -9,6 +9,7 @@ import com.intellij.openapi.util.Pair;
 import java.awt.Point;
 import java.awt.Rectangle;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
@@ -104,6 +105,69 @@ public class EditorAPI {
   }
 
   /**
+   * Calculates the line base position value for the given text base offset in the given editor.
+   *
+   * <p>The given offset must not be negative.
+   *
+   * @param editor the editor to use for the calculation
+   * @param offset the text based offset
+   * @return the line base position value for the given text base offsets in the given editor
+   * @throws IllegalArgumentException if the the given offset is negative
+   */
+  public static TextPosition calculatePosition(@NotNull Editor editor, int offset) {
+    if (offset < 0) {
+      throw new IllegalArgumentException("The given offset must not be negative");
+    }
+
+    return calculatePositionInternal(editor, offset, null).first;
+  }
+
+  /**
+   * Calculates the line base position value for the given text base offset in the given editor.
+   *
+   * <p>This method is used for performance optimization. It accepts a pair containing a line number
+   * and the start offset of that line and also returns the calculated line number and start offset
+   * of that line. This information can be used to skip calculations of line start offsets when
+   * multiple text positions are located in the same line.
+   *
+   * <p>This method does not validate the input. The input is expected to be validated beforehand by
+   * the caller.
+   *
+   * @param editor the editor to use for the calculation
+   * @param offset the text based offset
+   * @return the line base position value for the given text base offsets in the given editor
+   * @throws IllegalArgumentException if the the given offset is negative
+   */
+  private static Pair<TextPosition, Pair<Integer, Integer>> calculatePositionInternal(
+      Editor editor, int offset, @Nullable Pair<Integer, Integer> knownLineStartOffset) {
+
+    LogicalPosition logicalPosition = editor.offsetToLogicalPosition(offset);
+
+    int lineNumber = logicalPosition.line;
+
+    int lineStartOffset;
+    Pair<Integer, Integer> returnedKnownLineStartOffset;
+
+    if (knownLineStartOffset != null && knownLineStartOffset.first == lineNumber) {
+      lineStartOffset = knownLineStartOffset.second;
+
+      returnedKnownLineStartOffset = knownLineStartOffset;
+
+    } else {
+      lineStartOffset = calculateLineOffset(editor, lineNumber);
+
+      returnedKnownLineStartOffset = new Pair<>(lineNumber, lineStartOffset);
+    }
+
+    // necessary as the logical position counts a tab char as it's displayed width
+    int correctedInLineOffset = offset - lineStartOffset;
+
+    TextPosition textPosition = new TextPosition(lineNumber, correctedInLineOffset);
+
+    return new Pair<>(textPosition, returnedKnownLineStartOffset);
+  }
+
+  /**
    * Calculates the line base selection values for the given text base selection offsets in the
    * given editor.
    *
@@ -128,39 +192,59 @@ public class EditorAPI {
               + selectionEndOffset);
     }
 
-    LogicalPosition selectionStart = editor.offsetToLogicalPosition(selectionStartOffset);
+    Pair<TextPosition, Pair<Integer, Integer>> startPositionResult =
+        calculatePositionInternal(editor, selectionStartOffset, null);
 
-    int startLine = selectionStart.line;
-    int startLineOffset = calculateLineOffset(editor, startLine);
-
-    // necessary as the logical position counts a tab char as it's displayed width
-    int correctedStartInLineOffset = selectionStartOffset - startLineOffset;
-
-    TextPosition startPosition = new TextPosition(startLine, correctedStartInLineOffset);
+    TextPosition startPosition = startPositionResult.first;
 
     // Skip second part of calculation if no selection is present
     if (selectionEndOffset == selectionStartOffset) {
       return new TextSelection(startPosition, startPosition);
     }
 
-    LogicalPosition selectionEnd = editor.offsetToLogicalPosition(selectionEndOffset);
+    Pair<Integer, Integer> knownLineStartOffset = startPositionResult.second;
 
-    int endLine = selectionEnd.line;
-    int endLineOffset;
+    Pair<TextPosition, Pair<Integer, Integer>> endPositionResult =
+        calculatePositionInternal(editor, selectionEndOffset, knownLineStartOffset);
 
-    // Skip line offset calculation if end is in same line as start
-    if (endLine == startLine) {
-      endLineOffset = startLineOffset;
-    } else {
-      endLineOffset = calculateLineOffset(editor, endLine);
-    }
-
-    // necessary as the logical position counts a tab char as it's displayed width
-    int correctedEndInLineOffset = selectionEndOffset - endLineOffset;
-
-    TextPosition endPosition = new TextPosition(endLine, correctedEndInLineOffset);
+    TextPosition endPosition = endPositionResult.first;
 
     return new TextSelection(startPosition, endPosition);
+  }
+
+  /**
+   * Calculates the absolute offsets in the given editor for the given text position.
+   *
+   * <p><b>NOTE:</b> The given text position must not be invalid!
+   *
+   * @param editor the local editor for the file
+   * @param textPosition the text position
+   * @return the absolute offset in the given editor for the given text position
+   * @throws IllegalArgumentException if the given text position is invalid
+   */
+  public static int calculateOffset(@NotNull Editor editor, @NotNull TextPosition textPosition) {
+    if (!textPosition.isValid()) {
+      throw new IllegalArgumentException("The given text position must not be invalid");
+    }
+
+    return calculateOffsetInternal(editor, textPosition);
+  }
+
+  /**
+   * Calculates the absolute offsets in the given editor for the given text position.
+   *
+   * <p>This method does not validate the input. The input is expected to be validated beforehand by
+   * the caller.
+   *
+   * @param editor the local editor for the file
+   * @param textPosition the text position
+   * @return the absolute offset in the given editor for the given text position
+   */
+  private static int calculateOffsetInternal(Editor editor, TextPosition textPosition) {
+    int lineNumber = textPosition.getLineNumber();
+    int lineStartOffset = calculateLineOffset(editor, lineNumber);
+
+    return lineStartOffset + textPosition.getInLineOffset();
   }
 
   /**
@@ -182,24 +266,23 @@ public class EditorAPI {
 
     TextPosition startPosition = textSelection.getStartPosition();
 
-    int startLine = startPosition.getLineNumber();
-    int startLineOffset = calculateLineOffset(editor, startLine);
-
-    int startOffset = startLineOffset + startPosition.getInLineOffset();
+    int startOffset = calculateOffsetInternal(editor, startPosition);
 
     TextPosition endPosition = textSelection.getEndPosition();
 
-    int endLine = endPosition.getLineNumber();
-
-    int endLineOffset;
-
-    if (endLine == startLine) {
-      endLineOffset = startLineOffset;
-    } else {
-      endLineOffset = calculateLineOffset(editor, endLine);
+    if (startPosition.equals(endPosition)) {
+      return new Pair<>(startOffset, startOffset);
     }
 
-    int endOffset = endLineOffset + endPosition.getInLineOffset();
+    int endOffset;
+
+    if (startPosition.getLineNumber() == endPosition.getLineNumber()) {
+      int lineStartOffset = startOffset - startPosition.getInLineOffset();
+
+      endOffset = lineStartOffset + endPosition.getInLineOffset();
+    } else {
+      endOffset = calculateOffset(editor, endPosition);
+    }
 
     return new Pair<>(startOffset, endOffset);
   }
