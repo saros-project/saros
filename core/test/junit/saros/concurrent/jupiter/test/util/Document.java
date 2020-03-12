@@ -80,7 +80,7 @@ public class Document {
 
     List<TextEditActivity> activities = op.toTextEdit(new SPath(project, path), dummy);
 
-    String lineSeparator = OperationHelper.LINE_SEPARATOR;
+    String lineSeparator = OperationHelper.EOL;
 
     for (TextEditActivity activity : activities) {
 

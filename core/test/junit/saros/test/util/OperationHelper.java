@@ -19,7 +19,7 @@ import saros.session.User;
 public class OperationHelper {
 
   /** Line separator assumed to be used by test documents. */
-  public static final String LINE_SEPARATOR = "\n";
+  public static final String EOL = "\n";
 
   /**
    * Returns a no-operation.
@@ -43,7 +43,7 @@ public class OperationHelper {
 
   /**
    * Returns an insert operation with the given parameters. The start position will be located in
-   * line 0.
+   * line 0. The start position will also be used as the origin position.
    *
    * @param inLineOffset the in-line offset for the operation
    * @param text the text for the operation
@@ -66,6 +66,21 @@ public class OperationHelper {
    */
   public static InsertOperation I(int inLineOffset, String text, int originInLineOffset) {
     return I(0, inLineOffset, text, 0, originInLineOffset);
+  }
+
+  /**
+   * Returns an insert operation with the given parameters. The start position will also be used as
+   * the origin position.
+   *
+   * @param lineNumber the line number for the operation
+   * @param inLineOffset the in-line offset for the operation
+   * @param text the text for the operation
+   * @return an insert operation with the given parameters
+   * @see #I(int, int, String, int, int)
+   */
+  public static InsertOperation I(int lineNumber, int inLineOffset, String text) {
+
+    return I(lineNumber, inLineOffset, text, lineNumber, inLineOffset);
   }
 
   /**
@@ -98,7 +113,7 @@ public class OperationHelper {
    * @see InsertOperation#InsertOperation(TextPosition, int,int, String, TextPosition)
    */
   public static InsertOperation I(TextPosition position, String text, TextPosition origin) {
-    Pair<Integer, Integer> deltas = TextPositionUtils.calculateDeltas(text, LINE_SEPARATOR);
+    Pair<Integer, Integer> deltas = TextPositionUtils.calculateDeltas(text, EOL);
 
     int lineDelta = deltas.getLeft();
     int offsetDelta = deltas.getRight();
@@ -141,7 +156,7 @@ public class OperationHelper {
    * @see DeleteOperation#DeleteOperation(TextPosition, int, int, String)
    */
   public static DeleteOperation D(TextPosition position, String text) {
-    Pair<Integer, Integer> deltas = TextPositionUtils.calculateDeltas(text, LINE_SEPARATOR);
+    Pair<Integer, Integer> deltas = TextPositionUtils.calculateDeltas(text, EOL);
 
     int lineDelta = deltas.getLeft();
     int offsetDelta = deltas.getRight();
@@ -164,7 +179,26 @@ public class OperationHelper {
   public static TextEditActivity T(
       User source, int inLineOffset, String text, String replacedText, SPath path) {
 
-    TextPosition startPosition = new TextPosition(0, inLineOffset);
+    return T(source, 0, inLineOffset, text, replacedText, path);
+  }
+
+  /**
+   * Returns a text edit activity with the given parameters. The start position for the operation
+   * will be located in line 0.
+   *
+   * @param source the source to use for the activity
+   * @param lineNumber the line number ti use for the activity
+   * @param inLineOffset the in-line offset to use for the activity
+   * @param text the text to use for the activity
+   * @param replacedText the replaced text to use for the activity
+   * @param path the path to use for the activity
+   * @return a text edit activity with the given parameters
+   * @see #T(User, TextPosition, String, String, SPath)
+   */
+  public static TextEditActivity T(
+      User source, int lineNumber, int inLineOffset, String text, String replacedText, SPath path) {
+
+    TextPosition startPosition = new TextPosition(lineNumber, inLineOffset);
 
     return T(source, startPosition, text, replacedText, path);
   }
@@ -183,7 +217,6 @@ public class OperationHelper {
   public static TextEditActivity T(
       User source, TextPosition position, String text, String replacedText, SPath path) {
 
-    return TextEditActivity.buildTextEditActivity(
-        source, position, text, replacedText, path, LINE_SEPARATOR);
+    return TextEditActivity.buildTextEditActivity(source, position, text, replacedText, path, EOL);
   }
 }
