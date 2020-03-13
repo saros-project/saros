@@ -204,6 +204,13 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
       // op1'(op2)
       assertOpEquals(D(2, "C"), inclusion.transform(op1, op2, Boolean.FALSE));
     }
+    {
+      Operation op1 = D(4, "ABCDEF");
+      Operation op2 = D(5, "BCD");
+
+      // op1'(op2)
+      assertOpEquals(D(4, "AEF"), inclusion.transform(op1, op2, Boolean.FALSE));
+    }
   }
 
   @Test
