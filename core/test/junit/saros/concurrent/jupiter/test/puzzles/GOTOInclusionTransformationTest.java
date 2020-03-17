@@ -13,6 +13,12 @@ import saros.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
 import saros.concurrent.jupiter.internal.text.SplitOperation;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
 
+/**
+ * Tests {@link GOTOInclusionTransformation}.
+ *
+ * <p>Manual fuzzing tests of the inclusion transformation can be done using {@link
+ * InclusionTransformationFuzzingTest}.
+ */
 public class GOTOInclusionTransformationTest extends JupiterTestCase {
 
   protected InclusionTransformation inclusion = new GOTOInclusionTransformation();

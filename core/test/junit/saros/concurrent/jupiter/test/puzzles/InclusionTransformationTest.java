@@ -16,6 +16,9 @@ import saros.concurrent.jupiter.test.util.TwoWayJupiterServerDocument;
 /**
  * Test class contains all possible transformation of insert and delete operations.
  *
+ * <p>Manual fuzzing tests of the inclusion transformation can be done using {@link
+ * InclusionTransformationFuzzingTest}.
+ *
  * @see saros.concurrent.jupiter.internal.text.GOTOInclusionTransformation
  */
 public class InclusionTransformationTest extends JupiterTestCase {
