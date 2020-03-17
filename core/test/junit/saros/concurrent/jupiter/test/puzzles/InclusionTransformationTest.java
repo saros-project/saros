@@ -1,13 +1,12 @@
 package saros.concurrent.jupiter.test.puzzles;
 
 import static org.junit.Assert.assertEquals;
+import static saros.test.util.OperationHelper.D;
+import static saros.test.util.OperationHelper.I;
+import static saros.test.util.OperationHelper.S;
 
 import org.junit.Before;
 import org.junit.Test;
-import saros.concurrent.jupiter.Operation;
-import saros.concurrent.jupiter.internal.text.DeleteOperation;
-import saros.concurrent.jupiter.internal.text.InsertOperation;
-import saros.concurrent.jupiter.internal.text.SplitOperation;
 import saros.concurrent.jupiter.test.util.JupiterSimulator;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
 import saros.concurrent.jupiter.test.util.TwoWayJupiterClientDocument;
@@ -19,18 +18,6 @@ import saros.concurrent.jupiter.test.util.TwoWayJupiterServerDocument;
  * @author orieger
  */
 public class InclusionTransformationTest extends JupiterTestCase {
-
-  public static Operation S(Operation one, Operation two) {
-    return new SplitOperation(one, two);
-  }
-
-  public static Operation I(int i, String s) {
-    return new InsertOperation(i, s);
-  }
-
-  public static Operation D(int i, String s) {
-    return new DeleteOperation(i, s);
-  }
 
   TwoWayJupiterClientDocument client;
   TwoWayJupiterServerDocument server;
@@ -52,13 +39,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     network.addClient(server);
   }
 
-  /**
-   * insert before insert
-   *
-   * @throws Exception
-   */
+  /** insert before insert */
   @Test
-  public void insertBeforeInsert() throws Exception {
+  public void insertBeforeInsert() {
     client.sendOperation(I(0, "x"), 100);
     server.sendOperation(I(0, "y"), 200);
 
@@ -74,13 +57,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("xyyxabcdefg", client, server);
   }
 
-  /**
-   * insert after insert
-   *
-   * @throws Exception
-   */
+  /** insert after insert */
   @Test
-  public void insertAfterInsert() throws Exception {
+  public void insertAfterInsert() {
     client.sendOperation(I(1, "xx"), 100);
     server.sendOperation(D(0, "abc"), 200);
 
@@ -96,13 +75,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("xyxxdefg", client, server);
   }
 
-  /**
-   * insert before delete operation
-   *
-   * @throws Exception
-   */
+  /** insert before delete operation */
   @Test
-  public void insertBeforeDelete() throws Exception {
+  public void insertBeforeDelete() {
     client.sendOperation(I(1, "x"), 100);
     server.sendOperation(D(2, "c"), 200);
 
@@ -118,13 +93,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("yxbdefg", client, server);
   }
 
-  /**
-   * insert after delete operation
-   *
-   * @throws Exception
-   */
+  /** insert after delete operation */
   @Test
-  public void insertAfterDelete() throws Exception {
+  public void insertAfterDelete() {
     client.sendOperation(I(1, "x"), 100);
     server.sendOperation(D(0, "a"), 200);
 
@@ -133,13 +104,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("xbcdefg", client, server);
   }
 
-  /**
-   * insert operation inside delete operation area
-   *
-   * @throws Exception
-   */
+  /** insert operation inside delete operation area */
   @Test
-  public void insertInsideDelete() throws Exception {
+  public void insertInsideDelete() {
     client.sendOperation(I(1, "x"), 100);
     server.sendOperation(D(0, "abc"), 200);
 
@@ -148,13 +115,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("xdefg", client, server);
   }
 
-  /**
-   * insert operation after delete operation
-   *
-   * @throws Exception
-   */
+  /** insert operation after delete operation */
   @Test
-  public void insertAfterDeleteClient() throws Exception {
+  public void insertAfterDeleteClient() {
     client.sendOperation(D(0, "a"), 100);
     server.sendOperation(I(1, "x"), 200);
 
@@ -163,13 +126,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("xbcdefg", client, server);
   }
 
-  /**
-   * insert operation at same position of delete operation
-   *
-   * @throws Exception
-   */
+  /** insert operation at same position of delete operation */
   @Test
-  public void insertDeleteSamePosition() throws Exception {
+  public void insertDeleteSamePosition() {
     client.sendOperation(D(0, "a"), 200);
     server.sendOperation(I(0, "x"), 100);
 
@@ -178,13 +137,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("xbcdefg", client, server);
   }
 
-  /**
-   * insert operation is in area of delete operation.
-   *
-   * @throws Exception
-   */
+  /** insert operation is in area of delete operation. */
   @Test
-  public void insertAreaOfDelete() throws Exception {
+  public void insertAreaOfDelete() {
     client.sendOperation(D(0, "abc"), 100);
     server.sendOperation(I(1, "x"), 200);
 
@@ -193,13 +148,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("xdefg", client, server);
   }
 
-  /**
-   * first delete operation is completely before second operation.
-   *
-   * @throws Exception
-   */
+  /** first delete operation is completely before second operation. */
   @Test
-  public void deleteRace() throws Exception {
+  public void deleteRace() {
     client.sendOperation(D(0, "a"), 100);
     server.sendOperation(D(1, "bc"), 200);
 
@@ -208,13 +159,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("defg", client, server);
   }
 
-  /**
-   * delete operation inside delete operation area
-   *
-   * @throws Exception
-   */
+  /** delete operation inside delete operation area */
   @Test
-  public void deleteInsideDelete() throws Exception {
+  public void deleteInsideDelete() {
     client.sendOperation(D(0, "abcd"), 100);
     server.sendOperation(D(1, "bc"), 200);
 
@@ -223,13 +170,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("efg", client, server);
   }
 
-  /**
-   * delete operation starts before second delete operation and ends inside.
-   *
-   * @throws Exception
-   */
+  /** delete operation starts before second delete operation and ends inside. */
   @Test
-  public void deleteDeleteTimeOverlap() throws Exception {
+  public void deleteDeleteTimeOverlap() {
     client.sendOperation(D(0, "ab"), 100);
     server.sendOperation(D(1, "bcd"), 200);
 
@@ -238,13 +181,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("efg", client, server);
   }
 
-  /**
-   * delete operation starts inside of delete operation area and ends after this.
-   *
-   * @throws Exception
-   */
+  /** delete operation starts inside of delete operation area and ends after this. */
   @Test
-  public void deleteInsideDeleteTimeOverlap() throws Exception {
+  public void deleteInsideDeleteTimeOverlap() {
     client.sendOperation(D(1, "bcd"), 100);
     server.sendOperation(D(0, "abc"), 200);
 
@@ -253,13 +192,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     assertEqualDocs("efg", client, server);
   }
 
-  /**
-   * delete operation inside second delete operation area
-   *
-   * @throws Exception
-   */
+  /** delete operation inside second delete operation area */
   @Test
-  public void deleteAreaInsideDeleteArea() throws Exception {
+  public void deleteAreaInsideDeleteArea() {
     client.sendOperation(D(1, "b"), 100);
     server.sendOperation(D(0, "abc"), 200);
 
@@ -269,7 +204,7 @@ public class InclusionTransformationTest extends JupiterTestCase {
   }
 
   @Test
-  public void overlappingSplitOperations() throws Exception {
+  public void overlappingSplitOperations() {
     client.sendOperation(S(D(1, "bcd"), I(0, "xyz")), 100);
     server.sendOperation(S(D(0, "abc"), I(0, "uvw")), 200);
 
@@ -279,7 +214,7 @@ public class InclusionTransformationTest extends JupiterTestCase {
   }
 
   @Test
-  public void splitOperations() throws Exception {
+  public void splitOperations() {
 
     // ----01234567890123456789012345
     setUp("abcdefghijklmnopqrstuvwxyz");
@@ -294,7 +229,7 @@ public class InclusionTransformationTest extends JupiterTestCase {
   }
 
   @Test
-  public void deleteOperations() throws Exception {
+  public void deleteOperations() {
 
     // ----01234567890123456789012345
     setUp("abcdefghijklmnopqrstuvwxyz");
@@ -309,7 +244,7 @@ public class InclusionTransformationTest extends JupiterTestCase {
   }
 
   @Test
-  public void deleteSplitOperations() throws Exception {
+  public void deleteSplitOperations() {
 
     // ----01234567890123456789012345
     setUp("abcdefghijklmnopqrstuvwxyz");
@@ -335,7 +270,7 @@ public class InclusionTransformationTest extends JupiterTestCase {
   }
 
   @Test
-  public void deleteSplitOperations2() throws Exception {
+  public void deleteSplitOperations2() {
 
     // ----01234567890123456789012345
     setUp("abcdefghijklmnopqrstuvwxyz");
@@ -353,7 +288,7 @@ public class InclusionTransformationTest extends JupiterTestCase {
   }
 
   @Test
-  public void deleteInsertDelete() throws Exception {
+  public void deleteInsertDelete() {
 
     // ----01234567890123456789012345
     setUp("abcdefghijklmnopqrstuvwxyz");
@@ -369,7 +304,7 @@ public class InclusionTransformationTest extends JupiterTestCase {
   }
 
   @Test
-  public void insertInsideDelete2() throws Exception {
+  public void insertInsideDelete2() {
 
     // ----01234567890123456789012345
     setUp("abcdefghijklmnopqrstuvwxyz");
@@ -383,7 +318,7 @@ public class InclusionTransformationTest extends JupiterTestCase {
   }
 
   @Test
-  public void nestedSplitOperation() throws Exception {
+  public void nestedSplitOperation() {
 
     // ----01234567890123456789012345
     setUp("abcdefghijklmnopqrstuvwxyz");

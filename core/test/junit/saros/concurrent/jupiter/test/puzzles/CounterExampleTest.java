@@ -1,10 +1,10 @@
 package saros.concurrent.jupiter.test.puzzles;
 
 import static org.junit.Assert.assertEquals;
+import static saros.test.util.OperationHelper.D;
+import static saros.test.util.OperationHelper.I;
 
 import org.junit.Test;
-import saros.concurrent.jupiter.internal.text.DeleteOperation;
-import saros.concurrent.jupiter.internal.text.InsertOperation;
 import saros.concurrent.jupiter.test.util.ClientSynchronizedDocument;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
 import saros.concurrent.jupiter.test.util.ServerSynchronizedDocument;
@@ -19,13 +19,9 @@ import saros.concurrent.jupiter.test.util.ServerSynchronizedDocument;
  */
 public class CounterExampleTest extends JupiterTestCase {
 
-  /**
-   * Scenario described in fig. 3 of discussed paper.
-   *
-   * @throws Exception
-   */
+  /** Scenario described in fig. 3 of discussed paper. */
   @Test
-  public void testCounterExampleViolatingConditionC1() throws Exception {
+  public void testCounterExampleViolatingConditionC1() {
     String initDocumentState = "abc";
 
     /* init simulated client and server components. */
@@ -48,8 +44,8 @@ public class CounterExampleTest extends JupiterTestCase {
 
     /* O3 || O2 */
 
-    client_1.sendOperation(new InsertOperation(1, "x"), 100);
-    client_2.sendOperation(new DeleteOperation(1, "b"), 200);
+    client_1.sendOperation(I(1, "x"), 100);
+    client_2.sendOperation(D(1, "b"), 200);
 
     network.execute(200);
 
@@ -57,13 +53,9 @@ public class CounterExampleTest extends JupiterTestCase {
     assertEquals("axc", client_1.getDocument());
   }
 
-  /**
-   * Scenario described in fig. 4 of discussed paper.
-   *
-   * @throws Exception
-   */
+  /** Scenario described in fig. 4 of discussed paper. */
   @Test
-  public void testCounterExampleViolatingConditionC2() throws Exception {
+  public void testCounterExampleViolatingConditionC2() {
     String initDocumentState = "abc";
 
     /* init simulated client and server components. */
@@ -87,9 +79,9 @@ public class CounterExampleTest extends JupiterTestCase {
     server.addProxyClient(carl);
 
     /* O3 || O2 */
-    client_1.sendOperation(new InsertOperation(1, "x"), 100);
-    client_2.sendOperation(new DeleteOperation(1, "b"), 200);
-    client_3.sendOperation(new InsertOperation(2, "y"), 1000);
+    client_1.sendOperation(I(1, "x"), 100);
+    client_2.sendOperation(D(1, "b"), 200);
+    client_3.sendOperation(I(2, "y"), 1000);
 
     network.execute(1000);
 
@@ -98,13 +90,9 @@ public class CounterExampleTest extends JupiterTestCase {
     System.out.println(client_1.getDocument());
   }
 
-  /**
-   * Scenario described in fig. 5 of discussed paper.
-   *
-   * @throws Exception
-   */
+  /** Scenario described in fig. 5 of discussed paper. */
   @Test
-  public void testCounterExample2ViolatingConditionC2() throws Exception {
+  public void testCounterExample2ViolatingConditionC2() {
     String initDocumentState = "abc";
 
     /* init simulated client and server components. */
@@ -128,9 +116,9 @@ public class CounterExampleTest extends JupiterTestCase {
     server.addProxyClient(carl);
 
     /* O3 || O2 */
-    client_1.sendOperation(new InsertOperation(1, "y"), 100);
-    client_2.sendOperation(new DeleteOperation(1, "b"), 200);
-    client_3.sendOperation(new InsertOperation(2, "y"), 1000);
+    client_1.sendOperation(I(1, "y"), 100);
+    client_2.sendOperation(D(1, "b"), 200);
+    client_3.sendOperation(I(2, "y"), 1000);
 
     network.execute(1000);
 

@@ -1,10 +1,10 @@
 package saros.concurrent.jupiter.test.puzzles;
 
 import static org.junit.Assert.assertEquals;
+import static saros.test.util.OperationHelper.D;
+import static saros.test.util.OperationHelper.I;
 
 import org.junit.Test;
-import saros.concurrent.jupiter.internal.text.DeleteOperation;
-import saros.concurrent.jupiter.internal.text.InsertOperation;
 import saros.concurrent.jupiter.test.util.ClientSynchronizedDocument;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
 import saros.concurrent.jupiter.test.util.TwoWayJupiterClientDocument;
@@ -33,21 +33,21 @@ public class SimpleClientServerTest extends JupiterTestCase {
    * the document states.
    */
   @Test
-  public void test2WayProtocol() throws Exception {
+  public void test2WayProtocol() {
 
     setupClientServer("abc");
 
-    client.sendOperation(new InsertOperation(0, "e"), 100);
+    client.sendOperation(I(0, "e"), 100);
 
     assertEquals("eabc", client.getDocument());
     assertEquals("abc", server.getDocument());
 
-    client.sendOperation(new InsertOperation(0, "x"), 200);
+    client.sendOperation(I(0, "x"), 200);
 
     assertEquals("xeabc", client.getDocument());
     assertEquals("abc", server.getDocument());
 
-    server.sendOperation(client.getUser(), new DeleteOperation(0, "a"), 50);
+    server.sendOperation(client.getUser(), D(0, "a"), 50);
 
     assertEquals("xeabc", client.getDocument());
     assertEquals("bc", server.getDocument());
@@ -70,12 +70,12 @@ public class SimpleClientServerTest extends JupiterTestCase {
    * seconds.
    */
   @Test
-  public void testDeleteStringWithConcurentInsert() throws Exception {
+  public void testDeleteStringWithConcurentInsert() {
 
     setupClientServer("abcdefg");
 
-    client.sendOperation(new InsertOperation(3, "x"), 100);
-    server.sendOperation(client.getUser(), new DeleteOperation(1, "bcde"), 400);
+    client.sendOperation(I(3, "x"), 100);
+    server.sendOperation(client.getUser(), D(1, "bcde"), 400);
 
     network.execute(200);
     assertEquals("abcxdefg", client.getDocument());
@@ -86,12 +86,12 @@ public class SimpleClientServerTest extends JupiterTestCase {
 
   /** Client insert a char into the delete area of Server. */
   @Test
-  public void testInsertStringWithConcurentDelete() throws Exception {
+  public void testInsertStringWithConcurentDelete() {
 
     setupClientServer("abcdefg");
 
-    client.sendOperation(new InsertOperation(3, "x"), 300);
-    server.sendOperation(client.getUser(), new DeleteOperation(1, "bcde"), 100);
+    client.sendOperation(I(3, "x"), 300);
+    server.sendOperation(client.getUser(), D(1, "bcde"), 100);
 
     network.execute(100);
     assertEquals("afg", server.getDocument());
