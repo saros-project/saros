@@ -1,10 +1,10 @@
 package saros.concurrent.jupiter.test.puzzles;
 
 import static org.junit.Assert.assertEquals;
+import static saros.test.util.OperationHelper.D;
+import static saros.test.util.OperationHelper.I;
 
 import org.junit.Test;
-import saros.concurrent.jupiter.internal.text.DeleteOperation;
-import saros.concurrent.jupiter.internal.text.InsertOperation;
 import saros.concurrent.jupiter.test.util.ClientSynchronizedDocument;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
 import saros.concurrent.jupiter.test.util.ServerSynchronizedDocument;
@@ -44,17 +44,13 @@ public class SimpleServerProxyTest extends JupiterTestCase {
     server.addProxyClient(bob);
   }
 
-  /**
-   * two clients connect with jupiter server.
-   *
-   * @throws Exception
-   */
+  /** two clients connect with jupiter server. */
   @Test
-  public void testTwoConcurrentInsertOperations() throws Exception {
+  public void testTwoConcurrentInsertOperations() {
     setUp("X");
 
-    client_1.sendOperation(new InsertOperation(0, "a"), 300);
-    client_2.sendOperation(new InsertOperation(1, "b"), 400);
+    client_1.sendOperation(I(0, "a"), 300);
+    client_2.sendOperation(I(1, "b"), 400);
     network.execute();
 
     assertEquals("aXb", client_1.getDocument());
@@ -64,13 +60,13 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 
   /** two clients connect with jupiter server. */
   @Test
-  public void testThreeConcurrentInsertOperations() throws Exception {
+  public void testThreeConcurrentInsertOperations() {
 
     setUp("X");
 
-    client_1.sendOperation(new InsertOperation(0, "a"), 200);
-    client_1.sendOperation(new InsertOperation(1, "b"), 400);
-    client_2.sendOperation(new InsertOperation(1, "c"), 600);
+    client_1.sendOperation(I(0, "a"), 200);
+    client_1.sendOperation(I(1, "b"), 400);
+    client_2.sendOperation(I(1, "c"), 600);
 
     network.execute();
 
@@ -78,17 +74,13 @@ public class SimpleServerProxyTest extends JupiterTestCase {
     assertEquals("abXc", client_1.getDocument());
   }
 
-  /**
-   * two clients connect with jupiter server.
-   *
-   * @throws Exception
-   */
+  /** two clients connect with jupiter server. */
   @Test
-  public void testTwoClientWithJupiterProxy() throws Exception {
+  public void testTwoClientWithJupiterProxy() {
 
     setUp("abcdefg");
 
-    client_1.sendOperation(new InsertOperation(1, "c"), 0);
+    client_1.sendOperation(I(1, "c"), 0);
 
     network.execute();
 
@@ -96,8 +88,8 @@ public class SimpleServerProxyTest extends JupiterTestCase {
     assertEquals("acbcdefg", client_2.getDocument());
 
     /* send two concurrent operations. */
-    client_1.sendOperation(new InsertOperation(1, "x"), 100);
-    client_2.sendOperation(new InsertOperation(2, "t"), 200);
+    client_1.sendOperation(I(1, "x"), 100);
+    client_2.sendOperation(I(2, "t"), 200);
 
     /* assert local execution. */
     assertEquals("axcbcdefg", client_1.getDocument());
@@ -114,27 +106,23 @@ public class SimpleServerProxyTest extends JupiterTestCase {
     assertEquals("axctbcdefg", client_2.getDocument());
 
     /* send two concurrent operations. */
-    client_1.sendOperation(new InsertOperation(1, "t"), 300);
-    client_2.sendOperation(new InsertOperation(3, "x"), 400);
+    client_1.sendOperation(I(1, "t"), 300);
+    client_2.sendOperation(I(3, "x"), 400);
 
     /* assert remote operations. */
     network.execute();
     assertEquals(client_1.getDocument(), client_2.getDocument());
   }
 
-  /**
-   * two clients connect with jupiter server. Concurrent delete and insert operations.
-   *
-   * @throws Exception
-   */
+  /** two clients connect with jupiter server. Concurrent delete and insert operations. */
   @Test
-  public void testTwoClientWithJupiterProxyDeleteInsertOperations() throws Exception {
+  public void testTwoClientWithJupiterProxyDeleteInsertOperations() {
 
     setUp("abcdefg");
 
     /* send two concurrent operations. */
-    client_1.sendOperation(new DeleteOperation(0, "abc"), 100);
-    client_2.sendOperation(new InsertOperation(1, "t"), 200);
+    client_1.sendOperation(D(0, "abc"), 100);
+    client_2.sendOperation(I(1, "t"), 200);
 
     /* assert local execution. */
     assertEquals("defg", client_1.getDocument());
