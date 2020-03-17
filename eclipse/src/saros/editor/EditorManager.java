@@ -633,14 +633,6 @@ public class EditorManager implements IEditorManager {
 
     // inform all registered ISharedEditorListeners about this text edit
     editorListenerDispatch.textEdited(textEdit);
-
-    /*
-     * TODO Investigate if this is really needed here
-     */
-    IEditorInput input = changedEditor.getEditorInput();
-    IDocumentProvider provider = EditorAPI.getDocumentProvider(input);
-    IAnnotationModel model = provider.getAnnotationModel(input);
-    contributionAnnotationManager.splitAnnotation(model, offset);
   }
 
   private void execEditorActivity(EditorActivity editorActivity) {

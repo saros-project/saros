@@ -2,6 +2,7 @@ package saros.editor.internal;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
@@ -85,6 +86,10 @@ class ContributionAnnotationHistory {
             + oldAnnotation
             + " in the current history for user: "
             + oldAnnotation.getSource());
+  }
+
+  protected void addNewEntry(ContributionAnnotation annotation) {
+    addNewEntry(Arrays.asList(annotation));
   }
 
   protected void addNewEntry(List<ContributionAnnotation> annotations) {
