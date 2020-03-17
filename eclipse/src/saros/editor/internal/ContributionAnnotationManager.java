@@ -1,16 +1,15 @@
 package saros.editor.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.Position;
@@ -128,55 +127,6 @@ public class ContributionAnnotationManager {
   }
 
   /**
-   * Splits the contribution annotation at given position, so that a following text change will not
-   * expand the annotation. This needs to be called before the text is changed.
-   *
-   * @param model to search for annotations to split
-   * @param offset at which annotations should be split
-   */
-  public void splitAnnotation(final IAnnotationModel model, final int offset) {
-
-    if (!contribtionAnnotationsEnabled) return;
-
-    final List<ContributionAnnotation> annotationsToRemove =
-        new ArrayList<ContributionAnnotation>();
-
-    final Map<ContributionAnnotation, Position> annotationsToAdd =
-        new HashMap<ContributionAnnotation, Position>();
-
-    for (Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext(); ) {
-
-      final Annotation annotation = it.next();
-
-      if (!(annotation instanceof ContributionAnnotation)) continue;
-
-      final ContributionAnnotation contributionAnnotation = (ContributionAnnotation) annotation;
-      final User source = contributionAnnotation.getSource();
-
-      final Position pos = model.getPosition(contributionAnnotation);
-
-      if ((offset > pos.offset) && (offset < pos.offset + pos.length)) {
-
-        final Position before = new Position(pos.offset, offset - pos.offset);
-
-        final Position after = new Position(offset, pos.length - (offset - pos.offset));
-
-        annotationsToRemove.add(contributionAnnotation);
-
-        final ContributionAnnotation beforeAnnotation = new ContributionAnnotation(source, model);
-        final ContributionAnnotation afterAnnotation = new ContributionAnnotation(source, model);
-
-        annotationsToAdd.put(beforeAnnotation, before);
-        annotationsToAdd.put(afterAnnotation, after);
-
-        replaceInHistory(contributionAnnotation, beforeAnnotation, afterAnnotation);
-      }
-    }
-
-    annotationModelHelper.replaceAnnotationsInModel(model, annotationsToRemove, annotationsToAdd);
-  }
-
-  /**
    * Refreshes all contribution annotations in the model by removing and reinserting them.
    *
    * @param model the annotation model that should be refreshed
@@ -207,12 +157,13 @@ public class ContributionAnnotationManager {
        */
       annotationsToRemove.add(annotation);
 
-      ContributionAnnotation annotationToAdd =
-          new ContributionAnnotation(((ContributionAnnotation) annotation).getSource(), model);
+      ContributionAnnotation annotationToReplace = (ContributionAnnotation) annotation;
+      User source = annotationToReplace.getSource();
+      ContributionAnnotation annotationToAdd = new ContributionAnnotation(source, model);
 
       annotationsToAdd.put(annotationToAdd, position);
 
-      replaceInHistory((ContributionAnnotation) annotation, annotationToAdd);
+      getHistory(source).replaceInHistory(annotationToReplace, annotationToAdd);
     }
 
     if (annotationsToRemove.isEmpty()) return;
@@ -241,12 +192,12 @@ public class ContributionAnnotationManager {
 
     final ContributionAnnotationHistory history = getHistory(annotation.getSource());
 
-    final List<ContributionAnnotationHistory.Entry> removedEntries = removeHistoryEntries(history);
+    final Pair<IAnnotationModel, List<ContributionAnnotation>> annotationToRemove =
+        history.removeHistoryEntry();
 
     history.addNewEntry(annotation);
 
-    if (removedEntries.isEmpty()) {
-      System.out.println("EMPTY");
+    if (annotationToRemove == null) {
       annotation.getModel().addAnnotation(annotation, position);
       return;
     }
@@ -254,85 +205,9 @@ public class ContributionAnnotationManager {
     // TODO OPTIMIZE it is usually 2 annotations after the queue is full
     annotation.getModel().addAnnotation(annotation, position);
 
-    for (final ContributionAnnotationHistory.Entry entry : removedEntries) {
-      entry.getAnnotations().get(0).getModel().removeAnnotation(entry.getAnnotations().get(0));
-      System.out.println("RM");
+    for (ContributionAnnotation a : annotationToRemove.getRight()) {
+      annotationToRemove.getLeft().removeAnnotation(a);
     }
-  }
-
-  /**
-   * Removes entries from the history based on the history current insert stamp. This method <b>DOES
-   * NOT</b> alter the annotation model the removed annotations in the history belong to!
-   */
-  private List<ContributionAnnotationHistory.Entry> removeHistoryEntries(
-      final ContributionAnnotationHistory history) {
-
-    final List<ContributionAnnotationHistory.Entry> removedEntries = new ArrayList<>();
-
-    final int insertStampToRemove = history.getCurrentInsertStamp();
-
-    /* the logic assumes that the entry order does not change during lifetime
-     * i.e if we have a history of size 4 the list must look like this regarding the insert stamps
-     * 0 0 0 1 2 3 3 3 0 1 1 1 2 2 2 2 3 0 1 1 1 1 1 2 3 ... and so on
-     */
-
-    final Iterator<ContributionAnnotationHistory.Entry> it = history.getEntries().iterator();
-
-    while (it.hasNext()) {
-      final ContributionAnnotationHistory.Entry entry = it.next();
-
-      if (entry.getInsertStamp() != insertStampToRemove) break;
-
-      removedEntries.add(entry);
-      it.remove();
-    }
-
-    return removedEntries;
-  }
-
-  /**
-   * Replaces an existing annotation in the current history with new annotations. This method
-   * <b>DOES NOT</b> alter the annotation model!
-   */
-  private void replaceInHistory(
-      final ContributionAnnotation oldAnnotation, final ContributionAnnotation... newAnnotations) {
-
-    final User user = oldAnnotation.getSource();
-
-    final ContributionAnnotationHistory history = getHistory(user);
-
-    /* update the history entry, e.g we want to modify annotation D
-     * pre: A, B, C, D, E, F, G
-     * post: A, B, C, D_0, D_1, ..., D_N, E, F, G
-     *
-     */
-    for (final ListIterator<ContributionAnnotationHistory.Entry> lit =
-            history.getEntries().listIterator();
-        lit.hasNext(); ) {
-
-      final ContributionAnnotationHistory.Entry entry = lit.next();
-
-      if (entry.getAnnotations().get(0).equals(oldAnnotation)) {
-
-        // see JavaDoc remove must be called BEFORE add
-        lit.remove();
-
-        for (int i = 0; i < newAnnotations.length; i++) {
-          assert oldAnnotation.getSource().equals(newAnnotations[i].getSource());
-          lit.add(
-              new ContributionAnnotationHistory.Entry(
-                  Arrays.asList(newAnnotations[i]), entry.getInsertStamp()));
-        }
-
-        return;
-      }
-    }
-
-    log.warn(
-        "could not find annotation "
-            + oldAnnotation
-            + " in the current history for user: "
-            + oldAnnotation.getSource());
   }
 
   /**
@@ -364,12 +239,10 @@ public class ContributionAnnotationManager {
     final Set<User> users = new HashSet<>();
 
     for (final ContributionAnnotationHistory history : histories) {
-      while (!history.getEntries().isEmpty()) {
-
-        final ContributionAnnotationHistory.Entry entry = history.getEntries().poll();
-
-        annotationModels.add(entry.getAnnotations().get(0).getModel());
-        users.add(entry.getAnnotations().get(0).getSource());
+      List<ContributionAnnotation> allAnnotationsInHistory = history.clear();
+      for (ContributionAnnotation annotation : allAnnotationsInHistory) {
+        annotationModels.add(annotation.getModel());
+        users.add(annotation.getSource());
       }
     }
 
