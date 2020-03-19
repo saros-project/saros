@@ -158,6 +158,10 @@ public class LocalEditorManipulator {
         int start = EditorAPI.calculateOffset(calculationEditor, op.getStartPosition());
         int end = EditorAPI.calculateOffset(calculationEditor, op.getEndPosition());
 
+        /*
+         * Intellij internally always uses UNIX line separators for editor content
+         * -> no line ending denormalization necessary as normalized format matches editor format
+         */
         if (op instanceof DeleteOperation) {
           DocumentAPI.deleteText(project, doc, start, end);
 

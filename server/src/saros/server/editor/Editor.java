@@ -6,6 +6,7 @@ import org.apache.commons.io.IOUtils;
 import saros.activities.TextEditActivity;
 import saros.editor.text.TextPositionUtils;
 import saros.filesystem.IFile;
+import saros.util.LineSeparatorNormalizationUtil;
 
 /** Representation of an open file on the server. Used by {@link ServerEditorManager}. */
 public class Editor {
@@ -48,14 +49,33 @@ public class Editor {
    * @param edit the text edit operation to apply
    */
   public void applyTextEdit(TextEditActivity edit) {
+    String contentString = content.toString();
+
+    String lineSeparator = TextPositionUtils.guessLineSeparator(contentString);
+
+    // Use system default line separator if text does not contain any line separator yet.
+    if (lineSeparator.isEmpty()) {
+      lineSeparator = System.lineSeparator();
+    }
+
     int startOffset =
-        TextPositionUtils.calculateOffset(content.toString(), edit.getStartPosition());
+        TextPositionUtils.calculateOffset(contentString, edit.getStartPosition(), lineSeparator);
 
     if (edit.getReplacedText().length() > 0) {
-      content.delete(startOffset, edit.getReplacedText().length());
+      String replacedText = edit.getReplacedText();
+
+      String denormalizedReplacedText =
+          LineSeparatorNormalizationUtil.revertNormalization(replacedText, lineSeparator);
+
+      content.delete(startOffset, denormalizedReplacedText.length());
     }
     if (edit.getNewText().length() > 0) {
-      content.insert(startOffset, edit.getNewText());
+      String newText = edit.getNewText();
+
+      String denormalizedNewText =
+          LineSeparatorNormalizationUtil.revertNormalization(newText, lineSeparator);
+
+      content.insert(startOffset, denormalizedNewText);
     }
   }
 
