@@ -19,6 +19,8 @@
  */
 package saros.activities;
 
+import static saros.util.LineSeparatorNormalizationUtil.NORMALIZED_LINE_SEPARATOR;
+
 import java.util.Objects;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,8 +34,17 @@ import saros.concurrent.jupiter.internal.text.SplitOperation;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextPositionUtils;
 import saros.session.User;
+import saros.util.LineSeparatorNormalizationUtil;
 
-/** An immutable TextEditActivity. */
+/**
+ * An immutable TextEditActivity.
+ *
+ * <p>The replaced and new text contained in text edit activities only uses normalized line
+ * separators, meaning it doesn't contain any line separators besides the {@link
+ * LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+ *
+ * @see LineSeparatorNormalizationUtil
+ */
 public class TextEditActivity extends AbstractResourceActivity {
 
   private static final Logger log = Logger.getLogger(TextEditActivity.class);
@@ -53,72 +64,33 @@ public class TextEditActivity extends AbstractResourceActivity {
    * Calculates the line and offset deltas for the given new and replaced text and instantiates a
    * new text edit activity with the given parameters and the calculated deltas.
    *
-   * <p>Uses the given line separator to calculate the line delta and offset delta of the given new
-   * and replaced text.
+   * <p>The given replaced and new text must only use normalized line separators, meaning it must
+   * not contain any line separators besides the {@link
+   * LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+   *
+   * <p>Uses the normalization line separator to calculate the line delta and offset delta of the
+   * given new and replaced text.
    *
    * @param source the user that caused the activity
    * @param startPosition the position at which the text edit activity applies
    * @param newText the new text added with this activity
    * @param replacedText the replaced text removed with this activity
    * @param path the resource the activity belongs to
-   * @param lineSeparator the line separator used in the given new and replaced text
-   * @see TextPositionUtils#calculateDeltas(String, String)
+   * @see TextPositionUtils#calculateDeltas(String,String)
+   * @see LineSeparatorNormalizationUtil
    */
-  // TODO unify once content is normalized to Unix line separators
   public static TextEditActivity buildTextEditActivity(
-      User source,
-      TextPosition startPosition,
-      String newText,
-      String replacedText,
-      SPath path,
-      String lineSeparator) {
+      User source, TextPosition startPosition, String newText, String replacedText, SPath path) {
 
     Pair<Integer, Integer> newTextDeltas =
-        TextPositionUtils.calculateDeltas(newText, lineSeparator);
+        TextPositionUtils.calculateDeltas(newText, NORMALIZED_LINE_SEPARATOR);
+
     int newTextLineDelta = newTextDeltas.getLeft();
     int newTextOffsetDelta = newTextDeltas.getRight();
 
     Pair<Integer, Integer> replacedTextDeltas =
-        TextPositionUtils.calculateDeltas(replacedText, lineSeparator);
-    int replacedTextLineDelta = replacedTextDeltas.getLeft();
-    int replacedTextOffsetDelta = replacedTextDeltas.getRight();
+        TextPositionUtils.calculateDeltas(replacedText, NORMALIZED_LINE_SEPARATOR);
 
-    return new TextEditActivity(
-        source,
-        startPosition,
-        newTextLineDelta,
-        newTextOffsetDelta,
-        newText,
-        replacedTextLineDelta,
-        replacedTextOffsetDelta,
-        replacedText,
-        path);
-  }
-
-  /**
-   * Calculates the line and offset deltas for the given new and replaced text and instantiates a
-   * new text edit activity with the given parameters and the calculated deltas.
-   *
-   * <p>Tries to guess the used line separator by checking for Windows (<code>\r\n</code>) or Unix
-   * line separators (<code>\n</code>) in the text.
-   *
-   * @param source the user that caused the activity
-   * @param startPosition the position at which the text edit activity applies
-   * @param newText the new text added with this activity
-   * @param replacedText the replaced text removed with this activity
-   * @param path the resource the activity belongs to
-   * @see TextPositionUtils#calculateDeltas(String)
-   * @see TextPositionUtils#guessLineSeparator(String)
-   */
-  // TODO unify once content is normalized to Unix line separators
-  public static TextEditActivity buildTextEditActivity(
-      User source, TextPosition startPosition, String newText, String replacedText, SPath path) {
-
-    Pair<Integer, Integer> newTextDeltas = TextPositionUtils.calculateDeltas(newText);
-    int newTextLineDelta = newTextDeltas.getLeft();
-    int newTextOffsetDelta = newTextDeltas.getRight();
-
-    Pair<Integer, Integer> replacedTextDeltas = TextPositionUtils.calculateDeltas(replacedText);
     int replacedTextLineDelta = replacedTextDeltas.getLeft();
     int replacedTextOffsetDelta = replacedTextDeltas.getRight();
 
@@ -137,6 +109,10 @@ public class TextEditActivity extends AbstractResourceActivity {
   /**
    * Instantiates a new text edit activity with the given parameters.
    *
+   * <p>The given replaced and new text must only use normalized line separators, meaning it must
+   * not contain any line separators besides the {@link
+   * LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+   *
    * @param source the user that caused the activity
    * @param startPosition the position at which the text edit activity applies
    * @param newTextLineDelta the number of lines added with the new text
@@ -146,6 +122,7 @@ public class TextEditActivity extends AbstractResourceActivity {
    * @param replacedTextOffsetDelta the offset delta in the last line of the replaced text
    * @param replacedText the replaced text removed with this activity
    * @param path the resource the activity belongs to
+   * @see LineSeparatorNormalizationUtil
    */
   public TextEditActivity(
       User source,
@@ -175,6 +152,9 @@ public class TextEditActivity extends AbstractResourceActivity {
 
     if (newText == null) throw new IllegalArgumentException("Text must not be null");
     if (replacedText == null) throw new IllegalArgumentException("ReplacedText must not be null");
+
+    assert !newText.contains("\r\n");
+    assert !replacedText.contains("\r\n");
 
     if (path == null) throw new IllegalArgumentException("Resource must not be null");
 
@@ -222,7 +202,11 @@ public class TextEditActivity extends AbstractResourceActivity {
   /**
    * Returns the new text added by this text activity.
    *
+   * <p>The returned text only uses normalized line separators, meaning it doesn't contain any line
+   * separators besides the {@link LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+   *
    * @return the new text added by this text activity
+   * @see LineSeparatorNormalizationUtil
    */
   public String getNewText() {
     return newText;
@@ -231,7 +215,11 @@ public class TextEditActivity extends AbstractResourceActivity {
   /**
    * Returns the replaced text removed by this text activity.
    *
+   * <p>The returned text only uses normalized line separators, meaning it doesn't contain any line
+   * separators besides the {@link LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+   *
    * @return the replaced text removed by this text activity
+   * @see LineSeparatorNormalizationUtil
    */
   public String getReplacedText() {
     return replacedText;

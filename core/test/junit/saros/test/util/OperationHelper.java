@@ -212,11 +212,11 @@ public class OperationHelper {
    * @param replacedText the replaced text to use for the activity
    * @param path the path to use for the activity
    * @return a text edit activity with the given parameters
-   * @see TextEditActivity#buildTextEditActivity(User, TextPosition, String, String, SPath, String)
+   * @see TextEditActivity#buildTextEditActivity(User, TextPosition, String, String, SPath)
    */
   public static TextEditActivity T(
       User source, TextPosition position, String text, String replacedText, SPath path) {
 
-    return TextEditActivity.buildTextEditActivity(source, position, text, replacedText, path, EOL);
+    return TextEditActivity.buildTextEditActivity(source, position, text, replacedText, path);
   }
 }

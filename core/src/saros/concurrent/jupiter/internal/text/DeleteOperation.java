@@ -34,10 +34,17 @@ import saros.activities.TextEditActivity;
 import saros.editor.text.TextPosition;
 import saros.misc.xstream.UrlEncodingStringConverter;
 import saros.session.User;
+import saros.util.LineSeparatorNormalizationUtil;
 
 /**
  * The DeleteOperation is used to hold a text together with its position that is to be deleted in
  * the document model.
+ *
+ * <p>The text contained in delete operations only uses normalized line separators, meaning it
+ * doesn't contain any line separators besides the {@link
+ * LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+ *
+ * @see LineSeparatorNormalizationUtil
  */
 @XStreamAlias("deleteOp")
 public class DeleteOperation implements ITextOperation {
@@ -74,10 +81,15 @@ public class DeleteOperation implements ITextOperation {
   /**
    * Instantiates a new delete operation using the given parameters.
    *
+   * <p>The given replaced text must only use normalized line separators, meaning it must not
+   * contain any line separators besides the {@link
+   * LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+   *
    * @param startPosition the start position of the delete operation
    * @param lineDelta how many lines are deleted by the operation
    * @param offsetDelta the offset delta in the last modified line
    * @param replacedText the text removed by this operation
+   * @see LineSeparatorNormalizationUtil
    */
   public DeleteOperation(
       TextPosition startPosition, int lineDelta, int offsetDelta, String replacedText) {
@@ -137,7 +149,11 @@ public class DeleteOperation implements ITextOperation {
   /**
    * Returns the text to be deleted.
    *
+   * <p>The returned text only uses normalized line separators, meaning it doesn't contain any line
+   * separators besides the {@link LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+   *
    * @return the text to be deleted
+   * @see LineSeparatorNormalizationUtil
    */
   @Override
   public String getText() {
