@@ -14,9 +14,9 @@ dependencies {
   releaseDep 'commons-io:commons-io:2.0.1'
   releaseDep 'org.apache.commons:commons-lang3:3.8.1'
 
-  releaseDep 'javax.jmdns:jmdns:3.4.1'
   releaseDep project(path: ':saros.picocontainer', configuration: 'shadow')
-  releaseDep 'xpp3:xpp3:1.1.4c'
+  // xpp3_min provides the classes with package org.xmlpull.(v1|mxp)
+  releaseDep 'xpp3:xpp3_min:1.1.4c'
   releaseDep 'com.thoughtworks.xstream:xstream:1.4.10'
   releaseDep 'org.gnu.inet:libidn:1.15'
 
