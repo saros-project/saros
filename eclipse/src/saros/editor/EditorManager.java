@@ -462,6 +462,21 @@ public class EditorManager implements IEditorManager {
   }
 
   @Override
+  public String getNormalizedContent(SPath path) {
+    String content = getContent(path);
+
+    if (content == null) {
+      return null;
+    }
+
+    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+
+    String lineSeparator = FileUtil.getLineSeparator(file);
+
+    return LineSeparatorNormalizationUtil.normalize(content, lineSeparator);
+  }
+
+  @Override
   public Set<SPath> getOpenEditors() {
     return openEditorPaths;
   }

@@ -15,11 +15,13 @@ import saros.activities.TextEditActivity;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.text.LineRange;
+import saros.editor.text.TextPositionUtils;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.session.User;
+import saros.util.LineSeparatorNormalizationUtil;
 
 /** Server implementation of the {@link IEditorManager} interface */
 public class ServerEditorManager implements IEditorManager {
@@ -50,6 +52,19 @@ public class ServerEditorManager implements IEditorManager {
     } catch (IOException e) {
       return null;
     }
+  }
+
+  @Override
+  public String getNormalizedContent(SPath path) {
+    String content = getContent(path);
+
+    if (content == null) {
+      return null;
+    }
+
+    String lineSeparator = TextPositionUtils.guessLineSeparator(content);
+
+    return LineSeparatorNormalizationUtil.normalize(content, lineSeparator);
   }
 
   @Override
