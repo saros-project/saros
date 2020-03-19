@@ -6,6 +6,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IProject;
 import saros.session.User;
+import saros.util.LineSeparatorNormalizationUtil;
 
 /**
  * Tracks and provides access to editors for the set of files shared in the currently running
@@ -52,6 +53,19 @@ public interface IEditorManager {
    *     with the given path exists locally
    */
   String getContent(SPath path);
+
+  /**
+   * Returns the normalized text content of the local editor associated with the specified file, or
+   * the content of the file itself if there is currently no open editor for it.
+   *
+   * <p>Normalized text only contains Unix line separators.
+   *
+   * @param path path of the file whose content should be returned
+   * @return the normalized text content of the matching local editor or file or <code>null</code>
+   *     if no file with the given path exists locally
+   * @see LineSeparatorNormalizationUtil
+   */
+  String getNormalizedContent(SPath path);
 
   /**
    * Saves the local editors of all shared files belonging to the given project. If <code>null

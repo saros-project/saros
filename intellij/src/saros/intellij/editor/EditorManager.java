@@ -706,6 +706,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   @Override
+  public String getNormalizedContent(SPath path) {
+    // Intellij editor content is already normalized
+    return getContent(path);
+  }
+
+  @Override
   public void addSharedEditorListener(ISharedEditorListener listener) {
     editorListenerDispatch.add(listener);
   }
