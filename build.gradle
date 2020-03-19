@@ -82,8 +82,8 @@ configure(projectsToConfigure) { projectToConf ->
     }
   }
 
-  projectToConf.ext.junitVersion = 'junit:junit:4.12'
   projectToConf.ext.log4jVersion = 'log4j:log4j:1.2.15'
+  projectToConf.ext.junitVersion = 'junit:junit:4.13'
   projectToConf.ext.addLog4JDependency = { config ->
     config.dependencies.add(dependencies.create('log4j:log4j:1.2.15') {
       exclude group: 'com.sun.jmx', module: 'jmxri'
