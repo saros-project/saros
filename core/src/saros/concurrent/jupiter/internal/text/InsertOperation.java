@@ -34,6 +34,7 @@ import saros.activities.TextEditActivity;
 import saros.editor.text.TextPosition;
 import saros.misc.xstream.UrlEncodingStringConverter;
 import saros.session.User;
+import saros.util.LineSeparatorNormalizationUtil;
 
 /**
  * The InsertOperation is used to hold a text together with its position index. The text is to be
@@ -44,6 +45,12 @@ import saros.session.User;
  * concept could be extended in such a way that two origin positions could be compared to each other
  * based on the same context. Therefore, if the two positions do not relate on the same document
  * context, a least synchronization point (LSP) would have to be determined.
+ *
+ * <p>The text contained in insert operations only uses normalized line separators, meaning it
+ * doesn't contain any line separators besides the {@link
+ * LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+ *
+ * @see LineSeparatorNormalizationUtil
  */
 @XStreamAlias("insertOp")
 public class InsertOperation implements ITextOperation {
@@ -90,11 +97,15 @@ public class InsertOperation implements ITextOperation {
    *
    * <p>Uses the given start position as the origin start position.
    *
+   * <p>The given new text must only use normalized line separators, meaning it must not contain any
+   * line separators besides the {@link LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+   *
    * @param startPosition the start position of the insert operation
    * @param lineDelta how many lines are added by the operation
    * @param offsetDelta the offset delta in the last modified line
    * @param text the text added by this operation
    * @see #InsertOperation(TextPosition, int, int, String, TextPosition)
+   * @see LineSeparatorNormalizationUtil
    */
   public InsertOperation(TextPosition startPosition, int lineDelta, int offsetDelta, String text) {
     this(startPosition, lineDelta, offsetDelta, text, startPosition);
@@ -103,13 +114,16 @@ public class InsertOperation implements ITextOperation {
   /**
    * Instantiates a new insert operation using the given parameters.
    *
+   * <p>The given new text must only use normalized line separators, meaning it must not contain any
+   * line separators besides the {@link LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+   *
    * @param startPosition the start position of the insert operation
    * @param lineDelta how many lines are added by the operation
    * @param offsetDelta the offset delta in the last modified line
    * @param text the text added by this operation
    * @param originStartPosition the original start position the insert operation was meant for; see
    *     {@link #getOriginStartPosition()}
-   * @see #InsertOperation(TextPosition, int, int, String, TextPosition)
+   * @see LineSeparatorNormalizationUtil
    */
   public InsertOperation(
       TextPosition startPosition,
@@ -193,7 +207,11 @@ public class InsertOperation implements ITextOperation {
   /**
    * Returns the text to be added by the operation.
    *
+   * <p>The returned text only uses normalized line separators, meaning it doesn't contain any line
+   * separators besides the {@link LineSeparatorNormalizationUtil#NORMALIZED_LINE_SEPARATOR}.
+   *
    * @return the text to be added by the operation
+   * @see LineSeparatorNormalizationUtil
    */
   @Override
   public String getText() {

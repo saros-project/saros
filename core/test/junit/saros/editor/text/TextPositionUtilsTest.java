@@ -132,27 +132,6 @@ public class TextPositionUtilsTest {
   }
 
   @Test
-  public void testLineEndingDetection() {
-    TextPosition position = new TextPosition(10, 24);
-
-    int detectedUnixOffset = TextPositionUtils.calculateOffset(UNIX_TEST_STRING, position);
-    int unixOffset = calculateUnixOffset(position);
-
-    assertEquals(
-        "method using line separator detection returned wrong offset for Unix line separators",
-        unixOffset,
-        detectedUnixOffset);
-
-    int detectedWindowsOffset = TextPositionUtils.calculateOffset(WINDOWS_TEST_STRING, position);
-    int windowsOffset = calculateWindowsOffset(position);
-
-    assertEquals(
-        "method using line separator detection returned wrong offset for Windows line separators",
-        windowsOffset,
-        detectedWindowsOffset);
-  }
-
-  @Test
   public void testUnixPositionCalculation() {
     int realUnixOffset;
     TextPosition position;

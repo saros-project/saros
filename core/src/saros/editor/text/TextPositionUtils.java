@@ -21,32 +21,6 @@ public class TextPositionUtils {
    * Calculates the offset of the given text position in the given text using the given line
    * separator.
    *
-   * <p>Tries to guess the used line separator by checking for Windows (<code>\r\n</code>) or Unix
-   * line separators (<code>\n</code>) in the text.
-   *
-   * @param text the text with which to calculate the offset
-   * @param position the position for which to calculate the offset
-   * @return the offset of the given text position in the given text
-   * @throws NullPointerException if the given text position, text, or line separator is <code>null
-   *     </code>
-   * @throws IllegalArgumentException if the given text position is invalid
-   * @throws IllegalStateException if the given text contains fewer lines than specified by the text
-   *     position
-   * @see #guessLineSeparator(String)
-   */
-  public static int calculateOffset(String text, TextPosition position) {
-
-    Objects.requireNonNull(text, "The given text must not be null");
-
-    String lineSeparator = guessLineSeparator(text);
-
-    return calculateOffset(text, position, lineSeparator);
-  }
-
-  /**
-   * Calculates the offset of the given text position in the given text using the given line
-   * separator.
-   *
    * @param text the text with which to calculate the offset
    * @param position the position for which to calculate the offset
    * @param lineSeparator the line separator used in the text
@@ -90,28 +64,6 @@ public class TextPositionUtils {
     int lineStartOffset = previousLineEndOffset + lineSeparator.length();
 
     return lineStartOffset + position.getInLineOffset();
-  }
-
-  /**
-   * Calculates the line and offset delta contained in the text, i.e. how many lines the text
-   * contains and how many characters it contains in the last line.
-   *
-   * <p>Tries to guess the used line separator by checking for Windows (<code>\r\n</code>) or Unix
-   * line separators (<code>\n</code>) in the text.
-   *
-   * @param text the text for which to calculate the deltas
-   * @return a pair containing the line delta as the first/left element and the offset delta as the
-   *     second/right element
-   * @throws NullPointerException if the given text is <code>null</code>
-   * @see #guessLineSeparator(String)
-   */
-  // TODO remove different line separator handling once internal normalization is set up
-  public static Pair<Integer, Integer> calculateDeltas(String text) {
-    Objects.requireNonNull(text, "The given text must not be null");
-
-    String lineSeparator = guessLineSeparator(text);
-
-    return calculateDeltas(text, lineSeparator);
   }
 
   /**

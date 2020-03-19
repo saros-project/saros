@@ -20,13 +20,14 @@
  */
 package saros.concurrent.jupiter.internal.text;
 
+import static saros.util.LineSeparatorNormalizationUtil.NORMALIZED_LINE_SEPARATOR;
+
 import java.security.InvalidParameterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import saros.concurrent.jupiter.InclusionTransformation;
 import saros.concurrent.jupiter.Operation;
 import saros.editor.text.TextPosition;
-import saros.editor.text.TextPositionUtils;
 
 /**
  * Implementation of the GOTO operational transformation functions. The pseudo code can be found in
@@ -451,17 +452,15 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
       } else {
         offsetDeltaBeforeSplit = inLineOffsetStartB;
 
-        // TODO remove guess once we have implemented content normalization
-        String lineSeparator = TextPositionUtils.guessLineSeparator(text);
-
-        int splitLineOffset = StringUtils.ordinalIndexOf(text, lineSeparator, lineDeltaBeforeSplit);
+        int splitLineOffset =
+            StringUtils.ordinalIndexOf(text, NORMALIZED_LINE_SEPARATOR, lineDeltaBeforeSplit);
 
         if (splitLineOffset == -1) {
           throw new IllegalStateException(
               "Could not find line separator " + lineDeltaBeforeSplit + " in text");
         }
 
-        splitOffset = splitLineOffset + lineSeparator.length() + offsetDeltaBeforeSplit;
+        splitOffset = splitLineOffset + NORMALIZED_LINE_SEPARATOR.length() + offsetDeltaBeforeSplit;
       }
 
       String textBeforeSplit = text.substring(0, splitOffset);
@@ -647,17 +646,15 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
       adjustedLineDelta = lineDeltaA;
 
     } else {
-      // TODO remove guess once we have implemented content normalization
-      String lineSeparator = TextPositionUtils.guessLineSeparator(text);
-
-      int splitLineOffset = StringUtils.ordinalIndexOf(text, lineSeparator, droppedLines);
+      int splitLineOffset =
+          StringUtils.ordinalIndexOf(text, NORMALIZED_LINE_SEPARATOR, droppedLines);
 
       if (splitLineOffset == -1) {
         throw new IllegalStateException(
             "Could not find line separator " + droppedLines + " in text");
       }
 
-      int newStartOffset = splitLineOffset + lineSeparator.length() + inLineOffsetEndB;
+      int newStartOffset = splitLineOffset + NORMALIZED_LINE_SEPARATOR.length() + inLineOffsetEndB;
 
       adjustedText = text.substring(newStartOffset);
 
@@ -727,17 +724,16 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
         adjustedText = text.substring(0, adjustedOffsetDelta);
 
       } else {
-        // TODO remove guess once we have implemented content normalization
-        String lineSeparator = TextPositionUtils.guessLineSeparator(text);
-
-        int splitLineOffset = StringUtils.ordinalIndexOf(text, lineSeparator, adjustedLineDelta);
+        int splitLineOffset =
+            StringUtils.ordinalIndexOf(text, NORMALIZED_LINE_SEPARATOR, adjustedLineDelta);
 
         if (splitLineOffset == -1) {
           throw new IllegalStateException(
               "Could not find line separator " + adjustedLineDelta + " in text");
         }
 
-        int newEndOffset = splitLineOffset + lineSeparator.length() + inLineOffsetStartB;
+        int newEndOffset =
+            splitLineOffset + NORMALIZED_LINE_SEPARATOR.length() + inLineOffsetStartB;
 
         adjustedText = text.substring(0, newEndOffset);
 

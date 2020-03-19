@@ -35,7 +35,6 @@ import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
-import saros.editor.text.TextPositionUtils;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
@@ -883,11 +882,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
      * Intellij internally always uses UNIX line separators for editor content
      * -> no line ending normalization necessary as content already normalized
      */
-    String lineSeparator = TextPositionUtils.UNIX_LINE_SEPARATOR;
-
     TextEditActivity textEdit =
         TextEditActivity.buildTextEditActivity(
-            session.getLocalUser(), startPosition, newText, replacedText, path, lineSeparator);
+            session.getLocalUser(), startPosition, newText, replacedText, path);
 
     if (!hasWriteAccess || isLocked) {
       /*
