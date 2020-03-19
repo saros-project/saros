@@ -286,26 +286,26 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
       return false;
     }
 
-    final String editorContent = editorManager.getContent(path);
+    final String normalizedEditorContent = editorManager.getNormalizedContent(path);
 
-    if (editorContent == null) {
+    if (normalizedEditorContent == null) {
       log.debug("Inconsistency detected -> no editor content found for resource: " + path);
 
       return true;
     }
 
-    if ((editorContent.length() != checksum.getLength())
-        || (editorContent.hashCode() != checksum.getHash())) {
+    if ((normalizedEditorContent.length() != checksum.getLength())
+        || (normalizedEditorContent.hashCode() != checksum.getHash())) {
 
       log.debug(
           String.format(
               "Inconsistency detected -> %s L(%d %s %d) H(%x %s %x)",
               path.toString(),
-              editorContent.length(),
-              editorContent.length() == checksum.getLength() ? "==" : "!=",
+              normalizedEditorContent.length(),
+              normalizedEditorContent.length() == checksum.getLength() ? "==" : "!=",
               checksum.getLength(),
-              editorContent.hashCode(),
-              editorContent.hashCode() == checksum.getHash() ? "==" : "!=",
+              normalizedEditorContent.hashCode(),
+              normalizedEditorContent.hashCode() == checksum.getHash() ? "==" : "!=",
               checksum.getHash()));
 
       return true;

@@ -264,9 +264,9 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
       return;
     }
 
-    String content = editorManager.getContent(checksum.getPath());
+    String normalizedEditorContent = editorManager.getNormalizedContent(checksum.getPath());
 
-    if (content == null) {
+    if (normalizedEditorContent == null) {
       if (localEditors.contains(checksum.getPath())) {
         log.error(
             "EditorManager is in an inconsistent state. "
@@ -284,7 +284,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
       }
     }
 
-    checksum.update(content);
+    checksum.update(normalizedEditorContent);
   }
 
   private void broadcastChecksum(SPath docPath) {

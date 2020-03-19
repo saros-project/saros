@@ -223,7 +223,10 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
      */
 
     DocumentChecksum checksum = new DocumentChecksum(path);
-    checksum.update(text);
+
+    String normalizedText = editorManager.getNormalizedContent(path);
+
+    checksum.update(normalizedText);
 
     fireActivity(new ChecksumActivity(user, path, checksum.getHash(), checksum.getLength(), null));
   }
