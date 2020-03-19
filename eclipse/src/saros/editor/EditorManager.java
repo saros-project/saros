@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.internal.utils.FileUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -72,6 +73,7 @@ import saros.session.User;
 import saros.session.User.Permission;
 import saros.synchronize.Blockable;
 import saros.ui.util.SWTUtils;
+import saros.util.LineSeparatorNormalizationUtil;
 import saros.util.Predicate;
 import saros.util.StackTrace;
 
@@ -605,9 +607,17 @@ public class EditorManager implements IEditorManager {
 
     TextPosition startPosition = EditorAPI.calculatePosition(document, offset);
 
+    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+
+    String lineSeparator = FileUtil.getLineSeparator(file);
+
+    String normalizedText = LineSeparatorNormalizationUtil.normalize(text, lineSeparator);
+    String normalizedReplacedText =
+        LineSeparatorNormalizationUtil.normalize(replacedText, lineSeparator);
+
     TextEditActivity textEdit =
         TextEditActivity.buildTextEditActivity(
-            session.getLocalUser(), startPosition, text, replacedText, path);
+            session.getLocalUser(), startPosition, normalizedText, normalizedReplacedText, path);
 
     if (!hasWriteAccess || isLocked) {
       /**
@@ -704,6 +714,13 @@ public class EditorManager implements IEditorManager {
       String replacedText = textEdit.getReplacedText();
       String text = textEdit.getNewText();
 
+      String lineSeparator = FileUtil.getLineSeparator(file);
+
+      String denormalizedReplacedText =
+          LineSeparatorNormalizationUtil.revertNormalization(replacedText, lineSeparator);
+      String denormalizedNewText =
+          LineSeparatorNormalizationUtil.revertNormalization(text, lineSeparator);
+
       /*
        * Disable documentListener temporarily to avoid being notified of the
        * change, otherwise this would lead to an infinite activity sending,
@@ -711,7 +728,7 @@ public class EditorManager implements IEditorManager {
        */
       editorPool.setDocumentListenerEnabled(false);
 
-      replaceText(path, offset, replacedText, text, user, doc);
+      replaceText(path, offset, denormalizedReplacedText, denormalizedNewText, user, doc);
 
       editorPool.setDocumentListenerEnabled(true);
 

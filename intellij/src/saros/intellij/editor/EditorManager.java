@@ -879,7 +879,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     TextPosition startPosition = EditorAPI.calculatePosition(editor, offset);
 
-    // Intellij internally always used UNIX line separators
+    /*
+     * Intellij internally always uses UNIX line separators for editor content
+     * -> no line ending normalization necessary as content already normalized
+     */
     String lineSeparator = TextPositionUtils.UNIX_LINE_SEPARATOR;
 
     TextEditActivity textEdit =
