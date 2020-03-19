@@ -53,6 +53,10 @@ configure(projectsToConfigure) { projectToConf ->
 
   test {
 
+    // Otherwise our custom tags (as "@JTourBus") let the javadoc generation fail
+    javadoc {
+      failOnError = false
+    }
     // Exclude test suites if property is set. Otherwise tests are executed multiple times
     // in the ci server (via test class and suite).
     // see gradle.properties for default values
