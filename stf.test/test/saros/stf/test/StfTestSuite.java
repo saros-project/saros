@@ -12,7 +12,7 @@ import org.junit.runners.Suite;
   saros.stf.test.filefolderoperations.TestSuite.class,
   saros.stf.test.followmode.TestSuite.class,
   saros.stf.test.invitation.TestSuite.class,
-  saros.stf.test.partialsharing.TestSuite.class,
+  saros.stf.test.encoding.TestSuite.class,
   saros.stf.test.permissions.TestSuite.class,
   saros.stf.test.roster.TestSuite.class,
   saros.stf.test.session.TestSuite.class

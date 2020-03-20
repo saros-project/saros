@@ -1,4 +1,4 @@
-package saros.stf.test.partialsharing;
+package saros.stf.test.encoding;
 
 import static org.junit.Assert.assertEquals;
 import static saros.stf.client.tester.SarosTester.ALICE;
@@ -12,7 +12,7 @@ import saros.stf.client.StfTestCase;
 import saros.stf.client.util.Util;
 import saros.stf.shared.Constants.TypeOfCreateProject;
 
-public class ShareFilesToProjectsWithDifferentEncodingTest extends StfTestCase {
+public class ChangeShareFilesEncodingTest extends StfTestCase {
 
   private static String CONTENT =
       "Bittida en morgon, innan solen upprann,\nInnan foglarna började sjunga,\nBergatrollet friade till fager ungersven.\nHon hade en falskeliger tunga:\nHerr Mannelig, herr Mannelig, trolofven I mig.\nFör det jag bjuder så gerna;\nI kunnen väl svara endast ja eller nej.\nOm i viljen eller ej.\nEder vill jag gifva de gångare tolf,\nSom gå uti rosendelunden;\nAldrig har det varit någon sadel uppå dem,\nEj heller betsel uti munnen.\nEder vill jag gifva de qvarnarna tolf,\nSom stå mellan Tillö och Ternö;\nStenarna de äro af rödaste gull,\nOch hjulen silfverbeslagna.\nEder vill jag gifva ett förgyllande svärd,\nSom klingar utaf femton guldringar;\nOch strida huru I strida vill,\nStridsplatsen skolen i väl vinna.\nEder vill jag gifva en skjorta så ny,\nDen bästa I lysten att slita;\nInte är hon sömmad av nål eller trå,\nMen virkad af silket det hvita.\nSådana gåfvor jag toge väl emot,\nOm du vore kristelig qvinna,\nMen nu så är du det värsta bergatroll\nAf Neckens och djefvulens stämma.\nBergatrollet ut på dörren sprang,\nHon rister och jämrar sig svåra:\nHade jag fått den fager ungersven,\nSå hade jag mistat min plåga.\nHerr Mannelig herr Mannelig trolofven I mig.\nFör det jag bjuder så gerna;\nI kunnen väl svara endast ja eller nej,\nOm i viljen eller ej.";
@@ -34,38 +34,6 @@ public class ShareFilesToProjectsWithDifferentEncodingTest extends StfTestCase {
     leaveSessionHostFirst(ALICE);
   }
 
-  @Test
-  public void testShareFilesWithDifferentProjectEncodingsAndRecovery() throws Exception {
-
-    createProjects("UTF-8", "UTF-16");
-
-    Util.buildFileSessionConcurrently(
-        "foo", new String[] {"Herr Mannelig.txt"}, TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
-
-    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/Herr Mannelig.txt");
-
-    ALICE.superBot().views().packageExplorerView().selectFile("foo", "Herr Mannelig.txt").open();
-    ALICE.remoteBot().editor("Herr Mannelig.txt").waitUntilIsActive();
-
-    BOB.superBot().views().packageExplorerView().selectFile("foo", "Herr Mannelig.txt").open();
-    BOB.remoteBot().editor("Herr Mannelig.txt").waitUntilIsActive();
-
-    // Watchdog needs up to 10 seconds to kick in
-    Thread.sleep(10000);
-
-    // 10 seconds + 5 seconds default timeout < Watchdog update period
-    // FIXME fix waitUntilIsInconsistencyDetected
-    BOB.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
-
-    BOB.superBot().views().sarosView().resolveInconsistency();
-
-    assertEquals(
-        ALICE.remoteBot().editor("Herr Mannelig.txt").getText(),
-        BOB.remoteBot().editor("Herr Mannelig.txt").getText());
-  }
-
-  // FIMXE move to another test package as this has nothing to do with partial
-  // sharing
   @Test
   public void testChangeFileEncodingInFullSharedProject() throws Exception {
 
@@ -101,40 +69,6 @@ public class ShareFilesToProjectsWithDifferentEncodingTest extends StfTestCase {
     Thread.sleep(10000);
 
     // assert at least both have the same "garbage"
-
-    assertEquals(
-        ALICE.remoteBot().editor("Herr Mannelig.txt").getText(),
-        BOB.remoteBot().editor("Herr Mannelig.txt").getText());
-  }
-
-  @Test
-  public void testShareFilesWithDifferentFileEncodingsAndRecovery() throws Exception {
-
-    createProjects("UTF-8", "UTF-8");
-
-    BOB.superBot().internal().changeFileEncoding("foo", "Herr Mannelig.txt", "US-ASCII");
-
-    Util.buildFileSessionConcurrently(
-        "foo", new String[] {"Herr Mannelig.txt"}, TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
-
-    BOB.superBot().views().packageExplorerView().waitUntilResourceIsShared("foo/Herr Mannelig.txt");
-
-    ALICE.superBot().views().packageExplorerView().selectFile("foo", "Herr Mannelig.txt").open();
-    ALICE.remoteBot().editor("Herr Mannelig.txt").waitUntilIsActive();
-
-    BOB.superBot().views().packageExplorerView().selectFile("foo", "Herr Mannelig.txt").open();
-    BOB.remoteBot().editor("Herr Mannelig.txt").waitUntilIsActive();
-
-    // Watchdog needs up to 10 seconds to kick in
-    Thread.sleep(10000);
-
-    // 10 seconds + 5 seconds default timeout < Watchdog update period
-    // FIXME fix waitUntilIsInconsistencyDetected
-    BOB.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
-
-    BOB.superBot().views().sarosView().resolveInconsistency();
-
-    assertEquals(CONTENT, ALICE.remoteBot().editor("Herr Mannelig.txt").getText());
 
     assertEquals(
         ALICE.remoteBot().editor("Herr Mannelig.txt").getText(),

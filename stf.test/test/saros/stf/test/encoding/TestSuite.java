@@ -1,13 +1,11 @@
-package saros.stf.test.partialsharing;
+package saros.stf.test.encoding;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  ModifyNonSharedFilesTest.class,
-  ShareFilesFromOneProjectToMultipleRemoteProjectsTest.class,
-  ShareFilesToProjectsWithDifferentEncodingTest.class,
+  ChangeShareFilesEncodingTest.class,
 })
 public class TestSuite {
   // the class remains completely empty,

@@ -10,7 +10,6 @@ import org.junit.runners.Suite;
   EditFileThatIsNotOpenOnRemoteSideTest.class,
   EditFileThatIsNotOpenOnRemoteSideTest.class,
   EstablishSessionWithDifferentTransportModesTest.class,
-  OverlappingSharingTest.class,
   ShareMultipleProjectsTest.class
 })
 public class TestSuite {
