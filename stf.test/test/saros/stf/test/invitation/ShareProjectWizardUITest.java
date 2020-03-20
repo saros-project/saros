@@ -14,6 +14,7 @@ import java.util.Random;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import saros.stf.client.StfTestCase;
 import saros.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
@@ -96,6 +97,11 @@ public class ShareProjectWizardUITest extends StfTestCase {
     return cls;
   }
 
+  /**
+   * Ignored while project selection window is restricted by hack. See <code>nonProjectFiler</code>
+   * in {@link saros.ui.widgets.viewer.project.BaseResourceSelectionComposite}.
+   */
+  @Ignore("Ignored while project selection window is restricted by hack.")
   @Test
   public void testShareProjectsUndoRedo() throws Exception {
     ALICE.remoteBot().activateWorkbench();
@@ -117,6 +123,11 @@ public class ShareProjectWizardUITest extends StfTestCase {
     assertAllChecked();
   }
 
+  /**
+   * Ignored while project selection window is restricted by hack. See <code>nonProjectFiler</code>
+   * in {@link saros.ui.widgets.viewer.project.BaseResourceSelectionComposite}.
+   */
+  @Ignore("Ignored while project selection window is restricted by hack.")
   @Test
   public void testShareProjectsRestoreSelection() throws Exception {
     ALICE.remoteBot().activateWorkbench();
