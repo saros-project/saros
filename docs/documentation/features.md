@@ -25,8 +25,7 @@ time.
 
 ## Various Sharing Options
 
-You may share multiple projects within one session. You may also share
-only a selection of files of a project. If you create, delete or rename
+You may share multiple projects within one session. If you create, delete or rename
 a file/folder in a shared project, it will be created/deleted/renamed at
 the session's participants as well.
 
