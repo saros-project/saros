@@ -43,7 +43,6 @@ public class Messages {
   public static String CollaborationUtils_confirm_leaving_message;
   public static String CollaborationUtils_insufficient_privileges_title;
   public static String CollaborationUtils_insufficient_privileges_message;
-  public static String CollaborationUtils_partial;
 
   public static String ConsistencyAction_progress_perform_recovery;
 

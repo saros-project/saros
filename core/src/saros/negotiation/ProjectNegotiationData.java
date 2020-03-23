@@ -8,8 +8,7 @@ import java.util.Map;
 /**
  * This class contains all the information that the remote user needs during a project negotiation.
  *
- * <p>It contains the local project name, session-wide project id, local file list, and whether the
- * project is completely or partially shared.
+ * <p>It contains the local project name, session-wide project id, and local file list.
  *
  * <p>Furthermore, it contains a map of additional options for the project. These parameters can be
  * used to provide additional, potentially IDE specific information about the project that are
@@ -29,10 +28,6 @@ public class ProjectNegotiationData {
   @XStreamAsAttribute
   private final String projectID;
 
-  @XStreamAlias("partial")
-  @XStreamAsAttribute
-  private final boolean partial;
-
   @XStreamAlias("filelist")
   private final FileList fileList;
 
@@ -48,14 +43,12 @@ public class ProjectNegotiationData {
   public ProjectNegotiationData(
       String projectID,
       String projectName,
-      boolean partial,
       FileList fileList,
       Map<String, String> additionalProjectData) {
 
     this.fileList = fileList;
     this.projectName = projectName;
     this.projectID = projectID;
-    this.partial = partial;
     this.additionalProjectData = additionalProjectData;
   }
 
@@ -69,10 +62,6 @@ public class ProjectNegotiationData {
 
   public String getProjectID() {
     return projectID;
-  }
-
-  public boolean isPartial() {
-    return partial;
   }
 
   /**

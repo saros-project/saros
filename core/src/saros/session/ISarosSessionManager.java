@@ -1,10 +1,8 @@
 package saros.session;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
 import saros.preferences.IPreferenceStore;
 
@@ -18,11 +16,11 @@ public interface ISarosSessionManager {
   public ISarosSession getSession();
 
   /**
-   * Starts a new DPP session with the local user as only participant.
+   * Starts a new Saros session with the local user as the only participant.
    *
-   * @param projectResources the local project resources which should be shared.
+   * @param projects the local projects which should be shared
    */
-  public void startSession(Map<IProject, List<IResource>> projectResources);
+  void startSession(Set<IProject> projects);
 
   // FIXME this method is error prone and only used by the IPN, find a better
   // abstraction
@@ -84,11 +82,11 @@ public interface ISarosSessionManager {
   public void invite(Collection<JID> jidsToInvite, String description);
 
   /**
-   * Adds project resources to an existing session.
+   * Adds projects to an existing session.
    *
-   * @param projectResourcesMapping
+   * @param projects the projects to add
    */
-  public void addResourcesToSession(Map<IProject, List<IResource>> projectResourcesMapping);
+  void addProjectsToSession(Set<IProject> projects);
 
   /**
    * Call this before a ISarosSession is started.

@@ -35,6 +35,9 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
 
     Util.setUpSessionWithJavaProjectAndClass(
         Constants.PROJECT1, Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL, DAVE);
+
+    // ensure all participants have successfully joined the session
+    Thread.sleep(5000);
   }
 
   @Before

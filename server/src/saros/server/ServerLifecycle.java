@@ -2,7 +2,7 @@ package saros.server;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import org.apache.log4j.Logger;
 import saros.account.XMPPAccount;
@@ -11,8 +11,6 @@ import saros.communication.connection.ConnectionHandler;
 import saros.context.AbstractContextLifecycle;
 import saros.context.ContainerContext;
 import saros.context.IContextFactory;
-import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
 import saros.session.ISarosSessionManager;
 import saros.session.SessionEndReason;
@@ -31,9 +29,7 @@ public class ServerLifecycle extends AbstractContextLifecycle {
   @Override
   protected void initializeContext(final ContainerContext context) {
     connectToXMPPServer(context);
-    context
-        .getComponent(ISarosSessionManager.class)
-        .startSession(new HashMap<IProject, List<IResource>>());
+    context.getComponent(ISarosSessionManager.class).startSession(new HashSet<>());
   }
 
   @Override

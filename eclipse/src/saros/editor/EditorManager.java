@@ -986,8 +986,8 @@ public class EditorManager implements IEditorManager {
    * <ol>
    *   <li>Has an underlying <code>IResource</code> as storage.
    *   <li>Can be adapted to an <code>ITextViewer</code>.
-   *   <li>The underlying <code>IResource</code> is part of the current (partial) project sharing
-   *       (see {@link ISarosSession#isShared}).
+   *   <li>The underlying <code>IResource</code> is part of the current project sharing (see {@link
+   *       ISarosSession#isShared}).
    * </ol>
    */
   private boolean isSharedEditor(final IEditorPart editorPart) {

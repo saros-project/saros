@@ -60,12 +60,6 @@ public class JupiterServer {
    *
    * @host
    */
-  /*
-   * TODO This solution currently just works for partial sharing by
-   * coincidence. To really fix the issue we have to expand the
-   * SarosSessionMapper to also track the resources and not just the projects
-   * that are already shared for every user individually.
-   */
   private synchronized JupiterDocumentServer getServer(final SPath path) {
 
     JupiterDocumentServer docServer = concurrentDocuments.get(path);

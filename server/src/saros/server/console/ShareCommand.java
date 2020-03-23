@@ -1,12 +1,11 @@
 package saros.server.console;
 
 import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.server.filesystem.ServerProjectImpl;
 import saros.session.ISarosSession;
@@ -44,16 +43,16 @@ public class ShareCommand extends ConsoleCommand {
     }
 
     try {
-      Map<IProject, List<IResource>> projects = new HashMap<>();
+      Set<IProject> projects = new HashSet<>();
       for (String path : args) {
         try {
           IProject project = new ServerProjectImpl(this.workspace, path);
-          projects.put(project, null);
+          projects.add(project);
         } catch (Exception e) {
           log.error(path + " could not be added to the session", e);
         }
       }
-      sessionManager.addResourcesToSession(projects);
+      sessionManager.addProjectsToSession(projects);
     } catch (Exception e) {
       log.error("Error sharing resources", e);
     }

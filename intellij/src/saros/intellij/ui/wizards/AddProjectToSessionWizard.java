@@ -741,16 +741,13 @@ public class AddProjectToSessionWizard extends Wizard {
 
         final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
 
-        if (data.isPartial()) throw new IllegalStateException("partial sharing is not supported");
-
         FileList localFileList =
             FileListFactory.createFileList(
                 project,
-                null,
                 checksumCache,
                 new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-        final FileListDiff diff = FileListDiff.diff(localFileList, data.getFileList(), false);
+        final FileListDiff diff = FileListDiff.diff(localFileList, data.getFileList());
 
         if (!diff.getRemovedFolders().isEmpty()
             || !diff.getRemovedFiles().isEmpty()

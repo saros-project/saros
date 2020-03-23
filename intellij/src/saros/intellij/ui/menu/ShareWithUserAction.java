@@ -65,8 +65,6 @@ public class ShareWithUserAction extends AnAction {
     IResource module;
 
     try {
-      // We allow only completely shared projects, so no need to check
-      // for partially shared ones.
       module = getModuleForVirtualFile(virtualFile, event.getProject());
 
     } catch (IllegalArgumentException e) {

@@ -98,9 +98,6 @@ public interface ISessionListener {
    * Is fired then a project has been made part of the session, either because the local user began
    * sharing it or because it is being shared by a remote user.
    *
-   * <p>Note that this event is also fired if a project is re-shared with a different set of shared
-   * resources (e.g. by sharing a previously unshared folder of a partially shared project).
-   *
    * <p>This method might <i>not</i> be called on the UI thread.
    *
    * @param project the project that was added

@@ -22,9 +22,7 @@ package saros.session.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,11 +30,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import saros.activities.FileActivity;
-import saros.activities.FolderCreatedActivity;
-import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
-import saros.activities.IFileSystemModificationActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.NOPActivity;
 import saros.activities.SPath;
@@ -44,8 +38,6 @@ import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.context.IContainerContext;
-import saros.filesystem.IFile;
-import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.net.IConnectionManager;
@@ -208,17 +200,6 @@ public final class SarosSession implements ISarosSession {
                   e);
             }
           }
-
-          /*
-           * TODO depending if we call this before or after the consumer
-           * dispatch a consumer may see the resource as shared or not. This
-           * is weird as there is NO guideline currently on how
-           * IFileSystemModificationActivity should be treated when it comes
-           * to resource query of the current session, e.g isShared()
-           */
-
-          if (activity instanceof IFileSystemModificationActivity)
-            updatePartialSharedResources((IFileSystemModificationActivity) activity);
         }
       };
 
@@ -240,64 +221,14 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public void addSharedResources(IProject project, String id, List<IResource> resources) {
-
-    Set<IResource> allResources = null;
-
-    if (resources != null) {
-      allResources = new HashSet<IResource>();
-      for (IResource resource : resources) allResources.addAll(getAllNonSharedChildren(resource));
-    }
-
+  public void addSharedProject(IProject project, String projectID) {
     if (!projectMapper.isShared(project)) {
-      // new project
-      if (allResources == null) {
-        // new fully shared project
-        projectMapper.addProject(id, project, false);
-      } else {
-        // new partially shared project
-        projectMapper.addProject(id, project, true);
-        projectMapper.addResources(project, allResources);
-      }
+      projectMapper.addProject(projectID, project);
 
       listenerDispatch.projectAdded(project);
-    } else {
-      // existing project
-      if (allResources == null) {
-        // upgrade partially shared to fully shared project
-        projectMapper.addProject(id, project, false);
-      } else {
-        // increase scope of partially shared project
-        projectMapper.addResources(project, allResources);
-      }
     }
 
     listenerDispatch.resourcesAdded(project);
-  }
-
-  /**
-   * Recursively get non-shared resources
-   *
-   * @param resource of type {@link IResource#FOLDER} or {@link IResource#FILE}
-   */
-  private List<IResource> getAllNonSharedChildren(IResource resource) {
-    List<IResource> list = new ArrayList<IResource>();
-
-    if (isShared(resource)) return list;
-
-    list.add(resource);
-
-    if (resource.getType() == IResource.FOLDER) {
-      try {
-        IResource[] members = resource.adaptTo(IFolder.class).members();
-
-        for (int i = 0; i < members.length; i++) list.addAll(getAllNonSharedChildren(members[i]));
-      } catch (IOException e) {
-        log.error("Can't get children of folder " + resource, e);
-      }
-    }
-
-    return list;
   }
 
   @Override
@@ -735,198 +666,11 @@ public final class SarosSession implements ISarosSession {
       return;
     }
 
-    boolean send = true;
-
-    /*
-     * To explain some magic: When the host generates an activity this
-     * method will be called multiple times. It is first called with the
-     * host as it is only recipient and then it is called again for the
-     * other recipients.
-     */
-    // handle IFileSystemModificationActivities to update ProjectMapper
-    if (activity instanceof IFileSystemModificationActivity
-        && (!isHost() || (isHost() && recipients.contains(getLocalUser())))) {
-
-      send = updatePartialSharedResources((IFileSystemModificationActivity) activity);
-    }
-
-    if (!send) return;
-
     try {
       activitySequencer.sendActivity(recipients, activity);
     } catch (IllegalArgumentException e) {
       log.warn("could not serialize activity: " + activity, e);
     }
-  }
-
-  /**
-   * Must be called to update the project mapper when changes on shared files or shared folders
-   * happened.
-   *
-   * @param activity {@link IFileSystemModificationActivity} to handle
-   * @return <code>true</code> if the activity should be send to the user, <code>false</code>
-   *     otherwise
-   */
-  /*
-   * TODO This method needs more information, e.g we need to add resources to
-   * the mapper on the receiving side even if there was an I/= error. The
-   * current logic will abort as soon as possible, which might result in an
-   * inconsistent state that cannot be resolved.
-   */
-  /*
-   * TODO move to ProjectMapper
-   */
-  /*
-   * FIXME While it is nice to have this logic here, it should be done in the
-   * component that handles these activities. Drawback would be that we have
-   * to call addSharedResources which would result in broadcasts.
-   */
-
-  private boolean updatePartialSharedResources(final IFileSystemModificationActivity activity) {
-
-    final IProject project = activity.getPath().getProject();
-
-    /*
-     * The follow 'if check' assumes that move operations where at least one
-     * project is not part of the sharing is announced as create and delete
-     * activities.
-     */
-
-    if (!projectMapper.isPartiallyShared(project)) return true;
-
-    if (activity instanceof FileActivity) {
-      FileActivity fileActivity = ((FileActivity) activity);
-      IFile file = fileActivity.getPath().getFile();
-
-      switch (fileActivity.getType()) {
-        case CREATED:
-          if (!isShared(file.getParent())) {
-            log.error(
-                "PSFIC -"
-                    + " unable to update partial sharing state"
-                    + ", parent is not shared for file: "
-                    + file);
-
-            return false;
-          }
-
-          if (!file.exists()) {
-            log.error(
-                "PSFIC -"
-                    + " unable to update partial sharing state"
-                    + ", file does not exist: "
-                    + file);
-            return false;
-          }
-
-          projectMapper.addResources(project, Collections.singletonList(file));
-
-          break;
-
-        case REMOVED:
-          if (!isShared(file)) {
-            log.error("PSFIR -" + " file removal detected for a non shared file: " + file);
-            return false;
-          }
-
-          if (file.exists()) {
-            log.error(
-                "PSFIR -"
-                    + " unable to update partial sharing state"
-                    + ", file still exists: "
-                    + file);
-            return false;
-          }
-
-          projectMapper.removeResources(project, Collections.singletonList(file));
-
-          break;
-
-        case MOVED:
-          IFile oldFile = fileActivity.getOldPath().getFile();
-
-          if (!isShared(oldFile)) {
-            log.error(
-                "PSFIM -"
-                    + " file move detected for a non shared file, source file is not shared, src: "
-                    + oldFile
-                    + " , dest: "
-                    + file);
-            return false;
-          }
-
-          if (oldFile.exists()) {
-            log.error(
-                "PSFIM -"
-                    + " unable to update partial sharing state"
-                    + ", source file still exist: "
-                    + oldFile);
-            return false;
-          }
-
-          if (isShared(file)) {
-            log.error(
-                "PSFIM -"
-                    + " file move detected for shared file, destination file already shared, src: "
-                    + oldFile
-                    + " , dest: "
-                    + file);
-            return false;
-          }
-
-          if (!file.exists()) {
-            log.error(
-                "PSFIM -"
-                    + " unable to update partial sharing state"
-                    + ", destination file does not exist: "
-                    + file);
-            return false;
-          }
-
-          projectMapper.removeAndAddResources(
-              project, Collections.singletonList(oldFile), Collections.singletonList(file));
-
-          break;
-      }
-    } else if (activity instanceof FolderCreatedActivity) {
-      IFolder folder = activity.getPath().getFolder();
-
-      if (!isShared(folder.getParent())) {
-        log.error("PSFOC -" + " folder creation detected for a non shared parent: " + folder);
-        return false;
-      }
-
-      if (!folder.exists()) {
-        log.error(
-            "PSFOC - unable to update partial sharing state"
-                + ", folder does not exist: "
-                + folder);
-        return false;
-      }
-
-      projectMapper.addResources(project, Collections.singletonList(folder));
-
-    } else if (activity instanceof FolderDeletedActivity) {
-      IFolder folder = activity.getPath().getFolder();
-
-      if (!isShared(folder)) {
-        log.error("PSFOR -" + " folder removal detected for a non shared folder: " + folder);
-        return false;
-      }
-
-      if (folder.exists()) {
-        log.error(
-            "PSFOR -"
-                + " unable to update partial sharing state"
-                + ", folder still exists: "
-                + folder);
-        return false;
-      }
-
-      projectMapper.removeResources(project, Collections.singletonList(folder));
-    }
-
-    return true;
   }
 
   @Override
@@ -966,11 +710,6 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public List<IResource> getSharedResources() {
-    return projectMapper.getPartiallySharedResources();
-  }
-
-  @Override
   public String getProjectID(IProject project) {
     return projectMapper.getID(project);
   }
@@ -981,24 +720,9 @@ public final class SarosSession implements ISarosSession {
   }
 
   @Override
-  public Map<IProject, List<IResource>> getProjectResourcesMapping() {
-    return projectMapper.getProjectResourceMapping();
-  }
-
-  @Override
-  public List<IResource> getSharedResources(IProject project) {
-    return projectMapper.getProjectResourceMapping().get(project);
-  }
-
-  @Override
-  public boolean isCompletelyShared(IProject project) {
-    return projectMapper.isCompletelyShared(project);
-  }
-
-  @Override
   public void addProjectMapping(String projectID, IProject project) {
     if (projectMapper.getProject(projectID) == null) {
-      projectMapper.addProject(projectID, project, true);
+      projectMapper.addProject(projectID, project);
       listenerDispatch.projectAdded(project);
     }
   }
