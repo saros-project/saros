@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import saros.core.ui.util.CollaborationUtils;
+import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.filesystem.IntelliJProjectImpl;
@@ -26,10 +27,10 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void startSession(List<IResource> resources, List<JID> contacts) {
+  public void startSession(Set<IProject> projects, List<JID> contacts) {
     Set<Project> sharedProjects = new HashSet<>();
 
-    for (IResource resource : resources) {
+    for (IResource resource : projects) {
       sharedProjects.add(
           resource.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject());
     }
@@ -42,7 +43,7 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
     }
     SharedIDEContext.preregisterProject(sharedProjects.toArray(new Project[1])[0]);
 
-    CollaborationUtils.startSession(resources, contacts);
+    CollaborationUtils.startSession(projects, contacts);
   }
 
   @Override
@@ -51,8 +52,8 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void addResourcesToSession(List<IResource> resources) {
-    CollaborationUtils.addResourcesToSession(resources);
+  public void addProjectsToSession(Set<IProject> projects) {
+    CollaborationUtils.addResourcesToSession(projects);
   }
 
   @Override

@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import saros.SarosPluginContext;
@@ -52,20 +51,14 @@ public class CollaborationUtils {
   private CollaborationUtils() {}
 
   /**
-   * Starts a new session and shares the given resources with given contacts.<br>
+   * Starts a new session and shares the given projects with given contacts.<br>
    * Does nothing if a {@link ISarosSession session} is already running.
    *
-   * @param resources
-   * @param contacts
+   * @param projects the projects to share
+   * @param contacts the contacts to share the projects with
    * @nonBlocking
    */
-  // TODO use set of projects?
-  public static void startSession(List<IResource> resources, final List<JID> contacts) {
-    assert resources.stream().allMatch(resource -> resource instanceof IProject)
-        : "Encountered non-project resource to share";
-
-    final Set<IProject> projects =
-        resources.stream().map(resource -> (IProject) resource).collect(Collectors.toSet());
+  public static void startSession(Set<IProject> projects, final List<JID> contacts) {
 
     UIMonitoredJob sessionStartupJob =
         new UIMonitoredJob("Session Startup") {
@@ -152,14 +145,13 @@ public class CollaborationUtils {
   }
 
   /**
-   * Adds the given project resources to the session.<br>
+   * Adds the given projects to the session.<br>
    * Does nothing if no {@link SarosSession session} is running.
    *
-   * @param resourcesToAdd
+   * @param projectsToAdd the projects to add to the session
    * @nonBlocking
    */
-  // TODO require set of projects to be passed?
-  public static void addResourcesToSession(List<IResource> resourcesToAdd) {
+  public static void addResourcesToSession(Set<IProject> projectsToAdd) {
 
     final ISarosSession sarosSession = sessionManager.getSession();
 
@@ -168,13 +160,9 @@ public class CollaborationUtils {
       return;
     }
 
-    if (resourcesToAdd.isEmpty()) return;
-
-    assert resourcesToAdd.stream().allMatch(resource -> resource instanceof IProject)
-        : "Encountered non-project resource to share";
-
-    final Set<IProject> projects =
-        resourcesToAdd.stream().map(resource -> (IProject) resource).collect(Collectors.toSet());
+    if (projectsToAdd.isEmpty()) {
+      return;
+    }
 
     ThreadUtils.runSafeAsync(
         "AddResourceToSession",
@@ -184,7 +172,7 @@ public class CollaborationUtils {
           public void run() {
 
             if (sarosSession.hasWriteAccess()) {
-              sessionManager.addProjectsToSession(projects);
+              sessionManager.addProjectsToSession(projectsToAdd);
               return;
             }
 

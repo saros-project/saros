@@ -1,7 +1,8 @@
 package saros.util;
 
 import java.util.List;
-import saros.filesystem.IResource;
+import java.util.Set;
+import saros.filesystem.IProject;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.net.xmpp.JID;
 import saros.ui.util.CollaborationUtils;
@@ -13,8 +14,8 @@ import saros.ui.util.ICollaborationUtils;
 public class EclipseCollaborationUtilsImpl implements ICollaborationUtils {
 
   @Override
-  public void startSession(List<IResource> resources, List<JID> contacts) {
-    CollaborationUtils.startSession(ResourceAdapterFactory.convertBack(resources), contacts);
+  public void startSession(Set<IProject> projects, List<JID> contacts) {
+    CollaborationUtils.startSession(ResourceAdapterFactory.convertBack(projects), contacts);
   }
 
   @Override
@@ -23,8 +24,8 @@ public class EclipseCollaborationUtilsImpl implements ICollaborationUtils {
   }
 
   @Override
-  public void addResourcesToSession(List<IResource> resources) {
-    CollaborationUtils.addResourcesToSession(ResourceAdapterFactory.convertBack(resources));
+  public void addProjectsToSession(Set<IProject> projects) {
+    CollaborationUtils.addResourcesToSession(ResourceAdapterFactory.convertBack(projects));
   }
 
   @Override

@@ -64,14 +64,25 @@ public class CollaborationUtils {
    * @param contacts
    * @nonBlocking
    */
-  // TODO require set of projects to be passed?
-  public static void startSession(List<IResource> resources, final List<JID> contacts) {
+  public static void startSession(final List<IResource> resources, final List<JID> contacts) {
     assert resources.stream().allMatch(resource -> resource instanceof IProject)
         : "Encountered non-project resource to share";
 
     final Set<IProject> projects =
         resources.stream().map(resource -> (IProject) resource).collect(Collectors.toSet());
 
+    startSession(projects, contacts);
+  }
+
+  /**
+   * Starts a new session and shares the given projects with given contacts.<br>
+   * Does nothing if a {@link ISarosSession session} is already running.
+   *
+   * @param projects the projects share
+   * @param contacts the contacts to share the projects with
+   * @nonBlocking
+   */
+  public static void startSession(final Set<IProject> projects, final List<JID> contacts) {
     Job sessionStartupJob =
         new Job("Session Startup") {
 
@@ -161,15 +172,7 @@ public class CollaborationUtils {
    * @param resourcesToAdd
    * @nonBlocking
    */
-  // TODO require set of projects to be passed?
   public static void addResourcesToSession(List<IResource> resourcesToAdd) {
-
-    final ISarosSession session = sessionManager.getSession();
-
-    if (session == null) {
-      log.warn("cannot add resources to a non-running session");
-      return;
-    }
 
     if (resourcesToAdd.isEmpty()) return;
 
@@ -178,6 +181,25 @@ public class CollaborationUtils {
 
     final Set<IProject> projects =
         resourcesToAdd.stream().map(resource -> (IProject) resource).collect(Collectors.toSet());
+
+    addResourcesToSession(projects);
+  }
+
+  /**
+   * Adds the given project resources to the session.<br>
+   * Does nothing if no {@link SarosSession session} is running.
+   *
+   * @param projectsToAdd the projects to add to the session
+   * @nonBlocking
+   */
+  public static void addResourcesToSession(Set<IProject> projectsToAdd) {
+
+    final ISarosSession session = sessionManager.getSession();
+
+    if (session == null) {
+      log.warn("cannot add resources to a non-running session");
+      return;
+    }
 
     ThreadUtils.runSafeAsync(
         "AddResourceToSession",
@@ -196,7 +218,7 @@ public class CollaborationUtils {
 
             final List<IProject> projectsToRefresh = new ArrayList<IProject>();
 
-            for (IProject project : projects) {
+            for (IProject project : projectsToAdd) {
               if (!session.isShared(ResourceAdapterFactory.create(project)))
                 projectsToRefresh.add(project);
             }
@@ -211,7 +233,7 @@ public class CollaborationUtils {
                */
             }
 
-            sessionManager.addProjectsToSession(convert(projects));
+            sessionManager.addProjectsToSession(convert(projectsToAdd));
           }
         });
   }
