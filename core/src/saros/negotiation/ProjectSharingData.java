@@ -3,35 +3,27 @@ package saros.negotiation;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 
 /**
- * Defines which projects and *which of their resources) to share during a particular {@link
+ * Defines which projects and which of their resources) to share during a particular {@link
  * AbstractOutgoingProjectNegotiation}.
  */
 public class ProjectSharingData implements Iterable<IProject> {
 
   private Map<String, IProject> projectsById = new HashMap<>();
   private Map<IProject, String> idsByProject = new HashMap<>();
-  private Map<IProject, List<IResource>> resourcesToShareByProject = new HashMap<>();
 
   /**
-   * Declares that the passed project should be shared with the specified ID. Optionally, a subset
-   * of the project's resources may be passed, which means that only those resources should be
-   * shared (that is, the project should be shared partially).
+   * Declares that the passed project should be shared with the specified ID.
    *
    * @param project project that should be shared
    * @param projectId session-wide ID assigned to the project
-   * @param resourcesToShare the resources of the project to share , or null to share the project
-   *     completely
    */
-  public void addProject(IProject project, String projectId, List<IResource> resourcesToShare) {
+  public void addProject(IProject project, String projectId) {
     projectsById.put(projectId, project);
     idsByProject.put(project, projectId);
-    resourcesToShareByProject.put(project, resourcesToShare);
   }
 
   /**
@@ -61,7 +53,7 @@ public class ProjectSharingData implements Iterable<IProject> {
    * @return boolean indicating if the project is already contained in this collection
    */
   public boolean hasProject(IProject project) {
-    return resourcesToShareByProject.containsKey(project);
+    return idsByProject.containsKey(project);
   }
 
   /**
@@ -72,28 +64,6 @@ public class ProjectSharingData implements Iterable<IProject> {
    */
   public String getProjectID(IProject project) {
     return idsByProject.get(project);
-  }
-
-  /**
-   * Returns whether sharing of the specified project should be restricted to particular resources
-   * (which, if true, can be queried with {@link #getResourcesToShare(IProject)}.
-   *
-   * @param project one of the to-be-shared projects
-   * @return true if the project should be shared partially, false if completely
-   */
-  public boolean shouldBeSharedPartially(IProject project) {
-    return getResourcesToShare(project) != null;
-  }
-
-  /**
-   * Returns a list of the resources to share from the specified project if that project is to be
-   * shared only partially. If not, null is returned instead.
-   *
-   * @param project one of the to-be-shared projects
-   * @return resources to share, or null if the project should be shared completely
-   */
-  public List<IResource> getResourcesToShare(IProject project) {
-    return resourcesToShareByProject.get(project);
   }
 
   /**

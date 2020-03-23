@@ -567,24 +567,14 @@ public class AddProjectToSessionWizard extends Wizard {
       final saros.filesystem.IProject adaptedProject =
           ResourceAdapterFactory.create(entry.getValue());
 
-      /*
-       * do not refresh already partially shared projects as this may
-       * trigger resource change events
-       */
       if (!session.isShared(adaptedProject)) project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
       final FileList localFileList;
-
-      /*
-       * TODO optimize for partial shared projects a.k.a do not scan all
-       * files
-       */
 
       try {
         localFileList =
             FileListFactory.createFileList(
                 adaptedProject,
-                null,
                 checksumCache,
                 ProgressMonitorAdapterFactory.convert(
                     subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS)));
@@ -600,8 +590,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
       final ProjectNegotiationData data = negotiation.getProjectNegotiationData(projectID);
 
-      final FileListDiff diff =
-          FileListDiff.diff(localFileList, data.getFileList(), data.isPartial());
+      final FileListDiff diff = FileListDiff.diff(localFileList, data.getFileList());
 
       if (!diff.getRemovedFolders().isEmpty()
           || !diff.getRemovedFiles().isEmpty()

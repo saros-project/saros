@@ -336,12 +336,7 @@ public final class PackageExplorerView extends StfRemoteObject implements IPacka
   }
 
   private String createProjectRegex(String projectName) {
-    return Pattern.quote(projectName)
-        + "("
-        + Pattern.quote(PROJECT_SHARED_DECORATOR)
-        + "|"
-        + Pattern.quote(PROJECT_PARTIAL_SHARED_DECORATOR)
-        + ")?+";
+    return Pattern.quote(projectName) + "(" + Pattern.quote(PROJECT_SHARED_DECORATOR) + ")?+";
   }
 
   private String[] createNodeRegex(String projectName, String... nodes) {

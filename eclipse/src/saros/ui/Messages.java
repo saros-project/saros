@@ -77,7 +77,6 @@ public class Messages extends NLS {
   public static String CollaborationUtils_confirm_closing_text;
   public static String CollaborationUtils_confirm_leaving;
   public static String CollaborationUtils_confirm_leaving_text;
-  public static String CollaborationUtils_partial;
   public static String CollaborationUtils_insufficient_privileges;
   public static String CollaborationUtils_insufficient_privileges_text;
 
@@ -367,7 +366,6 @@ public class Messages extends NLS {
   public static String FollowThisPersonAction_stop_follow_tooltip;
 
   public static String SharedProjectDecorator_shared;
-  public static String SharedProjectDecorator_shared_partial;
 
   public static String SubscriptionManager_incoming_subscription_request_title;
   public static String SubscriptionManager_incoming_subscription_request_message;

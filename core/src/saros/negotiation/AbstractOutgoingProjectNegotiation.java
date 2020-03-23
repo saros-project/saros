@@ -17,7 +17,6 @@ import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.SubProgressMonitor;
@@ -111,8 +110,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
       if (!session.isHost()) {
         for (IProject project : projects) {
           String projectID = projects.getProjectID(project);
-          List<IResource> resources = projects.getResourcesToShare(project);
-          session.addSharedResources(project, projectID, resources);
+          session.addSharedProject(project, projectID);
         }
       }
 
@@ -328,7 +326,6 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         throw new LocalCancellationException(null, CancelOption.DO_NOT_NOTIFY_PEER);
       try {
         String projectID = projectSharingData.getProjectID(project);
-        List<IResource> resources = projectSharingData.getResourcesToShare(project);
 
         /*
          * force editor buffer flush because we read the files from the
@@ -339,7 +336,6 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         FileList projectFileList =
             FileListFactory.createFileList(
                 project,
-                resources,
                 checksumCache,
                 new SubProgressMonitor(
                     monitor,
@@ -347,15 +343,13 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
                     SubProgressMonitor.SUPPRESS_BEGINTASK
                         | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-        boolean partial = projectSharingData.shouldBeSharedPartially(project);
-
         projectFileList.setProjectID(projectID);
 
         Map<String, String> additionalProjectData = additionalProjectDataFactory.build(project);
 
         ProjectNegotiationData data =
             new ProjectNegotiationData(
-                projectID, project.getName(), partial, projectFileList, additionalProjectData);
+                projectID, project.getName(), projectFileList, additionalProjectData);
 
         negData.add(data);
 

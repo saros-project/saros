@@ -11,7 +11,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import saros.SarosPluginContext;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.intellij.ui.util.IconManager;
 import saros.intellij.ui.views.SarosMainPanelView;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -188,14 +187,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
   private void addProjectNode(IProject project) {
     for (DefaultMutableTreeNode nSession : sessionNodeList.values()) {
-      ISarosSession session = ((SessionInfo) nSession.getUserObject()).getSession();
-
-      ProjectInfo projInfo;
-      if (session.isCompletelyShared(project)) {
-        projInfo = new ProjectInfo(project);
-      } else {
-        projInfo = new ProjectInfo(project, session.getSharedResources(project));
-      }
+      ProjectInfo projInfo = new ProjectInfo(project);
 
       DefaultMutableTreeNode nProject = new DefaultMutableTreeNode(projInfo);
       treeModel.insertNodeInto(nProject, nSession, nSession.getChildCount());
@@ -263,16 +255,10 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
   protected class ProjectInfo extends LeafInfo {
     private final IProject project;
-    private List<IResource> resList;
 
     public ProjectInfo(IProject project) {
       super(project.getName());
       this.project = project;
-    }
-
-    public ProjectInfo(IProject project, List<IResource> resources) {
-      this(project);
-      resList = resources;
     }
 
     public IProject getProject() {
@@ -281,21 +267,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode implements Dispo
 
     @Override
     public String toString() {
-      if (resList != null) {
-        StringBuilder sbOut = new StringBuilder();
-        sbOut.append(project.getName());
-        sbOut.append(" : ");
-        for (IResource res : resList) {
-          if (res.getType() == IResource.FILE) {
-            sbOut.append(res.getName());
-            sbOut.append("; ");
-          }
-        }
 
-        return sbOut.toString();
-      } else {
-        return project.getName();
-      }
+      return project.getName();
     }
   }
 }

@@ -10,7 +10,7 @@ import saros.negotiation.FileList.MetaData;
 /**
  * A diff between two {@link FileList file lists}.
  *
- * @see #diff(FileList, FileList, boolean)
+ * @see #diff(FileList, FileList)
  */
 public class FileListDiff {
 
@@ -45,13 +45,10 @@ public class FileListDiff {
    *
    * @param base The base {@link FileList}.
    * @param target The {@link FileList} to compare to.
-   * @param excludeRemoved if <code>true</code> removed files and folders are not included in the
-   *     result
    * @return a new {@link FileListDiff} which contains the difference information of the two {@link
    *     FileList}s.
    */
-  public static FileListDiff diff(
-      final FileList base, final FileList target, final boolean excludeRemoved) {
+  public static FileListDiff diff(final FileList base, final FileList target) {
 
     FileListDiff result = new FileListDiff();
 
@@ -93,13 +90,11 @@ public class FileListDiff {
 
     result.addedFiles.addAll(complementSet);
 
-    if (!excludeRemoved) {
-      complementSet.clear();
-      complementSet.addAll(baseFiles);
-      complementSet.removeAll(targetFiles);
+    complementSet.clear();
+    complementSet.addAll(baseFiles);
+    complementSet.removeAll(targetFiles);
 
-      result.removedFiles.addAll(complementSet);
-    }
+    result.removedFiles.addAll(complementSet);
 
     final Set<String> intersectionSet =
         new HashSet<String>(max(targetFiles.size(), targetFolders.size()));
@@ -127,13 +122,11 @@ public class FileListDiff {
 
     result.addedFolders.addAll(complementSet);
 
-    if (!excludeRemoved) {
-      complementSet.clear();
-      complementSet.addAll(baseFolders);
-      complementSet.removeAll(targetFolders);
+    complementSet.clear();
+    complementSet.addAll(baseFolders);
+    complementSet.removeAll(targetFolders);
 
-      result.removedFolders.addAll(complementSet);
-    }
+    result.removedFolders.addAll(complementSet);
 
     intersectionSet.clear();
     intersectionSet.addAll(targetFolders);

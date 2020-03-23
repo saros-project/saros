@@ -35,7 +35,7 @@ public class ProjectPropertyTester extends PropertyTester {
     if ("isInSarosSession".equals(property)) {
 
       if (resource.getType() == IResource.PROJECT) {
-        return session.isCompletelyShared(ResourceAdapterFactory.create((IProject) resource));
+        return session.isShared(ResourceAdapterFactory.create((IProject) resource));
       }
 
       return session.isShared(ResourceAdapterFactory.create(resource));

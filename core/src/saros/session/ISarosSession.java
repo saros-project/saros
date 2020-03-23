@@ -20,7 +20,6 @@
 package saros.session;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import saros.activities.IActivity;
@@ -291,14 +290,6 @@ public interface ISarosSession {
   public boolean isShared(IResource resource);
 
   /**
-   * Checks if selected project is a complete shared one or partial shared.
-   *
-   * @param project
-   * @return <code>true</code> if complete, <code>false</code> if partial
-   */
-  public boolean isCompletelyShared(IProject project);
-
-  /**
    * Returns the global ID of the project.
    *
    * @return the global ID of the project or <code>null</code> if this project is not shared
@@ -313,36 +304,12 @@ public interface ISarosSession {
   public IProject getProject(String projectID);
 
   /**
-   * Adds the specified project and/or resources to this session.
+   * Adds the specified project to this session.
    *
-   * @param project The project to share.
-   * @param projectID The global project ID.
-   * @param dependentResources The project dependent resources.
+   * @param project The project to share
+   * @param projectID The global project ID
    */
-  public void addSharedResources(
-      IProject project, String projectID, List<IResource> dependentResources);
-
-  /**
-   * Returns all shared resources in this session.
-   *
-   * @return a list of all shared resources (excluding projects) from this session.
-   */
-  public List<IResource> getSharedResources();
-
-  /**
-   * Returns a map with the mapping of shared resources to their project.
-   *
-   * @return project-->resource mapping
-   */
-  public Map<IProject, List<IResource>> getProjectResourcesMapping();
-
-  /**
-   * Returns the shared resources of the project in this session.
-   *
-   * @param project
-   * @return the shared resources or <code>null</code> if this project is not or fully shared.
-   */
-  public List<IResource> getSharedResources(IProject project);
+  void addSharedProject(IProject project, String projectID);
 
   /**
    * Stores a bidirectional mapping between <code>project</code> and <code>projectID</code>.

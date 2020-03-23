@@ -22,9 +22,8 @@ package saros.session;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -35,7 +34,6 @@ import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
 import saros.context.IContainerContext;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.negotiation.AbstractIncomingProjectNegotiation;
 import saros.negotiation.AbstractOutgoingProjectNegotiation;
 import saros.negotiation.IncomingSessionNegotiation;
@@ -143,9 +141,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             for (ProjectNegotiationData projectNegotiationData : ipn.getProjectNegotiationData()) {
               String projectID = projectNegotiationData.getProjectID();
               IProject project = session.getProject(projectID);
-              List<IResource> resourcesToShare = session.getSharedResources(project);
 
-              projectSharingData.addProject(project, projectID, resourcesToShare);
+              projectSharingData.addProject(project, projectID);
             }
 
             User originUser = session.getUser(negotiation.getPeer());
@@ -208,7 +205,7 @@ public class SarosSessionManager implements ISarosSessionManager {
    * order to start a session.)
    */
   @Override
-  public void startSession(final Map<IProject, List<IResource>> projectResourcesMapping) {
+  public void startSession(final Set<IProject> projects) {
 
     /*
      * FIXME split the logic, start a session without anything and then add
@@ -266,14 +263,10 @@ public class SarosSessionManager implements ISarosSessionManager {
       session.start();
       sessionStarted(session);
 
-      for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping.entrySet()) {
-
-        final IProject project = mapEntry.getKey();
-        final List<IResource> resourcesList = mapEntry.getValue();
-
+      for (IProject project : projects) {
         String projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
 
-        session.addSharedResources(project, projectID, resourcesList);
+        session.addSharedProject(project, projectID);
       }
 
       log.info("session started");
@@ -504,14 +497,13 @@ public class SarosSessionManager implements ISarosSessionManager {
   }
 
   /**
-   * Adds project resources to an existing session.
+   * Adds projects to an existing session.
    *
-   * @param projectResourcesMapping
+   * @param projects to projects to add
    */
   @Override
-  public synchronized void addResourcesToSession(
-      Map<IProject, List<IResource>> projectResourcesMapping) {
-    if (projectResourcesMapping == null) {
+  public synchronized void addProjectsToSession(Set<IProject> projects) {
+    if (projects == null) {
       return;
     }
 
@@ -522,7 +514,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * negotiation with all collected resources.
      */
 
-    nextProjectNegotiation.add(projectResourcesMapping);
+    nextProjectNegotiation.addProjects(projects);
 
     if (nextProjectNegotiationWorker != null && nextProjectNegotiationWorker.isAlive()) {
       return;
@@ -578,27 +570,21 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     ProjectSharingData projectsToShare = new ProjectSharingData();
-    Map<IProject, List<IResource>> mapping = nextProjectNegotiation.get();
+    Set<IProject> projects = nextProjectNegotiation.getProjects();
 
     /*
      * Put all information about which projects and resources to share into
      * a ProjectsToShare instance, for passing to
      * OutgoingProjectNegotiation. On the way, generate session-wide ID's
-     * for the projects that don't have them yet. (A project might already
-     * have an ID if it is a already-partially-shared project that is now
-     * being re-added, e.g. to share additional resources from it.)
+     * for the projects that don't have them yet.
      */
-    for (Entry<IProject, List<IResource>> mapEntry : mapping.entrySet()) {
-      final IProject project = mapEntry.getKey();
-      final List<IResource> resourcesList = mapEntry.getValue();
-
-      // side effect: non shared projects are always partial -.-
+    for (IProject project : projects) {
       String projectID = currentSession.getProjectID(project);
 
       if (projectID == null) {
         projectID = String.valueOf(SESSION_ID_GENERATOR.nextInt(Integer.MAX_VALUE));
       }
-      projectsToShare.addProject(project, projectID, resourcesList);
+      projectsToShare.addProject(project, projectID);
 
       /*
        * If this is the host, add the project directly to the session
@@ -610,8 +596,8 @@ public class SarosSessionManager implements ISarosSessionManager {
        * registered as being part of the session. This is because their
        * lists of shared resources may have changed.
        */
-      if (currentSession.isHost() && !currentSession.isCompletelyShared(project)) {
-        currentSession.addSharedResources(project, projectID, resourcesList);
+      if (currentSession.isHost() && !currentSession.isShared(project)) {
+        currentSession.addSharedProject(project, projectID);
       }
     }
 
@@ -695,8 +681,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     ProjectSharingData currentSharedProjects = new ProjectSharingData();
     for (IProject project : currentSession.getProjects()) {
-      currentSharedProjects.addProject(
-          project, session.getProjectID(project), session.getSharedResources(project));
+      currentSharedProjects.addProject(project, session.getProjectID(project));
     }
 
     if (currentSharedProjects.isEmpty()) return;

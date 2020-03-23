@@ -189,22 +189,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
         final String projectID = entry.getKey();
         final IProject project = entry.getValue();
 
-        final boolean isPartialRemoteProject = getProjectNegotiationData(projectID).isPartial();
-
-        final FileList remoteFileList = getProjectNegotiationData(projectID).getFileList();
-
-        List<IResource> resources = null;
-
-        if (isPartialRemoteProject) {
-
-          final List<String> paths = remoteFileList.getPaths();
-
-          resources = new ArrayList<IResource>(paths.size());
-
-          for (final String path : paths) resources.add(getResource(project, path));
-        }
-
-        session.addSharedResources(project, projectID, resources);
+        session.addSharedProject(project, projectID);
       }
     } catch (Exception e) {
       exception = e;
@@ -360,26 +345,18 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       final String id = entry.getKey();
       final IProject project = entry.getValue();
 
-      // TODO optimize for partial shared projects
-
       final FileList localProjectFileList =
           FileListFactory.createFileList(
               project,
-              null,
               checksumCache,
               new SubProgressMonitor(
                   monitor, 1 * MONITOR_WORK_SCALE, SubProgressMonitor.SUPPRESS_BEGINTASK));
 
       final ProjectNegotiationData data = getProjectNegotiationData(id);
 
-      final FileListDiff diff =
-          FileListDiff.diff(localProjectFileList, data.getFileList(), data.isPartial());
+      final FileListDiff diff = FileListDiff.diff(localProjectFileList, data.getFileList());
 
       checkCancellation(CancelOption.NOTIFY_PEER);
-
-      if (data.isPartial()
-          && (!diff.getRemovedFiles().isEmpty() || !diff.getRemovedFolders().isEmpty()))
-        throw new IllegalStateException("partial sharing cannot delete existing resources");
 
       result.put(id, diff);
     }

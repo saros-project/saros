@@ -21,7 +21,7 @@ import saros.negotiation.FileList.MetaData;
  *
  * <p>
  * <li>Either an inexpensive one that rescans the whole project to gather meta data:<br>
- *     {@link #createFileList(IProject, List, IChecksumCache, IProgressMonitor)}
+ *     {@link #createFileList(IProject, IChecksumCache, IProgressMonitor)}
  * <li>Or a cheap one which requires the caller to take care of the validity of input data:<br>
  *     {@link #createFileList(List)}
  */
@@ -40,14 +40,10 @@ public class FileListFactory {
   }
 
   public static FileList createFileList(
-      IProject project,
-      List<IResource> resources,
-      IChecksumCache checksumCache,
-      IProgressMonitor monitor)
-      throws IOException {
+      IProject project, IChecksumCache checksumCache, IProgressMonitor monitor) throws IOException {
 
     FileListFactory fact = new FileListFactory(checksumCache, monitor);
-    return fact.build(project, resources);
+    return fact.build(project);
   }
 
   /**
@@ -72,16 +68,13 @@ public class FileListFactory {
     return new FileList();
   }
 
-  private FileList build(IProject project, List<IResource> resources) throws IOException {
+  private FileList build(IProject project) throws IOException {
 
     FileList list = new FileList();
 
-    if (resources == null) {
-      list.addEncoding(project.getDefaultCharset());
-      resources = Arrays.asList(project.members());
-    }
+    list.addEncoding(project.getDefaultCharset());
 
-    addMembersToList(list, resources);
+    addMembersToList(list, Arrays.asList(project.members()));
 
     return list;
   }

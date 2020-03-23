@@ -35,7 +35,7 @@ public class FileListDiffTest {
     b.addPath(FILE_A);
     b.addPath(FILE_C);
 
-    FileListDiff diff = FileListDiff.diff(a, b, false);
+    FileListDiff diff = FileListDiff.diff(a, b);
 
     assertPaths(diff.getAddedFiles(), FILE_C);
     assertPaths(diff.getRemovedFiles(), FILE_B);
@@ -74,7 +74,7 @@ public class FileListDiffTest {
 
     b.addPath(FILE_C);
 
-    FileListDiff diff = FileListDiff.diff(a, b, false);
+    FileListDiff diff = FileListDiff.diff(a, b);
 
     assertPaths(diff.getAddedFiles(), FILE_C);
     assertPaths(diff.getRemovedFiles());
@@ -103,7 +103,7 @@ public class FileListDiffTest {
     b.addPath(FOLDER_C, null, true);
     b.addPath(FOLDER_D, null, true);
 
-    FileListDiff diff = FileListDiff.diff(a, b, false);
+    FileListDiff diff = FileListDiff.diff(a, b);
 
     assertPaths(diff.getAddedFiles());
     assertPaths(diff.getRemovedFiles());
@@ -132,7 +132,7 @@ public class FileListDiffTest {
     b.addPath(FOLDER_A, null, true);
     b.addPath(FOLDER_B, null, true);
 
-    FileListDiff diff = FileListDiff.diff(a, b, false);
+    FileListDiff diff = FileListDiff.diff(a, b);
 
     assertPaths(diff.getAddedFiles());
     assertPaths(diff.getRemovedFiles());
@@ -144,35 +144,6 @@ public class FileListDiffTest {
     assertPaths(diff.getRemovedFolders(), FOLDER_C, FOLDER_D);
 
     assertPaths(diff.getUnalteredFolders(), FOLDER_SRC, FOLDER_A, FOLDER_B);
-  }
-
-  @Test
-  public void testExcludeRemoved() {
-
-    FileList a = new FileList();
-
-    a.addPath(FOLDER_A, null, true);
-    a.addPath(FOLDER_B, null, true);
-    a.addPath(FOLDER_C, null, true);
-    a.addPath(FOLDER_D, null, true);
-
-    a.addPath(FILE_A, null, false);
-    a.addPath(FILE_B, null, false);
-    a.addPath(FILE_C, null, false);
-    a.addPath(FILE_D, null, false);
-
-    FileListDiff diff = FileListDiff.diff(a, new FileList(), true);
-
-    assertPaths(diff.getAddedFiles());
-    assertPaths(diff.getRemovedFiles());
-
-    assertPaths(diff.getUnalteredFiles());
-    assertPaths(diff.getAlteredFiles());
-
-    assertPaths(diff.getAddedFolders());
-    assertPaths(diff.getRemovedFolders());
-
-    assertPaths(diff.getUnalteredFolders());
   }
 
   private static void assertPaths(List<String> actual, String... expected) {

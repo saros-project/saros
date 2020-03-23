@@ -1,12 +1,9 @@
 package saros.feedback;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import saros.annotations.Component;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.session.ISarosSession;
 import saros.session.ISessionListener;
 
@@ -21,12 +18,8 @@ public class ProjectCollector extends AbstractStatisticCollector {
   // Keys for shared project information
   private static final String KEY_COMPLETE_SHARED_PROJECTS =
       "session.shared.project.complete.count";
-  private static final String KEY_PARTIAL_SHARED_PROJECTS = "session.shared.project.partial.count";
-  private static final String KEY_PARTIAL_SHARED_PROJECTS_FILES =
-      "session.shared.project.partial.files.count";
 
   private static class ProjectInformation {
-    public boolean isPartial;
     public int files;
   }
 
@@ -45,27 +38,6 @@ public class ProjectCollector extends AbstractStatisticCollector {
             info = new ProjectInformation();
             sharedProjects.put(projectID, info);
           }
-
-          boolean isPartial = !sarosSession.isCompletelyShared(project);
-
-          /*
-           * ignore partial shared projects that were upgraded to full shared
-           * projects so we now that the users use at least partial sharing
-           */
-          if (!info.isPartial && isPartial) info.isPartial = true;
-
-          List<IResource> sharedResources = sarosSession.getSharedResources(project);
-
-          if (sharedResources != null) {
-            for (Iterator<IResource> it = sharedResources.iterator(); it.hasNext(); ) {
-
-              IResource resource = it.next();
-
-              if (resource.getType() != IResource.FILE) it.remove();
-            }
-
-            info.files = sharedResources.size();
-          }
         }
       };
 
@@ -75,20 +47,9 @@ public class ProjectCollector extends AbstractStatisticCollector {
 
   @Override
   protected void processGatheredData() {
-    int completeSharedProjects = 0;
-    int partialSharedProjects = 0;
-    int partialSharedFiles = 0;
-
-    for (ProjectInformation info : sharedProjects.values()) {
-      if (info.isPartial) {
-        partialSharedProjects++;
-        partialSharedFiles += info.files;
-      } else completeSharedProjects++;
-    }
+    int completeSharedProjects = sharedProjects.size();
 
     data.put(KEY_COMPLETE_SHARED_PROJECTS, completeSharedProjects);
-    data.put(KEY_PARTIAL_SHARED_PROJECTS, partialSharedProjects);
-    data.put(KEY_PARTIAL_SHARED_PROJECTS_FILES, partialSharedFiles);
   }
 
   @Override

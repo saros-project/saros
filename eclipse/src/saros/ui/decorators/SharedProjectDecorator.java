@@ -111,13 +111,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
     decoration.addOverlay(SharedProjectDecorator.PROJECT_DESCRIPTOR, IDecoration.TOP_LEFT);
 
     if (resource.getType() == IResource.PROJECT) {
-      boolean isCompletelyShared =
-          currentSession.isCompletelyShared(ResourceAdapterFactory.create(resource.getProject()));
-
-      decoration.addSuffix(
-          isCompletelyShared
-              ? Messages.SharedProjectDecorator_shared
-              : Messages.SharedProjectDecorator_shared_partial);
+      decoration.addSuffix(Messages.SharedProjectDecorator_shared);
     }
   }
 

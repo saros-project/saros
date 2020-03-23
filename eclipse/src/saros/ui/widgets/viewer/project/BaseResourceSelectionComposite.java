@@ -476,8 +476,7 @@ public abstract class BaseResourceSelectionComposite extends ViewerComposite<Che
             if (element instanceof IFile || element instanceof IFolder) {
               return !sarosSession.isShared(ResourceAdapterFactory.create((IResource) element));
             } else if (element instanceof IProject) {
-              return !(sarosSession.isCompletelyShared(
-                  ResourceAdapterFactory.create((IProject) element)));
+              return !(sarosSession.isShared(ResourceAdapterFactory.create((IProject) element)));
             }
           }
           return true;

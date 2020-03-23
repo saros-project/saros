@@ -59,7 +59,7 @@ public class FileListTest {
   @Test
   public void testCreateFileListForProject() throws IOException {
 
-    final FileList fileList = FileListFactory.createFileList(project, null, null, null);
+    final FileList fileList = FileListFactory.createFileList(project, null, null);
 
     final List<String> paths = fileList.getPaths();
 

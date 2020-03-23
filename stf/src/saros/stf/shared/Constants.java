@@ -36,9 +36,6 @@ public interface Constants {
 
   public static final String PROJECT_SHARED_DECORATOR = get("SharedProjectDecorator_shared");
 
-  public static final String PROJECT_PARTIAL_SHARED_DECORATOR =
-      get("SharedProjectDecorator_shared_partial");
-
   /* *********************************************
    *
    * Basic Wigets
