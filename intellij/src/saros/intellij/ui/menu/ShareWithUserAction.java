@@ -8,11 +8,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.text.MessageFormat;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import saros.core.ui.util.CollaborationUtils;
-import saros.filesystem.IResource;
+import saros.filesystem.IProject;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.runtime.FilesystemRunner;
@@ -24,7 +26,7 @@ import saros.net.xmpp.JID;
 /**
  * An Action that starts a session when triggered.
  *
- * <p>Calls {@link CollaborationUtils#startSession(List, List)} with the selected module as
+ * <p>Calls {@link CollaborationUtils#startSession(Set, List)} with the selected module as
  * parameter.
  *
  * <p>This class assumes that the project is allowed to be shared (at the moment only completely
@@ -62,7 +64,7 @@ public class ShareWithUserAction extends AnAction {
           "Unable to start session - could not determine virtual file for highlighted resource.");
     }
 
-    IResource module;
+    IProject module;
 
     try {
       module = getModuleForVirtualFile(virtualFile, event.getProject());
@@ -77,15 +79,16 @@ public class ShareWithUserAction extends AnAction {
       return;
     }
 
-    List<IResource> resources = Arrays.asList(module);
+    Set<IProject> projects = new HashSet<>();
+    projects.add(module);
 
-    List<JID> contacts = Arrays.asList(userJID);
+    List<JID> contacts = Collections.singletonList(userJID);
 
     SharedIDEContext.preregisterProject(project);
-    CollaborationUtils.startSession(resources, contacts);
+    CollaborationUtils.startSession(projects, contacts);
   }
 
-  private IResource getModuleForVirtualFile(VirtualFile virtualFile, Project project) {
+  private IProject getModuleForVirtualFile(VirtualFile virtualFile, Project project) {
     ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
 
     Module module =

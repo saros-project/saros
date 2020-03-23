@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -21,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.core.ui.util.CollaborationUtils;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.intellij.context.SharedIDEContext;
 import saros.intellij.filesystem.IntelliJProjectImpl;
 import saros.intellij.ui.Messages;
@@ -217,11 +217,11 @@ class ContactPopMenu extends JPopupMenu {
         return;
       }
 
-      List<IResource> resources = Collections.singletonList(module);
-      List<JID> contact = Collections.singletonList(contactInfo.getJid());
+      Set<IProject> projects = Collections.singleton(module);
+      List<JID> contacts = Collections.singletonList(contactInfo.getJid());
 
       SharedIDEContext.preregisterProject(project);
-      CollaborationUtils.startSession(resources, contact);
+      CollaborationUtils.startSession(projects, contacts);
     }
   }
 }
