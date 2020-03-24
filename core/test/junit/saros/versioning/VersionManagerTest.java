@@ -75,6 +75,11 @@ public class VersionManagerTest {
     VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
     assertEquals(Compatibility.OK, result.getCompatibility());
+
+    VersionCompatibilityResult remoteResult =
+        versionManagerRemote.determineVersionCompatibility(aliceJID);
+
+    assertEquals(Compatibility.OK, remoteResult.getCompatibility());
   }
 
   @Test
@@ -88,10 +93,15 @@ public class VersionManagerTest {
     VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
     assertEquals(Compatibility.OK, result.getCompatibility());
+
+    VersionCompatibilityResult remoteResult =
+        versionManagerRemote.determineVersionCompatibility(aliceJID);
+
+    assertEquals(Compatibility.OK, remoteResult.getCompatibility());
   }
 
   @Test
-  public void testlocalVersionsTooOld() {
+  public void testLocalVersionOlder() {
 
     Version local = Version.parseVersion("1.1.1.r1");
     Version remote = Version.parseVersion("1.1.2.r1");
@@ -101,10 +111,15 @@ public class VersionManagerTest {
     VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
     assertEquals(Compatibility.OLDER, result.getCompatibility());
+
+    VersionCompatibilityResult remoteResult =
+        versionManagerRemote.determineVersionCompatibility(aliceJID);
+
+    assertEquals(Compatibility.NEWER, remoteResult.getCompatibility());
   }
 
   @Test
-  public void testlocalVersionsTooNew() {
+  public void testLocalVersionNewer() {
 
     Version local = Version.parseVersion("1.1.2.r1");
     Version remote = Version.parseVersion("1.1.1.r1");
@@ -114,5 +129,10 @@ public class VersionManagerTest {
     VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
 
     assertEquals(Compatibility.NEWER, result.getCompatibility());
+
+    VersionCompatibilityResult remoteResult =
+        versionManagerRemote.determineVersionCompatibility(aliceJID);
+
+    assertEquals(Compatibility.OLDER, remoteResult.getCompatibility());
   }
 }
