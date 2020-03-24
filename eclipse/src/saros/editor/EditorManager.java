@@ -1054,6 +1054,8 @@ public class EditorManager implements IEditorManager {
 
       // Try to replace
       try {
+        // Attention: This method also alters the annotation model if an
+        // annotation exists at the offset and the length &gt; 1
         doc.replace(offset, replacedText.length(), text);
       } catch (BadLocationException e) {
         LOG.error(

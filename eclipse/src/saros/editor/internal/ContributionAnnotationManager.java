@@ -13,6 +13,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -32,6 +33,9 @@ import saros.ui.util.SWTUtils;
  * real-time along with the application of the textual changes and are removed when the characters
  * they belong to are deleted, the session ends, or their respective author leaves the session. To
  * avoid cluttering the editors, only the last {@value #MAX_HISTORY_LENGTH} changes are annotated.
+ *
+ * <p>The invariant of the class should be that all handled annotations have a length &lt;= 1. This
+ * avoid annotations that are automatically increased by new user input.
  *
  * <p>This class takes care of managing the annotations for session participants which involves
  * adding, removing, and splitting of Annotations.
@@ -111,6 +115,12 @@ public class ContributionAnnotationManager {
     // Return if length == 0, (called after a deletion was performed)
     if (!contribtionAnnotationsEnabled || length <= 0) return;
 
+    if (length > 1) {
+      // Correct current model state to match with the assumption that all
+      // annotations have length &lt;= 1.
+      enforceAnnotationsWithLengthOne(model);
+    }
+
     final ContributionAnnotationHistory history = getHistory(source);
 
     final Map<ContributionAnnotation, Position> annotationsToAdd =
@@ -138,6 +148,43 @@ public class ContributionAnnotationManager {
       annotationModelHelper.replaceAnnotationsInModel(
           model, Collections.emptyList(), annotationsToAdd);
     }
+  }
+
+  /**
+   * This method is only called if an annotation with length &gt; 1 should be inserted, because if
+   * text is pasted at a position that already contains an annotation, the content change on the
+   * {@link IDocument} that is performed by the caller of {@link #insertAnnotation} leads to an
+   * internal change of the annotation model.
+   *
+   * <p>The annotation with length &gt; 1 is removed, because the new annotation is subsequently
+   * added by {@link #insertAnnotation}
+   *
+   * <p>Therefore, this methods works against the internal mechanisms of eclipse in order to enforce
+   * the invariant of annotations with have a length &lt;= 1.
+   *
+   * @param model The model that could contain a violation of the invariant.
+   */
+  private void enforceAnnotationsWithLengthOne(IAnnotationModel model) {
+    List<ContributionAnnotation> annotationsToRemove = new ArrayList<>();
+
+    Iterator<Annotation> i = model.getAnnotationIterator();
+    while (i.hasNext()) {
+      Annotation annotation = i.next();
+
+      if (!(annotation instanceof ContributionAnnotation)) continue;
+
+      ContributionAnnotation contrAnnotation = (ContributionAnnotation) annotation;
+      Position p = model.getPosition(contrAnnotation);
+      if (p.getLength() > 1) {
+        annotationsToRemove.add(contrAnnotation);
+
+        // Expect only one annotation with length &gt; 1 created by
+        // callers content change.
+        break;
+      }
+    }
+    annotationModelHelper.replaceAnnotationsInModel(
+        model, annotationsToRemove, Collections.emptyMap());
   }
 
   /**
