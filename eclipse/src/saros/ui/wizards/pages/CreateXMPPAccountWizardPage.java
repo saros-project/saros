@@ -91,7 +91,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
     shell.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     Browser browser = new Browser(shell, SWT.NONE);
-    browser.setUrl("http://www.saros-project.org/setupXMPP");
+    browser.setUrl("https://www.saros-project.org/documentation/setup-xmpp.html");
     browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     shell.open();
