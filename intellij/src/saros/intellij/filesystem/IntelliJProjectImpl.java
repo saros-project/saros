@@ -26,7 +26,7 @@ import saros.intellij.runtime.FilesystemRunner;
 
 /** A <code>IntelliJProjectImpl</code> represents a specific module loaded in a specific project. */
 public final class IntelliJProjectImpl extends IntelliJResourceImpl implements IProject {
-  private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
+  private static final Logger log = Logger.getLogger(IntelliJProjectImpl.class);
 
   private final Project project;
 
@@ -215,7 +215,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
       return IntelliJPathImpl.fromString(relativePath.toString());
 
     } catch (IllegalArgumentException e) {
-      LOG.warn(
+      log.warn(
           "Could not find a relative path from the content root "
               + moduleRoot
               + " to the file "

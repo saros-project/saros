@@ -18,7 +18,7 @@ import saros.util.ThreadUtils;
 @Component(module = "integration")
 public class StartupSarosSTF implements IStartup {
 
-  private static final Logger LOG = Logger.getLogger(StartupSarosSTF.class);
+  private static final Logger log = Logger.getLogger(StartupSarosSTF.class);
 
   @Inject private IContainerContext context;
 
@@ -37,11 +37,11 @@ public class StartupSarosSTF implements IStartup {
     Integer port = Integer.getInteger("saros.testmode");
 
     if (port != null && port > 0 && port <= 65535) {
-      LOG.info("starting STF controller on port " + port);
+      log.info("starting STF controller on port " + port);
       startSTFController(port);
 
     } else {
-      LOG.error("could not start STF controller: port " + port + " is not a valid port number");
+      log.error("could not start STF controller: port " + port + " is not a valid port number");
     }
   }
 
@@ -49,14 +49,14 @@ public class StartupSarosSTF implements IStartup {
 
     ThreadUtils.runSafeAsync(
         "stf-startup",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
             try {
               STFController.start(port, context);
             } catch (Exception e) {
-              LOG.error("starting STF controller failed", e);
+              log.error("starting STF controller failed", e);
             }
           }
         });

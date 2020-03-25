@@ -33,7 +33,7 @@ import saros.session.SessionEndReason;
  * <p>FIXME: Remove awkward session handling together with UI components created with session.
  */
 public class ConsistencyButton extends AbstractSessionToolbarButton {
-  private static final Logger LOG = Logger.getLogger(ConsistencyButton.class);
+  private static final Logger log = Logger.getLogger(ConsistencyButton.class);
 
   private boolean previouslyInConsistentState = true;
 
@@ -182,7 +182,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
       return;
     }
 
-    LOG.debug("Inconsistency indicator goes: " + (isInconsistent ? "on" : "off"));
+    log.debug("Inconsistency indicator goes: " + (isInconsistent ? "on" : "off"));
 
     EDTExecutor.invokeLater(() -> setInconsistent(isInconsistent));
 
@@ -240,7 +240,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
       IResource resource = path.getResource();
 
       if (resource == null) {
-        LOG.warn("Inconsistent resource " + path + " could not be " + "found.");
+        log.warn("Inconsistent resource " + path + " could not be " + "found.");
 
         continue;
       }

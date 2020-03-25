@@ -38,7 +38,7 @@ import saros.util.ThreadUtils;
 public class ConsistencyWatchdogServer extends AbstractActivityProducer
     implements Startable, Blockable {
 
-  private static final Logger LOG = Logger.getLogger(ConsistencyWatchdogServer.class);
+  private static final Logger log = Logger.getLogger(ConsistencyWatchdogServer.class);
 
   private static final long CHECKSUM_CALCULATION_INTERVAL = 10000;
   private static final long TERMINATION_TIMEOUT = 10000;
@@ -69,7 +69,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
            */
           synchronizer.syncExec(
               ThreadUtils.wrapSafe(
-                  LOG,
+                  log,
                   new Runnable() {
                     @Override
                     public void run() {
@@ -153,11 +153,11 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
       isTerminated =
           checksumCalculationExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
-      LOG.warn("Interrupted while waiting for consistency watchdog to terminate");
+      log.warn("Interrupted while waiting for consistency watchdog to terminate");
       terminationWasInterrupted = true;
     }
 
-    if (!isTerminated) LOG.error("Consistency watchdog server is still running");
+    if (!isTerminated) log.error("Consistency watchdog server is still running");
 
     /*
      * Make sure we only clear the checksum map after the last checksum
@@ -248,7 +248,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
      */
     if (checksum.getHash() != DocumentChecksum.NOT_AVAILABLE && !docPath.getFile().exists()) {
 
-      LOG.debug(
+      log.debug(
           "Updating checksum for "
               + docPath
               + " to correctly "
@@ -268,7 +268,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
 
     if (content == null) {
       if (localEditors.contains(checksum.getPath())) {
-        LOG.error(
+        log.error(
             "EditorManager is in an inconsistent state. "
                 + "It is reporting a locally open editor but no"
                 + " document could be found in the underlying file system: "

@@ -23,7 +23,7 @@ import saros.session.ISarosSessionManager;
 
 /** Saros action group for the pop-up menu when right-clicking on a module. */
 public class SarosFileShareGroup extends ActionGroup {
-  private static final Logger LOG = Logger.getLogger(SarosFileShareGroup.class);
+  private static final Logger log = Logger.getLogger(SarosFileShareGroup.class);
 
   @Inject private ISarosSessionManager sessionManager;
 
@@ -95,8 +95,8 @@ public class SarosFileShareGroup extends ActionGroup {
       new IntelliJProjectImpl(module);
 
     } catch (IllegalArgumentException exception) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace(
+      if (log.isTraceEnabled()) {
+        log.trace(
             "Ignoring module "
                 + moduleName
                 + " as it does not meet the current release restrictions.");

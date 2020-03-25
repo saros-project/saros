@@ -23,7 +23,7 @@ import saros.net.xmpp.XMPPConnectionService;
 @Component(module = "net")
 public class RosterTracker {
 
-  private static final Logger LOG = Logger.getLogger(RosterTracker.class);
+  private static final Logger log = Logger.getLogger(RosterTracker.class);
 
   private Connection connection;
 
@@ -140,7 +140,7 @@ public class RosterTracker {
 
       String rjid = presence.getFrom();
       if (rjid == null) {
-        LOG.error("presence.getFrom() is null");
+        log.error("presence.getFrom() is null");
         continue;
       }
       result.add(new JID(rjid));
@@ -176,7 +176,7 @@ public class RosterTracker {
       try {
         listener.entriesAdded(addresses);
       } catch (RuntimeException e) {
-        LOG.error("invoking listener: " + listener + " failed", e);
+        log.error("invoking listener: " + listener + " failed", e);
       }
     }
   }
@@ -186,7 +186,7 @@ public class RosterTracker {
       try {
         listener.entriesDeleted(addresses);
       } catch (RuntimeException e) {
-        LOG.error("invoking listener: " + listener + " failed", e);
+        log.error("invoking listener: " + listener + " failed", e);
       }
     }
   }
@@ -196,7 +196,7 @@ public class RosterTracker {
       try {
         listener.entriesUpdated(addresses);
       } catch (RuntimeException e) {
-        LOG.error("invoking listener: " + listener + " failed", e);
+        log.error("invoking listener: " + listener + " failed", e);
       }
     }
   }
@@ -206,7 +206,7 @@ public class RosterTracker {
       try {
         listener.presenceChanged(presence);
       } catch (RuntimeException e) {
-        LOG.error("invoking listener: " + listener + " failed", e);
+        log.error("invoking listener: " + listener + " failed", e);
       }
     }
   }
@@ -216,7 +216,7 @@ public class RosterTracker {
       try {
         listener.rosterChanged(roster);
       } catch (RuntimeException e) {
-        LOG.error("invoking listener: " + listener + " failed", e);
+        log.error("invoking listener: " + listener + " failed", e);
       }
     }
   }

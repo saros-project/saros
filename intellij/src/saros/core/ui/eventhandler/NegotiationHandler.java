@@ -34,7 +34,7 @@ import saros.session.ISarosSessionManager;
  */
 public class NegotiationHandler implements INegotiationHandler {
 
-  private static final Logger LOG = Logger.getLogger(NegotiationHandler.class);
+  private static final Logger log = Logger.getLogger(NegotiationHandler.class);
 
   private final ISarosSessionManager sessionManager;
   private final UIProjectUtils projectUtils;
@@ -171,7 +171,7 @@ public class NegotiationHandler implements INegotiationHandler {
         }
 
       } catch (Exception e) {
-        LOG.error("This exception is not expected here: ", e);
+        log.error("This exception is not expected here: ", e);
         return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID, e.getMessage(), e);
       }
 
@@ -229,7 +229,7 @@ public class NegotiationHandler implements INegotiationHandler {
             return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID, message);
         }
       } catch (Exception e) {
-        LOG.error("This exception is not expected here: ", e);
+        log.error("This exception is not expected here: ", e);
         return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID, e.getMessage(), e);
       }
 

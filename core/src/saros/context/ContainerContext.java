@@ -63,7 +63,7 @@ import saros.repackaged.picocontainer.injectors.Reinjector;
  */
 public class ContainerContext implements IContainerContext {
 
-  private static final Logger LOG = Logger.getLogger(ContainerContext.class);
+  private static final Logger log = Logger.getLogger(ContainerContext.class);
 
   private static final String SAROS_DATA_DIRECTORY = ".saros";
 
@@ -162,7 +162,7 @@ public class ContainerContext implements IContainerContext {
 
     if (initialized) return;
 
-    LOG.info("initializing context...");
+    log.info("initializing context...");
 
     for (IContextFactory factory : factories) factory.createComponents(container);
 
@@ -181,16 +181,16 @@ public class ContainerContext implements IContainerContext {
      */
     final List<Object> components = container.getComponents();
 
-    if (LOG.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       for (final Object component : components) {
-        LOG.debug("created context component: " + component.getClass().getName());
+        log.debug("created context component: " + component.getClass().getName());
       }
     }
 
     container.start();
     initialized = true;
 
-    LOG.info("successfully initialized context");
+    log.info("successfully initialized context");
   }
 
   /**
@@ -202,11 +202,11 @@ public class ContainerContext implements IContainerContext {
 
     if (!initialized || disposed) return;
 
-    LOG.info("disposing context...");
+    log.info("disposing context...");
     container.stop();
     disposed = true;
     container.dispose();
-    LOG.info("successfully disposed context");
+    log.info("successfully disposed context");
   }
 
   private void initAccountStore(XMPPAccountStore store) {
@@ -231,7 +231,7 @@ public class ContainerContext implements IContainerContext {
     if (homeDirectory == null) homeDirectory = System.getProperty("user.home");
 
     if (homeDirectory == null) {
-      LOG.warn("home directory not set, cannot save and load account data");
+      log.warn("home directory not set, cannot save and load account data");
       return;
     }
 

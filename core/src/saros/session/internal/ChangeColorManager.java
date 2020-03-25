@@ -37,7 +37,7 @@ import saros.session.User;
 @Component(module = "core")
 public class ChangeColorManager extends AbstractActivityProducer implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(ChangeColorManager.class);
+  private static final Logger log = Logger.getLogger(ChangeColorManager.class);
 
   private final SarosSession session;
   private final ColorIDSetStorage colorIDSetStorage;
@@ -210,11 +210,11 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
       currentUsers.addAll(favoriteUserColors.keySet());
 
       if (affected == null) {
-        LOG.warn("received color id change for a user that is no longer part of the session");
+        log.warn("received color id change for a user that is no longer part of the session");
         return;
       }
 
-      LOG.debug(
+      log.debug(
           "received color id change fo user : " + affected + " [" + activity.getColorID() + "]");
 
       // host send us an update for a user
@@ -264,7 +264,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
   private void reassignSessionColorIDs(List<User> currentUsers, User user, boolean joined) {
     assert session.isHost() : "only the session host can assign a color id";
 
-    LOG.debug("reassigning color IDs for the current session users");
+    log.debug("reassigning color IDs for the current session users");
 
     synchronized (this) {
 
@@ -295,7 +295,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
 
         // no conflict = OK
         if (isOptimalColorAssignment(assignedColors)) {
-          LOG.debug("color conflict resolve result = NO CONFLICT");
+          log.debug("color conflict resolve result = NO CONFLICT");
           break resolveColorConflicts;
         }
 
@@ -320,7 +320,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
            */
           if (favoriteUserColors.containsValue(UserColorID.UNKNOWN)
               && isValidColorAssignment(assignedColors)) {
-            LOG.debug(
+            log.debug(
                 "color conflict resolve result = FAVORITE COLORS UNKNOWN, USING PREVIOUS COLOR ASSIGNMENT");
             break resolveColorConflicts;
           }
@@ -329,7 +329,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
            * if color assignment is optimal, assignment is resolved.
            */
           if (isOptimalColorAssignment(assignedColors)) {
-            LOG.debug("color conflict resolve result = ALREADY SOLVED");
+            log.debug("color conflict resolve result = ALREADY SOLVED");
             break resolveColorConflicts;
           } else {
             // the colorIdSet was not optimal, reassign colors
@@ -350,10 +350,10 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
         /* release all colors again as they will be removed again */
         for (int colorID : assignedColors.values()) addColorIdToPool(colorID);
 
-        LOG.debug("color conflict resolve result = RESOLVED");
+        log.debug("color conflict resolve result = RESOLVED");
       } // END resolveColorConflicts
 
-      LOG.debug("new color assignment: " + assignedColors);
+      log.debug("new color assignment: " + assignedColors);
 
       updateColorAndUserPools(assignedColors);
 
@@ -534,13 +534,13 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
     Integer colorIDUseCount = usedColorIDs.get(colorID);
 
     if (colorIDUseCount == null) {
-      LOG.warn("color id: " + colorID + " was added although it was never removed");
+      log.warn("color id: " + colorID + " was added although it was never removed");
       colorIDUseCount = 0;
     } else {
       colorIDUseCount--;
     }
 
-    LOG.trace("color id: " + colorID + " is currently used " + colorIDUseCount + " times");
+    log.trace("color id: " + colorID + " is currently used " + colorIDUseCount + " times");
 
     /*
      * remove the colorID to ensure that getNextAvailableColorID returns
@@ -561,7 +561,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
 
     colorIDUseCount++;
 
-    LOG.trace("color id: " + colorID + " is currently used " + colorIDUseCount + " times");
+    log.trace("color id: " + colorID + " is currently used " + colorIDUseCount + " times");
 
     usedColorIDs.put(colorID, colorIDUseCount);
   }
@@ -570,7 +570,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
 
     ColorIDSet colorIDSet = colorIDSetStorage.getColorIDSet(asIDCollection(users));
 
-    LOG.debug("updating color id set: " + Arrays.toString(colorIDSet.getParticipants().toArray()));
+    log.debug("updating color id set: " + Arrays.toString(colorIDSet.getParticipants().toArray()));
 
     /*
      * reset colors to unknown otherwise we may get an illegal state
@@ -595,7 +595,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements Star
         break;
       }
 
-      LOG.trace(
+      log.trace(
           "updating color id set: user '"
               + user
               + "' id '"

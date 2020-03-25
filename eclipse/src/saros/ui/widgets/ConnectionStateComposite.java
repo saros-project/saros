@@ -35,7 +35,7 @@ import saros.ui.views.SarosView;
 // FIXME displaying account related information is not the best decision.
 public class ConnectionStateComposite extends Composite {
 
-  private static final Logger LOG = Logger.getLogger(ConnectionStateComposite.class);
+  private static final Logger log = Logger.getLogger(ConnectionStateComposite.class);
 
   private static final String CONNECTED_TOOLTIP =
       Messages.ConnectionStateComposite_tooltip_connected;
@@ -57,7 +57,7 @@ public class ConnectionStateComposite extends Composite {
         @Override
         public void accountsChanged(List<XMPPAccount> currentAccounts) {
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               () -> {
                 if (!ConnectionStateComposite.this.isDisposed()) updateLabel(null, null);
               });
@@ -70,7 +70,7 @@ public class ConnectionStateComposite extends Composite {
         public void connectionStateChanged(final ConnectionState state, final Exception error) {
 
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
                 @Override
                 public void run() {

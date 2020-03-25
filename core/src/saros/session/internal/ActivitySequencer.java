@@ -56,7 +56,7 @@ import saros.util.ThreadUtils;
  */
 public class ActivitySequencer implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(ActivitySequencer.class.getName());
+  private static final Logger log = Logger.getLogger(ActivitySequencer.class.getName());
 
   /** join timeout when stopping this component */
   private static final long TIMEOUT = 30000;
@@ -249,7 +249,7 @@ public class ActivitySequencer implements Startable {
     receiver.addPacketListener(
         activitiesPacketListener, ActivitiesExtension.PROVIDER.getPacketFilter(currentSessionID));
 
-    activitySendThread = ThreadUtils.runSafeAsync("activity-sender", LOG, activitySender);
+    activitySendThread = ThreadUtils.runSafeAsync("activity-sender", log, activitySender);
   }
 
   /**
@@ -282,14 +282,14 @@ public class ActivitySequencer implements Startable {
     try {
       activitySendThread.join(TIMEOUT);
     } catch (InterruptedException e) {
-      LOG.warn(
+      log.warn(
           "interrupted while waiting for " + activitySendThread.getName() + " thread to terminate");
 
       isStoppingInterrupted = true;
     }
 
     if (activitySendThread.isAlive())
-      LOG.error(activitySendThread.getName() + " thread is still running");
+      log.error(activitySendThread.getName() + " thread is still running");
 
     synchronized (bufferedOutgoingActivities) {
       bufferedOutgoingActivities.clear();
@@ -318,7 +318,7 @@ public class ActivitySequencer implements Startable {
       ActivityBuffer<IActivity> buffer = bufferedIncomingActivities.get(sender);
 
       if (buffer == null) {
-        LOG.warn(
+        log.warn(
             "dropping received activity from "
                 + sender
                 + " because it is currently not registers, dropping activities: "
@@ -353,7 +353,7 @@ public class ActivitySequencer implements Startable {
         continue;
       }
 
-      LOG.trace("dispatching activity " + activity + " to the local user: " + user);
+      log.trace("dispatching activity " + activity + " to the local user: " + user);
 
       dispatchThread.executeAsDispatch(
           new Runnable() {
@@ -371,7 +371,7 @@ public class ActivitySequencer implements Startable {
         ActivityBuffer<IActivity> buffer = bufferedOutgoingActivities.get(recipient.getJID());
 
         if (buffer == null) {
-          LOG.warn(
+          log.warn(
               "cannot send activity to "
                   + recipient
                   + " because it is currently not registers, dropped activity: "
@@ -510,22 +510,22 @@ public class ActivitySequencer implements Startable {
                   new ArrayList<IActivity>(activitiesToMarshall),
                   sequenceNumber));
 
-      if (LOG.isTraceEnabled()) {
-        LOG.trace(
+      if (log.isTraceEnabled()) {
+        log.trace(
             "send ("
                 + String.format("%03d", activities.size())
                 + ") "
                 + recipient
                 + " -> "
                 + activities);
-      } else if (LOG.isDebugEnabled()) {
-        LOG.debug("send (" + String.format("%03d", activities.size()) + ") " + recipient);
+      } else if (log.isDebugEnabled()) {
+        log.debug("send (" + String.format("%03d", activities.size()) + ") " + recipient);
       }
 
       try {
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, recipient, activityPacketExtension);
       } catch (IOException e) {
-        LOG.error("failed to sent activities: " + activities, e);
+        log.error("failed to sent activities: " + activities, e);
 
         unregisterUser(recipient);
         notifyTransmissionError(recipient);
@@ -560,7 +560,7 @@ public class ActivitySequencer implements Startable {
     ActivitiesExtension payload = ActivitiesExtension.PROVIDER.getPayload(activityPacket);
 
     if (payload == null) {
-      LOG.warn("activity packet payload is corrupted");
+      log.warn("activity packet payload is corrupted");
       return;
     }
 
@@ -568,11 +568,11 @@ public class ActivitySequencer implements Startable {
 
     List<IActivity> activities = payload.getActivities();
 
-    if (LOG.isTraceEnabled()) {
-      LOG.trace(
+    if (log.isTraceEnabled()) {
+      log.trace(
           "rcvd (" + String.format("%03d", activities.size()) + ") " + from + " -> " + activities);
-    } else if (LOG.isDebugEnabled()) {
-      LOG.debug("rcvd (" + String.format("%03d", activities.size()) + ") " + from);
+    } else if (log.isDebugEnabled()) {
+      log.debug("rcvd (" + String.format("%03d", activities.size()) + ") " + from);
     }
 
     executeActivities(from, activities, payload.getSequenceNumber());

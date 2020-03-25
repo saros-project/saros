@@ -16,7 +16,7 @@ import saros.net.xmpp.JID;
  */
 final class ProjectNegotiationObservable {
 
-  private static final Logger LOG = Logger.getLogger(ProjectNegotiationObservable.class);
+  private static final Logger log = Logger.getLogger(ProjectNegotiationObservable.class);
 
   private final Map<JID, List<ProjectNegotiation>> negotiations =
       new HashMap<JID, List<ProjectNegotiation>>();
@@ -55,7 +55,7 @@ final class ProjectNegotiationObservable {
 
     for (final ProjectNegotiation currentNegotiation : currentNegotiations) {
       if (currentNegotiation.getID().equals(negotiation.getID())) {
-        LOG.warn(
+        log.warn(
             negotiation.getPeer()
                 + ": a project negotiation with ID "
                 + negotiation.getID()
@@ -86,7 +86,7 @@ final class ProjectNegotiationObservable {
       }
     }
 
-    LOG.warn(
+    log.warn(
         negotiation.getPeer()
             + ": a project negotiation with ID "
             + negotiation.getID()

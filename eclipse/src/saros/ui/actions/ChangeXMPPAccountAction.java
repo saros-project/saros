@@ -35,7 +35,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
 
   public static final String ACTION_ID = ChangeXMPPAccountAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(ChangeXMPPAccountAction.class);
+  private static final Logger log = Logger.getLogger(ChangeXMPPAccountAction.class);
 
   private Menu accountMenu;
 
@@ -54,7 +54,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
         @Override
         public void connectionStateChanged(final ConnectionState state, final Exception error) {
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
 
                 @Override
@@ -110,7 +110,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
           "Default account missing",
           "A default account has not been set yet. Do you want set a default account?")) return;
 
-      SWTUtils.runSafeSWTAsync(LOG, this::openPreferences);
+      SWTUtils.runSafeSWTAsync(log, this::openPreferences);
       return;
     }
 
@@ -250,7 +250,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
               || state == ConnectionState.ERROR);
 
     } catch (RuntimeException e) {
-      LOG.error("Internal error in ChangeXMPPAccountAction:", e);
+      log.error("Internal error in ChangeXMPPAccountAction:", e);
     }
   }
 
@@ -265,7 +265,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator, Dis
     try {
       service.executeCommand("saros.ui.commands.OpenSarosPreferences", null);
     } catch (Exception e) {
-      LOG.debug("Could execute command", e);
+      log.debug("Could execute command", e);
     }
   }
 }

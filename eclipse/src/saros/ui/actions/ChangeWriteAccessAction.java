@@ -37,7 +37,7 @@ import saros.util.ThreadUtils;
  */
 public class ChangeWriteAccessAction extends Action implements Disposable {
 
-  private static final Logger LOG = Logger.getLogger(ChangeWriteAccessAction.class);
+  private static final Logger log = Logger.getLogger(ChangeWriteAccessAction.class);
 
   public static final class WriteAccess {
     public static final String ACTION_ID =
@@ -162,7 +162,7 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
   @Override
   public void run() {
     ThreadUtils.runSafeSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -178,11 +178,11 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
                 performPermissionChange(session, selected, permission);
                 updateEnablement();
               } else {
-                LOG.warn(
+                log.warn(
                     "Did not change write access of " + selected + ", because it's already set.");
               }
             } else {
-              LOG.warn("More than one participant selected."); // $NON-NLS-1$
+              log.warn("More than one participant selected."); // $NON-NLS-1$
             }
           }
         });
@@ -213,7 +213,7 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
                  */
                 // } catch (CancellationException e) {
               } catch (InterruptedException e) {
-                LOG.error(e); // cannot happen
+                log.error(e); // cannot happen
               } finally {
                 monitor.done();
               }
@@ -223,20 +223,20 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
       Throwable t = e.getCause();
 
       if (t instanceof CancellationException) {
-        LOG.warn("permission change failed, user " + user + " did not respond"); // $NON-NLS-1$
+        log.warn("permission change failed, user " + user + " did not respond"); // $NON-NLS-1$
         MessageDialog.openWarning(
             SWTUtils.getShell(),
             Messages.SarosUI_permission_canceled,
             Messages.SarosUI_permission_canceled_text);
       } else {
-        LOG.error("permission change failed", e); // $NON-NLS-1$
+        log.error("permission change failed", e); // $NON-NLS-1$
         MessageDialog.openError(
             SWTUtils.getShell(),
             Messages.SarosUI_permission_failed,
             Messages.SarosUI_permission_failed_text);
       }
     } catch (InterruptedException e) {
-      LOG.error(e); // cannot happen
+      log.error(e); // cannot happen
     }
   }
 }

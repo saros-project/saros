@@ -14,7 +14,7 @@ import saros.net.xmpp.JID;
 // TODO remove the ID part here, there should only be one invitation per JID
 final class SessionNegotiationObservable {
 
-  private static final Logger LOG = Logger.getLogger(SessionNegotiationObservable.class);
+  private static final Logger log = Logger.getLogger(SessionNegotiationObservable.class);
 
   private final Map<JID, List<SessionNegotiation>> negotiations =
       new HashMap<JID, List<SessionNegotiation>>();
@@ -64,12 +64,12 @@ final class SessionNegotiationObservable {
     }
 
     if (!currentNegotiations.isEmpty())
-      LOG.warn(
+      log.warn(
           "there is already a running session negotiation for contact: " + negotiation.getPeer());
 
     for (final SessionNegotiation currentNegotiation : currentNegotiations) {
       if (currentNegotiation.getID().equals(negotiation.getID())) {
-        LOG.warn("a session negotiation with ID " + negotiation.getID() + " is already registered");
+        log.warn("a session negotiation with ID " + negotiation.getID() + " is already registered");
         return;
       }
     }
@@ -96,7 +96,7 @@ final class SessionNegotiationObservable {
       }
     }
 
-    LOG.warn("a session negotiation with ID " + negotiation.getID() + " is not registered");
+    log.warn("a session negotiation with ID " + negotiation.getID() + " is not registered");
   }
 
   /**

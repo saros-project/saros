@@ -36,7 +36,7 @@ import saros.net.xmpp.XMPPConnectionService;
 @Component(module = "net")
 public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
 
-  private static final Logger LOG = Logger.getLogger(XMPPReceiver.class);
+  private static final Logger log = Logger.getLogger(XMPPReceiver.class);
 
   private static final int CHUNKSIZE = 16 * 1024;
 
@@ -210,8 +210,8 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
 
     if (!dispatchPacket) return null;
 
-    if (LOG.isTraceEnabled())
-      LOG.trace(
+    if (log.isTraceEnabled())
+      log.trace(
           "received binary XMPP extension: "
               + extension.getTransferDescription()
               + ", size: "
@@ -229,7 +229,7 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
       try {
         payload = inflate(payload);
       } catch (IOException e) {
-        LOG.error("could not decompress extension payload", e);
+        log.error("could not decompress extension payload", e);
         return null;
       }
 
@@ -253,7 +253,7 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
             ProviderManager.getInstance().getExtensionProvider(name, namespace);
 
     if (provider == null) {
-      LOG.warn(
+      log.warn(
           "could not deserialize transfer object because no provider with namespace '"
               + namespace
               + "' and element name '"
@@ -273,7 +273,7 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
       parser.next();
       packetExtension = provider.parseExtension(parser);
     } catch (Exception e) {
-      LOG.error("could not deserialize transfer object payload: " + e.getMessage(), e);
+      log.error("could not deserialize transfer object payload: " + e.getMessage(), e);
 
       // just to be safe
       parser = new MXParser();
@@ -299,7 +299,7 @@ public class XMPPReceiver implements IReceiver, IBinaryXMPPExtensionReceiver {
       try {
         listener.received(mode, sizeCompressed, sizeUncompressed, duration);
       } catch (RuntimeException e) {
-        LOG.error("invoking received() on listener: " + listener + " failed", e);
+        log.error("invoking received() on listener: " + listener + " failed", e);
       }
     }
   }

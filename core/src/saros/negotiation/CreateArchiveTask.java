@@ -25,7 +25,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
   private static final int BUFFER_SIZE = 32 * 1024;
 
-  private static final Logger LOG = Logger.getLogger(CreateArchiveTask.class);
+  private static final Logger log = Logger.getLogger(CreateArchiveTask.class);
 
   private final File archive;
   private final List<IFile> files;
@@ -85,7 +85,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
         if (entryName == null) entryName = originalEntryName;
 
-        if (LOG.isTraceEnabled()) LOG.trace("compressing file: " + originalEntryName);
+        if (log.isTraceEnabled()) log.trace("compressing file: " + originalEntryName);
 
         monitor.subTask("compressing file: " + originalEntryName);
 
@@ -122,14 +122,14 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
     } finally {
       IOUtils.closeQuietly(zipStream);
       if (cleanup && archive != null && archive.exists() && !archive.delete())
-        LOG.warn("could not delete archive file: " + archive);
+        log.warn("could not delete archive file: " + archive);
 
       monitor.done();
     }
 
     stopWatch.stop();
 
-    LOG.debug(
+    log.debug(
         String.format(
             "created archive %s I/O: [%s]",
             archive.getAbsolutePath(),
@@ -160,7 +160,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
       try {
         size += file.getSize();
       } catch (IOException e) {
-        LOG.warn("unable to retrieve file size for file: " + file.getFullPath(), e);
+        log.warn("unable to retrieve file size for file: " + file.getFullPath(), e);
       }
     }
 

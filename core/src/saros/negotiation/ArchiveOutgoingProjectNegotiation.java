@@ -33,7 +33,7 @@ import saros.synchronize.StartHandle;
  */
 public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNegotiation {
 
-  private static final Logger LOG = Logger.getLogger(ArchiveOutgoingProjectNegotiation.class);
+  private static final Logger log = Logger.getLogger(ArchiveOutgoingProjectNegotiation.class);
   private File zipArchive = null;
 
   public ArchiveOutgoingProjectNegotiation( //
@@ -114,7 +114,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   @Override
   protected void cleanup(IProgressMonitor monitor) {
     if (zipArchive != null && !zipArchive.delete())
-      LOG.warn("could not delete archive file: " + zipArchive.getAbsolutePath());
+      log.warn("could not delete archive file: " + zipArchive.getAbsolutePath());
     super.cleanup(monitor);
   }
 
@@ -178,7 +178,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       }
     }
 
-    LOG.debug(this + " : creating archive");
+    log.debug(this + " : creating archive");
 
     File tempArchive = null;
 
@@ -202,7 +202,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       File archive, JID remoteContact, String transferID, IProgressMonitor monitor)
       throws SarosCancellationException, IOException {
 
-    LOG.debug(this + " : sending archive");
+    log.debug(this + " : sending archive");
     monitor.beginTask("Sending archive file...", 100);
 
     assert fileTransferManager != null;
@@ -219,6 +219,6 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
     monitor.done();
 
-    LOG.debug(this + " : archive send");
+    log.debug(this + " : archive send");
   }
 }

@@ -20,7 +20,7 @@ import saros.net.xmpp.JID;
  */
 public final class IncomingFileTransferJob extends FileTransferJob {
 
-  private static final Logger LOG = Logger.getLogger(IncomingFileTransferJob.class);
+  private static final Logger log = Logger.getLogger(IncomingFileTransferJob.class);
 
   private final FileTransferRequest request;
   private final File file;
@@ -43,10 +43,10 @@ public final class IncomingFileTransferJob extends FileTransferJob {
 
       return monitorTransfer(transfer, monitor);
     } catch (RuntimeException e) {
-      LOG.error("internal error in file transfer", e);
+      log.error("internal error in file transfer", e);
       throw e;
     } catch (Exception e) {
-      LOG.error("file transfer failed: " + jid, e);
+      log.error("file transfer failed: " + jid, e);
 
       return new Status(IStatus.ERROR, Saros.PLUGIN_ID, "file transfer failed", e);
     } finally {

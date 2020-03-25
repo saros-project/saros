@@ -45,7 +45,7 @@ import saros.util.CoreUtils;
 @Component(module = "consistency")
 public class ConsistencyWatchdogClient extends AbstractActivityProducer implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(ConsistencyWatchdogClient.class);
+  private static final Logger log = Logger.getLogger(ConsistencyWatchdogClient.class);
 
   private static final Random RANDOM = new Random();
 
@@ -166,14 +166,14 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
      * the session ends
      */
     if (!lock.tryLock()) {
-      LOG.error("Restarting Checksum Error Handling" + " while another operation is running");
+      log.error("Restarting Checksum Error Handling" + " while another operation is running");
       try {
         // Try to cancel currently running recovery
         do {
           cancelRecovery.set(true);
         } while (!lock.tryLock(100, TimeUnit.MILLISECONDS));
       } catch (InterruptedException e) {
-        LOG.error("Not designed to be interruptible");
+        log.error("Not designed to be interruptible");
         return;
       }
 
@@ -263,7 +263,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
        * host, check whether we still have it. If it exists, we do have an
        * inconsistency
        */
-      LOG.debug(
+      log.debug(
           "Inconsistency detected -> resource found that does not exist on host side: " + path);
 
       return true;
@@ -274,14 +274,14 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
        * If the checksum tells us that the file exists, but we do not have
        * it, it is an inconsistency as well
        */
-      LOG.debug(
+      log.debug(
           "Inconsistency detected -> no resource found that does exist on host side: " + path);
 
       return true;
     }
 
     if (!checksum.existsFile() && !existsFileLocally) {
-      LOG.debug("Ignoring checksum activity for file that does not exist on both sides: " + path);
+      log.debug("Ignoring checksum activity for file that does not exist on both sides: " + path);
 
       return false;
     }
@@ -289,7 +289,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
     final String editorContent = editorManager.getContent(path);
 
     if (editorContent == null) {
-      LOG.debug("Inconsistency detected -> no editor content found for resource: " + path);
+      log.debug("Inconsistency detected -> no editor content found for resource: " + path);
 
       return true;
     }
@@ -297,7 +297,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
     if ((editorContent.length() != checksum.getLength())
         || (editorContent.hashCode() != checksum.getHash())) {
 
-      LOG.debug(
+      log.debug(
           String.format(
               "Inconsistency detected -> %s L(%d %s %d) H(%x %s %x)",
               path.toString(),
@@ -336,12 +336,12 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
     // Update InconsistencyToResolve observable
     if (pathsWithWrongChecksums.isEmpty()) {
       if (inconsistencyToResolve.getValue()) {
-        LOG.info("All Inconsistencies are resolved");
+        log.info("All Inconsistencies are resolved");
       }
       inconsistencyToResolve.setValue(false);
     } else {
       if (!inconsistencyToResolve.getValue()) {
-        LOG.info("Inconsistencies have been detected");
+        log.info("Inconsistencies have been detected");
       }
       inconsistencyToResolve.setValue(true);
     }

@@ -23,7 +23,7 @@ import saros.session.User;
  */
 class SharedProjectMapper {
 
-  private static final Logger LOG = Logger.getLogger(SharedProjectMapper.class);
+  private static final Logger log = Logger.getLogger(SharedProjectMapper.class);
 
   /** Mapping from project IDs to currently registered shared projects. */
   private Map<String, IProject> idToProjectMapping = new HashMap<String, IProject>();
@@ -116,7 +116,7 @@ class SharedProjectMapper {
       // release resources
       partiallySharedResourceMapping.put(project, null);
 
-      LOG.debug(
+      log.debug(
           "upgraded partially shared project "
               + project
               + " with ID "
@@ -131,7 +131,7 @@ class SharedProjectMapper {
     if (isPartially) partiallySharedResourceMapping.put(project, new HashSet<IResource>());
     else partiallySharedResourceMapping.put(project, null);
 
-    LOG.debug(
+    log.debug(
         "added project "
             + project
             + " with ID "
@@ -151,7 +151,7 @@ class SharedProjectMapper {
     IProject project = idToProjectMapping.get(id);
 
     if (project == null) {
-      LOG.warn("could not remove project, no project is registerid with ID: " + id);
+      log.warn("could not remove project, no project is registerid with ID: " + id);
       return;
     }
 
@@ -162,7 +162,7 @@ class SharedProjectMapper {
     projectToIDMapping.remove(project);
     partiallySharedResourceMapping.remove(project);
 
-    LOG.debug("removed project " + project + " with ID " + id);
+    log.debug("removed project " + project + " with ID " + id);
   }
 
   /**
@@ -181,7 +181,7 @@ class SharedProjectMapper {
       IProject project, Collection<? extends IResource> resources) {
 
     if (projectToIDMapping.get(project) == null) {
-      LOG.warn("could not add resources to project " + project + " because it is not shared");
+      log.warn("could not add resources to project " + project + " because it is not shared");
       // throw new IllegalStateException(
       // "could not add resources to project " + project
       // + " because it is not shared");
@@ -189,7 +189,7 @@ class SharedProjectMapper {
     }
 
     if (completelySharedProjects.contains(project)) {
-      LOG.warn("cannot add resources to completely shared project: " + project);
+      log.warn("cannot add resources to completely shared project: " + project);
       // throw new IllegalStateException(
       // "cannot add resources to completely shared project: " + project);
       return;
@@ -222,7 +222,7 @@ class SharedProjectMapper {
       IProject project, Collection<? extends IResource> resources) {
 
     if (projectToIDMapping.get(project) == null) {
-      LOG.warn("could not remove resources from project " + project + " because it is not shared");
+      log.warn("could not remove resources from project " + project + " because it is not shared");
       // throw new IllegalStateException(
       // "could not remove resources from project " + project
       // + " because it is not shared");
@@ -230,7 +230,7 @@ class SharedProjectMapper {
     }
 
     if (completelySharedProjects.contains(project)) {
-      LOG.warn("cannot remove resources from completely shared project: " + project);
+      log.warn("cannot remove resources from completely shared project: " + project);
       // throw new IllegalStateException(
       // "cannot remove resources from completely shared project: " +
       // project);

@@ -20,7 +20,7 @@ import saros.session.ISarosSession;
 
 public class DecompressArchiveTask implements IWorkspaceRunnable {
 
-  private static final Logger LOG = Logger.getLogger(DecompressArchiveTask.class);
+  private static final Logger log = Logger.getLogger(DecompressArchiveTask.class);
 
   private final File file;
   private final IProgressMonitor monitor;
@@ -78,7 +78,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
         final int delimiterIdx = entry.getName().indexOf(delimiter);
 
         if (delimiterIdx == -1) {
-          LOG.warn("skipping zip entry " + entryName + ", entry is not valid");
+          log.warn("skipping zip entry " + entryName + ", entry is not valid");
 
           monitor.worked(1);
           continue;
@@ -91,7 +91,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
         final IProject project = idToProjectMapping.get(id);
 
         if (project == null) {
-          LOG.warn("skipping zip entry " + entryName + ", unknown project id: " + id);
+          log.warn("skipping zip entry " + entryName + ", unknown project id: " + id);
 
           monitor.worked(1);
           continue;
@@ -122,7 +122,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
         monitor.worked(1);
 
-        if (LOG.isTraceEnabled()) LOG.trace("file written to disk: " + path);
+        if (log.isTraceEnabled()) log.trace("file written to disk: " + path);
       }
     } finally {
       if (monitor != null) monitor.done();
@@ -130,7 +130,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
       try {
         if (zipFile != null) zipFile.close();
       } catch (IOException e) {
-        LOG.warn("failed to close zip file " + zipFile.getName() + " : " + e.getMessage());
+        log.warn("failed to close zip file " + zipFile.getName() + " : " + e.getMessage());
       }
     }
   }

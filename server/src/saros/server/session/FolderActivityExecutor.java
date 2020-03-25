@@ -15,7 +15,7 @@ import saros.session.ISarosSession;
 /** Executes FolderActivities and performs actual filesystem operations. */
 public class FolderActivityExecutor extends AbstractActivityConsumer implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(FolderActivityExecutor.class);
+  private static final Logger log = Logger.getLogger(FolderActivityExecutor.class);
 
   private final ISarosSession session;
   private final ServerEditorManager editorManager;
@@ -47,7 +47,7 @@ public class FolderActivityExecutor extends AbstractActivityConsumer implements 
     try {
       executeFolderCreation(activity);
     } catch (IOException e) {
-      LOG.error("Could not execute " + activity, e);
+      log.error("Could not execute " + activity, e);
     }
   }
 
@@ -56,7 +56,7 @@ public class FolderActivityExecutor extends AbstractActivityConsumer implements 
     try {
       executeFolderRemoval(activity);
     } catch (IOException e) {
-      LOG.error("Could not execute " + activity, e);
+      log.error("Could not execute " + activity, e);
     }
   }
 

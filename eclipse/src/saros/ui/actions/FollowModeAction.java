@@ -39,7 +39,7 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
 
   public static final String ACTION_ID = FollowModeAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(FollowModeAction.class);
+  private static final Logger log = Logger.getLogger(FollowModeAction.class);
 
   private ISelectionListener selectionListener =
       new ISelectionListener() {
@@ -54,7 +54,7 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
         @Override
         public void userLeft(final User user) {
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
 
                 @Override
@@ -72,7 +72,7 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
         @Override
         public void userJoined(final User user) {
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
 
                 @Override
@@ -95,7 +95,7 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
           followModeManager.addListener(followModeListener);
 
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
 
                 @Override
@@ -119,7 +119,7 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
           followModeManager = null;
 
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
 
                 @Override
@@ -138,7 +138,7 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
         @Override
         public void stoppedFollowing(Reason reason) {
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
                 @Override
                 public void run() {
@@ -151,7 +151,7 @@ public class FollowModeAction extends Action implements IMenuCreator, Disposable
         @Override
         public void startedFollowing(final User target) {
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
                 @Override
                 public void run() {

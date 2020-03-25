@@ -25,7 +25,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements D
 
   public static final String ACTION_ID = JumpToUserWithWriteAccessPositionAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(JumpToUserWithWriteAccessPositionAction.class);
+  private static final Logger log = Logger.getLogger(JumpToUserWithWriteAccessPositionAction.class);
 
   protected ISelectionListener selectionListener =
       new ISelectionListener() {
@@ -64,7 +64,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements D
       this.setEnabled(false);
     } catch (Exception e) {
       if (!PlatformUI.getWorkbench().isClosing())
-        LOG.error("Unexpected error while updating enablement", e); // $NON-NLS-1$
+        log.error("Unexpected error while updating enablement", e); // $NON-NLS-1$
     }
   }
 
@@ -72,7 +72,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements D
   @Override
   public void run() {
     ThreadUtils.runSafeSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -81,7 +81,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements D
             if (participants.size() == 1) {
               editorManager.jumpToUser(participants.get(0));
             } else {
-              LOG.warn("More than one participant selected."); // $NON-NLS-1$
+              log.warn("More than one participant selected."); // $NON-NLS-1$
             }
           }
         });

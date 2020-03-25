@@ -24,7 +24,7 @@ import saros.session.User;
 /** Server implementation of the {@link IEditorManager} interface */
 public class ServerEditorManager implements IEditorManager {
 
-  private static final Logger LOG = Logger.getLogger(ServerEditorManager.class);
+  private static final Logger log = Logger.getLogger(ServerEditorManager.class);
 
   private Map<SPath, Editor> openEditors = Collections.synchronizedMap(new LRUMap<>(10));
   private List<ISharedEditorListener> listeners = new CopyOnWriteArrayList<>();
@@ -34,7 +34,7 @@ public class ServerEditorManager implements IEditorManager {
     try {
       getOrCreateEditor(path);
     } catch (IOException e) {
-      LOG.warn("Could not open editor for " + path);
+      log.warn("Could not open editor for " + path);
     }
   }
 
@@ -121,7 +121,7 @@ public class ServerEditorManager implements IEditorManager {
         listener.textEdited(activity);
       }
     } catch (IOException e) {
-      LOG.error("Could not read " + path + " to apply text edit", e);
+      log.error("Could not read " + path + " to apply text edit", e);
     }
   }
 

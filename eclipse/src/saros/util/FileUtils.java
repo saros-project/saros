@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IPath;
  */
 public class FileUtils {
 
-  private static Logger LOG = Logger.getLogger(FileUtils.class);
+  private static Logger log = Logger.getLogger(FileUtils.class);
 
   private FileUtils() {
     // no instantiation allowed
@@ -78,7 +78,7 @@ public class FileUtils {
    */
   public static void create(final IFolder folder) throws CoreException {
     if (folder.exists()) {
-      LOG.warn("folder already exists: " + folder, new StackTrace());
+      log.warn("folder already exists: " + folder, new StackTrace());
       return;
     }
 
@@ -95,7 +95,7 @@ public class FileUtils {
    */
   public static void delete(final IResource resource) throws CoreException {
     if (!resource.exists()) {
-      LOG.warn("file for deletion does not exist: " + resource, new StackTrace());
+      log.warn("file for deletion does not exist: " + resource, new StackTrace());
       return;
     }
 
@@ -142,7 +142,7 @@ public class FileUtils {
 
             totalFileSize += filesize;
           } catch (Exception e) {
-            LOG.warn("failed to retrieve file size of file " + resource.getLocationURI(), e);
+            log.warn("failed to retrieve file size of file " + resource.getLocationURI(), e);
           }
           break;
         case IResource.PROJECT:
@@ -160,7 +160,7 @@ public class FileUtils {
             totalFileCount += subFileCountAndSize.getRight();
 
           } catch (Exception e) {
-            LOG.warn("failed to process container: " + resource, e);
+            log.warn("failed to process container: " + resource, e);
           }
           break;
         default:
@@ -185,9 +185,9 @@ public class FileUtils {
       in = localFile.getContents();
       content = IOUtils.toByteArray(in);
     } catch (CoreException e) {
-      LOG.warn("could not get content of file " + localFile.getFullPath());
+      log.warn("could not get content of file " + localFile.getFullPath());
     } catch (IOException e) {
-      LOG.warn(
+      log.warn(
           "could not convert file content to byte array (file: " + localFile.getFullPath() + ")");
     } finally {
       IOUtils.closeQuietly(in);

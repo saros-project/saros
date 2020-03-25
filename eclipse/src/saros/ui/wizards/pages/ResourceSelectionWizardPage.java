@@ -23,7 +23,7 @@ import saros.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
 import saros.ui.widgets.viewer.project.events.ResourceSelectionListener;
 
 public class ResourceSelectionWizardPage extends WizardPage {
-  private static final Logger LOG = Logger.getLogger(ResourceSelectionWizardPage.class);
+  private static final Logger log = Logger.getLogger(ResourceSelectionWizardPage.class);
 
   private ResourceSelectionComposite resourceSelectionComposite;
 
@@ -135,7 +135,7 @@ public class ResourceSelectionWizardPage extends WizardPage {
         };
 
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
 
           @Override

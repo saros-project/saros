@@ -29,7 +29,7 @@ import saros.session.ISarosSession;
 @Component
 public class SPathConverter implements Converter, Startable {
 
-  private static final Logger LOG = Logger.getLogger(SPathConverter.class);
+  private static final Logger log = Logger.getLogger(SPathConverter.class);
 
   private static final String PATH = "p";
   private static final String PROJECT_ID = "i";
@@ -65,7 +65,7 @@ public class SPathConverter implements Converter, Startable {
 
     String i = session.getProjectID(spath.getProject());
     if (i == null) {
-      LOG.error(
+      log.error(
           "Could not retrieve project id for project '"
               + spath.getProject().getName()
               + "'. Make sure you don't create activities for non-shared projects");
@@ -86,7 +86,7 @@ public class SPathConverter implements Converter, Startable {
 
     IProject project = session.getProject(i);
     if (project == null) {
-      LOG.error("Could not create SPath because there is no shared project for id '" + i + "'");
+      log.error("Could not create SPath because there is no shared project for id '" + i + "'");
       return null;
     }
 

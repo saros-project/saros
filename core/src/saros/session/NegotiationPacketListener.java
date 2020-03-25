@@ -26,7 +26,7 @@ import saros.net.xmpp.JID;
  */
 final class NegotiationPacketListener {
 
-  private static final Logger LOG = Logger.getLogger(NegotiationPacketListener.class);
+  private static final Logger log = Logger.getLogger(NegotiationPacketListener.class);
 
   private final ITransmitter transmitter;
   private final IReceiver receiver;
@@ -72,7 +72,7 @@ final class NegotiationPacketListener {
           final CancelInviteExtension extension = CancelInviteExtension.PROVIDER.getPayload(packet);
 
           if (extension == null) {
-            LOG.warn("received malformed session negotiation packet from " + packet.getFrom());
+            log.warn("received malformed session negotiation packet from " + packet.getFrom());
             return;
           }
 
@@ -91,7 +91,7 @@ final class NegotiationPacketListener {
               InvitationOfferingExtension.PROVIDER.getPayload(packet);
 
           if (extension == null) {
-            LOG.warn("received malformed session negotiation packet from " + packet.getFrom());
+            log.warn("received malformed session negotiation packet from " + packet.getFrom());
             return;
           }
 
@@ -114,7 +114,7 @@ final class NegotiationPacketListener {
               CancelProjectNegotiationExtension.PROVIDER.getPayload(packet);
 
           if (extension == null) {
-            LOG.warn("received malformed project negotiation packet from " + packet.getFrom());
+            log.warn("received malformed project negotiation packet from " + packet.getFrom());
             return;
           }
 
@@ -133,7 +133,7 @@ final class NegotiationPacketListener {
               ProjectNegotiationOfferingExtension.PROVIDER.getPayload(packet);
 
           if (extension == null) {
-            LOG.warn("received malformed project negotiation packet from " + packet.getFrom());
+            log.warn("received malformed project negotiation packet from " + packet.getFrom());
             return;
           }
 
@@ -198,7 +198,7 @@ final class NegotiationPacketListener {
     final SessionNegotiation negotiation = sessionNegotiations.get(sender, sessionNegotiationID);
 
     if (negotiation == null) {
-      LOG.warn(
+      log.warn(
           "received session negotiation cancel from "
               + sender
               + " for a nonexisting instance with id: "
@@ -206,7 +206,7 @@ final class NegotiationPacketListener {
       return;
     }
 
-    LOG.debug(
+    log.debug(
         sender
             + " canceled session negotiation [id="
             + sessionNegotiationID
@@ -224,7 +224,7 @@ final class NegotiationPacketListener {
       final String sessionID,
       final String description) {
 
-    LOG.info(
+    log.info(
         "received invitation from "
             + sender
             + " [negotiation id: "
@@ -238,7 +238,7 @@ final class NegotiationPacketListener {
             + "]");
 
     if (rejectSessionNegotiationRequests) {
-      LOG.info("rejecting session negotiation request with id: " + negotiationID);
+      log.info("rejecting session negotiation request with id: " + negotiationID);
 
       /*
        * FIXME This text should be replaced with a cancel ID. This is GUI
@@ -284,7 +284,7 @@ final class NegotiationPacketListener {
     final ProjectNegotiation negotiation = projectNegotiations.get(sender, negotiationID);
 
     if (negotiation != null) {
-      LOG.debug(
+      log.debug(
           sender
               + " canceled project negotiation [id="
               + negotiationID
@@ -294,7 +294,7 @@ final class NegotiationPacketListener {
 
       negotiation.remoteCancel(errorMessage);
     } else {
-      LOG.warn(
+      log.warn(
           "received project negotiation cancel from "
               + sender
               + " for a nonexisting instance with id: "
@@ -307,7 +307,7 @@ final class NegotiationPacketListener {
       final String negotiationID,
       final List<ProjectNegotiationData> projectNegotiationData) {
 
-    LOG.info(
+    log.info(
         "received project negotiation from " + sender + " with negotiation id: " + negotiationID);
 
     sessionManager.projectNegotiationRequestReceived(sender, projectNegotiationData, negotiationID);

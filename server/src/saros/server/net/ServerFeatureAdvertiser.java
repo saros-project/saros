@@ -13,7 +13,7 @@ import saros.net.xmpp.XMPPConnectionService;
 @Component(module = "server")
 public class ServerFeatureAdvertiser {
 
-  private static final Logger LOG = Logger.getLogger(ServerFeatureAdvertiser.class);
+  private static final Logger log = Logger.getLogger(ServerFeatureAdvertiser.class);
 
   private IConnectionListener connectionListener =
       new IConnectionListener() {
@@ -37,7 +37,7 @@ public class ServerFeatureAdvertiser {
   }
 
   private static void advertiseServerFeature(Connection connection) {
-    LOG.info("Starting to advertise ourselves as server");
+    log.info("Starting to advertise ourselves as server");
 
     ServiceDiscoveryManager discoveryManager = ServiceDiscoveryManager.getInstanceFor(connection);
 

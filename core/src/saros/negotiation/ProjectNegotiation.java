@@ -29,7 +29,7 @@ import saros.session.ISarosSessionManager;
  */
 public abstract class ProjectNegotiation extends Negotiation {
 
-  private static final Logger LOG = Logger.getLogger(ProjectNegotiation.class);
+  private static final Logger log = Logger.getLogger(ProjectNegotiation.class);
 
   /** Prefix part of the id used in the SMACK XMPP file transfer protocol. */
   public static final String TRANSFER_ID_PREFIX = "saros-dpp-pn-server-client/";
@@ -102,7 +102,7 @@ public abstract class ProjectNegotiation extends Negotiation {
 
     if (cause.getCancelOption() != CancelOption.NOTIFY_PEER) return;
 
-    LOG.debug(
+    log.debug(
         "notifying remote contact " + getPeer() + " of the local project negotiation cancellation");
 
     PacketExtension notification =

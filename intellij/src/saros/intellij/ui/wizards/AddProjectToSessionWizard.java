@@ -78,7 +78,7 @@ import saros.util.ThreadUtils;
 
 //  FIXME: Add facility for more than one project.
 public class AddProjectToSessionWizard extends Wizard {
-  private static final Logger LOG = Logger.getLogger(AddProjectToSessionWizard.class);
+  private static final Logger log = Logger.getLogger(AddProjectToSessionWizard.class);
 
   public static final String SELECT_MODULE_REPRESENTATION_PAGE_ID = "selectModuleRepresentation";
   public static final String FILE_LIST_PAGE_ID = "fileListPage";
@@ -192,7 +192,7 @@ public class AddProjectToSessionWizard extends Wizard {
           String moduleType = moduleConfiguration.getModuleType();
 
           if (moduleType == null) {
-            LOG.error("Aborted module creation as no module type was received.");
+            log.error("Aborted module creation as no module type was received.");
 
             cancelNegotiation("Failed to create shared module");
 
@@ -209,7 +209,7 @@ public class AddProjectToSessionWizard extends Wizard {
             module = createBaseModule(moduleName, moduleType, moduleBasePath, project);
 
           } catch (IOException e) {
-            LOG.error("Could not create the shared module " + moduleName + ".", e);
+            log.error("Could not create the shared module " + moduleName + ".", e);
 
             cancelNegotiation("Failed to create shared module");
 
@@ -227,7 +227,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
           } catch (ModuleWithNameAlreadyExists e) {
-            LOG.warn("Could not create the shared module " + moduleName + ".", e);
+            log.warn("Could not create the shared module " + moduleName + ".", e);
 
             cancelNegotiation("Failed to create shared module");
 
@@ -266,7 +266,7 @@ public class AddProjectToSessionWizard extends Wizard {
             sharedProject = new IntelliJProjectImpl(existingModule);
 
           } catch (IllegalArgumentException e) {
-            LOG.debug("No session is started as an invalid module was chosen");
+            log.debug("No session is started as an invalid module was chosen");
 
             cancelNegotiation("Invalid module chosen by client");
 
@@ -313,7 +313,7 @@ public class AddProjectToSessionWizard extends Wizard {
           ISarosSession session = sessionManager.getSession();
 
           if (session == null) {
-            LOG.error("Encountered project negotiation without running session");
+            log.error("Encountered project negotiation without running session");
 
             NotificationPanel.showError(
                 Messages.AddProjectToSessionWizard_no_session_message,
@@ -326,7 +326,7 @@ public class AddProjectToSessionWizard extends Wizard {
               session.getComponent(ModuleConfigurationInitializer.class);
 
           if (moduleConfigurationInitializer == null) {
-            LOG.error(
+            log.error(
                 "Could not obtain class from session context - "
                     + ModuleConfigurationInitializer.class.getSimpleName());
 
@@ -349,9 +349,9 @@ public class AddProjectToSessionWizard extends Wizard {
          */
         private void noisyCancel(@NotNull String reason, @Nullable Throwable throwable) {
           if (throwable != null) {
-            LOG.error("Encountered error reading module selection results: " + reason, throwable);
+            log.error("Encountered error reading module selection results: " + reason, throwable);
           } else {
-            LOG.error("Encountered error reading module selection results: " + reason);
+            log.error("Encountered error reading module selection results: " + reason);
           }
 
           NotificationPanel.showError(
@@ -381,7 +381,7 @@ public class AddProjectToSessionWizard extends Wizard {
    */
   private void cancelNegotiation(@Nullable final String reason) {
     ThreadUtils.runSafeAsync(
-        LOG,
+        log,
         new Runnable() {
 
           @Override
@@ -762,7 +762,7 @@ public class AddProjectToSessionWizard extends Wizard {
         }
 
       } catch (IOException e) {
-        LOG.warn("could not refresh project: " + project, e);
+        log.warn("could not refresh project: " + project, e);
       }
     }
     return modifiedResources;

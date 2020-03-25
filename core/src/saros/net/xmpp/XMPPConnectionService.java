@@ -34,7 +34,7 @@ import saros.util.ThreadUtils;
  */
 @Component(module = "net")
 public class XMPPConnectionService {
-  private static final Logger LOG = Logger.getLogger(XMPPConnectionService.class);
+  private static final Logger log = Logger.getLogger(XMPPConnectionService.class);
 
   // DO NOT CHANGE THE CONTENT OF THIS STRING, NEVER NEVER NEVER !!!
   private static final String PORT_MAPPING_DESCRIPTION = "Saros Socks5 TCP";
@@ -94,7 +94,7 @@ public class XMPPConnectionService {
         @Override
         public void connectionClosedOnError(Exception e) {
           synchronized (XMPPConnectionService.this) {
-            LOG.error("XMPP connection error: ", e);
+            log.error("XMPP connection error: ", e);
             setConnectionState(ConnectionState.ERROR, e);
             disconnectInternal();
             setConnectionState(ConnectionState.NOT_CONNECTED, null);
@@ -188,7 +188,7 @@ public class XMPPConnectionService {
 
     ThreadUtils.runSafeAsync(
         "upnp-resolver",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -337,7 +337,7 @@ public class XMPPConnectionService {
       connection.removeConnectionListener(smackConnectionListener);
       connection.disconnect();
     } catch (RuntimeException e) {
-      LOG.warn("could not disconnect from the current XMPPConnection", e);
+      log.warn("could not disconnect from the current XMPPConnection", e);
     } finally {
 
       uninitialzeNetworkComponents();
@@ -359,16 +359,16 @@ public class XMPPConnectionService {
     }
 
     if (error == null) {
-      LOG.debug(prefix + " new connection state == " + state);
+      log.debug(prefix + " new connection state == " + state);
     } else {
-      LOG.error(prefix + " new connection state == " + state, error);
+      log.error(prefix + " new connection state == " + state, error);
     }
 
     for (IConnectionListener listener : listeners) {
       try {
         listener.connectionStateChanged(connection, state);
       } catch (Exception e) {
-        LOG.error("internal error in listener: " + listener, e);
+        log.error("internal error in listener: " + listener, e);
       }
     }
   }
@@ -399,7 +399,7 @@ public class XMPPConnectionService {
     proxy.start();
     socks5ProxyPort = proxy.getPort();
 
-    LOG.debug(
+    log.debug(
         "started Socks5 proxy on port: " + socks5ProxyPort + " [listening on all interfaces]");
 
     List<String> interfaceAddresses = new ArrayList<String>();
@@ -408,15 +408,15 @@ public class XMPPConnectionService {
       interfaceAddresses.addAll(proxyAddresses);
 
       if (interfaceAddresses.isEmpty())
-        LOG.warn("Socks5 preconfigured addresses list is empty, using autodetect mode");
-      else LOG.debug("using preconfigured addresses: " + interfaceAddresses);
+        log.warn("Socks5 preconfigured addresses list is empty, using autodetect mode");
+      else log.debug("using preconfigured addresses: " + interfaceAddresses);
     }
 
     if (interfaceAddresses.isEmpty()) {
       for (InetAddress interfaceAddress : NetworkingUtils.getAllNonLoopbackLocalIPAddresses(true)) {
         interfaceAddresses.add(interfaceAddress.getHostAddress());
       }
-      LOG.debug("using autodetected addresses: " + interfaceAddresses);
+      log.debug("using autodetected addresses: " + interfaceAddresses);
     }
 
     proxy.replaceLocalAddresses(interfaceAddresses);
@@ -431,7 +431,7 @@ public class XMPPConnectionService {
     if (stunService != null && stunServer != null) {
       ThreadUtils.runSafeAsync(
           "stun-discovery",
-          LOG,
+          log,
           new Runnable() {
             @Override
             public void run() {
@@ -450,7 +450,7 @@ public class XMPPConnectionService {
       final String gatewayDeviceIDToFind = gatewayDeviceID;
       ThreadUtils.runSafeAsync(
           "upnp-portmapping",
-          LOG,
+          log,
           new Runnable() {
             @Override
             public void run() {
@@ -460,7 +460,7 @@ public class XMPPConnectionService {
                 List<GatewayDevice> devices = upnpService.getGateways(false);
 
                 if (devices == null) {
-                  LOG.warn("aborting UPNP port mapping due to network failure");
+                  log.warn("aborting UPNP port mapping due to network failure");
                   return;
                 }
 
@@ -472,7 +472,7 @@ public class XMPPConnectionService {
                 }
 
                 if (device == null) {
-                  LOG.warn(
+                  log.warn(
                       "could not find gateway device with id: + "
                           + gatewayDeviceID
                           + " in the current network environment");
@@ -481,7 +481,7 @@ public class XMPPConnectionService {
 
                 upnpService.deletePortMapping(device, socks5ProxyPort, IUPnPService.TCP);
 
-                LOG.debug(
+                log.debug(
                     "creating port mapping on device: "
                         + device.getFriendlyName()
                         + " ["
@@ -493,7 +493,7 @@ public class XMPPConnectionService {
                 if (!upnpService.createPortMapping(
                     device, socks5ProxyPort, IUPnPService.TCP, PORT_MAPPING_DESCRIPTION)) {
 
-                  LOG.warn(
+                  log.warn(
                       "failed to create port mapping on device: "
                           + device.getFriendlyName()
                           + " ["
@@ -535,7 +535,7 @@ public class XMPPConnectionService {
 
       if (!upnpService.isMapped(device, socks5ProxyPort, IUPnPService.TCP)) break deleteMapping;
 
-      LOG.debug(
+      log.debug(
           "deleting port mapping on device: "
               + device.getFriendlyName()
               + " ["
@@ -545,7 +545,7 @@ public class XMPPConnectionService {
               + "]");
 
       if (!upnpService.deletePortMapping(device, socks5ProxyPort, IUPnPService.TCP)) {
-        LOG.warn(
+        log.warn(
             "failed to delete port mapping on device: "
                 + device.getFriendlyName()
                 + " ["

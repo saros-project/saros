@@ -27,7 +27,7 @@ import saros.net.xmpp.XMPPConnectionService;
  */
 @Component(module = "net")
 public class SubscriptionHandler {
-  private static final Logger LOG = Logger.getLogger(SubscriptionHandler.class);
+  private static final Logger log = Logger.getLogger(SubscriptionHandler.class);
 
   private Connection connection = null;
 
@@ -51,7 +51,7 @@ public class SubscriptionHandler {
           try {
             processPresence((Presence) packet);
           } catch (RuntimeException e) {
-            LOG.error("failed to process packet: " + packet, e);
+            log.error("failed to process packet: " + packet, e);
           }
         }
       };
@@ -125,25 +125,25 @@ public class SubscriptionHandler {
                 presence.getFrom(),
                 presence.getError().getCondition(),
                 presence.getError().getMessage());
-        LOG.warn(message);
+        log.warn(message);
         return;
 
       case subscribed:
-        LOG.debug("contact subscribed to us: " + jid);
+        log.debug("contact subscribed to us: " + jid);
         break;
 
       case unsubscribed:
-        LOG.debug("contact unsubscribed from us: " + jid);
+        log.debug("contact unsubscribed from us: " + jid);
         notifySubscriptionCanceled(jid);
         break;
 
       case subscribe:
-        LOG.debug("contact requests to subscribe to us: " + jid);
+        log.debug("contact requests to subscribe to us: " + jid);
         notifySubscriptionReceived(jid);
         break;
 
       case unsubscribe:
-        LOG.debug("contact requests to unsubscribe from us: " + jid);
+        log.debug("contact requests to unsubscribe from us: " + jid);
         removeSubscription(jid);
         break;
 
@@ -164,10 +164,10 @@ public class SubscriptionHandler {
         connection.getRoster().createEntry(jid.getBase(), null, null);
 
     } catch (XMPPException e) {
-      LOG.error("adding user to roster failed", e);
+      log.error("adding user to roster failed", e);
       success = false;
     } catch (IllegalStateException e) {
-      LOG.error("cannot add user to roster, not connected to a XMPP server", e);
+      log.error("cannot add user to roster, not connected to a XMPP server", e);
       success = false;
     }
 
@@ -180,7 +180,7 @@ public class SubscriptionHandler {
     try {
       sendPresence(Presence.Type.subscribed, jid.getBase());
     } catch (IllegalStateException e) {
-      LOG.error("failed to send subscribe message, not connected to a XMPP server", e);
+      log.error("failed to send subscribe message, not connected to a XMPP server", e);
 
       success = false;
     }
@@ -194,7 +194,7 @@ public class SubscriptionHandler {
     try {
       sendPresence(Presence.Type.unsubscribed, jid.getBase());
     } catch (IllegalStateException e) {
-      LOG.error("failed to send unsubscribed message, not connected to a XMPP server", e);
+      log.error("failed to send unsubscribed message, not connected to a XMPP server", e);
 
       success = false;
     }

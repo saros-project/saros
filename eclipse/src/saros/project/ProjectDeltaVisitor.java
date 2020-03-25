@@ -30,7 +30,7 @@ import saros.util.FileUtils;
  */
 final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
-  private static final Logger LOG = Logger.getLogger(ProjectDeltaVisitor.class);
+  private static final Logger log = Logger.getLogger(ProjectDeltaVisitor.class);
 
   private static final int CAPACITY_THRESHOLD = 128;
 
@@ -341,6 +341,6 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
   }
 
   private static void logResourceReadError(IResource resource) {
-    LOG.error("could not read contents of file: " + resource.getFullPath());
+    log.error("could not read contents of file: " + resource.getFullPath());
   }
 }

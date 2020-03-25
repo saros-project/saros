@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  */
 class URLCodec {
 
-  private static final Logger LOG = Logger.getLogger(URLCodec.class);
+  private static final Logger log = Logger.getLogger(URLCodec.class);
 
   private static final Charset CHARSET = Charset.forName("UTF-8");
 
@@ -23,7 +23,7 @@ class URLCodec {
     try {
       return URL_CODEC.encode(data);
     } catch (EncoderException e) {
-      LOG.error("failed to encode data: " + data, e);
+      log.error("failed to encode data: " + data, e);
       return data;
     }
   }
@@ -33,7 +33,7 @@ class URLCodec {
     try {
       return URL_CODEC.decode(data);
     } catch (DecoderException e) {
-      LOG.error("failed to decode data: " + data, e);
+      log.error("failed to decode data: " + data, e);
       return data;
     }
   }

@@ -45,7 +45,7 @@ import saros.ui.widgets.viewer.ViewerComposite;
  */
 public abstract class SessionDisplayComposite extends ViewerComposite<TreeViewer> {
 
-  private static final Logger LOGGER = Logger.getLogger(SessionDisplayComposite.class);
+  private static final Logger log = Logger.getLogger(SessionDisplayComposite.class);
 
   @Inject protected ISarosSessionManager sessionManager;
 
@@ -73,7 +73,7 @@ public abstract class SessionDisplayComposite extends ViewerComposite<TreeViewer
           session.addListener(sessionListener);
 
           SWTUtils.runSafeSWTAsync(
-              LOGGER,
+              log,
               new Runnable() {
 
                 @Override
@@ -94,7 +94,7 @@ public abstract class SessionDisplayComposite extends ViewerComposite<TreeViewer
         public void sessionEnded(ISarosSession session, SessionEndReason reason) {
           session.removeListener(sessionListener);
           SWTUtils.runSafeSWTAsync(
-              LOGGER,
+              log,
               new Runnable() {
 
                 @Override
@@ -179,7 +179,7 @@ public abstract class SessionDisplayComposite extends ViewerComposite<TreeViewer
 
     // run async because the CTOR init. chain is not finished at this point
     SWTUtils.runSafeSWTAsync(
-        LOGGER,
+        log,
         new Runnable() {
 
           @Override

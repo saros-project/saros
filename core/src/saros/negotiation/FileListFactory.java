@@ -27,7 +27,7 @@ import saros.negotiation.FileList.MetaData;
  */
 public class FileListFactory {
 
-  private static final Logger LOG = Logger.getLogger(FileListFactory.class);
+  private static final Logger log = Logger.getLogger(FileListFactory.class);
 
   private IChecksumCache checksumCache;
   private IProgressMonitor monitor;
@@ -140,11 +140,11 @@ public class FileListFactory {
           boolean isInvalid = checksumCache.addChecksum(file, data.checksum);
 
           if (isInvalid && checksum != null)
-            LOG.warn("calculated checksum on dirty data: " + file.getFullPath());
+            log.warn("calculated checksum on dirty data: " + file.getFullPath());
         }
 
       } catch (IOException e) {
-        LOG.error(e);
+        log.error(e);
       }
 
       monitor.worked(1);

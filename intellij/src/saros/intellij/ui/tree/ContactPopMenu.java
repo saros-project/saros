@@ -34,7 +34,7 @@ import saros.net.xmpp.JID;
  */
 class ContactPopMenu extends JPopupMenu {
 
-  private static final Logger LOG = Logger.getLogger(ContactPopMenu.class);
+  private static final Logger log = Logger.getLogger(ContactPopMenu.class);
 
   private final ContactTreeRootNode.ContactInfo contactInfo;
 
@@ -90,7 +90,7 @@ class ContactPopMenu extends JPopupMenu {
       }
 
     } else {
-      LOG.debug(
+      log.debug(
           "No modules shown to user as no modules "
               + (nonCompliantModules.isEmpty()
                   ? ""
@@ -167,7 +167,7 @@ class ContactPopMenu extends JPopupMenu {
         shownModules.add(moduleItem);
 
       } catch (IllegalArgumentException exception) {
-        LOG.debug(
+        log.debug(
             "Ignoring module "
                 + fullModuleName
                 + " as it does not meet the current release restrictions.");
@@ -200,7 +200,7 @@ class ContactPopMenu extends JPopupMenu {
     @Override
     public void actionPerformed(ActionEvent e) {
       if (module == null || !module.exists()) {
-        LOG.error(
+        log.error(
             "The IProject object for the module "
                 + moduleName
                 + " could not be created. This most likely means that the local Intellij instance "

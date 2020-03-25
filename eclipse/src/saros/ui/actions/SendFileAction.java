@@ -59,7 +59,7 @@ public class SendFileAction extends Action implements Disposable {
 
   public static final String ACTION_ID = SendFileAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(SendFileAction.class);
+  private static final Logger log = Logger.getLogger(SendFileAction.class);
 
   // static smack ****
   static {
@@ -78,7 +78,7 @@ public class SendFileAction extends Action implements Disposable {
             return;
 
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
                 @Override
                 public void run() {
@@ -102,7 +102,7 @@ public class SendFileAction extends Action implements Disposable {
         public void connectionStateChanged(
             final Connection connection, final ConnectionState state) {
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
 
                 @Override

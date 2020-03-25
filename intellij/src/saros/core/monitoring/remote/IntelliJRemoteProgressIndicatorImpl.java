@@ -18,7 +18,7 @@ import saros.util.CoreUtils;
 /** IntelliJ implementation of the {@link IRemoteProgressIndicator} interface. */
 final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndicator {
 
-  private static final Logger LOG = Logger.getLogger(IntelliJRemoteProgressIndicatorImpl.class);
+  private static final Logger log = Logger.getLogger(IntelliJRemoteProgressIndicatorImpl.class);
 
   private final RemoteProgressManager rpm;
   private final String remoteProgressID;
@@ -72,7 +72,7 @@ final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndica
               mainloop(monitor);
               return Status.OK_STATUS;
             } catch (Exception e) {
-              LOG.error(e);
+              log.error(e);
               return Status.CANCEL_STATUS;
             } finally {
               rpm.progressIndicatorStopped(IntelliJRemoteProgressIndicatorImpl.this);
@@ -102,7 +102,7 @@ final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndica
   @Override
   public synchronized void handleProgress(ProgressActivity activity) {
     if (!remoteUser.equals(activity.getSource())) {
-      LOG.warn(
+      log.warn(
           "RemoteProgress with ID: "
               + remoteProgressID
               + " is owned by user "
@@ -113,7 +113,7 @@ final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndica
     }
 
     if (!running) {
-      LOG.debug(
+      log.debug(
           "RemoteProgress with ID: "
               + remoteProgressID
               + " has already been closed. Discarding activity: "
@@ -149,7 +149,7 @@ final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndica
 
       int newWorked;
 
-      if (LOG.isTraceEnabled()) LOG.trace("executing progress activity: " + activity);
+      if (log.isTraceEnabled()) log.trace("executing progress activity: " + activity);
 
       switch (activity.getAction()) {
         case BEGINTASK:
@@ -184,7 +184,7 @@ final class IntelliJRemoteProgressIndicatorImpl implements IRemoteProgressIndica
           monitor.done();
           break update;
         case CANCEL:
-          LOG.debug("progress was canceled by remote user");
+          log.debug("progress was canceled by remote user");
           monitor.setCanceled(true);
           break update;
       }

@@ -37,7 +37,7 @@ public class DisconnectServerAction extends AbstractSarosAction {
               @Override
               public void run(@NotNull ProgressIndicator indicator) {
 
-                LOG.info(
+                log.info(
                     "Disconnecting current connection: " + connectionHandler.getConnectionID());
 
                 indicator.setIndeterminate(true);

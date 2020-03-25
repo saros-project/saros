@@ -99,7 +99,7 @@ public class EditorManager implements IEditorManager {
    * other participants. Furthermore every Activity from other participants needs to be replayed in
    * your local editor when it is received.
    */
-  private static final Logger LOG = Logger.getLogger(EditorManager.class);
+  private static final Logger log = Logger.getLogger(EditorManager.class);
 
   boolean hasWriteAccess;
 
@@ -167,7 +167,7 @@ public class EditorManager implements IEditorManager {
 
           User sender = activity.getSource();
           if (!sender.isInSession()) {
-            LOG.warn(
+            log.warn(
                 "skipping execution of activity "
                     + activity
                     + " for user "
@@ -239,7 +239,7 @@ public class EditorManager implements IEditorManager {
 
         private void execute(final boolean lock) {
           SWTUtils.runSafeSWTSync(
-              LOG,
+              log,
               new Runnable() {
                 @Override
                 public void run() {
@@ -291,7 +291,7 @@ public class EditorManager implements IEditorManager {
                     localViewport.getNumberOfLines(),
                     locallyActiveEditor));
           } else {
-            LOG.warn("No viewport for locallyActivateEditor: " + locallyActiveEditor);
+            log.warn("No viewport for locallyActivateEditor: " + locallyActiveEditor);
           }
 
           if (localSelection != null) {
@@ -301,7 +301,7 @@ public class EditorManager implements IEditorManager {
             activityDelayer.fireActivity(
                 new TextSelectionActivity(localUser, offset, length, locallyActiveEditor));
           } else {
-            LOG.warn("No selection for locallyActivateEditor: " + locallyActiveEditor);
+            log.warn("No selection for locallyActivateEditor: " + locallyActiveEditor);
           }
         }
 
@@ -327,7 +327,7 @@ public class EditorManager implements IEditorManager {
         @Override
         public void resourcesAdded(IProject project) {
           SWTUtils.runSafeSWTSync(
-              LOG,
+              log,
               new Runnable() {
                 /*
                  * When Alice invites Bob to a session with a project and Alice
@@ -351,7 +351,7 @@ public class EditorManager implements IEditorManager {
         @Override
         public void sessionStarted(final ISarosSession session) {
           SWTUtils.runSafeSWTSync(
-              LOG,
+              log,
               new Runnable() {
                 @Override
                 public void run() {
@@ -363,7 +363,7 @@ public class EditorManager implements IEditorManager {
         @Override
         public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
           SWTUtils.runSafeSWTSync(
-              LOG,
+              log,
               new Runnable() {
                 @Override
                 public void run() {
@@ -378,7 +378,7 @@ public class EditorManager implements IEditorManager {
     this.preferenceStore = preferenceStore;
 
     editorPool = new EditorPool(this);
-    partListener = new SafePartListener2(LOG, new EditorPartListener(this));
+    partListener = new SafePartListener2(log, new EditorPartListener(this));
 
     registerCustomAnnotations();
     sessionManager.addSessionLifecycleListener(this.sessionLifecycleListener);
@@ -398,14 +398,14 @@ public class EditorManager implements IEditorManager {
    */
   void connect(final IFile file) {
     if (!file.isAccessible()) {
-      LOG.error(".connect(): file " + file + " could not be accessed");
+      log.error(".connect(): file " + file + " could not be accessed");
       return;
     }
 
-    LOG.trace(".connect(" + file + ") invoked");
+    log.trace(".connect(" + file + ") invoked");
 
     if (isManaged(file)) {
-      LOG.trace("file " + file + " is already connected");
+      log.trace("file " + file + " is already connected");
       return;
     }
 
@@ -415,10 +415,10 @@ public class EditorManager implements IEditorManager {
   }
 
   void disconnect(final IFile file) {
-    LOG.trace(".disconnect(" + file + ") invoked");
+    log.trace(".disconnect(" + file + ") invoked");
 
     if (!isManaged(file)) {
-      LOG.warn(".disconnect(): file " + file + " already disconnected");
+      log.warn(".disconnect(): file " + file + " already disconnected");
       return;
     }
 
@@ -437,7 +437,7 @@ public class EditorManager implements IEditorManager {
             }
           });
     } catch (Exception e) {
-      LOG.warn("Failed to get editor content for " + path, e);
+      log.warn("Failed to get editor content for " + path, e);
       return null;
     }
   }
@@ -449,7 +449,7 @@ public class EditorManager implements IEditorManager {
     IDocumentProvider provider = EditorAPI.connect(input);
 
     if (provider == null) {
-      LOG.warn("Failed to retrieve the content of " + path);
+      log.warn("Failed to retrieve the content of " + path);
       return null;
     }
 
@@ -509,13 +509,13 @@ public class EditorManager implements IEditorManager {
   void generateViewport(IEditorPart part, LineRange viewport) {
 
     if (this.session == null) {
-      LOG.warn("SharedEditorListener not correctly unregistered!");
+      log.warn("SharedEditorListener not correctly unregistered!");
       return;
     }
 
     SPath path = EditorAPI.getEditorPath(part);
     if (path == null) {
-      LOG.warn("Could not find path for editor " + part.getTitle());
+      log.warn("Could not find path for editor " + part.getTitle());
       return;
     }
 
@@ -540,7 +540,7 @@ public class EditorManager implements IEditorManager {
 
     SPath path = EditorAPI.getEditorPath(part);
     if (path == null) {
-      LOG.warn("Could not find path for editor " + part.getTitle());
+      log.warn("Could not find path for editor " + part.getTitle());
       return;
     }
 
@@ -569,7 +569,7 @@ public class EditorManager implements IEditorManager {
     if (fileReplacementInProgressObservable.isReplacementInProgress()) return;
 
     if (session == null) {
-      LOG.error("session has ended but text edits" + " are received from local user");
+      log.error("session has ended but text edits" + " are received from local user");
       return;
     }
 
@@ -587,13 +587,13 @@ public class EditorManager implements IEditorManager {
     }
 
     if (changedEditor == null) {
-      LOG.error("Could not find editor for changed document " + document);
+      log.error("Could not find editor for changed document " + document);
       return;
     }
 
     SPath path = EditorAPI.getEditorPath(changedEditor);
     if (path == null) {
-      LOG.warn("Could not find path for editor " + changedEditor.getTitle());
+      log.warn("Could not find path for editor " + changedEditor.getTitle());
       return;
     }
 
@@ -601,7 +601,7 @@ public class EditorManager implements IEditorManager {
     try {
       replacedText = document.get(offset, replaceLength);
     } catch (BadLocationException e) {
-      LOG.error("Offset and/or replace invalid", e);
+      log.error("Offset and/or replace invalid", e);
 
       StringBuilder sb = new StringBuilder();
       for (int i = 0; i < replaceLength; i++) sb.append("?");
@@ -619,7 +619,7 @@ public class EditorManager implements IEditorManager {
        *
        * <p>But watch out for changes because of a consistency check!
        */
-      LOG.warn(
+      log.warn(
           "local user caused text changes: "
               + textEdit
               + " | write access : "
@@ -665,19 +665,19 @@ public class EditorManager implements IEditorManager {
         saveEditor(sPath);
         break;
       default:
-        LOG.warn("Unexpected type: " + editorActivity.getType());
+        log.warn("Unexpected type: " + editorActivity.getType());
     }
   }
 
   private void execTextEdit(TextEditActivity textEdit) {
 
-    LOG.trace(".execTextEdit invoked");
+    log.trace(".execTextEdit invoked");
 
     SPath path = textEdit.getPath();
     IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
     if (!file.exists()) {
-      LOG.error("TextEditActivity refers to file which" + " is not available locally: " + textEdit);
+      log.error("TextEditActivity refers to file which" + " is not available locally: " + textEdit);
       // TODO A consistency check can be started here
       return;
     }
@@ -734,7 +734,7 @@ public class EditorManager implements IEditorManager {
     if (path == null) throw new IllegalArgumentException("path must not be null");
 
     SWTUtils.runSafeSWTSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -764,7 +764,7 @@ public class EditorManager implements IEditorManager {
     if (path == null) throw new IllegalArgumentException("path must not be null");
 
     SWTUtils.runSafeSWTSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -778,7 +778,7 @@ public class EditorManager implements IEditorManager {
   /** Called when the local user opened an editor part. (called by EditorPartListener) */
   void partOpened(IEditorPart editorPart) {
 
-    LOG.trace(".partOpened invoked");
+    log.trace(".partOpened invoked");
 
     if (!isSharedEditor(editorPart)) return;
 
@@ -790,7 +790,7 @@ public class EditorManager implements IEditorManager {
     final IResource resource = EditorAPI.getEditorResource(editorPart);
 
     if (!resource.isAccessible()) {
-      LOG.warn(".partOpened resource: " + resource + " is not accessible");
+      log.warn(".partOpened resource: " + resource + " is not accessible");
       return;
     }
 
@@ -824,7 +824,7 @@ public class EditorManager implements IEditorManager {
    */
   void partActivated(IEditorPart editorPart) {
 
-    LOG.trace(".partActivated invoked");
+    log.trace(".partActivated invoked");
 
     // editorPart = null, no editor opened at all
     if (editorPart == null) {
@@ -852,7 +852,7 @@ public class EditorManager implements IEditorManager {
     SPath editorPath = EditorAPI.getEditorPath(editorPart);
 
     if (editorPath.equals(locallyActiveEditor)) {
-      LOG.debug(
+      log.debug(
           "ignoring partActivated event for editor path "
               + editorPath
               + " because it is already active");
@@ -869,7 +869,7 @@ public class EditorManager implements IEditorManager {
     LineRange viewport = EditorAPI.getViewport(viewer);
 
     if (viewport == null) {
-      LOG.warn("Shared Editor does not have a Viewport: " + editorPart);
+      log.warn("Shared Editor does not have a Viewport: " + editorPart);
     } else {
       generateViewport(editorPart, viewport);
     }
@@ -884,7 +884,7 @@ public class EditorManager implements IEditorManager {
    */
   void partInputChanged(IEditorPart editorPart) {
 
-    LOG.trace(".partInputChanged invoked");
+    log.trace(".partInputChanged invoked");
 
     // FIXME Get rid of this followModeManager dependency
     // notice currently followed user before closing the editor
@@ -896,7 +896,7 @@ public class EditorManager implements IEditorManager {
       // before the move happened) and then simulate it being opened again
       SPath path = editorPool.getPath(editorPart);
       if (path == null) {
-        LOG.warn("Editor was managed but path could not be found: " + editorPart);
+        log.warn("Editor was managed but path could not be found: " + editorPart);
       } else {
         partClosedOfPath(editorPart, path);
       }
@@ -908,7 +908,7 @@ public class EditorManager implements IEditorManager {
       User newFollowedUser = followModeManager.getFollowedUser();
       if (oldFollowedUser != null && oldFollowedUser != newFollowedUser) {
         followModeManager.follow(oldFollowedUser);
-        LOG.debug(
+        log.debug(
             "Followed user changed from "
                 + oldFollowedUser
                 + " to "
@@ -921,7 +921,7 @@ public class EditorManager implements IEditorManager {
   /** Called if the local user closed a part (called by EditorPartListener) */
   void partClosed(IEditorPart editorPart) {
 
-    LOG.trace(".partClosed invoked");
+    log.trace(".partClosed invoked");
 
     if (!isSharedEditor(editorPart)) {
       return;
@@ -1028,19 +1028,19 @@ public class EditorManager implements IEditorManager {
     try {
       IDocument doc = provider.getDocument(input);
       if (doc == null) {
-        LOG.error(
+        log.error(
             "Could not connect document provider for file: " + file.toString(), new StackTrace());
         // TODO Trigger a consistency recovery
         return;
       }
 
       // Check if the replaced text is really there.
-      if (LOG.isDebugEnabled()) {
+      if (log.isDebugEnabled()) {
         String is;
         try {
           is = doc.get(offset, replacedText.length());
           if (!is.equals(replacedText)) {
-            LOG.error(
+            log.error(
                 "replaceText should be '"
                     + StringEscapeUtils.escapeJava(replacedText)
                     + "' is '"
@@ -1058,7 +1058,7 @@ public class EditorManager implements IEditorManager {
         // annotation exists at the offset and the length > 1
         doc.replace(offset, replacedText.length(), text);
       } catch (BadLocationException e) {
-        LOG.error(
+        log.error(
             String.format(
                 "Could not apply TextEdit at %d-%d of document "
                     + "with length %d.\nWas supposed to replace"
@@ -1090,7 +1090,7 @@ public class EditorManager implements IEditorManager {
   public void saveLazy(final SPath path) {
 
     SWTUtils.runSafeSWTSync(
-        LOG,
+        log,
         new Runnable() {
 
           @Override
@@ -1100,7 +1100,7 @@ public class EditorManager implements IEditorManager {
             try {
               isDirty = isDirty(path);
             } catch (FileNotFoundException e) {
-              LOG.warn("could not save editor: " + path, e);
+              log.warn("could not save editor: " + path, e);
             }
 
             if (isDirty) saveEditor(path);
@@ -1145,10 +1145,10 @@ public class EditorManager implements IEditorManager {
 
     IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
-    LOG.trace(".saveEditor (" + file.getName() + ") invoked");
+    log.trace(".saveEditor (" + file.getName() + ") invoked");
 
     if (!file.exists()) {
-      LOG.warn("File not found for saving: " + path.toString(), new StackTrace());
+      log.warn("File not found for saving: " + path.toString(), new StackTrace());
       return;
     }
 
@@ -1162,12 +1162,12 @@ public class EditorManager implements IEditorManager {
        * This happens when a file which is already saved is saved again by
        * a user.
        */
-      LOG.debug(".saveEditor File " + file.getName() + " does not need to be saved");
+      log.debug(".saveEditor File " + file.getName() + " does not need to be saved");
       provider.disconnect(input);
       return;
     }
 
-    LOG.trace(".saveEditor File " + file.getName() + " will be saved");
+    log.trace(".saveEditor File " + file.getName() + " will be saved");
 
     final boolean isConnected = isManaged(file);
 
@@ -1184,15 +1184,15 @@ public class EditorManager implements IEditorManager {
     IAnnotationModel model = provider.getAnnotationModel(input);
     if (model != null) model.connect(doc);
 
-    LOG.trace(".saveEditor Annotations on the IDocument are set");
+    log.trace(".saveEditor Annotations on the IDocument are set");
 
     editorPool.setElementStateListenerEnabled(false);
 
     try {
       provider.saveDocument(new NullProgressMonitor(), input, doc, true);
-      LOG.debug("Saved document: " + path);
+      log.debug("Saved document: " + path);
     } catch (CoreException e) {
-      LOG.error("Failed to save document: " + path, e);
+      log.error("Failed to save document: " + path, e);
     }
 
     editorPool.setElementStateListenerEnabled(true);
@@ -1292,7 +1292,7 @@ public class EditorManager implements IEditorManager {
 
     SPath path = EditorAPI.getEditorPath(editorPart);
     if (path == null) {
-      LOG.warn("Could not find path for editor " + editorPart.getTitle());
+      log.warn("Could not find path for editor " + editorPart.getTitle());
       return;
     }
 
@@ -1365,7 +1365,7 @@ public class EditorManager implements IEditorManager {
    * @param lock if true then editors are locked, otherwise they are unlocked
    */
   private void lockAllEditors(boolean lock) {
-    LOG.debug(lock ? "locking all editors" : "unlocking all editors");
+    log.debug(lock ? "locking all editors" : "unlocking all editors");
 
     editorPool.setEditable(!lock && session.hasWriteAccess());
 
@@ -1404,7 +1404,7 @@ public class EditorManager implements IEditorManager {
     if (path == null) throw new IllegalArgumentException();
 
     SWTUtils.runSafeSWTSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -1416,7 +1416,7 @@ public class EditorManager implements IEditorManager {
   @Override
   public void saveEditors(final IProject project) {
     SWTUtils.runSafeSWTSync(
-        LOG,
+        log,
         new Runnable() {
 
           @Override
@@ -1447,7 +1447,7 @@ public class EditorManager implements IEditorManager {
     final EditorState activeEditor = userEditorStateManager.getState(jumpTo).getActiveEditorState();
 
     if (activeEditor == null) {
-      LOG.debug("user " + jumpTo + " has no editor open");
+      log.debug("user " + jumpTo + " has no editor open");
 
       // changed waldmann, 22.01.2012: this balloon Notification became
       // annoying as the awareness information, which file is opened is
@@ -1469,18 +1469,18 @@ public class EditorManager implements IEditorManager {
     // TODO So jumping to a user's position based on his/her selection is
     // not an option?
     if (viewport == null) {
-      LOG.warn("user " + jumpTo + " has no viewport in editor: " + path);
+      log.warn("user " + jumpTo + " has no viewport in editor: " + path);
       return;
     }
 
     SWTUtils.runSafeSWTSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
             IEditorPart newEditor = EditorAPI.openEditor(path, true);
             if (newEditor == null) {
-              LOG.warn("editor for " + path + " couldn't be opened");
+              log.warn("editor for " + path + " couldn't be opened");
               return;
             }
 
@@ -1574,7 +1574,7 @@ public class EditorManager implements IEditorManager {
         selectionBottom = document.getLineOfOffset(selection.getOffset() + selection.getLength());
       } catch (BadLocationException e) {
         // should never be reached
-        LOG.error(
+        log.error(
             "Invalid line selection: offset: "
                 + selection.getOffset()
                 + ", length: "

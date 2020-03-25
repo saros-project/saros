@@ -33,7 +33,7 @@ import saros.session.User.Permission;
  */
 final class EditorPool {
 
-  private static final Logger LOG = Logger.getLogger(EditorPool.class);
+  private static final Logger log = Logger.getLogger(EditorPool.class);
 
   /*
    * The values might change over time but we need the original state when an
@@ -102,17 +102,17 @@ final class EditorPool {
    * ITextViewer.
    */
   public void add(final IEditorPart editorPart) {
-    LOG.trace("adding editor part " + editorPart + " [" + editorPart.getTitle() + "]");
+    log.trace("adding editor part " + editorPart + " [" + editorPart.getTitle() + "]");
 
     if (isManaged(editorPart)) {
-      LOG.error("editor part " + editorPart + " is already managed");
+      log.error("editor part " + editorPart + " is already managed");
       return;
     }
 
     final ITextViewer viewer = EditorAPI.getViewer(editorPart);
 
     if (viewer == null) {
-      LOG.warn("editor part is not a ITextViewer: " + editorPart);
+      log.warn("editor part is not a ITextViewer: " + editorPart);
       return;
     }
 
@@ -120,7 +120,7 @@ final class EditorPool {
     final IFile file = ResourceUtil.getFile(input);
 
     if (file == null) {
-      LOG.warn("editor part does not use a file storage: " + editorPart);
+      log.warn("editor part does not use a file storage: " + editorPart);
       return;
     }
 
@@ -170,7 +170,7 @@ final class EditorPool {
     if (newIsEditable) lockedEditors.remove(editorPart);
     else lockedEditors.add(editorPart);
 
-    LOG.trace(editorPart.getEditorInput().getName() + " set to editable: " + newIsEditable);
+    log.trace(editorPart.getEditorInput().getName() + " set to editable: " + newIsEditable);
 
     EditorAPI.setEditable(editorPart, newIsEditable);
   }
@@ -208,10 +208,10 @@ final class EditorPool {
    * @param editorPart editorPart to be removed
    */
   public void remove(final IEditorPart editorPart) {
-    LOG.trace("removing editor part " + editorPart + " [" + editorPart.getTitle() + "]");
+    log.trace("removing editor part " + editorPart + " [" + editorPart.getTitle() + "]");
 
     if (!isManaged(editorPart)) {
-      LOG.error("editor part is not managed: " + editorPart);
+      log.error("editor part is not managed: " + editorPart);
       return;
     }
 
@@ -232,7 +232,7 @@ final class EditorPool {
     final IDocument document = documentProvider.getDocument(input);
 
     if (document == null) {
-      LOG.warn("could not disconnect from document: " + file);
+      log.warn("could not disconnect from document: " + file);
     } else {
       document.removeDocumentListener(documentListener);
     }
@@ -274,7 +274,7 @@ final class EditorPool {
 
   /** Removes all {@link IEditorPart} from the EditorPool. */
   public void removeAllEditors() {
-    LOG.trace("removing all editors");
+    log.trace("removing all editors");
 
     for (final IEditorPart part : new HashSet<IEditorPart>(getAllEditors())) remove(part);
 
@@ -321,7 +321,7 @@ final class EditorPool {
         EditorAPI.getDocumentProvider(editorPart.getEditorInput());
 
     if (!(defaultDocumentProvider instanceof TextFileDocumentProvider)) {
-      LOG.warn(
+      log.warn(
           "The default document provider "
               + defaultDocumentProvider
               + " for editor with title '"
@@ -338,7 +338,7 @@ final class EditorPool {
     final IDocumentProvider editorDocumentProvider = textEditor.getDocumentProvider();
 
     if (!(editorDocumentProvider instanceof TextFileDocumentProvider)) {
-      LOG.warn(
+      log.warn(
           "The document provider "
               + editorDocumentProvider
               + " for editor with title '"

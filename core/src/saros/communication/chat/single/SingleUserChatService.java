@@ -23,7 +23,7 @@ import saros.net.xmpp.XMPPConnectionService;
 
 public class SingleUserChatService extends AbstractChatService {
 
-  private static final Logger LOG = Logger.getLogger(SingleUserChatService.class);
+  private static final Logger log = Logger.getLogger(SingleUserChatService.class);
 
   private IConnectionListener connectionLister =
       new IConnectionListener() {
@@ -77,7 +77,7 @@ public class SingleUserChatService extends AbstractChatService {
         public void processMessage(Chat chat, Message message) {
           if (!message.getBodies().isEmpty()) {
 
-            LOG.info(
+            log.info(
                 "chat created between "
                     + userJID
                     + " <->"
@@ -104,7 +104,7 @@ public class SingleUserChatService extends AbstractChatService {
 
             // do not inform the listener because the chat is reused if
             if (exists) {
-              LOG.info("skipping notification of listeners because the chat already exists");
+              log.info("skipping notification of listeners because the chat already exists");
               return;
             }
 
@@ -159,7 +159,7 @@ public class SingleUserChatService extends AbstractChatService {
     SingleUserChat createdChat = currentChats.get(jid);
 
     if (createdChat == null) {
-      LOG.trace("creating new chat between " + userJID + " <->" + jid);
+      log.trace("creating new chat between " + userJID + " <->" + jid);
 
       createdChat = new SingleUserChat();
 
@@ -182,7 +182,7 @@ public class SingleUserChatService extends AbstractChatService {
   }
 
   private synchronized void updateChat(SingleUserChat chat) {
-    LOG.trace(
+    log.trace(
         "updating chat between " + userJID + " <->" + chat.getParticipants().iterator().next());
 
     chat.initChat(

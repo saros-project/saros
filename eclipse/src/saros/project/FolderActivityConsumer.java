@@ -15,7 +15,7 @@ import saros.util.FileUtils;
 
 public final class FolderActivityConsumer extends AbstractActivityConsumer implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(FolderActivityConsumer.class);
+  private static final Logger log = Logger.getLogger(FolderActivityConsumer.class);
 
   private final ISarosSession session;
   private final SharedResourcesManager resourceChangeListener;
@@ -43,7 +43,7 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer imple
       return;
 
     try {
-      if (LOG.isTraceEnabled()) LOG.trace("executing folder activity: " + activity);
+      if (log.isTraceEnabled()) log.trace("executing folder activity: " + activity);
 
       resourceChangeListener.suspend();
       super.exec(activity);
@@ -64,7 +64,7 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer imple
     try {
       FileUtils.create(folder);
     } catch (CoreException e) {
-      LOG.error("failed to execute folder activity: " + activity, e);
+      log.error("failed to execute folder activity: " + activity, e);
     }
   }
 
@@ -81,7 +81,7 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer imple
       if (folder.exists()) FileUtils.delete(folder);
 
     } catch (CoreException e) {
-      LOG.error("failed to execute folder activity: " + activity, e);
+      log.error("failed to execute folder activity: " + activity, e);
     }
   }
 }

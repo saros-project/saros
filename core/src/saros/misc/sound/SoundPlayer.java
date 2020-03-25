@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 
 public class SoundPlayer {
 
-  private static final Logger LOG = Logger.getLogger(SoundPlayer.class);
+  private static final Logger log = Logger.getLogger(SoundPlayer.class);
 
   // 16 Bit, 44.1 kHz, 2 seconds
   private static final int BUFFER_SIZE = 2 * 44100 * 2;
@@ -36,10 +36,10 @@ public class SoundPlayer {
     try {
       audioInputStream = AudioSystem.getAudioInputStream(file);
     } catch (UnsupportedAudioFileException e) {
-      LOG.warn("unsupported audio file: " + file.getName(), e);
+      log.warn("unsupported audio file: " + file.getName(), e);
       return;
     } catch (IOException e) {
-      LOG.error("unable to read audio file:" + file.getName(), e);
+      log.error("unable to read audio file:" + file.getName(), e);
       return;
     }
 
@@ -52,11 +52,11 @@ public class SoundPlayer {
       audioLine = (SourceDataLine) AudioSystem.getLine(info);
       audioLine.open(format);
     } catch (LineUnavailableException e) {
-      LOG.warn("no audioline available, could not play audio file: " + file.getName(), e);
+      log.warn("no audioline available, could not play audio file: " + file.getName(), e);
       IOUtils.closeQuietly(audioInputStream);
       return;
     } catch (Exception e) {
-      LOG.error("could not access sound system", e);
+      log.error("could not access sound system", e);
       IOUtils.closeQuietly(audioInputStream);
       return;
     }
@@ -72,7 +72,7 @@ public class SoundPlayer {
         if (read >= 0) audioLine.write(buffer, 0, read);
       }
     } catch (IOException e) {
-      LOG.error("I/O error while streaming audio file: " + file.getName(), e);
+      log.error("I/O error while streaming audio file: " + file.getName(), e);
       return;
     } finally {
       audioLine.drain();

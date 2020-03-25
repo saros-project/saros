@@ -27,7 +27,7 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
   private static final String TYPE_ARCHIVE = TransferType.ARCHIVE.name();
   private static final String TYPE_INSTANT = TransferType.INSTANT.name();
 
-  private static final Logger LOG = Logger.getLogger(ProjectNegotiationTypeHook.class);
+  private static final Logger log = Logger.getLogger(ProjectNegotiationTypeHook.class);
 
   private Preferences localPref;
 
@@ -55,7 +55,7 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
   @Override
   public Map<String, String> considerClientPreferences(JID client, Map<String, String> input) {
     if (input == null || !input.containsKey(KEY_PREFERRED_TYPE)) {
-      LOG.warn(
+      log.warn(
           "The client did not indicate any transfer type "
               + "preferences. This could be an indication for a version "
               + "mismatch.");
@@ -78,7 +78,7 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
       IPreferenceStore hostPreferences,
       IPreferenceStore clientPreferences) {
     if (input == null || !input.containsKey(KEY_TYPE)) {
-      LOG.warn(
+      log.warn(
           "The host did not set any parameters. This may be caused"
               + "if the client did not indicate any transfer type "
               + "preferences to begin with."
@@ -91,7 +91,7 @@ public class ProjectNegotiationTypeHook implements ISessionNegotiationHook {
     try {
       type = TransferType.valueOf(input.get(KEY_TYPE));
     } catch (IllegalArgumentException e) {
-      LOG.warn(
+      log.warn(
           "The client send a unknown transfer type: '"
               + input.get(KEY_TYPE)
               + "'! This could be an indication for a version mismatch.");

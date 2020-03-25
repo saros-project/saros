@@ -28,7 +28,7 @@ public class DeleteContactAction extends Action implements Disposable {
 
   public static final String ACTION_ID = DeleteContactAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(DeleteContactAction.class);
+  private static final Logger log = Logger.getLogger(DeleteContactAction.class);
 
   protected IConnectionStateListener connectionListener = (state, error) -> updateEnablement();
 
@@ -67,7 +67,7 @@ public class DeleteContactAction extends Action implements Disposable {
       this.setEnabled(false);
     } catch (Exception e) {
       if (!PlatformUI.getWorkbench().isClosing())
-        LOG.error("Unexpected error while updating enablement", e); // $NON-NLS-1$
+        log.error("Unexpected error while updating enablement", e); // $NON-NLS-1$
     }
   }
 
@@ -75,7 +75,7 @@ public class DeleteContactAction extends Action implements Disposable {
   @Override
   public void run() {
     ThreadUtils.runSafeSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -93,7 +93,7 @@ public class DeleteContactAction extends Action implements Disposable {
     }
 
     if (contact == null) {
-      LOG.error("XMPPContact should not be null at this point!"); // $NON-NLS-1$
+      log.error("XMPPContact should not be null at this point!"); // $NON-NLS-1$
       return;
     }
 
