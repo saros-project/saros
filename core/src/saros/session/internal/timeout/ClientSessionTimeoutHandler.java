@@ -20,7 +20,7 @@ import saros.util.ThreadUtils;
  */
 public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
 
-  private static final Logger LOG = Logger.getLogger(ClientSessionTimeoutHandler.class);
+  private static final Logger log = Logger.getLogger(ClientSessionTimeoutHandler.class);
 
   private boolean shutdown;
 
@@ -57,7 +57,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                 try {
                   ClientSessionTimeoutHandler.this.wait(PING_PONG_UPDATE_DELAY);
                 } catch (InterruptedException e) {
-                  if (!shutdown) LOG.error("watchdog shutdown prematurely", e);
+                  if (!shutdown) log.error("watchdog shutdown prematurely", e);
 
                   return;
                 }
@@ -74,7 +74,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
             }
 
             if (abort) {
-              LOG.error("no ping received, reached timeout = " + PING_PONG_TIMEOUT);
+              log.error("no ping received, reached timeout = " + PING_PONG_TIMEOUT);
               handleNetworkError(session.getHost().getJID(), "rx");
               return;
             }
@@ -85,7 +85,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                   session.getHost().getJID(),
                   PongExtension.PROVIDER.create(new PongExtension(currentSessionID)));
             } catch (IOException e) {
-              LOG.error("failed to send pong", e);
+              log.error("failed to send pong", e);
               handleNetworkError(session.getHost().getJID(), "tx");
             }
           }
@@ -115,7 +115,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
         pingPacketListener, PingExtension.PROVIDER.getPacketFilter(currentSessionID));
 
     workerThread =
-        ThreadUtils.runSafeAsync("client-network-watchdog", LOG, clientSessionTimeoutWatchdog);
+        ThreadUtils.runSafeAsync("client-network-watchdog", log, clientSessionTimeoutWatchdog);
   }
 
   @Override
@@ -132,11 +132,11 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
     try {
       workerThread.join(TIMEOUT);
     } catch (InterruptedException e) {
-      LOG.warn("interrupted while waiting for " + workerThread.getName() + " thread to terminate");
+      log.warn("interrupted while waiting for " + workerThread.getName() + " thread to terminate");
 
       Thread.currentThread().interrupt();
     }
 
-    if (workerThread.isAlive()) LOG.error(workerThread.getName() + " thread is still running");
+    if (workerThread.isAlive()) log.error(workerThread.getName() + " thread is still running");
   }
 }

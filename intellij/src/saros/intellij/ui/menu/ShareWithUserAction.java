@@ -34,7 +34,7 @@ import saros.net.xmpp.JID;
  */
 public class ShareWithUserAction extends AnAction {
 
-  private static final Logger LOG = Logger.getLogger(ShareWithUserAction.class);
+  private static final Logger log = Logger.getLogger(ShareWithUserAction.class);
 
   private final JID userJID;
   private final String title;
@@ -70,7 +70,7 @@ public class ShareWithUserAction extends AnAction {
       module = getModuleForVirtualFile(virtualFile, event.getProject());
 
     } catch (IllegalArgumentException e) {
-      LOG.error("Tried to share illegal module", e);
+      log.error("Tried to share illegal module", e);
 
       NotificationPanel.showError(
           MessageFormat.format(Messages.ShareWithUserAction_illegal_module_message, e.getMessage()),

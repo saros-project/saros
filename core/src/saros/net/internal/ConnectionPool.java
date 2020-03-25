@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  */
 final class ConnectionPool {
 
-  private static final Logger LOG = Logger.getLogger(ConnectionPool.class);
+  private static final Logger log = Logger.getLogger(ConnectionPool.class);
 
   private boolean isOpen;
 
@@ -46,7 +46,7 @@ final class ConnectionPool {
       final IByteStreamConnection connection = entry.getValue();
       connection.close();
 
-      LOG.debug("closed connection [id=" + id + "]: " + connection);
+      log.debug("closed connection [id=" + id + "]: " + connection);
     }
   }
 

@@ -25,7 +25,7 @@ import saros.preferences.Preferences;
 // TODO better name
 public class ConnectionHandler {
 
-  private static final Logger LOG = Logger.getLogger(ConnectionHandler.class);
+  private static final Logger log = Logger.getLogger(ConnectionHandler.class);
 
   private final XMPPConnectionService connectionService;
 
@@ -228,7 +228,7 @@ public class ConnectionHandler {
           createConnectionConfiguration(domain, server, port, useTLS, useSASL), username, password);
     } catch (Exception e) {
       if (!(e instanceof XMPPException))
-        LOG.error("internal error while connecting to the XMPP server: " + e.getMessage(), e);
+        log.error("internal error while connecting to the XMPP server: " + e.getMessage(), e);
 
       synchronized (this) {
         isConnecting = false;
@@ -269,7 +269,7 @@ public class ConnectionHandler {
       try {
         listener.connectionStateChanged(state, error);
       } catch (Exception e) {
-        LOG.error("internal error in listener: " + listener, e);
+        log.error("internal error in listener: " + listener, e);
       }
     }
   }

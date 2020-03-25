@@ -112,7 +112,7 @@ import saros.util.CoreUtils;
 @Component(module = "ui")
 public class SarosView extends ViewPart {
 
-  private static final Logger LOG = Logger.getLogger(SarosView.class);
+  private static final Logger log = Logger.getLogger(SarosView.class);
 
   public static final String ID = "saros.ui.views.SarosView";
 
@@ -614,7 +614,7 @@ public class SarosView extends ViewPart {
     if (!showBalloonNotifications) return;
 
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -681,7 +681,7 @@ public class SarosView extends ViewPart {
       case LOCAL_USER_LEFT:
         return;
       default:
-        LOG.warn("no UI notification available for stop reason: " + reason);
+        log.warn("no UI notification available for stop reason: " + reason);
         return;
     }
 
@@ -694,7 +694,7 @@ public class SarosView extends ViewPart {
    */
   public static void clearNotifications() {
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {

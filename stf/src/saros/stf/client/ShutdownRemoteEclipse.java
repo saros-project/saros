@@ -11,7 +11,7 @@ import saros.stf.client.tester.SarosTester;
 
 public class ShutdownRemoteEclipse {
 
-  private static final Logger LOGGER = Logger.getLogger(ShutdownRemoteEclipse.class.getName());
+  private static final Logger log = Logger.getLogger(ShutdownRemoteEclipse.class.getName());
 
   public static void main(String... args) {
 
@@ -24,13 +24,13 @@ public class ShutdownRemoteEclipse {
         try {
           clients.add(SarosTester.valueOf(arg));
         } catch (Exception e) {
-          LOGGER.log(Level.WARNING, arg + " is not a tester", e);
+          log.log(Level.WARNING, arg + " is not a tester", e);
         }
       }
     }
 
     for (AbstractTester tester : clients) {
-      LOGGER.info("closing Eclipse instance of " + tester);
+      log.info("closing Eclipse instance of " + tester);
       try {
         tester.superBot().views().sarosView().disconnect();
         tester.remoteBot().closeAllEditors();
@@ -40,9 +40,9 @@ public class ShutdownRemoteEclipse {
         tester.remoteBot().menu("File").menu("Exit").click();
       } catch (Exception e) {
         if (!(e.getCause() instanceof SocketException))
-          LOGGER.log(Level.SEVERE, "unable to shutdown eclipse instance of " + tester, e);
+          log.log(Level.SEVERE, "unable to shutdown eclipse instance of " + tester, e);
       }
     }
-    LOGGER.info("DONE");
+    log.info("DONE");
   }
 }

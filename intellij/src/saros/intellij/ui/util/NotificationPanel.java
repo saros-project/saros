@@ -13,7 +13,7 @@ import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Class uses Intellij API to show notifications */
 public class NotificationPanel {
-  private static final Logger LOG = Logger.getLogger(NotificationPanel.class);
+  private static final Logger log = Logger.getLogger(NotificationPanel.class);
 
   private static final String GROUP_NOTIFICATION_ID = "sarosNotification";
   private static final NotificationGroup GROUP_DISPLAY_ID_INFO =
@@ -49,7 +49,7 @@ public class NotificationPanel {
 
     projectUtils.runWithProject(
         (project) -> {
-          LOG.info("Showing notification - " + notificationType + ": " + title + " - " + message);
+          log.info("Showing notification - " + notificationType + ": " + title + " - " + message);
 
           final Notification notification =
               GROUP_DISPLAY_ID_INFO.createNotification(

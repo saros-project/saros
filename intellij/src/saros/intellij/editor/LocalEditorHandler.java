@@ -20,7 +20,7 @@ import saros.session.ISarosSession;
  */
 public class LocalEditorHandler {
 
-  private static final Logger LOG = Logger.getLogger(LocalEditorHandler.class);
+  private static final Logger log = Logger.getLogger(LocalEditorHandler.class);
 
   private final EditorManager manager;
   private final ISarosSession sarosSession;
@@ -58,7 +58,7 @@ public class LocalEditorHandler {
     SPath path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
     if (path == null || !sarosSession.isShared(path.getResource())) {
-      LOG.debug(
+      log.debug(
           "Ignored open editor request for file "
               + virtualFile
               + " as it does not belong to a shared module");
@@ -90,7 +90,7 @@ public class LocalEditorHandler {
     IResource resource = VirtualFileConverter.convertToResource(virtualFile, project);
 
     if (resource == null || !sarosSession.isShared(resource)) {
-      LOG.debug(
+      log.debug(
           "Could not open Editor for file "
               + virtualFile
               + " as it does not belong to the given module "
@@ -124,12 +124,12 @@ public class LocalEditorHandler {
       @NotNull VirtualFile virtualFile, @NotNull SPath path, boolean activate) {
 
     if (!virtualFile.exists()) {
-      LOG.debug("Could not open Editor for file " + virtualFile + " as it does not exist");
+      log.debug("Could not open Editor for file " + virtualFile + " as it does not exist");
 
       return null;
 
     } else if (!sarosSession.isShared(path.getResource())) {
-      LOG.debug("Ignored open editor request for file " + virtualFile + " as it is not shared");
+      log.debug("Ignored open editor request for file " + virtualFile + " as it is not shared");
 
       return null;
     }
@@ -139,7 +139,7 @@ public class LocalEditorHandler {
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
     if (editor == null) {
-      LOG.debug("Ignoring non-text editor for file " + virtualFile);
+      log.debug("Ignoring non-text editor for file " + virtualFile);
 
       return null;
     }
@@ -147,7 +147,7 @@ public class LocalEditorHandler {
     editorPool.add(path, editor);
     manager.startEditor(editor);
 
-    LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
+    log.debug("Opened Editor " + editor + " for file " + virtualFile);
 
     return editor;
   }
@@ -204,7 +204,7 @@ public class LocalEditorHandler {
     VirtualFile file = VirtualFileConverter.convertToVirtualFile(path);
 
     if (file == null || !file.exists()) {
-      LOG.warn("Failed to save document for " + path + " - could not get a valid VirtualFile");
+      log.warn("Failed to save document for " + path + " - could not get a valid VirtualFile");
 
       return;
     }
@@ -216,7 +216,7 @@ public class LocalEditorHandler {
     document = DocumentAPI.getDocument(file);
 
     if (document == null) {
-      LOG.warn("Failed to save document for " + file + " - could not get a matching Document");
+      log.warn("Failed to save document for " + file + " - could not get a matching Document");
 
       return;
     }

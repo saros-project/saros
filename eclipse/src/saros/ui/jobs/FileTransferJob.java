@@ -15,7 +15,7 @@ import saros.net.xmpp.JID;
 
 abstract class FileTransferJob extends Job {
 
-  private static final Logger LOG = Logger.getLogger(FileTransferJob.class);
+  private static final Logger log = Logger.getLogger(FileTransferJob.class);
   final JID jid;
 
   FileTransferJob(String name, JID jid) {
@@ -42,7 +42,7 @@ abstract class FileTransferJob extends Job {
                 : error.getMessage();
         Status status = new Status(IStatus.ERROR, Saros.PLUGIN_ID, errMsg, transfer.getException());
 
-        LOG.error("file transfer from " + jid + " failed: " + errMsg, transfer.getException());
+        log.error("file transfer from " + jid + " failed: " + errMsg, transfer.getException());
 
         return status;
       case CANCEL:

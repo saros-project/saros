@@ -16,7 +16,7 @@ import saros.preferences.PreferenceStore;
 /** Preference store allowing the storing and retrieving of the preferences to and from a file. */
 public final class PersistencePreferenceStore extends PreferenceStore {
 
-  private static final Logger LOG = Logger.getLogger(PersistencePreferenceStore.class);
+  private static final Logger log = Logger.getLogger(PersistencePreferenceStore.class);
 
   private File preferenceFile;
 
@@ -53,12 +53,12 @@ public final class PersistencePreferenceStore extends PreferenceStore {
       properties.clear();
       properties.loadFromXML(in);
     } catch (InvalidPropertiesFormatException e) {
-      LOG.error(
+      log.error(
           "failed to load properties, file " + preferenceFile + " contains malformed data", e);
     } catch (FileNotFoundException e) {
-      LOG.error("failed to load properties, file " + preferenceFile + " does not exists", e);
+      log.error("failed to load properties, file " + preferenceFile + " does not exists", e);
     } catch (IOException e) {
-      LOG.error("failed to load properties from file: " + preferenceFile, e);
+      log.error("failed to load properties from file: " + preferenceFile, e);
     }
   }
 
@@ -75,13 +75,13 @@ public final class PersistencePreferenceStore extends PreferenceStore {
       properties.storeToXML(out, null);
 
     } catch (FileNotFoundException e) {
-      LOG.error(
+      log.error(
           "failed to save properties, file "
               + preferenceFile
               + " is either a directory or could not be created",
           e);
     } catch (IOException e) {
-      LOG.error("failed to save properties to file: " + preferenceFile, e);
+      log.error("failed to save properties to file: " + preferenceFile, e);
     }
   }
 }

@@ -28,7 +28,7 @@ import saros.intellij.runtime.EDTExecutor;
  * Application#invokeLater(Runnable,ModalityState)}.
  */
 public class SafeDialogUtils {
-  private static final Logger LOG = Logger.getLogger(SafeDialogUtils.class);
+  private static final Logger log = Logger.getLogger(SafeDialogUtils.class);
 
   private static final Application application;
 
@@ -70,7 +70,7 @@ public class SafeDialogUtils {
       throw new IllegalAWTContextException("AWT events are not allowed " + "inside write actions.");
     }
 
-    LOG.info("Showing input dialog: " + title + " - " + message + " - " + initialValue);
+    log.info("Showing input dialog: " + title + " - " + message + " - " + initialValue);
 
     return EDTExecutor.invokeAndWait(
         (Computable<String>)
@@ -124,7 +124,7 @@ public class SafeDialogUtils {
    * @param title the text displayed as the title of the dialog
    */
   public static void showInfo(Project project, final String message, final String title) {
-    LOG.info("Showing info dialog: " + title + " - " + message);
+    log.info("Showing info dialog: " + title + " - " + message);
 
     EDTExecutor.invokeLater(
         () -> Messages.showInfoMessage(project, message, title),
@@ -139,7 +139,7 @@ public class SafeDialogUtils {
    * @param title the text displayed as the title of the dialog
    */
   public static void showError(Project project, final String message, final String title) {
-    LOG.info("Showing error dialog: " + title + " - " + message);
+    log.info("Showing error dialog: " + title + " - " + message);
 
     EDTExecutor.invokeLater(
         () -> Messages.showErrorDialog(project, message, title),
@@ -168,7 +168,7 @@ public class SafeDialogUtils {
       throw new IllegalAWTContextException("AWT events are not allowed " + "inside write actions.");
     }
 
-    LOG.info("Showing password dialog: " + title + " - " + message);
+    log.info("Showing password dialog: " + title + " - " + message);
 
     return EDTExecutor.invokeAndWait(
         (Computable<String>)
@@ -198,7 +198,7 @@ public class SafeDialogUtils {
       throw new IllegalAWTContextException("AWT events are not allowed inside write actions.");
     }
 
-    LOG.info("Showing yes/no dialog: " + title + " - " + message);
+    log.info("Showing yes/no dialog: " + title + " - " + message);
 
     Integer result =
         EDTExecutor.invokeAndWait(
@@ -234,7 +234,7 @@ public class SafeDialogUtils {
       @NotNull String title,
       @NotNull Runnable runAfter) {
 
-    LOG.info("Showing non-blocking yes/no dialog: " + title + " - " + message);
+    log.info("Showing non-blocking yes/no dialog: " + title + " - " + message);
 
     EDTExecutor.invokeLater(
         () -> {

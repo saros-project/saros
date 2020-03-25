@@ -10,7 +10,7 @@ import saros.ui.views.SarosView;
 
 public class ViewUtils {
 
-  private static final Logger LOG = Logger.getLogger(ViewUtils.class);
+  private static final Logger log = Logger.getLogger(ViewUtils.class);
 
   public static void openSarosView() {
     /*
@@ -27,7 +27,7 @@ public class ViewUtils {
     try {
       window.getActivePage().showView(SarosView.ID, null, IWorkbenchPage.VIEW_CREATE);
     } catch (PartInitException e) {
-      LOG.error("could not open Saros view (id: " + SarosView.ID + ")", e); // $NON-NLS-1$
+      log.error("could not open Saros view (id: " + SarosView.ID + ")", e); // $NON-NLS-1$
     }
   }
 }

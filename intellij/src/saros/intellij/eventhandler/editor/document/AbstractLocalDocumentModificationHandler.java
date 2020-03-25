@@ -17,7 +17,7 @@ import saros.session.ISarosSession;
 /** Parent class containing utility methods when working with document listeners. */
 public abstract class AbstractLocalDocumentModificationHandler implements IProjectEventHandler {
 
-  private static final Logger LOG =
+  private static final Logger log =
       Logger.getLogger(AbstractLocalDocumentModificationHandler.class);
 
   protected final Project project;
@@ -77,7 +77,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
     assert !disposed || !enabled : "disposed listeners must not be enabled";
 
     if (!this.enabled && enabled) {
-      LOG.debug("Started listening for document events");
+      log.debug("Started listening for document events");
 
       EditorFactory.getInstance().getEventMulticaster().addDocumentListener(documentListener);
 
@@ -85,7 +85,7 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
 
     } else if (this.enabled && !enabled) {
 
-      LOG.debug("Stopped listening for document events");
+      log.debug("Stopped listening for document events");
 
       EditorFactory.getInstance().getEventMulticaster().removeDocumentListener(documentListener);
 
@@ -117,8 +117,8 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
     VirtualFile virtualFile = DocumentAPI.getVirtualFile(document);
 
     if (virtualFile == null) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace(
+      if (log.isTraceEnabled()) {
+        log.trace(
             "Ignoring event for document "
                 + document
                 + " - document is not known to the editor pool and a "
@@ -131,8 +131,8 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
     path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
     if (path == null || !sarosSession.isShared(path.getResource())) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace("Ignoring Event for document " + document + " - document is not shared");
+      if (log.isTraceEnabled()) {
+        log.trace("Ignoring Event for document " + document + " - document is not shared");
       }
 
       return null;

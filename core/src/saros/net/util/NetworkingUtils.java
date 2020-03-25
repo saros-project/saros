@@ -15,7 +15,7 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 /** Static networking class, dealing with local IP retrieval */
 public class NetworkingUtils {
 
-  private static final Logger LOG = Logger.getLogger(NetworkingUtils.class);
+  private static final Logger log = Logger.getLogger(NetworkingUtils.class);
 
   /**
    * Retrieves all IP addresses from all non-loopback-, running network devices of the local host.
@@ -35,7 +35,7 @@ public class NetworkingUtils {
     try {
       networkInterfaces = NetworkInterface.getNetworkInterfaces();
     } catch (SocketException e) {
-      LOG.error("failed to retrieve available network interfaces", e);
+      log.error("failed to retrieve available network interfaces", e);
       return addresses;
     }
 
@@ -46,7 +46,7 @@ public class NetworkingUtils {
       try {
         if (networkInterface.isLoopback() || !networkInterface.isUp()) continue;
       } catch (SocketException e) {
-        LOG.warn("skipping network interface: " + networkInterface, e);
+        log.warn("skipping network interface: " + networkInterface, e);
         continue;
       }
 

@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public final class Configuration {
 
-  private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
+  private static final Logger log = Logger.getLogger(Configuration.class.getName());
 
   private static final String DEFAULT_CONFIGURATION_FILE =
       "saros/stf/client/configuration.properties";
@@ -42,21 +42,21 @@ public final class Configuration {
             .getContextClassLoader()
             .getResourceAsStream(DEFAULT_CONFIGURATION_FILE);
 
-    LOGGER.info("loading internal property file");
+    log.info("loading internal property file");
     if (in != null) {
       try {
         loadProperties(in);
       } catch (IOException e) {
-        LOGGER.log(Level.SEVERE, "error while reading internal property file", e);
+        log.log(Level.SEVERE, "error while reading internal property file", e);
       } finally {
         try {
           in.close();
         } catch (IOException ignore) {
-          LOGGER.log(Level.WARNING, ignore.getMessage(), ignore);
+          log.log(Level.WARNING, ignore.getMessage(), ignore);
         }
       }
     } else
-      LOGGER.log(
+      log.log(
           Level.WARNING, "could not find internal property file: " + DEFAULT_CONFIGURATION_FILE);
 
     String configurationFiles = System.getProperty(OPTIONAL_CONFIGURATION_FILES_PROPERTY, "");
@@ -68,19 +68,19 @@ public final class Configuration {
       if (configurationFile.length() == 0) continue;
 
       in = null;
-      LOGGER.info("loading external property file: " + configurationFile);
+      log.info("loading external property file: " + configurationFile);
       try {
         in = new FileInputStream(new File(configurationFile));
         loadProperties(in);
       } catch (FileNotFoundException e) {
-        LOGGER.log(Level.WARNING, "could not find external property file " + configurationFile, e);
+        log.log(Level.WARNING, "could not find external property file " + configurationFile, e);
       } catch (IOException e) {
-        LOGGER.log(Level.SEVERE, "error while reading property file", e);
+        log.log(Level.SEVERE, "error while reading property file", e);
       } finally {
         try {
           if (in != null) in.close();
         } catch (IOException ignore) {
-          LOGGER.log(Level.WARNING, ignore.getMessage(), ignore);
+          log.log(Level.WARNING, ignore.getMessage(), ignore);
         }
       }
     }

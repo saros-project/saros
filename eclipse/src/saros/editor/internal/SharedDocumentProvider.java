@@ -24,7 +24,7 @@ import saros.session.User;
 @Component(module = "eclipse")
 public final class SharedDocumentProvider extends TextFileDocumentProvider {
 
-  private static final Logger LOG = Logger.getLogger(SharedDocumentProvider.class);
+  private static final Logger log = Logger.getLogger(SharedDocumentProvider.class);
 
   private volatile ISarosSession session;
 
@@ -66,7 +66,7 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
   /** This constructor is necessary when Eclipse creates a SharedDocumentProvider. */
   public SharedDocumentProvider() {
 
-    LOG.debug("SharedDocumentProvider created by Eclipse");
+    log.debug("SharedDocumentProvider created by Eclipse");
 
     SarosPluginContext.initComponent(this);
 

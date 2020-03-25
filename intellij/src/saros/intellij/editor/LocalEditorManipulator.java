@@ -27,7 +27,7 @@ import saros.session.User;
 /** This class applies the logic for activities that were received from remote. */
 public class LocalEditorManipulator {
 
-  private static final Logger LOG = Logger.getLogger(LocalEditorManipulator.class);
+  private static final Logger log = Logger.getLogger(LocalEditorManipulator.class);
 
   private final AnnotationManager annotationManager;
   private final ISarosSession sarosSession;
@@ -64,7 +64,7 @@ public class LocalEditorManipulator {
    */
   public Editor openEditor(@NotNull SPath path, boolean activate) {
     if (!sarosSession.isShared(path.getResource())) {
-      LOG.warn("Ignored open editor request for path " + path + " as it is not shared");
+      log.warn("Ignored open editor request for path " + path + " as it is not shared");
 
       return null;
     }
@@ -72,7 +72,7 @@ public class LocalEditorManipulator {
     VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
 
     if (virtualFile == null || !virtualFile.exists()) {
-      LOG.warn(
+      log.warn(
           "Could not open Editor for path "
               + path
               + " as a "
@@ -86,7 +86,7 @@ public class LocalEditorManipulator {
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
     if (editor == null) {
-      LOG.debug("Ignoring non-text editor for file " + virtualFile);
+      log.debug("Ignoring non-text editor for file " + virtualFile);
 
       return null;
     }
@@ -94,7 +94,7 @@ public class LocalEditorManipulator {
     manager.startEditor(editor);
     editorPool.add(path, editor);
 
-    LOG.debug("Opened Editor " + editor + " for file " + virtualFile);
+    log.debug("Opened Editor " + editor + " for file " + virtualFile);
 
     return editor;
   }
@@ -107,12 +107,12 @@ public class LocalEditorManipulator {
   public void closeEditor(SPath path) {
     editorPool.removeEditor(path);
 
-    LOG.debug("Removed editor for path " + path + " from EditorPool");
+    log.debug("Removed editor for path " + path + " from EditorPool");
 
     VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
 
     if (virtualFile == null || !virtualFile.exists()) {
-      LOG.warn(
+      log.warn(
           "Could not close Editor for path "
               + path
               + " as a "
@@ -127,7 +127,7 @@ public class LocalEditorManipulator {
       ProjectAPI.closeEditor(project, virtualFile);
     }
 
-    LOG.debug("Closed editor for file " + virtualFile);
+    log.debug("Closed editor for file " + virtualFile);
   }
 
   /**
@@ -150,7 +150,7 @@ public class LocalEditorManipulator {
       VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
 
       if (virtualFile == null || !virtualFile.exists()) {
-        LOG.warn(
+        log.warn(
             "Could not apply TextOperations "
                 + operations
                 + " as the VirtualFile for path "
@@ -163,7 +163,7 @@ public class LocalEditorManipulator {
       doc = DocumentAPI.getDocument(virtualFile);
 
       if (doc == null) {
-        LOG.warn(
+        log.warn(
             "Could not apply TextOperations "
                 + operations
                 + " as the Document for VirtualFile "
@@ -222,7 +222,7 @@ public class LocalEditorManipulator {
     if (selection == null && range == null) {
       VirtualFile file = DocumentAPI.getVirtualFile(editor.getDocument());
 
-      LOG.warn(
+      log.warn(
           "Could not adjust viewport for "
               + file
               + " as no target location was given: given line range and text selection were null.");
@@ -253,8 +253,8 @@ public class LocalEditorManipulator {
     }
 
     if (localStartLine <= remoteStartLine && localEndLine >= remoteEndLine) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace(
+      if (log.isTraceEnabled()) {
+        log.trace(
             "Ignoring viewport change request as given viewport is already completely visible."
                 + " local viewport: "
                 + localStartLine
@@ -305,7 +305,7 @@ public class LocalEditorManipulator {
   public void handleContentRecovery(SPath path, byte[] content, String encoding, User source) {
     VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
     if (virtualFile == null) {
-      LOG.warn(
+      log.warn(
           "Could not recover file content of "
               + path
               + " as it could not be converted to a VirtualFile.");
@@ -317,7 +317,7 @@ public class LocalEditorManipulator {
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {
-      LOG.warn(
+      log.warn(
           "Could not recover file content of "
               + path
               + " as no valid Document representation was returned by the IntelliJ API.");
@@ -334,7 +334,7 @@ public class LocalEditorManipulator {
     try {
       text = new String(content, encoding);
     } catch (UnsupportedEncodingException e) {
-      LOG.warn("Could not decode text using given encoding. Using default instead.", e);
+      log.warn("Could not decode text using given encoding. Using default instead.", e);
 
       text = new String(content);
 
@@ -382,7 +382,7 @@ public class LocalEditorManipulator {
       editor = ProjectAPI.openEditor(project, virtualFile, false);
 
       if (editor == null) {
-        LOG.warn("Could not obtain text editor for open, recovered file " + virtualFile);
+        log.warn("Could not obtain text editor for open, recovered file " + virtualFile);
 
         return;
       }

@@ -11,7 +11,7 @@ import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.NullProgressMonitor;
 
 public class IntelliJWorkspaceImpl implements IWorkspace {
-  public static final Logger LOG = Logger.getLogger(IntelliJWorkspaceImpl.class);
+  public static final Logger log = Logger.getLogger(IntelliJWorkspaceImpl.class);
 
   @Override
   public void run(IWorkspaceRunnable procedure) throws IOException, OperationCanceledException {

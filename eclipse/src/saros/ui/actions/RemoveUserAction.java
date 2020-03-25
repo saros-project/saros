@@ -28,7 +28,7 @@ public class RemoveUserAction extends Action {
 
   public static final String ACTION_ID = RemoveUserAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(RemoveUserAction.class);
+  private static final Logger log = Logger.getLogger(RemoveUserAction.class);
 
   @Inject private ISarosSessionManager sessionManager;
 
@@ -127,7 +127,7 @@ public class RemoveUserAction extends Action {
             }
           });
     } catch (Exception e) {
-      LOG.error("internal error while removing users", e); // $NON-NLS-1$
+      log.error("internal error while removing users", e); // $NON-NLS-1$
     }
   }
 

@@ -86,7 +86,7 @@ public class ConnectServerAction extends AbstractSarosAction {
     }
 
     if (newJID.equals(currentJID)) {
-      LOG.debug(
+      log.debug(
           "Ignoring connection action as account is already connected. current JID: "
               + currentJID
               + ", new JID: "
@@ -117,7 +117,7 @@ public class ConnectServerAction extends AbstractSarosAction {
               project, message, Messages.ConnectServerAction_leave_session_confirmation_title);
 
     } catch (IllegalAWTContextException e) {
-      LOG.error("Failed to show question on whether to really switch accounts to user", e);
+      log.error("Failed to show question on whether to really switch accounts to user", e);
 
       NotificationPanel.showError(
           MessageFormat.format(
@@ -151,7 +151,7 @@ public class ConnectServerAction extends AbstractSarosAction {
 
     ThreadUtils.runSafeAsync(
         "Connecting to XMPP account " + account,
-        LOG,
+        log,
         () -> {
           if (isInSession) {
             sarosSessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
@@ -176,7 +176,7 @@ public class ConnectServerAction extends AbstractSarosAction {
 
                       indicator.setIndeterminate(true);
 
-                      LOG.info("Connecting to account: [" + qualifiedAccountName + "]");
+                      log.info("Connecting to account: [" + qualifiedAccountName + "]");
 
                       try {
                         connectionHandler.connect(account, false);

@@ -36,7 +36,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
         IActivityProducer,
         ISessionLifecycleListener {
 
-  private static final Logger LOG = Logger.getLogger(NetworkManipulatorImpl.class);
+  private static final Logger log = Logger.getLogger(NetworkManipulatorImpl.class);
 
   private static final Random RANDOM = new Random();
 
@@ -96,14 +96,14 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
         public boolean receivedPacket(BinaryXMPPExtension object) {
 
           JID jid = object.getTransferDescription().getSender();
-          LOG.trace("intercepting incoming packet from: " + jid);
+          log.trace("intercepting incoming packet from: " + jid);
 
           discardIncomingSessionPackets.putIfAbsent(jid, false);
 
           boolean discard = discardIncomingSessionPackets.get(jid);
 
           if (discard) {
-            LOG.trace("discarding incoming packet: " + object);
+            log.trace("discarding incoming packet: " + object);
             return false;
           }
 
@@ -116,7 +116,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
             blockedIncomingSessionPackets.putIfAbsent(
                 jid, new ConcurrentLinkedQueue<BinaryXMPPExtension>());
 
-            LOG.trace("queuing incoming packet: " + object);
+            log.trace("queuing incoming packet: " + object);
             blockedIncomingSessionPackets.get(jid).add(object);
             return false;
           }
@@ -130,14 +130,14 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
           if (!ISarosSession.SESSION_CONNECTION_ID.equals(connectionId)) return true;
 
-          LOG.trace("intercepting outgoing packet to: " + recipient);
+          log.trace("intercepting outgoing packet to: " + recipient);
 
           discardOutgoingSessionPackets.putIfAbsent(recipient, false);
 
           boolean discard = discardOutgoingSessionPackets.get(recipient);
 
           if (discard) {
-            LOG.trace("discarding outgoing packet: " + extension);
+            log.trace("discarding outgoing packet: " + extension);
             return false;
           }
 
@@ -154,7 +154,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
             holder.connectionId = connectionId;
             holder.extension = extension;
 
-            LOG.trace("queuing outgoing packet: " + extension);
+            log.trace("queuing outgoing packet: " + extension);
             blockedOutgoingSessionPackets.get(recipient).add(holder);
             return false;
           }
@@ -219,22 +219,22 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
   @Override
   public void blockIncomingSessionPackets(JID jid) throws RemoteException {
-    LOG.trace("blocking incoming packet transfer from " + jid);
+    log.trace("blocking incoming packet transfer from " + jid);
     blockIncomingSessionPackets.put(jid, true);
   }
 
   @Override
   public void blockOutgoingSessionPackets(JID jid) throws RemoteException {
-    LOG.trace("blocking outgoing packet transfer to " + jid);
+    log.trace("blocking outgoing packet transfer to " + jid);
     blockOutgoingSessionPackets.put(jid, true);
   }
 
   @Override
   public void unblockIncomingSessionPackets(JID jid) throws RemoteException {
-    LOG.trace("unblocking incoming packet transfer from " + jid);
+    log.trace("unblocking incoming packet transfer from " + jid);
 
     if (blockAllIncomingSessionPackets) {
-      LOG.warn(
+      log.warn(
           "cannot unblock incoming packet transfer from "
               + jid
               + ", because all incoming packet traffic is locked");
@@ -261,7 +261,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
     }
 
     if (pendingIncomingPackets.isEmpty()) {
-      LOG.trace("no packets where intercepted during blocking state");
+      log.trace("no packets where intercepted during blocking state");
       return;
     }
 
@@ -269,21 +269,21 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
       try {
         BinaryXMPPExtension object = pendingIncomingPackets.remove();
 
-        LOG.trace("dispatching blocked packet: " + object);
+        log.trace("dispatching blocked packet: " + object);
 
         ((XMPPReceiver) getReceiver()).receive(object);
       } catch (Exception e) {
-        LOG.error(e.getMessage(), e);
+        log.error(e.getMessage(), e);
       }
     }
   }
 
   @Override
   public void unblockOutgoingSessionPackets(JID jid) throws RemoteException {
-    LOG.trace("unblocking outgoing packet transfer to " + jid);
+    log.trace("unblocking outgoing packet transfer to " + jid);
 
     if (blockAllOutgoingSessionPackets) {
-      LOG.warn(
+      log.warn(
           "cannot unblock outgoing packet transfer to "
               + jid
               + ", because all outgoing packet traffic is locked");
@@ -310,7 +310,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
     }
 
     if (pendingOutgoingPackets.isEmpty()) {
-      LOG.trace("no packets where intercepted during blocking state");
+      log.trace("no packets where intercepted during blocking state");
       return;
     }
 
@@ -320,7 +320,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
       try {
         OutgoingPacketHolder holder = pendingOutgoingPackets.remove();
 
-        LOG.trace(
+        log.trace(
             "sending blocked packet: "
                 + holder.extension
                 + ", connection id: "
@@ -330,7 +330,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
         transmitter.send(holder.connectionId, jid, holder.extension);
       } catch (Exception e) {
-        LOG.error(e.getMessage(), e);
+        log.error(e.getMessage(), e);
       }
     }
   }
@@ -339,7 +339,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
   public void unblockIncomingSessionPackets() throws RemoteException {
     if (!blockAllIncomingSessionPackets) return;
 
-    LOG.trace("unblocking all incoming packet transfer");
+    log.trace("unblocking all incoming packet transfer");
     blockAllIncomingSessionPackets = false;
 
     for (JID jid : blockIncomingSessionPackets.keySet()) unblockIncomingSessionPackets(jid);
@@ -349,7 +349,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
   public void unblockOutgoingSessionPackets() throws RemoteException {
     if (!blockAllOutgoingSessionPackets) return;
 
-    LOG.trace("unblocking all outgoing packet transfer");
+    log.trace("unblocking all outgoing packet transfer");
     blockAllOutgoingSessionPackets = false;
 
     for (JID jid : blockOutgoingSessionPackets.keySet()) unblockOutgoingSessionPackets(jid);
@@ -357,13 +357,13 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
 
   @Override
   public void blockIncomingSessionPackets() throws RemoteException {
-    LOG.trace("blocking all incoming packet transfer");
+    log.trace("blocking all incoming packet transfer");
     blockAllIncomingSessionPackets = true;
   }
 
   @Override
   public void blockOutgoingSessionPackets() throws RemoteException {
-    LOG.trace("blocking all outgoing packet transfer");
+    log.trace("blocking all outgoing packet transfer");
     blockAllOutgoingSessionPackets = true;
   }
 
@@ -402,7 +402,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject
     try {
       if (!swtThreadSync.await(
           SarosSWTBotPreferences.SAROS_DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)) {
-        LOG.warn("could not synchronize on the SWT EDT");
+        log.warn("could not synchronize on the SWT EDT");
       }
     } catch (InterruptedException e1) {
       Thread.currentThread().interrupt();

@@ -21,7 +21,7 @@ import saros.ui.util.SWTUtils;
  */
 public class DirtyStateListener implements IElementStateListener {
 
-  private static final Logger LOG = Logger.getLogger(DirtyStateListener.class);
+  private static final Logger log = Logger.getLogger(DirtyStateListener.class);
 
   private final EditorManager editorManager;
 
@@ -53,7 +53,7 @@ public class DirtyStateListener implements IElementStateListener {
      * already
      */
     SWTUtils.runSafeSWTSync(
-        LOG,
+        log,
         new Runnable() {
 
           @Override
@@ -67,7 +67,7 @@ public class DirtyStateListener implements IElementStateListener {
             // Only trigger save events for files managed in the editor pool
             if (!editorManager.isManaged(file)) return;
 
-            LOG.debug("Dirty state reset for: " + file);
+            log.debug("Dirty state reset for: " + file);
             editorManager.sendEditorActivitySaved(new SPath(ResourceAdapterFactory.create(file)));
           }
         });
@@ -129,7 +129,7 @@ public class DirtyStateListener implements IElementStateListener {
 
     for (IDocumentProvider provider : documentProviders.keySet()) {
       // ????
-      LOG.warn(
+      log.warn(
           "DocumentProvider was not correctly"
               + " unregistered yet, EditorPool must be corrupted: "
               + documentProviders);

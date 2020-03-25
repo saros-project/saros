@@ -30,7 +30,7 @@ import saros.ui.wizards.ConfigurationWizard;
  */
 public class ConfigurationSummaryWizardPage extends WizardPage {
 
-  private static final Logger LOG = Logger.getLogger(ConfigurationSummaryWizardPage.class);
+  private static final Logger log = Logger.getLogger(ConfigurationSummaryWizardPage.class);
 
   public static final String TITLE = saros.ui.Messages.ConfigurationSummaryWizardPage_title;
   public static final String DESCRIPTION =
@@ -232,7 +232,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
       try {
         disabledUPnP = new Image(null, ImageManager.ICON_UPNP, SWT.IMAGE_DISABLE);
       } catch (Exception e) {
-        LOG.debug("Unable to convert image:" + e.getMessage()); // $NON-NLS-1$
+        log.debug("Unable to convert image:" + e.getMessage()); // $NON-NLS-1$
       }
 
       uPnPOption.setContent(

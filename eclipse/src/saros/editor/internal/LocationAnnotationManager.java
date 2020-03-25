@@ -35,7 +35,7 @@ import saros.util.Predicate;
  */
 public class LocationAnnotationManager {
 
-  private static final Logger LOG = Logger.getLogger(LocationAnnotationManager.class);
+  private static final Logger log = Logger.getLogger(LocationAnnotationManager.class);
 
   private AnnotationModelHelper annotationModelHelper;
 
@@ -64,7 +64,7 @@ public class LocationAnnotationManager {
       return;
 
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
 
           @Override
@@ -150,7 +150,7 @@ public class LocationAnnotationManager {
       Position position = new Position(start, end - start);
       model.addAnnotation(annotation, position);
     } catch (BadLocationException e) {
-      LOG.warn("Internal Error:", e);
+      log.warn("Internal Error:", e);
     }
   }
 

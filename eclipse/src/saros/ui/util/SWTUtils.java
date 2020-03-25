@@ -19,7 +19,7 @@ import saros.util.ThreadUtils;
 
 public class SWTUtils {
 
-  private static final Logger LOG = Logger.getLogger(SWTUtils.class);
+  private static final Logger log = Logger.getLogger(SWTUtils.class);
 
   private static class CallableResult<T> {
     private T result;
@@ -44,7 +44,7 @@ public class SWTUtils {
     try {
       url = new URL(urlString);
     } catch (MalformedURLException e) {
-      LOG.error("Couldn't parse URL from string " + urlString, e);
+      log.error("Couldn't parse URL from string " + urlString, e);
       return false;
     }
 
@@ -62,7 +62,7 @@ public class SWTUtils {
       browser.openURL(url);
       return true;
     } catch (Exception e) {
-      LOG.error("Couldn't open internal Browser", e);
+      log.error("Couldn't open internal Browser", e);
       return false;
     }
   }
@@ -79,7 +79,7 @@ public class SWTUtils {
     try {
       url = new URL(urlString);
     } catch (MalformedURLException e) {
-      LOG.error("Couldn't parse URL from string " + urlString, e);
+      log.error("Couldn't parse URL from string " + urlString, e);
       return false;
     }
 
@@ -90,7 +90,7 @@ public class SWTUtils {
       browser.openURL(url);
       return true;
     } catch (Exception e) {
-      LOG.error("Couldn't open external browser", e);
+      log.error("Couldn't open external browser", e);
       return false;
     }
   }
@@ -125,7 +125,7 @@ public class SWTUtils {
     } catch (SWTException e) {
       if (!PlatformUI.getWorkbench().isClosing()) throw e;
 
-      LOG.warn(
+      log.warn(
           "could not execute runnable " + runnable + ", UI thread is not available",
           new StackTrace());
     }
@@ -140,7 +140,7 @@ public class SWTUtils {
     final SWTUtils.CallableResult<T> result = new SWTUtils.CallableResult<T>();
 
     SWTUtils.runSafeSWTSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -173,7 +173,7 @@ public class SWTUtils {
     } catch (SWTException e) {
       if (!PlatformUI.getWorkbench().isClosing()) throw e;
 
-      LOG.warn(
+      log.warn(
           "could not execute runnable " + runnable + ", UI thread is not available",
           new StackTrace());
     }

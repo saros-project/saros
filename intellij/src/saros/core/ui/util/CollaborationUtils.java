@@ -47,7 +47,7 @@ import saros.util.ThreadUtils;
  */
 public class CollaborationUtils {
 
-  private static final Logger LOG = Logger.getLogger(CollaborationUtils.class);
+  private static final Logger log = Logger.getLogger(CollaborationUtils.class);
 
   @Inject private static ISarosSessionManager sessionManager;
 
@@ -93,7 +93,7 @@ public class CollaborationUtils {
 
             } catch (Exception e) {
 
-              LOG.error("could not start a Saros session", e);
+              log.error("could not start a Saros session", e);
               return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID, e.getMessage(), e);
             }
 
@@ -113,7 +113,7 @@ public class CollaborationUtils {
     ISarosSession sarosSession = sessionManager.getSession();
 
     if (sarosSession == null) {
-      LOG.warn("cannot leave a non-running session");
+      log.warn("cannot leave a non-running session");
       return;
     }
 
@@ -144,7 +144,7 @@ public class CollaborationUtils {
 
     ThreadUtils.runSafeAsync(
         "StopSession",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -165,7 +165,7 @@ public class CollaborationUtils {
     final ISarosSession sarosSession = sessionManager.getSession();
 
     if (sarosSession == null) {
-      LOG.warn("cannot add resources to a non-running session");
+      log.warn("cannot add resources to a non-running session");
       return;
     }
 
@@ -179,7 +179,7 @@ public class CollaborationUtils {
 
     ThreadUtils.runSafeAsync(
         "AddResourceToSession",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -208,13 +208,13 @@ public class CollaborationUtils {
     final ISarosSession sarosSession = sessionManager.getSession();
 
     if (sarosSession == null) {
-      LOG.warn("cannot add contacts to a non-running session");
+      log.warn("cannot add contacts to a non-running session");
       return;
     }
 
     ThreadUtils.runSafeAsync(
         "AddContactToSession",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -275,7 +275,7 @@ public class CollaborationUtils {
         }
       }
     } catch (IOException e) {
-      LOG.error(e.getMessage(), e);
+      log.error(e.getMessage(), e);
       return "Could not get description";
     }
 
@@ -372,7 +372,7 @@ public class CollaborationUtils {
       VirtualFile moduleFile = module.getModuleFile();
 
       if (moduleFile == null || !moduleFile.exists()) {
-        LOG.error(
+        log.error(
             "The module file for the module " + module + " does not exist or could not be found");
 
         NotificationPanel.showWarning(
@@ -387,7 +387,7 @@ public class CollaborationUtils {
         if (moduleFileResource != null) {
           additionalFilesForPartialSharing.add(moduleFileResource);
         } else {
-          LOG.error("The module file " + moduleFile + " could not be converted to an IFile.");
+          log.error("The module file " + moduleFile + " could not be converted to an IFile.");
 
           NotificationPanel.showWarning(
               "There was an error handling the  module file for"
@@ -457,7 +457,7 @@ public class CollaborationUtils {
 
             totalFileSize += file.getSize();
           } catch (IOException e) {
-            LOG.warn("failed to retrieve size of file " + resource, e);
+            log.warn("failed to retrieve size of file " + resource, e);
           }
           break;
         case IResource.PROJECT:
@@ -476,7 +476,7 @@ public class CollaborationUtils {
             totalFileCount += subFileCountAndSize.getRight();
 
           } catch (Exception e) {
-            LOG.warn("failed to process container: " + resource, e);
+            log.warn("failed to process container: " + resource, e);
           }
           break;
         default:

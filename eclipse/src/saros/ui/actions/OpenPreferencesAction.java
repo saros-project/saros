@@ -11,7 +11,7 @@ public class OpenPreferencesAction extends Action {
 
   public static final String ACTION_ID = OpenPreferencesAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(OpenPreferencesAction.class);
+  private static final Logger log = Logger.getLogger(OpenPreferencesAction.class);
 
   public OpenPreferencesAction() {
     super(Messages.OpenPreferencesAction_title);
@@ -36,7 +36,7 @@ public class OpenPreferencesAction extends Action {
           "saros.ui.commands.OpenSarosPreferences", //$NON-NLS-1$
           null);
     } catch (Exception e) {
-      LOG.error("Could not execute command", e); // $NON-NLS-1$
+      log.error("Could not execute command", e); // $NON-NLS-1$
     }
   }
 }

@@ -22,7 +22,7 @@ import saros.preferences.IPreferenceStore;
 @Component(module = "core")
 public final class ColorIDSetStorage {
 
-  private static final Logger LOG = Logger.getLogger(ColorIDSetStorage.class);
+  private static final Logger log = Logger.getLogger(ColorIDSetStorage.class);
 
   private static final String PREFERENCE_STORE_KEY = "saros.coloridsets";
 
@@ -157,7 +157,7 @@ public final class ColorIDSetStorage {
     try {
       serializedData = createXStream().toXML(currentAvailableSets);
     } catch (Exception e) {
-      LOG.error("error while saving color sets", e);
+      log.error("error while saving color sets", e);
       return;
     }
 
@@ -177,7 +177,7 @@ public final class ColorIDSetStorage {
     try {
       currentAvailableSets = (List<ColorIDSet>) createXStream().fromXML(serializedData);
     } catch (Exception e) {
-      LOG.error("error while loading color sets", e);
+      log.error("error while loading color sets", e);
     }
   }
 

@@ -17,7 +17,7 @@ import saros.util.CoreUtils;
 /** Eclipse-specific implementation of the {@link IRemoteProgressIndicator} interface. */
 final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicator {
 
-  private static final Logger LOG = Logger.getLogger(EclipseRemoteProgressIndicatorImpl.class);
+  private static final Logger log = Logger.getLogger(EclipseRemoteProgressIndicatorImpl.class);
 
   private final RemoteProgressManager rpm;
   private final String remoteProgressID;
@@ -71,7 +71,7 @@ final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicat
               mainloop(monitor);
               return Status.OK_STATUS;
             } catch (Exception e) {
-              LOG.error(e);
+              log.error(e);
               return Status.CANCEL_STATUS;
             } finally {
               rpm.progressIndicatorStopped(EclipseRemoteProgressIndicatorImpl.this);
@@ -104,7 +104,7 @@ final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicat
   @Override
   public synchronized void handleProgress(ProgressActivity activity) {
     if (!remoteUser.equals(activity.getSource())) {
-      LOG.warn(
+      log.warn(
           "RemoteProgress with ID: "
               + remoteProgressID
               + " is owned by user "
@@ -115,7 +115,7 @@ final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicat
     }
 
     if (!running) {
-      LOG.debug(
+      log.debug(
           "RemoteProgress with ID: "
               + remoteProgressID
               + " has already been closed. Discarding activity: "
@@ -151,7 +151,7 @@ final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicat
 
       int newWorked;
 
-      if (LOG.isTraceEnabled()) LOG.trace("executing progress activity: " + activity);
+      if (log.isTraceEnabled()) log.trace("executing progress activity: " + activity);
 
       switch (activity.getAction()) {
         case BEGINTASK:
@@ -186,7 +186,7 @@ final class EclipseRemoteProgressIndicatorImpl implements IRemoteProgressIndicat
           monitor.done();
           break update;
         case CANCEL:
-          LOG.debug("progress was canceled by remote user");
+          log.debug("progress was canceled by remote user");
           monitor.setCanceled(true);
           break update;
       }

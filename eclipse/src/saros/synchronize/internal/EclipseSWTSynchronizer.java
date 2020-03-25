@@ -11,7 +11,7 @@ import saros.util.StackTrace;
 @Component(module = "eclipse")
 public class EclipseSWTSynchronizer implements UISynchronizer {
 
-  private static final Logger LOG = Logger.getLogger(EclipseSWTSynchronizer.class);
+  private static final Logger log = Logger.getLogger(EclipseSWTSynchronizer.class);
 
   @Override
   public void asyncExec(Runnable runnable) {
@@ -48,11 +48,11 @@ public class EclipseSWTSynchronizer implements UISynchronizer {
     } catch (SWTException e) {
 
       if (PlatformUI.getWorkbench().isClosing()) {
-        LOG.warn(
+        log.warn(
             "could not execute runnable " + runnable + ", UI thread is not available",
             new StackTrace());
       } else {
-        LOG.error(
+        log.error(
             "could not execute runnable "
                 + runnable
                 + ", workbench display was disposed before workbench shutdown",

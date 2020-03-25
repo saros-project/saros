@@ -48,7 +48,7 @@ import saros.util.ThreadUtils;
  */
 public class CollaborationUtils {
 
-  private static final Logger LOG = Logger.getLogger(CollaborationUtils.class);
+  private static final Logger log = Logger.getLogger(CollaborationUtils.class);
 
   @Inject private static ISarosSessionManager sessionManager;
 
@@ -92,7 +92,7 @@ public class CollaborationUtils {
 
             } catch (Exception e) {
 
-              LOG.error("could not start a Saros session", e);
+              log.error("could not start a Saros session", e);
               return new Status(IStatus.ERROR, Saros.PLUGIN_ID, e.getMessage(), e);
             }
 
@@ -116,7 +116,7 @@ public class CollaborationUtils {
     Shell shell = SWTUtils.getShell();
 
     if (sarosSession == null) {
-      LOG.warn("cannot leave a non-running session");
+      log.warn("cannot leave a non-running session");
       return;
     }
 
@@ -145,7 +145,7 @@ public class CollaborationUtils {
 
     ThreadUtils.runSafeAsync(
         "StopSession",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -166,7 +166,7 @@ public class CollaborationUtils {
     final ISarosSession session = sessionManager.getSession();
 
     if (session == null) {
-      LOG.warn("cannot add resources to a non-running session");
+      log.warn("cannot add resources to a non-running session");
       return;
     }
 
@@ -177,7 +177,7 @@ public class CollaborationUtils {
 
     ThreadUtils.runSafeAsync(
         "AddResourceToSession",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -200,7 +200,7 @@ public class CollaborationUtils {
             try {
               refreshProjects(projectsToRefresh, null);
             } catch (CoreException e) {
-              LOG.warn("failed to refresh projects", e);
+              log.warn("failed to refresh projects", e);
               /*
                * FIXME use a Job instead of a plain thread and so better
                * execption handling !
@@ -224,13 +224,13 @@ public class CollaborationUtils {
     final ISarosSession sarosSession = sessionManager.getSession();
 
     if (sarosSession == null) {
-      LOG.warn("cannot add contacts to a non-running session");
+      log.warn("cannot add contacts to a non-running session");
       return;
     }
 
     ThreadUtils.runSafeAsync(
         "AddContactToSession",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -403,7 +403,7 @@ public class CollaborationUtils {
               additionalFilesForPartialSharing.add(resource);
           }
         } catch (CoreException e) {
-          LOG.warn("could not read the contents of the settings folder", e);
+          log.warn("could not read the contents of the settings folder", e);
         }
       }
 

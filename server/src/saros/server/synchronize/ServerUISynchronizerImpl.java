@@ -16,7 +16,7 @@ import saros.synchronize.UISynchronizer;
 @Component(module = "server")
 public class ServerUISynchronizerImpl implements UISynchronizer {
 
-  private static final Logger LOG = Logger.getLogger(ServerUISynchronizerImpl.class);
+  private static final Logger log = Logger.getLogger(ServerUISynchronizerImpl.class);
 
   private ExecutorService executor;
   private Thread virtualUIThread;
@@ -49,10 +49,10 @@ public class ServerUISynchronizerImpl implements UISynchronizer {
       Future<?> f = executor.submit(runnable);
       f.get();
     } catch (InterruptedException e) {
-      LOG.warn("interrupted while waiting for runnable " + runnable + " to finish execution");
+      log.warn("interrupted while waiting for runnable " + runnable + " to finish execution");
       Thread.currentThread().interrupt();
     } catch (ExecutionException e) {
-      LOG.error("execution of runnable " + runnable + " failed", e);
+      log.error("execution of runnable " + runnable + " failed", e);
     }
   }
 

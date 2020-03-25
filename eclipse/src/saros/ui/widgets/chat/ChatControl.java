@@ -78,7 +78,7 @@ import saros.util.CoreUtils;
  */
 public final class ChatControl extends Composite {
 
-  private static final Logger LOG = Logger.getLogger(ChatControl.class);
+  private static final Logger log = Logger.getLogger(ChatControl.class);
 
   /*
    * This should be configurable by the user so we do not have to think about
@@ -224,7 +224,7 @@ public final class ChatControl extends Composite {
                   EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED);
 
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
 
                 @Override
@@ -254,7 +254,7 @@ public final class ChatControl extends Composite {
         @Override
         public void stateChanged(final JID jid, final ChatState state) {
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
                 @Override
                 public void run() {
@@ -576,7 +576,7 @@ public final class ChatControl extends Composite {
    */
   private void updateColorsInSWTAsync() {
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -701,7 +701,7 @@ public final class ChatControl extends Composite {
     try {
       chat.setCurrentState(getInputText().isEmpty() ? ChatState.inactive : ChatState.composing);
     } catch (XMPPException ex) {
-      LOG.error(ex.getMessage(), ex);
+      log.error(ex.getMessage(), ex);
     }
   }
 }

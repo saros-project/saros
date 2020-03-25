@@ -48,7 +48,7 @@ import saros.net.xmpp.JID;
  */
 @Component(module = "account")
 public final class XMPPAccountStore {
-  private static final Logger LOG = Logger.getLogger(XMPPAccountStore.class);
+  private static final Logger log = Logger.getLogger(XMPPAccountStore.class);
 
   private static final long MAX_ACCOUNT_DATA_SIZE = 10 * 1024 * 1024;
 
@@ -127,7 +127,7 @@ public final class XMPPAccountStore {
         File parent = accountFile.getParentFile();
 
         if (parent != null && !parent.exists() && !parent.mkdirs()) {
-          LOG.error("could not create directories for file: " + file.getAbsolutePath());
+          log.error("could not create directories for file: " + file.getAbsolutePath());
           accountFile = null;
         }
       }
@@ -143,7 +143,7 @@ public final class XMPPAccountStore {
 
     if (accountFile == null || !accountFile.exists()) return;
 
-    LOG.debug("loading accounts from file: " + accountFile.getAbsolutePath());
+    log.debug("loading accounts from file: " + accountFile.getAbsolutePath());
 
     FileInputStream dataIn = null;
 
@@ -172,16 +172,16 @@ public final class XMPPAccountStore {
         defaultAccount = accountData.configuredAccounts.get(accountData.activeAccountIndex);
 
     } catch (RuntimeException e) {
-      LOG.error("internal error while loading account data", e);
+      log.error("internal error while loading account data", e);
       return;
     } catch (Exception e) {
-      LOG.error("could not load account data", e);
+      log.error("could not load account data", e);
       return;
     } finally {
       IOUtils.closeQuietly(dataIn);
     }
 
-    LOG.debug("loaded " + accounts.size() + " account(s)");
+    log.debug("loaded " + accounts.size() + " account(s)");
   }
 
   private synchronized void saveAccounts() {
@@ -192,7 +192,7 @@ public final class XMPPAccountStore {
       try {
         accountFile.createNewFile();
       } catch (IOException e) {
-        LOG.error(
+        log.error(
             "could not create file: " + accountFile.getAbsolutePath() + " to store account data");
         return;
       }
@@ -219,16 +219,16 @@ public final class XMPPAccountStore {
       dataOut.flush();
 
     } catch (RuntimeException e) {
-      LOG.error("internal error while storing account data", e);
+      log.error("internal error while storing account data", e);
       return;
     } catch (Exception e) {
-      LOG.error("could not store account data", e);
+      log.error("could not store account data", e);
       return;
     } finally {
       IOUtils.closeQuietly(dataOut);
     }
 
-    LOG.debug("saved " + accounts.size() + " account(s)");
+    log.debug("saved " + accounts.size() + " account(s)");
   }
 
   private XStream createXStream() {

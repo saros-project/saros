@@ -27,7 +27,7 @@ import saros.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 
 public abstract class StfTestCase {
 
-  private static final Logger LOGGER = Logger.getLogger(StfTestCase.class.getName());
+  private static final Logger log = Logger.getLogger(StfTestCase.class.getName());
 
   /** JUnit monitor. Do <b>NOT</b> call any method of this instance ! */
   @Rule
@@ -103,7 +103,7 @@ public abstract class StfTestCase {
             try {
               tester.remoteBot().logMessage(message);
             } catch (Exception e) {
-              LOGGER.log(
+              log.log(
                   Level.WARNING,
                   "could not log message '" + message + "' at remote bot of tester " + tester,
                   e);
@@ -120,7 +120,7 @@ public abstract class StfTestCase {
                   .captureScreenshot(
                       name + "_" + tester + "_" + System.currentTimeMillis() + ".jpg");
             } catch (Exception e) {
-              LOGGER.log(
+              log.log(
                   Level.WARNING, "could capture a screenshot at remote bot of tester " + tester, e);
             }
           }
@@ -217,7 +217,7 @@ public abstract class StfTestCase {
     try {
       terminateTestThreads(60 * 1000);
     } catch (Throwable t) {
-      LOGGER.log(Level.SEVERE, "aborting execution of all tests: " + t.getMessage(), t);
+      log.log(Level.SEVERE, "aborting execution of all tests: " + t.getMessage(), t);
       checkAndStopRunningTestThreads(true);
     }
 
@@ -239,7 +239,7 @@ public abstract class StfTestCase {
           try {
             tester.superBot().views().sarosView().closeChatroomWithRegex(".*");
           } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "chatsrooms were closed lately by Saros", e);
+            log.log(Level.WARNING, "chatsrooms were closed lately by Saros", e);
           }
         }
 

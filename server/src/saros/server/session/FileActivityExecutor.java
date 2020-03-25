@@ -15,7 +15,7 @@ import saros.session.ISarosSession;
 /** Executes FileActivities and performs actual filesystem operations. */
 public class FileActivityExecutor extends AbstractActivityConsumer implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(FileActivityExecutor.class);
+  private static final Logger log = Logger.getLogger(FileActivityExecutor.class);
 
   private final ISarosSession session;
   private final ServerEditorManager editorManager;
@@ -56,11 +56,11 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
           executeFileRemoval(activity);
           break;
         default:
-          LOG.warn("Unknown file activity type " + activity.getType());
+          log.warn("Unknown file activity type " + activity.getType());
           break;
       }
     } catch (IOException e) {
-      LOG.error("Could not execute " + activity, e);
+      log.error("Could not execute " + activity, e);
     }
   }
 

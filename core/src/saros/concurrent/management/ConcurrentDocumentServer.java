@@ -28,7 +28,7 @@ import saros.session.User;
  */
 public class ConcurrentDocumentServer implements Startable {
 
-  private static Logger LOG = Logger.getLogger(ConcurrentDocumentServer.class);
+  private static Logger log = Logger.getLogger(ConcurrentDocumentServer.class);
 
   private final ISarosSession sarosSession;
 
@@ -57,7 +57,7 @@ public class ConcurrentDocumentServer implements Startable {
 
     Consumer<SPath> deletedFileHandler =
         resource -> {
-          LOG.debug("Resetting jupiter server for " + resource);
+          log.debug("Resetting jupiter server for " + resource);
           server.removePath(resource);
         };
 
@@ -110,7 +110,7 @@ public class ConcurrentDocumentServer implements Startable {
     final List<QueueItem> result = new ArrayList<QueueItem>();
 
     if (resourceActivityFilter.isFiltered(activity)) {
-      LOG.debug("Ignored activity for already deleted resource: " + activity);
+      log.debug("Ignored activity for already deleted resource: " + activity);
 
       return result;
     }
@@ -123,7 +123,7 @@ public class ConcurrentDocumentServer implements Startable {
         result.addAll(withTimestamp((ChecksumActivity) activity));
       }
     } catch (Exception e) {
-      LOG.error("failed to transform jupiter activity: " + activity, e);
+      log.error("failed to transform jupiter activity: " + activity, e);
     }
 
     return result;
@@ -143,7 +143,7 @@ public class ConcurrentDocumentServer implements Startable {
     try {
       outgoing = server.transform(activity);
     } catch (TransformationException e) {
-      LOG.error("failed to transform jupiter activity: " + activity, e);
+      log.error("failed to transform jupiter activity: " + activity, e);
       // TODO this should trigger a consistency check
       return result;
     }
@@ -169,7 +169,7 @@ public class ConcurrentDocumentServer implements Startable {
 
     assert sarosSession.isHost();
 
-    LOG.debug("resetting jupiter server for user: " + user + ", path: " + path);
+    log.debug("resetting jupiter server for user: " + user + ", path: " + path);
 
     server.reset(path, user);
   }
@@ -185,7 +185,7 @@ public class ConcurrentDocumentServer implements Startable {
     try {
       outgoing = server.withTimestamp(activity);
     } catch (TransformationException e) {
-      LOG.error("failed to transform checksum activity: " + activity, e);
+      log.error("failed to transform checksum activity: " + activity, e);
       // TODO this should trigger a consistency check
       return result;
     }

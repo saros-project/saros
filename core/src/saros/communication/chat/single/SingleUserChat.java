@@ -19,14 +19,14 @@ import saros.net.xmpp.JID;
 
 /** This object represents a chat with a single user. */
 public class SingleUserChat extends AbstractChat {
-  private static final Logger LOG = Logger.getLogger(SingleUserChat.class);
+  private static final Logger log = Logger.getLogger(SingleUserChat.class);
 
   private final ChatStateListener chatStateListener =
       new ChatStateListener() {
 
         @Override
         public void processMessage(Chat chat, Message message) {
-          LOG.trace(
+          log.trace(
               this + " : received message from: " + message.getFrom() + " : " + message.getBody());
 
           if (message.getFrom() == null || message.getBody() == null) return;
@@ -87,7 +87,7 @@ public class SingleUserChat extends AbstractChat {
   void setConnected(boolean isConnected) {
     JID participant;
     synchronized (SingleUserChat.this) {
-      LOG.trace("new connection state, connected=" + isConnected);
+      log.trace("new connection state, connected=" + isConnected);
       this.isConnected = isConnected;
       participant = new JID(chat.getParticipant());
     }

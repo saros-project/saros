@@ -33,7 +33,7 @@ public class RenameContactAction extends Action {
 
   public static final String ACTION_ID = RenameContactAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(RenameContactAction.class);
+  private static final Logger log = Logger.getLogger(RenameContactAction.class);
 
   private IConnectionStateListener connectionListener = (state, error) -> updateEnablement();
 
@@ -72,7 +72,7 @@ public class RenameContactAction extends Action {
   @Override
   public void run() {
     ThreadUtils.runSafeSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -86,13 +86,13 @@ public class RenameContactAction extends Action {
                * at all?
                */
               if (contact.getBareJid().equals(connectionHandler.getLocalJID())) {
-                LOG.error("Rename of own contact is forbidden!");
+                log.error("Rename of own contact is forbidden!");
                 return;
               }
             }
 
             if (contact == null) {
-              LOG.error("XMPPContact should not be null at this point!"); // $NON-NLS-1$
+              log.error("XMPPContact should not be null at this point!"); // $NON-NLS-1$
               return;
             }
 

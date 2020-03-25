@@ -18,7 +18,7 @@ import saros.lsp.service.WorkspaceServiceStub;
 /** Implmenentation of the Saros language server. */
 public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguageClientAware {
 
-  private static final Logger LOG = Logger.getLogger(SarosLanguageServer.class);
+  private static final Logger log = Logger.getLogger(SarosLanguageServer.class);
 
   private ISarosLanguageClient languageClient;
 
@@ -49,13 +49,13 @@ public class SarosLanguageServer implements ISarosLanguageServer, ISarosLanguage
 
   @Override
   public CompletableFuture<Object> shutdown() {
-    LOG.info("shutdown");
+    log.info("shutdown");
     return CompletableFuture.completedFuture(null);
   }
 
   @Override
   public void exit() {
-    LOG.info("exit");
+    log.info("exit");
   }
 
   @Override

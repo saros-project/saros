@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 // 2^128)
 public final class FileSystemChecksumCache implements IChecksumCache {
 
-  private static final Logger LOG = Logger.getLogger(FileSystemChecksumCache.class);
+  private static final Logger log = Logger.getLogger(FileSystemChecksumCache.class);
 
   private static final int SEED = 0xDEADBEEF;
 
@@ -81,14 +81,14 @@ public final class FileSystemChecksumCache implements IChecksumCache {
             Murmur3Hash<Long> currentHash = getHash(path, hash);
 
             if (currentHash != null) {
-              if (LOG.isTraceEnabled())
-                LOG.trace(
+              if (log.isTraceEnabled())
+                log.trace(
                     "invalidating checksum for existing file: " + path + " [" + currentHash + "]");
 
               currentHash.setObject(null);
             } else {
-              if (LOG.isTraceEnabled())
-                LOG.trace("invalidating checksum for new file: " + path + " [" + hash + "]");
+              if (log.isTraceEnabled())
+                log.trace("invalidating checksum for new file: " + path + " [" + hash + "]");
 
               addChecksum(file, 0);
               getHash(path, hash).setObject(null);
@@ -345,12 +345,12 @@ public final class FileSystemChecksumCache implements IChecksumCache {
   }
 
   private void logNoValidChecksum(String path) {
-    if (LOG.isTraceEnabled()) LOG.trace("no valid checksum found for file: " + path);
+    if (log.isTraceEnabled()) log.trace("no valid checksum found for file: " + path);
   }
 
   private void logValidChecksum(String path, Murmur3Hash<Long> hash) {
-    if (LOG.isTraceEnabled())
-      LOG.trace(
+    if (log.isTraceEnabled())
+      log.trace(
           "found valid checksum found for file: "
               + path
               + " ["

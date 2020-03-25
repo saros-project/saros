@@ -34,7 +34,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
   private static final String KEY_AVAILABLE_TYPES = "availableModuleTypes";
   private static final String KEY_TYPE_MAPPINGS = "typeMappings";
 
-  private static final Logger LOG = Logger.getLogger(ModuleTypeNegotiationHook.class);
+  private static final Logger log = Logger.getLogger(ModuleTypeNegotiationHook.class);
 
   private final ISarosSessionManager sessionManager;
 
@@ -91,7 +91,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
     if (input == null) {
       clientModuleTypes = new ArrayList<>();
-      LOG.warn(
+      log.warn(
           "The client did not indicate any module type "
               + "preferences. This could be an indication for a version "
               + "mismatch.");
@@ -120,7 +120,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
                 + client
                 + "\". This might lead to an unexpected behavior of Saros.";
 
-        LOG.warn(warningMessage);
+        log.warn(warningMessage);
 
         NotificationPanel.showWarning(warningMessage, "Unknown module type");
       }
@@ -140,7 +140,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
       IPreferenceStore clientPreferences) {
 
     if (input == null) {
-      LOG.warn(
+      log.warn(
           "The client did not indicate any module type "
               + "preferences. This could be an indication for a version "
               + "mismatch.");
@@ -160,7 +160,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
       ModuleType moduleType = moduleTypeManager.findByID(value);
 
       if (!availableTypes.contains(moduleType)) {
-        LOG.warn(
+        log.warn(
             "The module type \""
                 + value
                 + "\" of the module "

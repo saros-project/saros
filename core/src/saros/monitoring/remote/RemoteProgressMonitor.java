@@ -16,7 +16,7 @@ import saros.util.StackTrace;
  */
 class RemoteProgressMonitor implements IProgressMonitor {
 
-  private static final Logger LOG = Logger.getLogger(RemoteProgressMonitor.class);
+  private static final Logger log = Logger.getLogger(RemoteProgressMonitor.class);
 
   private final RemoteProgressManager rpm;
   private final String id;
@@ -93,7 +93,7 @@ class RemoteProgressMonitor implements IProgressMonitor {
     worked += work;
 
     if (worked > totalWorked) {
-      LOG.warn(
+      log.warn(
           worked
               + " > "
               + totalWorked

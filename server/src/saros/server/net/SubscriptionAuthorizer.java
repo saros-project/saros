@@ -13,7 +13,7 @@ import saros.net.xmpp.subscription.SubscriptionListener;
 @Component(module = "server")
 public class SubscriptionAuthorizer implements SubscriptionListener {
 
-  private static final Logger LOG = Logger.getLogger(SubscriptionAuthorizer.class);
+  private static final Logger log = Logger.getLogger(SubscriptionAuthorizer.class);
 
   private SubscriptionHandler subscriptionHandler;
 
@@ -29,7 +29,7 @@ public class SubscriptionAuthorizer implements SubscriptionListener {
 
   @Override
   public void subscriptionRequestReceived(JID jid) {
-    LOG.info("Accepting presence subscription request from " + jid);
+    log.info("Accepting presence subscription request from " + jid);
     subscriptionHandler.addSubscription(jid, true);
   }
 }

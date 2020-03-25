@@ -25,7 +25,7 @@ import saros.session.User;
 // TODO move local selections affected by changes while editor is closed; see issue #116
 public class AnnotationManager implements Disposable {
 
-  private static final Logger LOG = Logger.getLogger(AnnotationManager.class);
+  private static final Logger log = Logger.getLogger(AnnotationManager.class);
 
   /** Enum containing the possible annotation types. */
   public enum AnnotationType {
@@ -711,7 +711,7 @@ public class AnnotationManager implements Disposable {
     int documentLength = editor.getDocument().getTextLength();
 
     if (documentLength < end) {
-      LOG.warn(
+      log.warn(
           "The creation of a range highlighter with the bounds ("
               + start
               + ", "
