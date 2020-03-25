@@ -117,7 +117,7 @@ public class ContributionAnnotationManager {
 
     if (length > 1) {
       // Correct current model state to match with the assumption that all
-      // annotations have length &lt;= 1.
+      // annotations have length <= 1.
       enforceAnnotationsWithLengthOne(model);
     }
 
@@ -178,7 +178,7 @@ public class ContributionAnnotationManager {
       if (p.getLength() > 1) {
         annotationsToRemove.add(contrAnnotation);
 
-        // Expect only one annotation with length &gt; 1 created by
+        // Expect only one annotation with length > 1 created by
         // callers content change.
         break;
       }
