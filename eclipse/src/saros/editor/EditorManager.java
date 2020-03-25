@@ -633,14 +633,6 @@ public class EditorManager implements IEditorManager {
 
     // inform all registered ISharedEditorListeners about this text edit
     editorListenerDispatch.textEdited(textEdit);
-
-    /*
-     * TODO Investigate if this is really needed here
-     */
-    IEditorInput input = changedEditor.getEditorInput();
-    IDocumentProvider provider = EditorAPI.getDocumentProvider(input);
-    IAnnotationModel model = provider.getAnnotationModel(input);
-    contributionAnnotationManager.splitAnnotation(model, offset);
   }
 
   private void execEditorActivity(EditorActivity editorActivity) {
@@ -1062,6 +1054,8 @@ public class EditorManager implements IEditorManager {
 
       // Try to replace
       try {
+        // Attention: This method also alters the annotation model if an
+        // annotation exists at the offset and the length > 1
         doc.replace(offset, replacedText.length(), text);
       } catch (BadLocationException e) {
         log.error(
@@ -1082,9 +1076,6 @@ public class EditorManager implements IEditorManager {
           contributionAnnotationManager.insertAnnotation(model, offset, text.length(), source);
         }
       }
-
-      IAnnotationModel model = provider.getAnnotationModel(input);
-      contributionAnnotationManager.insertAnnotation(model, offset, text.length(), source);
     } finally {
       provider.disconnect(input);
     }
