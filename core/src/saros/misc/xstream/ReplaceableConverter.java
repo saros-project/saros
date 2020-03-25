@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
  */
 class ReplaceableConverter extends Replaceable<Converter> implements Converter {
 
-  private static final Logger LOG = Logger.getLogger(ReplaceableConverter.class);
+  private static final Logger log = Logger.getLogger(ReplaceableConverter.class);
 
   /**
    * Wraps any {@link Converter} so this object can be registered to XStream (and stay registered),
@@ -45,7 +45,7 @@ class ReplaceableConverter extends Replaceable<Converter> implements Converter {
       Object value, HierarchicalStreamWriter writer, MarshallingContext context) {
 
     if (isReset()) {
-      LOG.debug("Tried to marshal " + value + " with inactive converter " + delegate);
+      log.debug("Tried to marshal " + value + " with inactive converter " + delegate);
       return;
     }
 
@@ -57,7 +57,7 @@ class ReplaceableConverter extends Replaceable<Converter> implements Converter {
       HierarchicalStreamReader reader, UnmarshallingContext context) {
 
     if (isReset()) {
-      LOG.debug("Tried to unmarshal with inactive converter " + delegate);
+      log.debug("Tried to unmarshal with inactive converter " + delegate);
       return null;
     }
 

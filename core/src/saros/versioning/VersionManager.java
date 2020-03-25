@@ -33,7 +33,7 @@ public class VersionManager {
 
   private static final Random ID_GENERATOR = new Random();
 
-  private static final Logger LOG = Logger.getLogger(VersionManager.class);
+  private static final Logger log = Logger.getLogger(VersionManager.class);
 
   private final Version localVersion;
   private final ITransmitter transmitter;
@@ -48,13 +48,13 @@ public class VersionManager {
         @Override
         public void processPacket(Packet packet) {
 
-          LOG.debug("received version request from " + packet.getFrom());
+          log.debug("received version request from " + packet.getFrom());
 
           VersionExchangeExtension versionExchangeRequest =
               VersionExchangeExtension.PROVIDER.getPayload(packet);
 
           if (versionExchangeRequest == null) {
-            LOG.warn("cannot reply to version request, packet is malformed");
+            log.warn("cannot reply to version request, packet is malformed");
             return;
           }
 
@@ -66,13 +66,13 @@ public class VersionManager {
 
             String remoteVersionString = versionExchangeRequest.get(VERSION_KEY);
             if (remoteVersionString == null) {
-              LOG.warn("remote version string not found in version exchange data");
+              log.warn("remote version string not found in version exchange data");
               break createResponseData;
             }
 
             Version remoteVersion = Version.parseVersion(remoteVersionString);
             if (remoteVersion == Version.INVALID) {
-              LOG.warn("remote version string is invalid: " + remoteVersionString);
+              log.warn("remote version string is invalid: " + remoteVersionString);
               break createResponseData;
             }
 
@@ -86,10 +86,10 @@ public class VersionManager {
           try {
             transmitter.sendPacket(reply);
           } catch (IOException e) {
-            LOG.error("could not send version response to " + packet.getFrom(), e);
+            log.error("could not send version response to " + packet.getFrom(), e);
           }
 
-          LOG.debug("send version response to " + packet.getFrom());
+          log.debug("send version response to " + packet.getFrom());
         }
       };
 
@@ -142,13 +142,13 @@ public class VersionManager {
     {
       String remoteVersionString = versionExchangeResponse.get(VERSION_KEY);
       if (remoteVersionString == null) {
-        LOG.warn("remote version string not found in version exchange data");
+        log.warn("remote version string not found in version exchange data");
         break determineCompatibility;
       }
 
       remoteVersion = Version.parseVersion(remoteVersionString);
       if (remoteVersion == Version.INVALID) {
-        LOG.warn("remote version string is invalid: " + remoteVersionString);
+        log.warn("remote version string is invalid: " + remoteVersionString);
         break determineCompatibility;
       }
 
@@ -195,7 +195,7 @@ public class VersionManager {
       transmitter.sendPacket(request);
       return VersionExchangeExtension.PROVIDER.getPayload(collector.nextResult(timeout));
     } catch (IOException e) {
-      LOG.warn(e.getMessage(), e);
+      log.warn(e.getMessage(), e);
       return null;
     } finally {
       collector.cancel();

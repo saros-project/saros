@@ -32,7 +32,7 @@ import saros.session.ISarosSessionManager;
  */
 public class MUCNegotiationManager {
 
-  private static final Logger LOG = Logger.getLogger(MUCNegotiationManager.class);
+  private static final Logger log = Logger.getLogger(MUCNegotiationManager.class);
 
   private static final String NOT_IN_SESSION = "NOT_IN_SESSION";
 
@@ -140,7 +140,7 @@ public class MUCNegotiationManager {
    * @param remotePreferences received communication settings
    */
   public void setSessionPreferences(MultiUserChatPreferences remotePreferences) {
-    LOG.debug(
+    log.debug(
         "Got hosts Communication Config: server "
             + remotePreferences.getService()
             + " room "

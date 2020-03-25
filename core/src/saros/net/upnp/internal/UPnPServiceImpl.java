@@ -30,7 +30,7 @@ import saros.util.NamedThreadFactory;
  */
 public final class UPnPServiceImpl implements IUPnPService, Disposable {
 
-  private static final Logger LOG = Logger.getLogger(UPnPServiceImpl.class);
+  private static final Logger log = Logger.getLogger(UPnPServiceImpl.class);
 
   private final Map<GatewayDevice, Map<String, Set<Integer>>> currentMappedPorts = new HashMap<>();
 
@@ -63,7 +63,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
 
     final String deviceName = getDeviceName(device);
 
-    LOG.debug(
+    log.debug(
         deviceName
             + " - creating port mapping... - port="
             + port
@@ -103,7 +103,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
               LEASE_DURATION);
 
       if (errorcode == 725)
-        LOG.debug(deviceName + " - does not support lease duration for port mappings");
+        log.debug(deviceName + " - does not support lease duration for port mappings");
 
       // in case mapping with lease duration fails, try without
       if (errorcode != 0) {
@@ -137,7 +137,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
       successfullyMapped = true;
 
     } catch (Exception e) {
-      LOG.error(deviceName + " - failed to create port mapping: " + e.getMessage(), e);
+      log.error(deviceName + " - failed to create port mapping: " + e.getMessage(), e);
       successfullyMapped = false;
     }
 
@@ -164,7 +164,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
      * duration
      */
     if (!isPersistentMapping) {
-      LOG.debug(deviceName + " - scheduling port mapping lease timer refresh");
+      log.debug(deviceName + " - scheduling port mapping lease timer refresh");
 
       final PortMappingRefreshTask task =
           new PortMappingRefreshTask(device, port, protocol, description);
@@ -177,7 +177,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
       portMappingRefreshTasks.add(task);
     }
 
-    LOG.debug(
+    log.debug(
         deviceName
             + " - sucessfully created port mapping - port="
             + port
@@ -194,7 +194,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
 
     if (!isMapped(device, port, protocol)) return false;
 
-    LOG.debug(deviceName + " - deleting port mapping... - port=" + port + ", protocol=" + protocol);
+    log.debug(deviceName + " - deleting port mapping... - port=" + port + ", protocol=" + protocol);
 
     final PortMappingRefreshTask task =
         portMappingRefreshTasks
@@ -206,7 +206,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
     if (task != null) {
       final Future<?> future = task.getFuture();
 
-      LOG.debug(
+      log.debug(
           deviceName
               + " - canceling port mapping refresh task.. - port="
               + port
@@ -219,20 +219,20 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
         try {
           future.get(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-          LOG.warn(
+          log.warn(
               deviceName + " - interrupted while waiting for port mapping refresh task to finish");
           Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-          LOG.error(
+          log.error(
               deviceName + " - unexpected error waiting for port mapping refresh task finish", e);
         } catch (TimeoutException e) {
-          LOG.warn(
+          log.warn(
               deviceName + " - timed out while waiting for port mapping refresh task to finsih");
         }
       }
 
       if (future.isDone())
-        LOG.debug(
+        log.debug(
             deviceName
                 + " - canceled port mapping refresh task - port="
                 + port
@@ -251,14 +251,14 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
         throw new IOException("port mapping delete request replied with error code:" + errorcode);
 
     } catch (Exception e) {
-      LOG.error(deviceName + " - failed to remove port mapping: " + e.getMessage(), e);
+      log.error(deviceName + " - failed to remove port mapping: " + e.getMessage(), e);
       // TODO re-add mapping refresh task
       return false;
     }
 
     currentMappedPorts.get(device).get(protocol).remove(port);
 
-    LOG.debug(
+    log.debug(
         deviceName
             + " - sucessfully deleted port mapping - port="
             + port
@@ -274,28 +274,28 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
     List<GatewayDevice> gateways = discoveredGateways.get();
 
     if (gateways != null && !forceRefresh) {
-      LOG.debug("aborting gateway discovery due to cached results");
+      log.debug("aborting gateway discovery due to cached results");
       return new ArrayList<GatewayDevice>(gateways);
     }
 
-    LOG.debug("performing gateways discovery");
+    log.debug("performing gateways discovery");
 
     try {
       // perform discovery
       gateways = new ArrayList<GatewayDevice>(upnpAccess.performDiscovery());
     } catch (Exception e) {
-      LOG.error("performing gateway discovery failed: " + e.getMessage(), e);
+      log.error("performing gateway discovery failed: " + e.getMessage(), e);
       return null;
     }
 
-    LOG.info("discovered " + gateways.size() + " gateway(s)");
+    log.info("discovered " + gateways.size() + " gateway(s)");
 
     discoveredGateways.set(gateways);
 
     gateways = new ArrayList<GatewayDevice>(gateways);
 
-    if (!gateways.isEmpty() && LOG.isTraceEnabled())
-      LOG.trace("discovered gateways devices: " + gateways);
+    if (!gateways.isEmpty() && log.isTraceEnabled())
+      log.trace("discovered gateways devices: " + gateways);
 
     return gateways;
   }
@@ -320,7 +320,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
     try {
       externalIPaddress = device.getExternalIPAddress();
     } catch (Exception e) {
-      LOG.warn("failed to discover external address of device: " + device.getFriendlyName(), e);
+      log.warn("failed to discover external address of device: " + device.getFriendlyName(), e);
       return null;
     }
 
@@ -342,7 +342,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
 
   @Override
   public synchronized void dispose() {
-    LOG.debug("deleting all existing port mappings..");
+    log.debug("deleting all existing port mappings..");
 
     for (Entry<GatewayDevice, Map<String, Set<Integer>>> mappedPortsEntry :
         currentMappedPorts.entrySet()) {
@@ -367,7 +367,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
       final GatewayDevice device, final int port, final String protocol, final String description) {
     final String deviceName = getDeviceName(device);
 
-    LOG.debug(deviceName + " - refreshing port mapping - port=" + port + ", protocol=" + protocol);
+    log.debug(deviceName + " - refreshing port mapping - port=" + port + ", protocol=" + protocol);
 
     try {
       final InetAddress localAddress = device.getLocalAddress();
@@ -386,7 +386,7 @@ public final class UPnPServiceImpl implements IUPnPService, Disposable {
         throw new IOException("port mapping request replied with error code:" + errorcode);
 
     } catch (Exception e) {
-      LOG.error(deviceName + " - failed to refresh port mapping: " + e.getMessage(), e);
+      log.error(deviceName + " - failed to refresh port mapping: " + e.getMessage(), e);
     }
   }
 

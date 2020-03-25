@@ -25,7 +25,7 @@ import saros.repackaged.picocontainer.annotations.Inject;
 
 /** Implementation of connect XMPP/jabber server button */
 public class ConnectButton extends AbstractToolbarButton {
-  private static final Logger LOG = Logger.getLogger(ConnectButton.class);
+  private static final Logger log = Logger.getLogger(ConnectButton.class);
 
   private static final String USER_ID_SEPARATOR = "@";
 
@@ -198,7 +198,7 @@ public class ConnectButton extends AbstractToolbarButton {
       }
 
     } catch (IllegalAWTContextException e) {
-      LOG.error("Account creation failed.", e);
+      log.error("Account creation failed.", e);
 
       showAccountCreationFailedError(e);
     }
@@ -223,7 +223,7 @@ public class ConnectButton extends AbstractToolbarButton {
               new TextRange(0, 0));
 
     } catch (IllegalAWTContextException e) {
-      LOG.error("Account creation failed.", e);
+      log.error("Account creation failed.", e);
 
       showAccountCreationFailedError(e);
 
@@ -231,7 +231,7 @@ public class ConnectButton extends AbstractToolbarButton {
     }
 
     if (userID == null) {
-      LOG.debug("Account creation canceled by user during user id entry.");
+      log.debug("Account creation canceled by user during user id entry.");
 
       return null;
     }
@@ -244,7 +244,7 @@ public class ConnectButton extends AbstractToolbarButton {
           Messages.ConnectButton_account_creation_invalid_jid_message,
           Messages.ConnectButton_account_creation_invalid_jid_title);
 
-      LOG.debug("Account creation failed as the user did not provide a valid user id.");
+      log.debug("Account creation failed as the user did not provide a valid user id.");
 
       return null;
     }
@@ -262,7 +262,7 @@ public class ConnectButton extends AbstractToolbarButton {
               Messages.ConnectButton_account_creation_password_title);
 
     } catch (IllegalAWTContextException e) {
-      LOG.error("Account creation failed.", e);
+      log.error("Account creation failed.", e);
 
       showAccountCreationFailedError(e);
 
@@ -270,7 +270,7 @@ public class ConnectButton extends AbstractToolbarButton {
     }
 
     if (password == null) {
-      LOG.debug("Account creation canceled by user during password entry.");
+      log.debug("Account creation canceled by user during password entry.");
 
       return null;
 
@@ -280,7 +280,7 @@ public class ConnectButton extends AbstractToolbarButton {
           Messages.ConnectButton_account_creation_invalid_password_message,
           Messages.ConnectButton_account_creation_invalid_password_title);
 
-      LOG.debug("Account creation failed as the user did not provide a valid password.");
+      log.debug("Account creation failed as the user did not provide a valid password.");
 
       return null;
     }
@@ -298,7 +298,7 @@ public class ConnectButton extends AbstractToolbarButton {
               Messages.ConnectButton_account_creation_xmpp_server_title);
 
     } catch (IllegalAWTContextException e) {
-      LOG.error("Account creation failed.", e);
+      log.error("Account creation failed.", e);
 
       showAccountCreationFailedError(e);
 
@@ -306,7 +306,7 @@ public class ConnectButton extends AbstractToolbarButton {
     }
 
     if (server == null) {
-      LOG.debug("Account creation canceled by user during server entry.");
+      log.debug("Account creation canceled by user during server entry.");
 
       return null;
 
@@ -322,7 +322,7 @@ public class ConnectButton extends AbstractToolbarButton {
                 Messages.ConnectButton_account_creation_xmpp_server_port_message);
 
       } catch (IllegalAWTContextException e) {
-        LOG.error("Account creation failed.", e);
+        log.error("Account creation failed.", e);
 
         showAccountCreationFailedError(e);
 
@@ -330,7 +330,7 @@ public class ConnectButton extends AbstractToolbarButton {
       }
 
       if (portUserEntry == null) {
-        LOG.debug("Account creation canceled by user during server port entry.");
+        log.debug("Account creation canceled by user during server port entry.");
 
         return null;
       }
@@ -350,7 +350,7 @@ public class ConnectButton extends AbstractToolbarButton {
             Messages.ConnectButton_account_creation_xmpp_server_invalid_port_message,
             Messages.ConnectButton_account_creation_xmpp_server_invalid_port_title);
 
-        LOG.debug("Account creation failed as the user did not provide a valid server port.");
+        log.debug("Account creation failed as the user did not provide a valid server port.");
 
         return null;
       }
@@ -360,7 +360,7 @@ public class ConnectButton extends AbstractToolbarButton {
       return accountStore.createAccount(username, password, domain, server, port, true, true);
 
     } catch (IllegalArgumentException e) {
-      LOG.error("Account creation failed", e);
+      log.error("Account creation failed", e);
 
       showAccountCreationFailedError(e);
 

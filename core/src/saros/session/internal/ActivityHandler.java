@@ -32,7 +32,7 @@ import saros.util.ThreadUtils;
  */
 public final class ActivityHandler implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(ActivityHandler.class);
+  private static final Logger log = Logger.getLogger(ActivityHandler.class);
 
   private static final List<IActivity> POISON_PILL = new ArrayList<>();
 
@@ -82,7 +82,7 @@ public final class ActivityHandler implements Startable {
 
         @Override
         public void run() {
-          LOG.debug("activity dispatcher started");
+          log.debug("activity dispatcher started");
 
           boolean isPoisoned = false;
 
@@ -110,7 +110,7 @@ public final class ActivityHandler implements Startable {
             dispatchAndExecuteActivities(activitiesToExecute);
           }
 
-          LOG.debug("activity dispatcher stopped");
+          log.debug("activity dispatcher stopped");
         }
       };
 
@@ -239,7 +239,7 @@ public final class ActivityHandler implements Startable {
      */
     synchronizer.syncExec(
         ThreadUtils.wrapSafe(
-            LOG,
+            log,
             new Runnable() {
 
               @Override
@@ -258,7 +258,7 @@ public final class ActivityHandler implements Startable {
   public void start() {
     if (DISPATCH_MODE == DISPATCH_MODE_ASYNC) return;
 
-    dispatchThread = ThreadUtils.runSafeAsync("activity-dispatcher", LOG, dispatchThreadRunnable);
+    dispatchThread = ThreadUtils.runSafeAsync("activity-dispatcher", log, dispatchThreadRunnable);
   }
 
   @Override
@@ -270,13 +270,13 @@ public final class ActivityHandler implements Startable {
     try {
       dispatchThread.join(TIMEOUT);
     } catch (InterruptedException e) {
-      LOG.warn(
+      log.warn(
           "interrupted while waiting for " + dispatchThread.getName() + " thread to terminate");
 
       Thread.currentThread().interrupt();
     }
 
-    if (dispatchThread.isAlive()) LOG.error(dispatchThread.getName() + " thread is still running");
+    if (dispatchThread.isAlive()) log.error(dispatchThread.getName() + " thread is still running");
   }
 
   /**
@@ -347,7 +347,7 @@ public final class ActivityHandler implements Startable {
                * activity.
                */
               if (!source.isInSession()) {
-                LOG.warn("dropping activity for user that is no longer in session: " + activity);
+                log.warn("dropping activity for user that is no longer in session: " + activity);
                 continue;
               }
 
@@ -357,20 +357,20 @@ public final class ActivityHandler implements Startable {
                 try {
                   callback.execute(transformedActivity);
                 } catch (Exception e) {
-                  LOG.error("failed to execute activity: " + activity, e);
+                  log.error("failed to execute activity: " + activity, e);
                 }
               }
             }
           }
         };
 
-    if (LOG.isTraceEnabled()) {
+    if (log.isTraceEnabled()) {
 
       if (optimizedActivities.size() != activities.size()) {
-        LOG.trace("original activities to dispatch: [#" + activities.size() + "] " + activities);
+        log.trace("original activities to dispatch: [#" + activities.size() + "] " + activities);
       }
 
-      LOG.trace(
+      log.trace(
           "dispatching [#"
               + optimizedActivities.size()
               + "] optimized activities [mode = "
@@ -380,8 +380,8 @@ public final class ActivityHandler implements Startable {
     }
 
     if (DISPATCH_MODE == DISPATCH_MODE_SYNC)
-      synchronizer.syncExec(ThreadUtils.wrapSafe(LOG, transformingRunnable));
-    else synchronizer.asyncExec(ThreadUtils.wrapSafe(LOG, transformingRunnable));
+      synchronizer.syncExec(ThreadUtils.wrapSafe(log, transformingRunnable));
+    else synchronizer.asyncExec(ThreadUtils.wrapSafe(log, transformingRunnable));
   }
 
   /**

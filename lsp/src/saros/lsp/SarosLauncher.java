@@ -13,7 +13,7 @@ import saros.lsp.log.LanguageClientAppender;
 /** Entry point for the Saros LSP server. */
 public class SarosLauncher {
 
-  private static final Logger LOG = Logger.getLogger(SarosLauncher.class);
+  private static final Logger log = Logger.getLogger(SarosLauncher.class);
   private static final String LOGGING_CONFIG_FILE = "/log4j.properties";
 
   /**
@@ -35,12 +35,12 @@ public class SarosLauncher {
     URL log4jProperties = SarosLauncher.class.getResource(LOGGING_CONFIG_FILE);
     PropertyConfigurator.configure(log4jProperties);
 
-    LOG.addAppender(new ConsoleAppender());
+    log.addAppender(new ConsoleAppender());
 
     int port = Integer.parseInt(args[0]);
     Socket socket = new Socket("localhost", port);
 
-    LOG.info("listening on port " + port);
+    log.info("listening on port " + port);
 
     Runtime.getRuntime()
         .addShutdownHook(
@@ -60,7 +60,7 @@ public class SarosLauncher {
             langSvr, ISarosLanguageClient.class, socket.getInputStream(), socket.getOutputStream());
 
     ISarosLanguageClient langClt = l.getRemoteProxy();
-    LOG.addAppender(new LanguageClientAppender(langClt));
+    log.addAppender(new LanguageClientAppender(langClt));
     langSvr.connect(langClt);
 
     l.startListening();

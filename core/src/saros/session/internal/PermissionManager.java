@@ -23,7 +23,7 @@ import saros.util.ThreadUtils;
  */
 @Component(module = "core")
 public class PermissionManager extends AbstractActivityProducer implements Startable {
-  private static final Logger LOG = Logger.getLogger(PermissionManager.class);
+  private static final Logger log = Logger.getLogger(PermissionManager.class);
 
   private final IActivityConsumer consumer =
       new AbstractActivityConsumer() {
@@ -100,14 +100,14 @@ public class PermissionManager extends AbstractActivityProducer implements Start
         };
 
     if (target.isHost()) {
-      synchronizer.syncExec(ThreadUtils.wrapSafe(LOG, fireActivityrunnable));
+      synchronizer.syncExec(ThreadUtils.wrapSafe(log, fireActivityrunnable));
     } else {
       StartHandle startHandle = session.getStopManager().stop(target, "Permission change");
 
-      synchronizer.syncExec(ThreadUtils.wrapSafe(LOG, fireActivityrunnable));
+      synchronizer.syncExec(ThreadUtils.wrapSafe(log, fireActivityrunnable));
 
       if (!startHandle.start())
-        LOG.error(
+        log.error(
             "failed to resume user: "
                 + target
                 + ", the user might no longer be able to perform changes in the current session!");

@@ -31,7 +31,7 @@ import saros.session.SessionEndReason;
  */
 public class IncomingSessionNegotiation extends SessionNegotiation {
 
-  private static Logger LOG = Logger.getLogger(IncomingSessionNegotiation.class);
+  private static Logger log = Logger.getLogger(IncomingSessionNegotiation.class);
 
   private final String remoteVersion;
 
@@ -107,7 +107,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
   }
 
   public Status accept(IProgressMonitor monitor) {
-    LOG.debug(this + " : invitation accepted");
+    log.debug(this + " : invitation accepted");
 
     monitor.beginTask("Joining session...", IProgressMonitor.UNKNOWN);
 
@@ -190,7 +190,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
    * Informs the session host that the user has established a connection (e.g Socks5) to the host.
    */
   private void sendConnectionEstablished() {
-    LOG.debug(this + " : sending connection established confirmation");
+    log.debug(this + " : sending connection established confirmation");
 
     transmitter.sendPacketExtension(
         getPeer(),
@@ -200,7 +200,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
   /** Informs the session host that the user has accepted the invitation. */
   private void sendInvitationAccepted() {
-    LOG.debug(this + " : sending invitation accepted confirmation");
+    log.debug(this + " : sending invitation accepted confirmation");
 
     transmitter.sendPacketExtension(
         getPeer(),
@@ -229,7 +229,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
   private void sendSessionPreferences(
       InvitationParameterExchangeExtension parameters, IProgressMonitor monitor) {
 
-    LOG.debug(this + " : sending session negotiation data");
+    log.debug(this + " : sending session negotiation data");
 
     monitor.setTaskName("Sending session configuration data...");
     transmitter.sendPacketExtension(
@@ -243,7 +243,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
   private InvitationParameterExchangeExtension awaitActualSessionParameters(
       IProgressMonitor monitor) throws SarosCancellationException {
 
-    LOG.debug(this + " : waiting for host's session negotiation configuration data");
+    log.debug(this + " : waiting for host's session negotiation configuration data");
 
     monitor.setTaskName("Waiting for remote session configuration data...");
 
@@ -260,7 +260,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
       throw new LocalCancellationException(
           getPeer() + " sent malformed data", CancelOption.DO_NOT_NOTIFY_PEER);
 
-    LOG.debug(this + " : received host's session parameters");
+    log.debug(this + " : received host's session parameters");
 
     return parameters;
   }
@@ -272,7 +272,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
    */
   private void initializeSession(
       InvitationParameterExchangeExtension parameters, IProgressMonitor monitor) {
-    LOG.debug(this + " : initializing session");
+    log.debug(this + " : initializing session");
 
     monitor.setTaskName("Initializing session...");
 
@@ -293,7 +293,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
   /** Starts the Saros session */
   private void startSession(IProgressMonitor monitor) {
-    LOG.debug(this + " : starting session");
+    log.debug(this + " : starting session");
 
     monitor.setTaskName("Starting session...");
 
@@ -307,7 +307,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     sarosSession.start();
     sessionManager.sessionStarted(sarosSession);
 
-    LOG.debug(this + " : invitation has completed successfully");
+    log.debug(this + " : invitation has completed successfully");
   }
 
   /** Signal the host that the session invitation is complete (from the client's perspective). */
@@ -317,7 +317,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
         getPeer(),
         InvitationCompletedExtension.PROVIDER.create(new InvitationCompletedExtension(getID())));
 
-    LOG.debug(this + " : invitation complete confirmation sent");
+    log.debug(this + " : invitation complete confirmation sent");
   }
 
   /**

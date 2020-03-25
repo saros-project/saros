@@ -42,7 +42,7 @@ import saros.synchronize.UISynchronizer;
  */
 public class ServerContextFactory extends AbstractContextFactory {
 
-  private static final Logger LOG = Logger.getLogger(ServerContextFactory.class);
+  private static final Logger log = Logger.getLogger(ServerContextFactory.class);
 
   @Override
   public void createComponents(MutablePicoContainer c) {
@@ -130,7 +130,7 @@ public class ServerContextFactory extends AbstractContextFactory {
                 try {
                   FileUtils.deleteDirectory(path.toFile());
                 } catch (IOException e) {
-                  LOG.warn("Could not remove temporary workspace folder", e);
+                  log.warn("Could not remove temporary workspace folder", e);
                 }
               }
             });

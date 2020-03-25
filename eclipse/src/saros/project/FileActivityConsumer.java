@@ -19,7 +19,7 @@ import saros.util.FileUtils;
 
 public class FileActivityConsumer extends AbstractActivityConsumer implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(FileActivityConsumer.class);
+  private static final Logger log = Logger.getLogger(FileActivityConsumer.class);
 
   private final ISarosSession session;
   private final SharedResourcesManager resourceChangeListener;
@@ -50,7 +50,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     if (!(activity instanceof FileActivity)) return;
 
     try {
-      if (LOG.isTraceEnabled()) LOG.trace("executing file activity: " + activity);
+      if (log.isTraceEnabled()) log.trace("executing file activity: " + activity);
 
       resourceChangeListener.suspend();
       super.exec(activity);
@@ -64,7 +64,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     try {
       handleFileActivity(activity);
     } catch (CoreException e) {
-      LOG.error("failed to execute file activity: " + activity, e);
+      log.error("failed to execute file activity: " + activity, e);
     }
   }
 
@@ -92,7 +92,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   private void handleFileRecovery(FileActivity activity) throws CoreException {
     SPath path = activity.getPath();
 
-    LOG.debug("performing recovery for file: " + activity.getPath().getFullPath());
+    log.debug("performing recovery for file: " + activity.getPath().getFullPath());
 
     /*
      * We have to save the editor or otherwise the internal buffer is not
@@ -110,7 +110,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     try {
       if (type == FileActivity.Type.CREATED) handleFileCreation(activity);
       else if (type == FileActivity.Type.REMOVED) handleFileDeletion(activity);
-      else LOG.warn("performing recovery for type " + type + " is not supported");
+      else log.warn("performing recovery for type " + type + " is not supported");
     } finally {
 
       // TODO why does Jupiter not process the activities by itself ?
@@ -148,7 +148,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     final IFile file = toEclipseIFile(path.getFile());
 
     if (file.exists()) FileUtils.delete(file);
-    else LOG.warn("could not delete file " + file + " because it does not exist");
+    else log.warn("could not delete file " + file + " because it does not exist");
   }
 
   private void handleFileCreation(FileActivity activity) throws CoreException {
@@ -164,7 +164,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     if (!Arrays.equals(newContent, actualContent)) {
       FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
     } else {
-      LOG.debug("FileActivity " + activity + " dropped (same content)");
+      log.debug("FileActivity " + activity + " dropped (same content)");
     }
 
     if (encoding != null) updateFileEncoding(encoding, file);
@@ -188,7 +188,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     try {
       Charset.forName(encoding);
     } catch (Exception e) {
-      LOG.warn(
+      log.warn(
           "encoding " + encoding + " for file " + file + " is not available on this platform", e);
       return;
     }
@@ -199,23 +199,23 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     try {
       projectEncoding = file.getProject().getDefaultCharset();
     } catch (CoreException e) {
-      LOG.warn("could not determine project encoding for project " + file.getProject(), e);
+      log.warn("could not determine project encoding for project " + file.getProject(), e);
     }
 
     try {
       fileEncoding = file.getCharset();
     } catch (CoreException e) {
-      LOG.warn("could not determine file encoding for file " + file, e);
+      log.warn("could not determine file encoding for file " + file, e);
     }
 
     if (encoding.equals(fileEncoding)) {
-      LOG.debug("encoding does not need to be changed for file: " + file);
+      log.debug("encoding does not need to be changed for file: " + file);
       return;
     }
 
     // use inherited encoding if possible
     if (encoding.equals(projectEncoding)) {
-      LOG.debug(
+      log.debug(
           "changing encoding for file "
               + file
               + " to use default project encoding: "
@@ -224,7 +224,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
       return;
     }
 
-    LOG.debug("changing encoding for file " + file + " to encoding: " + encoding);
+    log.debug("changing encoding for file " + file + " to encoding: " + encoding);
 
     file.setCharset(encoding, new NullProgressMonitor());
   }

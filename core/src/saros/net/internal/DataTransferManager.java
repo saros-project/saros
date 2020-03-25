@@ -36,7 +36,7 @@ import saros.repackaged.picocontainer.annotations.Nullable;
 @Component(module = "net")
 public class DataTransferManager implements IConnectionListener, IConnectionManager {
 
-  private static final Logger LOG = Logger.getLogger(DataTransferManager.class);
+  private static final Logger log = Logger.getLogger(DataTransferManager.class);
 
   private static final String DEFAULT_CONNECTION_ID = "default";
 
@@ -86,7 +86,7 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
 
           notfiyconnectionChanged(id, connection, incomingRequest);
 
-          LOG.debug(
+          log.debug(
               "bytestream connection changed "
                   + connection
                   + ", inc="
@@ -104,7 +104,7 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
           if (current != null) {
             current.close();
             if (current == connection) {
-              LOG.warn(
+              log.warn(
                   "closed connection [pool id="
                       + id
                       + "]: "
@@ -113,7 +113,7 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
 
               return;
             } else {
-              LOG.warn(
+              log.warn(
                   "existing connection [pool id="
                       + id
                       + "] "
@@ -191,13 +191,13 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
     if (out != null) {
       closed |= true;
       out.close();
-      LOG.debug("closed connection [pool id=" + outID + "]: " + out);
+      log.debug("closed connection [pool id=" + outID + "]: " + out);
     }
 
     if (in != null) {
       closed |= true;
       in.close();
-      LOG.debug("closed connection [pool id=" + inID + "]: " + in);
+      log.debug("closed connection [pool id=" + inID + "]: " + in);
     }
 
     return closed;
@@ -266,7 +266,7 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
           new ArrayList<IStreamService>(streamServices);
 
       for (IStreamService streamService : currentStreamServices) {
-        LOG.info(
+        log.info(
             "establishing connection to "
                 + peer
                 + " from "
@@ -277,9 +277,9 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
           connection = streamService.connect(connectionID, peer);
           break;
         } catch (IOException e) {
-          LOG.warn("failed to connect to " + peer + " using stream service: " + streamService, e);
+          log.warn("failed to connect to " + peer + " using stream service: " + streamService, e);
         } catch (InterruptedException e) {
-          LOG.warn(
+          log.warn(
               "interrupted while connecting to "
                   + peer
                   + " using stream service: "
@@ -289,7 +289,7 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
           io.initCause(e);
           throw io;
         } catch (Exception e) {
-          LOG.error(
+          log.error(
               "failed to connect to "
                   + peer
                   + " due to an internal error in stream service: "
@@ -332,7 +332,7 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
 
     if (useIBB && fallbackService != null) streamServices.add(fallbackService);
 
-    LOG.debug(
+    log.debug(
         "used stream service order for the current XMPP connection: "
             + Arrays.toString(streamServices.toArray()));
   }
@@ -413,7 +413,7 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
       try {
         listener.connectionClosed(connectionId, connection);
       } catch (RuntimeException e) {
-        LOG.error("invoking connectionClosed() on listener: " + listener + " failed", e);
+        log.error("invoking connectionClosed() on listener: " + listener + " failed", e);
       }
     }
   }
@@ -427,7 +427,7 @@ public class DataTransferManager implements IConnectionListener, IConnectionMana
       try {
         listener.connectionChanged(connectionId, connection, incomingRequest);
       } catch (RuntimeException e) {
-        LOG.error("invoking connectionChanged() on listener: " + listener + " failed", e);
+        log.error("invoking connectionChanged() on listener: " + listener + " failed", e);
       }
     }
   }

@@ -34,7 +34,7 @@ import saros.util.ThreadUtils;
 public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
     implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(ConsistencyWatchdogHandler.class);
+  private static final Logger log = Logger.getLogger(ConsistencyWatchdogHandler.class);
 
   private final IEditorManager editorManager;
 
@@ -77,7 +77,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
   private void triggerRecovery(final ChecksumErrorActivity checksumError) {
 
-    LOG.debug("received Checksum Error: " + checksumError);
+    log.debug("received Checksum Error: " + checksumError);
 
     /*
      * fork a thread as this is normally called from the UI thread and so we
@@ -90,7 +90,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
      * a single ThreadWorker ?
      */
     ThreadUtils.runSafeAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -125,7 +125,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
         }
       }
       if (inconsistentStartHandle == null) {
-        LOG.error("could not find start handle" + " of the inconsistent user");
+        log.error("could not find start handle" + " of the inconsistent user");
       } else {
         // FIXME evaluate the return value
         inconsistentStartHandle.startAndAwait();
@@ -192,7 +192,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
     try {
       charset = file.getCharset();
     } catch (IOException e) {
-      LOG.error("could not determine encoding for file: " + file, e);
+      log.error("could not determine encoding for file: " + file, e);
       return;
     }
 
@@ -203,13 +203,13 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
       text = editorManager.getContent(path);
 
       if (text == null) {
-        LOG.error("could retrieve content of file: " + file);
+        log.error("could retrieve content of file: " + file);
         return;
       }
 
       content = text.getBytes(charset);
     } catch (UnsupportedEncodingException e) {
-      LOG.error("could not decode file: " + file, e);
+      log.error("could not decode file: " + file, e);
       return;
     }
 

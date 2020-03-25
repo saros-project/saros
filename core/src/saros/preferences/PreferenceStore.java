@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class PreferenceStore implements IPreferenceStore {
 
-  private static final Logger LOG = Logger.getLogger(PreferenceStore.class);
+  private static final Logger log = Logger.getLogger(PreferenceStore.class);
 
   /** The default-default value for boolean preferences (<code>false</code>). */
   public static final boolean DEFAULT_BOOLEAN = false;
@@ -200,7 +200,7 @@ public class PreferenceStore implements IPreferenceStore {
       try {
         listener.preferenceChange(event);
       } catch (RuntimeException e) {
-        LOG.error(
+        log.error(
             "invoking change listener " + listener + " with change event " + event + " failed", e);
       }
     }

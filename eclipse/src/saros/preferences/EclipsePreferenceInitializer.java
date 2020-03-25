@@ -21,11 +21,11 @@ public class EclipsePreferenceInitializer extends AbstractPreferenceInitializer 
   /*
    * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
    */
-  private static final Logger LOG = Logger.getLogger(EclipsePreferenceInitializer.class.getName());
+  private static final Logger log = Logger.getLogger(EclipsePreferenceInitializer.class.getName());
 
   @Override
   public void initializeDefaultPreferences() {
-    LOG.info("initializing preference default values");
+    log.info("initializing preference default values");
     setPreferences(DefaultScope.INSTANCE.getNode(Saros.PLUGIN_ID));
   }
 

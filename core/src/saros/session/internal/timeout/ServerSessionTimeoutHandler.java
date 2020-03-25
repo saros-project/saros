@@ -27,7 +27,7 @@ import saros.util.ThreadUtils;
  */
 public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
-  private static final Logger LOG = Logger.getLogger(ClientSessionTimeoutHandler.class);
+  private static final Logger log = Logger.getLogger(ClientSessionTimeoutHandler.class);
 
   private Thread workerThread;
 
@@ -102,7 +102,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
                 if (!user.isInSession()) continue;
 
-                LOG.error("failed to send ping to: " + user, e);
+                log.error("failed to send ping to: " + user, e);
                 handleNetworkError(user.getJID(), "tx");
               }
             }
@@ -115,7 +115,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
                 getTimedOutUsers(System.currentTimeMillis(), PING_PONG_TIMEOUT);
 
             for (User user : usersToRemove) {
-              LOG.error(
+              log.error(
                   "no pong received from user "
                       + user
                       + ", reached timeout = "
@@ -133,7 +133,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
               try {
                 ServerSessionTimeoutHandler.this.wait(PING_PONG_UPDATE_DELAY);
               } catch (InterruptedException e) {
-                if (!shutdown) LOG.error("watchdog shutdown prematurely", e);
+                if (!shutdown) log.error("watchdog shutdown prematurely", e);
 
                 return;
               }
@@ -165,7 +165,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
     session.addListener(sessionListener);
 
     workerThread =
-        ThreadUtils.runSafeAsync("server-network-watchdog", LOG, serverSessionTimeoutWatchdog);
+        ThreadUtils.runSafeAsync("server-network-watchdog", log, serverSessionTimeoutWatchdog);
   }
 
   @Override
@@ -184,12 +184,12 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
     try {
       workerThread.join(TIMEOUT);
     } catch (InterruptedException e) {
-      LOG.warn("interrupted while waiting for " + workerThread.getName() + " thread to terminate");
+      log.warn("interrupted while waiting for " + workerThread.getName() + " thread to terminate");
 
       Thread.currentThread().interrupt();
     }
 
-    if (workerThread.isAlive()) LOG.error(workerThread.getName() + " thread is still running");
+    if (workerThread.isAlive()) log.error(workerThread.getName() + " thread is still running");
   }
 
   private synchronized List<User> getTimedOutUsers(final long currentTime, final long timeout) {

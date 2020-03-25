@@ -21,7 +21,7 @@ import saros.util.ThreadUtils;
  */
 abstract class SessionTimeoutHandler implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(SessionTimeoutHandler.class);
+  private static final Logger log = Logger.getLogger(SessionTimeoutHandler.class);
 
   /** Join timeout when stopping this component */
   protected static final long TIMEOUT = 10000L;
@@ -97,7 +97,7 @@ abstract class SessionTimeoutHandler implements Startable {
     if (session.isHost()) {
       ThreadUtils.runSafeAsync(
           "kill-user-" + jid.getName() + "-" + threadName,
-          LOG,
+          log,
           new Runnable() {
             @Override
             public void run() {
@@ -108,7 +108,7 @@ abstract class SessionTimeoutHandler implements Startable {
     } else {
       ThreadUtils.runSafeAsync(
           "kill-session-" + threadName,
-          LOG,
+          log,
           new Runnable() {
             @Override
             public void run() {

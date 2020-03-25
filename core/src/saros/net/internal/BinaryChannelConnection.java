@@ -32,7 +32,7 @@ import saros.net.xmpp.JID;
  */
 public class BinaryChannelConnection implements IByteStreamConnection {
 
-  private static final Logger LOG = Logger.getLogger(BinaryChannelConnection.class);
+  private static final Logger log = Logger.getLogger(BinaryChannelConnection.class);
 
   private static final long TERMINATE_TIMEOUT = 10000L;
 
@@ -88,7 +88,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     public void run() {
       String connection = BinaryChannelConnection.this.toString();
 
-      LOG.debug(connection + " ReceiverThread started.");
+      log.debug(connection + " ReceiverThread started.");
       try {
         while (!isInterrupted()) {
           final BinaryXMPPExtension extension = readNextXMPPExtension();
@@ -96,13 +96,13 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         }
 
       } catch (SocketException e) {
-        LOG.debug(connection + " connection closed locally: " + e.getMessage());
+        log.debug(connection + " connection closed locally: " + e.getMessage());
       } catch (EOFException e) {
-        LOG.debug(connection + " connection closed remotely:" + e.getMessage());
+        log.debug(connection + " connection closed remotely:" + e.getMessage());
       } catch (IOException e) {
-        LOG.error(connection + " network error: " + e.getMessage(), e);
+        log.error(connection + " network error: " + e.getMessage(), e);
       } catch (Exception e) {
-        LOG.error(connection + " internal error: " + e.getMessage(), e);
+        log.error(connection + " internal error: " + e.getMessage(), e);
       } finally {
         close();
       }
@@ -171,7 +171,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
       try {
         stream.close();
       } catch (Exception e) {
-        LOG.error("failed to gracefully close connection " + this, e);
+        log.error("failed to gracefully close connection " + this, e);
       } finally {
         connected = false;
       }
@@ -187,7 +187,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
       }
 
       if (receiveThread.isAlive()) {
-        LOG.warn("timeout while waiting for closure of binary channel " + this);
+        log.warn("timeout while waiting for closure of binary channel " + this);
         receiveThread.interrupt();
       }
     }
@@ -229,8 +229,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
           namespaceId = Integer.valueOf(nextNamespaceId++);
           outNamespaceCache.put(namespace, namespaceId);
 
-          if (LOG.isTraceEnabled())
-            LOG.trace(
+          if (log.isTraceEnabled())
+            log.trace(
                 "updated outgoing namespace cache, id: "
                     + namespaceId
                     + " , namespace: "
@@ -250,8 +250,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
           elementNameId = Integer.valueOf(nextElementNameId++);
           outElementNameCache.put(elementName, elementNameId);
 
-          if (LOG.isTraceEnabled())
-            LOG.trace(
+          if (log.isTraceEnabled())
+            log.trace(
                 "updated outgoing element name cache, id: "
                     + elementNameId
                     + " , element name: "
@@ -304,8 +304,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
           fragmentId = inputStream.readShort();
           final int chunks = inputStream.readInt();
 
-          if (LOG.isTraceEnabled()) {
-            LOG.trace(
+          if (log.isTraceEnabled()) {
+            log.trace(
                 "processing opcode 0x"
                     + Integer.toHexString(opcode).toUpperCase()
                     + " [TFD]: id="
@@ -342,8 +342,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
           fragmentId = inputStream.readShort();
           final int payloadLength = inputStream.readInt();
 
-          if (LOG.isTraceEnabled()) {
-            LOG.trace(
+          if (log.isTraceEnabled()) {
+            log.trace(
                 "processing opcode 0x"
                     + Integer.toHexString(opcode).toUpperCase()
                     + " [DATA]: id="
@@ -388,8 +388,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
           return fullyReceivedTransferObject;
 
         case Opcode.ELEMENT_NAME_UPDATE:
-          if (LOG.isTraceEnabled()) {
-            LOG.trace(
+          if (log.isTraceEnabled()) {
+            log.trace(
                 "processing opcode 0x" + Integer.toHexString(opcode).toUpperCase() + " [ENU]");
           }
 
@@ -397,15 +397,15 @@ public class BinaryChannelConnection implements IByteStreamConnection {
           name = inputStream.readUTF();
           inElementNameCache.put(Integer.valueOf(id), name);
 
-          if (LOG.isTraceEnabled())
-            LOG.trace(
+          if (log.isTraceEnabled())
+            log.trace(
                 "updated incoming element name cache, id: " + id + " , element name: " + name);
 
           break;
 
         case Opcode.NAMESPACE_UPDATE:
-          if (LOG.isTraceEnabled()) {
-            LOG.trace(
+          if (log.isTraceEnabled()) {
+            log.trace(
                 "processing opcode 0x" + Integer.toHexString(opcode).toUpperCase() + " [NSU]");
           }
 
@@ -413,8 +413,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
           name = inputStream.readUTF();
           inNamespaceCache.put(Integer.valueOf(id), name);
 
-          if (LOG.isTraceEnabled())
-            LOG.trace("updated incoming namespace cache, id: " + id + " , namespace: " + name);
+          if (log.isTraceEnabled())
+            log.trace("updated incoming namespace cache, id: " + id + " , namespace: " + name);
 
           break;
 
@@ -433,8 +433,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
   private synchronized void sendData(int fragmentId, byte[] data, int offset, int length)
       throws IOException {
 
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("sending data: id=" + fragmentId + ", len=" + length + " bytes");
+    if (log.isTraceEnabled()) {
+      log.trace("sending data: id=" + fragmentId + ", len=" + length + " bytes");
     }
 
     outputStream.write(Opcode.DATA);
@@ -448,8 +448,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
       int fragmentId, int chunks, int namespaceId, int elementNameId, boolean compress)
       throws IOException {
 
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("sending transfer description: id=" + fragmentId);
+    if (log.isTraceEnabled()) {
+      log.trace("sending transfer description: id=" + fragmentId);
     }
 
     outputStream.write(Opcode.TRANSFERDESCRIPTION);

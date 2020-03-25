@@ -10,7 +10,7 @@ import saros.stf.server.rmi.controlbot.manipulation.IAccountManipulator;
 
 public class AccountManipulatorImpl extends StfRemoteObject implements IAccountManipulator {
 
-  private static final Logger LOG = Logger.getLogger(AccountManipulatorImpl.class);
+  private static final Logger log = Logger.getLogger(AccountManipulatorImpl.class);
 
   private static final IAccountManipulator INSTANCE = new AccountManipulatorImpl();
 
@@ -37,12 +37,12 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
     XMPPAccountStore accountStore = getXmppAccountStore();
 
     if (accountStore.existsAccount(username, domain, "", 0)) {
-      LOG.debug(
+      log.debug(
           "account with username '" + username + "' and domain '" + domain + "' already exists");
       return;
     }
 
-    LOG.debug("creating account for username '" + username + "' and domain '" + domain + "'");
+    log.debug("creating account for username '" + username + "' and domain '" + domain + "'");
     accountStore.createAccount(username, password, domain, "", 0, true, true);
   }
 
@@ -72,7 +72,7 @@ public class AccountManipulatorImpl extends StfRemoteObject implements IAccountM
     final List<XMPPAccount> accounts = accountStore.getAllAccounts();
 
     for (final XMPPAccount account : accounts) {
-      LOG.debug("deleting account: " + account);
+      log.debug("deleting account: " + account);
       accountStore.deleteAccount(account);
     }
   }

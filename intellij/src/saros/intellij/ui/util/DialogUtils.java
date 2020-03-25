@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 /** Dialog message helper that shows Dialogs in the current Thread. */
 public class DialogUtils {
-  private static final Logger LOG = Logger.getLogger(DialogUtils.class);
+  private static final Logger log = Logger.getLogger(DialogUtils.class);
 
   private DialogUtils() {}
 
@@ -22,7 +22,7 @@ public class DialogUtils {
    */
   public static boolean showConfirm(Project project, String title, String msg) {
 
-    LOG.info("Showing confirmation dialog: " + title + " - " + msg);
+    log.info("Showing confirmation dialog: " + title + " - " + msg);
 
     Component parentComponent = getProjectComponent(project);
 
@@ -42,7 +42,7 @@ public class DialogUtils {
    */
   public static boolean showQuestion(Project project, String title, String msg) {
 
-    LOG.info("Showing question dialog: " + title + " - " + msg);
+    log.info("Showing question dialog: " + title + " - " + msg);
 
     Component parentComponent = getProjectComponent(project);
 

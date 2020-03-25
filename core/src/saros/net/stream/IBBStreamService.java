@@ -21,7 +21,7 @@ import saros.net.xmpp.JID;
  */
 public class IBBStreamService implements IStreamService, BytestreamListener {
 
-  private static final Logger LOG = Logger.getLogger(IBBStreamService.class);
+  private static final Logger log = Logger.getLogger(IBBStreamService.class);
 
   private volatile InBandBytestreamManager manager;
   private volatile IByteStreamConnectionListener connectionListener;
@@ -46,7 +46,7 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
       throw new IllegalArgumentException(
           "connectionID must not contain '" + IStreamService.SESSION_ID_DELIMITER + "'");
 
-    LOG.debug("establishing IBB bytestream to: " + remoteAddress);
+    log.debug("establishing IBB bytestream to: " + remoteAddress);
 
     final BytestreamManager currentManager = manager;
     final IByteStreamConnectionListener currentConnectionListener = connectionListener;
@@ -94,12 +94,12 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
   @Override
   public void incomingBytestreamRequest(BytestreamRequest request) {
 
-    LOG.debug("accepting IBB bytestream from: " + request.getFrom());
+    log.debug("accepting IBB bytestream from: " + request.getFrom());
 
     final IByteStreamConnectionListener currentConnectionListener = connectionListener;
 
     if (currentConnectionListener == null) {
-      LOG.warn(this + " is not initialized, rejecting connection...");
+      log.warn(this + " is not initialized, rejecting connection...");
       request.reject();
     }
 
@@ -108,7 +108,7 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
     try {
       session = request.accept();
     } catch (XMPPException e) {
-      LOG.error("failed to accept IBB bytestream from: " + request.getFrom(), e);
+      log.error("failed to accept IBB bytestream from: " + request.getFrom(), e);
       return;
     } catch (InterruptedException e) {
       /*
@@ -116,7 +116,7 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
        * how SMACK handle thread interruption
        */
 
-      LOG.error("interrupted while accepting IBB bytestream from: " + request.getFrom(), e);
+      log.error("interrupted while accepting IBB bytestream from: " + request.getFrom(), e);
       return;
     }
 
@@ -132,11 +132,11 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
               StreamMode.IBB,
               connectionListener);
     } catch (IOException e) {
-      LOG.error("failed to initialize connection for IBB stream", e);
+      log.error("failed to initialize connection for IBB stream", e);
       try {
         session.close();
       } catch (IOException ignore) {
-        LOG.error(ignore);
+        log.error(ignore);
       }
       return;
     }

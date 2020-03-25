@@ -54,7 +54,7 @@ import saros.ui.util.SWTUtils;
 @Component(module = "eclipse")
 public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
-  private static final Logger LOG = Logger.getLogger(SharedProjectFileDecorator.class.getName());
+  private static final Logger log = Logger.getLogger(SharedProjectFileDecorator.class.getName());
 
   private static final String IMAGE_PATH = "icons/ovr16/dot.png"; // $NON-NLS-1$
 
@@ -141,8 +141,8 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
           if (user.isLocal()) return;
 
-          if (LOG.isTraceEnabled())
-            LOG.trace("remote user: " + user + " activated an editor -> " + filePath);
+          if (log.isTraceEnabled())
+            log.trace("remote user: " + user + " activated an editor -> " + filePath);
 
           oldResources = activeEditorResources.remove(user);
 
@@ -151,7 +151,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             IResource resource = ResourceAdapterFactory.convertBack(filePath.getResource());
 
             if (resource != null) activeEditorResources.put(user, getResources(resource));
-            else LOG.warn("resource for editor " + filePath + " does not exist locally");
+            else log.warn("resource for editor " + filePath + " does not exist locally");
           }
 
           updateImageDescriptorMapping();
@@ -224,7 +224,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
   private void updateDecoratorsAsync(final Object[] updateElements) {
 
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -244,7 +244,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     Set<IResource> resources = new HashSet<IResource>();
 
     if (resource == null) {
-      LOG.warn("resource should not be null");
+      log.warn("resource should not be null");
       return resources;
     }
 

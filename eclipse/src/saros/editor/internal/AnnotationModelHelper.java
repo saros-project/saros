@@ -20,7 +20,7 @@ import saros.util.Predicate;
 /** This class holds convenience methods for managing annotations. */
 public class AnnotationModelHelper {
 
-  private static final Logger LOG = Logger.getLogger(AnnotationModelHelper.class);
+  private static final Logger log = Logger.getLogger(AnnotationModelHelper.class);
 
   private static Iterable<Annotation> toIterable(final IAnnotationModel model) {
     return new Iterable<Annotation>() {
@@ -73,8 +73,8 @@ public class AnnotationModelHelper {
           annotationsToRemove.toArray(new Annotation[annotationsToRemove.size()]),
           annotationsToAdd);
     } else {
-      if (LOG.isTraceEnabled())
-        LOG.trace("AnnotationModel " + model + " does not support IAnnotationModelExtension");
+      if (log.isTraceEnabled())
+        log.trace("AnnotationModel " + model + " does not support IAnnotationModelExtension");
 
       for (Annotation annotation : annotationsToRemove) {
         model.removeAnnotation(annotation);

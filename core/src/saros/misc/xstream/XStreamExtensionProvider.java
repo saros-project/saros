@@ -49,7 +49,7 @@ import org.xmlpull.v1.XmlPullParser;
  */
 public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQProvider {
 
-  private static final Logger LOG = Logger.getLogger(XStreamExtensionProvider.class);
+  private static final Logger log = Logger.getLogger(XStreamExtensionProvider.class);
 
   private static volatile ClassLoader currentClassloader;
 
@@ -126,12 +126,12 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
     Class<? extends Converter> clazz = converter.getClass();
 
     if (replaceables.containsKey(clazz)) {
-      LOG.debug("Renewing existing converter of " + clazz);
+      log.debug("Renewing existing converter of " + clazz);
       replaceables.get(clazz).replace(converter);
       return;
     }
 
-    LOG.debug("Registering new converter of " + clazz);
+    log.debug("Registering new converter of " + clazz);
 
     ReplaceableConverter replaceable = new ReplaceableConverter(converter);
     xstream.registerConverter(replaceable);
@@ -149,7 +149,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
     Class<? extends Converter> clazz = converter.getClass();
 
     if (replaceables.containsKey(clazz)) {
-      LOG.debug("Unregistering (resetting) converter of " + clazz);
+      log.debug("Unregistering (resetting) converter of " + clazz);
       replaceables.get(clazz).reset();
     }
   }
@@ -166,12 +166,12 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
     Class<? extends SingleValueConverter> clazz = converter.getClass();
 
     if (replaceableSingles.containsKey(clazz)) {
-      LOG.debug("Renewing existing converter of " + clazz);
+      log.debug("Renewing existing converter of " + clazz);
       replaceableSingles.get(clazz).replace(converter);
       return;
     }
 
-    LOG.debug("Registering new converter of " + clazz);
+    log.debug("Registering new converter of " + clazz);
 
     ReplaceableSingleValueConverter replaceable = new ReplaceableSingleValueConverter(converter);
     xstream.registerConverter(replaceable);
@@ -189,7 +189,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
     Class<? extends SingleValueConverter> clazz = converter.getClass();
 
     if (replaceableSingles.containsKey(clazz)) {
-      LOG.debug("Unregistering (resetting) converter of " + clazz);
+      log.debug("Unregistering (resetting) converter of " + clazz);
       replaceableSingles.get(clazz).reset();
     }
   }
@@ -297,7 +297,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
       result.provider = this;
       return result;
     } catch (RuntimeException e) {
-      LOG.error("unmarshalling data failed", e);
+      log.error("unmarshalling data failed", e);
       return new DropSilentlyPacketExtension();
     }
   }
@@ -364,7 +364,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider, IQP
       result.provider = this;
       return new XStreamIQPacket<T>(result);
     } catch (RuntimeException e) {
-      LOG.error("unmarshalling data failed", e);
+      log.error("unmarshalling data failed", e);
       return null;
     }
   }

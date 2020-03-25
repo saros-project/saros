@@ -33,7 +33,7 @@ import saros.util.CoreUtils;
  */
 public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNegotiation {
 
-  private static final Logger LOG = Logger.getLogger(ArchiveIncomingProjectNegotiation.class);
+  private static final Logger log = Logger.getLogger(ArchiveIncomingProjectNegotiation.class);
 
   public ArchiveIncomingProjectNegotiation(
       final JID peer, //
@@ -100,7 +100,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
       monitor.done();
     } finally {
       if (archiveFile != null && !archiveFile.delete()) {
-        LOG.warn("Could not clean up archive file " + archiveFile.getAbsolutePath());
+        log.warn("Could not clean up archive file " + archiveFile.getAbsolutePath());
       }
     }
   }
@@ -121,7 +121,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
     long startTime = System.currentTimeMillis();
 
-    LOG.debug(this + " : unpacking archive file...");
+    log.debug(this + " : unpacking archive file...");
 
     /*
      * TODO: calculate the ADLER32 checksums during decompression and add
@@ -140,7 +140,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
       throw canceled;
     }
 
-    LOG.debug(
+    log.debug(
         String.format("unpacked archive in %d s", (System.currentTimeMillis() - startTime) / 1000));
 
     // TODO: now add the checksums into the cache
@@ -150,7 +150,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
       throws IOException, SarosCancellationException {
 
     monitor.beginTask("Receiving archive file...", 100);
-    LOG.debug("waiting for incoming archive stream request");
+    log.debug("waiting for incoming archive stream request");
 
     monitor.subTask("Host is compressing project files. Waiting for the archive file...");
 
@@ -158,7 +158,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
     monitor.subTask("Receiving archive file...");
 
-    LOG.debug(this + " : receiving archive");
+    log.debug(this + " : receiving archive");
 
     IncomingFileTransfer transfer = archiveTransferListener.getRequest().accept();
 
@@ -175,13 +175,13 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
       throw new IOException(e.getMessage(), e.getCause());
     } finally {
       if (transferFailed && !archiveFile.delete()) {
-        LOG.warn("Could not clean up archive file " + archiveFile.getAbsolutePath());
+        log.warn("Could not clean up archive file " + archiveFile.getAbsolutePath());
       }
     }
 
     monitor.done();
 
-    LOG.debug(
+    log.debug(
         this
             + " : stored archive in file "
             + archiveFile.getAbsolutePath()

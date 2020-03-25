@@ -19,7 +19,7 @@ import saros.session.IActivityConsumer;
  */
 public class UserEditorState {
 
-  private static final Logger LOG = Logger.getLogger(UserEditorState.class);
+  private static final Logger log = Logger.getLogger(UserEditorState.class);
 
   private final LinkedHashMap<SPath, EditorState> openEditors =
       new LinkedHashMap<SPath, EditorState>();
@@ -43,7 +43,7 @@ public class UserEditorState {
               closed(sPath);
               break;
             default:
-              LOG.warn("Unexpected type: " + editorActivity.getType());
+              log.warn("Unexpected type: " + editorActivity.getType());
               assert false;
           }
         }
@@ -53,7 +53,7 @@ public class UserEditorState {
           SPath path = viewportActivity.getPath();
 
           if (!openEditors.containsKey(path)) {
-            LOG.warn("Viewport for editor which was never activated: " + path);
+            log.warn("Viewport for editor which was never activated: " + path);
             return;
           }
 
@@ -68,7 +68,7 @@ public class UserEditorState {
           SPath path = textSelectionActivity.getPath();
 
           if (!openEditors.containsKey(path)) {
-            LOG.warn("received selection for editor which was never activated: " + path);
+            log.warn("received selection for editor which was never activated: " + path);
             return;
           }
 
@@ -111,7 +111,7 @@ public class UserEditorState {
     EditorState state = openEditors.remove(path);
 
     if (state == null) {
-      LOG.warn("Removing an editor which has never been added: " + path);
+      log.warn("Removing an editor which has never been added: " + path);
       return;
     }
 

@@ -74,7 +74,7 @@ import saros.util.ThreadUtils;
 
 public class AddProjectToSessionWizard extends Wizard {
 
-  private static Logger LOG = Logger.getLogger(AddProjectToSessionWizard.class);
+  private static Logger log = Logger.getLogger(AddProjectToSessionWizard.class);
 
   private EnterProjectNamePage namePage;
   private WizardDialogAccessable wizardDialog;
@@ -199,7 +199,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
     if (containsDirtyEditors) {
       SWTUtils.runSafeSWTAsync(
-          LOG,
+          log,
           new Runnable() {
             @Override
             public void run() {
@@ -217,14 +217,14 @@ public class AddProjectToSessionWizard extends Wizard {
     try {
       modifiedResources = createProjectsAndGetModifiedResources(targetProjectMapping);
     } catch (CoreException e) {
-      LOG.error("could not compute local file list", e);
+      log.error("could not compute local file list", e);
       MessageDialog.openError(
           getShell(),
           "Error computing file list",
           "Could not compute local file list: " + e.getMessage());
       return false;
     } catch (RuntimeException e) {
-      LOG.error("internal error while computing file list", e);
+      log.error("internal error while computing file list", e);
       MessageDialog.openError(
           getShell(), "Error computing file list", "Internal error: " + e.getMessage());
 
@@ -244,7 +244,7 @@ public class AddProjectToSessionWizard extends Wizard {
       final JID jid, final String errorMsg, final CancelLocation cancelLocation) {
 
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -256,7 +256,7 @@ public class AddProjectToSessionWizard extends Wizard {
         });
 
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -279,7 +279,7 @@ public class AddProjectToSessionWizard extends Wizard {
       }
       ThreadUtils.runSafeAsync(
           "CancelAddProjectWizard",
-          LOG,
+          log,
           new Runnable() {
             @Override
             public void run() {
@@ -302,7 +302,7 @@ public class AddProjectToSessionWizard extends Wizard {
             try {
 
               SWTUtils.runSafeSWTSync(
-                  LOG,
+                  log,
                   new Runnable() {
                     @Override
                     public void run() {
@@ -325,7 +325,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 try {
                   workspace.setDescription(description);
                 } catch (CoreException e) {
-                  LOG.warn("could not disable auto building", e);
+                  log.warn("could not disable auto building", e);
                 }
               }
 
@@ -345,7 +345,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 try {
                   workspace.setDescription(description);
                 } catch (CoreException e) {
-                  LOG.warn("could not re-enable auto building", e);
+                  log.warn("could not re-enable auto building", e);
                 }
               }
 
@@ -363,11 +363,11 @@ public class AddProjectToSessionWizard extends Wizard {
                       StringUtils.join(projectNames, ", ")));
 
             } catch (RuntimeException e) {
-              LOG.error("unknown error during project negotiation: " + e.getMessage(), e);
+              log.error("unknown error during project negotiation: " + e.getMessage(), e);
               return Status.CANCEL_STATUS;
             } finally {
               SWTUtils.runSafeSWTAsync(
-                  LOG,
+                  log,
                   new Runnable() {
                     @Override
                     public void run() {

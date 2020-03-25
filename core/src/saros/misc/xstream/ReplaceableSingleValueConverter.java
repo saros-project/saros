@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 class ReplaceableSingleValueConverter extends Replaceable<SingleValueConverter>
     implements SingleValueConverter {
 
-  private static final Logger LOG = Logger.getLogger(ReplaceableSingleValueConverter.class);
+  private static final Logger log = Logger.getLogger(ReplaceableSingleValueConverter.class);
 
   /**
    * Wraps any {@link SingleValueConverter} so this object can be registered to XStream (and stay
@@ -41,7 +41,7 @@ class ReplaceableSingleValueConverter extends Replaceable<SingleValueConverter>
   @Override
   public synchronized String toString(Object obj) {
     if (isReset()) {
-      LOG.debug("Tried to marshal " + obj + " with inactive converter " + delegate);
+      log.debug("Tried to marshal " + obj + " with inactive converter " + delegate);
       return "";
     }
 
@@ -51,7 +51,7 @@ class ReplaceableSingleValueConverter extends Replaceable<SingleValueConverter>
   @Override
   public synchronized Object fromString(String str) {
     if (isReset()) {
-      LOG.debug("Tried to unmarshal " + str + " with inactive converter " + delegate);
+      log.debug("Tried to unmarshal " + str + " with inactive converter " + delegate);
       return null;
     }
 

@@ -36,7 +36,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
 
   public static final String ACTION_ID = FollowThisPersonAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(FollowThisPersonAction.class);
+  private static final Logger log = Logger.getLogger(FollowThisPersonAction.class);
 
   protected ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
@@ -111,7 +111,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
   @Override
   public void run() {
     ThreadUtils.runSafeSync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -119,7 +119,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
                 SelectionRetrieverFactory.getSelectionRetriever(User.class).getSelection();
 
             if (!canBeExecuted(users)) {
-              LOG.warn(
+              log.warn(
                   "could not execute change follow mode action " //$NON-NLS-1$
                       + "because either no session is running, " //$NON-NLS-1$
                       + "more than one user is selected or " //$NON-NLS-1$
@@ -136,7 +136,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
 
   protected void updateActionEnablement() {
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {

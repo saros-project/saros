@@ -40,7 +40,7 @@ import saros.util.ThreadUtils;
  */
 public class ConfigurationSettingsWizardPage extends WizardPage {
 
-  private static final Logger LOG = Logger.getLogger(ConfigurationSettingsWizardPage.class);
+  private static final Logger log = Logger.getLogger(ConfigurationSettingsWizardPage.class);
 
   public static final String TITLE = saros.ui.Messages.ConfigurationSettingsWizardPage_title;
   public static final String DESCRIPTION =
@@ -403,7 +403,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         this.gateways.add(gw);
 
       } catch (Exception e) {
-        LOG.debug("Error updating UPnP selector:" + e.getMessage()); // $NON-NLS-1$
+        log.debug("Error updating UPnP selector:" + e.getMessage()); // $NON-NLS-1$
         // ignore faulty gateway
       }
     }

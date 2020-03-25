@@ -27,7 +27,7 @@ import saros.util.ThreadUtils;
 public class JoinSessionWizard extends Wizard {
   private static final String PAGE_INFO_ID = "JoinSessionInfo";
 
-  private static final Logger LOG = Logger.getLogger(JoinSessionWizard.class);
+  private static final Logger log = Logger.getLogger(JoinSessionWizard.class);
 
   private final IncomingSessionNegotiation negotiation;
 
@@ -122,7 +122,7 @@ public class JoinSessionWizard extends Wizard {
   private void performCancel() {
     ThreadUtils.runSafeAsync(
         "CancelJoinSessionWizard",
-        LOG,
+        log,
         () -> negotiation.localCancel(null, CancelOption.NOTIFY_PEER));
   }
 

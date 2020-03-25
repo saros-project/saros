@@ -39,7 +39,7 @@ import saros.ui.wizards.dialogs.WizardDialogAccessable;
  */
 public class NegotiationHandler implements INegotiationHandler {
 
-  private static final Logger LOG = Logger.getLogger(NegotiationHandler.class);
+  private static final Logger log = Logger.getLogger(NegotiationHandler.class);
 
   /**
    * OutgoingInvitationJob wraps the instance of {@link OutgoingSessionNegotiation} and cares about
@@ -111,7 +111,7 @@ public class NegotiationHandler implements INegotiationHandler {
                     negotiation.getErrorMessage()));
         }
       } catch (Exception e) {
-        LOG.error("This exception is not expected here: ", e);
+        log.error("This exception is not expected here: ", e);
         return new Status(IStatus.ERROR, Saros.PLUGIN_ID, e.getMessage(), e);
       }
 
@@ -160,7 +160,7 @@ public class NegotiationHandler implements INegotiationHandler {
                     Messages.NegotiationHandler_project_sharing_canceled_text, peerName);
 
             SWTUtils.runSafeSWTAsync(
-                LOG,
+                log,
                 new Runnable() {
                   @Override
                   public void run() {
@@ -182,7 +182,7 @@ public class NegotiationHandler implements INegotiationHandler {
             return new Status(IStatus.ERROR, Saros.PLUGIN_ID, message);
         }
       } catch (Exception e) {
-        LOG.error("This exception is not expected here: ", e);
+        log.error("This exception is not expected here: ", e);
         return new Status(IStatus.ERROR, Saros.PLUGIN_ID, e.getMessage(), e);
       }
 
@@ -228,7 +228,7 @@ public class NegotiationHandler implements INegotiationHandler {
   private void showIncomingInvitationUI(final IncomingSessionNegotiation negotiation) {
 
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -239,7 +239,7 @@ public class NegotiationHandler implements INegotiationHandler {
     // Fixes #2727848: InvitationDialog is opened in the
     // background
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -270,7 +270,7 @@ public class NegotiationHandler implements INegotiationHandler {
   private void showIncomingProjectUI(final AbstractIncomingProjectNegotiation negotiation) {
 
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
 
           @Override

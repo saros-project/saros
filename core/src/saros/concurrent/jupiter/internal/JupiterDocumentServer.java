@@ -19,7 +19,7 @@ import saros.session.User;
  */
 public class JupiterDocumentServer {
 
-  private static final Logger LOG = Logger.getLogger(JupiterDocumentServer.class);
+  private static final Logger log = Logger.getLogger(JupiterDocumentServer.class);
 
   /** List of proxy clients. */
   private final HashMap<User, Jupiter> proxies = new HashMap<User, Jupiter>();
@@ -87,7 +87,7 @@ public class JupiterDocumentServer {
     final Jupiter proxy = proxies.get(source);
 
     if (proxy == null) {
-      LOG.error("no proxy found for user: " + source);
+      log.error("no proxy found for user: " + source);
       return;
     }
 
@@ -97,7 +97,7 @@ public class JupiterDocumentServer {
           .get(dest)
           .updateVectorTime(new JupiterVectorTime(ts.getComponents()[1], ts.getComponents()[0]));
     } catch (TransformationException e) {
-      LOG.error("error during update vector time for user: " + dest, e);
+      log.error("error during update vector time for user: " + dest, e);
     }
   }
 

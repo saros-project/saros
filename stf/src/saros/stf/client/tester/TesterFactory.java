@@ -7,7 +7,7 @@ import saros.stf.client.Configuration;
 
 final class TesterFactory {
 
-  private static final Logger LOGGER = Logger.getLogger(TesterFactory.class.getName());
+  private static final Logger log = Logger.getLogger(TesterFactory.class.getName());
 
   private static AbstractTester createInvalidTester(
       Exception exception, String name, Object jid, Object password, Object host, Object port) {
@@ -35,7 +35,7 @@ final class TesterFactory {
 
     name = name.toUpperCase();
 
-    LOGGER.info("initializing bot for name '" + name + "'");
+    log.info("initializing bot for name '" + name + "'");
 
     Object jid = null;
     Object password = null;
@@ -75,12 +75,11 @@ final class TesterFactory {
               host.toString(),
               Integer.parseInt(port.toString()));
     } catch (Exception e) {
-      LOGGER.log(Level.WARNING, "could not create tester: " + name, e);
+      log.log(Level.WARNING, "could not create tester: " + name, e);
       return createInvalidTester(e, name, jid, password, host, port);
     }
 
-    LOGGER.info(
-        "created bot '" + name + "' with JID: " + jid + ", host: " + host + ", port: " + port);
+    log.info("created bot '" + name + "' with JID: " + jid + ", host: " + host + ", port: " + port);
 
     return tester;
   }

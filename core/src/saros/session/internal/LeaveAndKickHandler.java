@@ -20,7 +20,7 @@ import saros.util.ThreadUtils;
  */
 public class LeaveAndKickHandler implements Startable {
 
-  private static final Logger LOG = Logger.getLogger(LeaveAndKickHandler.class.getName());
+  private static final Logger log = Logger.getLogger(LeaveAndKickHandler.class.getName());
 
   private final ISarosSession session;
   private final ISarosSessionManager sessionManager;
@@ -75,7 +75,7 @@ public class LeaveAndKickHandler implements Startable {
     final User user = session.getUser(from);
 
     if (user.equals(session.getLocalUser())) {
-      LOG.warn("the local user cannot kick itself out of the session");
+      log.warn("the local user cannot kick itself out of the session");
       return;
     }
 
@@ -85,7 +85,7 @@ public class LeaveAndKickHandler implements Startable {
   private void leaveReceived(JID from) {
     final User user = session.getUser(from);
     if (user == null) {
-      LOG.warn(
+      log.warn(
           "received leave message from user who" + " is not part of the current session: " + from);
       return;
     }
@@ -96,7 +96,7 @@ public class LeaveAndKickHandler implements Startable {
     }
 
     if (!session.isHost()) {
-      LOG.warn(
+      log.warn(
           "Received leave message from user " + user + " who is not the current session's host");
       return;
     }
@@ -107,7 +107,7 @@ public class LeaveAndKickHandler implements Startable {
      */
     ThreadUtils.runSafeAsync(
         "remove-" + user,
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -119,7 +119,7 @@ public class LeaveAndKickHandler implements Startable {
   private void stopSession(final User user, final SessionEndReason reason) {
     ThreadUtils.runSafeAsync(
         "stop-host",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {

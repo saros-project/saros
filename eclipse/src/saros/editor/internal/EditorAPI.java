@@ -51,7 +51,7 @@ import saros.util.StackTrace;
  */
 public class EditorAPI {
 
-  private static final Logger LOG = Logger.getLogger(EditorAPI.class);
+  private static final Logger log = Logger.getLogger(EditorAPI.class);
 
   private static final String[] RESTRICTED_ACTION = {
     ITextEditorActionConstants.CUT_LINE,
@@ -102,7 +102,7 @@ public class EditorAPI {
     IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
     if (!file.exists()) {
-      LOG.error("EditorAPI cannot open file which does not exist: " + file, new StackTrace());
+      log.error("EditorAPI cannot open file which does not exist: " + file, new StackTrace());
       return null;
     }
 
@@ -132,7 +132,7 @@ public class EditorAPI {
          *
          * TODO Open as an internal editor
          */
-        LOG.warn(
+        log.warn(
             "Editor for file "
                 + file.getName()
                 + " is configured to be opened externally,"
@@ -154,7 +154,7 @@ public class EditorAPI {
 
       return IDE.openEditor(page, file, activate);
     } catch (PartInitException e) {
-      LOG.error("could not initialize part: ", e);
+      log.error("could not initialize part: ", e);
     }
 
     return null;
@@ -178,7 +178,7 @@ public class EditorAPI {
       page.openEditor(part.getEditorInput(), part.getEditorSite().getId());
       return true;
     } catch (PartInitException e) {
-      LOG.error("failed to open editor part with title: " + part.getTitle(), e);
+      log.error("failed to open editor part with title: " + part.getTitle(), e);
     }
     return false;
   }
@@ -222,7 +222,7 @@ public class EditorAPI {
           IEditorPart editorPart = reference.getEditor(false);
 
           if (editorPart == null) {
-            LOG.debug("editor part needs to be restored: " + reference.getTitle());
+            log.debug("editor part needs to be restored: " + reference.getTitle());
             // Making this call might cause partOpen events
             editorPart = reference.getEditor(true);
           }
@@ -230,7 +230,7 @@ public class EditorAPI {
           if (editorPart != null) {
             editorParts.add(editorPart);
           } else {
-            LOG.warn("editor part could not be restored: " + reference);
+            log.warn("editor part could not be restored: " + reference);
           }
         }
       }
@@ -261,7 +261,7 @@ public class EditorAPI {
     IResource resource = ResourceUtil.getResource(input);
 
     if (resource == null) {
-      LOG.warn("could not get resource reference from editor part: " + editorPart);
+      log.warn("could not get resource reference from editor part: " + editorPart);
     }
 
     return resource;
@@ -336,7 +336,7 @@ public class EditorAPI {
     if (bottom < top) {
       // FIXME This warning occurs when the document is shorter than the
       // viewport
-      LOG.warn(
+      log.warn(
           "Viewport Range Problem in " + viewer + ": Bottom == " + bottom + " < Top == " + top);
       bottom = top;
     }
@@ -377,7 +377,7 @@ public class EditorAPI {
     try {
       return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
     } catch (Exception e) {
-      LOG.error("could not get active window", e);
+      log.error("could not get active window", e);
       return null;
     }
   }
@@ -435,7 +435,7 @@ public class EditorAPI {
     try {
       provider.connect(input);
     } catch (CoreException e) {
-      LOG.error("could not connect to document provider for file: " + input.getName(), e);
+      log.error("could not connect to document provider for file: " + input.getName(), e);
       return null;
     }
 

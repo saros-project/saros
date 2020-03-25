@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 /** Parent class for all Saros actions */
 public abstract class AbstractSarosAction {
-  protected static final Logger LOG = Logger.getLogger(AbstractSarosAction.class);
+  protected static final Logger log = Logger.getLogger(AbstractSarosAction.class);
 
   private final List<ActionListener> actionListeners = new ArrayList<>();
 

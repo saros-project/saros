@@ -52,7 +52,7 @@ public class ConsistencyAction extends Action implements Disposable {
 
   public static final String ACTION_ID = ConsistencyAction.class.getName();
 
-  private static final Logger LOG = Logger.getLogger(ConsistencyAction.class);
+  private static final Logger log = Logger.getLogger(ConsistencyAction.class);
 
   private static final int MIN_ALPHA_VALUE = 64;
   private static final int MAX_ALPHA_VALUE = 255;
@@ -149,7 +149,7 @@ public class ConsistencyAction extends Action implements Disposable {
        * nothing is displayed anymore
        */
       SWTUtils.runSafeSWTAsync(
-          LOG,
+          log,
           new Runnable() {
             @Override
             public void run() {
@@ -169,19 +169,19 @@ public class ConsistencyAction extends Action implements Disposable {
         currentSession.getComponent(ConsistencyWatchdogClient.class);
 
     if (watchdogClient == null) {
-      LOG.warn(
+      log.warn(
           "watchdog client component is not available, cannot perform inconsistency notification");
       return;
     }
 
     if (currentSession.isHost() && isInconsistent) {
-      LOG.warn(
+      log.warn(
           "No inconsistency should ever be reported" //$NON-NLS-1$
               + " to the host"); //$NON-NLS-1$
       return;
     }
 
-    LOG.debug(
+    log.debug(
         "Inconsistency indicator goes: " //$NON-NLS-1$
             + (isInconsistent ? "on" : "off")); // $NON-NLS-1$ //$NON-NLS-2$
 
@@ -193,7 +193,7 @@ public class ConsistencyAction extends Action implements Disposable {
     }
 
     SWTUtils.runSafeSWTSync(
-        LOG,
+        log,
         new Runnable() {
 
           @Override
@@ -207,7 +207,7 @@ public class ConsistencyAction extends Action implements Disposable {
     final Set<SPath> paths = new HashSet<SPath>(watchdogClient.getPathsWithWrongChecksums());
 
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -251,11 +251,11 @@ public class ConsistencyAction extends Action implements Disposable {
         currentSession.getComponent(ConsistencyWatchdogClient.class);
 
     if (watchdogClient == null) {
-      LOG.warn("watchdog client component is not available, cannot perform recovery");
+      log.warn("watchdog client component is not available, cannot perform recovery");
       return;
     }
 
-    LOG.debug("user activated CW recovery."); // $NON-NLS-1$
+    log.debug("user activated CW recovery."); // $NON-NLS-1$
 
     Shell shell = SWTUtils.getShell();
 
@@ -323,9 +323,9 @@ public class ConsistencyAction extends Action implements Disposable {
             }
           });
     } catch (InvocationTargetException e) {
-      LOG.error("Exception not expected here.", e); // $NON-NLS-1$
+      log.error("Exception not expected here.", e); // $NON-NLS-1$
     } catch (InterruptedException e) {
-      LOG.error("Exception not expected here.", e); // $NON-NLS-1$
+      log.error("Exception not expected here.", e); // $NON-NLS-1$
     }
   }
 

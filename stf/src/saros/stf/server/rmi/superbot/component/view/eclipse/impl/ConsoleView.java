@@ -21,7 +21,7 @@ import saros.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
 
 public final class ConsoleView extends StfRemoteObject implements IConsoleView {
 
-  private static final Logger LOG = Logger.getLogger(ConsoleView.class);
+  private static final Logger log = Logger.getLogger(ConsoleView.class);
 
   private static final ConsoleView INSTANCE = new ConsoleView();
 
@@ -47,7 +47,7 @@ public final class ConsoleView extends StfRemoteObject implements IConsoleView {
       if (view.bot().styledText().getText().equals("")) return false;
       return true;
     } catch (Exception e) {
-      LOG.error(e.getMessage(), e);
+      log.error(e.getMessage(), e);
       return false;
     }
   }

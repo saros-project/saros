@@ -12,7 +12,7 @@ import saros.ui.util.SWTUtils;
 /** Handler for accepting or rejecting incoming XMPP subscription requests */
 public class XMPPAuthorizationHandler {
 
-  private static final Logger LOG = Logger.getLogger(XMPPAuthorizationHandler.class);
+  private static final Logger log = Logger.getLogger(XMPPAuthorizationHandler.class);
 
   private final SubscriptionHandler subscriptionHandler;
 
@@ -23,7 +23,7 @@ public class XMPPAuthorizationHandler {
         public void subscriptionRequestReceived(final JID jid) {
 
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
                 @Override
                 public void run() {

@@ -37,7 +37,7 @@ import saros.util.ThreadUtils;
  */
 public class JoinSessionWizard extends Wizard {
 
-  private static final Logger LOG = Logger.getLogger(JoinSessionWizard.class);
+  private static final Logger log = Logger.getLogger(JoinSessionWizard.class);
 
   private boolean isNegotiationRunning = false;
 
@@ -159,7 +159,7 @@ public class JoinSessionWizard extends Wizard {
 
     ThreadUtils.runSafeAsync(
         "isn-cancel",
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -176,7 +176,7 @@ public class JoinSessionWizard extends Wizard {
 
   private void handleCanceledAsync(final CancelLocation location, final String message) {
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {
@@ -188,7 +188,7 @@ public class JoinSessionWizard extends Wizard {
   private void showCancelMessageAsync(
       final JID jid, final String errorMsg, final CancelLocation cancelLocation) {
     SWTUtils.runSafeSWTAsync(
-        LOG,
+        log,
         new Runnable() {
           @Override
           public void run() {

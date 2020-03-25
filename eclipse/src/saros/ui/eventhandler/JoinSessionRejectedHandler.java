@@ -12,7 +12,7 @@ import saros.ui.util.SWTUtils;
 
 public final class JoinSessionRejectedHandler {
 
-  private static final Logger LOG = Logger.getLogger(JoinSessionRejectedHandler.class);
+  private static final Logger log = Logger.getLogger(JoinSessionRejectedHandler.class);
 
   private final IReceiver receiver;
 
@@ -22,7 +22,7 @@ public final class JoinSessionRejectedHandler {
         @Override
         public void processPacket(final Packet packet) {
           SWTUtils.runSafeSWTAsync(
-              LOG,
+              log,
               new Runnable() {
 
                 @Override

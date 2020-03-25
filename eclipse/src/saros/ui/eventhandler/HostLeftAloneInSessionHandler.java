@@ -24,7 +24,7 @@ import saros.ui.views.SarosView;
  */
 public class HostLeftAloneInSessionHandler {
 
-  private static Logger LOG = Logger.getLogger(HostLeftAloneInSessionHandler.class);
+  private static Logger log = Logger.getLogger(HostLeftAloneInSessionHandler.class);
 
   private final ISarosSessionManager sessionManager;
 
@@ -154,7 +154,7 @@ public class HostLeftAloneInSessionHandler {
 
     if (stopSession) {
       SWTUtils.runSafeSWTAsync(
-          LOG,
+          log,
           new Runnable() {
             @Override
             public void run() {

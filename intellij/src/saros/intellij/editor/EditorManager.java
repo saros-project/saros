@@ -60,7 +60,7 @@ import saros.synchronize.Blockable;
 /** IntelliJ implementation of the {@link IEditorManager} interface. */
 public class EditorManager extends AbstractActivityProducer implements IEditorManager {
 
-  private static final Logger LOG = Logger.getLogger(EditorManager.class);
+  private static final Logger log = Logger.getLogger(EditorManager.class);
 
   private final Blockable stopManagerListener =
       new Blockable() {
@@ -101,7 +101,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return;
           }
 
-          LOG.debug(path + " editor activity received " + editorActivity);
+          log.debug(path + " editor activity received " + editorActivity);
 
           final User user = editorActivity.getSource();
 
@@ -117,7 +117,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
               localEditorHandler.saveDocument(path);
               break;
             default:
-              LOG.warn("Unexpected type: " + editorActivity.getType());
+              log.warn("Unexpected type: " + editorActivity.getType());
           }
         }
 
@@ -129,7 +129,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return;
           }
 
-          LOG.debug(path + " text edit activity received " + editorActivity);
+          log.debug(path + " text edit activity received " + editorActivity);
 
           User user = editorActivity.getSource();
 
@@ -198,7 +198,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           IFile file = path.getFile();
 
-          LOG.debug("Text selection activity received: " + path + ", " + selection);
+          log.debug("Text selection activity received: " + path + ", " + selection);
 
           User user = selection.getSource();
           int start = selection.getOffset();
@@ -332,7 +332,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     VirtualFile fileForEditor = DocumentAPI.getVirtualFile(editor.getDocument());
 
     if (fileForEditor == null) {
-      LOG.warn(
+      log.warn(
           "Encountered editor without valid virtual file representation - path held in editor pool: "
               + path);
 
@@ -340,7 +340,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     }
 
     if (!visibleFilePaths.contains(fileForEditor.getPath())) {
-      LOG.debug(
+      log.debug(
           "Ignoring "
               + path
               + " while sending viewport awareness information as the editor is not currently visible.");
@@ -431,7 +431,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
               "Could not create SPath for resource that is known to be shared: " + openFile);
 
         } else if (path.getResource().isIgnored()) {
-          LOG.debug("Skipping editor for ignored open file " + path);
+          log.debug("Skipping editor for ignored open file " + path);
 
           continue;
         }
@@ -605,7 +605,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
 
-            LOG.warn(
+            log.warn(
                 "Could not retrieve content of "
                     + path
                     + " as a matching VirtualFile could not be found,"
@@ -736,7 +736,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   public void generateViewport(SPath path, LineRange viewport) {
     if (session == null) {
-      LOG.warn("SharedEditorListener not correctly unregistered!");
+      log.warn("SharedEditorListener not correctly unregistered!");
       return;
     }
 
@@ -771,7 +771,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
        * But watch out for changes because of a consistency check!
        */
 
-      LOG.warn(
+      log.warn(
           "local user caused text changes: "
               + textEdit
               + " | write access : "
@@ -786,8 +786,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
      * activities during the project negotiation
      */
     if (fileReplacementInProgressObservable.isReplacementInProgress()) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace("File replacement in progress - Ignoring local activity " + textEdit);
+      if (log.isTraceEnabled()) {
+        log.trace("File replacement in progress - Ignoring local activity " + textEdit);
       }
 
       return;
@@ -810,7 +810,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         userEditorStateManager.getState(jumpTo).getActiveEditorState();
 
     if (remoteActiveEditor == null) {
-      LOG.info("Remote user " + jumpTo + " does not have an open editor.");
+      log.info("Remote user " + jumpTo + " does not have an open editor.");
       return;
     }
 
@@ -956,7 +956,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(path);
 
     if (passedFile == null) {
-      LOG.warn(
+      log.warn(
           "Ignoring request to adjust viewport as no valid VirtualFile could be found for "
               + path
               + " - given range: "
@@ -977,7 +977,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     }
 
     if (editor == null) {
-      LOG.warn(
+      log.warn(
           "Failed to adjust viewport for "
               + path
               + " as it is not known to the editor pool even though it is currently open");

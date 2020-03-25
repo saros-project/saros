@@ -15,7 +15,7 @@ import saros.filesystem.IWorkspace;
 /** Server implementation of the {@link IFile} interface. */
 public class ServerFileImpl extends ServerResourceImpl implements IFile {
 
-  private static final Logger LOG = Logger.getLogger(ServerFileImpl.class);
+  private static final Logger log = Logger.getLogger(ServerFileImpl.class);
 
   private String charset;
 
@@ -55,7 +55,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
     try {
       Files.delete(toNioPath());
     } catch (NoSuchFileException e) {
-      LOG.debug("Could not delete " + getFullPath() + " because it doesn't exist (ignoring)", e);
+      log.debug("Could not delete " + getFullPath() + " because it doesn't exist (ignoring)", e);
     }
   }
 
