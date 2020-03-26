@@ -55,7 +55,6 @@ docs/Gemfile.lock
 
 # Common
 .project
-.settings
 
 # LSP
 lsp/.classpath
