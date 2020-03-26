@@ -1,8 +1,4 @@
----
----
 
-$link-color-active: #007bff;
-$link-color: #343a40;
 
 html {
   position: relative;
@@ -39,25 +35,25 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 
-  border: 1px solid #dfe2e5;
+  border: 1px solid $table-border-color;
   margin-bottom: 20px;
 }
 
 th {
    padding: 10px;
-   border: 1px solid #dfe2e5;
+   border: 1px solid $table-border-color;
 }
 
 td {
    padding: 10px;
-   border: 1px solid #dfe2e5;
+   border: 1px solid $table-border-color;
 }
 
 
 h1, h2, h3, h4, h5, h6 {
   margin: 10px 0;
   font-weight: 700;
-  color:#222222;
+  color: $header-color;
   font-family: 'Lucida Grande', 'Calibri', Helvetica, Arial, sans-serif;
   letter-spacing: -1px;
 }
@@ -110,10 +106,10 @@ h6 {
   right: 10px;
   z-index: 10;
   padding: 10px 10px 10px 10px;
-  color: #fff;
-  background: #0090ff no-repeat 95% 50%;
+  color: $white;
+  background: $default-background no-repeat 95% 50%;
   font-weight: 700;
-  box-shadow: 0 0 10px rgba(0,0,0,.5);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
@@ -124,7 +120,7 @@ h6 {
 
 /* navigation bars */
 .logo span {
-  color: #222222;
+  color: $header-color;
   text-decoration: none;
   font-size: 30px;
   font-weight: 700;
@@ -141,7 +137,7 @@ h6 {
 }
 
 .bg-blue {
-  background: rgba(0, 144, 255, 0.2)
+  background: rgba(0, 144, 255, 0.2); 
 }
 
 /* sidebar */

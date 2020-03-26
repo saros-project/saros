@@ -23,8 +23,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          cd docs
+          npm install
       - name: Building jekyll documentation
         uses: agentd00nut/jekyll-build-optional-deploy-gh-pages@v1
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ secrets.GITHUB_REPOSITORY }}
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           JEKYLL_ROOT: "docs/"
-          DEPLOY_SITE: "false"
+          DEPLOY_SITE: "true"
+          REMOTE_BRANCH: "gh-pages"

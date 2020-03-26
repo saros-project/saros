@@ -5,6 +5,15 @@ kramdown:
   syntax_highlighter: rouge
 repository: saros-project/saros
 
+# sass loading
+sass:
+    load_paths:
+        - _sass
+        - node_modules
+
+# Avoid default exclude of node_modules 
+exclude: []
+
 # custom properties
 
 title: Saros
