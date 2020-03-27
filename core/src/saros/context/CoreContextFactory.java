@@ -2,6 +2,7 @@ package saros.context;
 
 import java.util.Arrays;
 import saros.account.XMPPAccountStore;
+import saros.communication.InfoManager;
 import saros.communication.chat.muc.MultiUserChatService;
 import saros.communication.chat.single.SingleUserChatService;
 import saros.communication.connection.ConnectionHandler;
@@ -59,6 +60,7 @@ public class CoreContextFactory extends AbstractContextFactory {
       Component.create(ConnectionHandler.class),
 
       // Version support
+      Component.create(InfoManager.class),
       Component.create(VersionManager.class),
       Component.create(MultiUserChatService.class),
       Component.create(SingleUserChatService.class),

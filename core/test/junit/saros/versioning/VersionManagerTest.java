@@ -27,6 +27,7 @@ import java.util.HashMap;
 import org.jivesoftware.smack.packet.IQ;
 import org.junit.Before;
 import org.junit.Test;
+import saros.communication.InfoManager;
 import saros.communication.extensions.InfoExchangeExtension;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
@@ -61,8 +62,9 @@ public class VersionManagerTest {
     XMPPContactsService aliceContactsService = SarosMocks.contactsServiceMockFor(bobJID);
     bobContact = aliceContactsService.getContact(bobJID.getRAW()).get();
 
-    versionManagerLocal =
-        new VersionManager(local.toString(), aliceReceiver, aliceTransmitter, aliceContactsService);
+    InfoManager infoManager =
+        new InfoManager(aliceReceiver, aliceTransmitter, aliceContactsService);
+    versionManagerLocal = new VersionManager(local.toString(), infoManager);
 
     HashMap<String, String> info = new HashMap<>();
     info.put(VersionManager.VERSION_KEY, remote.toString());
