@@ -31,6 +31,7 @@ import saros.communication.extensions.VersionExchangeExtension;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.test.fakes.net.FakeConnectionFactory;
 import saros.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
@@ -45,6 +46,8 @@ public class VersionManagerTest {
   private final JID aliceJID = new JID("alice@alice.com/Saros");
   private final JID bobJID = new JID("bob@bob.com/Saros");
 
+  private XMPPContact bobContact;
+
   @Before
   public void setUp() {
     FakeConnectionFactoryResult result =
@@ -56,6 +59,7 @@ public class VersionManagerTest {
 
   private void init(Version local, Version remote) {
     XMPPContactsService aliceContactsService = SarosMocks.contactsServiceMockFor(bobJID);
+    bobContact = aliceContactsService.getContact(bobJID.getRAW()).get();
 
     versionManagerLocal =
         new VersionManager(local.toString(), aliceReceiver, aliceTransmitter, aliceContactsService);
@@ -78,7 +82,8 @@ public class VersionManagerTest {
 
     init(local, remote);
 
-    VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
 
     assertEquals(Compatibility.OK, result.getCompatibility());
   }
@@ -90,7 +95,8 @@ public class VersionManagerTest {
 
     init(local, remote);
 
-    VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
 
     assertEquals(Compatibility.OK, result.getCompatibility());
   }
@@ -102,7 +108,8 @@ public class VersionManagerTest {
 
     init(local, remote);
 
-    VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
 
     assertEquals(Compatibility.OLDER, result.getCompatibility());
   }
@@ -114,7 +121,8 @@ public class VersionManagerTest {
 
     init(local, remote);
 
-    VersionCompatibilityResult result = versionManagerLocal.determineVersionCompatibility(bobJID);
+    VersionCompatibilityResult result =
+        versionManagerLocal.determineVersionCompatibility(bobContact);
 
     assertEquals(Compatibility.NEWER, result.getCompatibility());
   }

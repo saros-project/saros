@@ -3,6 +3,7 @@ package saros.versioning;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
@@ -97,26 +98,30 @@ public class VersionManager {
   }
 
   /**
-   * Determines the version compatibility with the given peer.
+   * Determines the version compatibility with the given contact.
    *
-   * @param jid the JID of the peer
+   * @param contact the remote party
    * @return the {@link VersionCompatibilityResult VersionCompatibilityResult}
    */
-  public VersionCompatibilityResult determineVersionCompatibility(JID jid) {
-    Optional<ClientInfo> contactInfo =
-        contactsService.getContact(jid.getRAW()).map(remoteInfo::get);
-    if (!contactInfo.isPresent())
-      log.warn("contact: " + jid + ", remote version string not found in info data");
+  public VersionCompatibilityResult determineVersionCompatibility(XMPPContact contact) {
+    Objects.requireNonNull(contact, "contact is needed");
 
-    Optional<String> versionString = contactInfo.map(clientInfo -> clientInfo.getInfo(VERSION_KEY));
-    Version remoteVersion = versionString.map(Version::parseVersion).orElse(null);
-    if (remoteVersion == null) {
-      log.warn("remote version not found for: " + jid);
+    ClientInfo contactInfo = remoteInfo.get(contact);
+    if (contactInfo == null) {
+      log.warn("contact: " + contact + ", remote version string not found in info data");
       return new VersionCompatibilityResult(Compatibility.UNKNOWN, localVersion, Version.INVALID);
     }
 
-    if (remoteVersion == Version.INVALID)
-      log.warn("contact: " + jid + ", remote version string is invalid: " + versionString.get());
+    String versionString = contactInfo.getInfo(VERSION_KEY);
+    if (versionString == null) {
+      log.warn("remote version not found for: " + contact);
+      return new VersionCompatibilityResult(Compatibility.UNKNOWN, localVersion, Version.INVALID);
+    }
+
+    Version remoteVersion = Version.parseVersion(versionString);
+    if (remoteVersion == Version.INVALID) {
+      log.warn("contact: " + contact + ", remote version string is invalid: " + versionString);
+    }
 
     Compatibility compatibility = determineCompatibility(localVersion, remoteVersion);
     return new VersionCompatibilityResult(compatibility, localVersion, remoteVersion);
