@@ -43,6 +43,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import saros.SarosPluginContext;
 import saros.annotations.Component;
+import saros.communication.InfoManager;
 import saros.editor.EditorManager;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.ContactStatus.Type;
@@ -91,7 +92,6 @@ import saros.ui.widgets.chat.ChatRoomsComposite;
 import saros.ui.widgets.viewer.ViewerComposite;
 import saros.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
 import saros.util.CoreUtils;
-import saros.versioning.VersionManager;
 
 /**
  * @JTourBusStop 1, The Interface Tour:
@@ -237,7 +237,7 @@ public class SarosView extends ViewPart {
 
   @Inject private XMPPContactsService contactsService;
 
-  @Inject private VersionManager versionManager;
+  @Inject private InfoManager infoManager;
 
   private static volatile boolean showBalloonNotifications;
   private volatile boolean playAvailableSound;
@@ -484,7 +484,7 @@ public class SarosView extends ViewPart {
 
             // TODO: Currently only Saros/S is known to have a working JoinSessionRequestHandler,
             //       remove this once the situation changes / change this to it's own feature.
-            if (versionManager
+            if (infoManager
                 .getRemoteInfo(contact, PreferenceConstants.SERVER_SUPPORT)
                 .isPresent()) {
               manager.add(getAction(RequestSessionInviteAction.ACTION_ID));
