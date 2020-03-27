@@ -26,6 +26,7 @@ import saros.net.IConnectionManager;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.preferences.IPreferenceStore;
 import saros.session.ISarosSession;
@@ -107,7 +108,7 @@ public class SessionNegotiationTest {
     expect(compatibilityResult.getCompatibility()).andReturn(Compatibility.OK);
 
     versionManager = createNiceMock(VersionManager.class);
-    expect(versionManager.determineVersionCompatibility(anyObject(JID.class)))
+    expect(versionManager.determineVersionCompatibility(anyObject(XMPPContact.class)))
         .andReturn(compatibilityResult);
 
     aliceSession = createNiceMock(ISarosSession.class);

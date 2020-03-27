@@ -21,6 +21,7 @@ import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 import saros.preferences.IPreferenceStore;
 import saros.preferences.PreferenceStore;
@@ -230,7 +231,15 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     log.debug(this + " : checking version compatibility");
     monitor.setTaskName("Checking version compatibility...");
 
-    VersionCompatibilityResult result = versionManager.determineVersionCompatibility(getPeer());
+    XMPPContact contact =
+        contactsService
+            .getContact(getPeer().getRAW())
+            .orElseThrow(
+                () ->
+                    new LocalCancellationException(
+                        "Could not obtain the Contact for " + getPeer().getBareJID(),
+                        CancelOption.DO_NOT_NOTIFY_PEER));
+    VersionCompatibilityResult result = versionManager.determineVersionCompatibility(contact);
 
     checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
 
