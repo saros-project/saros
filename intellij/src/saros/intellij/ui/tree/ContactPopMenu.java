@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.JMenu;
@@ -216,15 +217,11 @@ class ContactPopMenu extends JPopupMenu {
         return;
       }
 
-      List<IResource> resources = new ArrayList<>();
-      resources.add(module);
-
-      JID user = new JID(contactInfo.getRosterEntry().getUser());
-      List<JID> contacts = new ArrayList<>();
-      contacts.add(user);
+      List<IResource> resources = Collections.singletonList(module);
+      List<JID> contact = Collections.singletonList(contactInfo.getJid());
 
       SharedIDEContext.preregisterProject(project);
-      CollaborationUtils.startSession(resources, contacts);
+      CollaborationUtils.startSession(resources, contact);
     }
   }
 }
