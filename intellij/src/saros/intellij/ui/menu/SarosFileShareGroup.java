@@ -11,13 +11,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.packet.Presence;
 import saros.SarosPluginContext;
 import saros.intellij.filesystem.IntelliJProjectImpl;
-import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.XMPPContact;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSessionManager;
 
@@ -27,7 +24,7 @@ public class SarosFileShareGroup extends ActionGroup {
 
   @Inject private ISarosSessionManager sessionManager;
 
-  @Inject private XMPPConnectionService connectionService;
+  @Inject private XMPPContactsService contactsService;
 
   @Override
   public void actionPerformed(AnActionEvent e) {
@@ -42,7 +39,7 @@ public class SarosFileShareGroup extends ActionGroup {
     // running yet when this class is instantiated.
     // To make the dependency injection work,
     // SarosPluginContext.initComponent has to be called here.
-    if (sessionManager == null && connectionService == null) {
+    if (sessionManager == null && contactsService == null) {
       SarosPluginContext.initComponent(this);
     }
 
@@ -54,19 +51,11 @@ public class SarosFileShareGroup extends ActionGroup {
       return new AnAction[0];
     }
 
-    Roster roster = connectionService.getRoster();
-    if (roster == null) {
-      return new AnAction[0];
-    }
-
     int userCount = 1;
-
     List<AnAction> list = new ArrayList<>();
-    for (RosterEntry rosterEntry : roster.getEntries()) {
-      Presence presence = roster.getPresence(rosterEntry.getUser());
-      if (presence.getType() == Presence.Type.available) {
-        list.add(new ShareWithUserAction(new JID(rosterEntry.getUser()), userCount));
-
+    for (XMPPContact contact : contactsService.getAllContacts()) {
+      if (contact.getStatus().isOnline()) {
+        list.add(new ShareWithUserAction(contact.getBareJid(), userCount));
         userCount++;
       }
     }
