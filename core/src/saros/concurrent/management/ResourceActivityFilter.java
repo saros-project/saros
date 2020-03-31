@@ -155,6 +155,8 @@ class ResourceActivityFilter {
    * <p>Does nothing if the passed activity is not a {@link FileActivity} or does not have the type
    * {@link FileActivity.Type#REMOVED} or {@link FileActivity.Type#MOVED}.
    *
+   * <p>Ignores file move activities where the origin and destination path is the same.
+   *
    * @param activity the activity to handle
    * @see #deletedFileFilter
    * @see #handleFileCreation(IActivity)
