@@ -239,8 +239,6 @@ public class SharedResourcesManager implements Startable {
     } finally {
       setFilesystemModificationHandlerEnabled(true);
     }
-
-    // TODO reset the vector time for the old file
   }
 
   private void handleFileDeletion(@NotNull FileActivity activity) throws IOException {
@@ -270,8 +268,6 @@ public class SharedResourcesManager implements Startable {
     }
 
     annotationManager.removeAnnotations(file);
-
-    // TODO reset the vector time for the deleted file
   }
 
   private void handleFileCreation(@NotNull FileActivity activity) throws IOException {
