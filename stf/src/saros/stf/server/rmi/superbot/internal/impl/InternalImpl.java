@@ -107,6 +107,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         originalVersion = (Version) localVersionField.get(getVersionManager());
 
       localVersionField.set(getVersionManager(), newVersion);
+      getInfoManager().setLocalInfo(VersionManager.VERSION_KEY, newVersion.toString());
 
     } catch (IllegalArgumentException e) {
       log.error("unable to change saros version, reflection failed", e);
@@ -129,6 +130,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     try {
       localVersionField.set(getVersionManager(), originalVersion);
+      getInfoManager().setLocalInfo(VersionManager.VERSION_KEY, originalVersion.toString());
     } catch (IllegalArgumentException e) {
       log.error("unable to reset saros version, reflection failed", e);
       throw new RemoteException("unable to reset saros version, reflection failed", e);
