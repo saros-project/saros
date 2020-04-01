@@ -31,10 +31,10 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
 
   @Override
   public void connectingFailed(final XMPPAccount account, final Exception exception) {
-    SWTUtils.runSafeSWTAsync(log, () -> handleConnectionFailed(exception));
+    SWTUtils.runSafeSWTAsync(log, () -> handleConnectionFailed(account, exception));
   }
 
-  private void handleConnectionFailed(Exception exception) {
+  private void handleConnectionFailed(XMPPAccount account, Exception exception) {
 
     try {
 
@@ -52,28 +52,16 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
         return;
       }
 
-      final XMPPAccount accountUsedForConnecting =
-          XMPPConnectionSupport.getInstance().getCurrentXMPPAccount();
-
-      // should not happen
-      if (accountUsedForConnecting == null) {
-        log.warn(
-            "could not found the account that was used for establishing the connection - "
-                + "this can happen if connections are not established through class: "
-                + XMPPConnectionSupport.class.getSimpleName());
-        return;
-      }
-
-      final String errorMessesage = generateHumanReadableErrorMessage((XMPPException) exception);
+      final String errorMessage = generateHumanReadableErrorMessage((XMPPException) exception);
 
       final boolean editAccountAndConnectAgain =
-          MessageDialog.openQuestion(SWTUtils.getShell(), "Connecting Error", errorMessesage);
+          MessageDialog.openQuestion(SWTUtils.getShell(), "Connecting Error", errorMessage);
 
       if (!editAccountAndConnectAgain) return;
 
-      if (WizardUtils.openEditXMPPAccountWizard(accountUsedForConnecting) == null) return;
+      if (WizardUtils.openEditXMPPAccountWizard(account) == null) return;
 
-      XMPPConnectionSupport.getInstance().connect(accountUsedForConnecting, false);
+      XMPPConnectionSupport.getInstance().connect(account, false);
 
     } finally {
       isHandling = false;
