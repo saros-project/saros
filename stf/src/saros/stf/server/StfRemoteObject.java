@@ -4,6 +4,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
 import saros.Saros;
 import saros.account.XMPPAccountStore;
+import saros.communication.InfoManager;
 import saros.context.IContainerContext;
 import saros.editor.EditorManager;
 import saros.editor.FollowModeManager;
@@ -64,6 +65,10 @@ public abstract class StfRemoteObject implements Constants {
 
   protected XMPPAccountStore getXmppAccountStore() {
     return context.getComponent(XMPPAccountStore.class);
+  }
+
+  protected InfoManager getInfoManager() {
+    return context.getComponent(InfoManager.class);
   }
 
   protected VersionManager getVersionManager() {
