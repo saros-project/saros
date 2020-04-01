@@ -3,8 +3,11 @@ name: STF Tests
 on:
   push:
     branches:
-      - 'pr/stf/*'
       - 'master'
+      - 'test/stf/*'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
 
 jobs:
   stf:
