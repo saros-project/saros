@@ -217,5 +217,9 @@ public class Messages {
   public static String ModuleConfigurationInitializer_override_module_config_title;
   public static String ModuleConfigurationInitializer_override_module_config_message;
 
+  public static String ConnectingFailureHandler_title;
+  public static String ConnectingFailureHandler_unknown_error_message;
+  public static String ConnectingFailureHandler_invalid_username_password_message;
+
   private Messages() {}
 }
