@@ -30,7 +30,7 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
   }
 
   @Override
-  public void connectingFailed(final Exception exception) {
+  public void connectingFailed(final XMPPAccount account, final Exception exception) {
     SWTUtils.runSafeSWTAsync(log, () -> handleConnectionFailed(exception));
   }
 

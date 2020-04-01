@@ -227,8 +227,7 @@ public class ConnectionHandler {
       }
 
       if (callbackTmp != null && !failSilently) {
-        callbackTmp.connectingFailed(e);
-        return;
+        callbackTmp.connectingFailed(account, e);
       }
     }
   }

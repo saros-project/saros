@@ -1,13 +1,15 @@
 package saros.communication.connection;
 
+import saros.account.XMPPAccount;
+
 /** Simple callback interface which is being notified in case of connecting error. */
 public interface IConnectingFailureCallback {
 
   /**
    * Gets called when it was not possible to successfully connect the requested service.
    *
-   * @param exception the exception that occurred during the connection attempt or <code>null</code>
-   *     if it could not be made because of missing data
+   * @param account the XMPP used for the connection attempt
+   * @param exception the exception that occurred during the connection attempt
    */
-  public void connectingFailed(Exception exception);
+  void connectingFailed(XMPPAccount account, Exception exception);
 }
