@@ -23,6 +23,7 @@ import saros.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import saros.intellij.project.filesystem.IntelliJWorkspaceRootImpl;
 import saros.intellij.project.filesystem.PathFactory;
 import saros.intellij.runtime.IntellijUISynchronizer;
+import saros.intellij.ui.eventhandler.ConnectingFailureHandler;
 import saros.intellij.ui.eventhandler.SessionStatusChangeHandler;
 import saros.intellij.ui.util.UIProjectUtils;
 import saros.monitoring.remote.IRemoteProgressIndicatorFactory;
@@ -53,15 +54,18 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
 
       // UI handlers
       Component.create(NegotiationHandler.class),
-      Component.create(UserStatusChangeHandler.class),
       Component.create(XMPPAuthorizationHandler.class),
-      Component.create(SessionStatusChangeHandler.class),
       Component.create(IChecksumCache.class, NullChecksumCache.class),
       Component.create(UISynchronizer.class, IntellijUISynchronizer.class),
       Component.create(IPreferenceStore.class, PropertiesComponentAdapter.class),
       Component.create(Preferences.class, IntelliJPreferences.class),
       Component.create(
           IRemoteProgressIndicatorFactory.class, IntelliJRemoteProgressIndicatorFactoryImpl.class),
+
+      // UI event handlers relaying information to the user
+      Component.create(ConnectingFailureHandler.class),
+      Component.create(UserStatusChangeHandler.class),
+      Component.create(SessionStatusChangeHandler.class),
 
       // UI Utility
       Component.create(UIProjectUtils.class),
