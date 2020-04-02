@@ -19,7 +19,7 @@ public class VersionManager {
    * key with the last working version as value and add a check for it.
    */
 
-  static final String VERSION_KEY = "version";
+  public static final String VERSION_KEY = "version";
 
   private static final Logger log = Logger.getLogger(VersionManager.class);
 
