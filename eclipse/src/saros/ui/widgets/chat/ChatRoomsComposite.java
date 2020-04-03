@@ -37,8 +37,10 @@ import saros.editor.EditorManager;
 import saros.net.ConnectionState;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.roster.IRosterListener;
-import saros.net.xmpp.roster.RosterTracker;
+import saros.net.xmpp.contact.IContactsUpdate;
+import saros.net.xmpp.contact.IContactsUpdate.UpdateType;
+import saros.net.xmpp.contact.XMPPContact;
+import saros.net.xmpp.contact.XMPPContactsService;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
@@ -87,8 +89,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
   protected boolean isSessionHost;
 
-  protected RosterTracker rosterTracker;
-
   protected IChat sessionChat;
 
   protected CTabItem sessionChatErrorTab;
@@ -110,6 +110,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
   @Inject private MUCNegotiationManager mucNegotiationManager;
 
   @Inject private IPreferenceStore preferenceStore;
+
+  @Inject private XMPPContactsService contactsService;
 
   private final IPropertyChangeListener propertyChangeListener =
       new IPropertyChangeListener() {
@@ -142,31 +144,19 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
       };
 
-  /**
-   * This RosterListener closure is added to the RosterTracker to get notifications when the roster
-   * changes.
-   */
-  protected IRosterListener rosterListener =
-      new IRosterListener() {
-
-        @Override
-        public void entriesUpdated(final Collection<String> addresses) {
+  private final IContactsUpdate contactsUpdate =
+      (contact, updateType) -> {
+        if (updateType == UpdateType.NICKNAME_CHANGED) {
           SWTUtils.runSafeSWTAsync(
               log,
-              new Runnable() {
-                @Override
-                public void run() {
+              () -> {
+                if (ChatRoomsComposite.this.isDisposed()) return;
 
-                  if (ChatRoomsComposite.this.isDisposed()) return;
-
-                  log.trace("roster entries changed, refreshing chat tabs");
-
-                  Collection<JID> jids = new ArrayList<JID>();
-
-                  for (String address : addresses) jids.add(new JID(address));
-
-                  updateChatTabs(jids);
-                }
+                log.trace("contact entry changed, refreshing chat tabs");
+                contact
+                    .map(XMPPContact::getBareJid)
+                    .map(Collections::singletonList)
+                    .ifPresent(ChatRoomsComposite.this::updateChatTabs);
               });
         }
       };
@@ -416,11 +406,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
       };
 
-  public ChatRoomsComposite(Composite parent, int style, final RosterTracker rosterTracker) {
+  public ChatRoomsComposite(Composite parent, int style) {
     super(parent, style);
-
-    this.rosterTracker = rosterTracker;
-    rosterTracker.addRosterListener(rosterListener);
 
     SarosPluginContext.initComponent(this);
 
@@ -429,6 +416,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     multiUserChatService.addChatServiceListener(chatServiceListener);
     connectionHandler.addConnectionStateListener(connectionStateListener);
     preferenceStore.addPropertyChangeListener(propertyChangeListener);
+    contactsService.addListener(contactsUpdate);
 
     ISarosSession session = sessionManager.getSession();
     if (session != null) {
@@ -467,18 +455,11 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             }
 
             sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
-
             preferenceStore.removePropertyChangeListener(propertyChangeListener);
-
             singleUserChatService.removeChatServiceListener(chatServiceListener);
-
             multiUserChatService.removeChatServiceListener(chatServiceListener);
-
             connectionHandler.removeConnectionStateListener(connectionStateListener);
-            /**
-             * This must be called before finalization otherwise you will get NPE on RosterTracker.
-             */
-            rosterTracker.removeRosterListener(rosterListener);
+            contactsService.removeListener(contactsUpdate);
           }
         });
   }

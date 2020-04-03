@@ -30,7 +30,6 @@ import saros.net.upnp.internal.UPnPAccessImpl;
 import saros.net.upnp.internal.UPnPServiceImpl;
 import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.XMPPContactsService;
-import saros.net.xmpp.roster.RosterTracker;
 import saros.net.xmpp.subscription.SubscriptionHandler;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.BindKey;
@@ -86,7 +85,6 @@ public class CoreContextFactory extends AbstractContextFactory {
       Component.create(
           BindKey.bindKey(IStreamService.class, IContextKeyBindings.Socks5StreamService.class),
           Socks5StreamService.class),
-      Component.create(RosterTracker.class),
       Component.create(XMPPConnectionService.class),
       Component.create(IStunService.class, StunServiceImpl.class),
       Component.create(SubscriptionHandler.class),
