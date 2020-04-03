@@ -50,7 +50,6 @@ import saros.net.xmpp.contact.ContactStatus.Type;
 import saros.net.xmpp.contact.IContactsUpdate;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
-import saros.net.xmpp.roster.RosterTracker;
 import saros.preferences.EclipsePreferenceConstants;
 import saros.preferences.PreferenceConstants;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -233,8 +232,6 @@ public class SarosView extends ViewPart {
 
   @Inject protected EditorManager editorManager;
 
-  @Inject protected RosterTracker rosterTracker;
-
   @Inject private XMPPContactsService contactsService;
 
   @Inject private InfoManager infoManager;
@@ -379,7 +376,7 @@ public class SarosView extends ViewPart {
         };
     baseSashForm.setWeights(weights);
 
-    chatRooms = new ChatRoomsComposite(rightComposite, SWT.NONE, rosterTracker);
+    chatRooms = new ChatRoomsComposite(rightComposite, SWT.NONE);
 
     notificationAnchor = new Composite(parent, SWT.NONE);
 
