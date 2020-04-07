@@ -29,21 +29,8 @@ public class FileListFactory {
 
   private static final Logger log = Logger.getLogger(FileListFactory.class);
 
-  private IChecksumCache checksumCache;
-  private IProgressMonitor monitor;
-
-  private FileListFactory(IChecksumCache checksumCache, IProgressMonitor monitor) {
-    this.checksumCache = checksumCache;
-    this.monitor = monitor;
-
-    if (this.monitor == null) this.monitor = new NullProgressMonitor();
-  }
-
-  public static FileList createFileList(
-      IProject project, IChecksumCache checksumCache, IProgressMonitor monitor) throws IOException {
-
-    FileListFactory fact = new FileListFactory(checksumCache, monitor);
-    return fact.build(project);
+  private FileListFactory() {
+    // NOP
   }
 
   /**
@@ -68,18 +55,28 @@ public class FileListFactory {
     return new FileList();
   }
 
-  private FileList build(IProject project) throws IOException {
+  public static FileList createFileList(
+      final IProject project, final IChecksumCache checksumCache, final IProgressMonitor monitor)
+      throws IOException {
 
     FileList list = new FileList();
 
     list.addEncoding(project.getDefaultCharset());
 
-    addMembersToList(list, Arrays.asList(project.members()));
+    addMembersToList(
+        list,
+        Arrays.asList(project.members()),
+        checksumCache,
+        monitor != null ? monitor : new NullProgressMonitor());
 
     return list;
   }
 
-  private void addMembersToList(final FileList list, final List<IResource> resources)
+  private static void addMembersToList(
+      final FileList list,
+      final List<IResource> resources,
+      final IChecksumCache checksumCache,
+      final IProgressMonitor monitor)
       throws IOException {
 
     if (resources.size() == 0) return;
