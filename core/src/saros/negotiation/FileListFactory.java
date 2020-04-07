@@ -2,6 +2,7 @@ package saros.negotiation;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,31 +56,55 @@ public class FileListFactory {
     return new FileList();
   }
 
+  /**
+   * Creates a file list for the given project.
+   *
+   * <p>Uses the given checksum cache for the checksum calculation. Reports progress to the passed
+   * progress monitor if present.
+   *
+   * @param project the project for which to create a file list
+   * @param checksumCache the checksum cache to use during the checksum calculation
+   * @param suggestedMonitor the progress monitor to report to or <code>null</code>
+   * @return a file list for the given project
+   * @throws IOException if the default charset for the project, the members contained in the
+   *     project or one of its folders, or the charset of a contained file could not be obtained
+   */
   public static FileList createFileList(
-      final IProject project, final IChecksumCache checksumCache, final IProgressMonitor monitor)
+      final IProject project,
+      final IChecksumCache checksumCache,
+      final IProgressMonitor suggestedMonitor)
       throws IOException {
 
     FileList list = new FileList();
 
     list.addEncoding(project.getDefaultCharset());
 
-    addMembersToList(
-        list,
-        Arrays.asList(project.members()),
-        checksumCache,
-        monitor != null ? monitor : new NullProgressMonitor());
+    List<IFile> files = calculateMembers(list, project);
+
+    IProgressMonitor monitor =
+        suggestedMonitor != null ? suggestedMonitor : new NullProgressMonitor();
+
+    calculateChecksums(list, files, checksumCache, monitor);
 
     return list;
   }
 
-  private static void addMembersToList(
-      final FileList list,
-      final List<IResource> resources,
-      final IChecksumCache checksumCache,
-      final IProgressMonitor monitor)
+  /**
+   * Calculates all files contained in the given project and adds them to the given file list.
+   * Returns a list of all found files.
+   *
+   * @param list the file list
+   * @param project the project for which to calculate the members
+   * @return a list of all found files
+   * @throws IOException if the members contained in the project or one of its folders or the
+   *     charset of a contained file could not be obtained
+   */
+  private static List<IFile> calculateMembers(final FileList list, final IProject project)
       throws IOException {
 
-    if (resources.size() == 0) return;
+    List<IResource> resources = Arrays.asList(project.members());
+
+    if (resources.size() == 0) return Collections.emptyList();
 
     Deque<IResource> stack = new LinkedList<IResource>();
 
@@ -111,6 +136,23 @@ public class FileListFactory {
           break;
       }
     }
+
+    return files;
+  }
+
+  /**
+   * Calculates the checksums of the given files and adds them to the given file list.
+   *
+   * @param list the file list
+   * @param files the files for which to calculate the checksum
+   * @param checksumCache the checksum cache to use during the checksum calculation
+   * @param monitor the progress monitor to report to
+   */
+  private static void calculateChecksums(
+      final FileList list,
+      final List<IFile> files,
+      final IChecksumCache checksumCache,
+      final IProgressMonitor monitor) {
 
     monitor.beginTask("Calculating checksums...", files.size());
 
