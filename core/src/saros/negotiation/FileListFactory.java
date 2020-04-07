@@ -106,11 +106,9 @@ public class FileListFactory {
 
     if (resources.size() == 0) return Collections.emptyList();
 
-    Deque<IResource> stack = new LinkedList<IResource>();
+    Deque<IResource> stack = new LinkedList<>(resources);
 
-    stack.addAll(resources);
-
-    List<IFile> files = new LinkedList<IFile>();
+    List<IFile> files = new LinkedList<>();
 
     while (!stack.isEmpty()) {
       IResource resource = stack.pop();
@@ -121,18 +119,17 @@ public class FileListFactory {
 
       if (list.contains(path)) continue;
 
-      MetaData data = null;
-
       switch (resource.getType()) {
         case IResource.FILE:
           files.add((IFile) resource);
-          data = new MetaData();
+          MetaData data = new MetaData();
           list.addPath(path, data, false);
           list.addEncoding(((IFile) resource).getCharset());
           break;
+
         case IResource.FOLDER:
           stack.addAll(Arrays.asList(((IFolder) resource).members()));
-          list.addPath(path, data, true);
+          list.addPath(path, null, true);
           break;
       }
     }
