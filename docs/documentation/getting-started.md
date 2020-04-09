@@ -2,28 +2,14 @@
 title: Getting Started
 ---
 
+{% include host-warning.html %}
+
 {% capture eclipse %}
 
 Here you will find a guideline **on how to set up Saros/E**.
 
 After that you might want to find out **what Saros can do**: Here is the
 complete [feature list](features.md).
-
-## The Host
-
-Before we get started you should know that Saros is a host-based system.
-
-To get familiar with this concept check out our comic:
-
-[//]: # This link does not point to a markdown file because Jekyll is unable to convert this nested link into a link with html extension
-[![](images/comics/small_6-1_host-comic_frame-1.jpg)
-![](images/comics/small_6-1_host-comic_frame-2.jpg)
-![](images/comics/small_6-1_host-comic_frame-3.jpg)
-![](images/comics/small_6-1_host-comic_frame-4.jpg)
-![](images/comics/small_host-comic_frame-5.jpg)
-![](images/comics/small_host-comic_frame-6.jpg)](host-comic.html)
-
-------------------------------------------------------------------------
 
 ## First Steps
 

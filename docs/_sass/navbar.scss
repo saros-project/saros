@@ -1,0 +1,32 @@
+#top-nav {
+  .nav-link {
+    font-size: $nav-link-font-size;
+  }
+
+  span {
+    color: $white;
+    font-size: 30px;
+    font-weight: 700;
+  }
+
+  img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.navbar-toggler {
+  border: none !important;
+}
+
+.navbar-toggler-icon {
+  font-size: 1em !important;
+  font-weight: normal !important;
+  border: none !important;
+}
+
+@media (max-width: 700px) {
+  #media-links-nav {
+    display: none !important;
+  }
+}

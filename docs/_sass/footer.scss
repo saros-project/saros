@@ -1,0 +1,21 @@
+
+footer {
+  bottom: 0;
+  background: $footer-background;
+  color: $white;
+  height: $footer-height;
+}
+
+footer a {
+  color: $footer-link-color;
+  text-decoration: none !important;
+
+  &:hover {
+    color: $footer-link-color-hover;
+  }
+}
+
+/* footer copyright part */
+.footer-copyright {
+  background: $footer-copyright-background;
+}

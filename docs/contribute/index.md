@@ -1,5 +1,6 @@
 ---
 title: Contribution
+toc: false
 ---
 
 In this area you will find all information about contributing to Saros. Please feel free to [modify this documentation](documentation.md) as

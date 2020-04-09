@@ -1,0 +1,39 @@
+/* Custom variables */
+$white: #fff;
+$black: #000;
+
+$theme-color: #2a7ebe;
+$nav-link-font-size: .8em;
+
+$navigation-link-color-hover: $white;
+$navigation-link-color: transparentize($navigation-link-color-hover, 0.3);
+
+$sidebar-link-color: lighten($black, 10);
+
+/* footer */
+
+$footer-background: #2b2b40;
+$footer-copyright-background: darken($footer-background, 10);
+
+$footer-link-color: $navigation-link-color;
+$footer-link-color-hover: $navigation-link-color-hover;
+
+$footer-height: 88px;
+
+/* Override Bootstrap variables */
+
+$navbar-dark-color: $navigation-link-color;
+$navbar-dark-hover-color: $navigation-link-color-hover;
+$dark: $theme-color;
+
+$link-color-active: $theme-color;
+$link-color: $theme-color;
+
+$grid-breakpoints: (
+        xs: 0,
+        sm: 576px,
+        md: 800px,
+        lg: 992px,
+        xl: 1200px,
+        xxl: 1900px
+);

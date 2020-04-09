@@ -1,44 +1,60 @@
-<div class="sidenav">
-<ul>
-    {% assign links = sidebar_data %}
+<div id="sidebar" class="pl-1">
+    <ul class="nav flex-column">
+        {% assign links = sidebar_data %}
 
-    {% for link in links %}
-    {% assign active_class = nil %}
-    {% if page.url contains link.url %}
-    {% assign active_class = 'active-sidelink' %}
-    {% endif %}
+        {% for link in links %}
 
-    {% if link.sublinks %}
-
-    {% assign link_id = (link.title | strip | replace:'/','-' | replace:' ','-') %}
-    <li class="nav-item">
-
-        {% assign collapse_state = '' %}
-        {% for sublink in link.sublinks %}
-        {% if page.url contains sublink.url %}
-        {% assign collapse_state = 'show' %}
+        {% assign active_class = '' %}
+        {% assign url_without_params = page.url | split: "?" | first %}
+        {% assign link_url_without_params = link.url | split: "?" | first %}
+        {% if url_without_params contains link_url_without_params %}
+        {% assign active_class = 'active-link' %}
         {% endif %}
-        {% endfor %}
 
-        <a class="font-weight-bold text-dark nav-link collapsable-side-item py-0" href="#{{ link_id }}" data-target="#{{ link_id }}" data-toggle="collapse">{{ link.title }}</a>
-        <div id="{{ link_id }}" class="collapse {{ collapse_state }}">
-        <ul>
+        {% unless link.sublinks %}
+        <li class="nav-item">
+            <a class="nav-link not-collapsable-side-item {{ active_class }} font-weight-bold py-0"
+                href="{{ link.url | absolute_url }}">{{ link.title }}</a>
+        </li>
+
+        {% else %}
+        {% assign link_id = (link.title | strip | replace:'/','-' | replace:' ','-') %}
+        <li class="nav-item">
+
+            {% assign collapse_state_content = '' %}
+            {% assign collapse_state_link = 'collapsed' %}
             {% for sublink in link.sublinks %}
-            {% assign active_class = nil %}
-            {% if page.url contains sublink.url %}
-            {% assign active_class = 'active-sidelink' %}
+
+            {% assign url_without_params = page.url | split: "?" | first %}
+            {% assign link_url_without_params = sublink.url | split: "?" | first %}
+
+            {% if url_without_params contains link_url_without_params %}
+            {% assign collapse_state_content = 'show' %}
+            {% assign collapse_state_link = '' %}
             {% endif %}
-            <li class="nav-item"><a class="{{ active_class }} nav-link py-0" href="{{ sublink.url | absolute_url }}">{{ sublink.title }}</a></li>
             {% endfor %}
-        </ul>
-      </div>
-    </li>
-    {% else %}
-    <li  class="nav-item">
-        <a class="{{ active_class }} font-weight-bold nav-link py-0" href="{{ link.url | absolute_url }}">{{ link.title }}</a>
-    </li>
-    {% endif %}
-    {% endfor %}
-</ul>
+
+            <a class="font-weight-bold nav-link py-0 collapsable-side-item {{ collapse_state_link }}" href="#{{ link_id }}"
+                data-target="#{{ link_id }}" data-toggle="collapse">{{ link.title }}</a>
+            <div id="{{ link_id }}" class="collapse {{ collapse_state_content }}">
+                <ul class="nav flex-column ml-2">
+                    {% for sublink in link.sublinks %}
+
+                    {% assign active_class = '' %}
+                    {% assign url_without_params = page.url | split: "?" | first %}
+                    {% assign link_url_without_params = sublink.url | split: "?" | first %}
+
+                    {% if url_without_params contains link_url_without_params %}
+                    {% assign active_class = 'active-link' %}
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link {{ active_class }} py-0 pl-5"
+                            href="{{ sublink.url | absolute_url }}">{{ sublink.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
+        {% endunless %}
+        {% endfor %}
+    </ul>
 
 </div>

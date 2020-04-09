@@ -1,0 +1,10 @@
+// Force mermaid diagrams to fit in the page
+.mermaid svg {
+  @extend .img-fluid;
+  width: 100%;
+
+  // overwrite default edge background
+  & .edgeLabel {
+      background: $white !important;
+  }
+}
