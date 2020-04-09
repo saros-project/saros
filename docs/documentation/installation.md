@@ -64,7 +64,7 @@ or from within Eclipse:
 {% endcapture %}
 {% capture intellij %}
 This is still an alpha release of Saros/I, so expect it to be a bit rough around the edges. Before using the plugin for the first time, please have a look at the release
-notes, especially the [disclaimer](/releases/saros-i_0.2.2.html#disclaimer) and the current [restrictions of the plugin](/releases/saros-i_0.2.2.html#restrictions).
+notes, especially the [disclaimer](/releases/saros-i_0.3.0.html#disclaimer) and the current [restrictions of the plugin](/releases/saros-i_0.3.0.html#restrictions).
 
 Saros/I can be installed from the JetBrains plugin repository or from disk.
 
