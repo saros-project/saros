@@ -86,7 +86,7 @@ In the following we are using these definitions:
 {% endcollapsible %}
 {% collapsible How many users does Saros support? %}
 
-Saros supports up to 5 users (see [here](/releases/saros-i_0.2.2.html#number-of-participants) for the current restrictions in IntelliJ).
+Saros supports up to 5 users (see [here](/releases/saros-i_0.3.0.html#number-of-participants) for the current restrictions in IntelliJ).
 However, this is not a hard limit. But the sixth and seventh and n-th user will get the same gray-ish color.
 
 {% endcollapsible %}

@@ -63,7 +63,7 @@ Saros account preferences. You can open these preferences:
 
 {% alert warning %}
 ## Note
-As mentioned in the section [missing features](/releases/saros-i_0.2.2.html#missing-features), Saros for IntelliJ **does currently not support the creation, management, or deletion of XMPP accounts**.
+As mentioned in the section [missing features](/releases/saros-i_0.3.0.html#missing-features), Saros for IntelliJ **does currently not support the creation, management, or deletion of XMPP accounts**.
 
 If you accidentally made a typo while entering your username or password, the created account entry can currently only be changed or deleted through Saros for Eclipse.
 
