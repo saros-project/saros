@@ -30,7 +30,7 @@
     </vendor>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="182.5107.16"/>
+    <idea-version since-build="192.6817.14"/>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
     <!-- ATTENTION: the following "depends" tags are automatically uncommented by nightly-rel.yml. Make sure that changes do not break the logic. -->
