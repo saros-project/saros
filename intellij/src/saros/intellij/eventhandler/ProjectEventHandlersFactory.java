@@ -84,7 +84,7 @@ public class ProjectEventHandlersFactory {
     /*
      * editor selection change handlers
      */
-    projectEventHandlers.add(new LocalTextSelectionChangeHandler(editorManager));
+    projectEventHandlers.add(new LocalTextSelectionChangeHandler(project, editorManager));
 
     /*
      * editor viewport change handlers

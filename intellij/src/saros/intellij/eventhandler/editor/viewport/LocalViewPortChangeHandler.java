@@ -130,6 +130,7 @@ public class LocalViewPortChangeHandler implements IProjectEventHandler {
       this.enabled = false;
 
     } else if (!this.enabled && enabled) {
+      // TODO add project as disposable parent once compatibility is set to above 2019.3
       EditorFactory.getInstance().getEventMulticaster().addVisibleAreaListener(visibleAreaListener);
 
       this.enabled = true;

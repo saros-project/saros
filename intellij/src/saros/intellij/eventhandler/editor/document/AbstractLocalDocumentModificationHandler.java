@@ -80,7 +80,9 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
     if (!this.enabled && enabled) {
       log.debug("Started listening for document events");
 
-      EditorFactory.getInstance().getEventMulticaster().addDocumentListener(documentListener);
+      EditorFactory.getInstance()
+          .getEventMulticaster()
+          .addDocumentListener(documentListener, project);
 
       this.enabled = true;
 
