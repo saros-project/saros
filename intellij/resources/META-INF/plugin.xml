@@ -11,11 +11,15 @@
     <change-notes>
         <![CDATA[
         <ul>
-            <li>Allow users to add contacts to the connected XMPP account through the plugin</li>
-            <li>Show specific icon for terminating the running session as the host</li>
-            <li>Fix <a href="https://github.com/saros-project/saros/pull/684">#684</a> - Allow the shared module to be moved without breaking the session</li>
-            <li>Fix <a href="https://github.com/saros-project/saros/pull/703">#703</a> - Fix "Use existing module" option failing on the Windows platform when used with multi-drive setups</li>
-            <li>Fix <a href="https://github.com/saros-project/saros/pull/819">#819</a> - Only attribute undoable action to modified editor</li>
+            <li>Bumped minimal required IntelliJ version to 2019.2.3</li>
+            <li>Adds support for caret/cursor annotations.</li>
+            <li>Adjusts the selection annotation logic to correctly display backwards selections.</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/pull/223">#223</a> - Re-creating a file deleted during a session now no longer leads to a desynchronization.</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/pull/711">#711</a> - Editors for shared non-text resources are now ignored by Saros.</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/pull/821">#821</a> - Disconnecting from the XMPP account during a session now no longer freezes the UI.</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/pull/891">#891</a> - Users are now notified about failed connection attempts to the XMPP server instead of just failing silently.</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/pull/922">#922</a> - Saros now explicitly ignores '.git' folders.</li>
+            <li>Fixed <a href="https://github.com/saros-project/saros/pull/931">#931</a> - Saros now saves all modified documents on session start instead of only the ones with open editors.</li>
         </ul>
         <br>
         This list only refers to changes included in the latest release.

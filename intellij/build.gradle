@@ -18,7 +18,7 @@ runIde {
 
 intellij {
   patchPluginXml {
-    version = '0.2.2' + versionQualifier
+    version = '0.3.0' + versionQualifier
   }
 }
 
