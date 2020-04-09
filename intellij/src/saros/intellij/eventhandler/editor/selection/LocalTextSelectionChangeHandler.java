@@ -3,6 +3,7 @@ package saros.intellij.eventhandler.editor.selection;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.editor.event.SelectionListener;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
@@ -11,6 +12,7 @@ import saros.intellij.eventhandler.IProjectEventHandler;
 /** Dispatches activities for selection changes. */
 public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
 
+  private final Project project;
   private final EditorManager editorManager;
 
   private final SelectionListener selectionListener =
@@ -31,7 +33,8 @@ public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
    *
    * @param editorManager the EditorManager instance
    */
-  public LocalTextSelectionChangeHandler(EditorManager editorManager) {
+  public LocalTextSelectionChangeHandler(Project project, EditorManager editorManager) {
+    this.project = project;
     this.editorManager = editorManager;
 
     this.enabled = false;
@@ -88,7 +91,9 @@ public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
       this.enabled = false;
 
     } else if (!this.enabled && enabled) {
-      EditorFactory.getInstance().getEventMulticaster().addSelectionListener(selectionListener);
+      EditorFactory.getInstance()
+          .getEventMulticaster()
+          .addSelectionListener(selectionListener, project);
 
       this.enabled = true;
     }

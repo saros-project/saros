@@ -123,7 +123,7 @@ public class ModuleConfigurationInitializer implements Startable {
 
     ContentEntry contentEntry = contentEntries[0];
 
-    if (!configurationDiffers(module, contentEntry, moduleConfiguration.getRootPaths())) {
+    if (!configurationDiffers(contentEntry, moduleConfiguration.getRootPaths())) {
       return;
     }
 
@@ -146,7 +146,6 @@ public class ModuleConfigurationInitializer implements Startable {
   /**
    * Returns whether the content entry source root configuration matches the passed configuration.
    *
-   * @param module the module the content entry belongs to
    * @param contentEntry the content entry to check
    * @param rootPaths the root paths received from the host
    * @return <code>true</code> if the root paths of the passed content entry match the paths
@@ -154,20 +153,15 @@ public class ModuleConfigurationInitializer implements Startable {
    *     configuration could not be read
    */
   private boolean configurationDiffers(
-      @NotNull Module module,
       @NotNull ContentEntry contentEntry,
       @NotNull Map<JpsModuleSourceRootType<? extends JpsElement>, String[]> rootPaths) {
 
     VirtualFile contentEntryFile = contentEntry.getFile();
 
     if (contentEntryFile == null) {
-      /*
-       * TODO drop module parameter and use content entry module root model instead when
-       *  backwards compatibility is dropped to 2019.2 or later
-       */
       log.error(
           "Encountered content root without a valid local representation for shared module \""
-              + module
+              + contentEntry.getRootModel().getModule()
               + "\". Can not provide source configuration.");
 
       return false;
@@ -290,7 +284,7 @@ public class ModuleConfigurationInitializer implements Startable {
 
     moduleConfiguration
         .getRootPaths()
-        .forEach((type, paths) -> addRoot(module, contentEntry, contentEntryFile, type, paths));
+        .forEach((type, paths) -> addRoot(contentEntry, contentEntryFile, type, paths));
   }
 
   /**
@@ -301,7 +295,6 @@ public class ModuleConfigurationInitializer implements Startable {
    * <p>Does nothing if the string representing the relative source root paths is <code>null
    * </code>.
    *
-   * @param module the module to add source root entry for
    * @param contentEntry the content entry to add the roots to
    * @param contentEntryFile the virtual file representing the content root
    * @param rootType the type of source root to add the paths as
@@ -309,7 +302,6 @@ public class ModuleConfigurationInitializer implements Startable {
    * @param <T> the type of the source root
    */
   private <T extends JpsElement> void addRoot(
-      @NotNull Module module,
       @NotNull ContentEntry contentEntry,
       @NotNull VirtualFile contentEntryFile,
       @NotNull JpsModuleSourceRootType<T> rootType,
@@ -326,13 +318,9 @@ public class ModuleConfigurationInitializer implements Startable {
         contentEntry.addSourceFolder(sourceRoot, rootType);
 
       } else {
-        /*
-         * TODO drop module parameter and use content entry module root model instead when
-         *  backwards compatibility is dropped to 2019.2 or later
-         */
         log.debug(
             "Skipping source root addition for module "
-                + module
+                + contentEntry.getRootModel().getModule()
                 + " as path resolution failed - type: "
                 + rootType
                 + ", relative path: "

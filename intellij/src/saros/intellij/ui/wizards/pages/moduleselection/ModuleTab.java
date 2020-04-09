@@ -10,7 +10,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.ListCellRendererWrapper;
+import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBTextField;
@@ -701,15 +701,11 @@ class ModuleTab {
 
     gbc.gridwidth = 1;
 
-    /*
-     * TODO replace with SimpleListCellRenderer once it is released and our the backwards
-     *  compatibility allows it
-     */
     projectComboBox.setRenderer(
-        new ListCellRendererWrapper<Project>() {
+        new SimpleListCellRenderer<Project>() {
           @Override
           public void customize(
-              JList list, Project value, int index, boolean selected, boolean hasFocus) {
+              @NotNull JList list, Project value, int index, boolean selected, boolean hasFocus) {
 
             if (value != null) {
               setText(value.getName());
@@ -786,15 +782,11 @@ class ModuleTab {
 
     moduleTabPanel.add(localModuleLabel, gbc);
 
-    /*
-     * TODO replace with SimpleListCellRenderer once it is released and our the backwards
-     *  compatibility allows it
-     */
     existingModuleComboBox.setRenderer(
-        new ListCellRendererWrapper<Module>() {
+        new SimpleListCellRenderer<Module>() {
           @Override
           public void customize(
-              JList list, Module value, int index, boolean selected, boolean hasFocus) {
+              @NotNull JList list, Module value, int index, boolean selected, boolean hasFocus) {
 
             if (value != null) {
               setText(value.getName());

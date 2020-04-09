@@ -7,9 +7,12 @@ import static org.powermock.api.easymock.PowerMock.replay;
 
 import com.intellij.mock.MockEditorEventMulticaster;
 import com.intellij.mock.MockEditorFactory;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorEventMulticaster;
+import com.intellij.openapi.project.Project;
+import org.easymock.EasyMock;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +22,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import saros.intellij.editor.EditorManager;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({EditorFactory.class})
+@PrepareForTest({EditorFactory.class, Project.class})
 public class LocalDocumentModificationHandlerTest {
 
   private LocalDocumentModificationHandler localDocumentModificationHandler;
@@ -27,9 +30,12 @@ public class LocalDocumentModificationHandlerTest {
 
   @Before
   public void before() {
+    Project project = EasyMock.createNiceMock(Project.class);
+    EasyMock.replay(project);
+
     mockEditorFactory();
     localDocumentModificationHandler =
-        new LocalDocumentModificationHandler(null, dummyEditorManager(), null);
+        new LocalDocumentModificationHandler(project, dummyEditorManager(), null);
     listening = false;
   }
 
@@ -65,7 +71,8 @@ public class LocalDocumentModificationHandlerTest {
         new MockEditorEventMulticaster() {
 
           @Override
-          public void addDocumentListener(@NotNull DocumentListener listener) {
+          public void addDocumentListener(
+              @NotNull DocumentListener listener, @NotNull Disposable parentDisposable) {
             listening = true;
           }
 

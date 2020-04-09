@@ -20,7 +20,7 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
   private final DocumentListener documentListener =
       new DocumentListener() {
         @Override
-        public void documentChanged(DocumentEvent event) {
+        public void documentChanged(@NotNull DocumentEvent event) {
           generateTextEditActivity(event);
         }
       };
