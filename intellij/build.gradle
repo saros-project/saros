@@ -3,7 +3,7 @@ apply plugin: 'saros.gradle.intellij.plugin'
 sarosIntellij {
   sandboxBaseDir = intellijSandboxDir as File
   localIntellijHome = intellijHome as File
-  intellijVersion = 'IC-2019.3'
+  intellijVersion = 'IC-2019.3.4'
 }
 
 intellij {
