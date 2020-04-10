@@ -286,8 +286,7 @@ public class LocalEditorManipulator {
         manager.setLocalDocumentModificationHandlersEnabled(false);
       }
 
-      DocumentAPI.deleteText(project, document, 0, documentLength);
-      DocumentAPI.insertText(project, document, 0, text);
+      DocumentAPI.replaceText(project, document, 0, documentLength, text);
 
     } finally {
 
