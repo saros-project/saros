@@ -163,4 +163,51 @@ public class DocumentAPI {
 
     FilesystemRunner.runWriteAction(deletionCommand, ModalityState.defaultModalityState());
   }
+
+  /**
+   * Replaces the specified range of text in the given document with the given text. Line breaks in
+   * the given text must be normalized as '\n'.
+   *
+   * <p>The replacement will be wrapped in a command processor action. The action will be assigned
+   * to the passed project. This means the action will be registered with the undo-buffer of the
+   * given project.
+   *
+   * @param project the project to assign the resulting deletion action to
+   * @param document the document to delete text from
+   * @param startOffset the start offset of the range to replace
+   * @param endOffset the end offset of the range to replace
+   * @param text the text to replace the current text with
+   * @see Document#replaceString(int, int, CharSequence)
+   * @see CommandProcessor
+   */
+  static void replaceText(
+      @NotNull Project project,
+      @NotNull Document document,
+      int startOffset,
+      int endOffset,
+      @NotNull String text) {
+    Runnable insertCommand =
+        () -> {
+          Runnable replaceText = () -> document.replaceString(startOffset, endOffset, text);
+
+          String commandName =
+              "Saros text replacement from index "
+                  + startOffset
+                  + " to "
+                  + endOffset
+                  + " with \""
+                  + text
+                  + "\"";
+
+          commandProcessor.executeCommand(
+              project,
+              replaceText,
+              commandName,
+              commandProcessor.getCurrentCommandGroupId(),
+              UndoConfirmationPolicy.REQUEST_CONFIRMATION,
+              false);
+        };
+
+    FilesystemRunner.runWriteAction(insertCommand, ModalityState.defaultModalityState());
+  }
 }
