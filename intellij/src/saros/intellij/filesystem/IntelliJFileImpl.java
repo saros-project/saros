@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.FileAlreadyExistsException;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IContainer;
@@ -20,6 +21,7 @@ import saros.filesystem.IResource;
 import saros.intellij.runtime.FilesystemRunner;
 
 public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
+  private static final Logger log = Logger.getLogger(IntelliJFileImpl.class);
 
   private static final int BUFFER_SIZE = 32 * 1024;
 
@@ -106,9 +108,11 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
             final VirtualFile file = project.findVirtualFile(path);
 
-            if (file == null)
-              throw new FileNotFoundException(
-                  IntelliJFileImpl.this + " does not exist or is ignored");
+            if (file == null) {
+              log.debug("Ignoring file deletion request for " + this + " as file does not exist");
+
+              return null;
+            }
 
             if (file.isDirectory()) throw new IOException(this + " is not a file");
 
