@@ -33,17 +33,6 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
   }
 
   @Override
-  public void move(IPath destination, boolean force) throws IOException {
-    IPath destinationBase =
-        destination.isAbsolute()
-            ? getWorkspace().getLocation()
-            : getLocation().removeLastSegments(1);
-
-    IPath absoluteDestination = destinationBase.append(destination);
-    FileUtils.moveDirectory(getLocation().toFile(), absoluteDestination.toFile());
-  }
-
-  @Override
   public IResource[] members() throws IOException {
     List<IResource> members = new ArrayList<>();
 

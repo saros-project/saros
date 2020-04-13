@@ -86,11 +86,6 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
-  public void move(IPath destination, boolean force) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public IPath getLocation() {
     throw new UnsupportedOperationException();
   }

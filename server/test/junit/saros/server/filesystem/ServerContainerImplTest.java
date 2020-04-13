@@ -4,9 +4,6 @@ import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static saros.server.filesystem.FileSystemTestUtils.absolutePath;
-import static saros.server.filesystem.FileSystemTestUtils.assertFileHasContent;
-import static saros.server.filesystem.FileSystemTestUtils.assertResourceExists;
 import static saros.server.filesystem.FileSystemTestUtils.assertResourceNotExists;
 import static saros.server.filesystem.FileSystemTestUtils.createFile;
 import static saros.server.filesystem.FileSystemTestUtils.createFolder;
@@ -43,8 +40,6 @@ public class ServerContainerImplTest extends EasyMockSupport {
   }
 
   private static final String CONTAINER_PATH = "project/folder";
-  private static final String CONTAINER_PARENT_PATH = "project";
-  private static final String OTHER_PATH = "project2/other";
 
   private IContainer container;
   private IWorkspace workspace;
@@ -89,43 +84,6 @@ public class ServerContainerImplTest extends EasyMockSupport {
   public void deleteNonExistent() throws Exception {
     assertResourceNotExists(workspace, CONTAINER_PATH);
     container.delete(IResource.NONE);
-  }
-
-  @Test
-  public void moveToAbsolutePath() throws Exception {
-    createFolder(workspace, CONTAINER_PATH);
-    createFile(workspace, CONTAINER_PATH + "/file", "content");
-    createFolder(workspace, OTHER_PATH);
-
-    container.move(absolutePath(OTHER_PATH + "/folder"), true);
-
-    assertResourceNotExists(workspace, CONTAINER_PATH);
-    assertResourceExists(workspace, OTHER_PATH + "/folder");
-    assertResourceExists(workspace, OTHER_PATH + "/folder/file");
-    assertFileHasContent(workspace, OTHER_PATH + "/folder/file", "content");
-  }
-
-  @Test
-  public void moveToRelativePath() throws Exception {
-    createFolder(workspace, CONTAINER_PATH);
-    createFile(workspace, CONTAINER_PATH + "/file", "content");
-
-    String siblingFolderPath = CONTAINER_PARENT_PATH + "/destination";
-    createFolder(workspace, siblingFolderPath);
-
-    container.move(path("destination/folder"), true);
-
-    assertResourceNotExists(workspace, CONTAINER_PATH);
-    assertResourceExists(workspace, siblingFolderPath + "/folder");
-    assertResourceExists(workspace, siblingFolderPath + "/folder/file");
-    assertFileHasContent(workspace, siblingFolderPath + "/folder/file", "content");
-  }
-
-  @Test(expected = IOException.class)
-  public void moveNonExistent() throws Exception {
-    assertResourceNotExists(workspace, CONTAINER_PATH);
-    createFolder(workspace, OTHER_PATH);
-    container.move(absolutePath(OTHER_PATH + "/folder"), true);
   }
 
   @Test

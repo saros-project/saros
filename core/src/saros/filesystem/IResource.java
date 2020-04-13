@@ -64,9 +64,6 @@ public interface IResource {
   /** Equivalent to the Eclipse call <code>IResource#delete(updateFlags, null)</code> */
   public void delete(int updateFlags) throws IOException;
 
-  /** Equivalent to the Eclipse call <code>IResource#delete(destination, force, null)</code> */
-  public void move(IPath destination, boolean force) throws IOException;
-
   public IPath getLocation();
 
   public <T extends IResource> T adaptTo(Class<T> clazz);

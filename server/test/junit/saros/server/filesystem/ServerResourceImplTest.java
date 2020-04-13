@@ -40,11 +40,6 @@ public class ServerResourceImplTest extends EasyMockSupport {
     public void delete(int updateFlags) throws IOException {
       // Do nothing
     }
-
-    @Override
-    public void move(IPath destination, boolean force) throws IOException {
-      // Do nothing
-    }
   }
 
   private IResource resource;
