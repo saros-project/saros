@@ -140,12 +140,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     return result.toArray(new IResource[0]);
   }
 
-  @NotNull
-  @Override
-  public IResource[] members(final int memberFlags) {
-    return members();
-  }
-
   @Nullable
   @Override
   public String getDefaultCharset() {

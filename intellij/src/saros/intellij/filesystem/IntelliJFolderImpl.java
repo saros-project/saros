@@ -76,12 +76,6 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
     return result.toArray(new IResource[0]);
   }
 
-  @NotNull
-  @Override
-  public IResource[] members(final int memberFlags) throws IOException {
-    return members();
-  }
-
   @Nullable
   @Override
   public String getDefaultCharset() throws IOException {
