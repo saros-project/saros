@@ -183,6 +183,9 @@ public class SharedResourcesManager implements Startable {
    * Applies the given move FileActivity. Subsequently cleans up the EditorPool and
    * AnnotationManager for the moved file if necessary.
    *
+   * <p>Overwrites the content of the moved file with the content contained in the activity if
+   * present. Keeps the original content otherwise.
+   *
    * @param activity the move activity to execute
    * @throws IOException if the creation of the new file or the deletion of the old file fails
    */
@@ -226,7 +229,18 @@ public class SharedResourcesManager implements Startable {
 
       localEditorHandler.saveDocument(oldPath);
 
-      newFile.create(oldFile.getContents(), FORCE);
+      byte[] activityContent = activity.getContent();
+
+      InputStream contents;
+
+      if (activityContent != null) {
+        contents = new ByteArrayInputStream(activityContent);
+
+      } else {
+        contents = oldFile.getContents();
+      }
+
+      newFile.create(contents, FORCE);
 
       if (fileOpen) {
         localEditorManipulator.openEditor(newPath, false);
