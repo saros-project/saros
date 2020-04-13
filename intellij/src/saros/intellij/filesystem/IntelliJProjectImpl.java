@@ -237,7 +237,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   }
 
   @Override
-  public void delete(final int updateFlags) throws IOException {
+  public void delete() throws IOException {
     throw new IOException("delete is not supported");
   }
 

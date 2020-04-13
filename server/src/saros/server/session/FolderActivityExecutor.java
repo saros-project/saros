@@ -6,7 +6,6 @@ import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.SPath;
 import saros.filesystem.IFolder;
-import saros.filesystem.IResource;
 import saros.repackaged.picocontainer.Startable;
 import saros.server.editor.ServerEditorManager;
 import saros.session.AbstractActivityConsumer;
@@ -70,7 +69,7 @@ public class FolderActivityExecutor extends AbstractActivityConsumer implements 
 
     SPath path = activity.getPath();
     IFolder folder = path.getFolder();
-    folder.delete(IResource.NONE);
+    folder.delete();
     editorManager.closeEditorsInFolder(path);
   }
 }

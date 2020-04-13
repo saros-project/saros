@@ -30,7 +30,6 @@ public interface IResource {
   public static final int FOLDER = 2;
   public static final int PROJECT = 4;
   public static final int ROOT = 8;
-  public static final int KEEP_HISTORY = 32;
 
   public boolean exists();
 
@@ -60,8 +59,7 @@ public interface IResource {
    */
   public boolean isIgnored();
 
-  /** Equivalent to the Eclipse call <code>IResource#delete(updateFlags, null)</code> */
-  public void delete(int updateFlags) throws IOException;
+  public void delete() throws IOException;
 
   public IPath getLocation();
 

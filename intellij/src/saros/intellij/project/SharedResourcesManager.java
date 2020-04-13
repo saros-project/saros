@@ -34,8 +34,6 @@ public class SharedResourcesManager implements Startable {
 
   private static final Logger log = Logger.getLogger(SharedResourcesManager.class);
 
-  private static final int DELETION_FLAGS = 0;
-
   private final ISarosSession sarosSession;
   private final EditorManager editorManager;
   private final SharedIDEContext sharedIDEContext;
@@ -252,7 +250,7 @@ public class SharedResourcesManager implements Startable {
         selectedEditorStateSnapshot.applyHeldState();
       }
 
-      oldFile.delete(DELETION_FLAGS);
+      oldFile.delete();
 
     } finally {
       setFilesystemModificationHandlerEnabled(true);
@@ -281,7 +279,7 @@ public class SharedResourcesManager implements Startable {
 
       localEditorHandler.saveDocument(path);
 
-      file.delete(DELETION_FLAGS);
+      file.delete();
 
     } finally {
       setFilesystemModificationHandlerEnabled(true);
@@ -357,7 +355,7 @@ public class SharedResourcesManager implements Startable {
     try {
       setFilesystemModificationHandlerEnabled(false);
 
-      folder.delete(DELETION_FLAGS);
+      folder.delete();
 
     } finally {
       setFilesystemModificationHandlerEnabled(true);

@@ -16,7 +16,6 @@ import org.junit.Test;
 import saros.exceptions.OperationCanceledException;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 import saros.filesystem.IWorkspaceRunnable;
 import saros.monitoring.IProgressMonitor;
@@ -59,7 +58,7 @@ public class ServerWorkspaceImplTest extends EasyMockSupport {
           public void run(IProgressMonitor monitor) throws IOException, OperationCanceledException {
 
             assertNotNull(monitor);
-            workspace.getProject("project").delete(IResource.NONE);
+            workspace.getProject("project").delete();
           }
         });
 

@@ -68,7 +68,7 @@ public class ServerContainerImplTest extends EasyMockSupport {
   @Test
   public void delete() throws Exception {
     createFolder(workspace, CONTAINER_PATH);
-    container.delete(IResource.NONE);
+    container.delete();
     assertResourceNotExists(workspace, CONTAINER_PATH);
   }
 
@@ -76,14 +76,14 @@ public class ServerContainerImplTest extends EasyMockSupport {
   public void deleteNonEmpty() throws Exception {
     createFolder(workspace, CONTAINER_PATH);
     createFile(workspace, CONTAINER_PATH + "/file");
-    container.delete(IResource.NONE);
+    container.delete();
     assertResourceNotExists(workspace, CONTAINER_PATH);
   }
 
   @Test(expected = None.class)
   public void deleteNonExistent() throws Exception {
     assertResourceNotExists(workspace, CONTAINER_PATH);
-    container.delete(IResource.NONE);
+    container.delete();
   }
 
   @Test
