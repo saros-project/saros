@@ -109,7 +109,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
         in = new CancelableInputStream(inZip, monitor);
 
         try {
-          if (!decompressedFile.exists()) decompressedFile.create(in, false);
+          if (!decompressedFile.exists()) decompressedFile.create(in);
           else decompressedFile.setContents(in);
         } catch (IOException e) {
           /* if triggered by check in CancelableInputStream */

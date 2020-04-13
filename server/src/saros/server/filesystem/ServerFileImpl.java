@@ -60,7 +60,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
   }
 
   @Override
-  public void create(InputStream input, boolean force) throws IOException {
+  public void create(InputStream input) throws IOException {
     Path nioPath = toNioPath();
 
     Files.createDirectories(nioPath.getParent());

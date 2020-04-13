@@ -200,12 +200,11 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
    * already existing file.
    *
    * @param input contents of the new file
-   * @param force not supported
    * @throws FileAlreadyExistsException if the file already exists
    * @throws FileNotFoundException if the parent directory of this file does not exist
    */
   @Override
-  public void create(@Nullable final InputStream input, final boolean force) throws IOException {
+  public void create(@Nullable final InputStream input) throws IOException {
 
     FilesystemRunner.runWriteAction(
         (ThrowableComputable<Void, IOException>)
@@ -224,11 +223,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
               final VirtualFile file = parentFile.findChild(getName());
 
               if (file != null) {
-                String exceptionText = IntelliJFileImpl.this + " already exists";
-
-                if (force) exceptionText += ", force option is not supported";
-
-                throw new FileAlreadyExistsException(exceptionText);
+                throw new FileAlreadyExistsException(IntelliJFileImpl.this + " already exists");
               }
 
               parentFile.createChildData(IntelliJFileImpl.this, getName());

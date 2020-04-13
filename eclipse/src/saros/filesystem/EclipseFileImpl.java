@@ -42,12 +42,10 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
   }
 
   @Override
-  public void create(InputStream input, boolean force) throws IOException {
+  public void create(InputStream input) throws IOException {
     try {
-      getDelegate().create(input, force, null);
-    } catch (CoreException e) {
-      throw new IOException(e);
-    } catch (OperationCanceledException e) {
+      getDelegate().create(input, false, null);
+    } catch (CoreException | OperationCanceledException e) {
       throw new IOException(e);
     }
   }

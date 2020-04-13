@@ -35,7 +35,6 @@ public class SharedResourcesManager implements Startable {
   private static final Logger log = Logger.getLogger(SharedResourcesManager.class);
 
   private static final int DELETION_FLAGS = 0;
-  private static final boolean FORCE = false;
 
   private final ISarosSession sarosSession;
   private final EditorManager editorManager;
@@ -239,7 +238,7 @@ public class SharedResourcesManager implements Startable {
         contents = oldFile.getContents();
       }
 
-      newFile.create(contents, FORCE);
+      newFile.create(contents);
 
       if (fileOpen) {
         localEditorManipulator.openEditor(newPath, false);
@@ -307,7 +306,7 @@ public class SharedResourcesManager implements Startable {
     try {
       setFilesystemModificationHandlerEnabled(false);
 
-      file.create(contents, FORCE);
+      file.create(contents);
 
     } finally {
       setFilesystemModificationHandlerEnabled(true);

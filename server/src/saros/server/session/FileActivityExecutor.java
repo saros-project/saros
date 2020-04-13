@@ -67,7 +67,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
 
   private void executeFileCreation(FileActivity activity) throws IOException {
     IFile file = activity.getPath().getFile();
-    file.create(new ByteArrayInputStream(activity.getContent()), true);
+    file.create(new ByteArrayInputStream(activity.getContent()));
   }
 
   private void executeFileMove(FileActivity activity) throws IOException {
@@ -98,7 +98,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
       contents = oldFile.getContents();
     }
 
-    newFile.create(contents, false);
+    newFile.create(contents);
 
     oldFile.delete(0);
 
