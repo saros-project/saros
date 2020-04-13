@@ -2,6 +2,7 @@ package saros.server.session;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import org.apache.log4j.Logger;
 import saros.activities.FileActivity;
 import saros.activities.SPath;
@@ -74,11 +75,33 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
     IFile oldFile = oldPath.getFile();
     SPath newPath = activity.getPath();
     IFile newFile = newPath.getFile();
-    oldFile.move(activity.getPath().getFullPath(), true);
-    byte[] content = activity.getContent();
-    if (content != null) {
-      newFile.setContents(new ByteArrayInputStream(content), true, true);
+
+    if (!oldFile.exists()) {
+      log.warn(
+          "Could not move file as it does not exist."
+              + " source: "
+              + oldFile
+              + " destination: "
+              + newFile);
+
+      return;
     }
+
+    byte[] activityContent = activity.getContent();
+
+    InputStream contents;
+
+    if (activityContent != null) {
+      contents = new ByteArrayInputStream(activityContent);
+
+    } else {
+      contents = oldFile.getContents();
+    }
+
+    newFile.create(contents, false);
+
+    oldFile.delete(0);
+
     // only update if all previous operations are successful
     editorManager.updateMapping(oldPath, newPath);
   }
