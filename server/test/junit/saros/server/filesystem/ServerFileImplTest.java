@@ -3,12 +3,10 @@ package saros.server.filesystem;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static saros.server.filesystem.FileSystemTestUtils.absolutePath;
 import static saros.server.filesystem.FileSystemTestUtils.assertFileHasContent;
 import static saros.server.filesystem.FileSystemTestUtils.assertResourceExists;
 import static saros.server.filesystem.FileSystemTestUtils.assertResourceNotExists;
 import static saros.server.filesystem.FileSystemTestUtils.createFile;
-import static saros.server.filesystem.FileSystemTestUtils.createFolder;
 import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 import static saros.server.filesystem.FileSystemTestUtils.path;
 
@@ -80,44 +78,6 @@ public class ServerFileImplTest extends EasyMockSupport {
   public void deleteNonExistent() throws Exception {
     assertResourceNotExists(workspace, "project/file");
     file.delete(IResource.NONE);
-  }
-
-  @Test
-  public void moveAbsolute() throws Exception {
-    createFile(workspace, "project/file", "content");
-    createFolder(workspace, "project/destination");
-
-    file.move(absolutePath("project/destination/newname"), true);
-
-    assertResourceNotExists(workspace, "project/file");
-    assertResourceExists(workspace, "project/destination/newname");
-    assertFileHasContent(workspace, "project/destination/newname", "content");
-  }
-
-  @Test
-  public void moveRelative() throws Exception {
-    createFile(workspace, "project/file", "content");
-    createFolder(workspace, "project/destination");
-
-    file.move(path("destination/newname"), true);
-
-    assertResourceNotExists(workspace, "project/file");
-    assertResourceExists(workspace, "project/destination/newname");
-    assertFileHasContent(workspace, "project/destination/newname", "content");
-  }
-
-  @Test(expected = IOException.class)
-  public void moveNonExistent() throws Exception {
-    assertResourceNotExists(workspace, "project/file");
-    createFolder(workspace, "project/destination");
-    file.move(path("project/destination/newname"), true);
-  }
-
-  @Test(expected = IOException.class)
-  public void moveToNonExistentFolder() throws Exception {
-    createFile(workspace, "project/file");
-    assertResourceNotExists(workspace, "project/desination");
-    file.move(path("project/destination/newname"), true);
   }
 
   public void create() throws Exception {

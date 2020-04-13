@@ -174,11 +174,6 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
         ModalityState.defaultModalityState());
   }
 
-  @Override
-  public void move(final IPath destination, final boolean force) throws IOException {
-    throw new IOException("NYI");
-  }
-
   @NotNull
   @Override
   public IPath getLocation() {

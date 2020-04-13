@@ -241,11 +241,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     throw new IOException("delete is not supported");
   }
 
-  @Override
-  public void move(final IPath destination, final boolean force) throws IOException {
-    throw new IOException("move is not supported");
-  }
-
   @NotNull
   @Override
   public IPath getLocation() {

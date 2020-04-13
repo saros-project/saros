@@ -60,19 +60,6 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
   }
 
   @Override
-  public void move(IPath destination, boolean force) throws IOException {
-    IPath destinationRoot =
-        destination.isAbsolute()
-            ? getWorkspace().getLocation()
-            : getLocation().removeLastSegments(1);
-
-    IPath absoluteDestination = destinationRoot.append(destination);
-    Path nioDestination = ((ServerPathImpl) absoluteDestination).getDelegate();
-
-    Files.move(toNioPath(), nioDestination);
-  }
-
-  @Override
   public void create(InputStream input, boolean force) throws IOException {
     Path nioPath = toNioPath();
 

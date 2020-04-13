@@ -120,11 +120,6 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
         ModalityState.defaultModalityState());
   }
 
-  @Override
-  public void move(@NotNull final IPath destination, final boolean force) throws IOException {
-    throw new IOException("NYI");
-  }
-
   @NotNull
   @Override
   public IPath getLocation() {

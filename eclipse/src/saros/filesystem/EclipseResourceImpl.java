@@ -118,17 +118,6 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public void move(IPath destination, boolean force) throws IOException {
-    try {
-      delegate.move(((EclipsePathImpl) destination).getDelegate(), force, null);
-    } catch (CoreException e) {
-      throw new IOException(e);
-    } catch (OperationCanceledException e) {
-      throw new IOException(e);
-    }
-  }
-
-  @Override
   public IPath getLocation() {
     org.eclipse.core.runtime.IPath location = delegate.getLocation();
     return (location != null) ? new EclipsePathImpl(location) : null;
