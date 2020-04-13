@@ -23,7 +23,7 @@ import saros.intellij.ui.Messages;
 import saros.intellij.ui.util.IconManager;
 
 /**
- * IntelliJ color scheme preferences for Saros-specific colors. This page can be used by the user to
+ * Intellij color scheme preferences for Saros-specific colors. This page can be used by the user to
  * specify how annotations will be displayed locally.
  */
 public class LocalSarosAnnotationColorsPage implements ColorSettingsPage {

@@ -75,7 +75,7 @@ public class NavigationPanel extends JPanel {
 
   /**
    * Methods changes enable status of back and next buttons according to position in the page list
-   * (see {@link Wizard.WizardPageModel}.
+   * (see <code>WizardPageModel</code> in {@link Wizard}.
    *
    * @param position page position in the page list
    * @param backButtonEnabled

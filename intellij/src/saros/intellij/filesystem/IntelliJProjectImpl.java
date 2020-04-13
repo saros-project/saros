@@ -116,7 +116,7 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @NotNull
   @Override
-  public IResource[] members() throws IOException {
+  public IResource[] members() {
     final List<IResource> result = new ArrayList<>();
 
     final VirtualFile[] children = getModuleContentRoot(module).getChildren();
@@ -142,13 +142,13 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
 
   @NotNull
   @Override
-  public IResource[] members(final int memberFlags) throws IOException {
+  public IResource[] members(final int memberFlags) {
     return members();
   }
 
   @Nullable
   @Override
-  public String getDefaultCharset() throws IOException {
+  public String getDefaultCharset() {
     // TODO retrieve encoding for the module or use the project settings
     return null;
   }

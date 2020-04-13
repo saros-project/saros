@@ -34,9 +34,9 @@ public class LocalEditorManipulator {
   private final ISarosSession sarosSession;
 
   /** This is just a reference to {@link EditorManager}'s editorPool and not a separate pool. */
-  private EditorPool editorPool;
+  private final EditorPool editorPool;
 
-  private EditorManager manager;
+  private final EditorManager manager;
 
   public LocalEditorManipulator(
       AnnotationManager annotationManager,
@@ -257,7 +257,7 @@ public class LocalEditorManipulator {
   /**
    * Returns the center file of the given line range.
    *
-   * <p>IntelliJ sets the center position of an editor at 1/3 of the visible line range. This is
+   * <p>Intellij sets the center position of an editor at 1/3 of the visible line range. This is
    * taken into account for the calculations.
    *
    * @param startLine the first line of the section
@@ -300,7 +300,7 @@ public class LocalEditorManipulator {
       log.warn(
           "Could not recover file content of "
               + path
-              + " as no valid Document representation was returned by the IntelliJ API.");
+              + " as no valid Document representation was returned by the Intellij API.");
 
       return;
     }

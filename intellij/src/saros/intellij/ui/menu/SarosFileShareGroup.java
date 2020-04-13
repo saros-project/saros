@@ -27,7 +27,7 @@ public class SarosFileShareGroup extends ActionGroup {
   @Inject private XMPPContactsService contactsService;
 
   @Override
-  public void actionPerformed(AnActionEvent e) {
+  public void actionPerformed(@NotNull AnActionEvent e) {
     // do nothing when menu pops-up
   }
 

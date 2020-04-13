@@ -10,7 +10,7 @@ import saros.filesystem.IPath;
  * Java 7 we can merge the two.
  */
 public class IntelliJPathImpl implements IPath {
-  private Path delegate;
+  private final Path delegate;
 
   public static final IPath EMPTY = new IntelliJPathImpl(Paths.get(""));
 

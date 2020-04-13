@@ -14,7 +14,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.jetbrains.annotations.NotNull;
 import saros.SarosPluginContext;
-import saros.account.XMPPAccountStore;
 import saros.communication.connection.ConnectionHandler;
 import saros.communication.connection.IConnectionStateListener;
 import saros.intellij.ui.util.IconManager;
@@ -38,8 +37,6 @@ public class SessionAndContactsTreeView extends JTree implements Disposable {
   private final ContactTreeRootNode contactTreeRootNode;
 
   private final Project project;
-
-  @Inject private XMPPAccountStore accountStore;
 
   @Inject private ConnectionHandler connectionHandler;
   @Inject private XMPPContactsService xmppContactsService;

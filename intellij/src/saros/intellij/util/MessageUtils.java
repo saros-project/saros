@@ -15,7 +15,7 @@ public class MessageUtils {
    * @param propertyFile
    * @param clazz
    */
-  public static void initializeMessages(String propertyFile, Class clazz) {
+  public static void initializeMessages(String propertyFile, Class<?> clazz) {
     try {
       log.info("Loading bundle [" + propertyFile + "]");
 

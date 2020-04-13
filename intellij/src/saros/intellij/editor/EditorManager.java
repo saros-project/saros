@@ -59,7 +59,7 @@ import saros.session.SessionEndReason;
 import saros.session.User;
 import saros.synchronize.Blockable;
 
-/** IntelliJ implementation of the {@link IEditorManager} interface. */
+/** Intellij implementation of the {@link IEditorManager} interface. */
 public class EditorManager extends AbstractActivityProducer implements IEditorManager {
 
   private static final Logger log = Logger.getLogger(EditorManager.class);
@@ -767,14 +767,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   @Nullable
   public SPath getFileForOpenEditor(@Nullable Document document) {
     return editorPool.getFile(document);
-  }
-
-  ISarosSession getSession() {
-    return session;
-  }
-
-  boolean hasSession() {
-    return session != null;
   }
 
   /**

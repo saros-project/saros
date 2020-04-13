@@ -16,9 +16,9 @@ import saros.editor.text.TextSelection;
 import saros.intellij.runtime.EDTExecutor;
 
 /**
- * IntellJ editor API. An Editor is a window for editing source files.
+ * Intellij editor API. An Editor is a window for editing source files.
  *
- * <p>Performs IntelliJ editor related actions in the UI thread.
+ * <p>Performs Intellij editor related actions in the UI thread.
  */
 public class EditorAPI {
 
@@ -34,7 +34,7 @@ public class EditorAPI {
    * If the given editor is not currently visible, it is not guaranteed that the editor will scroll
    * to the correct position.
    *
-   * <p><b>NOTE:</b> The center of the local viewport is at 1/3 for IntelliJ.
+   * <p><b>NOTE:</b> The center of the local viewport is at 1/3 for Intellij.
    *
    * @param editor the editor to scroll
    * @param line the line to scroll to

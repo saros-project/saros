@@ -38,7 +38,7 @@ import saros.activities.SPath;
  */
 public class BackgroundEditorPool implements Disposable {
 
-  private static Logger log = Logger.getLogger(BackgroundEditorPool.class);
+  private static final Logger log = Logger.getLogger(BackgroundEditorPool.class);
 
   /** The capacity for the LRU cache. */
   private static final int CAPACITY = 20;
@@ -150,9 +150,9 @@ public class BackgroundEditorPool implements Disposable {
   }
 
   /**
-   * Returns whether the background editor poos is empty.
+   * Returns whether the background editor pool is empty.
    *
-   * @return whether the background editor poos is empty
+   * @return whether the background editor pool is empty
    */
   synchronized boolean isEmpty() {
     return backgroundEditors.isEmpty();
@@ -166,7 +166,7 @@ public class BackgroundEditorPool implements Disposable {
   /**
    * Implementation of a least recently used cache using {@link LinkedHashMap}.
    *
-   * <p>Uses the default load factor of <code>0.75</code>.
+   * <p>Uses the default load factor {@link #LOAD_FACTOR}.
    *
    * @see LinkedHashMap
    * @see LinkedHashMap#removeEldestEntry(Map.Entry)

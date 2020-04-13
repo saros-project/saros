@@ -1,13 +1,12 @@
 package saros.intellij.project.filesystem;
 
-import java.io.IOException;
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.filesystem.IWorkspaceRoot;
 
-/** IntelliJ implementation of {@link IWorkspaceRoot}. */
+/** Intellij implementation of {@link IWorkspaceRoot}. */
 public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
 
   @Override
@@ -15,7 +14,7 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
     /*
      *  FIXME Implement! As IWorkspaceRoot might not be a sufficient concept for the core filesystem,
      *  it is used in the HTML-UI to create a list of files in the workspace that can be shared.
-     *  This IWorspaceRoot implementation is needed to avoid IntellJ crash when activating the HTML UI.
+     *  This IWorkspaceRoot implementation is needed to avoid Intellij crash when activating the HTML UI.
      *  Until the core filesystem is reworked, this throws an Exception to indicate that the implementation is missing.
      */
     throw new UnsupportedOperationException();
@@ -27,17 +26,17 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
-  public IResource[] members() throws IOException {
+  public IResource[] members() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public IResource[] members(int memberFlags) throws IOException {
+  public IResource[] members(int memberFlags) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public String getDefaultCharset() throws IOException {
+  public String getDefaultCharset() {
     return null;
   }
 
@@ -82,12 +81,12 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
-  public void delete(int updateFlags) throws IOException {
+  public void delete(int updateFlags) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void move(IPath destination, boolean force) throws IOException {
+  public void move(IPath destination, boolean force) {
     throw new UnsupportedOperationException();
   }
 

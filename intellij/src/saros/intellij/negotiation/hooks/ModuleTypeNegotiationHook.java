@@ -76,7 +76,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
 
     StringBuilder stringBuilder = new StringBuilder();
 
-    for (ModuleType type : moduleTypeManager.getRegisteredTypes()) {
+    for (ModuleType<?> type : moduleTypeManager.getRegisteredTypes()) {
       stringBuilder.append(String.format("%s\t", type.getId()));
     }
 
@@ -147,7 +147,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
       return;
     }
 
-    List<ModuleType> availableTypes = Arrays.asList(moduleTypeManager.getRegisteredTypes());
+    List<ModuleType<?>> availableTypes = Arrays.asList(moduleTypeManager.getRegisteredTypes());
 
     StringBuilder stringBuilder = new StringBuilder();
 
@@ -157,7 +157,7 @@ public class ModuleTypeNegotiationHook implements ISessionNegotiationHook {
       String key = separatedEntry[0];
       String value = separatedEntry[1];
 
-      ModuleType moduleType = moduleTypeManager.findByID(value);
+      ModuleType<?> moduleType = moduleTypeManager.findByID(value);
 
       if (!availableTypes.contains(moduleType)) {
         log.warn(
