@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static saros.filesystem.IResource.Type.PROJECT;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -153,7 +154,7 @@ public class SharedProjectMapperTest {
    */
   private IProject createProjectMock() {
     IProject projectMock = EasyMock.createNiceMock(IProject.class);
-    EasyMock.expect(projectMock.getType()).andStubReturn(IResource.PROJECT);
+    EasyMock.expect(projectMock.getType()).andStubReturn(PROJECT);
     EasyMock.replay(projectMock);
     return projectMock;
   }

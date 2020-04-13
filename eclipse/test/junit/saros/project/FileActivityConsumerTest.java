@@ -21,7 +21,6 @@ import saros.activities.FileActivity;
 import saros.activities.FileActivity.Purpose;
 import saros.activities.FileActivity.Type;
 import saros.activities.SPath;
-import saros.filesystem.IResource;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.net.xmpp.JID;
 import saros.session.User;
@@ -61,7 +60,7 @@ public class FileActivityConsumerTest {
     expect(file.getContents()).andStubReturn(new ByteArrayInputStream(FILE_CONTENT));
 
     expect(file.exists()).andStubReturn(Boolean.TRUE);
-    expect(file.getType()).andStubReturn(IResource.FILE);
+    expect(file.getType()).andStubReturn(org.eclipse.core.resources.IResource.FILE);
     expect(file.getAdapter(IFile.class)).andStubReturn(file);
   }
 

@@ -1,5 +1,7 @@
 package saros.intellij.filesystem;
 
+import static saros.filesystem.IResource.Type.PROJECT;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleFileIndex;
@@ -221,8 +223,8 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
   }
 
   @Override
-  public int getType() {
-    return IResource.PROJECT;
+  public Type getType() {
+    return PROJECT;
   }
 
   @Override

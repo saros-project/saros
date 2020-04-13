@@ -1,5 +1,7 @@
 package saros.server.filesystem;
 
+import static saros.filesystem.IResource.Type.FILE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -41,7 +43,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
   }
 
   @Override
-  public int getType() {
+  public Type getType() {
     return FILE;
   }
 

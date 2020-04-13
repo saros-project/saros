@@ -1,5 +1,7 @@
 package saros.intellij.filesystem;
 
+import static saros.filesystem.IResource.Type.FOLDER;
+
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -141,8 +143,8 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   }
 
   @Override
-  public int getType() {
-    return IResource.FOLDER;
+  public Type getType() {
+    return FOLDER;
   }
 
   @Override

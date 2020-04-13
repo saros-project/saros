@@ -1,5 +1,7 @@
 package saros.server.filesystem;
 
+import static saros.filesystem.IResource.Type.PROJECT;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,8 +28,8 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
   }
 
   @Override
-  public int getType() {
-    return IResource.PROJECT;
+  public Type getType() {
+    return PROJECT;
   }
 
   @Override

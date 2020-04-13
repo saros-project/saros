@@ -53,7 +53,7 @@ public class ServerFileImplTest extends EasyMockSupport {
 
   @Test
   public void getType() {
-    assertEquals(IResource.FILE, file.getType());
+    assertEquals(IResource.Type.FILE, file.getType());
   }
 
   @Test

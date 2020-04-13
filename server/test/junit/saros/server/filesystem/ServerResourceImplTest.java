@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static saros.filesystem.IResource.Type.FILE;
 import static saros.server.filesystem.FileSystemTestUtils.createFile;
 import static saros.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 import static saros.server.filesystem.FileSystemTestUtils.path;
@@ -32,8 +33,8 @@ public class ServerResourceImplTest extends EasyMockSupport {
     }
 
     @Override
-    public int getType() {
-      return IResource.FILE;
+    public Type getType() {
+      return FILE;
     }
 
     @Override

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static saros.filesystem.IResource.Type.FILE;
+import static saros.filesystem.IResource.Type.FOLDER;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.BooleanConverter;
@@ -151,7 +153,7 @@ public class FileListTest {
 
     EasyMock.expect(fileMock.isIgnored()).andStubReturn(false);
     EasyMock.expect(fileMock.exists()).andStubReturn(true);
-    EasyMock.expect(fileMock.getType()).andStubReturn(IResource.FILE);
+    EasyMock.expect(fileMock.getType()).andStubReturn(FILE);
 
     // only used for UI feedback
     EasyMock.expect(fileMock.getName()).andStubReturn("");
@@ -198,7 +200,7 @@ public class FileListTest {
 
     EasyMock.expect(folderMock.isIgnored()).andStubReturn(false);
     EasyMock.expect(folderMock.exists()).andStubReturn(true);
-    EasyMock.expect(folderMock.getType()).andStubReturn(IResource.FOLDER);
+    EasyMock.expect(folderMock.getType()).andStubReturn(FOLDER);
 
     try {
       EasyMock.expect(folderMock.members()).andStubReturn(members);

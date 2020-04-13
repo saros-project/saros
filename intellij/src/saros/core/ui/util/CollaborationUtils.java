@@ -287,7 +287,7 @@ public class CollaborationUtils {
 
     for (IResource resource : resources) {
       switch (resource.getType()) {
-        case IResource.FILE:
+        case FILE:
           totalFileCount++;
 
           try {
@@ -298,8 +298,8 @@ public class CollaborationUtils {
             log.warn("failed to retrieve size of file " + resource, e);
           }
           break;
-        case IResource.PROJECT:
-        case IResource.FOLDER:
+        case PROJECT:
+        case FOLDER:
           try {
             IContainer container = resource.adaptTo(IContainer.class);
 

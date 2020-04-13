@@ -1,12 +1,13 @@
 package saros.server.filesystem;
 
+import static saros.filesystem.IResource.Type.FOLDER;
+
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 
 /** Server implementation of the {@link IFolder} interface. */
@@ -23,8 +24,8 @@ public class ServerFolderImpl extends ServerContainerImpl implements IFolder {
   }
 
   @Override
-  public int getType() {
-    return IResource.FOLDER;
+  public Type getType() {
+    return FOLDER;
   }
 
   @Override

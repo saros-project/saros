@@ -114,16 +114,20 @@ public class ResourceAdapterFactory {
     if (resource == null) return null;
 
     switch (resource.getType()) {
-      case IResource.FILE:
+      case org.eclipse.core.resources.IResource.FILE:
         return new EclipseFileImpl(resource.getAdapter(org.eclipse.core.resources.IFile.class));
-      case IResource.FOLDER:
+
+      case org.eclipse.core.resources.IResource.FOLDER:
         return new EclipseFolderImpl(resource.getAdapter(org.eclipse.core.resources.IFolder.class));
-      case IResource.PROJECT:
+
+      case org.eclipse.core.resources.IResource.PROJECT:
         return new EclipseProjectImpl(
             resource.getAdapter(org.eclipse.core.resources.IProject.class));
-      case IResource.ROOT:
+
+      case org.eclipse.core.resources.IResource.ROOT:
         return new EclipseWorkspaceRootImpl(
             resource.getAdapter(org.eclipse.core.resources.IWorkspaceRoot.class));
+
       default:
         return new EclipseResourceImpl(resource);
     }

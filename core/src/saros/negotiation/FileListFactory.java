@@ -120,14 +120,14 @@ public class FileListFactory {
       if (list.contains(path)) continue;
 
       switch (resource.getType()) {
-        case IResource.FILE:
+        case FILE:
           files.add((IFile) resource);
           MetaData data = new MetaData();
           list.addPath(path, data, false);
           list.addEncoding(((IFile) resource).getCharset());
           break;
 
-        case IResource.FOLDER:
+        case FOLDER:
           stack.addAll(Arrays.asList(((IFolder) resource).members()));
           list.addPath(path, null, true);
           break;

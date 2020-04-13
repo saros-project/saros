@@ -34,8 +34,8 @@ public class ServerContainerImplTest extends EasyMockSupport {
     }
 
     @Override
-    public int getType() {
-      return IResource.FOLDER;
+    public Type getType() {
+      return IResource.Type.FOLDER;
     }
   }
 
@@ -105,9 +105,9 @@ public class ServerContainerImplTest extends EasyMockSupport {
         });
 
     assertEquals(path(CONTAINER_PATH + "/file"), members[0].getFullPath());
-    assertEquals(IResource.FILE, members[0].getType());
+    assertEquals(IResource.Type.FILE, members[0].getType());
     assertEquals(path(CONTAINER_PATH + "/subfolder"), members[1].getFullPath());
-    assertEquals(IResource.FOLDER, members[1].getType());
+    assertEquals(IResource.Type.FOLDER, members[1].getType());
   }
 
   @Test(expected = IOException.class)

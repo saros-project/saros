@@ -1,5 +1,7 @@
 package saros.intellij.project.filesystem;
 
+import static saros.filesystem.IResource.Type.ROOT;
+
 import saros.filesystem.IContainer;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
@@ -66,8 +68,8 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
-  public int getType() {
-    return IResource.ROOT;
+  public Type getType() {
+    return ROOT;
   }
 
   @Override

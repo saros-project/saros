@@ -1,5 +1,7 @@
 package saros.intellij.filesystem;
 
+import static saros.filesystem.IResource.Type.FILE;
+
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -93,8 +95,8 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   }
 
   @Override
-  public int getType() {
-    return IResource.FILE;
+  public Type getType() {
+    return FILE;
   }
 
   @Override
