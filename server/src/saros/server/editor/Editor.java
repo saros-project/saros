@@ -87,6 +87,6 @@ public class Editor {
    * @throws IOException if writing the file fails
    */
   public void save() throws IOException {
-    getFile().setContents(IOUtils.toInputStream(content.toString()), true, true);
+    getFile().setContents(IOUtils.toInputStream(content.toString()));
   }
 }

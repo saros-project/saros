@@ -36,7 +36,6 @@ public class SharedResourcesManager implements Startable {
 
   private static final int DELETION_FLAGS = 0;
   private static final boolean FORCE = false;
-  private static final boolean LOCAL = false;
 
   private final ISarosSession sarosSession;
   private final EditorManager editorManager;
