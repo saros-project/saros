@@ -31,11 +31,6 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
-  public IResource[] members(int memberFlags) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public String getDefaultCharset() {
     return null;
   }

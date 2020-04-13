@@ -33,7 +33,5 @@ public interface IContainer extends IResource {
 
   public IResource[] members() throws IOException;
 
-  public IResource[] members(int memberFlags) throws IOException;
-
   public String getDefaultCharset() throws IOException;
 }

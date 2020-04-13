@@ -19,15 +19,10 @@ public abstract class EclipseContainerImpl extends EclipseResourceImpl implement
 
   @Override
   public IResource[] members() throws IOException {
-    return members(org.eclipse.core.resources.IResource.NONE);
-  }
-
-  @Override
-  public IResource[] members(int memberFlags) throws IOException {
     org.eclipse.core.resources.IResource[] resources;
 
     try {
-      resources = getDelegate().members(memberFlags);
+      resources = getDelegate().members();
 
       List<IResource> result = new ArrayList<IResource>(resources.length);
       ResourceAdapterFactory.convertTo(Arrays.asList(resources), result);

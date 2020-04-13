@@ -58,11 +58,6 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
   }
 
   @Override
-  public IResource[] members(int memberFlags) throws IOException {
-    return members();
-  }
-
-  @Override
   public boolean exists(IPath path) {
     IPath childLocation = getLocation().append(path);
     return childLocation.toFile().exists();
