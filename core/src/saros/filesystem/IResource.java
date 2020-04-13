@@ -59,6 +59,13 @@ public interface IResource {
    */
   public boolean isIgnored();
 
+  /**
+   * Deletes this resource from the disk.
+   *
+   * <p>If the resource does not exist, this method does nothing.
+   *
+   * @throws IOException if the resource deletion failed
+   */
   public void delete() throws IOException;
 
   public IPath getLocation();

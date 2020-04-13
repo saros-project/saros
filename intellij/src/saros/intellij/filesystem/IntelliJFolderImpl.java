@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IContainer;
@@ -21,6 +22,7 @@ import saros.intellij.project.filesystem.IntelliJPathImpl;
 import saros.intellij.runtime.FilesystemRunner;
 
 public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder {
+  private static final Logger log = Logger.getLogger(IntelliJFolderImpl.class);
 
   /** Relative path from the given project */
   private final IPath path;
@@ -159,9 +161,11 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
 
             final VirtualFile file = project.findVirtualFile(path);
 
-            if (file == null)
-              throw new FileNotFoundException(
-                  IntelliJFolderImpl.this + " does not exist or is ignored");
+            if (file == null) {
+              log.debug("Ignoring file deletion request for " + this + " as folder does not exist");
+
+              return null;
+            }
 
             if (!file.isDirectory()) throw new IOException(this + " is not a folder");
 
