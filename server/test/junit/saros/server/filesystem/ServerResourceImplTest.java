@@ -37,7 +37,7 @@ public class ServerResourceImplTest extends EasyMockSupport {
     }
 
     @Override
-    public void delete(int updateFlags) throws IOException {
+    public void delete() throws IOException {
       // Do nothing
     }
   }

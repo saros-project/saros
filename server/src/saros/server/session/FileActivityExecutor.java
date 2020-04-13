@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import saros.activities.FileActivity;
 import saros.activities.SPath;
 import saros.filesystem.IFile;
-import saros.filesystem.IResource;
 import saros.repackaged.picocontainer.Startable;
 import saros.server.editor.ServerEditorManager;
 import saros.session.AbstractActivityConsumer;
@@ -100,7 +99,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
 
     newFile.create(contents);
 
-    oldFile.delete(0);
+    oldFile.delete();
 
     // only update if all previous operations are successful
     editorManager.updateMapping(oldPath, newPath);
@@ -110,6 +109,6 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
     SPath path = activity.getPath();
     IFile file = path.getFile();
     editorManager.closeEditor(path);
-    file.delete(IResource.NONE);
+    file.delete();
   }
 }

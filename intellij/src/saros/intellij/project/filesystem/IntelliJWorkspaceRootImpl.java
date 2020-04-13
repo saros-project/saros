@@ -81,7 +81,7 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   }
 
   @Override
-  public void delete(int updateFlags) {
+  public void delete() {
     throw new UnsupportedOperationException();
   }
 

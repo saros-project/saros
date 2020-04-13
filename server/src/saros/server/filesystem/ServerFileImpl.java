@@ -51,7 +51,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
   }
 
   @Override
-  public void delete(int updateFlags) throws IOException {
+  public void delete() throws IOException {
     try {
       Files.delete(toNioPath());
     } catch (NoSuchFileException e) {

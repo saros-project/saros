@@ -406,7 +406,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
           if (log.isTraceEnabled()) log.trace("deleting resource: " + resource);
 
-          resource.delete(IResource.KEEP_HISTORY);
+          resource.delete();
         }
       }
 

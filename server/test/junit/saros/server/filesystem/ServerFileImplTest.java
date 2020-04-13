@@ -70,14 +70,14 @@ public class ServerFileImplTest extends EasyMockSupport {
   @Test
   public void delete() throws Exception {
     createFile(workspace, "project/file");
-    file.delete(IResource.NONE);
+    file.delete();
     assertResourceNotExists(workspace, "project/file");
   }
 
   @Test(expected = None.class)
   public void deleteNonExistent() throws Exception {
     assertResourceNotExists(workspace, "project/file");
-    file.delete(IResource.NONE);
+    file.delete();
   }
 
   public void create() throws Exception {

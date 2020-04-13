@@ -28,7 +28,7 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
   }
 
   @Override
-  public void delete(int updateFlags) throws IOException {
+  public void delete() throws IOException {
     FileUtils.deleteDirectory(getLocation().toFile());
   }
 

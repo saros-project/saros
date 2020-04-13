@@ -107,12 +107,10 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public void delete(int updateFlags) throws IOException {
+  public void delete() throws IOException {
     try {
-      delegate.delete(updateFlags, null);
-    } catch (CoreException e) {
-      throw new IOException(e);
-    } catch (OperationCanceledException e) {
+      delegate.delete(org.eclipse.core.resources.IResource.KEEP_HISTORY, null);
+    } catch (CoreException | OperationCanceledException e) {
       throw new IOException(e);
     }
   }

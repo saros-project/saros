@@ -96,7 +96,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   }
 
   @Override
-  public void delete(final int updateFlags) throws IOException {
+  public void delete() throws IOException {
 
     FilesystemRunner.runWriteAction(
         new ThrowableComputable<Void, IOException>() {
