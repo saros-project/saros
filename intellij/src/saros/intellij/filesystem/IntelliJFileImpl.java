@@ -134,7 +134,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
   @Nullable
   @Override
-  public String getCharset() throws IOException {
+  public String getCharset() {
     final VirtualFile file = project.findVirtualFile(path);
 
     return file == null ? null : file.getCharset().name();
@@ -170,41 +170,37 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
       throws IOException {
 
     FilesystemRunner.runWriteAction(
-        new ThrowableComputable<Void, IOException>() {
+        (ThrowableComputable<Void, IOException>)
+            () -> {
+              final VirtualFile file = project.findVirtualFile(path);
 
-          @Override
-          public Void compute() throws IOException {
+              if (file == null) {
+                String exceptionText = IntelliJFileImpl.this + " does not exist or is ignored";
 
-            final VirtualFile file = project.findVirtualFile(path);
+                if (force) exceptionText += ", force option is not supported";
 
-            if (file == null) {
-              String exceptionText = IntelliJFileImpl.this + " does not exist or is ignored";
+                throw new FileNotFoundException(exceptionText);
+              }
 
-              if (force) exceptionText += ", force option is not supported";
+              final OutputStream out = file.getOutputStream(IntelliJFileImpl.this);
 
-              throw new FileNotFoundException(exceptionText);
-            }
+              final InputStream in = input == null ? new ByteArrayInputStream(new byte[0]) : input;
 
-            final OutputStream out = file.getOutputStream(IntelliJFileImpl.this);
+              final byte[] buffer = new byte[BUFFER_SIZE];
 
-            final InputStream in = input == null ? new ByteArrayInputStream(new byte[0]) : input;
+              int read;
 
-            final byte[] buffer = new byte[BUFFER_SIZE];
+              try {
 
-            int read = 0;
+                while ((read = in.read(buffer)) != -1) out.write(buffer, 0, read);
 
-            try {
+              } finally {
+                IOUtils.closeQuietly(out);
+                IOUtils.closeQuietly(in);
+              }
 
-              while ((read = in.read(buffer)) != -1) out.write(buffer, 0, read);
-
-            } finally {
-              IOUtils.closeQuietly(out);
-              IOUtils.closeQuietly(in);
-            }
-
-            return null;
-          }
-        },
+              return null;
+            },
         ModalityState.defaultModalityState());
   }
 
@@ -223,43 +219,40 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
   public void create(@Nullable final InputStream input, final boolean force) throws IOException {
 
     FilesystemRunner.runWriteAction(
-        new ThrowableComputable<Void, IOException>() {
+        (ThrowableComputable<Void, IOException>)
+            () -> {
+              final IResource parent = getParent();
 
-          @Override
-          public Void compute() throws IOException {
+              final VirtualFile parentFile =
+                  project.findVirtualFile(parent.getProjectRelativePath());
 
-            final IResource parent = getParent();
+              if (parentFile == null)
+                throw new FileNotFoundException(
+                    parent
+                        + " does not exist or is ignored, cannot create file "
+                        + IntelliJFileImpl.this);
 
-            final VirtualFile parentFile = project.findVirtualFile(parent.getProjectRelativePath());
+              final VirtualFile file = parentFile.findChild(getName());
 
-            if (parentFile == null)
-              throw new FileNotFoundException(
-                  parent
-                      + " does not exist or is ignored, cannot create file "
-                      + IntelliJFileImpl.this);
+              if (file != null) {
+                String exceptionText = IntelliJFileImpl.this + " already exists";
 
-            final VirtualFile file = parentFile.findChild(getName());
+                if (force) exceptionText += ", force option is not supported";
 
-            if (file != null) {
-              String exceptionText = IntelliJFileImpl.this + " already exists";
+                throw new FileAlreadyExistsException(exceptionText);
+              }
 
-              if (force) exceptionText += ", force option is not supported";
+              parentFile.createChildData(IntelliJFileImpl.this, getName());
 
-              throw new FileAlreadyExistsException(exceptionText);
-            }
+              if (input != null) setContents(input, force, true);
 
-            parentFile.createChildData(IntelliJFileImpl.this, getName());
-
-            if (input != null) setContents(input, force, true);
-
-            return null;
-          }
-        },
+              return null;
+            },
         ModalityState.defaultModalityState());
   }
 
   @Override
-  public long getSize() throws IOException {
+  public long getSize() {
     final VirtualFile file = project.findVirtualFile(path);
 
     return file == null ? 0L : file.getLength();

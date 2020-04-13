@@ -9,7 +9,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * IntelliJ color manager. This specifies the available colors that are used for Saros highlights
+ * Intellij color manager. This specifies the available colors that are used for Saros highlights
  * and that are available for configuration inside the Color Scheme preferences.
  */
 public final class ColorManager {
@@ -78,13 +78,13 @@ public final class ColorManager {
   }
 
   /**
-   * Set of IntelliJ attribute keys that are used to define appearance of Saros users inside the
+   * Set of Intellij attribute keys that are used to define appearance of Saros users inside the
    * IDE.
    */
   public interface ColorKeys {
 
     /**
-     * Returns the IntelliJ color key of the {@link TextAttributes} that should be used for
+     * Returns the Intellij color key of the {@link TextAttributes} that should be used for
      * highlighting the selection of a user.
      *
      * @return attribute key used for text selection highlighting. Always non-null.
@@ -93,7 +93,7 @@ public final class ColorManager {
     TextAttributesKey getSelectionColorKey();
 
     /**
-     * Returns the IntelliJ color key of the {@link TextAttributes} that should be used for
+     * Returns the Intellij color key of the {@link TextAttributes} that should be used for
      * highlighting recent code contributions of a user.
      *
      * @return attribute key used for text contribution highlighting. Always non-null.
@@ -102,7 +102,7 @@ public final class ColorManager {
     TextAttributesKey getContributionColorKey();
   }
 
-  /** A set of IntelliJ color keys that can be referenced using a color ID. */
+  /** A set of Intellij color keys that can be referenced using a color ID. */
   public static class IdentifiableColorKeys implements ColorKeys {
     /** ID of this color key set. Used for being referenced by a Saros user. */
     private final int id;
@@ -145,7 +145,7 @@ public final class ColorManager {
   }
 
   /**
-   * Holds IntelliJ color keys that are used if no matching {@link IdentifiableColorKeys} was found.
+   * Holds Intellij color keys that are used if no matching {@link IdentifiableColorKeys} was found.
    * These color keys are used if user specific color keys have been requested, but no color keys
    * matching a given user ID were found.
    */

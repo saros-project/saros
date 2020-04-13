@@ -51,10 +51,6 @@ public class LocalEditorHandler {
   public Editor openEditor(
       @NotNull Project project, @NotNull VirtualFile virtualFile, boolean activate) {
 
-    if (!manager.hasSession()) {
-      return null;
-    }
-
     SPath path = VirtualFileConverter.convertToSPath(project, virtualFile);
 
     if (path == null || !sarosSession.isShared(path.getResource())) {
@@ -170,15 +166,6 @@ public class LocalEditorHandler {
   }
 
   /**
-   * Removes the resource belonging to the given path from the editor pool
-   *
-   * @param path path
-   */
-  public void removeEditor(@NotNull SPath path) {
-    editorPool.removeEditor(path);
-  }
-
-  /**
    * Saves the document under path, thereby flushing its contents to disk.
    *
    * <p>Does nothing if there is no unsaved document content for the given resource. This is the
@@ -237,9 +224,7 @@ public class LocalEditorHandler {
   public void activateEditor(@NotNull Project project, @Nullable VirtualFile file) {
     if (file == null) {
 
-      if (manager.hasSession()) {
-        manager.generateEditorActivated(null);
-      }
+      manager.generateEditorActivated(null);
 
       return;
     }
@@ -261,10 +246,7 @@ public class LocalEditorHandler {
     manager.generateEditorSaved(path);
   }
 
-  /**
-   * @param path
-   * @return <code>true</code>, if the path is opened in an editor.
-   */
+  /** @return <code>true</code>, if the path is opened in an editor. */
   public boolean isOpenEditor(SPath path) {
     Document doc = editorPool.getDocument(path);
     if (doc == null) {

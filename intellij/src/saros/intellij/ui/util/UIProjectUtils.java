@@ -22,7 +22,7 @@ public class UIProjectUtils {
   private volatile ISarosSession sarosSession;
 
   @SuppressWarnings("FieldCanBeLocal")
-  private ISessionLifecycleListener sessionLifecycleListener =
+  private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession session) {

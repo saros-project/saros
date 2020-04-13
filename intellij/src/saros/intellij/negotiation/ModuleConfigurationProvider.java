@@ -30,7 +30,7 @@ import saros.negotiation.ProjectNegotiationData;
  * module.
  */
 public class ModuleConfigurationProvider implements ProjectDataProvider {
-  private static Logger log = Logger.getLogger(ModuleConfigurationProvider.class);
+  private static final Logger log = Logger.getLogger(ModuleConfigurationProvider.class);
 
   static final String MODULE_TYPE_KEY = "MODULE_TYPE";
   static final String SDK_KEY = "SKD";

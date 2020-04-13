@@ -2,6 +2,7 @@ package saros.intellij.preferences;
 
 import com.intellij.ide.util.PropertiesComponent;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.binary.Base64;
 import saros.preferences.PreferenceStore;
 
@@ -15,8 +16,8 @@ public class PropertiesComponentAdapter extends PreferenceStore {
 
   private static final String PROPERTY_PREFIX = "saros.config.";
 
-  private static final Charset PROPERTY_CHARSET = Charset.forName("UTF-8");
-  private static final Charset BASE64_CHARSET = Charset.forName("ISO-8859-1");
+  private static final Charset PROPERTY_CHARSET = StandardCharsets.UTF_8;
+  private static final Charset BASE64_CHARSET = StandardCharsets.ISO_8859_1;
 
   private final PropertiesComponent delegate;
 

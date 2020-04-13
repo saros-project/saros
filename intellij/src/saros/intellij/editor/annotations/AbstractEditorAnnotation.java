@@ -143,19 +143,6 @@ abstract class AbstractEditorAnnotation {
   }
 
   /**
-   * Checks whether the annotation has a local representation.
-   *
-   * @return whether the held editor is not <code>null</code> and all annotation ranges contain a
-   *     <code>RangeHighlighter</code>
-   */
-  boolean hasLocalRepresentation() {
-    return editor != null
-        && annotationRanges
-            .stream()
-            .noneMatch(annotationRange -> annotationRange.getRangeHighlighter() == null);
-  }
-
-  /**
    * Returns an <b>unmodifiable copy</b> of the held list of annotation ranges. The returned list
    * can not be used to modify the internally held list. To modify the internal list of annotation
    * ranges, please use {@link #replaceAnnotationRange(AnnotationRange, AnnotationRange)} and {@link

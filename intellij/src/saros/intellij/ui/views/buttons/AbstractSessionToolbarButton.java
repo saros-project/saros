@@ -26,7 +26,6 @@ import saros.session.SessionEndReason;
 abstract class AbstractSessionToolbarButton extends AbstractToolbarButton {
   @Inject protected ISarosSessionManager sarosSessionManager;
 
-  @SuppressWarnings("FieldCanBeLocal")
   private final ISessionLifecycleListener sessionLifecycleListener =
       new ISessionLifecycleListener() {
         @Override

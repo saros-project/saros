@@ -1,6 +1,5 @@
 package saros.intellij.context;
 
-import java.util.Arrays;
 import saros.context.AbstractContextFactory;
 import saros.context.IContextKeyBindings;
 import saros.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
@@ -35,7 +34,7 @@ import saros.session.ISarosSessionContextFactory;
 import saros.synchronize.UISynchronizer;
 import saros.ui.util.ICollaborationUtils;
 
-/** IntelliJ related context */
+/** Intellij related context */
 public class SarosIntellijContextFactory extends AbstractContextFactory {
 
   /**
@@ -43,7 +42,7 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
    *
    * @see <a href= "https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
    */
-  private final Component[] getContextComponents() {
+  private Component[] getContextComponents() {
     return new Component[] {
       // Core Managers
       Component.create(IEditorManager.class, EditorManager.class),
@@ -79,12 +78,12 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
   @Override
   public void createComponents(MutablePicoContainer container) {
 
-    // Saros Core PathIntl Support
+    // Saros Core Path Support
     container.addComponent(IPathFactory.class, new PathFactory());
 
     container.addComponent(IWorkspace.class, IntelliJWorkspaceImpl.class);
 
-    for (Component component : Arrays.asList(getContextComponents())) {
+    for (Component component : getContextComponents()) {
       container.addComponent(component.getBindKey(), component.getImplementation());
     }
 

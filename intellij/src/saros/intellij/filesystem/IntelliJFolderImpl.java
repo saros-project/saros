@@ -71,7 +71,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
               : new IntelliJFileImpl(project, childPath));
     }
 
-    return result.toArray(new IResource[result.size()]);
+    return result.toArray(new IResource[0]);
   }
 
   @NotNull
@@ -206,36 +206,33 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
   public void create(final boolean force, final boolean local) throws IOException {
 
     FilesystemRunner.runWriteAction(
-        new ThrowableComputable<Void, IOException>() {
+        (ThrowableComputable<Void, IOException>)
+            () -> {
+              final IResource parent = getParent();
 
-          @Override
-          public Void compute() throws IOException {
+              final VirtualFile parentFile =
+                  project.findVirtualFile(parent.getProjectRelativePath());
 
-            final IResource parent = getParent();
+              if (parentFile == null)
+                throw new FileNotFoundException(
+                    parent
+                        + " does not exist or is ignored, cannot create folder "
+                        + IntelliJFolderImpl.this);
 
-            final VirtualFile parentFile = project.findVirtualFile(parent.getProjectRelativePath());
+              final VirtualFile file = parentFile.findChild(getName());
 
-            if (parentFile == null)
-              throw new FileNotFoundException(
-                  parent
-                      + " does not exist or is ignored, cannot create folder "
-                      + IntelliJFolderImpl.this);
+              if (file != null) {
+                String exceptionText = IntelliJFolderImpl.this + " already exists";
 
-            final VirtualFile file = parentFile.findChild(getName());
+                if (force) exceptionText += ", force option is not supported";
 
-            if (file != null) {
-              String exceptionText = IntelliJFolderImpl.this + " already exists";
+                throw new FileAlreadyExistsException(exceptionText);
+              }
 
-              if (force) exceptionText += ", force option is not supported";
+              parentFile.createChildDirectory(IntelliJFolderImpl.this, getName());
 
-              throw new FileAlreadyExistsException(exceptionText);
-            }
-
-            parentFile.createChildDirectory(IntelliJFolderImpl.this, getName());
-
-            return null;
-          }
-        },
+              return null;
+            },
         ModalityState.defaultModalityState());
   }
 

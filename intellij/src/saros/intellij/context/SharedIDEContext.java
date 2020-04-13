@@ -23,7 +23,7 @@ import saros.repackaged.picocontainer.Disposable;
  * #setProject(Project)}.
  */
 public class SharedIDEContext implements Disposable {
-  private static Logger log = Logger.getLogger(SharedIDEContext.class);
+  private static final Logger log = Logger.getLogger(SharedIDEContext.class);
 
   private static Project preregisteredProject;
 
