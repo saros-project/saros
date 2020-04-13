@@ -59,7 +59,7 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol implements Au
         fileIn.setPropagateClose(false);
 
         if (file.exists()) file.setContents(fileIn);
-        else file.create(fileIn, false);
+        else file.create(fileIn);
       }
 
       if (monitor.isCanceled()) {

@@ -42,8 +42,13 @@ public interface IFile extends IResource {
    */
   public void setContents(InputStream input) throws IOException;
 
-  /** Equivalent to the Eclipse call <code>IFile#create(input, force, null)</code> */
-  public void create(InputStream input, boolean force) throws IOException;
+  /**
+   * Creates the this file with the given content.
+   *
+   * @throws IOException if the file already exists, could not be created, or the content of the
+   *     newly created file could not be set
+   */
+  public void create(InputStream input) throws IOException;
 
   /**
    * Returns the size of the file.
