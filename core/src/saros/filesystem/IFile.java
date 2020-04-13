@@ -34,9 +34,13 @@ public interface IFile extends IResource {
   public InputStream getContents() throws IOException;
 
   /**
-   * Equivalent to the Eclipse call <code>IFile#setContents(input, force, keepHistory, null)</code>
+   * Writes the content of the given input stream into the file. Any existing file content is
+   * overwritten.
+   *
+   * @param input the input stream to write into the file
+   * @throws IOException if the content could not be written to the file
    */
-  public void setContents(InputStream input, boolean force, boolean keepHistory) throws IOException;
+  public void setContents(InputStream input) throws IOException;
 
   /** Equivalent to the Eclipse call <code>IFile#create(input, force, null)</code> */
   public void create(InputStream input, boolean force) throws IOException;

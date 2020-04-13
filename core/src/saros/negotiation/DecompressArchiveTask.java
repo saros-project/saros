@@ -110,7 +110,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
         try {
           if (!decompressedFile.exists()) decompressedFile.create(in, false);
-          else decompressedFile.setContents(in, false, true);
+          else decompressedFile.setContents(in);
         } catch (IOException e) {
           /* if triggered by check in CancelableInputStream */
           if (monitor.isCanceled()) {

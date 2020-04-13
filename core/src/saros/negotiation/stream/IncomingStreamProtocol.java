@@ -58,7 +58,7 @@ public class IncomingStreamProtocol extends AbstractStreamProtocol implements Au
       try (BoundedInputStream fileIn = new BoundedInputStream(in, fileSize)) {
         fileIn.setPropagateClose(false);
 
-        if (file.exists()) file.setContents(fileIn, false, true);
+        if (file.exists()) file.setContents(fileIn);
         else file.create(fileIn, false);
       }
 

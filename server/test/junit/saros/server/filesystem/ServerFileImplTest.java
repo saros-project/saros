@@ -118,7 +118,7 @@ public class ServerFileImplTest extends EasyMockSupport {
     createFile(workspace, "project/file", "old content");
 
     StringReader reader = new StringReader("new content");
-    file.setContents(new ReaderInputStream(reader), true, true);
+    file.setContents(new ReaderInputStream(reader));
 
     assertFileHasContent(workspace, "project/file", "new content");
   }
@@ -128,7 +128,7 @@ public class ServerFileImplTest extends EasyMockSupport {
     assertResourceNotExists(workspace, "project/file");
 
     StringReader reader = new StringReader("new content");
-    file.setContents(new ReaderInputStream(reader), true, true);
+    file.setContents(new ReaderInputStream(reader));
 
     assertFileHasContent(workspace, "project/file", "new content");
   }
@@ -136,7 +136,7 @@ public class ServerFileImplTest extends EasyMockSupport {
   @Test
   public void setContentsToNull() throws Exception {
     createFile(workspace, "project/file", "old content");
-    file.setContents(null, true, true);
+    file.setContents(null);
     assertFileHasContent(workspace, "project/file", "");
   }
 

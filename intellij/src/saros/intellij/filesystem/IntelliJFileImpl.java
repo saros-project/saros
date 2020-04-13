@@ -156,13 +156,10 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
    * <p><b>Note:</b> The force flag is not supported.
    *
    * @param input new contents of the file
-   * @param force not supported
-   * @param keepHistory not supported
    * @throws IOException if the file does not exist
    */
   @Override
-  public void setContents(final InputStream input, final boolean force, final boolean keepHistory)
-      throws IOException {
+  public void setContents(final InputStream input) throws IOException {
 
     FilesystemRunner.runWriteAction(
         (ThrowableComputable<Void, IOException>)
@@ -170,11 +167,8 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
               final VirtualFile file = project.findVirtualFile(path);
 
               if (file == null) {
-                String exceptionText = IntelliJFileImpl.this + " does not exist or is ignored";
-
-                if (force) exceptionText += ", force option is not supported";
-
-                throw new FileNotFoundException(exceptionText);
+                throw new FileNotFoundException(
+                    IntelliJFileImpl.this + " does not exist or is ignored");
               }
 
               final OutputStream out = file.getOutputStream(IntelliJFileImpl.this);
@@ -239,7 +233,7 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
 
               parentFile.createChildData(IntelliJFileImpl.this, getName());
 
-              if (input != null) setContents(input, force, true);
+              if (input != null) setContents(input);
 
               return null;
             },

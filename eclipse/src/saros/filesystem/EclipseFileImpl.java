@@ -32,13 +32,11 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
   }
 
   @Override
-  public void setContents(InputStream input, boolean force, boolean keepHistory)
-      throws IOException {
+  public void setContents(InputStream input) throws IOException {
     try {
-      getDelegate().setContents(input, force, keepHistory, null);
-    } catch (CoreException e) {
-      throw new IOException(e);
-    } catch (OperationCanceledException e) {
+      getDelegate().setContents(input, false, true, null);
+
+    } catch (CoreException | OperationCanceledException e) {
       throw new IOException(e);
     }
   }

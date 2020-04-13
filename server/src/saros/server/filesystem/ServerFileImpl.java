@@ -65,7 +65,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
 
     Files.createDirectories(nioPath.getParent());
     Files.createFile(nioPath);
-    setContents(input, force, false);
+    setContents(input);
   }
 
   @Override
@@ -74,8 +74,7 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
   }
 
   @Override
-  public void setContents(InputStream input, boolean force, boolean keepHistory)
-      throws IOException {
+  public void setContents(InputStream input) throws IOException {
 
     /*
      * We write the new contents to a temporary file first, then move that
