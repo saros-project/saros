@@ -1,5 +1,10 @@
 package saros.filesystem;
 
+import static saros.filesystem.IResource.Type.FILE;
+import static saros.filesystem.IResource.Type.FOLDER;
+import static saros.filesystem.IResource.Type.PROJECT;
+import static saros.filesystem.IResource.Type.ROOT;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,26 +84,25 @@ public class EclipseResourceImpl implements IResource {
   }
 
   @Override
-  public int getType() {
-    int type = delegate.getType();
+  public Type getType() {
+    int delegateType = delegate.getType();
 
-    switch (type) {
+    switch (delegateType) {
       case org.eclipse.core.resources.IResource.FILE:
-        type = IResource.FILE;
-        break;
+        return FILE;
+
       case org.eclipse.core.resources.IResource.FOLDER:
-        type = IResource.FOLDER;
-        break;
+        return FOLDER;
+
       case org.eclipse.core.resources.IResource.PROJECT:
-        type = IResource.PROJECT;
-        break;
+        return PROJECT;
+
       case org.eclipse.core.resources.IResource.ROOT:
-        type = IResource.ROOT;
-        break;
+        return ROOT;
+
       default:
-        type = 0;
+        throw new IllegalStateException("Encountered unknown resource type " + delegateType);
     }
-    return type;
   }
 
   @Override

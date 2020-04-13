@@ -42,7 +42,7 @@ public class ServerProjectImplTest extends EasyMockSupport {
 
   @Test
   public void getType() {
-    assertEquals(IResource.PROJECT, project.getType());
+    assertEquals(IResource.Type.PROJECT, project.getType());
   }
 
   @Test
@@ -60,8 +60,8 @@ public class ServerProjectImplTest extends EasyMockSupport {
     IResource file = project.findMember(path("folder/file"));
     IResource nonExistent = project.findMember(path("non/existent"));
 
-    assertEquals(IResource.FOLDER, folder.getType());
-    assertEquals(IResource.FILE, file.getType());
+    assertEquals(IResource.Type.FOLDER, folder.getType());
+    assertEquals(IResource.Type.FILE, file.getType());
     assertNull(nonExistent);
   }
 

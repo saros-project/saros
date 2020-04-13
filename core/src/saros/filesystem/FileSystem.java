@@ -1,5 +1,8 @@
 package saros.filesystem;
 
+import static saros.filesystem.IResource.Type.FILE;
+import static saros.filesystem.IResource.Type.FOLDER;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -77,15 +80,15 @@ public class FileSystem {
 
   private static void createFolders(final IResource resource) throws IOException {
 
-    if (!(resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER)) return;
+    if (!(resource.getType() == FILE || resource.getType() == FOLDER)) return;
 
     final List<IFolder> parents = new ArrayList<IFolder>();
 
-    if (resource.getType() == IResource.FOLDER) parents.add((IFolder) resource);
+    if (resource.getType() == FOLDER) parents.add((IFolder) resource);
 
     IContainer parent = resource.getParent();
 
-    while (parent != null && parent.getType() == IResource.FOLDER) {
+    while (parent != null && parent.getType() == FOLDER) {
 
       if (parent.exists()) break;
 

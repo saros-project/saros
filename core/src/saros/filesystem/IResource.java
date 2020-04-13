@@ -25,11 +25,13 @@ import java.io.IOException;
  */
 public interface IResource {
 
-  public static final int NONE = 0;
-  public static final int FILE = 1;
-  public static final int FOLDER = 2;
-  public static final int PROJECT = 4;
-  public static final int ROOT = 8;
+  /** The different types of resources. */
+  enum Type {
+    FILE,
+    FOLDER,
+    PROJECT,
+    ROOT
+  }
 
   public boolean exists();
 
@@ -43,7 +45,7 @@ public interface IResource {
 
   public IPath getProjectRelativePath();
 
-  public int getType();
+  public Type getType();
 
   /**
    * Returns whether the resource should be ignored. Resources should be ignored if they match any

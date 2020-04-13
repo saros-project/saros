@@ -1,5 +1,7 @@
 package saros.session.internal;
 
+import static saros.filesystem.IResource.Type.PROJECT;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -132,7 +134,7 @@ class SharedProjectMapper {
   public synchronized boolean isShared(IResource resource) {
     if (resource == null) return false;
 
-    if (resource.getType() == IResource.PROJECT) return idToProjectMapping.containsValue(resource);
+    if (resource.getType() == PROJECT) return idToProjectMapping.containsValue(resource);
 
     IProject project = resource.getProject();
 
