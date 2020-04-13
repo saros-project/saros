@@ -28,7 +28,7 @@ public class ServerFolderImpl extends ServerContainerImpl implements IFolder {
   }
 
   @Override
-  public void create(int updateFlags, boolean local) throws IOException {
+  public void create() throws IOException {
     try {
       Files.createDirectory(toNioPath());
     } catch (FileAlreadyExistsException e) {
@@ -40,10 +40,5 @@ public class ServerFolderImpl extends ServerContainerImpl implements IFolder {
         throw e;
       }
     }
-  }
-
-  @Override
-  public void create(boolean force, boolean local) throws IOException {
-    create(IResource.NONE, local);
   }
 }

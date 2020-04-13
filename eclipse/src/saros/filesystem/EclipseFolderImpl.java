@@ -11,23 +11,10 @@ public class EclipseFolderImpl extends EclipseContainerImpl implements IFolder {
   }
 
   @Override
-  public void create(int updateFlags, boolean local) throws IOException {
+  public void create() throws IOException {
     try {
-      getDelegate().create(updateFlags, local, null);
-    } catch (CoreException e) {
-      throw new IOException(e);
-    } catch (OperationCanceledException e) {
-      throw new IOException(e);
-    }
-  }
-
-  @Override
-  public void create(boolean force, boolean local) throws IOException {
-    try {
-      getDelegate().create(force, local, null);
-    } catch (CoreException e) {
-      throw new IOException(e);
-    } catch (OperationCanceledException e) {
+      getDelegate().create(false, true, null);
+    } catch (CoreException | OperationCanceledException e) {
       throw new IOException(e);
     }
   }

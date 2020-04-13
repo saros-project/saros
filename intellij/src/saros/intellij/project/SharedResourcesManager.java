@@ -328,7 +328,7 @@ public class SharedResourcesManager implements Startable {
     try {
       setFilesystemModificationHandlerEnabled(false);
 
-      folder.create(FORCE, LOCAL);
+      folder.create();
 
     } finally {
       setFilesystemModificationHandlerEnabled(true);

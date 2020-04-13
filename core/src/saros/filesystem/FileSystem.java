@@ -95,6 +95,6 @@ public class FileSystem {
 
     Collections.reverse(parents);
 
-    for (final IFolder folder : parents) folder.create(false, true);
+    for (final IFolder folder : parents) folder.create();
   }
 }
