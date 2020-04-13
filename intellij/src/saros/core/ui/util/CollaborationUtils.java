@@ -238,7 +238,7 @@ public class CollaborationUtils {
 
         Pair<Long, Long> fileCountAndSize;
 
-        fileCountAndSize = getFileCountAndSize(Arrays.asList(project.members()), IResource.FILE);
+        fileCountAndSize = getFileCountAndSize(Arrays.asList(project.members()));
 
         result.append(
             String.format(
@@ -277,12 +277,10 @@ public class CollaborationUtils {
    *
    * @param resources collection containing the resources that file sizes and file count should be
    *     calculated
-   * @param flags additional flags on how to process the members of containers
    * @return a pair containing the file size (left element) and file count (right element) for the
    *     given resources
    */
-  private static Pair<Long, Long> getFileCountAndSize(
-      Collection<? extends IResource> resources, int flags) {
+  private static Pair<Long, Long> getFileCountAndSize(Collection<? extends IResource> resources) {
 
     long totalFileSize = 0;
     long totalFileCount = 0;
@@ -306,7 +304,7 @@ public class CollaborationUtils {
             IContainer container = resource.adaptTo(IContainer.class);
 
             Pair<Long, Long> subFileCountAndSize =
-                getFileCountAndSize(Arrays.asList(container.members(flags)), flags);
+                getFileCountAndSize(Arrays.asList(container.members()));
 
             totalFileSize += subFileCountAndSize.getLeft();
             totalFileCount += subFileCountAndSize.getRight();
