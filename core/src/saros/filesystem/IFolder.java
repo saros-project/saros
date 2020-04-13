@@ -29,9 +29,10 @@ import java.io.IOException;
  */
 public interface IFolder extends IContainer {
 
-  /** Equivalent to the Eclipse call <code>IFolder#create(updateFlags, local, null)</code> */
-  public void create(int updateFlags, boolean local) throws IOException;
-
-  /** Equivalent to the Eclipse call <code>IFolder#create(force, local, null)</code> */
-  public void create(boolean force, boolean local) throws IOException;
+  /**
+   * Creates the folder in the local filesystem.
+   *
+   * @throws IOException if the folder creation failed or the resource already exists
+   */
+  void create() throws IOException;
 }

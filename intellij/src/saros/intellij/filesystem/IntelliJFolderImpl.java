@@ -181,25 +181,14 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
     return project.getLocation().append(path);
   }
 
-  @Override
-  public void create(final int updateFlags, final boolean local) throws IOException {
-    this.create((updateFlags & IResource.FORCE) != 0, local);
-  }
-
   /**
    * Creates this folder in the local filesystem.
    *
-   * <p><b>Note:</b> The force flag is not supported. It does not allow the re-creation of an
-   * already existing folder.
-   *
-   * @param force not supported
-   * @param local not supported
    * @throws FileAlreadyExistsException if the folder already exists
    * @throws FileNotFoundException if the parent directory of this folder does not exist
    */
   @Override
-  public void create(final boolean force, final boolean local) throws IOException {
-
+  public void create() throws IOException {
     FilesystemRunner.runWriteAction(
         (ThrowableComputable<Void, IOException>)
             () -> {
@@ -217,11 +206,7 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
               final VirtualFile file = parentFile.findChild(getName());
 
               if (file != null) {
-                String exceptionText = IntelliJFolderImpl.this + " already exists";
-
-                if (force) exceptionText += ", force option is not supported";
-
-                throw new FileAlreadyExistsException(exceptionText);
+                throw new FileAlreadyExistsException(IntelliJFolderImpl.this + " already exists");
               }
 
               parentFile.createChildDirectory(IntelliJFolderImpl.this, getName());

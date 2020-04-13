@@ -63,7 +63,7 @@ public class FolderActivityExecutor extends AbstractActivityConsumer implements 
   private void executeFolderCreation(FolderCreatedActivity activity) throws IOException {
 
     IFolder folder = activity.getPath().getFolder();
-    folder.create(IResource.NONE, true);
+    folder.create();
   }
 
   private void executeFolderRemoval(FolderDeletedActivity activity) throws IOException {

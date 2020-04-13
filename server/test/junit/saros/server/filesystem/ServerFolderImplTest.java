@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Test.None;
 import saros.filesystem.IFolder;
-import saros.filesystem.IResource;
 import saros.filesystem.IWorkspace;
 
 public class ServerFolderImplTest extends EasyMockSupport {
@@ -46,7 +45,7 @@ public class ServerFolderImplTest extends EasyMockSupport {
   @Test
   public void create() throws Exception {
     createFolder(workspace, FOLDER_PARENT_PATH);
-    folder.create(IResource.NONE, true);
+    folder.create();
     assertResourceExists(workspace, FOLDER_PATH);
     assertIsFolder(workspace, FOLDER_PATH);
   }
@@ -54,18 +53,18 @@ public class ServerFolderImplTest extends EasyMockSupport {
   @Test(expected = None.class)
   public void createIfFolderExistsAtPath() throws Exception {
     createFolder(workspace, FOLDER_PATH);
-    folder.create(IResource.NONE, true);
+    folder.create();
   }
 
   @Test(expected = IOException.class)
   public void createIfFileExistsAtPath() throws Exception {
     createFile(workspace, FOLDER_PATH);
-    folder.create(IResource.NONE, true);
+    folder.create();
   }
 
   @Test(expected = IOException.class)
   public void createAtNonExistentParent() throws Exception {
     assertResourceNotExists(workspace, FOLDER_PARENT_PATH);
-    folder.create(IResource.NONE, true);
+    folder.create();
   }
 }
