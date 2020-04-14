@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IContainer;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
@@ -110,13 +109,6 @@ public final class IntelliJFolderImpl extends IntelliJResourceImpl implements IF
       throw new IllegalArgumentException("cannot create folder handle for an empty path");
 
     return new IntelliJFolderImpl(project, path);
-  }
-
-  @Nullable
-  @Override
-  public String getDefaultCharset() throws IOException {
-    // TODO retrieve encoding for the module or use the project settings
-    return getParent().getDefaultCharset();
   }
 
   /**

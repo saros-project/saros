@@ -88,9 +88,4 @@ public abstract class ServerContainerImpl extends ServerResourceImpl implements 
     IPath childLocation = getLocation().append(path);
     return childLocation.toFile().exists();
   }
-
-  @Override
-  public String getDefaultCharset() throws IOException {
-    return getParent().getDefaultCharset();
-  }
 }

@@ -9,9 +9,6 @@ import saros.filesystem.IWorkspace;
 
 /** Server implementation of the {@link IProject} interface. */
 public class ServerProjectImpl extends ServerContainerImpl implements IProject {
-
-  private static final String DEFAULT_CHARSET = "UTF-8";
-
   /**
    * Creates a ServerProjectImpl.
    *
@@ -25,12 +22,6 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
   @Override
   public Type getType() {
     return PROJECT;
-  }
-
-  @Override
-  public String getDefaultCharset() {
-    // TODO: Read default character set from the project metadata files.
-    return DEFAULT_CHARSET;
   }
 
   /**
