@@ -77,8 +77,6 @@ public class FileListFactory {
 
     FileList list = new FileList();
 
-    list.addEncoding(project.getDefaultCharset());
-
     List<IFile> files = calculateMembers(list, project);
 
     IProgressMonitor monitor =

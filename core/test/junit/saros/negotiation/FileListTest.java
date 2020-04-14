@@ -34,7 +34,7 @@ import saros.misc.xstream.XStreamFactory;
 /*
  *Project Layout for test
  *
- *  foo (Project, UTF-16 encoding)
+ *  foo (Project)
  *      bar (Empty folder)
  *      info.txt (File, random content, UTF-8 encoding)
  *      foobar (Folder)
@@ -74,8 +74,7 @@ public class FileListTest {
 
     assertTrue("file list does not contain folder: foobar/foo", paths.contains("foobar/foo/"));
 
-    final Set<String> expectedEncodings =
-        new HashSet<String>(Arrays.asList("ISO-8859-1", "UTF-8", "UTF-16"));
+    final Set<String> expectedEncodings = new HashSet<String>(Arrays.asList("ISO-8859-1", "UTF-8"));
 
     assertNotNull("no checksum found for file: info.txt", fileList.getMetaData("info.txt"));
 
@@ -128,8 +127,6 @@ public class FileListTest {
     EasyMock.expect(project.getName()).andStubReturn("foo");
 
     try {
-      EasyMock.expect(project.getDefaultCharset()).andStubReturn("UTF-16");
-
       EasyMock.expect(project.members())
           .andStubReturn(new IResource[] {barFolder, infoTxtFile, foobarFolder});
     } catch (IOException e) {

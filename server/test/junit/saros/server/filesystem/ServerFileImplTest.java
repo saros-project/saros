@@ -40,7 +40,6 @@ public class ServerFileImplTest extends EasyMockSupport {
     expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
 
     expect(workspace.getProject("project")).andStubReturn(project);
-    expect(project.getDefaultCharset()).andStubReturn("UTF-8");
 
     replayAll();
     file = new ServerFileImpl(workspace, path("project/file"));
@@ -54,11 +53,6 @@ public class ServerFileImplTest extends EasyMockSupport {
   @Test
   public void getType() {
     assertEquals(IResource.Type.FILE, file.getType());
-  }
-
-  @Test
-  public void getCharsetIfDefault() throws Exception {
-    assertEquals(project.getDefaultCharset(), file.getCharset());
   }
 
   @Test
