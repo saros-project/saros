@@ -173,16 +173,18 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
 
     if (isFile(resource)) {
-      byte[] content = FileUtils.getLocalFileContent(resource.getAdapter(IFile.class));
+      IFile file = resource.getAdapter(IFile.class);
 
-      if (content == null) {
+      byte[] content = FileUtils.getLocalFileContent(file);
+      String charset = FileUtils.getLocalFileCharset(file);
+
+      if (content == null || charset == null) {
         logResourceReadError(resource);
         return;
       }
 
-      // TODO add encoding
       addActivity(
-          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, null));
+          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, charset));
 
     } else if (isFolder(resource)) {
       addActivity(new FolderCreatedActivity(user, spath));
@@ -195,13 +197,17 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
       IResource resource, IPath oldFullPath, IProject oldProject, boolean contentChange) {
 
     byte[] content = null;
+    String charset = null;
 
     if (contentChange) {
       assert resource.getType() == IResource.FILE;
 
-      content = FileUtils.getLocalFileContent(resource.getAdapter(IFile.class));
+      IFile file = resource.getAdapter(IFile.class);
 
-      if (content == null) {
+      content = FileUtils.getLocalFileContent(file);
+      charset = FileUtils.getLocalFileCharset(file);
+
+      if (content == null || charset == null) {
         logResourceReadError(resource);
         return;
       }
@@ -212,9 +218,9 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         new SPath(
             ResourceAdapterFactory.create(oldProject),
             ResourceAdapterFactory.create(oldFullPath.removeFirstSegments(1)));
-    // TODO add encoding
+
     addActivity(
-        new FileActivity(user, Type.MOVED, Purpose.ACTIVITY, newPath, oldPath, content, null));
+        new FileActivity(user, Type.MOVED, Purpose.ACTIVITY, newPath, oldPath, content, charset));
   }
 
   private void generateRemoved(IResource resource) {
@@ -257,13 +263,18 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     if (editorManager.isOpened(spath) || editorManager.isManaged(resource.getAdapter(IFile.class)))
       return;
 
-    byte[] content = FileUtils.getLocalFileContent(resource.getAdapter(IFile.class));
+    IFile file = resource.getAdapter(IFile.class);
 
-    if (content == null) logResourceReadError(resource);
-    // TODO add encoding
-    else
+    byte[] content = FileUtils.getLocalFileContent(file);
+    String charset = FileUtils.getLocalFileCharset(file);
+
+    if (content == null || charset == null) {
+      logResourceReadError(resource);
+
+    } else {
       addActivity(
-          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, null));
+          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, charset));
+    }
   }
 
   private void addActivity(IResourceActivity activity) {
