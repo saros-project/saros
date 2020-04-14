@@ -142,13 +142,6 @@ public final class IntelliJProjectImpl extends IntelliJResourceImpl implements I
     return result.toArray(new IResource[0]);
   }
 
-  @Nullable
-  @Override
-  public String getDefaultCharset() {
-    // TODO retrieve encoding for the module or use the project settings
-    return null;
-  }
-
   @Override
   public boolean exists() {
     return !module.isDisposed() && module.isLoaded();

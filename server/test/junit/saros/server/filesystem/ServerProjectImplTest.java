@@ -42,11 +42,6 @@ public class ServerProjectImplTest extends EasyMockSupport {
   }
 
   @Test
-  public void defaultCharsetUTF8() throws Exception {
-    assertEquals("UTF-8", project.getDefaultCharset());
-  }
-
-  @Test
   public void getFileByPath() {
     IFile file = project.getFile(path("folder/file"));
     assertEquals(path("project/folder/file"), ((ServerFileImpl) file).getFullPath());

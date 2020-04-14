@@ -33,8 +33,6 @@ public interface IContainer extends IResource {
 
   public IResource[] members() throws IOException;
 
-  public String getDefaultCharset() throws IOException;
-
   /**
    * Returns a handle for the file with the given relative path to this resource.
    *

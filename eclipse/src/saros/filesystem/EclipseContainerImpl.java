@@ -65,15 +65,6 @@ public class EclipseContainerImpl extends EclipseResourceImpl implements IContai
     return ResourceAdapterFactory.create(path);
   }
 
-  @Override
-  public String getDefaultCharset() throws IOException {
-    try {
-      return getDelegate().getDefaultCharset();
-    } catch (CoreException e) {
-      throw new IOException(e);
-    }
-  }
-
   /**
    * Returns the original {@link org.eclipse.core.resources.IContainer IContainer} object.
    *

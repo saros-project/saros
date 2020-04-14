@@ -53,7 +53,6 @@ public class ServerContainerImplTest extends EasyMockSupport {
     expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
 
     expect(workspace.getProject("project")).andStubReturn(project);
-    expect(project.getDefaultCharset()).andStubReturn("UTF-8");
 
     replayAll();
 
@@ -130,10 +129,5 @@ public class ServerContainerImplTest extends EasyMockSupport {
     assertTrue(container.exists(path("subfolder")));
     assertTrue(container.exists(path("subfolder/file2")));
     assertFalse(container.exists(path("something/else")));
-  }
-
-  @Test
-  public void defaultCharset() throws IOException {
-    assertEquals("UTF-8", container.getDefaultCharset());
   }
 }
