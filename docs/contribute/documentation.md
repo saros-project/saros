@@ -2,8 +2,8 @@
 title: Documentation Writing
 ---
 
-In order to change the documentation you just simply follow the common [development process](processes/development.md)
-and the changes are deployed as soon as they are merged into the master branch.
+In order to change the documentation, you just simply follow the common [development process](processes/development.md).
+The changes are deployed as soon as they are merged into the master branch.
 
 ## Guidelines
 We prefer a small documentation that contains only important information which are related to Saros. In order to achieve this
@@ -22,7 +22,7 @@ directory on the master branch).
 
 ## Create and Change Diagrams
 In order to create diagrams, we use [mermaid](https://mermaid-js.github.io/mermaid/#/).
-Therefore is currently no jekyll integration. Therefore you have to add html tags into your
+There currently is no jekyll integration for this, meaning you have to add html tags into your
 markdown file:
 ```markdown
 <div class="mermaid" markdown="0">
@@ -30,7 +30,7 @@ mermaid content...
 </div>
 ```
 
-Don't forget the `markdown="0"` attribute in order to avoid that Jekyll converts the mermaid code to html.
+Don't forget the `markdown="0"` attribute in order to avoid Jekyll converting the mermaid code to html.
 
 ## Write IDE Specific Documentation
 Use the following tags if you want to embed an IDE specific part into a documentation or want to provide IDE specific versions of a page.
