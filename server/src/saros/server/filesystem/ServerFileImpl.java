@@ -22,6 +22,8 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
 
   private static final Logger log = Logger.getLogger(ServerFileImpl.class);
 
+  private static final String DEFAULT_CHARSET = "UTF-8";
+
   private String charset;
 
   /**
@@ -40,8 +42,13 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
   }
 
   @Override
-  public String getCharset() throws IOException {
-    return charset != null ? charset : getParent().getDefaultCharset();
+  public String getCharset() {
+    // TODO remove once #912 is resolved as this will no longer be necessary
+    if (charset == null) {
+      return DEFAULT_CHARSET;
+    }
+
+    return charset;
   }
 
   @Override
