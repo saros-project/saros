@@ -3,6 +3,7 @@ package saros.project;
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
@@ -11,6 +12,8 @@ import static org.easymock.EasyMock.verify;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,16 +24,18 @@ import saros.activities.FileActivity;
 import saros.activities.FileActivity.Purpose;
 import saros.activities.FileActivity.Type;
 import saros.activities.SPath;
-import saros.filesystem.ResourceAdapterFactory;
+import saros.filesystem.EclipseFileImpl;
 import saros.net.xmpp.JID;
 import saros.session.User;
 
 public class FileActivityConsumerTest {
 
-  private static final byte[] FILE_CONTENT = new byte[] {'a', 'b', 'c'};
+  private static final Charset charset = StandardCharsets.UTF_8;
+
+  private static final byte[] FILE_CONTENT = "abc".getBytes(charset);
 
   private static final byte[] INCOMING_SAME_CONTENT = FILE_CONTENT.clone();
-  private static final byte[] INCOMING_DIFFERENT_CONTENT = new byte[] {'a', 'b', 'd'};
+  private static final byte[] INCOMING_DIFFERENT_CONTENT = "abd".getBytes(charset);
 
   /** Unit under test */
   private FileActivityConsumer consumer;
@@ -38,11 +43,15 @@ public class FileActivityConsumerTest {
   /** Partial file mock in recording state, has to be replayed in every test before being used. */
   private IFile file;
 
+  /** Mocked path representing the file to test. */
+  private SPath path;
+
   private SharedResourcesManager resourceChangeListener;
 
   @Before
   public void setUp() throws CoreException {
 
+    // set up resource change listener mock
     resourceChangeListener = createMock(SharedResourcesManager.class);
 
     resourceChangeListener.suspend();
@@ -55,6 +64,7 @@ public class FileActivityConsumerTest {
 
     consumer = new FileActivityConsumer(null, resourceChangeListener, null);
 
+    // set up eclipse resource mock
     file = createMock(IFile.class);
 
     expect(file.getContents()).andStubReturn(new ByteArrayInputStream(FILE_CONTENT));
@@ -62,6 +72,15 @@ public class FileActivityConsumerTest {
     expect(file.exists()).andStubReturn(Boolean.TRUE);
     expect(file.getType()).andStubReturn(org.eclipse.core.resources.IResource.FILE);
     expect(file.getAdapter(IFile.class)).andStubReturn(file);
+
+    // set up saros resource wrapper mocks
+    EclipseFileImpl eclipseFileWrapper = createNiceMock(EclipseFileImpl.class);
+    expect(eclipseFileWrapper.getDelegate()).andStubReturn(file);
+    replay(eclipseFileWrapper);
+
+    path = createMock(SPath.class);
+    expect(path.getFile()).andStubReturn(eclipseFileWrapper);
+    replay(path);
   }
 
   @After
@@ -79,7 +98,7 @@ public class FileActivityConsumerTest {
 
     replay(file);
 
-    consumer.exec(createFileActivity(file, INCOMING_SAME_CONTENT));
+    consumer.exec(createFileActivity(INCOMING_SAME_CONTENT));
 
     verify(file);
   }
@@ -94,30 +113,20 @@ public class FileActivityConsumerTest {
 
     replay(file);
 
-    consumer.exec(createFileActivity(file, INCOMING_DIFFERENT_CONTENT));
+    consumer.exec(createFileActivity(INCOMING_DIFFERENT_CONTENT));
 
     // ensure file was written
     verify(file);
   }
 
-  private SPath createPathMockForFile(IFile file) {
-    final SPath path = createMock(SPath.class);
-
-    expect(path.getFile()).andStubReturn(ResourceAdapterFactory.create(file));
-
-    replay(path);
-
-    return path;
-  }
-
-  private FileActivity createFileActivity(IFile file, byte[] content) {
+  private FileActivity createFileActivity(byte[] content) {
     return new FileActivity(
         new User(new JID("foo@bar"), true, true, null),
         Type.CREATED,
         Purpose.ACTIVITY,
-        createPathMockForFile(file),
+        path,
         null,
         content,
-        null);
+        charset.name());
   }
 }
