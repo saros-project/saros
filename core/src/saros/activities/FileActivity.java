@@ -48,7 +48,9 @@ public class FileActivity extends AbstractResourceActivity
    *     null</code> otherwise)
    * @param content content of the file denoted by the path (only valid for {@link Type#CREATED} and
    *     {@link Type#MOVED})
-   * @param encoding the encoding the content is encoded with or <code>null</code>
+   * @param encoding the encoding the content is encoded with or <code>null</code> if (and only if)
+   *     the type is {@link Type#MOVED} and the content is <code>null</code> or the type is {@link
+   *     Type#REMOVED}
    */
   public FileActivity(
       User source,
@@ -75,6 +77,11 @@ public class FileActivity extends AbstractResourceActivity
       case MOVED:
         if (oldPath == null) throw new IllegalArgumentException();
         break;
+    }
+
+    if (encoding == null && (type == Type.CREATED || (type == Type.MOVED && content != null))) {
+      throw new IllegalArgumentException(
+          "Encoding must be passed if type is created and/or binary content is passed");
     }
 
     this.type = type;
