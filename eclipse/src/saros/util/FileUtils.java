@@ -2,6 +2,9 @@ package saros.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -193,5 +196,35 @@ public class FileUtils {
       IOUtils.closeQuietly(in);
     }
     return content;
+  }
+
+  /**
+   * Retrieves the character set of a local file.
+   *
+   * @param localFile the file for which to retrieve the character set
+   * @return the character set of a local file or <code>null</code> if the character set could not
+   *     be determined or the charset is not valid
+   * @see IFile#getCharset()
+   * @see Charset#forName(String)
+   */
+  public static String getLocalFileCharset(IFile localFile) {
+    String charset = null;
+
+    try {
+      charset = localFile.getCharset();
+
+      // validate charset
+      Charset.forName(charset);
+
+    } catch (CoreException e) {
+      log.warn("could not get charset of file " + localFile.getFullPath());
+
+    } catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
+      log.warn("charset for " + localFile.getFullPath() + " not valid - charset name: " + charset);
+
+      return null;
+    }
+
+    return charset;
   }
 }
