@@ -18,7 +18,6 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
@@ -30,6 +29,7 @@ import saros.net.util.XMPPUtils;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.contact.XMPPContact;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.User;
 import saros.ui.Messages;
@@ -49,11 +49,6 @@ import saros.util.CoreUtils;
  * TODO the receiving and file transfer creation part is misplaced here ... wrap
  * those calls and put them in the dpp.net package e.g XMPPFileTransfer class
  * hiding the need for tracking the XMPPConnection status etc.
- */
-
-/*
- * FIXME as the roster currently does not support multiple resources it can be
- * random which presence will receive the file
  */
 public class SendFileAction extends Action implements Disposable {
 
@@ -131,8 +126,6 @@ public class SendFileAction extends Action implements Disposable {
 
   private FileTransferManager fileTransferManager;
 
-  private Connection connection;
-
   public SendFileAction() {
     super(Messages.SendFileAction_title);
     SarosPluginContext.initComponent(this);
@@ -154,20 +147,16 @@ public class SendFileAction extends Action implements Disposable {
 
   @Override
   public void run() {
-
-    if (!canRun()) return;
-
     final JID jid = getSelectedJID();
+    if (jid == null) return;
 
     final FileDialog fd = new FileDialog(SWTUtils.getShell(), SWT.OPEN);
     fd.setText(Messages.SendFileAction_filedialog_text);
 
     final String filename = fd.open();
-
     if (filename == null) return;
 
     final File file = new File(filename);
-
     if (file.isDirectory()) return;
 
     // connection changes are executed while the dialog is open !
@@ -200,30 +189,18 @@ public class SendFileAction extends Action implements Disposable {
     List<User> sessionUsers =
         SelectionRetrieverFactory.getSelectionRetriever(User.class).getSelection();
 
-    List<JID> contacts = SelectionRetrieverFactory.getSelectionRetriever(JID.class).getSelection();
+    List<XMPPContact> contacts =
+        SelectionRetrieverFactory.getSelectionRetriever(XMPPContact.class).getSelection();
 
     // currently only one transfer per click (maybe improved later)
     if (contacts.size() + sessionUsers.size() != 1) return null;
 
-    if (sessionUsers.size() == 1 && sessionUsers.get(0).isLocal()) return null;
+    if (sessionUsers.size() == 1) {
+      if (sessionUsers.get(0).isLocal()) return null;
+      return sessionUsers.get(0).getJID();
+    }
 
-    if (contacts.size() == 1 && !isOnline(contacts.get(0))) return null;
-
-    if (sessionUsers.size() == 1) return sessionUsers.get(0).getJID();
-
-    // FIXME see TODO at class level ... this currently does not work well
-    // if (contacts.size() == 1 && !isOnline(contacts.get(0)))
-    // return null;
-    // return contacts.get(0);
-
-    // workaround
-    if (connection == null) return null;
-
-    Presence presence = connection.getRoster().getPresence(contacts.get(0).getBase());
-
-    if (!presence.isAvailable() || presence.getFrom() == null) return null;
-
-    return new JID(presence.getFrom());
+    return contacts.get(0).getOnlineJid().orElse(null);
   }
 
   private void updateFileTransferManager(Connection connection) {
@@ -236,14 +213,6 @@ public class SendFileAction extends Action implements Disposable {
       fileTransferManager = new FileTransferManager(connection);
       fileTransferManager.addFileTransferListener(fileTransferListener);
     }
-
-    this.connection = connection;
-  }
-
-  private boolean isOnline(JID jid) {
-    if (connection == null) return false;
-
-    return connection.getRoster().getPresenceResource(jid.getRAW()).isAvailable();
   }
 
   // TODO popping up dialogs can create a very bad UX but we have currently no

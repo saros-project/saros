@@ -126,6 +126,17 @@ public class XMPPContact {
   }
 
   /**
+   * Provide the best resource of a contact currently online.
+   *
+   * @deprecated This method should be avoided in future use outside of {@link saros.net.xmpp}
+   * @return Optional the JID of a resource online regardless of Saros support
+   */
+  @Deprecated
+  public Optional<JID> getOnlineJid() {
+    return bestResource.map(r -> r.fullJid);
+  }
+
+  /**
    * Provide the JID of a Saros Supporting resource if available.
    *
    * @deprecated This method should be avoided in future use outside of {@link saros.net.xmpp}
