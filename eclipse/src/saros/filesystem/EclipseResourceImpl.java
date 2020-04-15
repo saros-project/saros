@@ -6,27 +6,10 @@ import static saros.filesystem.IResource.Type.PROJECT;
 import static saros.filesystem.IResource.Type.ROOT;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 
 public class EclipseResourceImpl implements IResource {
-
-  private static final Map<
-          Class<? extends saros.filesystem.IResource>,
-          Class<? extends org.eclipse.core.resources.IResource>>
-      classMapping;
-
-  static {
-    classMapping = new HashMap<>();
-    classMapping.put(IResource.class, org.eclipse.core.resources.IResource.class);
-    classMapping.put(IWorkspaceRoot.class, org.eclipse.core.resources.IWorkspaceRoot.class);
-    classMapping.put(IContainer.class, org.eclipse.core.resources.IContainer.class);
-    classMapping.put(IProject.class, org.eclipse.core.resources.IProject.class);
-    classMapping.put(IFolder.class, org.eclipse.core.resources.IFolder.class);
-    classMapping.put(IFile.class, org.eclipse.core.resources.IFile.class);
-  }
 
   protected final org.eclipse.core.resources.IResource delegate;
 
@@ -146,22 +129,6 @@ public class EclipseResourceImpl implements IResource {
   public IPath getLocation() {
     org.eclipse.core.runtime.IPath location = delegate.getLocation();
     return (location != null) ? new EclipsePathImpl(location) : null;
-  }
-
-  @Override
-  public <T extends IResource> T adaptTo(Class<T> clazz) {
-
-    /*
-     * As we do not know what Eclipse is doing in the background play it safe and let Eclipse always
-     * convert the object.
-     */
-
-    Class<? extends org.eclipse.core.resources.IResource> classToMap = classMapping.get(clazz);
-
-    if (classToMap == null)
-      throw new IllegalArgumentException("class: " + clazz + " is not available as adapter");
-
-    return clazz.cast(ResourceAdapterFactory.create(delegate.getAdapter(classToMap)));
   }
 
   /**

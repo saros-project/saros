@@ -9,7 +9,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import saros.filesystem.IResource;
 import saros.intellij.editor.ProjectAPI;
 
@@ -109,11 +108,5 @@ public abstract class IntelliJResourceImpl implements IResource {
     Path filePath = Paths.get(virtualFile.getPath()).normalize();
 
     return filePath.startsWith(projectConfigDirPath);
-  }
-
-  @Nullable
-  @Override
-  public <T extends IResource> T adaptTo(@NotNull Class<T> clazz) {
-    return clazz.isInstance(this) ? clazz.cast(this) : null;
   }
 }

@@ -7,21 +7,6 @@ import java.io.IOException;
  * mentioned otherwise all offered methods are equivalent to their Eclipse counterpart.
  *
  * <p>Represents an element (normally a file or folder) in the (virtual) file system.
- *
- * <p><b>Note:</b> Instances of this class should <b>NOT</b> be casted using the Java type cast
- * operator. Instead use the {@link #adaptTo(Class)} method.
- *
- * <p>Example:
- *
- * <pre>
- *     IResource resource = getAResource();
- *
- *     if (resource == IResource.File) {
- *         IFile file = resource.adaptTo(IFile.class) // you may assume this will never return null
- *
- *         // do stuff
- *     }
- * </pre>
  */
 public interface IResource {
 
@@ -71,6 +56,4 @@ public interface IResource {
   public void delete() throws IOException;
 
   public IPath getLocation();
-
-  public <T extends IResource> T adaptTo(Class<T> clazz);
 }

@@ -3,8 +3,6 @@ package saros.server.filesystem;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static saros.filesystem.IResource.Type.FILE;
 import static saros.server.filesystem.FileSystemTestUtils.createFile;
@@ -17,7 +15,6 @@ import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
@@ -117,13 +114,6 @@ public class ServerResourceImplTest extends EasyMockSupport {
   @Test
   public void isNeverIgnored() throws Exception {
     assertFalse(resource.isIgnored());
-  }
-
-  @Test
-  public void getAdapterDefault() {
-    assertSame(resource, resource.adaptTo(ExampleResource.class));
-    assertSame(resource, resource.adaptTo(IResource.class));
-    assertNull(resource.adaptTo(IFile.class));
   }
 
   private void createFileForResource() throws IOException {

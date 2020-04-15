@@ -81,11 +81,6 @@ public abstract class ServerResourceImpl implements IResource {
   }
 
   @Override
-  public <T extends IResource> T adaptTo(Class<T> clazz) {
-    return clazz.isInstance(this) ? clazz.cast(this) : null;
-  }
-
-  @Override
   public final boolean equals(Object obj) {
 
     if (this == obj) return true;
