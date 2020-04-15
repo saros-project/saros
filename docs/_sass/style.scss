@@ -23,3 +23,8 @@ html {
 .main-content {
   padding-bottom: $footer-height + 20 !important;
 }
+
+table {
+  @extend .table;
+  @extend .table-bordered;
+}
