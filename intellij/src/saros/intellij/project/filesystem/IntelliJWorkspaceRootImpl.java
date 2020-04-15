@@ -86,9 +86,4 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
   public IPath getLocation() {
     throw new UnsupportedOperationException();
   }
-
-  @Override
-  public <T extends IResource> T adaptTo(Class<T> clazz) {
-    return null;
-  }
 }
