@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.file.FileAlreadyExistsException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -139,6 +140,21 @@ public final class IntelliJFileImpl extends IntelliJResourceImpl implements IFil
     final VirtualFile file = project.findVirtualFile(path);
 
     return file == null ? null : file.getCharset().name();
+  }
+
+  @Override
+  public void setCharset(String charset) throws IOException {
+    if (charset == null) {
+      return;
+    }
+
+    final VirtualFile file = project.findVirtualFile(path);
+
+    if (file == null) {
+      throw new FileNotFoundException("Could not obtain virtual file for " + this);
+    }
+
+    file.setCharset(Charset.forName(charset));
   }
 
   @NotNull
