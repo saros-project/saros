@@ -31,8 +31,7 @@ public class IntellijCollaborationUtilsImpl implements ICollaborationUtils {
     Set<Project> sharedProjects = new HashSet<>();
 
     for (IResource resource : projects) {
-      sharedProjects.add(
-          resource.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject());
+      sharedProjects.add(((IntelliJProjectImpl) resource.getProject()).getModule().getProject());
     }
 
     // Workaround while we only allow a single module (-> single project) to be shared

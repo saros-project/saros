@@ -291,7 +291,7 @@ public class CollaborationUtils {
           totalFileCount++;
 
           try {
-            IFile file = resource.adaptTo(IFile.class);
+            IFile file = (IFile) resource;
 
             totalFileSize += file.getSize();
           } catch (IOException e) {
@@ -301,7 +301,7 @@ public class CollaborationUtils {
         case PROJECT:
         case FOLDER:
           try {
-            IContainer container = resource.adaptTo(IContainer.class);
+            IContainer container = (IContainer) resource;
 
             Pair<Long, Long> subFileCountAndSize =
                 getFileCountAndSize(Arrays.asList(container.members()));

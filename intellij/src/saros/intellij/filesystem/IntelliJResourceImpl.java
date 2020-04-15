@@ -17,7 +17,7 @@ public abstract class IntelliJResourceImpl implements IResource {
 
   @Override
   public boolean isIgnored() {
-    IntelliJProjectImpl sarosProject = getProject().adaptTo(IntelliJProjectImpl.class);
+    IntelliJProjectImpl sarosProject = (IntelliJProjectImpl) getProject();
 
     VirtualFile virtualFile = sarosProject.findVirtualFile(getProjectRelativePath());
 

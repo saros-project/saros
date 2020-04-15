@@ -145,7 +145,7 @@ public class NegotiationHandler implements INegotiationHandler {
       // TODO: The file path is currently dictated by the name, potentially resulting in CONFLICTS
       if (!project.exists()) {
         try {
-          project.adaptTo(ServerProjectImpl.class).create();
+          ((ServerProjectImpl) project).create();
         } catch (IOException e) {
           negotiation.localCancel(
               "Error creating project folder", NegotiationTools.CancelOption.NOTIFY_PEER);

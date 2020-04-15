@@ -223,8 +223,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             @NotNull String replacedText,
             @NotNull String newText) {
 
-          Project project =
-              file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+          Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
 
           if (!replacedText.isEmpty()) {
             String documentReplacedText = document.getText(new TextRange(start, oldEnd));
@@ -554,7 +553,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * @param project the added project
    */
   private void addProjectResources(IProject project) {
-    Module module = project.adaptTo(IntelliJProjectImpl.class).getModule();
+    Module module = ((IntelliJProjectImpl) project).getModule();
     ModuleFileIndex moduleFileIndex = ModuleRootManager.getInstance(module).getFileIndex();
     Project intellijProject = module.getProject();
 
@@ -1120,7 +1119,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Set<String> visibleFilePaths = new HashSet<>();
 
-    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
 
     for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
       visibleFilePaths.add(virtualFile.getPath());
