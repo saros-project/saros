@@ -15,10 +15,17 @@ public class Editor {
   private GapBuffer content;
 
   public Editor(IFile file) throws IOException {
+    String charset = file.getCharset();
+
+    if (charset == null) {
+      throw new IllegalStateException(
+          "Tried to open an editor for a file without a valid charset mapping: " + file);
+    }
+
     this.file = file;
 
     try (InputStream input = file.getContents()) {
-      content = new GapBuffer(IOUtils.toString(input));
+      content = new GapBuffer(IOUtils.toString(input, charset));
     }
   }
 
@@ -87,6 +94,6 @@ public class Editor {
    * @throws IOException if writing the file fails
    */
   public void save() throws IOException {
-    getFile().setContents(IOUtils.toInputStream(content.toString()));
+    getFile().setContents(IOUtils.toInputStream(content.toString(), file.getCharset()));
   }
 }
