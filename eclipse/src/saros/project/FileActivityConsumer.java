@@ -1,12 +1,13 @@
 package saros.project;
 
 import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Arrays;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import saros.activities.FileActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
@@ -63,12 +64,18 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   public void receive(FileActivity activity) {
     try {
       handleFileActivity(activity);
-    } catch (CoreException e) {
+
+    } catch (CoreException
+        | IOException
+        | UnsupportedCharsetException
+        | IllegalCharsetNameException e) {
+
       log.error("failed to execute file activity: " + activity, e);
     }
   }
 
-  private void handleFileActivity(FileActivity activity) throws CoreException {
+  private void handleFileActivity(FileActivity activity)
+      throws CoreException, IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
     if (activity.isRecovery()) {
       handleFileRecovery(activity);
@@ -89,7 +96,9 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     }
   }
 
-  private void handleFileRecovery(FileActivity activity) throws CoreException {
+  private void handleFileRecovery(FileActivity activity)
+      throws CoreException, IOException, IllegalCharsetNameException, UnsupportedCharsetException {
+
     SPath path = activity.getPath();
 
     log.debug("performing recovery for file: " + activity.getPath().getFullPath());
@@ -125,7 +134,8 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     if (editorWasOpen && type != FileActivity.Type.REMOVED) editorManager.openEditor(path, true);
   }
 
-  private void handleFileMove(FileActivity activity) throws CoreException {
+  private void handleFileMove(FileActivity activity)
+      throws CoreException, IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
     final IFile fileDestination = toEclipseIFile(activity.getPath().getFile());
 
@@ -151,8 +161,12 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
     else log.warn("could not delete file " + file + " because it does not exist");
   }
 
-  private void handleFileCreation(FileActivity activity) throws CoreException {
-    final IFile file = toEclipseIFile(activity.getPath().getFile());
+  private void handleFileCreation(FileActivity activity)
+      throws CoreException, IOException, IllegalCharsetNameException, UnsupportedCharsetException {
+
+    saros.filesystem.IFile sarosFile = activity.getPath().getFile();
+
+    final IFile file = toEclipseIFile(sarosFile);
 
     final String encoding = activity.getEncoding();
     final byte[] newContent = activity.getContent();
@@ -167,66 +181,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
       log.debug("FileActivity " + activity + " dropped (same content)");
     }
 
-    if (encoding != null) updateFileEncoding(encoding, file);
-  }
-
-  /**
-   * Updates encoding of a file. A best effort is made to use the inherited encoding if available.
-   * Does nothing if the file does not exist or the encoding to set is <code>null</code>
-   *
-   * @param encoding the encoding that should be used
-   * @param file the file to update
-   * @throws CoreException if setting the encoding failed
-   */
-  private static void updateFileEncoding(final String encoding, final IFile file)
-      throws CoreException {
-
-    if (encoding == null) return;
-
-    if (!file.exists()) return;
-
-    try {
-      Charset.forName(encoding);
-    } catch (Exception e) {
-      log.warn(
-          "encoding " + encoding + " for file " + file + " is not available on this platform", e);
-      return;
-    }
-
-    String projectEncoding = null;
-    String fileEncoding = null;
-
-    try {
-      projectEncoding = file.getProject().getDefaultCharset();
-    } catch (CoreException e) {
-      log.warn("could not determine project encoding for project " + file.getProject(), e);
-    }
-
-    try {
-      fileEncoding = file.getCharset();
-    } catch (CoreException e) {
-      log.warn("could not determine file encoding for file " + file, e);
-    }
-
-    if (encoding.equals(fileEncoding)) {
-      log.debug("encoding does not need to be changed for file: " + file);
-      return;
-    }
-
-    // use inherited encoding if possible
-    if (encoding.equals(projectEncoding)) {
-      log.debug(
-          "changing encoding for file "
-              + file
-              + " to use default project encoding: "
-              + projectEncoding);
-      file.setCharset(null, new NullProgressMonitor());
-      return;
-    }
-
-    log.debug("changing encoding for file " + file + " to encoding: " + encoding);
-
-    file.setCharset(encoding, new NullProgressMonitor());
+    if (encoding != null) sarosFile.setCharset(encoding);
   }
 
   private static IFile toEclipseIFile(saros.filesystem.IFile file) {
