@@ -2,9 +2,9 @@
   <div class="container-fluid">
     <nav id="top-nav" class="navbar navbar-expand-sm navbar-dark bg-dark py-2 px-0">
       <!-- Logo -->
-      <a class="ml-md-3 navbar-brand pr-5" href="{{ '/' | relative_url }}">
+      <a class="ml-md-3 navbar-brand" href="{{ '/' | relative_url }}">
         <img class="float-left" src="{{ '/assets/images/logo/saros-logo.svg' | relative_url }}" />
-        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline ">{{ site.title }}</span>
+        <span class="text-decoration-none pl-2 d-inline d-sm-none d-md-inline pr-5">{{ site.title }}</span>
       </a>
 
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
@@ -21,7 +21,7 @@
         {% assign class = 'active' %}
         {% endif %}
         <li class="nav-item {{ class }}">
-          <a class="nav-link font-weight-bold text-uppercase py-sm-2"
+          <a class="nav-link font-weight-bold text-nowrap text-uppercase py-sm-2"
             href="{{ link.url | relative_url }}">{{ link.title }}</a>
         </li>
         {% endfor %}
