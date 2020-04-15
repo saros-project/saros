@@ -129,7 +129,7 @@ public class LocalEditorHandler {
       return null;
     }
 
-    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -255,7 +255,7 @@ public class LocalEditorHandler {
       return false;
     }
 
-    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
 
     return ProjectAPI.isOpen(project, doc);
   }

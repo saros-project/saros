@@ -70,7 +70,7 @@ public class ModuleConfigurationProvider implements ProjectDataProvider {
   public Map<String, String> getMapping(@NotNull IProject project) {
     Map<String, String> optionsMap = new HashMap<>();
 
-    Module module = project.adaptTo(IntelliJProjectImpl.class).getModule();
+    Module module = ((IntelliJProjectImpl) project).getModule();
 
     String moduleTypeName = module.getModuleTypeName();
 

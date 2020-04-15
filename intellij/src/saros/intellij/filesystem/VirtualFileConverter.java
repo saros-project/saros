@@ -80,7 +80,7 @@ public class VirtualFileConverter {
   public static IResource convertToResource(
       @NotNull VirtualFile virtualFile, @NotNull IProject project) {
 
-    IntelliJProjectImpl wrappedModule = project.adaptTo(IntelliJProjectImpl.class);
+    IntelliJProjectImpl wrappedModule = (IntelliJProjectImpl) project;
 
     return wrappedModule.getResource(virtualFile);
   }
@@ -101,7 +101,7 @@ public class VirtualFileConverter {
           "The given resource must be a file or a folder. resource: " + resource);
     }
 
-    IntelliJProjectImpl wrappedModule = resource.getProject().adaptTo(IntelliJProjectImpl.class);
+    IntelliJProjectImpl wrappedModule = (IntelliJProjectImpl) resource.getProject();
 
     return wrappedModule.findVirtualFile(resource.getProjectRelativePath());
   }

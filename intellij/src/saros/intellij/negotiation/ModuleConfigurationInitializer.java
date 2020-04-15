@@ -94,7 +94,7 @@ public class ModuleConfigurationInitializer implements Startable {
    * @param wrappedModule the <code>IProject</code> representing the shared module
    */
   private void applyModuleConfiguration(@NotNull IProject wrappedModule) {
-    Module module = wrappedModule.adaptTo(IntelliJProjectImpl.class).getModule();
+    Module module = ((IntelliJProjectImpl) wrappedModule).getModule();
 
     ModuleConfiguration moduleConfiguration = queuedModuleOptions.remove(module);
 

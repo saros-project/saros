@@ -78,7 +78,7 @@ public class LocalEditorManipulator {
       return null;
     }
 
-    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -118,7 +118,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
 
     if (ProjectAPI.isOpen(project, virtualFile)) {
       ProjectAPI.closeEditor(project, virtualFile);
@@ -235,7 +235,7 @@ public class LocalEditorManipulator {
       return;
     }
 
-    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = ((IntelliJProjectImpl) file.getProject()).getModule().getProject();
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {
