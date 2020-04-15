@@ -4,6 +4,8 @@ import com.intellij.openapi.application.ModalityState;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.FileActivity;
@@ -92,7 +94,8 @@ public class SharedResourcesManager implements Startable {
         public void receive(FileActivity activity) {
           try {
             handleFileActivity(activity);
-          } catch (IOException e) {
+
+          } catch (IOException | IllegalCharsetNameException | UnsupportedCharsetException e) {
             log.error("Failed to execute activity: " + activity, e);
           }
         }
@@ -116,7 +119,8 @@ public class SharedResourcesManager implements Startable {
         }
       };
 
-  private void handleFileActivity(@NotNull FileActivity activity) throws IOException {
+  private void handleFileActivity(@NotNull FileActivity activity)
+      throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
     if (activity.isRecovery()) {
       handleFileRecovery(activity);
@@ -142,7 +146,8 @@ public class SharedResourcesManager implements Startable {
     }
   }
 
-  private void handleFileRecovery(@NotNull FileActivity activity) throws IOException {
+  private void handleFileRecovery(@NotNull FileActivity activity)
+      throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
     SPath path = activity.getPath();
 
@@ -185,7 +190,8 @@ public class SharedResourcesManager implements Startable {
    * @param activity the move activity to execute
    * @throws IOException if the creation of the new file or the deletion of the old file fails
    */
-  private void handleFileMove(@NotNull FileActivity activity) throws IOException {
+  private void handleFileMove(@NotNull FileActivity activity)
+      throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
     SPath oldPath = activity.getOldPath();
     SPath newPath = activity.getPath();
@@ -228,15 +234,19 @@ public class SharedResourcesManager implements Startable {
       byte[] activityContent = activity.getContent();
 
       InputStream contents;
+      String charset;
 
       if (activityContent != null) {
         contents = new ByteArrayInputStream(activityContent);
+        charset = activity.getEncoding();
 
       } else {
         contents = oldFile.getContents();
+        charset = oldFile.getCharset();
       }
 
       newFile.create(contents);
+      newFile.setCharset(charset);
 
       if (fileOpen) {
         localEditorManipulator.openEditor(newPath, false);
@@ -288,7 +298,8 @@ public class SharedResourcesManager implements Startable {
     annotationManager.removeAnnotations(file);
   }
 
-  private void handleFileCreation(@NotNull FileActivity activity) throws IOException {
+  private void handleFileCreation(@NotNull FileActivity activity)
+      throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
     SPath path = activity.getPath();
     IFile file = path.getFile();
@@ -305,6 +316,8 @@ public class SharedResourcesManager implements Startable {
       setFilesystemModificationHandlerEnabled(false);
 
       file.create(contents);
+
+      file.setCharset(activity.getEncoding());
 
     } finally {
       setFilesystemModificationHandlerEnabled(true);
