@@ -3,6 +3,8 @@ package saros.server.session;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import org.apache.log4j.Logger;
 import saros.activities.FileActivity;
 import saros.activities.SPath;
@@ -59,17 +61,27 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
           log.warn("Unknown file activity type " + activity.getType());
           break;
       }
-    } catch (IOException e) {
+    } catch (IOException | IllegalCharsetNameException | UnsupportedCharsetException e) {
       log.error("Could not execute " + activity, e);
     }
   }
 
-  private void executeFileCreation(FileActivity activity) throws IOException {
+  private void executeFileCreation(FileActivity activity)
+      throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
+
     IFile file = activity.getPath().getFile();
     file.create(new ByteArrayInputStream(activity.getContent()));
+
+    String charset = activity.getEncoding();
+
+    if (charset != null) {
+      file.setCharset(charset);
+    }
   }
 
-  private void executeFileMove(FileActivity activity) throws IOException {
+  private void executeFileMove(FileActivity activity)
+      throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
+
     SPath oldPath = activity.getOldPath();
     IFile oldFile = oldPath.getFile();
     SPath newPath = activity.getPath();
@@ -89,15 +101,19 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
     byte[] activityContent = activity.getContent();
 
     InputStream contents;
+    String charset;
 
     if (activityContent != null) {
       contents = new ByteArrayInputStream(activityContent);
+      charset = activity.getEncoding();
 
     } else {
       contents = oldFile.getContents();
+      charset = oldFile.getCharset();
     }
 
     newFile.create(contents);
+    newFile.setCharset(charset);
 
     oldFile.delete();
 
