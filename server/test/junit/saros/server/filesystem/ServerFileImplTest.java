@@ -63,7 +63,7 @@ public class ServerFileImplTest extends EasyMockSupport {
 
   @Test
   public void getCharsetIfExplicitlySet() throws Exception {
-    ((ServerFileImpl) file).setCharset("ISO-8859-1");
+    file.setCharset("ISO-8859-1");
     assertEquals("ISO-8859-1", file.getCharset());
   }
 

@@ -23,6 +23,8 @@ package saros.filesystem;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.IllegalCharsetNameException;
 
 /**
  * This interface is under development. It currently equals its Eclipse counterpart. If not
@@ -30,6 +32,19 @@ import java.io.InputStream;
  */
 public interface IFile extends IResource {
   public String getCharset() throws IOException;
+
+  /**
+   * Sets the given character set for this file.
+   *
+   * <p>Does nothing if the passed character set is <code>null</code>.
+   *
+   * @param charset the character set to set
+   * @throws IOException if the character set could not be set
+   * @throws IllegalCharsetNameException if the given character set name is not valid
+   * @throws UnsupportedEncodingException if the given character set is not supported by the local
+   *     JVM
+   */
+  void setCharset(String charset) throws IOException;
 
   public InputStream getContents() throws IOException;
 

@@ -4,6 +4,9 @@ import static saros.filesystem.IResource.Type.FILE;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -31,17 +34,6 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
     super(workspace, path);
   }
 
-  /**
-   * Sets the character encoding to use when decoding this file to text. Passing <code>null</code>
-   * means the default encoding of the surrounding container should be used (which is the default
-   * behavior).
-   *
-   * @param charset the file's character encoding
-   */
-  public void setCharset(String charset) {
-    this.charset = charset;
-  }
-
   @Override
   public Type getType() {
     return FILE;
@@ -50,6 +42,20 @@ public class ServerFileImpl extends ServerResourceImpl implements IFile {
   @Override
   public String getCharset() throws IOException {
     return charset != null ? charset : getParent().getDefaultCharset();
+  }
+
+  @Override
+  public void setCharset(String charset)
+      throws IllegalCharsetNameException, UnsupportedCharsetException {
+
+    if (charset == null) {
+      return;
+    }
+
+    // Check whether charset is valid and supported
+    Charset.forName(charset);
+
+    this.charset = charset;
   }
 
   @Override
