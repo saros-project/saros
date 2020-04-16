@@ -22,7 +22,6 @@ import saros.activities.EditorActivity;
 import saros.activities.FileActivity;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
-import saros.activities.FolderMovedActivity;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.ITargetedActivity;
@@ -355,7 +354,6 @@ public class ActivityHandlerTest {
     activities.add(EasyMock.createNiceMock(PermissionActivity.class));
     activities.add(EasyMock.createNiceMock(FolderCreatedActivity.class));
     activities.add(EasyMock.createNiceMock(FolderDeletedActivity.class));
-    activities.add(EasyMock.createNiceMock(FolderMovedActivity.class));
     activities.add(EasyMock.createNiceMock(FileActivity.class));
     activities.add(EasyMock.createNiceMock(EditorActivity.class));
     activities.add(EasyMock.createNiceMock(StopActivity.class));
