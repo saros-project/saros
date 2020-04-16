@@ -1,0 +1,11 @@
+- icon_classes: fab fa-github
+  link: https://github.com/saros-project/saros
+
+- icon_classes: fab fa-gitter
+  link: https://gitter.im/saros-project/saros/user
+
+- icon_classes: fas fa-envelope
+  link: https://groups.google.com/forum/#!forum/saros-user
+
+- icon_classes: fab fa-twitter
+  link: https://twitter.com/saros_project

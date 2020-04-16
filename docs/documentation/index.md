@@ -28,19 +28,12 @@ toc: false
 *   The initiator of a session, the **host**, has a **privileged role**.
     To get familiar with this concept check out our comic:
 
-[//]: # This link does not point to a markdown file because Jekyll is unable to convert this nested link into a link with html extension
-[![](images/comics/small_6-1_host-comic_frame-1.jpg)
-![](images/comics/small_6-1_host-comic_frame-2.jpg)
-![](images/comics/small_6-1_host-comic_frame-3.jpg)
-![](images/comics/small_6-1_host-comic_frame-4.jpg)
-![](images/comics/small_host-comic_frame-5.jpg)
-![](images/comics/small_host-comic_frame-6.jpg)](host-comic.html)
-
+{% include host-warning.html %}
 
 ### Saros is not screen sharing, desktop sharing, or application sharing.
 
 *   That means for instance that it does not support joint
-    interactive [testing](host-comic.md).
+    interactive testing.
 
 ## Saros can be used in various scenarios.
 

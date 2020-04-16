@@ -1,0 +1,18 @@
+// style required only for the index page
+
+.index-content {
+  padding-bottom: $footer-height !important;
+}
+
+.btn-getting-started {
+  color: $theme-color;
+  background-color: $white;
+  border-color: $theme-color;
+  font-weight: bold;
+  
+  &:hover {
+    background-color: $theme-color;
+    color: $white;
+    border-color: $white;
+  }
+}

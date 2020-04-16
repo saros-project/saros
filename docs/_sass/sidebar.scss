@@ -1,0 +1,22 @@
+.leading-icon {
+  font-weight: normal !important;
+  padding-right: 0.5em;
+  font-family: "Font Awesome 5 Free";
+}
+
+// This places an invisble icon in front
+// of entries that are not collapsable.
+.not-collapsable-side-item::before {
+  @extend .leading-icon;
+  color: transparent;
+  content: '\f146';
+}
+
+.collapsable-side-item::before {
+  @extend .leading-icon;
+  content: '\f146';
+}
+.collapsable-side-item.collapsed::before {
+  @extend .leading-icon;
+  content: '\f0fe';
+}

@@ -1,0 +1,15 @@
+<script src="{{'/node_modules/jquery/dist/jquery.min.js' | relative_url }}"></script>
+<script src="{{'/node_modules/popper.js/dist/umd/popper.min.js' | relative_url }}"></script>
+<script src="{{'/node_modules/bootstrap/dist/js/bootstrap.min.js' | relative_url }}"></script>
+
+<script src="{{'/node_modules/mermaid/dist/mermaid.min.js' | relative_url }}"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true
+});
+</script>
+<!-- load after its dependency jquery -->
+{% unless include.load_custom_scripts == false %}
+<script src="{{ '/assets/js/ide-tabs.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/toc.js' | relative_url }}"></script>
+{% endunless %}

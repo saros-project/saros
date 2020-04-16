@@ -1,0 +1,30 @@
+html {
+  position: relative;
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+.bg-dark {
+  @extend .bg-dark;
+  color: $white;
+}
+
+.nav-link {
+  color: $sidebar-link-color;
+
+  // the default class active is used by the scrollspy
+  // and leads to unwanted sideffects during scrolling
+  &.active-link, &.active, &:hover {
+    color: $theme-color;
+  }
+}
+
+// Avoid that footer covers content
+.main-content {
+  padding-bottom: $footer-height + 20 !important;
+}
+
+table {
+  @extend .table;
+  @extend .table-bordered;
+}

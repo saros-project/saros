@@ -22,9 +22,43 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.6
+
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+          
       - uses: actions/checkout@v2
+        
+      - name: Install JavaScript dependencies
+        run: |
+          cd docs
+          npm install
+          
       - name: Building jekyll documentation
-        uses: agentd00nut/jekyll-build-optional-deploy-gh-pages@v1
-        env:
-          JEKYLL_ROOT: "docs/"
-          DEPLOY_SITE: "false"
+        run: |
+          gem install bundler
+          cd docs
+          bundle install --jobs 4 --retry 3
+          bundle exec jekyll build
+
+      # We deploy the compiled jekyll pages to the gh-pages branch
+      # therefore we want to avoid that GitHub tries to interpret
+      # the gh-pages content as Jekyll project
+      # https://github.blog/2009-12-29-bypassing-jekyll-on-github-pages/
+      - name: Create .nojekyll file
+        if: github.ref == 'refs/heads/master'
+        run: |
+          touch docs/_site/.nojekyll
+      - name: Deploy 🚀
+        if: github.ref == 'refs/heads/master'
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: docs/_site # The folder the action should deploy.
+          SINGLE_COMMIT: true # Don't preserve deployment history.

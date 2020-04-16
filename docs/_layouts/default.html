@@ -1,41 +1,51 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang | default: 'en-US' }}">
 
-  {% include head.html %}
+{% include head.html %}
 
-  <body>
-<div class="container-fluid">
+<body>
+  {% include navbar.html %}
+  <div class="container-fluid">
 
-    {% include navbar.html %}
-
+    {% assign sidebar_data = nil %}
     {% if page.url contains '/documentation/'  %}
-      {% assign sidebar_data = site.data.documentation.sidebar %}
+    {% assign sidebar_data = site.data.documentation.sidebar %}
     {% elsif page.url contains '/contribute' %}
-      {% assign sidebar_data = site.data.contribute.sidebar %}
+    {% assign sidebar_data = site.data.contribute.sidebar %}
     {% elsif page.url contains '/releases' %}
-      {% assign sidebar_data = site.data.releases.sidebar %}
+    {% assign sidebar_data = site.data.releases.sidebar %}
     {% endif %}
 
-     <div class="row flex-xl-nowrap">
-       <div class="col-12 col-md-3 col-xl-2">
-         {% include sidebar.html %}
-       </div>
+    {% assign content_y_margin = 'my-3' %}
 
-       <div id="main-content" class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 main-content">
+    <div class="row justify-content-left flex-xl-nowrap">
+      <!-- Left sidebar -->
+      <div class="col-12 col-md-4 col-xl-3 my-3 px-0  ">
+        {% if sidebar_data %}
+        {% include sidebar.html %}
+        {% endif %}
+      </div>
 
-           <h1 class="display-4">{{page.title}}</h1>
-           {{ content }}
+      <div id="main-content"
+        class="col-12 col-md-8 col-lg-6 main-content my-3 px-sm-2 px-md-1 px-xl-0">
 
-       </div>
-       <div class="col-xl-2">
-         {% unless page.toc == false %}
-         <!-- element filled by loadToc() from ide-tabs.js -->
-         <div id="toc-bar" class="toc-bar"></div>
-         {% endunless %}
-       </div>
-     </div>
-     {% include footer.html %}
-   </div>
-   <script>loadToc();</script>
-  </body>
+        <h1 class="display-4">{{page.title}}</h1>
+        {{ content }}
+
+      </div>
+
+      <!-- Right sidebar (TOC) -->
+      <div id="toc-bar-column" class="d-none d-lg-block col-12 col-lg-3 col-xl-3 px-0">
+        {% unless page.toc == false %}
+        <!-- element filled by loadToc() from toc.js -->
+        <ul id="toc-bar" class="sticky-top text-decoration-none nav toc-bar py-3"></ul>
+        {% endunless %}
+      </div>
+    </div>
+  </div>
+
+  {% include footer.html %}
+  {% include scripts.html %}
+</body>
+
 </html>
