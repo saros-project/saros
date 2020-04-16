@@ -30,7 +30,26 @@ mermaid content...
 </div>
 ```
 
-Don't forget the `markdown="0"` attribute in order to avoid Jekyll converting the mermaid code to html.
+{% alert warning %}
+Don't forget the **`markdown="0"`** attribute in order to avoid Jekyll converting the mermaid code to html.
+{% endalert %}
+
+## Write Alerts
+
+In order to write an (Bootstrap) [alert box](https://getbootstrap.com/docs/4.0/components/alerts/)  like:
+{% alert danger %}
+### Danger warning
+{% endalert %}
+you have to use our custom `alert` [Jekyll Tag Block](https://jekyllrb.com/docs/plugins/tags/#tag-blocks).
+```markdown
+{{ "{% alert danger " }}%}
+### Danger warning
+{{ "{% endalert " }}%}
+```
+Possible alerts are: `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `light`, `dark`
+
+If you want to inspect or change the corresponding code see `docs/_plugins/alert.rb`.
+
 
 ## Write IDE Specific Documentation
 Use the following tags if you want to embed an IDE specific part into a documentation or want to provide IDE specific versions of a page.
