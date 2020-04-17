@@ -50,10 +50,13 @@ jobs:
       # therefore we want to avoid that GitHub tries to interpret
       # the gh-pages content as Jekyll project
       # https://github.blog/2009-12-29-bypassing-jekyll-on-github-pages/
-      - name: Create .nojekyll file
+      - name: Create .nojekyll and CNAME file
         if: github.ref == 'refs/heads/master'
         run: |
-          touch docs/_site/.nojekyll
+          cd docs/_site
+          touch .nojekyll
+          mv CNAME_template CNAME
+
       - name: Deploy 🚀
         if: github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@releases/v3
