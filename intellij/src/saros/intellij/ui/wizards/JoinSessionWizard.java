@@ -14,6 +14,7 @@ import saros.intellij.ui.wizards.pages.InfoPage;
 import saros.intellij.ui.wizards.pages.PageActionListener;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
+import saros.negotiation.CancelListener;
 import saros.negotiation.IncomingSessionNegotiation;
 import saros.negotiation.NegotiationTools.CancelLocation;
 import saros.net.xmpp.JID;
@@ -30,6 +31,7 @@ public class JoinSessionWizard extends Wizard {
   private static final Logger log = Logger.getLogger(JoinSessionWizard.class);
 
   private final IncomingSessionNegotiation negotiation;
+  private final JID peer;
 
   private final PageActionListener actionListener =
       new PageActionListener() {
@@ -49,6 +51,19 @@ public class JoinSessionWizard extends Wizard {
         }
       };
 
+  @SuppressWarnings("FieldCanBeLocal")
+  private final CancelListener cancelListener =
+      new CancelListener() {
+
+        @Override
+        public void canceled(final CancelLocation location, final String message) {
+          if (location != CancelLocation.LOCAL) {
+            showCancelMessage(peer, message, location);
+            close();
+          }
+        }
+      };
+
   /**
    * Instantiates the wizard and its pages.
    *
@@ -65,6 +80,9 @@ public class JoinSessionWizard extends Wizard {
             Messages.ShowDescriptionPage_title2, Messages.ShowDescriptionPage_description));
 
     this.negotiation = negotiation;
+    this.peer = negotiation.getPeer();
+
+    negotiation.addCancelListener(cancelListener);
 
     InfoPage infoPage = createInfoPage(negotiation);
 
