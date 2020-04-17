@@ -54,6 +54,7 @@ import saros.negotiation.FileList;
 import saros.negotiation.FileListDiff;
 import saros.negotiation.FileListFactory;
 import saros.negotiation.NegotiationTools;
+import saros.negotiation.NegotiationTools.CancelLocation;
 import saros.negotiation.ProjectNegotiation;
 import saros.negotiation.ProjectNegotiationData;
 import saros.net.xmpp.JID;
@@ -507,12 +508,13 @@ public class AddProjectToSessionWizard extends Wizard {
         }
       };
 
+  @SuppressWarnings("FieldCanBeLocal")
   private final CancelListener cancelListener =
       new CancelListener() {
 
         @Override
-        public void canceled(final NegotiationTools.CancelLocation location, final String message) {
-          cancelWizard(peer, message, location);
+        public void canceled(final CancelLocation location, final String message) {
+          if (location != CancelLocation.LOCAL) cancelWizard(peer, message, location);
         }
       };
 
@@ -570,7 +572,7 @@ public class AddProjectToSessionWizard extends Wizard {
   public void cancelWizard(
       final JID peer, final String errorMsg, NegotiationTools.CancelLocation type) {
     final String message =
-        "Wizard canceled "
+        "Project negotiation canceled "
             + (type.equals(NegotiationTools.CancelLocation.LOCAL)
                 ? "locally "
                 : "remotely by " + peer);
