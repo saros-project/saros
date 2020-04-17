@@ -53,8 +53,9 @@ jobs:
       - name: Create .nojekyll and CNAME file
         if: github.ref == 'refs/heads/master'
         run: |
-          touch docs/_site/.nojekyll
-          echo "www.saros-project.org" > docs/_site/CNAME
+          cd docs/_site
+          touch .nojekyll
+          mv CNAME_template CNAME
 
       - name: Deploy 🚀
         if: github.ref == 'refs/heads/master'
