@@ -22,6 +22,7 @@ package saros.activities;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.Objects;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /**
@@ -60,6 +61,17 @@ public class EditorActivity extends AbstractResourceActivity {
     }
 
     this.type = type;
+  }
+
+  @Override
+  public IFile getResource() {
+    SPath path = getPath();
+
+    if (path == null) {
+      return null;
+    }
+
+    return path.getFile();
   }
 
   @Override

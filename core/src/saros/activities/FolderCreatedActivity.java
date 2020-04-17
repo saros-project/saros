@@ -1,6 +1,7 @@
 package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import saros.filesystem.IFolder;
 import saros.session.User;
 
 /** An activity that represents the creation of a folder made by a user during a session. */
@@ -12,6 +13,11 @@ public class FolderCreatedActivity extends AbstractResourceActivity
     super(source, path);
 
     if (path == null) throw new IllegalArgumentException("path must not be null");
+  }
+
+  @Override
+  public IFolder getResource() {
+    return getPath().getFolder();
   }
 
   @Override

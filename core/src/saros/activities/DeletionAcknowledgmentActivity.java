@@ -1,6 +1,7 @@
 package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import saros.filesystem.IFile;
 import saros.session.User;
 import saros.session.internal.DeletionAcknowledgmentDispatcher;
 
@@ -14,6 +15,11 @@ public class DeletionAcknowledgmentActivity extends AbstractResourceActivity {
 
   public DeletionAcknowledgmentActivity(User user, SPath resource) {
     super(user, resource);
+  }
+
+  @Override
+  public IFile getResource() {
+    return getPath().getFile();
   }
 
   @Override

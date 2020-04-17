@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.Objects;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.Timestamp;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /** A JupiterActivity is an Activity that can be handled by the Jupiter Algorithm. */
@@ -23,6 +24,11 @@ public class JupiterActivity extends AbstractResourceActivity {
 
     this.timestamp = timestamp;
     this.operation = operation;
+  }
+
+  @Override
+  public IFile getResource() {
+    return getPath().getFile();
   }
 
   public Operation getOperation() {

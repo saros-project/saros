@@ -33,6 +33,7 @@ import saros.concurrent.jupiter.internal.text.NoOperation;
 import saros.concurrent.jupiter.internal.text.SplitOperation;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextPositionUtils;
+import saros.filesystem.IFile;
 import saros.session.User;
 import saros.util.LineSeparatorNormalizationUtil;
 
@@ -169,6 +170,11 @@ public class TextEditActivity extends AbstractResourceActivity {
     this.replacedTextOffsetDelta = replacedTextOffsetDelta;
 
     this.replacedText = replacedText;
+  }
+
+  @Override
+  public IFile getResource() {
+    return getPath().getFile();
   }
 
   /**

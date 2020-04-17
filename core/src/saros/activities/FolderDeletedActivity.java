@@ -3,6 +3,7 @@ package saros.activities;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.concurrent.management.ConcurrentDocumentServer;
+import saros.filesystem.IFolder;
 import saros.session.User;
 
 /**
@@ -22,6 +23,11 @@ public class FolderDeletedActivity extends AbstractResourceActivity
     super(source, path);
 
     if (path == null) throw new IllegalArgumentException("path must not be null");
+  }
+
+  @Override
+  public IFolder getResource() {
+    return getPath().getFolder();
   }
 
   @Override

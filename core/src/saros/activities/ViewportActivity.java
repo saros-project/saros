@@ -2,6 +2,7 @@ package saros.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 @XStreamAlias("viewportActivity")
@@ -23,6 +24,11 @@ public class ViewportActivity extends AbstractResourceActivity {
 
     this.startLine = Math.max(0, startLine);
     this.numberOfLines = Math.max(0, numberOfLines);
+  }
+
+  @Override
+  public IFile getResource() {
+    return getPath().getFile();
   }
 
   @Override
