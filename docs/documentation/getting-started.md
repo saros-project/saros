@@ -484,11 +484,15 @@ Our current bug tracker can be found on our [GitHub page](https://github.com/sar
 Please make it clear that the issue is dealing with Saros/I.
 
 When reporting a bug that concerns the plugin behavior, please provide the Saros log file (or all relevant excerpts) for a session where the bug was encountered.
-The log files can be found in the IntelliJ settings directory, which usually resides in the home directory under `~/.IdeaXXXXXXXX/` (".IdeaXXXXXXXX" designates the used IntelliJ release; for IntelliJ IDEA Community Edition 2018.2, this would be `.IdeaIC2018.2`).
-The log files are located in `~/.IdeaXXXXXXXX/system/log/SarosLogs/`.
+
+The log files for JetBrains IDEs are located in the IDE system directory (here called`IDE_SYSTEM_DIR`).
+An overview over all configurations is given on [the support forum](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs).
+For specific releases, see the information for [2019.3 and earlier](https://www.jetbrains.com/help/idea/2019.3/tuning-the-ide.html#system-directory) or [2020.1 and later](https://www.jetbrains.com/help/idea/2020.1/tuning-the-ide.html#system-directory).
+
+The Saros log files are located in `[IDE_SYSTEM_DIR]/log/SarosLogs/*.log`.
 
 If you are encountering IntelliJ IDEA errors connected to Saros (which will be displayed by a red, blinking symbol in the bottom right corner of the IntelliJ project view; the error can be viewed in more detail by clicking the symbol), please also include the IntelliJ IDEA logs.
-They are located in `~/.IdeaXXXXXXXX/system/log/` and are named `idea.log` (the log will be truncated at some point and older logs will be moved to `idea.log.1`, etc.).
+They are located in `[IDE_SYSTEM_DIR]/log/` and are named `idea.log` (the log will be truncated at some point and older logs will be moved to `idea.log.1`, etc.).
 Please have a look at the contained timestamps to provide the correct file.
 
 Before attaching any log files, please make sure to redact any private information that you do not wish to make publicly available.
