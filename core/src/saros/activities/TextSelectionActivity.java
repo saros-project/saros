@@ -24,6 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.Objects;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 @XStreamAlias("textSelectionActivity")
@@ -65,6 +66,11 @@ public class TextSelectionActivity extends AbstractResourceActivity {
     TextPosition endPosition = selection.getEndPosition();
     this.endLine = endPosition.getLineNumber();
     this.endInLineOffset = endPosition.getInLineOffset();
+  }
+
+  @Override
+  public IFile getResource() {
+    return getPath().getFile();
   }
 
   @Override

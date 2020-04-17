@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.Arrays;
 import java.util.Objects;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 @XStreamAlias("fileActivity")
@@ -91,6 +92,21 @@ public class FileActivity extends AbstractResourceActivity
     this.purpose = purpose;
   }
 
+  /**
+   * Returns the old/source file in case this Activity represents a file move.
+   *
+   * @return the old/source file in case this Activity represents a file move, <code>null</code>
+   *     otherwise
+   */
+  public IFile getOldResource() {
+    return oldPath.getFile();
+  }
+
+  @Override
+  public IFile getResource() {
+    return getPath().getFile();
+  }
+
   @Override
   public boolean isValid() {
     /* oldPath == null is only unexpected for Type.MOVED */
@@ -98,6 +114,7 @@ public class FileActivity extends AbstractResourceActivity
   }
 
   /** Returns the old/source path in case this Activity represents a moving of files. */
+  @Deprecated
   public SPath getOldPath() {
     return oldPath;
   }

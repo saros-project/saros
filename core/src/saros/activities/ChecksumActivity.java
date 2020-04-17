@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.Objects;
 import saros.concurrent.jupiter.Timestamp;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /**
@@ -52,6 +53,11 @@ public class ChecksumActivity extends AbstractResourceActivity {
     this.hash = hash;
     this.length = length;
     this.jupiterTimestamp = jupiterTimestamp;
+  }
+
+  @Override
+  public IFile getResource() {
+    return getPath().getFile();
   }
 
   /** Returns a copy of the ChecksumActivity with a new {@link Timestamp}. */
