@@ -795,17 +795,6 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     editorListenerDispatch.remove(listener);
   }
 
-  /**
-   * Saves the document for the given file, thereby flushing its contents to disk.
-   *
-   * @param file the file for the document to save
-   * @see Document
-   * @see LocalEditorHandler#saveDocument(IFile)
-   */
-  private void saveDocument(IFile file) {
-    localEditorHandler.saveDocument(file);
-  }
-
   public void removeAllEditorsForFile(IFile file) {
     editorPool.removeEditor(file);
   }
@@ -1096,21 +1085,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   @Override
   public void saveEditors(final IProject project) {
-    executeInUIThreadSynchronous(
-        () -> {
-          Set<IFile> editorFiles = new HashSet<>(editorPool.getFiles());
-
-          if (userEditorStateManager != null) {
-            editorFiles.addAll(userEditorStateManager.getOpenEditors());
-          }
-
-          for (IFile editorFile : editorFiles) {
-            if (project == null || project.equals(editorFile.getProject())) {
-
-              saveDocument(editorFile);
-            }
-          }
-        });
+    DocumentAPI.saveAllDocuments();
   }
 
   @Override
