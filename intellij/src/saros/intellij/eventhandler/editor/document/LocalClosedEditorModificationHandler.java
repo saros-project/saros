@@ -24,7 +24,7 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
   private final DocumentListener documentListener =
       new DocumentListener() {
         @Override
-        public void beforeDocumentChange(DocumentEvent event) {
+        public void documentChanged(DocumentEvent event) {
           cleanUpAnnotations(event);
         }
       };
