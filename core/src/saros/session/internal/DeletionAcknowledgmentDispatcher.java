@@ -5,7 +5,7 @@ import saros.activities.DeletionAcknowledgmentActivity;
 import saros.activities.FileActivity;
 import saros.activities.FileActivity.Type;
 import saros.activities.IActivity;
-import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.AbstractActivityProducer;
@@ -63,15 +63,15 @@ public class DeletionAcknowledgmentDispatcher extends AbstractActivityProducer
    * @param fileActivity the file activity to check and acknowledge if applicable
    */
   private void acknowledgeDeletionActivity(FileActivity fileActivity) {
-    SPath deletedResource;
+    IFile deletedFile;
 
     if (fileActivity.getType() == Type.MOVED
-        && !fileActivity.getPath().equals(fileActivity.getOldPath())) {
+        && !fileActivity.getResource().equals(fileActivity.getOldResource())) {
 
-      deletedResource = fileActivity.getOldPath();
+      deletedFile = fileActivity.getOldResource();
 
     } else if (fileActivity.getType() == Type.REMOVED) {
-      deletedResource = fileActivity.getPath();
+      deletedFile = fileActivity.getResource();
 
     } else {
       return;
@@ -80,9 +80,9 @@ public class DeletionAcknowledgmentDispatcher extends AbstractActivityProducer
     User localUser = sarosSession.getLocalUser();
 
     IActivity deletionAcknowledgementActivity =
-        new DeletionAcknowledgmentActivity(localUser, deletedResource);
+        new DeletionAcknowledgmentActivity(localUser, deletedFile);
 
-    log.debug("Sending deletion acknowledgment for " + deletedResource);
+    log.debug("Sending deletion acknowledgment for " + deletedFile);
     fireActivity(deletionAcknowledgementActivity);
   }
 }
