@@ -70,7 +70,6 @@ import saros.session.ISessionLifecycleListener;
 import saros.session.ISessionListener;
 import saros.session.SessionEndReason;
 import saros.session.User;
-import saros.session.User.Permission;
 import saros.synchronize.Blockable;
 import saros.ui.util.SWTUtils;
 import saros.util.LineSeparatorNormalizationUtil;
@@ -277,11 +276,15 @@ public class EditorManager implements IEditorManager {
           // TODO The user should be able to ask for this
           User localUser = session.getLocalUser();
           for (SPath path : getOpenEditors()) {
-            activityDelayer.fireActivity(new EditorActivity(localUser, Type.ACTIVATED, path));
+            activityDelayer.fireActivity(
+                new EditorActivity(localUser, Type.ACTIVATED, path.getFile()));
           }
 
           activityDelayer.fireActivity(
-              new EditorActivity(localUser, Type.ACTIVATED, locallyActiveEditor));
+              new EditorActivity(
+                  localUser,
+                  Type.ACTIVATED,
+                  locallyActiveEditor != null ? locallyActiveEditor.getFile() : null));
 
           if (locallyActiveEditor == null) return;
 
@@ -502,11 +505,13 @@ public class EditorManager implements IEditorManager {
 
     this.locallyActiveEditor = path;
 
-    if (path != null && session.isShared(path.getResource())) openEditorPaths.add(path);
+    if (path != null && session.isShared(path.getFile())) openEditorPaths.add(path);
 
     editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
-    activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.ACTIVATED, path));
+    activityDelayer.fireActivity(
+        new EditorActivity(
+            session.getLocalUser(), Type.ACTIVATED, path != null ? path.getFile() : null));
   }
 
   /**
@@ -1000,7 +1005,8 @@ public class EditorManager implements IEditorManager {
 
     editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
-    activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.CLOSED, path));
+    activityDelayer.fireActivity(
+        new EditorActivity(session.getLocalUser(), Type.CLOSED, path.getFile()));
 
     /**
      * TODO We need a reliable way to communicate editors which are outside the shared project scope
@@ -1250,11 +1256,12 @@ public class EditorManager implements IEditorManager {
   /**
    * Sends an Activity for clients to save the editor of given path.
    *
-   * @param path the project relative path to the resource that the user with {@link
-   *     Permission#WRITE_ACCESS} was editing.
+   * @param file the saved file
    */
-  void sendEditorActivitySaved(SPath path) {
-    activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED, path));
+  void sendEditorActivitySaved(IFile file) {
+    activityDelayer.fireActivity(
+        new EditorActivity(
+            session.getLocalUser(), Type.SAVED, ResourceAdapterFactory.create(file)));
   }
 
   /**

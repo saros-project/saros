@@ -19,6 +19,7 @@ import saros.activities.ViewportActivity;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IPathFactory;
 import saros.filesystem.IProject;
@@ -29,8 +30,8 @@ public class UserEditorStateTest {
   /** Unit under test */
   private UserEditorState state;
 
-  private static SPath pathA;
-  private static SPath pathB;
+  private static IFile fileA;
+  private static IFile fileB;
 
   private static User source;
 
@@ -43,10 +44,18 @@ public class UserEditorStateTest {
 
     IProject project = EasyMock.createNiceMock(IProject.class);
 
-    EasyMock.replay(pathFactory, project);
+    fileA = EasyMock.createNiceMock(IFile.class);
+    EasyMock.expect(fileA.getProject()).andStubReturn(project);
+    EasyMock.expect(fileA.getProjectRelativePath()).andStubReturn(pathMockA);
 
-    pathA = new SPath(project, pathMockA);
-    pathB = new SPath(project, pathMockB);
+    fileB = EasyMock.createNiceMock(IFile.class);
+    EasyMock.expect(fileB.getProject()).andStubReturn(project);
+    EasyMock.expect(fileB.getProjectRelativePath()).andStubReturn(pathMockB);
+
+    EasyMock.expect(project.getFile(pathMockA)).andStubReturn(fileA);
+    EasyMock.expect(project.getFile(pathMockB)).andStubReturn(fileB);
+
+    EasyMock.replay(pathFactory, project, fileA, fileB);
 
     source = EasyMock.createMock(User.class);
     EasyMock.replay(source);
@@ -80,55 +89,56 @@ public class UserEditorStateTest {
   public void testIgnoreActivitiesOnActivatedEditors() {
     assertFalse(
         "user state should not exist before activity reception",
-        state.getOpenEditors().contains(pathA));
+        state.getOpenEditors().contains(new SPath(fileA)));
 
     // Selection values were chosen at "random"
     TextSelection selection = new TextSelection(new TextPosition(5, 15), new TextPosition(20, 1));
-    select(pathA, selection);
-    view(pathA, 10, 30);
+    select(new SPath(fileA), selection);
+    view(new SPath(fileA), 10, 30);
 
     assertFalse(
         "user state should not exist after awareness information " + "on non-activated editor",
-        state.getOpenEditors().contains(pathA));
+        state.getOpenEditors().contains(new SPath(fileA)));
 
-    activate(pathA);
+    activate(fileA);
 
     assertTrue(
-        "user state should exist after editor was opened", state.getOpenEditors().contains(pathA));
+        "user state should exist after editor was opened",
+        state.getOpenEditors().contains(new SPath(fileA)));
   }
 
   @Test
   public void testUpdateSelections() {
-    activate(pathA);
+    activate(fileA);
 
     TextSelection selection1 = new TextSelection(new TextPosition(5, 3), new TextPosition(8, 15));
-    select(pathA, selection1);
+    select(new SPath(fileA), selection1);
 
-    TextSelection stateSelection = state.getEditorState(pathA).getSelection();
+    TextSelection stateSelection = state.getEditorState(new SPath(fileA)).getSelection();
 
     assertEquals("selection should be set", selection1, stateSelection);
 
     TextSelection selection2 = new TextSelection(new TextPosition(0, 7), new TextPosition(34, 15));
-    select(pathA, selection2);
+    select(new SPath(fileA), selection2);
 
-    stateSelection = state.getEditorState(pathA).getSelection();
+    stateSelection = state.getEditorState(new SPath(fileA)).getSelection();
 
     assertEquals("selection should be updated", selection2, stateSelection);
   }
 
   @Test
   public void testUpdateViewports() {
-    activate(pathA);
-    view(pathA, 5, 50);
+    activate(fileA);
+    view(new SPath(fileA), 5, 50);
 
-    LineRange v = state.getEditorState(pathA).getViewport();
+    LineRange v = state.getEditorState(new SPath(fileA)).getViewport();
 
     assertEquals("viewport offset should be set", 5, v.getStartLine());
     assertEquals("viewport length should be set", 50, v.getNumberOfLines());
 
-    view(pathA, 10, 45);
+    view(new SPath(fileA), 10, 45);
 
-    v = state.getEditorState(pathA).getViewport();
+    v = state.getEditorState(new SPath(fileA)).getViewport();
 
     assertEquals("viewport offset should be updated", 10, v.getStartLine());
     assertEquals("viewport length should be updated", 45, v.getNumberOfLines());
@@ -136,20 +146,24 @@ public class UserEditorStateTest {
 
   @Test
   public void testActivateAndClose() {
-    activate(pathA);
-    activate(pathB);
+    activate(fileA);
+    activate(fileB);
 
     assertEquals("both activated editors should be open", 2, state.getOpenEditors().size());
 
     assertEquals(
-        "last activated editor should be active", pathB, state.getActiveEditorState().getPath());
+        "last activated editor should be active",
+        new SPath(fileB),
+        state.getActiveEditorState().getPath());
 
-    activate(pathA);
+    activate(fileA);
 
     assertEquals(
-        "last activated editor should be active", pathA, state.getActiveEditorState().getPath());
+        "last activated editor should be active",
+        new SPath(fileA),
+        state.getActiveEditorState().getPath());
 
-    close(pathA);
+    close(fileA);
 
     assertNull(
         "no editor should be active after the active editor " + "was closed",
@@ -159,19 +173,19 @@ public class UserEditorStateTest {
 
   @Test
   public void testMultiplePaths() {
-    activate(pathA);
-    activate(pathB);
+    activate(fileA);
+    activate(fileB);
 
     // Selection values were chosen at "random"
     TextSelection selectionA = new TextSelection(new TextPosition(1, 0), new TextPosition(2, 3));
-    select(pathA, selectionA);
-    view(pathA, 3, 4);
+    select(new SPath(fileA), selectionA);
+    view(new SPath(fileA), 3, 4);
 
     TextSelection selectionB = new TextSelection(new TextPosition(5, 4), new TextPosition(6, 1));
-    select(pathB, selectionB);
-    view(pathB, 7, 8);
+    select(new SPath(fileB), selectionB);
+    view(new SPath(fileB), 7, 8);
 
-    EditorState stateA = state.getEditorState(pathA);
+    EditorState stateA = state.getEditorState(new SPath(fileA));
     TextSelection selectionStateA = stateA.getSelection();
 
     assertEquals("selection should be set for first resource", selectionA, selectionStateA);
@@ -181,7 +195,7 @@ public class UserEditorStateTest {
     assertEquals("viewport should be set for first resource", 3, viewportA.getStartLine());
     assertEquals("viewport should be set for first resource", 4, viewportA.getNumberOfLines());
 
-    EditorState stateB = state.getEditorState(pathB);
+    EditorState stateB = state.getEditorState(new SPath(fileB));
     TextSelection selectionStateB = stateB.getSelection();
 
     assertEquals("selection should be set for second resource", selectionB, selectionStateB);
@@ -192,12 +206,12 @@ public class UserEditorStateTest {
     assertEquals("viewport should be set for second resource", 8, viewportB.getNumberOfLines());
   }
 
-  private void close(SPath path) {
-    state.consumer.exec(new EditorActivity(source, Type.CLOSED, path));
+  private void close(IFile file) {
+    state.consumer.exec(new EditorActivity(source, Type.CLOSED, file));
   }
 
-  private void activate(SPath path) {
-    state.consumer.exec(new EditorActivity(source, Type.ACTIVATED, path));
+  private void activate(IFile file) {
+    state.consumer.exec(new EditorActivity(source, Type.ACTIVATED, file));
   }
 
   private void view(SPath path, int start, int length) {

@@ -47,13 +47,13 @@ public class EditorActivity extends AbstractResourceActivity {
   @XStreamAsAttribute protected final Type type;
 
   /**
-   * @param path May be <code>null</code> -- only if type is {@link Type#ACTIVATED} -- to denote
+   * @param file May be <code>null</code> -- only if type is {@link Type#ACTIVATED} -- to denote
    *     that there is no active editor anymore. Must not be <code>null</code> for other types.
    */
-  public EditorActivity(User source, Type type, SPath path) {
-    super(source, path);
+  public EditorActivity(User source, Type type, IFile file) {
+    super(source, file != null ? new SPath(file) : null);
 
-    if (path == null) {
+    if (file == null) {
       if (type != Type.ACTIVATED) {
         throw new IllegalArgumentException(
             "Null path for non-activation type EditorActivity given.");
