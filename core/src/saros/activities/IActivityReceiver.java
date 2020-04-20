@@ -51,10 +51,6 @@ public interface IActivityReceiver {
     /*NOP*/
   }
 
-  default void receive(FolderMovedActivity folderMovedActivity) {
-    /*NOP*/
-  }
-
   default void receive(JupiterActivity jupiterActivity) {
     /*NOP*/
   }
