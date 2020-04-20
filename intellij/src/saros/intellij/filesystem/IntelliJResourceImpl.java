@@ -1,5 +1,7 @@
 package saros.intellij.filesystem;
 
+import static saros.filesystem.IResource.Type.FOLDER;
+
 import com.intellij.ide.highlighter.ProjectFileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -26,9 +28,23 @@ public abstract class IntelliJResourceImpl implements IResource {
       return true;
     }
 
-    return isExcluded(project, virtualFile)
+    return isGitConfig()
+        || isExcluded(project, virtualFile)
         || isModuleFile(module, virtualFile)
         || isProjectConfig(project, virtualFile);
+  }
+
+  /**
+   * Returns whether this resource is part of the git configuration directory.
+   *
+   * @return whether this resource is part of the git configuration directory
+   */
+  private boolean isGitConfig() {
+    String path = getProjectRelativePath().toPortableString();
+
+    return (path.startsWith(".git/")
+        || path.contains("/.git/")
+        || getType() == FOLDER && (path.endsWith("/.git") || path.equals(".git")));
   }
 
   /**

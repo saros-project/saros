@@ -32,7 +32,6 @@ import saros.activities.EditorActivity;
 import saros.activities.FileActivity;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
-import saros.activities.FolderMovedActivity;
 import saros.activities.IActivity;
 import saros.activities.JupiterActivity;
 import saros.activities.NOPActivity;
@@ -149,7 +148,6 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
           FileActivity.class,
           FolderCreatedActivity.class,
           FolderDeletedActivity.class,
-          FolderMovedActivity.class,
           JupiterActivity.class,
           NOPActivity.class,
           PermissionActivity.class,

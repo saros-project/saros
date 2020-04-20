@@ -107,7 +107,30 @@ public class EclipseResourceImpl implements IResource {
 
   @Override
   public boolean isIgnored() {
+    return isGitConfig() || isDerived();
+  }
+
+  /**
+   * Returns whether this resource is seen as derived by the local Eclipse instance.
+   *
+   * @return whether this resource is seen as derived by the local Eclipse instance
+   * @see org.eclipse.core.resources.IResource#isDerived(int)
+   */
+  boolean isDerived() {
     return delegate.isDerived(org.eclipse.core.resources.IResource.CHECK_ANCESTORS);
+  }
+
+  /**
+   * Returns whether this resource is part of the git configuration directory.
+   *
+   * @return whether this resource is part of the git configuration directory
+   */
+  private boolean isGitConfig() {
+    String path = getProjectRelativePath().toPortableString();
+
+    return (path.startsWith(".git/")
+        || path.contains("/.git/")
+        || getType() == FOLDER && (path.endsWith("/.git") || path.equals(".git")));
   }
 
   @Override
