@@ -9,10 +9,10 @@ import saros.session.User;
 public class FolderCreatedActivity extends AbstractResourceActivity
     implements IFileSystemModificationActivity {
 
-  public FolderCreatedActivity(final User source, final SPath path) {
-    super(source, path);
+  public FolderCreatedActivity(final User source, final IFolder folder) {
+    super(source, new SPath(folder));
 
-    if (path == null) throw new IllegalArgumentException("path must not be null");
+    if (folder == null) throw new IllegalArgumentException("path must not be null");
   }
 
   @Override

@@ -289,7 +289,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     IActivity activity;
 
     if (createdVirtualFile.isDirectory()) {
-      activity = new FolderCreatedActivity(user, new SPath((IFolder) resource));
+      activity = new FolderCreatedActivity(user, (IFolder) resource);
 
     } else {
       String charset = createdVirtualFile.getCharset().name();
@@ -400,9 +400,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFolder the folder that was deleted
    */
   private void generateFolderDeletionActivity(@NotNull VirtualFile deletedFolder) {
-    SPath path = VirtualFileConverter.convertToSPath(project, deletedFolder);
+    IFolder folder = (IFolder) VirtualFileConverter.convertToResource(project, deletedFolder);
 
-    if (!isShared(path, session)) {
+    if (folder == null || !session.isShared(folder)) {
       if (log.isTraceEnabled()) {
         log.trace("Ignoring non-shared folder deletion: " + deletedFolder);
       }
@@ -430,15 +430,16 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
             return true;
           }
 
-          SPath folderPath = VirtualFileConverter.convertToSPath(project, fileOrDir);
+          IFolder childFolder =
+              (IFolder) VirtualFileConverter.convertToResource(project, fileOrDir);
 
-          if (folderPath == null) {
+          if (childFolder == null) {
             log.debug("Skipping deleted folder as no SPath could be obtained " + fileOrDir);
 
             return true;
           }
 
-          IActivity newFolderDeletedActivity = new FolderDeletedActivity(user, folderPath);
+          IActivity newFolderDeletedActivity = new FolderDeletedActivity(user, childFolder);
 
           queuedDeletionActivities.addFirst(newFolderDeletedActivity);
 
@@ -567,13 +568,13 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String folderName = newFolderName != null ? newFolderName : oldFile.getName();
 
-    SPath oldPath = VirtualFileConverter.convertToSPath(project, oldFile);
-    SPath newParentPath = VirtualFileConverter.convertToSPath(project, newParent);
+    IFolder oldFolderWrapper = (IFolder) VirtualFileConverter.convertToResource(project, oldFile);
+    IFolder newParentWrapper = (IFolder) VirtualFileConverter.convertToResource(project, newParent);
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = isShared(oldPath, session);
-    boolean newPathIsShared = isShared(newParentPath, session);
+    boolean oldPathIsShared = oldFolderWrapper != null && session.isShared(oldFolderWrapper);
+    boolean newPathIsShared = newParentWrapper != null && session.isShared(newParentWrapper);
 
     if (!oldPathIsShared && !newPathIsShared) {
       if (log.isTraceEnabled()) {
@@ -590,7 +591,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     } else if (oldPathIsShared && isContentRootDirectory(oldFile)) {
       if (log.isTraceEnabled()) {
-        log.trace("Ignoring move of content root " + oldPath);
+        log.trace("Ignoring move of content root " + oldFolderWrapper);
       }
 
       return;
@@ -621,22 +622,27 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
           }
 
           if (newPathIsShared) {
-            SPath newFolderPath =
-                new SPath(
-                    newParentPath.getProject(),
-                    newParentPath.getProjectRelativePath().append(folderName).append(relativePath));
+            IFolder newFolder =
+                newParentWrapper
+                    .getProject()
+                    .getFolder(
+                        newParentWrapper
+                            .getProjectRelativePath()
+                            .append(folderName)
+                            .append(relativePath));
 
-            IActivity newFolderCreatedActivity = new FolderCreatedActivity(user, newFolderPath);
+            IActivity newFolderCreatedActivity = new FolderCreatedActivity(user, newFolder);
 
             dispatchActivity(newFolderCreatedActivity);
           }
 
           if (oldPathIsShared) {
-            SPath oldFolderPath =
-                new SPath(
-                    oldPath.getProject(), oldPath.getProjectRelativePath().append(relativePath));
+            IFolder oldFolder =
+                oldFolderWrapper
+                    .getProject()
+                    .getFolder(oldFolderWrapper.getProjectRelativePath().append(relativePath));
 
-            IActivity newFolderDeletedActivity = new FolderDeletedActivity(user, oldFolderPath);
+            IActivity newFolderDeletedActivity = new FolderDeletedActivity(user, oldFolder);
 
             queuedDeletionActivities.addFirst(newFolderDeletedActivity);
           }
@@ -917,9 +923,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
         if (parent == null) {
 
-          SPath path = VirtualFileConverter.convertToSPath(project, file);
+          IResource resource = VirtualFileConverter.convertToResource(project, file);
 
-          if (isShared(path, session)) {
+          if (resource != null && session.isShared(resource)) {
             log.error(
                 "Renamed resource is a root directory. "
                     + "Such an activity can not be shared through Saros.");
@@ -974,20 +980,6 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return null;
     }
-  }
-
-  private boolean isShared(@Nullable SPath path, @NotNull ISarosSession sarosSession) {
-    if (path == null) {
-      return false;
-    }
-
-    IResource resource = path.getResource();
-
-    if (resource == null) {
-      return false;
-    }
-
-    return sarosSession.isShared(resource);
   }
 
   /**

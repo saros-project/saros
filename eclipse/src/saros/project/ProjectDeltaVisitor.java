@@ -196,7 +196,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     } else if (isFolder(resource)) {
 
-      addActivity(new FolderCreatedActivity(user, new SPath((IFolder) wrappedResource)));
+      addActivity(new FolderCreatedActivity(user, (IFolder) wrappedResource));
 
     } else {
       assert false : "cannot handle resource of IResource#getType() = " + resource.getType();
@@ -248,7 +248,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     } else {
       IFolder removedFolder = (IFolder) removedResource;
 
-      addActivity(new FolderDeletedActivity(user, new SPath(removedFolder)));
+      addActivity(new FolderDeletedActivity(user, removedFolder));
     }
   }
 

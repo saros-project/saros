@@ -183,7 +183,7 @@ public class ActivityQueuerTest {
     activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
 
     IActivity firstActivityToBeQueued =
-        new FolderCreatedActivity(BOB, new SPath(FOLDER_OF_NOT_SHARED_PROJECT));
+        new FolderCreatedActivity(BOB, FOLDER_OF_NOT_SHARED_PROJECT);
 
     List<IActivity> result;
 
@@ -192,7 +192,7 @@ public class ActivityQueuerTest {
     assertEquals("activity was not queued", 0, result.size());
 
     IActivity secondActivityToBeQueued =
-        new FolderDeletedActivity(ALICE, new SPath(FOLDER_OF_NOT_SHARED_PROJECT));
+        new FolderDeletedActivity(ALICE, FOLDER_OF_NOT_SHARED_PROJECT);
 
     activityQueuer.disableQueuing(NOT_SHARED_PROJECT);
 
@@ -211,7 +211,7 @@ public class ActivityQueuerTest {
     assertSame("wrong flushing order", secondActivityToBeQueued, result.get(1));
 
     IActivity activityNotToBeQueued =
-        new FolderDeletedActivity(ALICE, new SPath(FOLDER_OF_NOT_SHARED_PROJECT));
+        new FolderDeletedActivity(ALICE, FOLDER_OF_NOT_SHARED_PROJECT);
 
     result = activityQueuer.process(Collections.singletonList(activityNotToBeQueued));
 
