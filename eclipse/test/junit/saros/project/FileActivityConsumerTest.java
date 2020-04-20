@@ -23,8 +23,9 @@ import org.junit.Test;
 import saros.activities.FileActivity;
 import saros.activities.FileActivity.Purpose;
 import saros.activities.FileActivity.Type;
-import saros.activities.SPath;
 import saros.filesystem.EclipseFileImpl;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
 import saros.net.xmpp.JID;
 import saros.session.User;
 
@@ -43,8 +44,8 @@ public class FileActivityConsumerTest {
   /** Partial file mock in recording state, has to be replayed in every test before being used. */
   private IFile file;
 
-  /** Mocked path representing the file to test. */
-  private SPath path;
+  /** Mocked saros file wrapper to test. */
+  private EclipseFileImpl eclipseFileWrapper;
 
   private SharedResourcesManager resourceChangeListener;
 
@@ -67,20 +68,26 @@ public class FileActivityConsumerTest {
     // set up eclipse resource mock
     file = createMock(IFile.class);
 
+    IPath path = createNiceMock(IPath.class);
+    IProject project = createNiceMock(IProject.class);
+    eclipseFileWrapper = createNiceMock(EclipseFileImpl.class);
+
     expect(file.getContents()).andStubReturn(new ByteArrayInputStream(FILE_CONTENT));
 
     expect(file.exists()).andStubReturn(Boolean.TRUE);
     expect(file.getType()).andStubReturn(org.eclipse.core.resources.IResource.FILE);
     expect(file.getAdapter(IFile.class)).andStubReturn(file);
 
-    // set up saros resource wrapper mocks
-    EclipseFileImpl eclipseFileWrapper = createNiceMock(EclipseFileImpl.class);
-    expect(eclipseFileWrapper.getDelegate()).andStubReturn(file);
-    replay(eclipseFileWrapper);
-
-    path = createMock(SPath.class);
-    expect(path.getFile()).andStubReturn(eclipseFileWrapper);
     replay(path);
+
+    expect(project.getFile(path)).andStubReturn(eclipseFileWrapper);
+    replay(project);
+
+    // set up saros resource wrapper mocks
+    expect(eclipseFileWrapper.getDelegate()).andStubReturn(file);
+    expect(eclipseFileWrapper.getProject()).andStubReturn(project);
+    expect(eclipseFileWrapper.getProjectRelativePath()).andStubReturn(path);
+    replay(eclipseFileWrapper);
   }
 
   @After
@@ -124,7 +131,7 @@ public class FileActivityConsumerTest {
         new User(new JID("foo@bar"), true, true, null),
         Type.CREATED,
         Purpose.ACTIVITY,
-        path,
+        eclipseFileWrapper,
         null,
         content,
         charset.name());

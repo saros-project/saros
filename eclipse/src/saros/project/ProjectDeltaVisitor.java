@@ -18,6 +18,7 @@ import saros.activities.FolderDeletedActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.SPath;
 import saros.editor.EditorManager;
+import saros.filesystem.IFolder;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.session.ISarosSession;
 import saros.session.User;
@@ -170,7 +171,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   private void generateCreated(IResource resource) {
 
-    final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
+    saros.filesystem.IResource wrappedResource = ResourceAdapterFactory.create(resource);
 
     if (isFile(resource)) {
       IFile file = resource.getAdapter(IFile.class);
@@ -184,10 +185,19 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
       }
 
       addActivity(
-          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, charset));
+          new FileActivity(
+              user,
+              Type.CREATED,
+              Purpose.ACTIVITY,
+              (saros.filesystem.IFile) wrappedResource,
+              null,
+              content,
+              charset));
 
     } else if (isFolder(resource)) {
-      addActivity(new FolderCreatedActivity(user, spath));
+
+      addActivity(new FolderCreatedActivity(user, new SPath((IFolder) wrappedResource)));
+
     } else {
       assert false : "cannot handle resource of IResource#getType() = " + resource.getType();
     }
@@ -199,11 +209,11 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     byte[] content = null;
     String charset = null;
 
+    assert resource.getType() == IResource.FILE;
+
+    IFile file = resource.getAdapter(IFile.class);
+
     if (contentChange) {
-      assert resource.getType() == IResource.FILE;
-
-      IFile file = resource.getAdapter(IFile.class);
-
       content = FileUtils.getLocalFileContent(file);
       charset = FileUtils.getLocalFileCharset(file);
 
@@ -213,33 +223,32 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
       }
     }
 
-    SPath newPath = new SPath(ResourceAdapterFactory.create(resource));
-    SPath oldPath =
-        new SPath(
-            ResourceAdapterFactory.create(oldProject),
-            ResourceAdapterFactory.create(oldFullPath.removeFirstSegments(1)));
+    saros.filesystem.IFile newFile = ResourceAdapterFactory.create(file);
+
+    saros.filesystem.IFile oldFile =
+        ResourceAdapterFactory.create(oldProject)
+            .getFile(ResourceAdapterFactory.create(oldFullPath.removeFirstSegments(1)));
 
     addActivity(
-        new FileActivity(user, Type.MOVED, Purpose.ACTIVITY, newPath, oldPath, content, charset));
+        new FileActivity(user, Type.MOVED, Purpose.ACTIVITY, newFile, oldFile, content, charset));
   }
 
   private void generateRemoved(IResource resource) {
 
+    saros.filesystem.IResource removedResource = ResourceAdapterFactory.create(resource);
+
     if (resource instanceof IFile) {
-      editorManager.closeEditor(new SPath(ResourceAdapterFactory.create(resource)), false);
+      saros.filesystem.IFile removedFile = (saros.filesystem.IFile) removedResource;
+
+      editorManager.closeEditor(new SPath(removedFile), false);
 
       addActivity(
-          new FileActivity(
-              user,
-              Type.REMOVED,
-              Purpose.ACTIVITY,
-              new SPath(ResourceAdapterFactory.create(resource)),
-              null,
-              null,
-              null));
+          new FileActivity(user, Type.REMOVED, Purpose.ACTIVITY, removedFile, null, null, null));
+
     } else {
-      addActivity(
-          new FolderDeletedActivity(user, new SPath(ResourceAdapterFactory.create(resource))));
+      IFolder removedFolder = (IFolder) removedResource;
+
+      addActivity(new FolderDeletedActivity(user, new SPath(removedFolder)));
     }
   }
 
@@ -256,14 +265,13 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     assert resource.getType() == IResource.FILE;
 
-    final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
-
-    if (!session.isShared(ResourceAdapterFactory.create(resource))) return;
-
-    if (editorManager.isOpened(spath) || editorManager.isManaged(resource.getAdapter(IFile.class)))
-      return;
-
     IFile file = resource.getAdapter(IFile.class);
+
+    saros.filesystem.IFile wrappedFile = ResourceAdapterFactory.create(file);
+
+    if (!session.isShared(wrappedFile)) return;
+
+    if (editorManager.isOpened(new SPath(wrappedFile)) || editorManager.isManaged(file)) return;
 
     byte[] content = FileUtils.getLocalFileContent(file);
     String charset = FileUtils.getLocalFileCharset(file);
@@ -273,7 +281,8 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     } else {
       addActivity(
-          new FileActivity(user, Type.CREATED, Purpose.ACTIVITY, spath, null, content, charset));
+          new FileActivity(
+              user, Type.CREATED, Purpose.ACTIVITY, wrappedFile, null, content, charset));
     }
   }
 

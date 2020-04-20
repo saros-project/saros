@@ -176,7 +176,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
       // Tell the client to delete the file
       fireActivity(
           new TargetedFileActivity(
-              user, from, Type.REMOVED, path, null, null, null, Purpose.RECOVERY));
+              user, from, Type.REMOVED, file, null, null, null, Purpose.RECOVERY));
       fireActivity(
           new ChecksumActivity(
               user,
@@ -215,7 +215,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
     fireActivity(
         new TargetedFileActivity(
-            user, from, Type.CREATED, path, null, content, charset, Purpose.RECOVERY));
+            user, from, Type.CREATED, file, null, content, charset, Purpose.RECOVERY));
 
     /*
      * Immediately follow up with a new checksum activity so that the remote

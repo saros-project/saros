@@ -34,6 +34,8 @@ import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
 import saros.activities.SPath;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IResource;
 import saros.intellij.editor.DocumentAPI;
@@ -270,9 +272,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       log.trace("Reacting to resource creation: " + createdVirtualFile);
     }
 
-    SPath path = VirtualFileConverter.convertToSPath(project, createdVirtualFile);
+    IResource resource = VirtualFileConverter.convertToResource(project, createdVirtualFile);
 
-    if (!isShared(path, session)) {
+    if (resource == null || !session.isShared(resource)) {
       if (log.isTraceEnabled()) {
         log.trace("Ignoring non-shared resource creation: " + createdVirtualFile);
       }
@@ -285,7 +287,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     IActivity activity;
 
     if (createdVirtualFile.isDirectory()) {
-      activity = new FolderCreatedActivity(user, path);
+      activity = new FolderCreatedActivity(user, new SPath((IFolder) resource));
 
     } else {
       String charset = createdVirtualFile.getCharset().name();
@@ -294,14 +296,20 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       activity =
           new FileActivity(
-              user, Type.CREATED, FileActivity.Purpose.ACTIVITY, path, null, content, charset);
+              user,
+              Type.CREATED,
+              FileActivity.Purpose.ACTIVITY,
+              (IFile) resource,
+              null,
+              content,
+              charset);
     }
 
     dispatchActivity(activity);
 
     // TODO check whether the editor is actually open locally
     if (!createdVirtualFile.isDirectory()) {
-      setUpCreatedFileState(path);
+      setUpCreatedFileState((IFile) resource);
     }
   }
 
@@ -331,9 +339,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               + copy);
     }
 
-    SPath copyPath = VirtualFileConverter.convertToSPath(project, copy);
+    IFile copyWrapper = (IFile) VirtualFileConverter.convertToResource(project, copy);
 
-    if (!isShared(copyPath, session)) {
+    if (copyWrapper == null || !session.isShared(copyWrapper)) {
       if (log.isTraceEnabled()) {
         log.trace("Ignoring non-shared resource copy: " + copy);
       }
@@ -348,7 +356,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     IActivity activity =
         new FileActivity(
-            user, Type.CREATED, FileActivity.Purpose.ACTIVITY, copyPath, null, content, charset);
+            user, Type.CREATED, FileActivity.Purpose.ACTIVITY, copyWrapper, null, content, charset);
 
     dispatchActivity(activity);
   }
@@ -455,9 +463,9 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFile the file that was deleted
    */
   private void generateFileDeletionActivity(VirtualFile deletedFile) {
-    SPath path = VirtualFileConverter.convertToSPath(project, deletedFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(project, deletedFile);
 
-    if (path == null || !session.isShared(path.getResource())) {
+    if (file == null || !session.isShared(file)) {
       if (log.isTraceEnabled()) {
         log.trace("Ignoring non-shared file deletion: " + deletedFile);
       }
@@ -468,10 +476,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     User user = session.getLocalUser();
 
     IActivity activity =
-        new FileActivity(user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, path, null, null, null);
+        new FileActivity(user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, file, null, null, null);
 
-    cleanUpDeletedFileState(path);
-    cleanUpBackgroundEditorPool(path);
+    cleanUpDeletedFileState(file);
+    cleanUpBackgroundEditorPool(file);
 
     dispatchActivity(activity);
   }
@@ -721,13 +729,14 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     String encoding = oldFile.getCharset().name();
 
-    SPath oldFilePath = VirtualFileConverter.convertToSPath(project, oldFile);
-    SPath newParentPath = VirtualFileConverter.convertToSPath(project, newBaseParent);
+    IFile oldFileWrapper = (IFile) VirtualFileConverter.convertToResource(project, oldFile);
+    IFolder newParentWrapper =
+        (IFolder) VirtualFileConverter.convertToResource(project, newBaseParent);
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = isShared(oldFilePath, session);
-    boolean newPathIsShared = isShared(newParentPath, session);
+    boolean oldPathIsShared = oldFileWrapper != null && session.isShared(oldFileWrapper);
+    boolean newPathIsShared = newParentWrapper != null && session.isShared(newParentWrapper);
 
     if (newPathIsShared) {
       Module targetModule =
@@ -768,55 +777,55 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     if (oldPathIsShared && newPathIsShared) {
       // moved file inside shared modules
-      SPath newFilePath =
-          new SPath(
-              newParentPath.getProject(),
-              newParentPath.getProjectRelativePath().append(relativePath));
+      IFile newFileWrapper =
+          newParentWrapper
+              .getProject()
+              .getFile(newParentWrapper.getProjectRelativePath().append(relativePath));
 
       activity =
           new FileActivity(
               user,
               Type.MOVED,
               FileActivity.Purpose.ACTIVITY,
-              newFilePath,
-              oldFilePath,
+              newFileWrapper,
+              oldFileWrapper,
               null,
               encoding);
 
-      updateMovedFileState(oldFilePath, newFilePath);
-      cleanUpBackgroundEditorPool(oldFilePath);
+      updateMovedFileState(oldFileWrapper, newFileWrapper);
+      cleanUpBackgroundEditorPool(oldFileWrapper);
 
     } else if (newPathIsShared) {
       // moved file into shared module
       byte[] fileContent = getContent(oldFile);
 
-      SPath newFilePath =
-          new SPath(
-              newParentPath.getProject(),
-              newParentPath.getProjectRelativePath().append(relativePath));
+      IFile newFileWrapper =
+          newParentWrapper
+              .getProject()
+              .getFile(newParentWrapper.getProjectRelativePath().append(relativePath));
 
       activity =
           new FileActivity(
               user,
               Type.CREATED,
               FileActivity.Purpose.ACTIVITY,
-              newFilePath,
+              newFileWrapper,
               null,
               fileContent,
               encoding);
 
       if (isOpenInTextEditor) {
-        setUpMovedEditorState(oldFile, newFilePath);
+        setUpMovedEditorState(oldFile, newFileWrapper);
       }
 
     } else if (oldPathIsShared) {
       // moved file out of shared module
       activity =
           new FileActivity(
-              user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, oldFilePath, null, null, null);
+              user, Type.REMOVED, FileActivity.Purpose.ACTIVITY, oldFileWrapper, null, null, null);
 
-      cleanUpDeletedFileState(oldFilePath);
-      cleanUpBackgroundEditorPool(oldFilePath);
+      cleanUpDeletedFileState(oldFileWrapper);
+      cleanUpBackgroundEditorPool(oldFileWrapper);
 
     } else {
       // neither source nor destination are shared
@@ -837,19 +846,19 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     if (oldPathIsShared && isOpenInTextEditor) {
       EditorActivity closeOldEditorActivity =
-          new EditorActivity(user, EditorActivity.Type.CLOSED, oldFilePath);
+          new EditorActivity(user, EditorActivity.Type.CLOSED, new SPath(oldFileWrapper));
 
       dispatchActivity(closeOldEditorActivity);
     }
 
     if (newPathIsShared && isOpenInTextEditor) {
-      SPath newFilePath =
-          new SPath(
-              newParentPath.getProject(),
-              newParentPath.getProjectRelativePath().append(relativePath));
+      IFile newFileWrapper =
+          newParentWrapper
+              .getProject()
+              .getFile(newParentWrapper.getProjectRelativePath().append(relativePath));
 
       EditorActivity openNewEditorActivity =
-          new EditorActivity(user, EditorActivity.Type.ACTIVATED, newFilePath);
+          new EditorActivity(user, EditorActivity.Type.ACTIVATED, new SPath(newFileWrapper));
 
       dispatchActivity(openNewEditorActivity);
     }
@@ -1038,42 +1047,42 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
   /**
    * Sets the editor manager state up for the created file.
    *
-   * @param createdFilePath the created file
+   * @param createdFile the created file
    */
-  private void setUpCreatedFileState(@NotNull SPath createdFilePath) {
-    editorManager.openEditor(createdFilePath, false);
+  private void setUpCreatedFileState(@NotNull IFile createdFile) {
+    editorManager.openEditor(new SPath(createdFile), false);
   }
 
   /**
    * Drops the held internal state for the deleted file.
    *
-   * @param deletedFilePath the deleted file
+   * @param deletedFile the deleted file
    */
-  private void cleanUpDeletedFileState(@NotNull SPath deletedFilePath) {
-    editorManager.removeAllEditorsForPath(deletedFilePath);
+  private void cleanUpDeletedFileState(@NotNull IFile deletedFile) {
+    editorManager.removeAllEditorsForPath(new SPath(deletedFile));
 
-    annotationManager.removeAnnotations(deletedFilePath.getFile());
+    annotationManager.removeAnnotations(deletedFile);
   }
 
   /**
    * Releases and drops the held background editor for the deleted file if present.
    *
-   * @param deletedFilePath the deleted file
+   * @param deletedFile the deleted file
    */
-  private void cleanUpBackgroundEditorPool(@NotNull SPath deletedFilePath) {
-    editorManager.removeBackgroundEditorForPath(deletedFilePath);
+  private void cleanUpBackgroundEditorPool(@NotNull IFile deletedFile) {
+    editorManager.removeBackgroundEditorForPath(new SPath(deletedFile));
   }
 
   /**
    * Updates the held internal state with the new path for the moved file.
    *
-   * @param oldFilePath the old location/version of the file
-   * @param newFilePath the new location/version of the file
+   * @param oldFile the old location/version of the file
+   * @param newFile the new location/version of the file
    */
-  private void updateMovedFileState(@NotNull SPath oldFilePath, @NotNull SPath newFilePath) {
-    editorManager.replaceAllEditorsForPath(oldFilePath, newFilePath);
+  private void updateMovedFileState(@NotNull IFile oldFile, @NotNull IFile newFile) {
+    editorManager.replaceAllEditorsForPath(new SPath(oldFile), new SPath(newFile));
 
-    annotationManager.updateAnnotationPath(oldFilePath.getFile(), newFilePath.getFile());
+    annotationManager.updateAnnotationPath(oldFile, newFile);
   }
 
   /**
@@ -1086,7 +1095,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * <p>Does nothing besides opening the editor if the moved file is not represented by a text
    * editor.
    */
-  private void setUpMovedEditorState(@NotNull VirtualFile oldFile, @NotNull SPath newFilePath) {
+  private void setUpMovedEditorState(@NotNull VirtualFile oldFile, @NotNull IFile newFile) {
     Editor editor = ProjectAPI.openEditor(project, oldFile, false);
 
     if (editor == null) {
@@ -1095,7 +1104,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       return;
     }
 
-    editorManager.addEditorMapping(newFilePath, editor);
+    editorManager.addEditorMapping(new SPath(newFile), editor);
   }
 
   /**

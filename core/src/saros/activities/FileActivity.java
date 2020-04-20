@@ -43,10 +43,10 @@ public class FileActivity extends AbstractResourceActivity
    * Generic constructor for {@link FileActivity}s
    *
    * @param source the user who is the source (originator) of this Activity
-   * @param newPath where to save the data (if {@link Type#CREATED}), destination of a move (if
+   * @param newFile where to save the data (if {@link Type#CREATED}), destination of a move (if
    *     {@link Type#MOVED}), file to remove (if {@link Type#REMOVED}); never <code>null</code>
-   * @param oldPath if type is {@link Type#MOVED}, the path from where the file was moved (<code>
-   *     null</code> otherwise)
+   * @param oldFile if type is {@link Type#MOVED}, the file handle representing from where the file
+   *     was moved (<code>null</code> otherwise)
    * @param content content of the file denoted by the path (only valid for {@link Type#CREATED} and
    *     {@link Type#MOVED})
    * @param encoding the encoding the content is encoded with or <code>null</code> if (and only if)
@@ -57,26 +57,26 @@ public class FileActivity extends AbstractResourceActivity
       User source,
       Type type,
       Purpose purpose,
-      SPath newPath,
-      SPath oldPath,
+      IFile newFile,
+      IFile oldFile,
       byte[] content,
       String encoding) {
 
-    super(source, newPath);
+    super(source, newFile != null ? new SPath(newFile) : null);
 
     if (type == null) throw new IllegalArgumentException("type must not be null");
     if (purpose == null) throw new IllegalArgumentException("purpose must not be null");
-    if (newPath == null) throw new IllegalArgumentException("newPath must not be null");
+    if (newFile == null) throw new IllegalArgumentException("newPath must not be null");
 
     switch (type) {
       case CREATED:
-        if (content == null || oldPath != null) throw new IllegalArgumentException();
+        if (content == null || oldFile != null) throw new IllegalArgumentException();
         break;
       case REMOVED:
-        if (content != null || oldPath != null) throw new IllegalArgumentException();
+        if (content != null || oldFile != null) throw new IllegalArgumentException();
         break;
       case MOVED:
-        if (oldPath == null) throw new IllegalArgumentException();
+        if (oldFile == null) throw new IllegalArgumentException();
         break;
     }
 
@@ -86,7 +86,7 @@ public class FileActivity extends AbstractResourceActivity
     }
 
     this.type = type;
-    this.oldPath = oldPath;
+    this.oldPath = oldFile != null ? new SPath(oldFile) : null;
     this.content = content;
     this.encoding = encoding;
     this.purpose = purpose;
