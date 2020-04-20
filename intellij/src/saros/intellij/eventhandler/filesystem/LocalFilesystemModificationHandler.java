@@ -208,17 +208,17 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     assert enabled : "the before contents change listener was triggered while it was disabled";
 
-    VirtualFile file = virtualFileEvent.getFile();
+    VirtualFile virtualFile = virtualFileEvent.getFile();
 
     if (log.isTraceEnabled()) {
-      log.trace("Reacting before resource contents changed: " + file);
+      log.trace("Reacting before resource contents changed: " + virtualFile);
     }
 
-    SPath path = VirtualFileConverter.convertToSPath(project, file);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (!isShared(path, session)) {
+    if (file == null || !session.isShared(file)) {
       if (log.isTraceEnabled()) {
-        log.trace("Ignoring non-shared resource's contents change: " + file);
+        log.trace("Ignoring non-shared resource's contents change: " + virtualFile);
       }
 
       return;
@@ -227,10 +227,12 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     if (virtualFileEvent.isFromSave()) {
       if (log.isTraceEnabled()) {
         log.trace(
-            "Ignoring contents change for " + file + " as they were caused by a document save.");
+            "Ignoring contents change for "
+                + virtualFile
+                + " as they were caused by a document save.");
       }
 
-      localEditorHandler.generateEditorSaved(path);
+      localEditorHandler.generateEditorSaved(file);
 
       return;
     }
@@ -239,7 +241,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       if (log.isTraceEnabled()) {
         log.trace(
             "Ignoring contents change for "
-                + file
+                + virtualFile
                 + " as they were caused by a filesystem snapshot refresh. "
                 + "This is already handled by the document listener.");
       }
@@ -251,7 +253,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
     log.warn(
         "Detected unhandled content change on the virtual file level "
             + "for "
-            + file
+            + virtualFile
             + ", requested by: "
             + virtualFileEvent.getRequestor());
   }
@@ -846,7 +848,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     if (oldPathIsShared && isOpenInTextEditor) {
       EditorActivity closeOldEditorActivity =
-          new EditorActivity(user, EditorActivity.Type.CLOSED, new SPath(oldFileWrapper));
+          new EditorActivity(user, EditorActivity.Type.CLOSED, oldFileWrapper);
 
       dispatchActivity(closeOldEditorActivity);
     }
@@ -858,7 +860,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               .getFile(newParentWrapper.getProjectRelativePath().append(relativePath));
 
       EditorActivity openNewEditorActivity =
-          new EditorActivity(user, EditorActivity.Type.ACTIVATED, new SPath(newFileWrapper));
+          new EditorActivity(user, EditorActivity.Type.ACTIVATED, newFileWrapper);
 
       dispatchActivity(openNewEditorActivity);
     }

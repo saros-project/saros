@@ -437,7 +437,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
               .getMapping()
               .forEach(
                   (path, editor) -> {
-                    sendEditorOpenInformation(localUser, path);
+                    sendEditorOpenInformation(localUser, path.getFile());
 
                     sendViewPortInformation(localUser, path, editor, visibleFilePaths);
 
@@ -470,8 +470,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     sendSelectionInformation(localUser, path, editor);
   }
 
-  private void sendEditorOpenInformation(@NotNull User user, @Nullable SPath path) {
-    EditorActivity activateEditor = new EditorActivity(user, EditorActivity.Type.ACTIVATED, path);
+  private void sendEditorOpenInformation(@NotNull User user, @Nullable IFile file) {
+    EditorActivity activateEditor = new EditorActivity(user, EditorActivity.Type.ACTIVATED, file);
 
     fireActivity(activateEditor);
   }
@@ -542,15 +542,22 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     Editor activeEditor = ProjectAPI.getActiveEditor(project);
 
-    SPath activeEditorPath;
+    IFile activeEditorFile;
 
     if (activeEditor != null) {
-      activeEditorPath = editorPool.getFile(activeEditor.getDocument());
+      SPath activeEditorPath = editorPool.getFile(activeEditor.getDocument());
+
+      if (activeEditorPath != null) {
+        activeEditorFile = activeEditorPath.getFile();
+      } else {
+        activeEditorFile = null;
+      }
+
     } else {
-      activeEditorPath = null;
+      activeEditorFile = null;
     }
 
-    sendEditorOpenInformation(localUser, activeEditorPath);
+    sendEditorOpenInformation(localUser, activeEditorFile);
   }
 
   /**
@@ -620,7 +627,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     openFileMapping.forEach(
         (path, editor) -> {
-          sendEditorOpenInformation(localUser, path);
+          sendEditorOpenInformation(localUser, path.getFile());
 
           sendViewPortInformation(localUser, path, editor, selectedFiles);
 
@@ -853,14 +860,15 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * Sets the local editor 'opened' and fires an {@link EditorActivity} of type {@link
    * Type#ACTIVATED}.
    *
-   * @param path the project-relative path to the resource that the editor is currently editing or
-   *     <code>null</code> if the local user has no editor open.
+   * @param file the file that the editor is currently editing or <code>null</code> if the local
+   *     user has no editor open.
    */
-  void generateEditorActivated(SPath path) {
-    if (path == null || session.isShared(path.getResource())) {
-      editorListenerDispatch.editorActivated(session.getLocalUser(), path);
+  void generateEditorActivated(IFile file) {
+    if (file == null || session.isShared(file)) {
+      editorListenerDispatch.editorActivated(
+          session.getLocalUser(), file != null ? new SPath(file) : null);
 
-      fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.ACTIVATED, path));
+      fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.ACTIVATED, file));
 
       //  generateSelection(path, selection);  //FIXME: add this feature
       //  generateViewport(path, viewport);    //FIXME:s add this feature
@@ -870,22 +878,24 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   /**
    * Fires an EditorActivity.Type.CLOSED event for the given path and notifies the local
    * EditorListenerDispatcher.
+   *
+   * @param file the closed file
    */
-  void generateEditorClosed(@NotNull SPath path) {
-    if (session.isShared(path.getResource())) {
-      editorListenerDispatch.editorClosed(session.getLocalUser(), path);
+  void generateEditorClosed(@NotNull IFile file) {
+    if (session.isShared(file)) {
+      editorListenerDispatch.editorClosed(session.getLocalUser(), new SPath(file));
 
-      fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, path));
+      fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, file));
     }
   }
 
   /**
    * Generates an editor save activity for the given path.
    *
-   * @param path the path to generate an editor saved activity for
+   * @param file the file to generate an editor saved activity for
    */
-  void generateEditorSaved(SPath path) {
-    fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED, path));
+  void generateEditorSaved(IFile file) {
+    fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED, file));
   }
 
   /**

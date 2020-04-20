@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.filesystem.IntelliJProjectImpl;
@@ -149,7 +150,7 @@ public class LocalEditorHandler {
   }
 
   /**
-   * Removes a file from the editorPool and calls {@link EditorManager#generateEditorClosed(SPath)}.
+   * Removes a file from the editorPool and calls {@link EditorManager#generateEditorClosed(IFile)}.
    *
    * <p>Does nothing if the file is not shared.
    *
@@ -157,12 +158,14 @@ public class LocalEditorHandler {
    * @param virtualFile the file for which to close the editor
    */
   public void closeEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-    SPath path = VirtualFileConverter.convertToSPath(project, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (path != null && sarosSession.isShared(path.getResource())) {
-      editorPool.removeEditor(path);
-      manager.generateEditorClosed(path);
+    if (file == null || !sarosSession.isShared(file)) {
+      return;
     }
+
+    editorPool.removeEditor(new SPath(file));
+    manager.generateEditorClosed(file);
   }
 
   /**
@@ -212,38 +215,39 @@ public class LocalEditorHandler {
   }
 
   /**
-   * Calls {@link EditorManager#generateEditorActivated(SPath)}.
+   * Calls {@link EditorManager#generateEditorActivated(IFile)}.
    *
    * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
    * outside the editor package. If you still need to access this method, please consider whether
    * your class should rather be located in the editor package.
    *
    * @param project the project in which to activate the editor
-   * @param file the file whose editor was activated or <code>null</code> if there is no editor open
+   * @param virtualFile the file whose editor was activated or <code>null</code> if there is no
+   *     editor open
    */
-  public void activateEditor(@NotNull Project project, @Nullable VirtualFile file) {
-    if (file == null) {
+  public void activateEditor(@NotNull Project project, @Nullable VirtualFile virtualFile) {
+    if (virtualFile == null) {
 
       manager.generateEditorActivated(null);
 
       return;
     }
 
-    SPath path = VirtualFileConverter.convertToSPath(project, file);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (path != null && sarosSession.isShared(path.getResource())) {
-      manager.generateEditorActivated(path);
+    if (file != null && sarosSession.isShared(file)) {
+      manager.generateEditorActivated(file);
     }
   }
 
   /**
    * Generates an editor save activity for the given path.
    *
-   * @param path the path to generate an editor saved activity for
-   * @see EditorManager#generateEditorSaved(SPath)
+   * @param file the file to generate an editor saved activity for
+   * @see EditorManager#generateEditorSaved(IFile)
    */
-  public void generateEditorSaved(SPath path) {
-    manager.generateEditorSaved(path);
+  public void generateEditorSaved(IFile file) {
+    manager.generateEditorSaved(file);
   }
 
   /** @return <code>true</code>, if the path is opened in an editor. */

@@ -10,7 +10,9 @@ import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.JupiterActivity;
 import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.filesystem.IProject;
+import saros.filesystem.IResource;
 import saros.session.User;
 
 /** This class enables the queuing of {@linkplain IActivity activities} for given projects. */
@@ -179,25 +181,30 @@ public class ActivityQueuer {
       for (final IResourceActivity resourceActivity : projectQueue.buffer) {
 
         // path cannot be null, see for-loop below
-        final SPath path = resourceActivity.getPath();
+        final IResource resource = resourceActivity.getResource();
         final User source = resourceActivity.getSource();
 
         if (resourceActivity instanceof EditorActivity) {
+          IFile file = (IFile) resource;
 
           final EditorActivity ea = (EditorActivity) resourceActivity;
 
-          if (!alreadyRememberedEditorActivity(editorActivities, path, source)
+          if (!alreadyRememberedEditorActivity(editorActivities, new SPath(file), source)
               && ea.getType() != Type.ACTIVATED) {
-            activities.add(new EditorActivity(ea.getSource(), Type.ACTIVATED, path));
+
+            activities.add(new EditorActivity(ea.getSource(), Type.ACTIVATED, file));
           }
 
-          rememberEditorActivity(editorActivities, path, source);
+          rememberEditorActivity(editorActivities, new SPath(file), source);
+
         } else if (resourceActivity instanceof JupiterActivity
-            && !alreadyRememberedEditorActivity(editorActivities, path, source)) {
+            && !alreadyRememberedEditorActivity(editorActivities, new SPath(resource), source)) {
 
-          activities.add(new EditorActivity(resourceActivity.getSource(), Type.ACTIVATED, path));
+          IFile file = (IFile) resource;
 
-          rememberEditorActivity(editorActivities, path, source);
+          activities.add(new EditorActivity(resourceActivity.getSource(), Type.ACTIVATED, file));
+
+          rememberEditorActivity(editorActivities, new SPath(file), source);
         }
 
         activities.add(resourceActivity);

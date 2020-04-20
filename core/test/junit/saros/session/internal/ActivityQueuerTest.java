@@ -23,6 +23,8 @@ import saros.activities.SPath;
 import saros.activities.StartFollowingActivity;
 import saros.concurrent.jupiter.internal.JupiterVectorTime;
 import saros.concurrent.jupiter.internal.text.NoOperation;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.net.xmpp.JID;
@@ -36,9 +38,10 @@ public class ActivityQueuerTest {
   private static IProject SHARED_PROJECT;
   private static IProject NOT_SHARED_PROJECT;
 
-  private static SPath FOO_PATH_SHARED_PROJECT;
-  private static SPath BAR_PATH_SHARED_PROJECT;
-  private static SPath PATH_TO_NOT_SHARED_PROJECT;
+  private static IFile FOO_FILE_SHARED_PROJECT;
+  private static IFile BAR_FILE_SHARED_PROJECT;
+  private static IFile FILE_OF_NOT_SHARED_PROJECT;
+  private static IFolder FOLDER_OF_NOT_SHARED_PROJECT;
 
   private ActivityQueuer activityQueuer;
 
@@ -47,11 +50,49 @@ public class ActivityQueuerTest {
     SHARED_PROJECT = EasyMock.createMock(IProject.class);
     NOT_SHARED_PROJECT = EasyMock.createMock(IProject.class);
 
-    FOO_PATH_SHARED_PROJECT = new SPath(SHARED_PROJECT, EasyMock.createMock(IPath.class));
+    IPath fooPath = EasyMock.createMock(IPath.class);
+    EasyMock.expect(fooPath.isAbsolute()).andStubReturn(false);
 
-    BAR_PATH_SHARED_PROJECT = new SPath(SHARED_PROJECT, EasyMock.createMock(IPath.class));
+    IPath barPath = EasyMock.createMock(IPath.class);
+    EasyMock.expect(barPath.isAbsolute()).andStubReturn(false);
 
-    PATH_TO_NOT_SHARED_PROJECT = new SPath(NOT_SHARED_PROJECT, EasyMock.createMock(IPath.class));
+    IPath notSharedPath = EasyMock.createMock(IPath.class);
+    EasyMock.expect(notSharedPath.isAbsolute()).andStubReturn(false);
+
+    EasyMock.replay(fooPath, barPath, notSharedPath);
+
+    FOO_FILE_SHARED_PROJECT = EasyMock.createNiceMock(IFile.class);
+    EasyMock.expect(FOO_FILE_SHARED_PROJECT.getProject()).andStubReturn(SHARED_PROJECT);
+    EasyMock.expect(FOO_FILE_SHARED_PROJECT.getProjectRelativePath()).andStubReturn(fooPath);
+
+    BAR_FILE_SHARED_PROJECT = EasyMock.createNiceMock(IFile.class);
+    EasyMock.expect(BAR_FILE_SHARED_PROJECT.getProject()).andStubReturn(SHARED_PROJECT);
+    EasyMock.expect(BAR_FILE_SHARED_PROJECT.getProjectRelativePath()).andStubReturn(barPath);
+
+    FILE_OF_NOT_SHARED_PROJECT = EasyMock.createNiceMock(IFile.class);
+    EasyMock.expect(FILE_OF_NOT_SHARED_PROJECT.getProject()).andStubReturn(NOT_SHARED_PROJECT);
+    EasyMock.expect(FILE_OF_NOT_SHARED_PROJECT.getProjectRelativePath())
+        .andStubReturn(notSharedPath);
+
+    FOLDER_OF_NOT_SHARED_PROJECT = EasyMock.createNiceMock(IFolder.class);
+    EasyMock.expect(FOLDER_OF_NOT_SHARED_PROJECT.getProject()).andStubReturn(NOT_SHARED_PROJECT);
+    EasyMock.expect(FOLDER_OF_NOT_SHARED_PROJECT.getProjectRelativePath())
+        .andStubReturn(notSharedPath);
+
+    EasyMock.replay(
+        FOO_FILE_SHARED_PROJECT,
+        BAR_FILE_SHARED_PROJECT,
+        FILE_OF_NOT_SHARED_PROJECT,
+        FOLDER_OF_NOT_SHARED_PROJECT);
+
+    EasyMock.expect(SHARED_PROJECT.getFile(fooPath)).andStubReturn(FOO_FILE_SHARED_PROJECT);
+    EasyMock.expect(SHARED_PROJECT.getFile(barPath)).andStubReturn(BAR_FILE_SHARED_PROJECT);
+    EasyMock.expect(NOT_SHARED_PROJECT.getFile(notSharedPath))
+        .andStubReturn(FILE_OF_NOT_SHARED_PROJECT);
+    EasyMock.expect(NOT_SHARED_PROJECT.getFolder(notSharedPath))
+        .andStubReturn(FOLDER_OF_NOT_SHARED_PROJECT);
+
+    EasyMock.replay(SHARED_PROJECT, NOT_SHARED_PROJECT);
   }
 
   @Before
@@ -77,9 +118,9 @@ public class ActivityQueuerTest {
     // see testHackForBug808 ... we are generating missing activities if
     // necessary
     final IActivity expectedEA =
-        new EditorActivity(BOB, EditorActivity.Type.ACTIVATED, PATH_TO_NOT_SHARED_PROJECT);
+        new EditorActivity(BOB, EditorActivity.Type.ACTIVATED, FILE_OF_NOT_SHARED_PROJECT);
 
-    IActivity activityToBeQueued = createJupiterActivity(PATH_TO_NOT_SHARED_PROJECT);
+    IActivity activityToBeQueued = createJupiterActivity(FILE_OF_NOT_SHARED_PROJECT);
     activities.add(activityToBeQueued);
 
     activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
@@ -89,7 +130,7 @@ public class ActivityQueuerTest {
     assertFalse(processedActivities.contains(activityToBeQueued));
     assertListsAreEqual(expectedActivities, processedActivities);
 
-    IActivity activityNotToBeQueued = createJupiterActivity(FOO_PATH_SHARED_PROJECT);
+    IActivity activityNotToBeQueued = createJupiterActivity(FOO_FILE_SHARED_PROJECT);
 
     List<IActivity> notQueuedActivities =
         activityQueuer.process(Collections.singletonList(activityNotToBeQueued));
@@ -141,7 +182,8 @@ public class ActivityQueuerTest {
     activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
     activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
 
-    IActivity firstActivityToBeQueued = new FolderCreatedActivity(BOB, PATH_TO_NOT_SHARED_PROJECT);
+    IActivity firstActivityToBeQueued =
+        new FolderCreatedActivity(BOB, new SPath(FOLDER_OF_NOT_SHARED_PROJECT));
 
     List<IActivity> result;
 
@@ -150,7 +192,7 @@ public class ActivityQueuerTest {
     assertEquals("activity was not queued", 0, result.size());
 
     IActivity secondActivityToBeQueued =
-        new FolderDeletedActivity(ALICE, PATH_TO_NOT_SHARED_PROJECT);
+        new FolderDeletedActivity(ALICE, new SPath(FOLDER_OF_NOT_SHARED_PROJECT));
 
     activityQueuer.disableQueuing(NOT_SHARED_PROJECT);
 
@@ -168,7 +210,8 @@ public class ActivityQueuerTest {
 
     assertSame("wrong flushing order", secondActivityToBeQueued, result.get(1));
 
-    IActivity activityNotToBeQueued = new FolderDeletedActivity(ALICE, PATH_TO_NOT_SHARED_PROJECT);
+    IActivity activityNotToBeQueued =
+        new FolderDeletedActivity(ALICE, new SPath(FOLDER_OF_NOT_SHARED_PROJECT));
 
     result = activityQueuer.process(Collections.singletonList(activityNotToBeQueued));
 
@@ -181,26 +224,32 @@ public class ActivityQueuerTest {
   @Test
   public void testHackForBug808() {
     final IActivity fooExpectedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, FOO_PATH_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, FOO_FILE_SHARED_PROJECT);
 
     final IActivity barExpectedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, BAR_PATH_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, BAR_FILE_SHARED_PROJECT);
 
     final IActivity fooClosedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.CLOSED, FOO_PATH_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.CLOSED, FOO_FILE_SHARED_PROJECT);
 
     final IActivity fooSavedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.CLOSED, FOO_PATH_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.CLOSED, FOO_FILE_SHARED_PROJECT);
 
     final List<IActivity> flush = Collections.emptyList();
 
     final IActivity fooJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, FOO_PATH_SHARED_PROJECT);
+            new JupiterVectorTime(0, 0),
+            new NoOperation(),
+            ALICE,
+            new SPath(FOO_FILE_SHARED_PROJECT));
 
     final IActivity barJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, BAR_PATH_SHARED_PROJECT);
+            new JupiterVectorTime(0, 0),
+            new NoOperation(),
+            ALICE,
+            new SPath(BAR_FILE_SHARED_PROJECT));
 
     List<IActivity> activities;
 
@@ -291,18 +340,24 @@ public class ActivityQueuerTest {
     // ------------------------------------------
 
     final IActivity aliceExpectedEditorADO =
-        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, FOO_PATH_SHARED_PROJECT);
+        new EditorActivity(ALICE, EditorActivity.Type.ACTIVATED, FOO_FILE_SHARED_PROJECT);
 
     final IActivity bobExpectedEditorADO =
-        new EditorActivity(BOB, EditorActivity.Type.ACTIVATED, FOO_PATH_SHARED_PROJECT);
+        new EditorActivity(BOB, EditorActivity.Type.ACTIVATED, FOO_FILE_SHARED_PROJECT);
 
     final IActivity aliceJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, FOO_PATH_SHARED_PROJECT);
+            new JupiterVectorTime(0, 0),
+            new NoOperation(),
+            ALICE,
+            new SPath(FOO_FILE_SHARED_PROJECT));
 
     final IActivity bobJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0), new NoOperation(), BOB, FOO_PATH_SHARED_PROJECT);
+            new JupiterVectorTime(0, 0),
+            new NoOperation(),
+            BOB,
+            new SPath(FOO_FILE_SHARED_PROJECT));
 
     activityQueuer = new ActivityQueuer();
     activityQueuer.enableQueuing(SHARED_PROJECT);
@@ -322,7 +377,7 @@ public class ActivityQueuerTest {
   private List<IActivity> createSomeActivities() {
     IActivity startFollowingActivity = new StartFollowingActivity(ALICE, BOB);
 
-    IActivity jupiterActivity = createJupiterActivity(FOO_PATH_SHARED_PROJECT);
+    IActivity jupiterActivity = createJupiterActivity(FOO_FILE_SHARED_PROJECT);
 
     List<IActivity> activities = new ArrayList<IActivity>();
     activities.add(startFollowingActivity);
@@ -331,8 +386,9 @@ public class ActivityQueuerTest {
     return activities;
   }
 
-  private JupiterActivity createJupiterActivity(SPath path) {
-    return new JupiterActivity(new JupiterVectorTime(0, 0), new NoOperation(), BOB, path);
+  private JupiterActivity createJupiterActivity(IFile file) {
+    return new JupiterActivity(
+        new JupiterVectorTime(0, 0), new NoOperation(), BOB, new SPath(file));
   }
 
   private void assertListsAreEqual(List<IActivity> expected, List<IActivity> actual) {

@@ -10,8 +10,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
-import saros.activities.SPath;
-import saros.filesystem.ResourceAdapterFactory;
 import saros.ui.util.SWTUtils;
 
 /**
@@ -68,7 +66,7 @@ public class DirtyStateListener implements IElementStateListener {
             if (!editorManager.isManaged(file)) return;
 
             log.debug("Dirty state reset for: " + file);
-            editorManager.sendEditorActivitySaved(new SPath(ResourceAdapterFactory.create(file)));
+            editorManager.sendEditorActivitySaved(file);
           }
         });
   }
