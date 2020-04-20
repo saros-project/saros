@@ -13,8 +13,8 @@ import saros.session.internal.DeletionAcknowledgmentDispatcher;
 @XStreamAlias("deletionAcknowledgementActivity")
 public class DeletionAcknowledgmentActivity extends AbstractResourceActivity {
 
-  public DeletionAcknowledgmentActivity(User user, SPath resource) {
-    super(user, resource);
+  public DeletionAcknowledgmentActivity(User user, IFile file) {
+    super(user, new SPath(file));
   }
 
   @Override
