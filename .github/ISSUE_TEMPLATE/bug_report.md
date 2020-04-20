@@ -26,10 +26,15 @@ Please provide the corresponding log files, but be sure to **remove or obfuscate
 
 You can find the log files in the following locations:
 * IntelliJ IDEA:
-  By default, the directory `.IdeaXXXXXXXX` is located in the user directory. The exact directory name is determined by your IntelliJ version, e.g. `.IdeaIC2019.1` for IntelliJ IDEA 2019.1.
-  More information about the location of the directory is given here: https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
-  * IDE logs - `~/.IdeaXXXXXXXX/system/log/idea.log*`
-  * Saros logs - `~/.IdeaXXXXXXXX/system/log/SarosLogs/*.log`
+  The log files for JetBrains IDEs are located in the IDE system directory (here called`IDE_SYSTEM_DIR`).
+  An overview over all configurations is given  on https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
+
+  For releases 2019.3 and earlier, see https://www.jetbrains.com/help/idea/2019.3/tuning-the-ide.html#system-directory
+  For release 2020.1 and later, see https://www.jetbrains.com/help/idea/2020.1/tuning-the-ide.html#system-directory
+
+  * IDE logs - `[IDE_SYSTEM_DIR]/log/idea.log*`
+  * Saros logs - `[IDE_SYSTEM_DIR]/log/SarosLogs/*.log`
+
 * Eclipse:
   * IDE logs - `<workspace>/.metadata/.log`
   * Saros logs - `<workspace>/.metadata/.plugins/saros.eclipse/log/<date>/*.log`

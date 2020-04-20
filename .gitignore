@@ -48,8 +48,6 @@ buildSrc/.gradle
 /stf/.project
 /stf.test/.project
 .DS_Store
-docs/_site
-docs/Gemfile.lock
 /.gradle/
 /build/
 

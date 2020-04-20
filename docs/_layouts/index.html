@@ -1,52 +1,18 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang | default: 'en-US' }}">
 
-  {% include head.html %}
+{% include head.html %}
 
-  <body>
+<body>
+  {% include navbar.html %}
+  <div class="container-fluid px-0" >
 
-    <div class="container">
-
-      <nav class="navbar navbar-expand-lg my-2">
-        <div class="container">
-          <div class="navbar-header">
-          <a class="logo" href="{{ '/' | absolute_url }}" style="text-decoration: none;">
-              <img src="{{ '/assets/images/logo/saros-logo.svg' | relative_url }}"/>
-              <span>{{ site.title }}</span>
-          </a>
-          </div>
-        </div>
-      </nav>
-
-      <div class="jumbotron jumbotron-index">
-        <h1>
-          {{ content }}
-        </h1>
-        <img src="{{ '/assets/images/comics/dpp.png' | relative_url }} " width="400" />
-      </div>
-
-      <div class="d-flex justify-content-center">
-      </div>
-
-      <div class="row">
-        <div class="col-lg-6">
-          {% include index_navbar.html %}
-        </div>
-
-        <div class="col-lg-6">
-          <a class="center twitter-timeline"
-             href="{{ site.contact.twitter.user-link }}"
-             data-tweet-limit="1"
-             data-chrome="noheader nofooter transparent noborders noscrollbar">
-             Tweets by @{{ site.contact.twitter.username }}
-          </a>
-          <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-        </div>
-      </div>
-
+    <div class="index-content">
+    {{ content }}
     </div>
 
-    {% include footer.html %}
+  {% include footer.html %}
+  {% include scripts.html load_custom_scripts=false %}
+</body>
 
-  </body>
 </html>

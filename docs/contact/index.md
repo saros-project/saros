@@ -1,5 +1,6 @@
 ---
-title: Support
+title: Contact
+toc: false
 ---
 
 If you have problems while using Saros that cannot be solved via the [FAQ](../documentation/faq.md) or [troubleshooting](../documentation/troubleshooting.md) pages, you can contact the Saros team via:

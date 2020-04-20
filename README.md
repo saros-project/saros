@@ -8,7 +8,7 @@
 
 Saros is an Open Source plugin for connecting multiple IDEs for distributed collaborative software development.
 
-![saros animation](docs/assets/images/animation/this_is_saros.gif)
+![saros animation](docs/assets/images/animation/saros.gif)
 
 * All participants get an **identical local copy** of the projects they work on.
 * Each can work in their **usual IDE**.

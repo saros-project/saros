@@ -1,24 +1,14 @@
-- title: Docs
-  long_title: User Documentation
+- title: User Docs
   url: /documentation
-  icon_class: fa fa-book
 
 - title: Releases
-  long_title: Get Saros
   url: /releases
-  icon_class: fa fa-download
 
 - title: Contribute
-  long_title: Contribute to Saros
   url: /contribute
-  icon_class: fa fa-upload
 
-- title: Support
-  long_title: Support
-  url: /support
-  icon_class: fa fa-headset
+- title: Contact 
+  url: /contact
 
 - title: Research
-  long_title: Research
   url: /research
-  icon_class: fa fa-glasses
