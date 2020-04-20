@@ -180,7 +180,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
       fireActivity(
           new ChecksumActivity(
               user,
-              path,
+              file,
               ChecksumActivity.NON_EXISTING_DOC,
               ChecksumActivity.NON_EXISTING_DOC,
               null));
@@ -228,6 +228,6 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
     checksum.update(normalizedText);
 
-    fireActivity(new ChecksumActivity(user, path, checksum.getHash(), checksum.getLength(), null));
+    fireActivity(new ChecksumActivity(user, file, checksum.getHash(), checksum.getLength(), null));
   }
 }

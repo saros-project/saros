@@ -39,16 +39,16 @@ public class ChecksumActivity extends AbstractResourceActivity {
    * a new Activity with a timestamp)
    *
    * @param source The User that created this activity
-   * @param path The SPath pointing to the document
+   * @param file The file represented by the document
    * @param hash The hashcode of the document
    * @param length The length of the document
    * @param jupiterTimestamp The current jupiterTimestamp for this document, may be <code>null
    *     </code>
    */
   public ChecksumActivity(
-      User source, SPath path, long hash, long length, Timestamp jupiterTimestamp) {
+      User source, IFile file, long hash, long length, Timestamp jupiterTimestamp) {
 
-    super(source, path);
+    super(source, new SPath(file));
 
     this.hash = hash;
     this.length = length;
@@ -62,7 +62,7 @@ public class ChecksumActivity extends AbstractResourceActivity {
 
   /** Returns a copy of the ChecksumActivity with a new {@link Timestamp}. */
   public ChecksumActivity withTimestamp(Timestamp jupiterTimestamp) {
-    return new ChecksumActivity(getSource(), getPath(), hash, length, jupiterTimestamp);
+    return new ChecksumActivity(getSource(), getResource(), hash, length, jupiterTimestamp);
   }
 
   @Override

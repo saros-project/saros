@@ -295,7 +295,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     ChecksumActivity checksumActivity =
         new ChecksumActivity(
             session.getLocalUser(),
-            checksum.getPath(),
+            checksum.getPath().getFile(),
             checksum.getHash(),
             checksum.getLength(),
             null);
