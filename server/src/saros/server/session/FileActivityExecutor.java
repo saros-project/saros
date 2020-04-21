@@ -69,7 +69,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
   private void executeFileCreation(FileActivity activity)
       throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
-    IFile file = activity.getPath().getFile();
+    IFile file = activity.getResource();
     file.create(new ByteArrayInputStream(activity.getContent()));
 
     String charset = activity.getEncoding();
@@ -82,10 +82,8 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
   private void executeFileMove(FileActivity activity)
       throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
-    SPath oldPath = activity.getOldPath();
-    IFile oldFile = oldPath.getFile();
-    SPath newPath = activity.getPath();
-    IFile newFile = newPath.getFile();
+    IFile oldFile = activity.getOldResource();
+    IFile newFile = activity.getResource();
 
     if (!oldFile.exists()) {
       log.warn(
@@ -118,13 +116,12 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
     oldFile.delete();
 
     // only update if all previous operations are successful
-    editorManager.updateMapping(oldPath, newPath);
+    editorManager.updateMapping(new SPath(oldFile), new SPath(newFile));
   }
 
   private void executeFileRemoval(FileActivity activity) throws IOException {
-    SPath path = activity.getPath();
-    IFile file = path.getFile();
-    editorManager.closeEditor(path);
+    IFile file = activity.getResource();
+    editorManager.closeEditor(new SPath(file));
     file.delete();
   }
 }
