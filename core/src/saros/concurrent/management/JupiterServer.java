@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import saros.activities.ChecksumActivity;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.JupiterDocumentServer;
+import saros.filesystem.IFile;
 import saros.session.ISarosSession;
 import saros.session.User;
 
@@ -24,8 +24,7 @@ public class JupiterServer {
    *
    * @host
    */
-  private final HashMap<SPath, JupiterDocumentServer> concurrentDocuments =
-      new HashMap<SPath, JupiterDocumentServer>();
+  private final HashMap<IFile, JupiterDocumentServer> concurrentDocuments = new HashMap<>();
 
   private final Set<User> currentClients = new HashSet<User>();
 
@@ -35,7 +34,7 @@ public class JupiterServer {
     this.sarosSession = sarosSession;
   }
 
-  public synchronized void removePath(final SPath path) {
+  public synchronized void removePath(final IFile path) {
     concurrentDocuments.remove(path);
   }
 
@@ -60,13 +59,13 @@ public class JupiterServer {
    *
    * @host
    */
-  private synchronized JupiterDocumentServer getServer(final SPath path) {
+  private synchronized JupiterDocumentServer getServer(final IFile file) {
 
-    JupiterDocumentServer docServer = concurrentDocuments.get(path);
+    JupiterDocumentServer docServer = concurrentDocuments.get(file);
 
     if (docServer == null) {
 
-      docServer = new JupiterDocumentServer(path);
+      docServer = new JupiterDocumentServer(file);
 
       for (final User client : currentClients) {
         /*
@@ -74,26 +73,26 @@ public class JupiterServer {
          * resources in question. Other clients that haven't accepted
          * the Project yet will be added later.
          */
-        if (sarosSession.userHasProject(client, path.getProject())) {
+        if (sarosSession.userHasProject(client, file.getProject())) {
           docServer.addProxyClient(client);
         }
       }
 
       docServer.addProxyClient(sarosSession.getHost());
 
-      concurrentDocuments.put(path, docServer);
+      concurrentDocuments.put(file, docServer);
     }
     return docServer;
   }
 
-  public synchronized void reset(final SPath path, final User user) {
-    getServer(path).reset(user);
+  public synchronized void reset(final IFile file, final User user) {
+    getServer(file).reset(user);
   }
 
   public synchronized Map<User, JupiterActivity> transform(final JupiterActivity activity)
       throws TransformationException {
 
-    final JupiterDocumentServer docServer = getServer(activity.getPath());
+    final JupiterDocumentServer docServer = getServer(activity.getResource());
 
     return docServer.transformJupiterActivity(activity);
   }
@@ -101,7 +100,7 @@ public class JupiterServer {
   public synchronized Map<User, ChecksumActivity> withTimestamp(final ChecksumActivity activity)
       throws TransformationException {
 
-    final JupiterDocumentServer docServer = getServer(activity.getPath());
+    final JupiterDocumentServer docServer = getServer(activity.getResource());
 
     return docServer.withTimestamp(activity);
   }

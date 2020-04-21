@@ -10,6 +10,7 @@ import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
+import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 
@@ -181,7 +182,7 @@ public class ConcurrentDocumentClient implements Startable {
    * Resets the JupiterClient for the given path.
    *
    * <p>When this is called on the client (or on the host for one of his JupiterClient), a call to
-   * {@link ConcurrentDocumentServer#reset(saros.session.User, SPath)} should be executed at the
+   * {@link ConcurrentDocumentServer#reset(saros.session.User, IFile)} should be executed at the
    * same time on the side of the given user.
    *
    * @client and @host This can be called on the host as well, if the host wants to reset his client

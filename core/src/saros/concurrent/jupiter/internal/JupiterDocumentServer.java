@@ -10,6 +10,7 @@ import saros.activities.SPath;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.Timestamp;
 import saros.concurrent.jupiter.TransformationException;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /**
@@ -24,14 +25,14 @@ public class JupiterDocumentServer {
   /** List of proxy clients. */
   private final HashMap<User, Jupiter> proxies = new HashMap<User, Jupiter>();
 
-  private final SPath editor;
+  private final IFile file;
 
   /**
    * Create a new JupiterDocument (server-side) representing the document identified by the given
-   * SPath
+   * file.
    */
-  public JupiterDocumentServer(SPath path) {
-    this.editor = path;
+  public JupiterDocumentServer(IFile file) {
+    this.file = file;
   }
 
   public synchronized void addProxyClient(final User user) {
@@ -75,7 +76,8 @@ public class JupiterDocumentServer {
 
       final Jupiter remoteProxy = entry.getValue();
 
-      final JupiterActivity transformed = remoteProxy.generateJupiterActivity(op, source, editor);
+      final JupiterActivity transformed =
+          remoteProxy.generateJupiterActivity(op, source, new SPath(file));
 
       result.put(user, transformed);
     }
