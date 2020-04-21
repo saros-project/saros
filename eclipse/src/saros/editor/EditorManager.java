@@ -198,12 +198,12 @@ public class EditorManager implements IEditorManager {
 
         @Override
         public void receive(TextSelectionActivity activity) {
-          SPath path = activity.getPath();
+          saros.filesystem.IFile file = activity.getResource();
           User user = activity.getSource();
 
           TextSelection textSelection = activity.getSelection();
 
-          for (IEditorPart editorPart : editorPool.getEditors(path)) {
+          for (IEditorPart editorPart : editorPool.getEditors(new SPath(file))) {
             locationAnnotationManager.setSelection(editorPart, textSelection, user);
           }
 
@@ -216,12 +216,12 @@ public class EditorManager implements IEditorManager {
 
         @Override
         public void receive(ViewportActivity activity) {
-          SPath path = activity.getPath();
+          saros.filesystem.IFile file = activity.getResource();
           User source = activity.getSource();
 
           LineRange lineRange = new LineRange(activity.getStartLine(), activity.getNumberOfLines());
 
-          for (IEditorPart editorPart : editorPool.getEditors(path)) {
+          for (IEditorPart editorPart : editorPool.getEditors(new SPath(file))) {
             locationAnnotationManager.setViewportForUser(source, editorPart, lineRange);
           }
         }
@@ -675,10 +675,10 @@ public class EditorManager implements IEditorManager {
 
   private void execEditorActivity(EditorActivity editorActivity) {
     User sender = editorActivity.getSource();
-    SPath sPath = editorActivity.getPath();
+    saros.filesystem.IFile file = editorActivity.getResource();
     switch (editorActivity.getType()) {
       case ACTIVATED:
-        editorListenerDispatch.editorActivated(sender, sPath);
+        editorListenerDispatch.editorActivated(sender, new SPath(file));
 
         // #2707089 We must clear annotations from shared editors that are
         // not commonly viewed
@@ -693,14 +693,14 @@ public class EditorManager implements IEditorManager {
         }
         break;
       case CLOSED:
-        editorListenerDispatch.editorClosed(sender, sPath);
+        editorListenerDispatch.editorClosed(sender, new SPath(file));
 
-        for (final IEditorPart editorPart : editorPool.getEditors(sPath)) {
+        for (final IEditorPart editorPart : editorPool.getEditors(new SPath(file))) {
           locationAnnotationManager.clearSelectionForUser(sender, editorPart);
         }
         break;
       case SAVED:
-        saveEditor(sPath);
+        saveEditor(new SPath(file));
         break;
       default:
         log.warn("Unexpected type: " + editorActivity.getType());
@@ -711,8 +711,8 @@ public class EditorManager implements IEditorManager {
 
     log.trace(".execTextEdit invoked");
 
-    SPath path = textEdit.getPath();
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    saros.filesystem.IFile fileWrapper = textEdit.getResource();
+    IFile file = ((EclipseFileImpl) fileWrapper).getDelegate();
 
     if (!file.exists()) {
       log.error("TextEditActivity refers to file which" + " is not available locally: " + textEdit);
@@ -758,7 +758,7 @@ public class EditorManager implements IEditorManager {
        */
       editorPool.setDocumentListenerEnabled(false);
 
-      replaceText(path, offset, denormalizedReplacedText, denormalizedNewText, user, doc);
+      replaceText(fileWrapper, offset, denormalizedReplacedText, denormalizedNewText, user, doc);
 
       editorPool.setDocumentListenerEnabled(true);
 
@@ -778,7 +778,7 @@ public class EditorManager implements IEditorManager {
      * TODO Performance optimization in case of batch operation might make
      * sense. Problem: How to recognize batch operations?
      */
-    for (IEditorPart editorPart : editorPool.getEditors(path)) {
+    for (IEditorPart editorPart : editorPool.getEditors(new SPath(fileWrapper))) {
       ITextViewer viewer = EditorAPI.getViewer(editorPart);
       if (viewer == null) {
         // No text viewer for the editorPart found.
@@ -1080,7 +1080,7 @@ public class EditorManager implements IEditorManager {
    * This method is called when a remote text edit has been received over the network to apply the
    * change to the local files.
    *
-   * @param path The path in which the change should be made.
+   * @param file The file in which the change should be made.
    * @param offset The position into the document of the given file, where the change started.
    * @param replacedText The text which is to be replaced by this operation at the given offset (is
    *     "" if this operation is only inserting text)
@@ -1090,7 +1090,12 @@ public class EditorManager implements IEditorManager {
    * @param doc the document for the file
    */
   private void replaceText(
-      SPath path, int offset, String replacedText, String text, User source, IDocument doc) {
+      saros.filesystem.IFile file,
+      int offset,
+      String replacedText,
+      String text,
+      User source,
+      IDocument doc) {
 
     int replacedLength = replacedText.length();
 
@@ -1129,7 +1134,7 @@ public class EditorManager implements IEditorManager {
 
     int length = text.length();
 
-    for (IEditorPart editorPart : editorPool.getEditors(path)) {
+    for (IEditorPart editorPart : editorPool.getEditors(new SPath(file))) {
 
       if (editorPart instanceof ITextEditor) {
         ITextEditor textEditor = (ITextEditor) editorPart;
