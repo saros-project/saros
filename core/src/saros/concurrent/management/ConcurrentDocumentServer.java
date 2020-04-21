@@ -12,6 +12,7 @@ import saros.activities.JupiterActivity;
 import saros.activities.QueueItem;
 import saros.activities.SPath;
 import saros.concurrent.jupiter.TransformationException;
+import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.ISarosSession;
 import saros.session.ISessionListener;
@@ -58,7 +59,7 @@ public class ConcurrentDocumentServer implements Startable {
     Consumer<SPath> deletedFileHandler =
         resource -> {
           log.debug("Resetting jupiter server for " + resource);
-          server.removePath(resource);
+          server.removePath(resource.getFile());
         };
 
     this.resourceActivityFilter = new ResourceActivityFilter(sarosSession, deletedFileHandler);
@@ -165,13 +166,13 @@ public class ConcurrentDocumentServer implements Startable {
    *
    * @host
    */
-  public synchronized void reset(final User user, final SPath path) {
+  public synchronized void reset(final User user, final IFile file) {
 
     assert sarosSession.isHost();
 
-    log.debug("resetting jupiter server for user: " + user + ", path: " + path);
+    log.debug("resetting jupiter server for user: " + user + ", path: " + file);
 
-    server.reset(path, user);
+    server.reset(file, user);
   }
 
   /** Does the actual work of transforming a ChecksumActivity. */

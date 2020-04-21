@@ -168,7 +168,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
     SPath path = new SPath(file);
 
     // Reset jupiter
-    concurrentDocumentServer.reset(from, path);
+    concurrentDocumentServer.reset(from, file);
 
     final User user = session.getLocalUser();
 
