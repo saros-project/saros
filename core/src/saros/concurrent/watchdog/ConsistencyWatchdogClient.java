@@ -1,6 +1,5 @@
 package saros.concurrent.watchdog;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -11,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
 import saros.activities.ChecksumErrorActivity;
@@ -18,6 +18,7 @@ import saros.activities.FileActivity;
 import saros.activities.SPath;
 import saros.annotations.Component;
 import saros.editor.IEditorManager;
+import saros.filesystem.IFile;
 import saros.monitoring.IProgressMonitor;
 import saros.monitoring.NullProgressMonitor;
 import saros.monitoring.remote.RemoteProgressManager;
@@ -189,7 +190,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
     try {
       cancelRecovery.set(false);
 
-      final List<SPath> pathsOfHandledFiles = new ArrayList<SPath>(pathsWithWrongChecksums);
+      final List<IFile> pathsOfHandledFiles =
+          pathsWithWrongChecksums.stream().map(SPath::getFile).collect(Collectors.toList());
 
       monitor.beginTask("Consistency recovery", pathsOfHandledFiles.size());
 
