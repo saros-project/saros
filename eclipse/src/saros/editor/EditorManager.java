@@ -612,8 +612,9 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    SPath path = EditorAPI.getEditorPath(changedEditor);
-    if (path == null) {
+    IFile file = EditorAPI.getEditorResource(changedEditor).getAdapter(IFile.class);
+
+    if (file == null) {
       log.warn("Could not find path for editor " + changedEditor.getTitle());
       return;
     }
@@ -631,17 +632,21 @@ public class EditorManager implements IEditorManager {
 
     TextPosition startPosition = EditorAPI.calculatePosition(document, offset);
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
-
     String lineSeparator = FileUtil.getLineSeparator(file);
 
     String normalizedText = LineSeparatorNormalizationUtil.normalize(text, lineSeparator);
     String normalizedReplacedText =
         LineSeparatorNormalizationUtil.normalize(replacedText, lineSeparator);
 
+    saros.filesystem.IFile wrappedFile = ResourceAdapterFactory.create(file);
+
     TextEditActivity textEdit =
         TextEditActivity.buildTextEditActivity(
-            session.getLocalUser(), startPosition, normalizedText, normalizedReplacedText, path);
+            session.getLocalUser(),
+            startPosition,
+            normalizedText,
+            normalizedReplacedText,
+            wrappedFile);
 
     if (!hasWriteAccess || isLocked) {
       /**

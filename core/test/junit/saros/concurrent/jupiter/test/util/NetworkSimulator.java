@@ -1,13 +1,12 @@
 package saros.concurrent.jupiter.test.util;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import saros.activities.SPath;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.session.User;
+import saros.test.mocks.SarosMocks;
 
 /**
  * This class simulates a network.
@@ -20,15 +19,18 @@ public class NetworkSimulator {
 
   public IProject project;
 
-  public IPath path = new PathFake("dummy");
+  public IPath path;
 
   protected PriorityQueue<NetworkRequest> sendQueue = new PriorityQueue<NetworkRequest>();
 
   protected int presentTime = -1;
 
   public NetworkSimulator() {
-    project = createMock(IProject.class);
-    replay(project);
+    SPath mockedPath = SarosMocks.mockResourceBackedSPath();
+
+    project = mockedPath.getProject();
+    path = mockedPath.getProjectRelativePath();
+
     clients = new HashMap<User, NetworkEventHandler>();
   }
 

@@ -163,7 +163,7 @@ public class SplitOperation implements Operation {
                 replacedTextLineDelta,
                 replacedTextOffsetDelta,
                 replacedText,
-                path);
+                path.getFile());
 
         result.add(textReplaceActivity);
         lastOp = null;

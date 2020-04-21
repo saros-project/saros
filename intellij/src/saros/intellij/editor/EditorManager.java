@@ -972,7 +972,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
      */
     TextEditActivity textEdit =
         TextEditActivity.buildTextEditActivity(
-            session.getLocalUser(), startPosition, newText, replacedText, path);
+            session.getLocalUser(), startPosition, newText, replacedText, path.getFile());
 
     if (!hasWriteAccess || isLocked) {
       /*

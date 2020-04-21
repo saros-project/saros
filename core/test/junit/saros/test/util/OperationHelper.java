@@ -1,7 +1,6 @@
 package saros.test.util;
 
 import org.apache.commons.lang3.tuple.Pair;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.text.DeleteOperation;
@@ -10,6 +9,7 @@ import saros.concurrent.jupiter.internal.text.NoOperation;
 import saros.concurrent.jupiter.internal.text.SplitOperation;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextPositionUtils;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /**
@@ -172,14 +172,14 @@ public class OperationHelper {
    * @param inLineOffset the in-line offset to use for the activity
    * @param text the text to use for the activity
    * @param replacedText the replaced text to use for the activity
-   * @param path the path to use for the activity
+   * @param file the file to use for the activity
    * @return a text edit activity with the given parameters
-   * @see #T(User, TextPosition, String, String, SPath)
+   * @see #T(User, TextPosition, String, String, IFile)
    */
   public static TextEditActivity T(
-      User source, int inLineOffset, String text, String replacedText, SPath path) {
+      User source, int inLineOffset, String text, String replacedText, IFile file) {
 
-    return T(source, 0, inLineOffset, text, replacedText, path);
+    return T(source, 0, inLineOffset, text, replacedText, file);
   }
 
   /**
@@ -191,16 +191,16 @@ public class OperationHelper {
    * @param inLineOffset the in-line offset to use for the activity
    * @param text the text to use for the activity
    * @param replacedText the replaced text to use for the activity
-   * @param path the path to use for the activity
+   * @param file the file to use for the activity
    * @return a text edit activity with the given parameters
-   * @see #T(User, TextPosition, String, String, SPath)
+   * @see #T(User, TextPosition, String, String, IFile)
    */
   public static TextEditActivity T(
-      User source, int lineNumber, int inLineOffset, String text, String replacedText, SPath path) {
+      User source, int lineNumber, int inLineOffset, String text, String replacedText, IFile file) {
 
     TextPosition startPosition = new TextPosition(lineNumber, inLineOffset);
 
-    return T(source, startPosition, text, replacedText, path);
+    return T(source, startPosition, text, replacedText, file);
   }
 
   /**
@@ -210,13 +210,13 @@ public class OperationHelper {
    * @param position the position to use for the activity
    * @param text the text to use for the activity
    * @param replacedText the replaced text to use for the activity
-   * @param path the path to use for the activity
+   * @param file the file to use for the activity
    * @return a text edit activity with the given parameters
-   * @see TextEditActivity#buildTextEditActivity(User, TextPosition, String, String, SPath)
+   * @see TextEditActivity#buildTextEditActivity(User, TextPosition, String, String, IFile)
    */
   public static TextEditActivity T(
-      User source, TextPosition position, String text, String replacedText, SPath path) {
+      User source, TextPosition position, String text, String replacedText, IFile file) {
 
-    return TextEditActivity.buildTextEditActivity(source, position, text, replacedText, path);
+    return TextEditActivity.buildTextEditActivity(source, position, text, replacedText, file);
   }
 }

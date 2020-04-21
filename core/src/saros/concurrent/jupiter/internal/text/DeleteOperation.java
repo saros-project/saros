@@ -200,7 +200,7 @@ public class DeleteOperation implements ITextOperation {
 
     TextEditActivity textEditActivity =
         new TextEditActivity(
-            source, startPosition, 0, 0, "", lineDelta, offsetDelta, replacedText, path);
+            source, startPosition, 0, 0, "", lineDelta, offsetDelta, replacedText, path.getFile());
 
     return Collections.singletonList(textEditActivity);
   }
