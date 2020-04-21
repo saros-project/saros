@@ -3,14 +3,12 @@ package saros.concurrent.jupiter.test.util;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.text.ITextOperation;
 import saros.concurrent.jupiter.internal.text.SplitOperation;
 import saros.editor.text.TextPositionUtils;
-import saros.filesystem.IPath;
-import saros.filesystem.IProject;
+import saros.filesystem.IFile;
 import saros.session.User;
 import saros.test.util.OperationHelper;
 
@@ -37,21 +35,18 @@ public class Document {
   private static final Logger log = Logger.getLogger(Document.class.getName());
 
   /** document state. */
-  protected StringBuffer doc;
+  private final StringBuffer doc;
 
-  protected IPath path;
-
-  protected IProject project;
+  private final IFile file;
 
   /**
    * constructor to init doc.
    *
    * @param initState start document state.
    */
-  public Document(String initState, IProject project, IPath path) {
-    doc = new StringBuffer(initState);
-    this.project = project;
-    this.path = path;
+  public Document(String initState, IFile file) {
+    this.doc = new StringBuffer(initState);
+    this.file = file;
   }
 
   /**
@@ -78,7 +73,7 @@ public class Document {
 
     checkOperationDeltas(op);
 
-    List<TextEditActivity> activities = op.toTextEdit(new SPath(project, path), dummy);
+    List<TextEditActivity> activities = op.toTextEdit(file, dummy);
 
     String lineSeparator = OperationHelper.EOL;
 

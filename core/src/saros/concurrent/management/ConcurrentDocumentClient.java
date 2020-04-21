@@ -169,7 +169,7 @@ public class ConcurrentDocumentClient implements Startable {
 
     // Transform to TextEdit so it can be executed locally
     for (TextEditActivity textEdit :
-        op.toTextEdit(jupiterActivity.getPath(), jupiterActivity.getSource())) {
+        op.toTextEdit(jupiterActivity.getResource(), jupiterActivity.getSource())) {
 
       activities.add(textEdit);
     }

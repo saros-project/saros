@@ -33,7 +33,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
   public void testExecuteLocalOperations() {
     Algorithm algo = new Jupiter(true);
 
-    Document doc = new Document("abc", pathMock.getProject(), pathMock.getProjectRelativePath());
+    Document doc = new Document("abc", pathMock.getFile());
     assertEquals("abc", doc.getDocument());
 
     /* insert one char. */

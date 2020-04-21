@@ -24,10 +24,10 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.editor.text.TextPosition;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /**
@@ -99,7 +99,7 @@ public class SplitOperation implements Operation {
   }
 
   @Override
-  public List<TextEditActivity> toTextEdit(SPath path, User source) {
+  public List<TextEditActivity> toTextEdit(IFile file, User source) {
 
     List<TextEditActivity> result = new ArrayList<TextEditActivity>();
 
@@ -163,18 +163,18 @@ public class SplitOperation implements Operation {
                 replacedTextLineDelta,
                 replacedTextOffsetDelta,
                 replacedText,
-                path.getFile());
+                file);
 
         result.add(textReplaceActivity);
         lastOp = null;
         continue;
       } else {
         // Cannot combine two operations to a replace
-        result.addAll(lastOp.toTextEdit(path, source));
+        result.addAll(lastOp.toTextEdit(file, source));
         lastOp = operation;
       }
     }
-    if (lastOp != null) result.addAll(lastOp.toTextEdit(path, source));
+    if (lastOp != null) result.addAll(lastOp.toTextEdit(file, source));
 
     return result;
   }

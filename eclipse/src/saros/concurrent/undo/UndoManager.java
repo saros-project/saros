@@ -453,7 +453,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
       return;
     }
 
-    for (TextEditActivity activity : op.toTextEdit(editor, sarosSession.getLocalUser())) {
+    for (TextEditActivity activity : op.toTextEdit(editor.getFile(), sarosSession.getLocalUser())) {
       log.debug("undone: " + activity + " in " + editor);
       fireActivity(activity);
     }
@@ -463,7 +463,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
     Operation op = calcRedoOperation(editor);
 
-    for (TextEditActivity activity : op.toTextEdit(editor, sarosSession.getLocalUser())) {
+    for (TextEditActivity activity : op.toTextEdit(editor.getFile(), sarosSession.getLocalUser())) {
       log.debug("redone: " + activity + " in " + editor);
       fireActivity(activity);
     }
