@@ -7,7 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
   ReplaceableConverterTest.class,
   ReplaceableSingleValueConverterTest.class,
-  SPathConverterTest.class,
+  ResourceTransportWrapperConverterTest.class,
   UserConverterTest.class
 })
 public class TestSuite {

@@ -19,6 +19,7 @@
  */
 package saros.activities;
 
+import saros.filesystem.IResource;
 import saros.session.User;
 
 /**
@@ -89,9 +90,10 @@ public interface IActivity {
    * since this method is only expected to cover deserialization errors, it is sufficient for
    * implementations to only check for (unwanted) <code>null</code> values of fields of which the
    * conversions rely on external states (such as the Saros session), i.e. fields of type {@link
-   * User} and {@link SPath}. The latter are the cases in which implementations <i>must</i> return
-   * <code>false</code>; they are <i>allowed</i> to return <code>false</code> for all configurations
-   * that would throw an {@link IllegalArgumentException} if the constructor was used.
+   * User} and {@link IResource}. The latter are the cases in which implementations <i>must</i>
+   * return <code>false</code>; they are <i>allowed</i> to return <code>false</code> for all
+   * configurations that would throw an {@link IllegalArgumentException} if the constructor was
+   * used.
    *
    * <p>An alternative solution for this could make use of the <a href=
    * "http://docs.oracle.com/javase/6/docs/api/java/io/Serializable.html"> <code>readResolve()

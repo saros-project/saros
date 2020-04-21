@@ -11,15 +11,10 @@ import saros.session.internal.DeletionAcknowledgmentDispatcher;
  * @see DeletionAcknowledgmentDispatcher
  */
 @XStreamAlias("deletionAcknowledgementActivity")
-public class DeletionAcknowledgmentActivity extends AbstractResourceActivity {
+public class DeletionAcknowledgmentActivity extends AbstractResourceActivity<IFile> {
 
   public DeletionAcknowledgmentActivity(User user, IFile file) {
-    super(user, new SPath(file));
-  }
-
-  @Override
-  public IFile getResource() {
-    return getPath().getFile();
+    super(user, file);
   }
 
   @Override
@@ -29,6 +24,6 @@ public class DeletionAcknowledgmentActivity extends AbstractResourceActivity {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + " : " + getSource() + " - " + getPath();
+    return this.getClass().getSimpleName() + " : " + getSource() + " - " + getResource();
   }
 }

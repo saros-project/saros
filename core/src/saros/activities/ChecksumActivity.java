@@ -21,7 +21,7 @@ import saros.session.User;
  * invalidates the checksum.
  */
 @XStreamAlias("checksumActivity")
-public class ChecksumActivity extends AbstractResourceActivity {
+public class ChecksumActivity extends AbstractResourceActivity<IFile> {
 
   /** Constant used for representing a missing file */
   public static final int NON_EXISTING_DOC = -1;
@@ -48,16 +48,11 @@ public class ChecksumActivity extends AbstractResourceActivity {
   public ChecksumActivity(
       User source, IFile file, long hash, long length, Timestamp jupiterTimestamp) {
 
-    super(source, new SPath(file));
+    super(source, file);
 
     this.hash = hash;
     this.length = length;
     this.jupiterTimestamp = jupiterTimestamp;
-  }
-
-  @Override
-  public IFile getResource() {
-    return getPath().getFile();
   }
 
   /** Returns a copy of the ChecksumActivity with a new {@link Timestamp}. */
@@ -68,7 +63,7 @@ public class ChecksumActivity extends AbstractResourceActivity {
   @Override
   public String toString() {
     return "ChecksumActivity(path: "
-        + getPath()
+        + getResource()
         + ", hash: "
         + hash
         + ", length: "

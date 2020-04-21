@@ -6,7 +6,7 @@ import saros.filesystem.IFile;
 import saros.session.User;
 
 @XStreamAlias("viewportActivity")
-public class ViewportActivity extends AbstractResourceActivity {
+public class ViewportActivity extends AbstractResourceActivity<IFile> {
 
   @XStreamAlias("o")
   @XStreamAsAttribute
@@ -18,7 +18,7 @@ public class ViewportActivity extends AbstractResourceActivity {
 
   public ViewportActivity(User source, int startLine, int numberOfLines, IFile file) {
 
-    super(source, new SPath(file));
+    super(source, file);
 
     if (file == null) throw new IllegalArgumentException("path must not be null");
 
@@ -27,13 +27,8 @@ public class ViewportActivity extends AbstractResourceActivity {
   }
 
   @Override
-  public IFile getResource() {
-    return getPath().getFile();
-  }
-
-  @Override
   public boolean isValid() {
-    return super.isValid() && (getPath() != null);
+    return super.isValid() && (getResource() != null);
   }
 
   /**
@@ -81,7 +76,7 @@ public class ViewportActivity extends AbstractResourceActivity {
   @Override
   public String toString() {
     return "ViewportActivity(path: "
-        + getPath()
+        + getResource()
         + ", range: ("
         + startLine
         + ","

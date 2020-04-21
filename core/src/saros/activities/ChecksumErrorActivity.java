@@ -42,7 +42,7 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
 
   @XStreamAsAttribute protected String recoveryID;
 
-  @XStreamImplicit protected List<SPath> paths;
+  @XStreamImplicit protected List<ResourceTransportWrapper<IFile>> files;
 
   public ChecksumErrorActivity(User source, User target, List<IFile> files, String recoveryID) {
 
@@ -51,7 +51,10 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
     if (target == null) throw new IllegalArgumentException("target must not be null");
 
     this.target = target;
-    this.paths = files == null ? null : files.stream().map(SPath::new).collect(Collectors.toList());
+    this.files =
+        files == null
+            ? null
+            : files.stream().map(ResourceTransportWrapper::new).collect(Collectors.toList());
     this.recoveryID = recoveryID;
   }
 
@@ -61,7 +64,9 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
   }
 
   public List<IFile> getFiles() {
-    return paths.stream().map(SPath::getFile).collect(Collectors.toList());
+    return files == null
+        ? null
+        : files.stream().map(ResourceTransportWrapper::getResource).collect(Collectors.toList());
   }
 
   /** Each ChecksumError has a unique ID, which should be used to identify a recovery session */
@@ -78,7 +83,7 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + Objects.hashCode(paths);
+    result = prime * result + Objects.hashCode(files);
     result = prime * result + Objects.hashCode(recoveryID);
     result = prime * result + Objects.hashCode(target);
     return result;
@@ -93,7 +98,7 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
     ChecksumErrorActivity other = (ChecksumErrorActivity) obj;
 
     if (!Objects.equals(this.recoveryID, other.recoveryID)) return false;
-    if (!Objects.equals(this.paths, other.paths)) return false;
+    if (!Objects.equals(this.files, other.files)) return false;
     if (!Objects.equals(this.target, other.target)) return false;
 
     return true;
@@ -106,7 +111,7 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
         + ", target: "
         + target
         + ", paths: "
-        + paths
+        + getFiles()
         + ", recoveryID: "
         + recoveryID
         + ")";
