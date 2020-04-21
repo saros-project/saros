@@ -18,6 +18,7 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextPositionUtils;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.session.User;
@@ -161,7 +162,7 @@ public class ServerEditorManager implements IEditorManager {
    *
    * @param folder path of the folder
    */
-  public void closeEditorsInFolder(SPath folder) {
+  public void closeEditorsInFolder(IFolder folder) {
     synchronized (openEditors) {
       Set<SPath> keys = openEditors.keySet();
       Set<SPath> invalidKeys = new HashSet<>();
