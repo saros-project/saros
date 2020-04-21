@@ -197,11 +197,11 @@ public final class ActivityHandler implements Startable {
        * as the EditorActivity currently break this and uses null paths
        * for non-shared-files we have to make this distinction for now.
        */
-      if (activity.getPath() == null) {
+      if (activity.getResource() == null) {
         recipients = item.recipients;
       } else {
         for (User user : item.recipients) {
-          if (session.userHasProject(user, activity.getPath().getProject())) {
+          if (session.userHasProject(user, activity.getResource().getProject())) {
             recipients.add(user);
           }
         }
