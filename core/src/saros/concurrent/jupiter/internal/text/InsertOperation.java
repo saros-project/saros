@@ -270,7 +270,8 @@ public class InsertOperation implements ITextOperation {
     TextPosition startPosition = getStartPosition();
 
     TextEditActivity textEditActivity =
-        new TextEditActivity(source, startPosition, lineDelta, offsetDelta, text, 0, 0, "", path);
+        new TextEditActivity(
+            source, startPosition, lineDelta, offsetDelta, text, 0, 0, "", path.getFile());
 
     return Collections.singletonList(textEditActivity);
   }

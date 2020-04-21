@@ -1,7 +1,5 @@
 package saros.concurrent;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static saros.test.util.OperationHelper.D;
 import static saros.test.util.OperationHelper.EOL;
@@ -20,9 +18,9 @@ import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.text.SplitOperation;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
-import saros.concurrent.jupiter.test.util.PathFake;
-import saros.filesystem.IProject;
+import saros.filesystem.IFile;
 import saros.session.User;
+import saros.test.mocks.SarosMocks;
 
 /**
  * Tests the logic that combines the contained operations if possible when creating text activities
@@ -32,28 +30,28 @@ import saros.session.User;
  */
 public class SplitOperationTest {
 
-  protected IProject project;
+  private IFile file;
+  private SPath path;
 
-  protected SPath path;
-  protected User source = JupiterTestCase.createUser("source");
+  private User source = JupiterTestCase.createUser("source");
 
   @Before
   public void setUp() {
-    project = createMock(IProject.class);
-    replay(project);
-    path = new SPath(project, new PathFake("path"));
+    path = SarosMocks.mockResourceBackedSPath();
+
+    file = path.getFile();
   }
 
   @Test
   public void testInsertInsert() {
     // Ins((0,4),"0ab") + Ins((0,7),"cd") -> Ins((0,4),"0abcd")
     Operation split1 = S(I(4, "0ab"), I(7, "cd"));
-    TextEditActivity expected1 = T(source, 4, "0abcd", "", path);
+    TextEditActivity expected1 = T(source, 4, "0abcd", "", file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Ins((0,4),"0ab") + Ins((0,4),"cd") -> Ins((0,4),"cd0ab")
     Operation split2 = S(I(4, "0ab"), I(4, "cd"));
-    TextEditActivity expected2 = T(source, 4, "cd0ab", "", path);
+    TextEditActivity expected2 = T(source, 4, "cd0ab", "", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
   }
 
@@ -61,27 +59,27 @@ public class SplitOperationTest {
   public void testMultiLineInsertInsertCase1() {
     // Ins((0,4),"0ab\n") + Ins((1,0),"cd") -> Ins((0,4),"0ab\ncd")
     Operation split1 = S(I(4, "0ab" + EOL), I(1, 0, "cd"));
-    TextEditActivity expected1 = T(source, 4, "0ab" + EOL + "cd", "", path);
+    TextEditActivity expected1 = T(source, 4, "0ab" + EOL + "cd", "", file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Ins((1,4),"0ab\ncd") + Ins((2,2),"efg") -> Ins((1,4),"0ab\ncdefg")
     Operation split2 = S(I(1, 4, "0ab" + EOL + "cd"), I(2, 2, "efg"));
-    TextEditActivity expected2 = T(source, 1, 4, "0ab" + EOL + "cdefg", "", path);
+    TextEditActivity expected2 = T(source, 1, 4, "0ab" + EOL + "cdefg", "", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
 
     // Ins((3,4),"0ab") + Ins((3,7),"cd\n") -> Ins((3,4),"0abcd\n")
     Operation split3 = S(I(3, 4, "0ab"), I(3, 7, "cd" + EOL));
-    TextEditActivity expected3 = T(source, 3, 4, "0abcd" + EOL, "", path);
+    TextEditActivity expected3 = T(source, 3, 4, "0abcd" + EOL, "", file);
     assertEquals(Collections.singletonList(expected3), split3.toTextEdit(path, source));
 
     // Ins((0,4),"0ab") + Ins((0,7),"cd\nef") -> Ins((0,4),"0abcd\nef")
     Operation split4 = S(I(4, "0ab"), I(7, "cd" + EOL + "ef"));
-    TextEditActivity expected4 = T(source, 4, "0abcd" + EOL + "ef", "", path);
+    TextEditActivity expected4 = T(source, 4, "0abcd" + EOL + "ef", "", file);
     assertEquals(Collections.singletonList(expected4), split4.toTextEdit(path, source));
 
     // Ins((0,4),"0ab\ncd") + Ins((1,2),"ef\ngh") -> Ins((0,4),"0ab\ncdef\ngh")
     Operation split5 = S(I(4, "0ab" + EOL + "cd"), I(1, 2, "ef" + EOL + "gh"));
-    TextEditActivity expected5 = T(source, 4, "0ab" + EOL + "cdef" + EOL + "gh", "", path);
+    TextEditActivity expected5 = T(source, 4, "0ab" + EOL + "cdef" + EOL + "gh", "", file);
     assertEquals(Collections.singletonList(expected5), split5.toTextEdit(path, source));
 
     // Ins((9,4),"0ab\ncd\nef\nghx") + Ins((12,3),"ij\nkl\nmn\nop") ->
@@ -97,7 +95,7 @@ public class SplitOperationTest {
             4,
             "0ab" + EOL + "cd" + EOL + "ef" + EOL + "ghxij" + EOL + "kl" + EOL + "mn" + EOL + "op",
             "",
-            path);
+            file);
     assertEquals(Collections.singletonList(expected6), split6.toTextEdit(path, source));
   }
 
@@ -105,27 +103,27 @@ public class SplitOperationTest {
   public void testMultiLineInsertInsertCase2() {
     // Ins((3,4),"0ab\n") + Ins((3,4),"cd") -> Ins((3,4),"cd0ab\n")
     Operation split1 = S(I(3, 4, "0ab" + EOL), I(3, 4, "cd"));
-    TextEditActivity expected1 = T(source, 3, 4, "cd0ab" + EOL, "", path);
+    TextEditActivity expected1 = T(source, 3, 4, "cd0ab" + EOL, "", file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Ins((5,4),"0ab\ncd") + Ins((5,4),"efg") -> Ins((5,4),"efg0ab\ncd")
     Operation split2 = S(I(5, 4, "0ab" + EOL + "cd"), I(5, 4, "efg"));
-    TextEditActivity expected2 = T(source, 5, 4, "efg0ab" + EOL + "cd", "", path);
+    TextEditActivity expected2 = T(source, 5, 4, "efg0ab" + EOL + "cd", "", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
 
     // Ins((0,4),"0ab") + Ins((0,7),"cd\n") -> Ins((0,4),"0abcd\n")
     Operation split3 = S(I(4, "0ab"), I(4, "cd" + EOL));
-    TextEditActivity expected3 = T(source, 4, "cd" + EOL + "0ab", "", path);
+    TextEditActivity expected3 = T(source, 4, "cd" + EOL + "0ab", "", file);
     assertEquals(Collections.singletonList(expected3), split3.toTextEdit(path, source));
 
     // Ins((0,4),"0ab") + Ins((0,4),"cd\nef") -> Ins((0,4),"cd\nef0ab")
     Operation split4 = S(I(4, "0ab"), I(4, "cd" + EOL + "ef"));
-    TextEditActivity expected4 = T(source, 4, "cd" + EOL + "ef0ab", "", path);
+    TextEditActivity expected4 = T(source, 4, "cd" + EOL + "ef0ab", "", file);
     assertEquals(Collections.singletonList(expected4), split4.toTextEdit(path, source));
 
     // Ins((1,4),"0ab\ncd") + Ins((1,4),"ef\ngh") -> Ins((1,4),"ef\ngh0ab\ncd")
     Operation split5 = S(I(1, 4, "0ab" + EOL + "cd"), I(1, 4, "ef" + EOL + "gh"));
-    TextEditActivity expected5 = T(source, 1, 4, "ef" + EOL + "gh0ab" + EOL + "cd", "", path);
+    TextEditActivity expected5 = T(source, 1, 4, "ef" + EOL + "gh0ab" + EOL + "cd", "", file);
     assertEquals(Collections.singletonList(expected5), split5.toTextEdit(path, source));
 
     // Ins((0,4),"0ab\ncd\nef\ngh") + Ins((0,4),"ij\nkl\nmn\nop") ->
@@ -140,7 +138,7 @@ public class SplitOperationTest {
             4,
             "ij" + EOL + "kl" + EOL + "mn" + EOL + "op0ab" + EOL + "cd" + EOL + "ef" + EOL + "gh",
             "",
-            path);
+            file);
     assertEquals(Collections.singletonList(expected6), split6.toTextEdit(path, source));
   }
 
@@ -148,17 +146,17 @@ public class SplitOperationTest {
   public void testDeleteDelete() {
     // Del((0,5),"ab") + Del((0,5),"cde") -> Del((0,5),"abcde")
     Operation split1 = S(D(5, "ab"), D(5, "cde"));
-    TextEditActivity expected1 = T(source, 5, "", "abcde", path);
+    TextEditActivity expected1 = T(source, 5, "", "abcde", file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Del((0,5),"cde") + Del((0,5),"ab") -> Del((0,5),"cdeab")
     Operation split2 = S(D(5, "cde"), D(5, "ab"));
-    TextEditActivity expected2 = T(source, 5, "", "cdeab", path);
+    TextEditActivity expected2 = T(source, 5, "", "cdeab", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
 
     // Del((0,7),"cde") + Del((0,5),"ab") -> Del((0,5),"abcde")
     Operation split3 = S(D(7, "cde"), D(5, "ab"));
-    TextEditActivity expected3 = T(source, 5, "", "abcde", path);
+    TextEditActivity expected3 = T(source, 5, "", "abcde", file);
     assertEquals(Collections.singletonList(expected3), split3.toTextEdit(path, source));
   }
 
@@ -166,27 +164,27 @@ public class SplitOperationTest {
   public void testMultiLineDeleteDeleteCase1() {
     // Del((0,5),"ab\n") + Del((0,5),"cde") -> Del((0,5),"ab\ncde")
     Operation split1 = S(D(5, "ab" + EOL), D(5, "cde"));
-    TextEditActivity expected1 = T(source, 5, "", "ab" + EOL + "cde", path);
+    TextEditActivity expected1 = T(source, 5, "", "ab" + EOL + "cde", file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Del((2,5),"ab\ncde") + Del((2,5),"fg") -> Del((2,5),"ab\ncdefg")
     Operation split2 = S(D(2, 5, "ab" + EOL + "cde"), D(2, 5, "fg"));
-    TextEditActivity expected2 = T(source, 2, 5, "", "ab" + EOL + "cdefg", path);
+    TextEditActivity expected2 = T(source, 2, 5, "", "ab" + EOL + "cdefg", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
 
     // Del((15,5),"ab") + Del((15,5),"cde\n") -> Del((15,5),"abcde\n")
     Operation split3 = S(D(15, 5, "ab"), D(15, 5, "cde" + EOL));
-    TextEditActivity expected3 = T(source, 15, 5, "", "abcde" + EOL, path);
+    TextEditActivity expected3 = T(source, 15, 5, "", "abcde" + EOL, file);
     assertEquals(Collections.singletonList(expected3), split3.toTextEdit(path, source));
 
     // Del((0,5),"ab") + Del((0,5),"cde\nfg") -> Del((0,5),"abcde\nfg")
     Operation split4 = S(D(5, "ab"), D(5, "cde" + EOL + "fg"));
-    TextEditActivity expected4 = T(source, 5, "", "abcde" + EOL + "fg", path);
+    TextEditActivity expected4 = T(source, 5, "", "abcde" + EOL + "fg", file);
     assertEquals(Collections.singletonList(expected4), split4.toTextEdit(path, source));
 
     // Del((3,5),"ab\ncde") + Del((3,5),"fg\nhi") -> Del((3,5),"ab\ncdefg\nhi")
     Operation split5 = S(D(3, 5, "ab" + EOL + "cde"), D(3, 5, "fg" + EOL + "hi"));
-    TextEditActivity expected5 = T(source, 3, 5, "", "ab" + EOL + "cdefg" + EOL + "hi", path);
+    TextEditActivity expected5 = T(source, 3, 5, "", "ab" + EOL + "cdefg" + EOL + "hi", file);
     assertEquals(Collections.singletonList(expected5), split5.toTextEdit(path, source));
 
     // Del((52,5),"0ab\ncd\nef\ngh") + Del((52,5),"ij\nkl\nmn\nop") ->
@@ -203,7 +201,7 @@ public class SplitOperationTest {
             "",
             "0ab" + EOL + "cd" + EOL + "ef" + EOL + "gh" + "ij" + EOL + "kl" + EOL + "mn" + EOL
                 + "op",
-            path);
+            file);
     assertEquals(Collections.singletonList(expected6), split6.toTextEdit(path, source));
   }
 
@@ -211,27 +209,27 @@ public class SplitOperationTest {
   public void testMultiLineDeleteDeleteCase2() {
     // Del((0,8),"ab\n") + Del((0,5),"cde") -> Del((0,5),"cdeab\n")
     Operation split1 = S(D(8, "ab" + EOL), D(5, "cde"));
-    TextEditActivity expected1 = T(source, 5, "", "cdeab" + EOL, path);
+    TextEditActivity expected1 = T(source, 5, "", "cdeab" + EOL, file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Del((1,7),"ab\ncde") + Del((1,5),"fg") -> Del((1,5),"fgab\ncde")
     Operation split2 = S(D(1, 7, "ab" + EOL + "cde"), D(1, 5, "fg"));
-    TextEditActivity expected2 = T(source, 1, 5, "", "fgab" + EOL + "cde", path);
+    TextEditActivity expected2 = T(source, 1, 5, "", "fgab" + EOL + "cde", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
 
     // Del((12,0),"ab") + Del((11,3),"cde\n") -> Del((11,5),"cde\nab")
     Operation split3 = S(D(12, 0, "ab"), D(11, 3, "cde" + EOL));
-    TextEditActivity expected3 = T(source, 11, 3, "", "cde" + EOL + "ab", path);
+    TextEditActivity expected3 = T(source, 11, 3, "", "cde" + EOL + "ab", file);
     assertEquals(Collections.singletonList(expected3), split3.toTextEdit(path, source));
 
     // Del((1,5),"ab") + Del((0,5),"cde\nfghij") -> Del((0,5),"cde\nfghijab")
     Operation split4 = S(D(1, 5, "ab"), D(5, "cde" + EOL + "fghij"));
-    TextEditActivity expected4 = T(source, 5, "", "cde" + EOL + "fghijab", path);
+    TextEditActivity expected4 = T(source, 5, "", "cde" + EOL + "fghijab", file);
     assertEquals(Collections.singletonList(expected4), split4.toTextEdit(path, source));
 
     // Del((8,2),"ab\ncde") + Del((7,2),"fg\nhi") -> Del((7,2),"fg\nhiab\ncde")
     Operation split5 = S(D(8, 2, "ab" + EOL + "cde"), D(7, 2, "fg" + EOL + "hi"));
-    TextEditActivity expected5 = T(source, 7, 2, "", "fg" + EOL + "hiab" + EOL + "cde", path);
+    TextEditActivity expected5 = T(source, 7, 2, "", "fg" + EOL + "hiab" + EOL + "cde", file);
     assertEquals(Collections.singletonList(expected5), split5.toTextEdit(path, source));
 
     // Del((47,9),"0ab\ncd\nef\ngh") + Del((44,4),"ij\nkl\nmn\nopqrstuvw") ->
@@ -259,7 +257,7 @@ public class SplitOperationTest {
                 + "ef"
                 + EOL
                 + "gh",
-            path);
+            file);
     assertEquals(Collections.singletonList(expected6), split6.toTextEdit(path, source));
   }
 
@@ -267,12 +265,12 @@ public class SplitOperationTest {
   public void testInsertDelete() {
     // Ins((0,5),"ab") + Del((0,5),"abcd") -> Del((0,5),"cd")
     Operation split1 = S(I(5, "ab"), D(5, "abcd"));
-    TextEditActivity expected1 = T(source, 5, "", "cd", path);
+    TextEditActivity expected1 = T(source, 5, "", "cd", file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Ins((0,5),"abcde") + Del((0,5),"abcd") -> Ins((0,5),"e")
     Operation split2 = S(I(5, "abcde"), D(5, "abcd"));
-    TextEditActivity expected2 = T(source, 5, "e", "", path);
+    TextEditActivity expected2 = T(source, 5, "e", "", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
   }
 
@@ -280,27 +278,27 @@ public class SplitOperationTest {
   public void testMultiLineInsertDeleteCase1() {
     // Ins((0,5),"ab\n") + Del((0,5),"ab\ncd") -> Del((0,5),"cd")
     Operation split1 = S(I(5, "ab" + EOL), D(5, "ab" + EOL + "cd"));
-    TextEditActivity expected1 = T(source, 5, "", "cd", path);
+    TextEditActivity expected1 = T(source, 5, "", "cd", file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Ins((3,2),"ab\ncd") + Del((3,2),"ab\ncdefgh") -> Del((3,2),"efgh")
     Operation split2 = S(I(3, 2, "ab" + EOL + "cd"), D(3, 2, "ab" + EOL + "cdefgh"));
-    TextEditActivity expected2 = T(source, 3, 2, "", "efgh", path);
+    TextEditActivity expected2 = T(source, 3, 2, "", "efgh", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
 
     // Ins((1,4),"ab\ncd") + Del((1,4),"ab\ncde\nfgh") -> Del((1,4),"e\nfgh")
     Operation split3 = S(I(1, 4, "ab" + EOL + "cd"), D(1, 4, "ab" + EOL + "cde" + EOL + "fgh"));
-    TextEditActivity expected3 = T(source, 1, 4, "", "e" + EOL + "fgh", path);
+    TextEditActivity expected3 = T(source, 1, 4, "", "e" + EOL + "fgh", file);
     assertEquals(Collections.singletonList(expected3), split3.toTextEdit(path, source));
 
     // Ins((1,4),"ab\ncd") + Del((1,4),"ab\ncd\nefgh") -> Del((1,4),"\nefgh")
     Operation split4 = S(I(1, 4, "ab" + EOL + "cd"), D(1, 4, "ab" + EOL + "cd" + EOL + "efgh"));
-    TextEditActivity expected4 = T(source, 1, 4, "", EOL + "efgh", path);
+    TextEditActivity expected4 = T(source, 1, 4, "", EOL + "efgh", file);
     assertEquals(Collections.singletonList(expected4), split4.toTextEdit(path, source));
 
     // Ins((0,0),"abc") + Del((0,0),"abcd\nefgh") -> Del((0,0),"d\nefgh")
     Operation split5 = S(I(0, "abc"), D(0, "abcd" + EOL + "efgh"));
-    TextEditActivity expected5 = T(source, 0, "", "d" + EOL + "efgh", path);
+    TextEditActivity expected5 = T(source, 0, "", "d" + EOL + "efgh", file);
     assertEquals(Collections.singletonList(expected5), split5.toTextEdit(path, source));
   }
 
@@ -308,17 +306,17 @@ public class SplitOperationTest {
   public void testMultiLineInsertDeleteCase2() {
     // Ins((0,5),"ab\ncde") + Del((0,5),"ab\n") -> Ins((0,5),"cde")
     Operation split1 = S(I(5, "ab" + EOL + "cde"), D(5, "ab" + EOL));
-    TextEditActivity expected1 = T(source, 5, "cde", "", path);
+    TextEditActivity expected1 = T(source, 5, "cde", "", file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Ins((1,4),"abcd\nefg") + Del((1,4),"abc") -> Ins((1,4),"d\nefg")
     Operation split2 = S(I(1, 4, "abcd" + EOL + "efg"), D(1, 4, "abc"));
-    TextEditActivity expected2 = T(source, 1, 4, "d" + EOL + "efg", "", path);
+    TextEditActivity expected2 = T(source, 1, 4, "d" + EOL + "efg", "", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
 
     // Ins((3,2),"ab\ncd\nef") + Del((3,2),"ab\ncd") -> Ins((3,2),"\ned")
     Operation split3 = S(I(3, 2, "ab" + EOL + "cd" + EOL + "ef"), D(3, 2, "ab" + EOL + "cd"));
-    TextEditActivity expected3 = T(source, 3, 2, EOL + "ef", "", path);
+    TextEditActivity expected3 = T(source, 3, 2, EOL + "ef", "", file);
     assertEquals(Collections.singletonList(expected3), split3.toTextEdit(path, source));
   }
 
@@ -326,7 +324,7 @@ public class SplitOperationTest {
   public void testDeleteInsert() {
     // Del((0,8),"abc") + Ins((0,8),"ghijk") -> Replace "abc" with "ghijk"
     Operation split1 = S(D(8, "abc"), I(8, "ghijk"));
-    TextEditActivity expected1 = T(source, 8, "ghijk", "abc", path);
+    TextEditActivity expected1 = T(source, 8, "ghijk", "abc", file);
     assertEquals(Collections.singletonList(expected1), split1.toTextEdit(path, source));
 
     // Del((1,7),"abc\ndef\ghi") + Ins((1,7),"jkl\nmno\npqr") ->
@@ -334,7 +332,7 @@ public class SplitOperationTest {
     Operation split2 =
         S(D(1, 7, "abc" + EOL + "def" + EOL + "ghi"), I(1, 7, "jkl" + EOL + "mno" + EOL + "pqr"));
     TextEditActivity expected2 =
-        T(source, 1, 7, "jkl" + EOL + "mno" + EOL + "pqr", "abc" + EOL + "def" + EOL + "ghi", path);
+        T(source, 1, 7, "jkl" + EOL + "mno" + EOL + "pqr", "abc" + EOL + "def" + EOL + "ghi", file);
     assertEquals(Collections.singletonList(expected2), split2.toTextEdit(path, source));
   }
 
@@ -342,7 +340,7 @@ public class SplitOperationTest {
   public void testDelSplit() {
     // Split(Del((0,8),"abc"), Split(NoOperation, Ins((0,8),"ghijk")
     Operation split = S(D(8, "abc"), S(NOP(), I(8, "ghijk")));
-    TextEditActivity expected = T(source, 8, "ghijk", "abc", path);
+    TextEditActivity expected = T(source, 8, "ghijk", "abc", file);
     assertEquals(Collections.singletonList(expected), split.toTextEdit(path, source));
   }
 
@@ -352,9 +350,9 @@ public class SplitOperationTest {
     Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), D(15, "xyz")));
 
     List<TextEditActivity> expected = new LinkedList<>();
-    expected.add(T(source, 8, "", "uvw", path));
-    expected.add(T(source, 2, "e", "", path));
-    expected.add(T(source, 15, "", "xyz", path));
+    expected.add(T(source, 8, "", "uvw", file));
+    expected.add(T(source, 2, "e", "", file));
+    expected.add(T(source, 15, "", "xyz", file));
 
     assertEquals(expected, split.toTextEdit(path, source));
   }
@@ -365,8 +363,8 @@ public class SplitOperationTest {
     Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), I(3, "xyz")));
 
     List<TextEditActivity> expected = new LinkedList<>();
-    expected.add(T(source, 8, "", "uvw", path));
-    expected.add(T(source, 2, "exyz", "", path));
+    expected.add(T(source, 8, "", "uvw", file));
+    expected.add(T(source, 2, "exyz", "", file));
 
     assertEquals(expected, split.toTextEdit(path, source));
   }
@@ -377,7 +375,7 @@ public class SplitOperationTest {
     Operation split = S(S(D(8, "abc"), D(8, "defg")), S(I(8, "1234"), I(12, "56")));
 
     List<TextEditActivity> expected = new LinkedList<>();
-    expected.add(T(source, 8, "123456", "abcdefg", path));
+    expected.add(T(source, 8, "123456", "abcdefg", file));
 
     assertEquals(expected, split.toTextEdit(path, source));
   }

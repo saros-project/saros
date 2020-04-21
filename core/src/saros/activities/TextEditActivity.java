@@ -76,12 +76,12 @@ public class TextEditActivity extends AbstractResourceActivity {
    * @param startPosition the position at which the text edit activity applies
    * @param newText the new text added with this activity
    * @param replacedText the replaced text removed with this activity
-   * @param path the resource the activity belongs to
+   * @param file the file the activity belongs to
    * @see TextPositionUtils#calculateDeltas(String,String)
    * @see LineSeparatorNormalizationUtil
    */
   public static TextEditActivity buildTextEditActivity(
-      User source, TextPosition startPosition, String newText, String replacedText, SPath path) {
+      User source, TextPosition startPosition, String newText, String replacedText, IFile file) {
 
     Pair<Integer, Integer> newTextDeltas =
         TextPositionUtils.calculateDeltas(newText, NORMALIZED_LINE_SEPARATOR);
@@ -104,7 +104,7 @@ public class TextEditActivity extends AbstractResourceActivity {
         replacedTextLineDelta,
         replacedTextOffsetDelta,
         replacedText,
-        path);
+        file);
   }
 
   /**
@@ -122,7 +122,7 @@ public class TextEditActivity extends AbstractResourceActivity {
    * @param replacedTextLineDelta the number of lines removed with the replaced text
    * @param replacedTextOffsetDelta the offset delta in the last line of the replaced text
    * @param replacedText the replaced text removed with this activity
-   * @param path the resource the activity belongs to
+   * @param file the file the activity belongs to
    * @see LineSeparatorNormalizationUtil
    */
   public TextEditActivity(
@@ -134,9 +134,9 @@ public class TextEditActivity extends AbstractResourceActivity {
       int replacedTextLineDelta,
       int replacedTextOffsetDelta,
       String replacedText,
-      SPath path) {
+      IFile file) {
 
-    super(source, path);
+    super(source, new SPath(file));
 
     if (startPosition == null || !startPosition.isValid())
       throw new IllegalArgumentException("Start position must be valid");
@@ -157,7 +157,7 @@ public class TextEditActivity extends AbstractResourceActivity {
     assert !newText.contains("\r\n");
     assert !replacedText.contains("\r\n");
 
-    if (path == null) throw new IllegalArgumentException("Resource must not be null");
+    if (file == null) throw new IllegalArgumentException("Resource must not be null");
 
     this.startPosition = startPosition;
 

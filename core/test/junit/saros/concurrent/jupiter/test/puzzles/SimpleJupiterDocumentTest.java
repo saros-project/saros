@@ -1,7 +1,5 @@
 package saros.concurrent.jupiter.test.puzzles;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static saros.test.util.OperationHelper.I;
 
@@ -14,9 +12,6 @@ import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.concurrent.jupiter.test.util.Document;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
-import saros.concurrent.jupiter.test.util.PathFake;
-import saros.filesystem.IPath;
-import saros.filesystem.IProject;
 import saros.session.User;
 import saros.test.mocks.SarosMocks;
 
@@ -37,12 +32,8 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
   @Test
   public void testExecuteLocalOperations() {
     Algorithm algo = new Jupiter(true);
-    IProject project = createMock(IProject.class);
-    replay(project);
 
-    IPath path = new PathFake("dummy");
-
-    Document doc = new Document("abc", project, path);
+    Document doc = new Document("abc", pathMock.getProject(), pathMock.getProjectRelativePath());
     assertEquals("abc", doc.getDocument());
 
     /* insert one char. */
