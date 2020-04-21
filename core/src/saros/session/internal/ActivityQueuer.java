@@ -9,7 +9,6 @@ import saros.activities.EditorActivity.Type;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
@@ -109,20 +108,20 @@ public class ActivityQueuer {
   }
 
   private boolean alreadyRememberedEditorActivity(
-      final Map<SPath, List<User>> editorActivities, final SPath spath, final User user) {
+      final Map<IFile, List<User>> editorActivities, final IFile file, final User user) {
 
-    final List<User> users = editorActivities.get(spath);
+    final List<User> users = editorActivities.get(file);
     return users != null && users.contains(user);
   }
 
   private void rememberEditorActivity(
-      final Map<SPath, List<User>> editorActivities, final SPath spath, final User user) {
+      final Map<IFile, List<User>> editorActivities, final IFile file, final User user) {
 
-    List<User> users = editorActivities.get(spath);
+    List<User> users = editorActivities.get(file);
 
     if (users == null) {
       users = new ArrayList<User>();
-      editorActivities.put(spath, users);
+      editorActivities.put(file, users);
     }
 
     if (!users.contains(user)) users.add(user);
@@ -138,14 +137,14 @@ public class ActivityQueuer {
 
         IResourceActivity resourceActivity = (IResourceActivity) activity;
 
-        SPath path = resourceActivity.getPath();
+        IResource resource = resourceActivity.getResource();
 
-        // can't queue activities without path
-        if (path != null) {
+        // can't queue activities without resource
+        if (resource != null) {
 
           // try to reuse the queue as lookup is O(n)
-          if (projectQueue == null || !projectQueue.project.equals(path.getProject())) {
-            projectQueue = getProjectQueue(path.getProject());
+          if (projectQueue == null || !projectQueue.project.equals(resource.getProject())) {
+            projectQueue = getProjectQueue(resource.getProject());
           }
 
           if (projectQueue != null) {
@@ -176,7 +175,7 @@ public class ActivityQueuer {
        * fired on the remote sides.
        */
 
-      final Map<SPath, List<User>> editorActivities = new HashMap<SPath, List<User>>();
+      final Map<IFile, List<User>> editorActivities = new HashMap<>();
 
       for (final IResourceActivity resourceActivity : projectQueue.buffer) {
 
@@ -189,22 +188,22 @@ public class ActivityQueuer {
 
           final EditorActivity ea = (EditorActivity) resourceActivity;
 
-          if (!alreadyRememberedEditorActivity(editorActivities, new SPath(file), source)
+          if (!alreadyRememberedEditorActivity(editorActivities, file, source)
               && ea.getType() != Type.ACTIVATED) {
 
             activities.add(new EditorActivity(ea.getSource(), Type.ACTIVATED, file));
           }
 
-          rememberEditorActivity(editorActivities, new SPath(file), source);
+          rememberEditorActivity(editorActivities, file, source);
 
-        } else if (resourceActivity instanceof JupiterActivity
-            && !alreadyRememberedEditorActivity(editorActivities, new SPath(resource), source)) {
-
+        } else if (resourceActivity instanceof JupiterActivity) {
           IFile file = (IFile) resource;
 
-          activities.add(new EditorActivity(resourceActivity.getSource(), Type.ACTIVATED, file));
+          if (!alreadyRememberedEditorActivity(editorActivities, file, source)) {
+            activities.add(new EditorActivity(resourceActivity.getSource(), Type.ACTIVATED, file));
 
-          rememberEditorActivity(editorActivities, new SPath(file), source);
+            rememberEditorActivity(editorActivities, file, source);
+          }
         }
 
         activities.add(resourceActivity);
