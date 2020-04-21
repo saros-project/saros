@@ -99,20 +99,20 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   private void handleFileRecovery(FileActivity activity)
       throws CoreException, IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
-    SPath path = activity.getPath();
+    saros.filesystem.IFile file = activity.getResource();
 
-    log.debug("performing recovery for file: " + activity.getPath().getFullPath());
+    log.debug("performing recovery for file: " + file.getFullPath());
 
     /*
      * We have to save the editor or otherwise the internal buffer is not
      * flushed and so replacing the file on disk will have NO impact on the
      * actual content !
      */
-    editorManager.saveLazy(path);
+    editorManager.saveLazy(new SPath(file));
 
-    boolean editorWasOpen = editorManager.isOpenEditor(path);
+    boolean editorWasOpen = editorManager.isOpenEditor(new SPath(file));
 
-    if (editorWasOpen) editorManager.closeEditor(path);
+    if (editorWasOpen) editorManager.closeEditor(new SPath(file));
 
     FileActivity.Type type = activity.getType();
 
@@ -128,18 +128,19 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
        * always reset Jupiter algorithm, because upon receiving that
        * activity, it was already reset on the host side
        */
-      session.getConcurrentDocumentClient().reset(path);
+      session.getConcurrentDocumentClient().reset(new SPath(file));
     }
 
-    if (editorWasOpen && type != FileActivity.Type.REMOVED) editorManager.openEditor(path, true);
+    if (editorWasOpen && type != FileActivity.Type.REMOVED)
+      editorManager.openEditor(new SPath(file), true);
   }
 
   private void handleFileMove(FileActivity activity)
       throws CoreException, IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
-    final IFile fileDestination = toEclipseIFile(activity.getPath().getFile());
+    final IFile fileDestination = toEclipseIFile(activity.getResource());
 
-    final IFile fileToMove = toEclipseIFile(activity.getOldPath().getFile());
+    final IFile fileToMove = toEclipseIFile(activity.getOldResource());
 
     FileUtils.mkdirs(fileDestination);
 
@@ -151,11 +152,11 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   }
 
   private void handleFileDeletion(FileActivity activity) throws CoreException {
-    SPath path = activity.getPath();
+    saros.filesystem.IFile fileWrapper = activity.getResource();
 
-    editorManager.closeEditor(path, false);
+    editorManager.closeEditor(new SPath(fileWrapper), false);
 
-    final IFile file = toEclipseIFile(path.getFile());
+    final IFile file = toEclipseIFile(fileWrapper);
 
     if (file.exists()) FileUtils.delete(file);
     else log.warn("could not delete file " + file + " because it does not exist");
@@ -164,7 +165,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   private void handleFileCreation(FileActivity activity)
       throws CoreException, IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
-    saros.filesystem.IFile sarosFile = activity.getPath().getFile();
+    saros.filesystem.IFile sarosFile = activity.getResource();
 
     final IFile file = toEclipseIFile(sarosFile);
 
