@@ -6,12 +6,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.part.FileEditorInput;
 import saros.activities.EditorActivity;
-import saros.activities.SPath;
 import saros.editor.internal.EditorAPI;
 import saros.filesystem.EclipseFileImpl;
+import saros.filesystem.IFile;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
 import saros.session.ISarosSession;
@@ -37,17 +36,17 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
   private static final Logger log = Logger.getLogger(RemoteWriteAccessManager.class);
 
   /** stores users and their opened files (identified by their path) */
-  protected Map<SPath, Set<User>> editorStates = new HashMap<SPath, Set<User>>();
+  private final Map<IFile, Set<User>> editorStates = new HashMap<>();
 
   /**
    * stores files (identified by their path) connected by at least user with {@link
    * Permission#WRITE_ACCESS}
    */
-  protected Set<SPath> connectedUserWithWriteAccessFiles = new HashSet<SPath>();
+  private final Set<IFile> connectedUserWithWriteAccessFiles = new HashSet<>();
 
-  protected ISarosSession sarosSession;
+  private final ISarosSession sarosSession;
 
-  public RemoteWriteAccessManager(final ISarosSession sarosSession) {
+  RemoteWriteAccessManager(final ISarosSession sarosSession) {
     this.sarosSession = sarosSession;
     this.sarosSession.addListener(sessionListener);
   }
@@ -56,8 +55,8 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
   @Override
   public void receive(final EditorActivity editorActivity) {
     User sender = editorActivity.getSource();
-    SPath path = editorActivity.getPath();
-    if (path == null) {
+    IFile file = editorActivity.getResource();
+    if (file == null) {
       /*
        * sPath == null means that the user has no active editor any more.
        */
@@ -66,20 +65,20 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     switch (editorActivity.getType()) {
       case ACTIVATED:
-        getEditorState(path).add(sender);
+        getEditorState(file).add(sender);
         break;
       case SAVED:
         break;
       case CLOSED:
-        getEditorState(path).remove(sender);
+        getEditorState(file).remove(sender);
         break;
       default:
         log.warn(".receive() Unknown Activity type");
     }
-    updateConnectionState(path);
+    updateConnectionState(file);
   }
 
-  protected ISessionListener sessionListener =
+  private ISessionListener sessionListener =
       new ISessionListener() {
 
         /**
@@ -88,7 +87,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
          */
         @Override
         public void userLeft(User user) {
-          for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
+          for (Entry<IFile, Set<User>> entry : editorStates.entrySet()) {
             if (entry.getValue().remove(user)) updateConnectionState(entry.getKey());
           }
         }
@@ -99,16 +98,16 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
          */
         @Override
         public void permissionChanged(User user) {
-          for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
+          for (Entry<IFile, Set<User>> entry : editorStates.entrySet()) {
             if (entry.getValue().contains(user)) updateConnectionState(entry.getKey());
           }
         }
       };
 
-  public void dispose() {
+  void dispose() {
     sarosSession.removeListener(sessionListener);
 
-    for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
+    for (Entry<IFile, Set<User>> entry : editorStates.entrySet()) {
       entry.getValue().clear();
       updateConnectionState(entry.getKey());
     }
@@ -127,20 +126,20 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
    * Connects a document under the given path as a reaction on a remote Activity of a user with
    * {@link Permission#WRITE_ACCESS} (e.g. Activate Editor).
    */
-  protected void connectDocumentProvider(SPath path) {
+  private void connectDocumentProvider(IFile fileWrapper) {
 
-    assert !connectedUserWithWriteAccessFiles.contains(path);
+    assert !connectedUserWithWriteAccessFiles.contains(fileWrapper);
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    org.eclipse.core.resources.IFile file = ((EclipseFileImpl) fileWrapper).getDelegate();
     if (!file.exists()) {
       log.error(
-          "Attempting to connect to file which" + " is not available locally: " + path,
+          "Attempting to connect to file which" + " is not available locally: " + fileWrapper,
           new StackTrace());
       return;
     }
 
     if (EditorAPI.connect(new FileEditorInput(file)) != null) {
-      connectedUserWithWriteAccessFiles.add(path);
+      connectedUserWithWriteAccessFiles.add(fileWrapper);
     }
   }
 
@@ -148,13 +147,13 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
    * Disconnects a document under the given path as a reaction on a remote Activity of a user with
    * {@link Permission#WRITE_ACCESS} (e.g. Close Editor)
    */
-  protected void disconnectDocumentProvider(final SPath path) {
+  private void disconnectDocumentProvider(final IFile fileWrapper) {
 
-    assert connectedUserWithWriteAccessFiles.contains(path);
+    assert connectedUserWithWriteAccessFiles.contains(fileWrapper);
 
-    connectedUserWithWriteAccessFiles.remove(path);
+    connectedUserWithWriteAccessFiles.remove(fileWrapper);
 
-    IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+    org.eclipse.core.resources.IFile file = ((EclipseFileImpl) fileWrapper).getDelegate();
     EditorAPI.disconnect(new FileEditorInput(file));
   }
 
@@ -163,14 +162,14 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
    * looks if this document is already connected, and whether it needs to get connected/disconnected
    * now.
    */
-  protected void updateConnectionState(final SPath path) {
+  private void updateConnectionState(final IFile file) {
 
-    log.trace(".updateConnectionState(" + path.toString() + ")");
+    log.trace(".updateConnectionState(" + file.toString() + ")");
 
-    boolean hadUserWithWriteAccess = connectedUserWithWriteAccessFiles.contains(path);
+    boolean hadUserWithWriteAccess = connectedUserWithWriteAccessFiles.contains(file);
     boolean hasUserWithWriteAccess = false;
 
-    for (User user : getEditorState(path)) {
+    for (User user : getEditorState(file)) {
       if (user.hasWriteAccess()) {
         hasUserWithWriteAccess = true;
         break;
@@ -178,22 +177,22 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
     }
 
     if (!hadUserWithWriteAccess && hasUserWithWriteAccess) {
-      log.trace(".updateConnectionState File " + path.toString() + " will be connected ");
-      connectDocumentProvider(path);
+      log.trace(".updateConnectionState File " + file.toString() + " will be connected ");
+      connectDocumentProvider(file);
     }
 
     if (hadUserWithWriteAccess && !hasUserWithWriteAccess) {
-      log.trace(".updateConnectionState File " + path.toString() + " will be disconnected ");
-      disconnectDocumentProvider(path);
+      log.trace(".updateConnectionState File " + file.toString() + " will be disconnected ");
+      disconnectDocumentProvider(file);
     }
   }
 
-  private Set<User> getEditorState(final SPath path) {
-    Set<User> editorState = editorStates.get(path);
+  private Set<User> getEditorState(final IFile file) {
+    Set<User> editorState = editorStates.get(file);
 
     if (editorState == null) {
       editorState = new HashSet<User>();
-      editorStates.put(path, editorState);
+      editorStates.put(file, editorState);
     }
 
     return editorState;
