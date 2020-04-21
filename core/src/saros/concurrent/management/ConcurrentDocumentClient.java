@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
 import saros.activities.IActivity;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
@@ -38,8 +37,7 @@ public class ConcurrentDocumentClient implements Startable {
     this.sarosSession = sarosSession;
     this.jupiterClient = new JupiterClient(sarosSession);
 
-    this.resourceActivityFilter =
-        new ResourceActivityFilter(sarosSession, file -> reset(new SPath(file)));
+    this.resourceActivityFilter = new ResourceActivityFilter(sarosSession, this::reset);
   }
 
   @Override
@@ -190,9 +188,9 @@ public class ConcurrentDocumentClient implements Startable {
    *     document (which at the moment never happens, because the version of the host is the
    *     authoritative one and thus does not need to be reset).
    */
-  public synchronized void reset(SPath path) {
-    log.debug("Resetting jupiter client for " + path);
-    jupiterClient.reset(path.getFile());
+  public synchronized void reset(IFile file) {
+    log.debug("Resetting jupiter client for " + file);
+    jupiterClient.reset(file);
   }
 
   public boolean isCurrent(ChecksumActivity checksumActivity) {

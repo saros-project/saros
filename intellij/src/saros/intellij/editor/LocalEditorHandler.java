@@ -250,14 +250,14 @@ public class LocalEditorHandler {
     manager.generateEditorSaved(file);
   }
 
-  /** @return <code>true</code>, if the path is opened in an editor. */
-  public boolean isOpenEditor(SPath path) {
-    Document doc = editorPool.getDocument(path);
+  /** @return <code>true</code>, if the file is opened in an editor. */
+  public boolean isOpenEditor(IFile file) {
+    Document doc = editorPool.getDocument(new SPath(file));
     if (doc == null) {
       return false;
     }
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
     return ProjectAPI.isOpen(project, doc);
   }

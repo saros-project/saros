@@ -149,17 +149,17 @@ public class SharedResourcesManager implements Startable {
   private void handleFileRecovery(@NotNull FileActivity activity)
       throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
-    SPath path = activity.getPath();
+    IFile file = activity.getResource();
 
-    log.debug("performing recovery for file: " + activity.getPath().getFullPath());
+    log.debug("performing recovery for file: " + file.getFullPath());
 
     FileActivity.Type type = activity.getType();
 
     try {
       if (type == FileActivity.Type.CREATED) {
-        if (path.getFile().exists()) {
+        if (file.exists()) {
           localEditorManipulator.handleContentRecovery(
-              path, activity.getContent(), activity.getEncoding(), activity.getSource());
+              file, activity.getContent(), activity.getEncoding(), activity.getSource());
 
         } else {
           handleFileCreation(activity);
@@ -176,7 +176,7 @@ public class SharedResourcesManager implements Startable {
        * always reset Jupiter or we will get into trouble because the
        * vector time has already been reset on the host
        */
-      sarosSession.getConcurrentDocumentClient().reset(path);
+      sarosSession.getConcurrentDocumentClient().reset(file);
     }
   }
 
@@ -193,11 +193,8 @@ public class SharedResourcesManager implements Startable {
   private void handleFileMove(@NotNull FileActivity activity)
       throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
-    SPath oldPath = activity.getOldPath();
-    SPath newPath = activity.getPath();
-
-    IFile oldFile = oldPath.getFile();
-    IFile newFile = newPath.getFile();
+    IFile oldFile = activity.getOldResource();
+    IFile newFile = activity.getResource();
 
     if (!oldFile.exists()) {
       log.warn(
@@ -212,7 +209,7 @@ public class SharedResourcesManager implements Startable {
       return;
     }
 
-    boolean fileOpen = localEditorHandler.isOpenEditor(oldPath);
+    boolean fileOpen = localEditorHandler.isOpenEditor(oldFile);
 
     SelectedEditorStateSnapshot selectedEditorStateSnapshot = null;
 
@@ -220,16 +217,16 @@ public class SharedResourcesManager implements Startable {
       selectedEditorStateSnapshot = selectedEditorStateSnapshotFactory.capturedState();
     }
 
-    localEditorManipulator.closeEditor(oldPath);
+    localEditorManipulator.closeEditor(new SPath(oldFile));
 
-    cleanUpBackgroundEditorPool(oldPath);
+    cleanUpBackgroundEditorPool(oldFile);
 
     annotationManager.updateAnnotationPath(oldFile, newFile);
 
     try {
       setFilesystemModificationHandlerEnabled(false);
 
-      localEditorHandler.saveDocument(oldPath);
+      localEditorHandler.saveDocument(new SPath(oldFile));
 
       byte[] activityContent = activity.getContent();
 
@@ -249,7 +246,7 @@ public class SharedResourcesManager implements Startable {
       newFile.setCharset(charset);
 
       if (fileOpen) {
-        localEditorManipulator.openEditor(newPath, false);
+        localEditorManipulator.openEditor(new SPath(newFile), false);
 
         try {
           selectedEditorStateSnapshot.replaceSelectedFile(oldFile, newFile);
@@ -269,8 +266,7 @@ public class SharedResourcesManager implements Startable {
 
   private void handleFileDeletion(@NotNull FileActivity activity) throws IOException {
 
-    SPath path = activity.getPath();
-    IFile file = path.getFile();
+    IFile file = activity.getResource();
 
     if (!file.exists()) {
       log.warn("Could not delete file " + file + " as it does not exist.");
@@ -278,16 +274,16 @@ public class SharedResourcesManager implements Startable {
       return;
     }
 
-    if (localEditorHandler.isOpenEditor(path)) {
-      localEditorManipulator.closeEditor(path);
+    if (localEditorHandler.isOpenEditor(file)) {
+      localEditorManipulator.closeEditor(new SPath(file));
     }
 
-    cleanUpBackgroundEditorPool(path);
+    cleanUpBackgroundEditorPool(file);
 
     try {
       setFilesystemModificationHandlerEnabled(false);
 
-      localEditorHandler.saveDocument(path);
+      localEditorHandler.saveDocument(new SPath(file));
 
       file.delete();
 
@@ -301,8 +297,7 @@ public class SharedResourcesManager implements Startable {
   private void handleFileCreation(@NotNull FileActivity activity)
       throws IOException, IllegalCharsetNameException, UnsupportedCharsetException {
 
-    SPath path = activity.getPath();
-    IFile file = path.getFile();
+    IFile file = activity.getResource();
 
     if (file.exists()) {
       log.warn("Could not create file " + file + " as it already exists.");
@@ -326,7 +321,7 @@ public class SharedResourcesManager implements Startable {
 
   private void handleFolderCreation(@NotNull FolderCreatedActivity activity) throws IOException {
 
-    IFolder folder = activity.getPath().getFolder();
+    IFolder folder = activity.getResource();
 
     if (folder.exists()) {
       log.warn("Could not create folder " + folder + " as it already exist.");
@@ -357,7 +352,7 @@ public class SharedResourcesManager implements Startable {
   // TODO deal with children that are not part of the current session (submodules)
   private void handleFolderDeletion(@NotNull FolderDeletedActivity activity) throws IOException {
 
-    IFolder folder = activity.getPath().getFolder();
+    IFolder folder = activity.getResource();
 
     if (!folder.exists()) {
       log.warn("Could not delete folder " + folder + " as it does not exist.");
@@ -389,9 +384,9 @@ public class SharedResourcesManager implements Startable {
   /**
    * Releases and drops the held background editor for the deleted file if present.
    *
-   * @param deletedFilePath the deleted file
+   * @param deletedFile the deleted file
    */
-  private void cleanUpBackgroundEditorPool(@NotNull SPath deletedFilePath) {
-    editorManager.removeBackgroundEditorForPath(deletedFilePath);
+  private void cleanUpBackgroundEditorPool(@NotNull IFile deletedFile) {
+    editorManager.removeBackgroundEditorForPath(new SPath(deletedFile));
   }
 }

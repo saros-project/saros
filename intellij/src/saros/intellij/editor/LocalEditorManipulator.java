@@ -219,30 +219,30 @@ public class LocalEditorManipulator {
    *
    * <p><b>NOTE:</b> This method should only be used as part of the recovery process.
    *
-   * @param path the path of the file to recover
+   * @param file the file to recover
    * @param content the new content of the file
    * @param encoding the encoding of the content
    * @param source the user that send the recovery action
    * @see Document
    */
-  public void handleContentRecovery(SPath path, byte[] content, String encoding, User source) {
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+  public void handleContentRecovery(IFile file, byte[] content, String encoding, User source) {
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
     if (virtualFile == null) {
       log.warn(
           "Could not recover file content of "
-              + path
+              + file
               + " as it could not be converted to a VirtualFile.");
 
       return;
     }
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
     Document document = DocumentAPI.getDocument(virtualFile);
     if (document == null) {
       log.warn(
           "Could not recover file content of "
-              + path
+              + file
               + " as no valid Document representation was returned by the Intellij API.");
 
       return;
@@ -250,7 +250,6 @@ public class LocalEditorManipulator {
 
     int documentLength = document.getTextLength();
 
-    IFile file = path.getFile();
     annotationManager.removeAnnotations(file);
 
     String text;
