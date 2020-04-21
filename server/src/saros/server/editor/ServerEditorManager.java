@@ -128,16 +128,16 @@ public class ServerEditorManager implements IEditorManager {
    * @param activity the activity describing the text edit to apply
    */
   public void applyTextEdit(TextEditActivity activity) {
-    SPath path = activity.getPath();
+    IFile file = activity.getResource();
     try {
-      Editor editor = getOrCreateEditor(path);
+      Editor editor = getOrCreateEditor(new SPath(file));
       editor.applyTextEdit(activity);
       editor.save();
       for (ISharedEditorListener listener : listeners) {
         listener.textEdited(activity);
       }
     } catch (IOException e) {
-      log.error("Could not read " + path + " to apply text edit", e);
+      log.error("Could not read " + file + " to apply text edit", e);
     }
   }
 
