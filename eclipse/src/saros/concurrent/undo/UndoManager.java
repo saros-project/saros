@@ -14,7 +14,6 @@ import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.commands.operations.OperationHistoryEvent;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -41,6 +40,7 @@ import saros.editor.EditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.internal.EditorAPI;
 import saros.filesystem.EclipseFileImpl;
+import saros.filesystem.IFile;
 import saros.preferences.Preferences;
 import saros.repackaged.picocontainer.Disposable;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -94,7 +94,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
   protected EditorManager editorManager;
 
-  protected SPath currentActiveEditor = null;
+  protected IFile currentActiveEditor = null;
 
   /** This UndoManager is disabled when not in a Saros session. */
   protected boolean enabled;
@@ -265,23 +265,26 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
         @Override
         public void editorActivated(User user, SPath newActiveEditor) {
+          IFile newActiveFile = newActiveEditor.getFile();
 
-          if (!user.isLocal() || Objects.equals(currentActiveEditor, newActiveEditor)) return;
+          if (!user.isLocal() || Objects.equals(currentActiveEditor, newActiveFile)) return;
 
           updateCurrentLocalAtomicOperation(null);
           storeCurrentLocalOperation();
-          currentActiveEditor = newActiveEditor;
+          currentActiveEditor = newActiveFile;
         }
 
         @Override
         public void editorClosed(User user, SPath closedEditor) {
-          if (Objects.equals(currentActiveEditor, closedEditor)) {
+          IFile closedFile = closedEditor.getFile();
+
+          if (Objects.equals(currentActiveEditor, closedFile)) {
             updateCurrentLocalAtomicOperation(null);
             storeCurrentLocalOperation();
             currentActiveEditor = null;
           }
 
-          undoHistory.clearEditorHistory(closedEditor);
+          undoHistory.clearEditorHistory(closedFile);
         }
       };
 
@@ -324,9 +327,9 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
             transformation.transform(currentLocalAtomicOperation, operation, Boolean.FALSE);
       }
       log.debug("adding remote " + operation + " to history");
-      undoHistory.add(textEditActivity.getPath(), Type.REMOTE, operation);
+      undoHistory.add(textEditActivity.getResource(), Type.REMOTE, operation);
     } else {
-      if (!textEditActivity.getPath().equals(currentActiveEditor)) {
+      if (!textEditActivity.getResource().equals(currentActiveEditor)) {
         log.error(
             "Editor of the local TextEditActivity is not the current "
                 + "active editor. Possibly the current active editor is not"
@@ -391,7 +394,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
   }
 
   /** @return operation that reverts the effect of the latest local operation in the given editor */
-  protected Operation calcUndoOperation(SPath editor) {
+  Operation calcUndoOperation(IFile editor) {
 
     if (!undoHistory.canUndo(editor)) return new NoOperation(); // nothing to undo
 
@@ -419,7 +422,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
   }
 
   /** @return operation that reverts the effect of the latest undo in the given editor */
-  protected Operation calcRedoOperation(SPath editor) {
+  Operation calcRedoOperation(IFile editor) {
 
     if (!undoHistory.canRedo(editor)) return new NoOperation(); // nothing to redo
 
@@ -442,7 +445,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     return redoOperation;
   }
 
-  protected void undo(SPath editor) {
+  private void undo(IFile editor) {
 
     Operation op = calcUndoOperation(editor);
     log.debug("calculated undo: " + op);
@@ -453,17 +456,17 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
       return;
     }
 
-    for (TextEditActivity activity : op.toTextEdit(editor.getFile(), sarosSession.getLocalUser())) {
+    for (TextEditActivity activity : op.toTextEdit(editor, sarosSession.getLocalUser())) {
       log.debug("undone: " + activity + " in " + editor);
       fireActivity(activity);
     }
   }
 
-  protected void redo(SPath editor) {
+  private void redo(IFile editor) {
 
     Operation op = calcRedoOperation(editor);
 
-    for (TextEditActivity activity : op.toTextEdit(editor.getFile(), sarosSession.getLocalUser())) {
+    for (TextEditActivity activity : op.toTextEdit(editor, sarosSession.getLocalUser())) {
       log.debug("redone: " + activity + " in " + editor);
       fireActivity(activity);
     }
@@ -489,7 +492,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
     List<ITextOperation> textOps = activity.toOperation().getTextOperations();
 
-    IFile file = ((EclipseFileImpl) currentActiveEditor.getFile()).getDelegate();
+    org.eclipse.core.resources.IFile file = ((EclipseFileImpl) currentActiveEditor).getDelegate();
 
     FileEditorInput input = new FileEditorInput(file);
     IDocumentProvider provider = EditorAPI.connect(input);

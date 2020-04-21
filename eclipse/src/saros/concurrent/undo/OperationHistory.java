@@ -4,34 +4,33 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.Operation;
+import saros.filesystem.IFile;
 
 /**
  * The Operation History is the data structure for saving operations to calculate undo and redo
  * operations. It contains histories for each editor.
  */
-public class OperationHistory {
+class OperationHistory {
 
   /** determines how many operations can be saved in history per editor */
   // TODO: has to be dependent on the Eclipse properties
-  public final int MAX_SIZE = 1000;
+  private static final int MAX_SIZE = 1000;
 
-  protected HashMap<SPath, LinkedList<EditorHistoryEntry>> history =
-      new HashMap<SPath, LinkedList<EditorHistoryEntry>>();
+  private final HashMap<IFile, LinkedList<EditorHistoryEntry>> history = new HashMap<>();
 
   /**
    * An operation can have three types. A local operation can be undone. A remote operation is not
    * interesting for us. A redoable operation is a local operation that was undone and can now be
    * redone.
    */
-  public enum Type {
+  enum Type {
     LOCAL,
     REMOTE,
     REDOABLE
   }
 
-  public class EditorHistoryEntry {
+  class EditorHistoryEntry {
     protected final Type type;
     protected final Operation operation;
 
@@ -79,7 +78,7 @@ public class OperationHistory {
    *
    * @param editor in which the operation was executed
    */
-  public void add(SPath editor, Type type, Operation operation) {
+  void add(IFile editor, Type type, Operation operation) {
 
     LinkedList<EditorHistoryEntry> editorHistory = history.get(editor);
 
@@ -98,7 +97,7 @@ public class OperationHistory {
   }
 
   /** @return the latest local Operation in the editor's history, null if there is none */
-  public Operation getLatestLocal(SPath editor) {
+  Operation getLatestLocal(IFile editor) {
 
     return getLatestOfType(Type.LOCAL, editor);
   }
@@ -106,12 +105,12 @@ public class OperationHistory {
   /**
    * @return the latest Operation in the editor's history that can be redone, null if there is none
    */
-  public Operation getLatestRedoable(SPath editor) {
+  Operation getLatestRedoable(IFile editor) {
 
     return getLatestOfType(Type.REDOABLE, editor);
   }
 
-  protected Operation getLatestOfType(Type type, SPath editor) {
+  private Operation getLatestOfType(Type type, IFile editor) {
 
     List<EditorHistoryEntry> editorHistory = history.get(editor);
     if (editorHistory == null) return null;
@@ -126,7 +125,7 @@ public class OperationHistory {
    * @return all entries up to the latest local Operation (exclusive) in reverse order (oldest
    *     first)
    */
-  public List<EditorHistoryEntry> entriesToLatestLocal(SPath editor) {
+  List<EditorHistoryEntry> entriesToLatestLocal(IFile editor) {
     return entriesToLatestOfType(Type.LOCAL, editor);
   }
 
@@ -134,7 +133,7 @@ public class OperationHistory {
    * @return all entries up to the latest redoable Operation (exclusive) in reverse order (oldest
    *     first)
    */
-  public List<EditorHistoryEntry> entriesToLatestRedoable(SPath editor) {
+  List<EditorHistoryEntry> entriesToLatestRedoable(IFile editor) {
     return entriesToLatestOfType(Type.REDOABLE, editor);
   }
 
@@ -142,7 +141,7 @@ public class OperationHistory {
    * @return all entries up to the latest operation of the given type (exclusive) in reverse order
    *     (oldest first)
    */
-  protected List<EditorHistoryEntry> entriesToLatestOfType(Type type, SPath editor) {
+  private List<EditorHistoryEntry> entriesToLatestOfType(Type type, IFile editor) {
 
     List<EditorHistoryEntry> result = new LinkedList<EditorHistoryEntry>();
 
@@ -159,7 +158,7 @@ public class OperationHistory {
     return result;
   }
 
-  public void replaceType(SPath editor, Operation operation, Type oldType, Type newType) {
+  void replaceType(IFile editor, Operation operation, Type oldType, Type newType) {
 
     EditorHistoryEntry oldEntry = new EditorHistoryEntry(oldType, operation);
     EditorHistoryEntry newEntry = new EditorHistoryEntry(newType, operation);
@@ -182,26 +181,26 @@ public class OperationHistory {
     throw new IllegalArgumentException("Cannot replace type of " + operation + ", not in history");
   }
 
-  public void clearEditorHistory(SPath editor) {
+  void clearEditorHistory(IFile editor) {
     history.remove(editor);
   }
 
-  public void clear() {
+  void clear() {
     history.clear();
   }
 
-  public List<EditorHistoryEntry> getAllEntries(SPath editor) {
+  List<EditorHistoryEntry> getAllEntries(IFile editor) {
     return (history.get(editor) != null)
         ? history.get(editor)
         : new LinkedList<EditorHistoryEntry>();
   }
 
-  public boolean canUndo(SPath editor) {
+  boolean canUndo(IFile editor) {
     return getLatestLocal(editor) != null;
   }
 
   /** Redo should only be possible if there was executed an undo. */
-  public boolean canRedo(SPath editor) {
+  boolean canRedo(IFile editor) {
     return getLatestRedoable(editor) != null;
   }
 }
