@@ -143,9 +143,9 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
           @Override
           public void run() {
 
-            for (final SPath path : checksumError.getPaths()) {
+            for (final IFile file : checksumError.getFiles()) {
 
-              recoverFile(checksumError.getSource(), path);
+              recoverFile(checksumError.getSource(), file);
 
               // Tell the user that we sent all files
               fireActivity(
@@ -163,9 +163,9 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
    * Recover a single file for the given user (that is either send the file or tell the user to
    * remove it).
    */
-  private void recoverFile(final User from, final SPath path) {
+  private void recoverFile(final User from, final IFile file) {
 
-    final IFile file = path.getFile();
+    SPath path = new SPath(file);
 
     // Reset jupiter
     concurrentDocumentServer.reset(from, path);

@@ -24,6 +24,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /**
@@ -42,14 +44,14 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
 
   @XStreamImplicit protected List<SPath> paths;
 
-  public ChecksumErrorActivity(User source, User target, List<SPath> paths, String recoveryID) {
+  public ChecksumErrorActivity(User source, User target, List<IFile> files, String recoveryID) {
 
     super(source);
 
     if (target == null) throw new IllegalArgumentException("target must not be null");
 
     this.target = target;
-    this.paths = paths;
+    this.paths = files == null ? null : files.stream().map(SPath::new).collect(Collectors.toList());
     this.recoveryID = recoveryID;
   }
 
@@ -58,8 +60,8 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
     return super.isValid() && (target != null);
   }
 
-  public List<SPath> getPaths() {
-    return paths;
+  public List<IFile> getFiles() {
+    return paths.stream().map(SPath::getFile).collect(Collectors.toList());
   }
 
   /** Each ChecksumError has a unique ID, which should be used to identify a recovery session */
