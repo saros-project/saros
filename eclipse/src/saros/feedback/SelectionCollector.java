@@ -12,6 +12,7 @@ import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
 import saros.net.xmpp.JID;
 import saros.session.ISarosSession;
 import saros.session.User;
@@ -48,7 +49,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
    *
    * <ul>
    *   <li>time of the event
-   *   <li>{@link SPath} of the event
+   *   <li>{@link IFile} of the event
    *   <li>{@link User} who made the selection
    *   <li>offset of the selection
    *   <li>length of the selection
@@ -58,15 +59,15 @@ public class SelectionCollector extends AbstractStatisticCollector {
    */
   private static class SelectionEvent {
     private long time;
-    private SPath path;
+    private IFile file;
     private TextSelection selection;
     private boolean withinFile;
     private boolean gestured;
 
     public SelectionEvent(
-        long time, SPath path, TextSelection selection, boolean withinFile, boolean gestured) {
+        long time, IFile file, TextSelection selection, boolean withinFile, boolean gestured) {
       this.time = time;
-      this.path = path;
+      this.file = file;
       this.selection = selection;
       this.withinFile = withinFile;
       this.gestured = gestured;
@@ -74,7 +75,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
   }
 
   /** Represents the current active editor of the local {@link User} */
-  private SPath localPath = null;
+  private IFile localFile = null;
 
   /** A map where the latest selections information for each each user as {@link JID} are stored. */
   private final Map<User, SelectionEvent> activeSelections = new HashMap<User, SelectionEvent>();
@@ -113,7 +114,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
              */
             User user = textEdit.getSource();
             TextPosition editStartPosition = textEdit.getStartPosition();
-            SPath filePath = textEdit.getPath();
+            IFile file = textEdit.getResource();
 
             TextPosition selectionStartPosition = selection.selection.getStartPosition();
             TextPosition selectionEndPosition = selection.selection.getEndPosition();
@@ -121,7 +122,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
             if (!currentUser.equals(user)
                 && selectionStartPosition.compareTo(editStartPosition) <= 0
                 && selectionEndPosition.compareTo(editStartPosition) >= 0
-                && (selection.path).equals(filePath)
+                && (selection.file).equals(file)
                 && !selection.gestured) {
               selection.gestured = true;
               break;
@@ -133,7 +134,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
         public void editorActivated(User user, SPath filePath) {
           if (user.equals(sarosSession.getLocalUser()))
             // Remember which editor the local user has open.
-            localPath = filePath;
+            localFile = filePath.getFile();
         }
 
         /**
@@ -146,7 +147,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
         public void textSelectionChanged(TextSelectionActivity selection) {
           // details of the occurred selection
           long time = System.currentTimeMillis();
-          SPath path = selection.getPath();
+          IFile file = selection.getResource();
 
           TextSelection textSelection = selection.getSelection();
           boolean hasSelection =
@@ -161,12 +162,12 @@ public class SelectionCollector extends AbstractStatisticCollector {
            * check if selection was made within the file the local user is
            * currently viewing
            */
-          if (path.equals(localPath)) {
+          if (file.equals(localFile)) {
             withinFile = true;
           }
 
           SelectionEvent currentSelection =
-              new SelectionEvent(time, path, textSelection, withinFile, gestured);
+              new SelectionEvent(time, file, textSelection, withinFile, gestured);
 
           /**
            * check if the selection was made by a user with {@link User.Permission#READONLY_ACCESS}
