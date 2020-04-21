@@ -26,10 +26,7 @@ public abstract class AbstractResourceActivity extends AbstractActivity
     return super.isValid() /* && (path != null) */;
   }
 
-  // TODO make protected or remove
-  @Override
-  @Deprecated
-  public SPath getPath() {
+  protected SPath getPath() {
     return path;
   }
 

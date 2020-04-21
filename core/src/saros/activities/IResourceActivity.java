@@ -6,13 +6,6 @@ import saros.filesystem.IResource;
 public interface IResourceActivity extends IActivity {
 
   /**
-   * @return the path of the file that this Activity is about. For instance for creating a file this
-   *     path denotes the file which is created. Must <b>not</b> be <code>null</code>.
-   */
-  @Deprecated
-  public SPath getPath();
-
-  /**
    * Returns the resource that this activity is about.
    *
    * <p>For instance, for creating a file, this resource denotes the file which is created. Must
@@ -21,5 +14,5 @@ public interface IResourceActivity extends IActivity {
    *
    * @return the resource that this activity is about
    */
-  public IResource getResource();
+  IResource getResource();
 }
