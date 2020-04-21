@@ -96,25 +96,26 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         private void execEditorActivity(EditorActivity editorActivity) {
 
-          SPath path = editorActivity.getPath();
-          if (path == null) {
+          IFile file = editorActivity.getResource();
+
+          if (file == null) {
             return;
           }
 
-          log.debug(path + " editor activity received " + editorActivity);
+          log.debug(file + " editor activity received " + editorActivity);
 
           final User user = editorActivity.getSource();
 
           switch (editorActivity.getType()) {
             case ACTIVATED:
-              editorListenerDispatch.editorActivated(user, path);
+              editorListenerDispatch.editorActivated(user, new SPath(file));
               break;
 
             case CLOSED:
-              editorListenerDispatch.editorClosed(user, path);
+              editorListenerDispatch.editorClosed(user, new SPath(file));
               break;
             case SAVED:
-              localEditorHandler.saveDocument(path);
+              localEditorHandler.saveDocument(new SPath(file));
               break;
             default:
               log.warn("Unexpected type: " + editorActivity.getType());
@@ -122,22 +123,18 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         }
 
         private void execTextEdit(TextEditActivity textEditActivity) {
-          SPath path = textEditActivity.getPath();
+          IFile file = textEditActivity.getResource();
 
-          if (path == null) {
-            return;
-          }
+          log.debug(file + " text edit activity received " + textEditActivity);
 
-          log.debug(path + " text edit activity received " + textEditActivity);
-
-          Editor calculationEditor = getCalculationEditor(path);
+          Editor calculationEditor = getCalculationEditor(file);
 
           if (calculationEditor == null) {
             log.warn(
                 "Could not apply text edit "
                     + textEditActivity
                     + " as no editor could be obtained for resource "
-                    + path);
+                    + file);
 
             return;
           }
@@ -157,40 +154,40 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           Document document = calculationEditor.getDocument();
 
-          applyTextEdit(path, document, start, oldEnd, replacedText, newText);
+          applyTextEdit(file, document, start, oldEnd, replacedText, newText);
 
           User user = textEditActivity.getSource();
 
           adjustAnnotationsAfterEdit(
-              user, path.getFile(), editorPool.getEditor(path), start, oldEnd, newEnd);
+              user, file, editorPool.getEditor(new SPath(file)), start, oldEnd, newEnd);
 
           editorListenerDispatch.textEdited(textEditActivity);
         }
 
         /**
-         * Obtains an editor for the given resource.
+         * Obtains an editor for the given file.
          *
          * <p>This editor might be a background editor and must therefore only be used for
          * calculation purposes.
          *
-         * @param path the path to obtain an editor for
-         * @return returns a valid editor for the given resource or <code>null</code> if no such
-         *     editor could be obtained
+         * @param file the file to obtain an editor for
+         * @return returns a valid editor for the given file or <code>null</code> if no such editor
+         *     could be obtained
          * @see BackgroundEditorPool
          */
-        private Editor getCalculationEditor(@NotNull SPath path) {
-          Editor calculationEditor = editorPool.getEditor(path);
+        private Editor getCalculationEditor(@NotNull IFile file) {
+          Editor calculationEditor = editorPool.getEditor(new SPath(file));
 
           if (calculationEditor != null) {
             return calculationEditor;
           }
 
-          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
           if (virtualFile == null) {
             log.warn(
                 "Could not create an editor instance for "
-                    + path
+                    + file
                     + " as no virtual file could be obtained for the resource.");
 
             return null;
@@ -207,13 +204,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             return null;
           }
 
-          return backgroundEditorPool.getBackgroundEditor(path, document);
+          return backgroundEditorPool.getBackgroundEditor(new SPath(file), document);
         }
 
         /**
          * Applies the text edit represented by the given values to the given document.
          *
-         * @param path the resource whose document to modify
+         * @param file the file whose document to modify
          * @param document the document to modify
          * @param start the start offset for the modification
          * @param oldEnd the end offset of the replaced text
@@ -221,7 +218,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
          * @param newText the new text inserted into the document
          */
         private void applyTextEdit(
-            @NotNull SPath path,
+            @NotNull IFile file,
             @NotNull Document document,
             int start,
             int oldEnd,
@@ -229,7 +226,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             @NotNull String newText) {
 
           Project project =
-              path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+              file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
           if (!replacedText.isEmpty()) {
             String documentReplacedText = document.getText(new TextRange(start, oldEnd));
@@ -237,7 +234,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
             if (!replacedText.equals(documentReplacedText)) {
               log.error(
                   "Text to be replaced for "
-                      + path
+                      + file
                       + " from offset "
                       + start
                       + " to "
@@ -310,32 +307,30 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
         private void execTextSelection(TextSelectionActivity selection) {
 
-          SPath path = selection.getPath();
+          IFile file = selection.getResource();
 
-          if (path == null) {
+          if (file == null) {
             return;
           }
 
-          IFile file = path.getFile();
-
-          log.debug("Text selection activity received: " + path + ", " + selection);
+          log.debug("Text selection activity received: " + file + ", " + selection);
 
           User user = selection.getSource();
 
-          Editor editor = editorPool.getEditor(path);
+          Editor editor = editorPool.getEditor(new SPath(file));
 
           // Editor used for position calculation
           Editor calcEditor = editor;
 
           if (calcEditor == null) {
-            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+            VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
             if (virtualFile == null) {
               log.warn(
                   "Could not apply selection "
                       + selection
                       + " as no virtual file could be obtained for resource "
-                      + path);
+                      + file);
 
               return;
             }
@@ -352,7 +347,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
               return;
             }
 
-            calcEditor = backgroundEditorPool.getBackgroundEditor(path, document);
+            calcEditor = backgroundEditorPool.getBackgroundEditor(new SPath(file), document);
           }
 
           TextSelection textSelection = selection.getSelection();
