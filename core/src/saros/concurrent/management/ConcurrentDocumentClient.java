@@ -190,7 +190,7 @@ public class ConcurrentDocumentClient implements Startable {
    */
   public synchronized void reset(SPath path) {
     log.debug("Resetting jupiter client for " + path);
-    jupiterClient.reset(path);
+    jupiterClient.reset(path.getFile());
   }
 
   public boolean isCurrent(ChecksumActivity checksumActivity) {

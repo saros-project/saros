@@ -10,6 +10,7 @@ import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
+import saros.filesystem.IFile;
 import saros.session.ISarosSession;
 
 /** A JupiterClient manages Jupiter client docs for a single user with several paths */
@@ -28,26 +29,26 @@ public class JupiterClient {
    *     <p>Note: This needs to be a *Concurrent*HashMap, because it is periodically iterated by the
    *     HeartbeatDispatcher class.
    */
-  private final ConcurrentHashMap<SPath, Jupiter> clientDocs = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<IFile, Jupiter> clientDocs = new ConcurrentHashMap<>();
 
   /** @host and @client */
-  protected synchronized Jupiter get(SPath path) {
-    return clientDocs.computeIfAbsent(path, (key) -> new Jupiter(true));
+  protected synchronized Jupiter get(IFile file) {
+    return clientDocs.computeIfAbsent(file, (key) -> new Jupiter(true));
   }
 
   public synchronized Operation receive(JupiterActivity jupiterActivity)
       throws TransformationException {
-    return get(jupiterActivity.getPath()).receiveJupiterActivity(jupiterActivity);
+    return get(jupiterActivity.getResource()).receiveJupiterActivity(jupiterActivity);
   }
 
   public synchronized boolean isCurrent(ChecksumActivity checksumActivity)
       throws TransformationException {
 
-    return get(checksumActivity.getPath()).isCurrent(checksumActivity.getTimestamp());
+    return get(checksumActivity.getResource()).isCurrent(checksumActivity.getTimestamp());
   }
 
-  public synchronized void reset(SPath path) {
-    this.clientDocs.remove(path);
+  public synchronized void reset(IFile file) {
+    this.clientDocs.remove(file);
   }
 
   public synchronized void reset() {
@@ -56,9 +57,11 @@ public class JupiterClient {
 
   public synchronized JupiterActivity generate(TextEditActivity textEdit) {
 
-    SPath path = textEdit.getPath();
-    return get(path)
-        .generateJupiterActivity(textEdit.toOperation(), sarosSession.getLocalUser(), path);
+    IFile file = textEdit.getResource();
+
+    return get(file)
+        .generateJupiterActivity(
+            textEdit.toOperation(), sarosSession.getLocalUser(), new SPath(file));
   }
 
   /**
@@ -67,11 +70,11 @@ public class JupiterClient {
    */
   public synchronized ChecksumActivity withTimestamp(ChecksumActivity checksumActivity) {
 
-    return get(checksumActivity.getPath()).withTimestamp(checksumActivity);
+    return get(checksumActivity.getResource()).withTimestamp(checksumActivity);
   }
 
   // Package-private function for the HeartbeatDispatcher
-  Map<SPath, Jupiter> getClientDocs() {
+  Map<IFile, Jupiter> getClientDocs() {
     return Collections.unmodifiableMap(clientDocs);
   }
 }
