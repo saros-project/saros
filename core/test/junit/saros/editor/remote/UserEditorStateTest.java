@@ -89,7 +89,7 @@ public class UserEditorStateTest {
   public void testIgnoreActivitiesOnActivatedEditors() {
     assertFalse(
         "user state should not exist before activity reception",
-        state.getOpenEditors().contains(new SPath(fileA)));
+        state.getOpenEditors().contains(fileA));
 
     // Selection values were chosen at "random"
     TextSelection selection = new TextSelection(new TextPosition(5, 15), new TextPosition(20, 1));
@@ -98,13 +98,12 @@ public class UserEditorStateTest {
 
     assertFalse(
         "user state should not exist after awareness information " + "on non-activated editor",
-        state.getOpenEditors().contains(new SPath(fileA)));
+        state.getOpenEditors().contains(fileA));
 
     activate(fileA);
 
     assertTrue(
-        "user state should exist after editor was opened",
-        state.getOpenEditors().contains(new SPath(fileA)));
+        "user state should exist after editor was opened", state.getOpenEditors().contains(fileA));
   }
 
   @Test
@@ -114,14 +113,14 @@ public class UserEditorStateTest {
     TextSelection selection1 = new TextSelection(new TextPosition(5, 3), new TextPosition(8, 15));
     select(fileA, selection1);
 
-    TextSelection stateSelection = state.getEditorState(new SPath(fileA)).getSelection();
+    TextSelection stateSelection = state.getEditorState(fileA).getSelection();
 
     assertEquals("selection should be set", selection1, stateSelection);
 
     TextSelection selection2 = new TextSelection(new TextPosition(0, 7), new TextPosition(34, 15));
     select(fileA, selection2);
 
-    stateSelection = state.getEditorState(new SPath(fileA)).getSelection();
+    stateSelection = state.getEditorState(fileA).getSelection();
 
     assertEquals("selection should be updated", selection2, stateSelection);
   }
@@ -131,14 +130,14 @@ public class UserEditorStateTest {
     activate(fileA);
     view(fileA, 5, 50);
 
-    LineRange v = state.getEditorState(new SPath(fileA)).getViewport();
+    LineRange v = state.getEditorState(fileA).getViewport();
 
     assertEquals("viewport offset should be set", 5, v.getStartLine());
     assertEquals("viewport length should be set", 50, v.getNumberOfLines());
 
     view(fileA, 10, 45);
 
-    v = state.getEditorState(new SPath(fileA)).getViewport();
+    v = state.getEditorState(fileA).getViewport();
 
     assertEquals("viewport offset should be updated", 10, v.getStartLine());
     assertEquals("viewport length should be updated", 45, v.getNumberOfLines());
@@ -185,7 +184,7 @@ public class UserEditorStateTest {
     select(fileB, selectionB);
     view(fileB, 7, 8);
 
-    EditorState stateA = state.getEditorState(new SPath(fileA));
+    EditorState stateA = state.getEditorState(fileA);
     TextSelection selectionStateA = stateA.getSelection();
 
     assertEquals("selection should be set for first resource", selectionA, selectionStateA);
@@ -195,7 +194,7 @@ public class UserEditorStateTest {
     assertEquals("viewport should be set for first resource", 3, viewportA.getStartLine());
     assertEquals("viewport should be set for first resource", 4, viewportA.getNumberOfLines());
 
-    EditorState stateB = state.getEditorState(new SPath(fileB));
+    EditorState stateB = state.getEditorState(fileB);
     TextSelection selectionStateB = stateB.getSelection();
 
     assertEquals("selection should be set for second resource", selectionB, selectionStateB);

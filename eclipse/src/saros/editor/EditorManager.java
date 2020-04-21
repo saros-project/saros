@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.internal.utils.FileUtil;
@@ -1381,7 +1382,8 @@ public class EditorManager implements IEditorManager {
         continue;
       }
 
-      EditorState remoteEditor = userEditorStateManager.getState(user).getEditorState(path);
+      EditorState remoteEditor =
+          userEditorStateManager.getState(user).getEditorState(path.getFile());
 
       if (remoteEditor == null) continue;
 
@@ -1414,7 +1416,12 @@ public class EditorManager implements IEditorManager {
   public Set<SPath> getRemoteOpenEditors(User user) {
     return userEditorStateManager == null
         ? Collections.<SPath>emptySet()
-        : userEditorStateManager.getState(user).getOpenEditors();
+        : userEditorStateManager
+            .getState(user)
+            .getOpenEditors()
+            .stream()
+            .map(SPath::new)
+            .collect(Collectors.toSet());
   }
 
   /**

@@ -10,6 +10,7 @@ import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
 
@@ -21,8 +22,7 @@ public class UserEditorState {
 
   private static final Logger log = Logger.getLogger(UserEditorState.class);
 
-  private final LinkedHashMap<SPath, EditorState> openEditors =
-      new LinkedHashMap<SPath, EditorState>();
+  private final LinkedHashMap<IFile, EditorState> openEditors = new LinkedHashMap<>();
 
   private EditorState activeEditor;
 
@@ -31,16 +31,16 @@ public class UserEditorState {
 
         @Override
         public void receive(EditorActivity editorActivity) {
-          SPath sPath = editorActivity.getPath();
+          IFile file = editorActivity.getResource();
 
           switch (editorActivity.getType()) {
             case ACTIVATED:
-              activated(sPath);
+              activated(file);
               break;
             case SAVED:
               break;
             case CLOSED:
-              closed(sPath);
+              closed(file);
               break;
             default:
               log.warn("Unexpected type: " + editorActivity.getType());
@@ -50,66 +50,66 @@ public class UserEditorState {
 
         @Override
         public void receive(ViewportActivity viewportActivity) {
-          SPath path = viewportActivity.getPath();
+          IFile file = viewportActivity.getResource();
 
-          if (!openEditors.containsKey(path)) {
-            log.warn("Viewport for editor which was never activated: " + path);
+          if (!openEditors.containsKey(file)) {
+            log.warn("Viewport for editor which was never activated: " + file);
             return;
           }
 
           LineRange lineRange =
               new LineRange(viewportActivity.getStartLine(), viewportActivity.getNumberOfLines());
 
-          updateEditorState(path).setViewport(lineRange);
+          updateEditorState(file).setViewport(lineRange);
         }
 
         @Override
         public void receive(TextSelectionActivity textSelectionActivity) {
-          SPath path = textSelectionActivity.getPath();
+          IFile file = textSelectionActivity.getResource();
 
-          if (!openEditors.containsKey(path)) {
-            log.warn("received selection for editor which was never activated: " + path);
+          if (!openEditors.containsKey(file)) {
+            log.warn("received selection for editor which was never activated: " + file);
             return;
           }
 
           TextSelection selection = textSelectionActivity.getSelection();
 
-          updateEditorState(path).setSelection(selection);
+          updateEditorState(file).setSelection(selection);
         }
       };
 
   /* Helper */
 
-  private synchronized EditorState updateEditorState(SPath path) {
-    EditorState result = openEditors.get(path);
+  private synchronized EditorState updateEditorState(IFile file) {
+    EditorState result = openEditors.get(file);
     if (result == null) {
-      result = new EditorState(path);
-      openEditors.put(path, result);
+      result = new EditorState(new SPath(file));
+      openEditors.put(file, result);
     }
     return result;
   }
 
-  private synchronized void activated(SPath path) {
-    if (path == null) {
+  private synchronized void activated(IFile file) {
+    if (file == null) {
       activeEditor = null;
     } else {
-      activeEditor = openEditors.get(path);
+      activeEditor = openEditors.get(file);
 
       // Create new or reinsert at the end of the Map
       if (activeEditor == null) {
-        activeEditor = new EditorState(path);
+        activeEditor = new EditorState(new SPath(file));
       } else {
-        openEditors.remove(path);
+        openEditors.remove(file);
       }
-      openEditors.put(path, activeEditor);
+      openEditors.put(file, activeEditor);
     }
   }
 
-  private synchronized void closed(SPath path) {
-    EditorState state = openEditors.remove(path);
+  private synchronized void closed(IFile file) {
+    EditorState state = openEditors.remove(file);
 
     if (state == null) {
-      log.warn("Removing an editor which has never been added: " + path);
+      log.warn("Removing an editor which has never been added: " + file);
       return;
     }
 
@@ -121,19 +121,19 @@ public class UserEditorState {
   /* Public methods */
 
   /** @return a list of path referenced by the open editors */
-  public synchronized Set<SPath> getOpenEditors() {
-    return new HashSet<SPath>(openEditors.keySet());
+  public synchronized Set<IFile> getOpenEditors() {
+    return new HashSet<>(openEditors.keySet());
   }
 
   /**
    * Returns an {@link EditorState} representing an editor
    *
-   * @param path The path of the file for which the editor state should be retrieved
+   * @param file The file for which the editor state should be retrieved
    * @return An immutable {@link EditorState}, or <code>null</code> if there is no open editor for
    *     the given path (i.e. it's not in {@link #getOpenEditors()})
    */
-  public synchronized EditorState getEditorState(SPath path) {
-    EditorState result = openEditors.get(path);
+  public synchronized EditorState getEditorState(IFile file) {
+    EditorState result = openEditors.get(file);
 
     if (result == null) {
       return null;
