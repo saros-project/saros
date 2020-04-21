@@ -54,7 +54,7 @@ final class EditorActivityDelayer extends AbstractActivityProducer {
     if (currentSelectionActivity == null) {
       currentSelectionActivity = activity;
       display.timerExec(DELAY, this::flushCurrentSelectionActivity);
-    } else if (currentSelectionActivity.getPath().equals(activity.getPath())) {
+    } else if (currentSelectionActivity.getResource().equals(activity.getResource())) {
       currentSelectionActivity = activity;
     } else {
       flushCurrentSelectionActivity();
