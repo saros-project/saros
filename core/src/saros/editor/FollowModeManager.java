@@ -18,6 +18,7 @@ import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
@@ -141,14 +142,14 @@ public class FollowModeManager implements Startable {
 
         @Override
         public void receive(EditorActivity activity) {
-          SPath path = activity.getPath();
+          IFile file = activity.getResource();
 
           switch (activity.getType()) {
             case ACTIVATED:
               // path == null means there is no open editor left
-              if (path != null) {
+              if (file != null) {
                 // open editor, but don't change focus
-                editorManager.openEditor(path, false);
+                editorManager.openEditor(new SPath(file), false);
               } else {
                 // the follow mode is "paused"
               }
@@ -164,14 +165,16 @@ public class FollowModeManager implements Startable {
         public void receive(ViewportActivity activity) {
           LineRange range = new LineRange(activity.getStartLine(), activity.getNumberOfLines());
 
-          editorManager.adjustViewport(activity.getPath(), range, followeeSelection());
+          editorManager.adjustViewport(
+              new SPath(activity.getResource()), range, followeeSelection());
         }
 
         @Override
         public void receive(TextSelectionActivity activity) {
           TextSelection selection = activity.getSelection();
 
-          editorManager.adjustViewport(activity.getPath(), followeeRange(), selection);
+          editorManager.adjustViewport(
+              new SPath(activity.getResource()), followeeRange(), selection);
         }
       };
 
