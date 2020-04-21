@@ -9,6 +9,7 @@ import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.concurrent.jupiter.internal.text.NoOperation;
+import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
@@ -77,13 +78,13 @@ public class HeartbeatDispatcher extends AbstractActivityProducer implements Sta
 
     final User localUser = session.getLocalUser();
 
-    for (Entry<SPath, Jupiter> entry : jupiterClient.getClientDocs().entrySet()) {
+    for (Entry<IFile, Jupiter> entry : jupiterClient.getClientDocs().entrySet()) {
 
-      final SPath path = entry.getKey();
+      final IFile file = entry.getKey();
       final Algorithm jupiterAlgorithm = entry.getValue();
 
       final JupiterActivity heartbeat =
-          jupiterAlgorithm.generateJupiterActivity(new NoOperation(), localUser, path);
+          jupiterAlgorithm.generateJupiterActivity(new NoOperation(), localUser, new SPath(file));
 
       fireActivity(heartbeat);
     }
