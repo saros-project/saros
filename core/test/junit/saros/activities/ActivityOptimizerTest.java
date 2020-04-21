@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.net.xmpp.JID;
@@ -20,73 +21,88 @@ public class ActivityOptimizerTest {
   private final User alice = new User(new JID("alice@junit"), true, true, null);
   private final User bob = new User(new JID("bob@junit"), false, false, null);
 
-  private IPath fooPath;
-  private IPath barPath;
-
-  private IProject fooProject;
-  private IProject barProject;
+  private IFile fooFooFile;
+  private IFile fooBarFile;
+  private IFile barFooFile;
+  private IFile barBarFile;
 
   private final NOPActivity nop = new NOPActivity(alice, bob, 0);
 
   @Before
   public void setup() {
 
-    fooProject = EasyMock.createNiceMock(IProject.class);
-    barProject = EasyMock.createNiceMock(IProject.class);
+    IProject fooProject = EasyMock.createNiceMock(IProject.class);
+    IProject barProject = EasyMock.createNiceMock(IProject.class);
 
-    fooPath = EasyMock.createNiceMock(IPath.class);
-    barPath = EasyMock.createNiceMock(IPath.class);
+    IPath fooPath = EasyMock.createNiceMock(IPath.class);
+    IPath barPath = EasyMock.createNiceMock(IPath.class);
 
-    EasyMock.replay(fooProject, barProject, fooPath, barPath);
+    EasyMock.expect(fooPath.isAbsolute()).andStubReturn(false);
+    EasyMock.expect(barPath.isAbsolute()).andStubReturn(false);
+
+    fooFooFile = EasyMock.createNiceMock(IFile.class);
+    fooBarFile = EasyMock.createNiceMock(IFile.class);
+    barFooFile = EasyMock.createNiceMock(IFile.class);
+    barBarFile = EasyMock.createNiceMock(IFile.class);
+
+    EasyMock.expect(fooFooFile.getProject()).andStubReturn(fooProject);
+    EasyMock.expect(fooFooFile.getProjectRelativePath()).andStubReturn(fooPath);
+    EasyMock.expect(fooProject.getFile(fooPath)).andStubReturn(fooFooFile);
+
+    EasyMock.expect(fooBarFile.getProject()).andStubReturn(fooProject);
+    EasyMock.expect(fooBarFile.getProjectRelativePath()).andStubReturn(barPath);
+    EasyMock.expect(fooProject.getFile(barPath)).andStubReturn(fooBarFile);
+
+    EasyMock.expect(barFooFile.getProject()).andStubReturn(barProject);
+    EasyMock.expect(barFooFile.getProjectRelativePath()).andStubReturn(fooPath);
+    EasyMock.expect(barProject.getFile(fooPath)).andStubReturn(barFooFile);
+
+    EasyMock.expect(barBarFile.getProject()).andStubReturn(barProject);
+    EasyMock.expect(barBarFile.getProjectRelativePath()).andStubReturn(barPath);
+    EasyMock.expect(barProject.getFile(barPath)).andStubReturn(barBarFile);
+
+    EasyMock.replay(
+        fooProject, barProject, fooPath, barPath, fooFooFile, fooBarFile, barFooFile, barBarFile);
   }
 
   @Test
   public void testOptimize() {
-
-    SPath foofooSPath = new SPath(fooProject, fooPath);
-
-    SPath foobarSPath = new SPath(fooProject, barPath);
-
-    SPath barfooSPath = new SPath(barProject, fooPath);
-
-    SPath barbarSPath = new SPath(barProject, barPath);
-
     TextSelection selection1 = new TextSelection(new TextPosition(0, 0), new TextPosition(1, 1));
     TextSelection selection2 = new TextSelection(new TextPosition(1, 1), new TextPosition(1, 1));
 
-    TextSelectionActivity tsChange0 = new TextSelectionActivity(alice, selection1, foofooSPath);
+    TextSelectionActivity tsChange0 = new TextSelectionActivity(alice, selection1, fooFooFile);
 
-    TextSelectionActivity tsChange1 = new TextSelectionActivity(alice, selection2, foofooSPath);
+    TextSelectionActivity tsChange1 = new TextSelectionActivity(alice, selection2, fooFooFile);
 
-    TextSelectionActivity tsChange2 = new TextSelectionActivity(alice, selection1, foobarSPath);
+    TextSelectionActivity tsChange2 = new TextSelectionActivity(alice, selection1, fooBarFile);
 
-    TextSelectionActivity tsChange3 = new TextSelectionActivity(alice, selection2, foobarSPath);
+    TextSelectionActivity tsChange3 = new TextSelectionActivity(alice, selection2, fooBarFile);
 
-    TextSelectionActivity tsChange4 = new TextSelectionActivity(alice, selection1, barfooSPath);
+    TextSelectionActivity tsChange4 = new TextSelectionActivity(alice, selection1, barFooFile);
 
-    TextSelectionActivity tsChange5 = new TextSelectionActivity(alice, selection2, barfooSPath);
+    TextSelectionActivity tsChange5 = new TextSelectionActivity(alice, selection2, barFooFile);
 
-    TextSelectionActivity tsChange6 = new TextSelectionActivity(alice, selection1, barbarSPath);
+    TextSelectionActivity tsChange6 = new TextSelectionActivity(alice, selection1, barBarFile);
 
-    TextSelectionActivity tsChange7 = new TextSelectionActivity(alice, selection2, barbarSPath);
+    TextSelectionActivity tsChange7 = new TextSelectionActivity(alice, selection2, barBarFile);
 
     // --------------------------------------------------------------------------------
 
-    ViewportActivity vpChange0 = new ViewportActivity(alice, 0, 1, foofooSPath);
+    ViewportActivity vpChange0 = new ViewportActivity(alice, 0, 1, new SPath(fooFooFile));
 
-    ViewportActivity vpChange1 = new ViewportActivity(alice, 1, 1, foofooSPath);
+    ViewportActivity vpChange1 = new ViewportActivity(alice, 1, 1, new SPath(fooFooFile));
 
-    ViewportActivity vpChange2 = new ViewportActivity(alice, 0, 1, foobarSPath);
+    ViewportActivity vpChange2 = new ViewportActivity(alice, 0, 1, new SPath(fooBarFile));
 
-    ViewportActivity vpChange3 = new ViewportActivity(alice, 1, 1, foobarSPath);
+    ViewportActivity vpChange3 = new ViewportActivity(alice, 1, 1, new SPath(fooBarFile));
 
-    ViewportActivity vpChange4 = new ViewportActivity(alice, 0, 1, barfooSPath);
+    ViewportActivity vpChange4 = new ViewportActivity(alice, 0, 1, new SPath(barFooFile));
 
-    ViewportActivity vpChange5 = new ViewportActivity(alice, 1, 1, barfooSPath);
+    ViewportActivity vpChange5 = new ViewportActivity(alice, 1, 1, new SPath(barFooFile));
 
-    ViewportActivity vpChange6 = new ViewportActivity(alice, 0, 1, barbarSPath);
+    ViewportActivity vpChange6 = new ViewportActivity(alice, 0, 1, new SPath(barBarFile));
 
-    ViewportActivity vpChange7 = new ViewportActivity(alice, 1, 1, barbarSPath);
+    ViewportActivity vpChange7 = new ViewportActivity(alice, 1, 1, new SPath(barBarFile));
 
     List<IActivity> activities = new ArrayList<>();
 

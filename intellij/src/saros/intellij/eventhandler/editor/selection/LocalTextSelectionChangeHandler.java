@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.editor.event.SelectionListener;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.IProjectEventHandler;
 
@@ -56,7 +57,7 @@ public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
   }
 
   /**
-   * Calls {@link EditorManager#generateSelection(SPath, SelectionEvent)}.
+   * Calls {@link EditorManager#generateSelection(IFile, SelectionEvent)}.
    *
    * <p>This method relies on the EditorPool to filter editor events.
    *
@@ -69,7 +70,7 @@ public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
     SPath path = editorManager.getFileForOpenEditor(event.getEditor().getDocument());
 
     if (path != null) {
-      editorManager.generateSelection(path, event);
+      editorManager.generateSelection(path.getFile(), event);
     }
   }
 

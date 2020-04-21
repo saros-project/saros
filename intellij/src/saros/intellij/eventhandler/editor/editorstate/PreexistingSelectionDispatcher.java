@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
-import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.filesystem.VirtualFileConverter;
@@ -61,10 +61,10 @@ public class PreexistingSelectionDispatcher extends AbstractLocalEditorStatusCha
   private void sendExistingSelection(@NotNull VirtualFile virtualFile) {
     Editor editor = localEditorHandler.openEditor(project, virtualFile, false);
 
-    SPath sPath = VirtualFileConverter.convertToSPath(project, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (sPath != null && sarosSession.isShared(sPath.getResource()) && editor != null) {
-      editorManager.sendExistingSelection(sPath, editor);
+    if (file != null && sarosSession.isShared(file) && editor != null) {
+      editorManager.sendExistingSelection(file, editor);
     }
   }
 
