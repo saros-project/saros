@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
-import saros.activities.SPath;
 import saros.filesystem.IFolder;
 import saros.repackaged.picocontainer.Startable;
 import saros.server.editor.ServerEditorManager;
@@ -61,15 +60,14 @@ public class FolderActivityExecutor extends AbstractActivityConsumer implements 
 
   private void executeFolderCreation(FolderCreatedActivity activity) throws IOException {
 
-    IFolder folder = activity.getPath().getFolder();
+    IFolder folder = activity.getResource();
     folder.create();
   }
 
   private void executeFolderRemoval(FolderDeletedActivity activity) throws IOException {
 
-    SPath path = activity.getPath();
-    IFolder folder = path.getFolder();
+    IFolder folder = activity.getResource();
     folder.delete();
-    editorManager.closeEditorsInFolder(path);
+    editorManager.closeEditorsInFolder(folder);
   }
 }
