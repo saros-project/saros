@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import saros.filesystem.IFile;
 
 /** Optimizer for activities. */
 public class ActivityOptimizer {
@@ -29,12 +30,12 @@ public class ActivityOptimizer {
    */
   public static List<IActivity> optimize(Collection<IActivity> activities) {
 
-    List<IActivity> result = new ArrayList<IActivity>(activities.size());
+    List<IActivity> result = new ArrayList<>(activities.size());
 
     boolean[] dropActivityIdx = new boolean[activities.size()];
 
-    Map<SPath, Integer> selections = new HashMap<SPath, Integer>();
-    Map<SPath, Integer> viewports = new HashMap<SPath, Integer>();
+    Map<IFile, Integer> selections = new HashMap<>();
+    Map<IFile, Integer> viewports = new HashMap<>();
 
     /*
      * keep only the latest selection/viewport activities per project and
@@ -46,21 +47,21 @@ public class ActivityOptimizer {
     for (IActivity activity : activities) {
 
       if (activity instanceof TextSelectionActivity) {
-        SPath path = ((TextSelectionActivity) activity).getPath();
+        IFile file = ((TextSelectionActivity) activity).getResource();
 
-        Integer idx = selections.get(path);
+        Integer idx = selections.get(file);
 
         if (idx != null) dropActivityIdx[idx] = true;
 
-        selections.put(path, activityIdx);
+        selections.put(file, activityIdx);
       } else if (activity instanceof ViewportActivity) {
-        SPath path = ((ViewportActivity) activity).getPath();
+        IFile file = ((ViewportActivity) activity).getResource();
 
-        Integer idx = viewports.get(path);
+        Integer idx = viewports.get(file);
 
         if (idx != null) dropActivityIdx[idx] = true;
 
-        viewports.put(path, activityIdx);
+        viewports.put(file, activityIdx);
       }
 
       activityIdx++;
