@@ -37,7 +37,7 @@ import saros.activities.JupiterActivity;
 import saros.activities.NOPActivity;
 import saros.activities.PermissionActivity;
 import saros.activities.ProgressActivity;
-import saros.activities.SPath;
+import saros.activities.ResourceTransportWrapper;
 import saros.activities.StartFollowingActivity;
 import saros.activities.StopActivity;
 import saros.activities.StopFollowingActivity;
@@ -136,8 +136,8 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
           SplitOperation.class,
           TimestampOperation.class,
 
-          // SPATH
-          SPath.class,
+          // Resource transport wrapper
+          ResourceTransportWrapper.class,
 
           // Activities
           ChangeColorActivity.class,

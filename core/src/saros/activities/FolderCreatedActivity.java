@@ -6,18 +6,13 @@ import saros.session.User;
 
 /** An activity that represents the creation of a folder made by a user during a session. */
 @XStreamAlias("folderCreated")
-public class FolderCreatedActivity extends AbstractResourceActivity
-    implements IFileSystemModificationActivity {
+public class FolderCreatedActivity extends AbstractResourceActivity<IFolder>
+    implements IFileSystemModificationActivity<IFolder> {
 
   public FolderCreatedActivity(final User source, final IFolder folder) {
-    super(source, new SPath(folder));
+    super(source, folder);
 
     if (folder == null) throw new IllegalArgumentException("path must not be null");
-  }
-
-  @Override
-  public IFolder getResource() {
-    return getPath().getFolder();
   }
 
   @Override
@@ -27,11 +22,11 @@ public class FolderCreatedActivity extends AbstractResourceActivity
 
   @Override
   public boolean isValid() {
-    return super.isValid() && (getPath() != null);
+    return super.isValid() && (getResource() != null);
   }
 
   @Override
   public String toString() {
-    return "FolderCreatedActivity [path=" + getPath() + "]";
+    return "FolderCreatedActivity [path=" + getResource() + "]";
   }
 }

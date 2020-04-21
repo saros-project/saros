@@ -9,7 +9,7 @@ import saros.concurrent.watchdog.ConsistencyWatchdogServer;
 import saros.editor.FollowModeBroadcaster;
 import saros.editor.FollowModeManager;
 import saros.editor.remote.UserEditorStateManager;
-import saros.misc.xstream.SPathConverter;
+import saros.misc.xstream.ResourceTransportWrapperConverter;
 import saros.misc.xstream.UserConverter;
 import saros.repackaged.picocontainer.MutablePicoContainer;
 import saros.session.internal.ActivityHandler;
@@ -52,7 +52,7 @@ public class SarosCoreSessionContextFactory implements ISarosSessionContextFacto
     } else container.addComponent(ConsistencyWatchdogClient.class);
 
     // Session-dependent XStream Converter
-    container.addComponent(SPathConverter.class);
+    container.addComponent(ResourceTransportWrapperConverter.class);
     container.addComponent(UserConverter.class);
 
     // Other

@@ -7,7 +7,6 @@ import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
-import saros.misc.xstream.SPathConverter;
 
 /**
  * A <i>SPath</i> points to a {@link IResource resource} in a {@link IProject project}. The specific
@@ -15,8 +14,10 @@ import saros.misc.xstream.SPathConverter;
  *
  * <p><i>SPath</i> objects can be marshaled and unmarshaled.
  *
- * @see SPathConverter
+ * @deprecated replaced by {@link ResourceTransportWrapper}; for non-transfer-related logic, just
+ *     use the resource directly
  */
+@Deprecated
 @XStreamAlias("SPath")
 public class SPath {
 

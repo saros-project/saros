@@ -8,8 +8,8 @@ import saros.filesystem.IFile;
 import saros.session.User;
 
 @XStreamAlias("fileActivity")
-public class FileActivity extends AbstractResourceActivity
-    implements IFileSystemModificationActivity {
+public class FileActivity extends AbstractResourceActivity<IFile>
+    implements IFileSystemModificationActivity<IFile> {
 
   /**
    * Enumeration used to distinguish file activities which are caused as part of a consistency
@@ -29,7 +29,7 @@ public class FileActivity extends AbstractResourceActivity
     MOVED
   }
 
-  protected final SPath oldPath;
+  private final ResourceTransportWrapper<IFile> oldFileWrapper;
 
   @XStreamAsAttribute protected final Type type;
 
@@ -62,7 +62,7 @@ public class FileActivity extends AbstractResourceActivity
       byte[] content,
       String encoding) {
 
-    super(source, newFile != null ? new SPath(newFile) : null);
+    super(source, newFile);
 
     if (type == null) throw new IllegalArgumentException("type must not be null");
     if (purpose == null) throw new IllegalArgumentException("purpose must not be null");
@@ -86,7 +86,7 @@ public class FileActivity extends AbstractResourceActivity
     }
 
     this.type = type;
-    this.oldPath = oldFile != null ? new SPath(oldFile) : null;
+    this.oldFileWrapper = oldFile != null ? new ResourceTransportWrapper<>(oldFile) : null;
     this.content = content;
     this.encoding = encoding;
     this.purpose = purpose;
@@ -99,24 +99,15 @@ public class FileActivity extends AbstractResourceActivity
    *     otherwise
    */
   public IFile getOldResource() {
-    return oldPath.getFile();
-  }
-
-  @Override
-  public IFile getResource() {
-    return getPath().getFile();
+    return oldFileWrapper != null ? oldFileWrapper.getResource() : null;
   }
 
   @Override
   public boolean isValid() {
     /* oldPath == null is only unexpected for Type.MOVED */
-    return super.isValid() && (getPath() != null) && (oldPath != null || type != Type.MOVED);
-  }
-
-  /** Returns the old/source path in case this Activity represents a moving of files. */
-  @Deprecated
-  public SPath getOldPath() {
-    return oldPath;
+    return super.isValid()
+        && (getResource() != null)
+        && (oldFileWrapper != null || type != Type.MOVED);
   }
 
   public Type getType() {
@@ -143,9 +134,9 @@ public class FileActivity extends AbstractResourceActivity
   @Override
   public String toString() {
     return "FileActivity [dst:path="
-        + getPath()
+        + getResource()
         + ", src:path="
-        + (oldPath == null ? "N/A" : oldPath)
+        + (oldFileWrapper == null ? "N/A" : oldFileWrapper.getResource())
         + ", type="
         + type
         + ", encoding="
@@ -160,7 +151,7 @@ public class FileActivity extends AbstractResourceActivity
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + Arrays.hashCode(content);
-    result = prime * result + Objects.hashCode(oldPath);
+    result = prime * result + Objects.hashCode(oldFileWrapper);
     result = prime * result + Objects.hashCode(type);
     result = prime * result + Objects.hashCode(purpose);
     return result;
@@ -180,7 +171,7 @@ public class FileActivity extends AbstractResourceActivity
 
     if (purpose != other.purpose) return false;
 
-    if (!Objects.equals(oldPath, other.oldPath)) return false;
+    if (!Objects.equals(oldFileWrapper, other.oldFileWrapper)) return false;
 
     if (!Arrays.equals(content, other.content)) return false;
 

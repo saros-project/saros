@@ -46,7 +46,7 @@ import saros.util.LineSeparatorNormalizationUtil;
  *
  * @see LineSeparatorNormalizationUtil
  */
-public class TextEditActivity extends AbstractResourceActivity {
+public class TextEditActivity extends AbstractResourceActivity<IFile> {
 
   private static final Logger log = Logger.getLogger(TextEditActivity.class);
 
@@ -136,7 +136,7 @@ public class TextEditActivity extends AbstractResourceActivity {
       String replacedText,
       IFile file) {
 
-    super(source, new SPath(file));
+    super(source, file);
 
     if (startPosition == null || !startPosition.isValid())
       throw new IllegalArgumentException("Start position must be valid");
@@ -170,11 +170,6 @@ public class TextEditActivity extends AbstractResourceActivity {
     this.replacedTextOffsetDelta = replacedTextOffsetDelta;
 
     this.replacedText = replacedText;
-  }
-
-  @Override
-  public IFile getResource() {
-    return getPath().getFile();
   }
 
   /**
@@ -250,7 +245,7 @@ public class TextEditActivity extends AbstractResourceActivity {
         + ", old: '"
         + oldText
         + "', path: "
-        + getPath()
+        + getResource()
         + ", src: "
         + getSource()
         + ")";

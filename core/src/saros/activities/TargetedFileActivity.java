@@ -60,9 +60,9 @@ public class TargetedFileActivity extends FileActivity implements ITargetedActiv
         + "purpose="
         + purpose
         + ", dst:path="
-        + getPath()
+        + getResource()
         + ", src:path="
-        + (oldPath == null ? "N/A" : oldPath)
+        + (getOldResource() == null ? "N/A" : getOldResource())
         + ", type="
         + type
         + ", encoding="

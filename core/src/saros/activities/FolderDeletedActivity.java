@@ -16,18 +16,13 @@ import saros.session.User;
  * and {@link ConcurrentDocumentClient}.
  */
 @XStreamAlias("folderDeleted")
-public class FolderDeletedActivity extends AbstractResourceActivity
-    implements IFileSystemModificationActivity {
+public class FolderDeletedActivity extends AbstractResourceActivity<IFolder>
+    implements IFileSystemModificationActivity<IFolder> {
 
   public FolderDeletedActivity(final User source, final IFolder folder) {
-    super(source, new SPath(folder));
+    super(source, folder);
 
     if (folder == null) throw new IllegalArgumentException("path must not be null");
-  }
-
-  @Override
-  public IFolder getResource() {
-    return getPath().getFolder();
   }
 
   @Override
@@ -37,11 +32,11 @@ public class FolderDeletedActivity extends AbstractResourceActivity
 
   @Override
   public boolean isValid() {
-    return super.isValid() && (getPath() != null);
+    return super.isValid() && (getResource() != null);
   }
 
   @Override
   public String toString() {
-    return "FolderDeletedActivity [path=" + getPath() + "]";
+    return "FolderDeletedActivity [path=" + getResource() + "]";
   }
 }

@@ -28,7 +28,7 @@ import saros.filesystem.IFile;
 import saros.session.User;
 
 @XStreamAlias("textSelectionActivity")
-public class TextSelectionActivity extends AbstractResourceActivity {
+public class TextSelectionActivity extends AbstractResourceActivity<IFile> {
 
   @XStreamAlias("sl")
   @XStreamAsAttribute
@@ -55,7 +55,7 @@ public class TextSelectionActivity extends AbstractResourceActivity {
    * @throws IllegalArgumentException if the source or path is <code>null</code>
    */
   public TextSelectionActivity(User source, TextSelection selection, IFile file) {
-    super(source, new SPath(file));
+    super(source, file);
 
     if (file == null) throw new IllegalArgumentException("path must not be null");
 
@@ -69,13 +69,8 @@ public class TextSelectionActivity extends AbstractResourceActivity {
   }
 
   @Override
-  public IFile getResource() {
-    return getPath().getFile();
-  }
-
-  @Override
   public boolean isValid() {
-    return super.isValid() && (getPath() != null);
+    return super.isValid() && (getResource() != null);
   }
 
   /**
@@ -122,7 +117,7 @@ public class TextSelectionActivity extends AbstractResourceActivity {
         + ", src: "
         + getSource()
         + ", path: "
-        + getPath()
+        + getResource()
         + ")";
   }
 

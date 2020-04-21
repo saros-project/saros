@@ -26,8 +26,8 @@ import saros.filesystem.IFile;
 import saros.session.User;
 
 /**
- * Activity for activating, closing, and saving editors. If the {@link #getPath()} returns <code>
- * null</code> then no resource is currently active.
+ * Activity for activating, closing, and saving editors. If the {@link #getResource()} ()} returns
+ * <code>null</code> then no resource is currently active.
  *
  * <p>Saving is not document- but editor-specific because one editor might perform changes on the
  * document before actually saving while others just save. An example is a Java editor with save
@@ -36,7 +36,7 @@ import saros.session.User;
  * @author rdjemili
  */
 @XStreamAlias("editorActivity")
-public class EditorActivity extends AbstractResourceActivity {
+public class EditorActivity extends AbstractResourceActivity<IFile> {
 
   public static enum Type {
     ACTIVATED,
@@ -51,7 +51,7 @@ public class EditorActivity extends AbstractResourceActivity {
    *     that there is no active editor anymore. Must not be <code>null</code> for other types.
    */
   public EditorActivity(User source, Type type, IFile file) {
-    super(source, file != null ? new SPath(file) : null);
+    super(source, file);
 
     if (file == null) {
       if (type != Type.ACTIVATED) {
@@ -64,23 +64,12 @@ public class EditorActivity extends AbstractResourceActivity {
   }
 
   @Override
-  public IFile getResource() {
-    SPath path = getPath();
-
-    if (path == null) {
-      return null;
-    }
-
-    return path.getFile();
-  }
-
-  @Override
   public boolean isValid() {
     /*
      * path might be null for Type.ACTIVATED, see ctor and TODO in
      * AbstractResourceActivity#isValid()
      */
-    return super.isValid() && (getPath() != null || type == Type.ACTIVATED);
+    return super.isValid() && (getResource() != null || type == Type.ACTIVATED);
   }
 
   public Type getType() {
@@ -110,7 +99,7 @@ public class EditorActivity extends AbstractResourceActivity {
 
   @Override
   public String toString() {
-    return "EditorActivity(type: " + type + ", path: " + getPath() + ")";
+    return "EditorActivity(type: " + type + ", path: " + getResource() + ")";
   }
 
   @Override

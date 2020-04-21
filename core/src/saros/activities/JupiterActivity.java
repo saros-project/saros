@@ -9,7 +9,7 @@ import saros.session.User;
 
 /** A JupiterActivity is an Activity that can be handled by the Jupiter Algorithm. */
 @XStreamAlias("jupiterActivity")
-public class JupiterActivity extends AbstractResourceActivity {
+public class JupiterActivity extends AbstractResourceActivity<IFile> {
 
   /** Timestamp that specifies the definition context of the enclosed operation. */
   @XStreamAlias("t")
@@ -20,15 +20,10 @@ public class JupiterActivity extends AbstractResourceActivity {
 
   public JupiterActivity(Timestamp timestamp, Operation operation, User source, IFile file) {
 
-    super(source, new SPath(file));
+    super(source, file);
 
     this.timestamp = timestamp;
     this.operation = operation;
-  }
-
-  @Override
-  public IFile getResource() {
-    return getPath().getFile();
   }
 
   public Operation getOperation() {

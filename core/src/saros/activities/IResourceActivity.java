@@ -2,8 +2,12 @@ package saros.activities;
 
 import saros.filesystem.IResource;
 
-/** An interface for Activities that are resource-related (e.g. FileActivity) */
-public interface IResourceActivity extends IActivity {
+/**
+ * An interface for Activities that are resource-related (e.g. FileActivity).
+ *
+ * @param <T> the type of resource the activity is handling
+ */
+public interface IResourceActivity<T extends IResource> extends IActivity {
 
   /**
    * Returns the resource that this activity is about.
@@ -14,5 +18,5 @@ public interface IResourceActivity extends IActivity {
    *
    * @return the resource that this activity is about
    */
-  IResource getResource();
+  T getResource();
 }
