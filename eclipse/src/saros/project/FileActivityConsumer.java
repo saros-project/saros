@@ -128,7 +128,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
        * always reset Jupiter algorithm, because upon receiving that
        * activity, it was already reset on the host side
        */
-      session.getConcurrentDocumentClient().reset(new SPath(file));
+      session.getConcurrentDocumentClient().reset(file);
     }
 
     if (editorWasOpen && type != FileActivity.Type.REMOVED)
