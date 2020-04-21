@@ -3,9 +3,9 @@ package saros.concurrent.jupiter.internal.text;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.Collections;
 import java.util.List;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /**
@@ -46,7 +46,7 @@ public class TimestampOperation implements Operation {
   }
 
   @Override
-  public List<TextEditActivity> toTextEdit(SPath path, User source) {
+  public List<TextEditActivity> toTextEdit(IFile file, User source) {
     return Collections.emptyList();
   }
 

@@ -42,8 +42,8 @@ public class JupiterSimulator {
 
     replay(project, file);
 
-    client = new Peer(new Jupiter(true), document, project, path);
-    server = new Peer(new Jupiter(false), document, project, path);
+    client = new Peer(new Jupiter(true), document, file);
+    server = new Peer(new Jupiter(false), document, file);
   }
 
   public class Peer {
@@ -54,15 +54,12 @@ public class JupiterSimulator {
 
     protected Document document;
 
-    protected IPath path;
+    private final IFile file;
 
-    protected IProject project;
-
-    public Peer(Algorithm algorithm, String document, IProject project, IPath path) {
+    public Peer(Algorithm algorithm, String document, IFile file) {
       this.algorithm = algorithm;
-      this.document = new Document(document, project, path);
-      this.project = project;
-      this.path = path;
+      this.document = new Document(document, file);
+      this.file = file;
     }
 
     public void generate(Operation operation) {
@@ -73,7 +70,7 @@ public class JupiterSimulator {
       User user = JupiterTestCase.createUser("DUMMY");
 
       JupiterActivity jupiterActivity =
-          algorithm.generateJupiterActivity(operation, user, new SPath(project, path));
+          algorithm.generateJupiterActivity(operation, user, new SPath(file));
 
       if (this == client) {
         server.inQueue.add(jupiterActivity);

@@ -28,7 +28,7 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler, Documen
   private final SPath pathMock;
 
   public TwoWayJupiterServerDocument(String content, NetworkSimulator con) {
-    this.doc = new Document(content, con.project, con.path);
+    this.doc = new Document(content, con.file);
     this.algorithm = new Jupiter(false);
     this.connection = con;
 

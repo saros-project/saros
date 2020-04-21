@@ -32,7 +32,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler, Document
   public ClientSynchronizedDocument(
       User server, String content, NetworkSimulator connection, User user) {
     this.server = server;
-    this.doc = new Document(content, connection.project, connection.path);
+    this.doc = new Document(content, connection.file);
     this.algorithm = new Jupiter(true);
     this.connection = connection;
     this.user = user;

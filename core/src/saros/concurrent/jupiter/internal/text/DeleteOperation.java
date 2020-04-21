@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.editor.text.TextPosition;
+import saros.filesystem.IFile;
 import saros.misc.xstream.UrlEncodingStringConverter;
 import saros.session.User;
 import saros.util.LineSeparatorNormalizationUtil;
@@ -195,12 +195,12 @@ public class DeleteOperation implements ITextOperation {
   }
 
   @Override
-  public List<TextEditActivity> toTextEdit(SPath path, User source) {
+  public List<TextEditActivity> toTextEdit(IFile file, User source) {
     TextPosition startPosition = getStartPosition();
 
     TextEditActivity textEditActivity =
         new TextEditActivity(
-            source, startPosition, 0, 0, "", lineDelta, offsetDelta, replacedText, path.getFile());
+            source, startPosition, 0, 0, "", lineDelta, offsetDelta, replacedText, file);
 
     return Collections.singletonList(textEditActivity);
   }

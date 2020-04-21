@@ -1,9 +1,9 @@
 package saros.concurrent.jupiter;
 
 import java.util.List;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.internal.text.ITextOperation;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /**
@@ -19,7 +19,7 @@ public interface Operation {
    * Returns a sequence of {@link TextEditActivity}s which represent this operation if applied in
    * order to the editor denoted by the given path by the user identified by the given source.
    */
-  List<TextEditActivity> toTextEdit(SPath path, User source);
+  List<TextEditActivity> toTextEdit(IFile file, User source);
 
   /**
    * Returns a list of all operations represented by this operation that perform text changes in the
