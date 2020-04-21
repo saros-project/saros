@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.activities.NOPActivity;
-import saros.activities.SPath;
 import saros.communication.extensions.KickUserExtension;
 import saros.communication.extensions.LeaveSessionExtension;
 import saros.concurrent.management.ConcurrentDocumentClient;
@@ -159,9 +158,9 @@ public final class SarosSession implements ISarosSession {
         public void execute(IActivity activity) {
           // Filters out resource activities for projects whose activity execution is disabled
           if (activity instanceof IResourceActivity) {
-            SPath path = ((IResourceActivity) activity).getPath();
+            IResource resource = ((IResourceActivity) activity).getResource();
 
-            if (path != null && filteredProjects.contains(path.getProject())) {
+            if (resource != null && filteredProjects.contains(resource.getProject())) {
               log.debug("Dropped activity for resource of filtered project: " + activity);
 
               return;
