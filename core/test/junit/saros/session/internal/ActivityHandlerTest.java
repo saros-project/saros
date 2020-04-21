@@ -29,7 +29,6 @@ import saros.activities.JupiterActivity;
 import saros.activities.PermissionActivity;
 import saros.activities.ProgressActivity;
 import saros.activities.QueueItem;
-import saros.activities.SPath;
 import saros.activities.StartFollowingActivity;
 import saros.activities.StopActivity;
 import saros.activities.StopFollowingActivity;
@@ -38,6 +37,8 @@ import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.concurrent.management.ConcurrentDocumentServer;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
 import saros.session.IActivityHandlerCallback;
 import saros.session.ISarosSession;
@@ -99,7 +100,6 @@ public class ActivityHandlerTest {
           if (gateToCountdown != null) gateToCountdown.countDown();
         }
       };
-  private SPath path;
 
   @Before
   public void setUp() {
@@ -366,9 +366,13 @@ public class ActivityHandlerTest {
     activities.add(EasyMock.createNiceMock(TextEditActivity.class));
     activities.add(EasyMock.createNiceMock(ChecksumActivity.class));
 
-    path = EasyMock.createMock(SPath.class);
-    EasyMock.expect(path.getProject()).andStubReturn(project);
-    EasyMock.replay(path);
+    IFile file = EasyMock.createNiceMock(IFile.class);
+    EasyMock.expect(file.getProject()).andStubReturn(project);
+    EasyMock.replay(file);
+
+    IFolder folder = EasyMock.createNiceMock(IFolder.class);
+    EasyMock.expect(folder.getProject()).andStubReturn(project);
+    EasyMock.replay(folder);
 
     // Assign Targets and Source to activities
     for (IActivity activity : activities) {
@@ -395,8 +399,12 @@ public class ActivityHandlerTest {
               })
           .anyTimes();
 
-      if (activity instanceof IResourceActivity) {
-        EasyMock.expect(((IResourceActivity) activity).getPath()).andStubReturn(path);
+      if (activity instanceof FolderDeletedActivity || activity instanceof FolderCreatedActivity) {
+        EasyMock.expect(((IResourceActivity) activity).getResource()).andStubReturn(folder);
+
+      } else if (activity instanceof IResourceActivity) {
+
+        EasyMock.expect(((IResourceActivity) activity).getResource()).andStubReturn(file);
       }
       EasyMock.replay(activity);
     }
