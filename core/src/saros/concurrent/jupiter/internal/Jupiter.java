@@ -80,7 +80,8 @@ public class Jupiter implements Algorithm {
   public JupiterActivity generateJupiterActivity(Operation op, User source, SPath editor) {
 
     // send(op, myMsgs, otherMsgs);
-    JupiterActivity jupiterActivity = new JupiterActivity(this.vectorTime, op, source, editor);
+    JupiterActivity jupiterActivity =
+        new JupiterActivity(this.vectorTime, op, source, editor.getFile());
 
     // add(op, myMsgs) to outgoing;
     this.ackJupiterActivityList.add(

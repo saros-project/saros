@@ -18,9 +18,9 @@ public class JupiterActivity extends AbstractResourceActivity {
   @XStreamAlias("o")
   private final Operation operation;
 
-  public JupiterActivity(Timestamp timestamp, Operation operation, User source, SPath path) {
+  public JupiterActivity(Timestamp timestamp, Operation operation, User source, IFile file) {
 
-    super(source, path);
+    super(source, new SPath(file));
 
     this.timestamp = timestamp;
     this.operation = operation;
