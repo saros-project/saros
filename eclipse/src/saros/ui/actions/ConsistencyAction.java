@@ -2,7 +2,6 @@ package saros.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-import java.util.HashSet;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,10 +22,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import saros.Saros;
 import saros.SarosPluginContext;
-import saros.activities.SPath;
 import saros.annotations.Component;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.concurrent.watchdog.IsInconsistentObservable;
+import saros.filesystem.IFile;
 import saros.monitoring.ProgressMonitorAdapterFactory;
 import saros.observables.ValueChangeListener;
 import saros.repackaged.picocontainer.annotations.Inject;
@@ -204,7 +203,7 @@ public class ConsistencyAction extends Action implements Disposable {
           }
         });
 
-    final Set<SPath> paths = new HashSet<SPath>(watchdogClient.getPathsWithWrongChecksums());
+    final Set<IFile> files = watchdogClient.getPathsWithWrongChecksums();
 
     SWTUtils.runSafeSWTAsync(
         log,
@@ -214,10 +213,10 @@ public class ConsistencyAction extends Action implements Disposable {
 
             StringBuilder sb = new StringBuilder();
 
-            for (SPath path : paths) {
+            for (IFile file : files) {
               if (sb.length() > 0) sb.append(", ");
 
-              sb.append(path.getFullPath().toOSString());
+              sb.append(file.getFullPath().toOSString());
             }
 
             String files = sb.toString();
@@ -259,7 +258,7 @@ public class ConsistencyAction extends Action implements Disposable {
 
     Shell shell = SWTUtils.getShell();
 
-    final Set<SPath> paths = new HashSet<SPath>(watchdogClient.getPathsWithWrongChecksums());
+    final Set<IFile> files = watchdogClient.getPathsWithWrongChecksums();
 
     String pluginID = Saros.PLUGIN_ID;
 
@@ -272,15 +271,15 @@ public class ConsistencyAction extends Action implements Disposable {
                 + "Press 'Details' for the affected files and folders.",
             null);
 
-    for (SPath path : paths)
+    for (IFile file : files)
       multiStatus.add(
           new Status(
               IStatus.WARNING,
               pluginID,
               "project: "
-                  + path.getProject().getName()
+                  + file.getProject().getName()
                   + ", file:"
-                  + path.getProjectRelativePath().toOSString()));
+                  + file.getProjectRelativePath().toOSString()));
 
     class OkCancelErrorDialog extends ErrorDialog {
       public OkCancelErrorDialog(

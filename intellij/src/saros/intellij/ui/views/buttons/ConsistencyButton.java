@@ -4,14 +4,12 @@ import com.intellij.openapi.project.Project;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
-import java.util.HashSet;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import saros.activities.SPath;
 import saros.concurrent.watchdog.ConsistencyWatchdogClient;
 import saros.concurrent.watchdog.IsInconsistentObservable;
-import saros.filesystem.IResource;
+import saros.filesystem.IFile;
 import saros.intellij.runtime.EDTExecutor;
 import saros.intellij.ui.Messages;
 import saros.intellij.ui.actions.ConsistencyAction;
@@ -48,10 +46,10 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
 
           setEnabled(false);
 
-          final Set<SPath> paths =
-              new HashSet<>(sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
+          final Set<IFile> files =
+              sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums();
 
-          String inconsistentFiles = createConfirmationMessage(paths);
+          String inconsistentFiles = createConfirmationMessage(files);
 
           boolean userConfirmedRecovery =
               DialogUtils.showQuestion(
@@ -202,56 +200,46 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
       previouslyInConsistentState = false;
     }
 
-    final Set<SPath> paths =
-        new HashSet<>(sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
+    final Set<IFile> files = sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums();
 
-    final String files = createInconsistentPathsMessage(paths);
+    final String inconsistentFilesMessage = createInconsistentFilesMessage(files);
 
-    if (files.isEmpty()) {
+    if (inconsistentFilesMessage.isEmpty()) {
       NotificationPanel.showWarning(
           Messages.ConsistencyButton_message_inconsistency_detected_no_files,
           Messages.ConsistencyButton_title_inconsistency_detected);
 
     } else {
       NotificationPanel.showWarning(
-          MessageFormat.format(Messages.ConsistencyButton_message_inconsistency_detected, files),
+          MessageFormat.format(
+              Messages.ConsistencyButton_message_inconsistency_detected, inconsistentFilesMessage),
           Messages.ConsistencyButton_title_inconsistency_detected);
     }
   }
 
-  private String createConfirmationMessage(Set<SPath> paths) {
+  private String createConfirmationMessage(Set<IFile> files) {
     StringBuilder sbInconsistentFiles = new StringBuilder();
 
-    for (SPath path : paths) {
+    for (IFile file : files) {
       sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_module).append(": ");
-      sbInconsistentFiles.append(path.getProject().getName()).append(", ");
+      sbInconsistentFiles.append(file.getProject().getName()).append(", ");
       sbInconsistentFiles.append(Messages.ConsistencyButton_inconsistent_list_file).append(": ");
-      sbInconsistentFiles.append(path.getProjectRelativePath().toOSString());
+      sbInconsistentFiles.append(file.getProjectRelativePath().toOSString());
       sbInconsistentFiles.append("\n");
     }
 
     return sbInconsistentFiles.toString();
   }
 
-  private String createInconsistentPathsMessage(Set<SPath> paths) {
+  private String createInconsistentFilesMessage(Set<IFile> files) {
     StringBuilder sb = new StringBuilder();
 
-    for (SPath path : paths) {
-      IResource resource = path.getResource();
-
-      if (resource == null) {
-        log.warn("Inconsistent resource " + path + " could not be " + "found.");
-
-        continue;
-      }
-
+    for (IFile file : files) {
       if (sb.length() > 0) {
         sb.append(", ");
       }
 
-      sb.append(resource.getProject().getName())
-          .append(" - ")
-          .append(resource.getProjectRelativePath());
+      sb.append(file.getProject().getName()).append(" - ").append(file.getProjectRelativePath());
     }
 
     return sb.toString();
