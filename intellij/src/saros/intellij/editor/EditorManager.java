@@ -439,7 +439,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
                   (path, editor) -> {
                     sendEditorOpenInformation(localUser, path.getFile());
 
-                    sendViewPortInformation(localUser, path, editor, visibleFilePaths);
+                    sendViewPortInformation(localUser, path.getFile(), editor, visibleFilePaths);
 
                     sendSelectionInformation(localUser, path.getFile(), editor);
                   });
@@ -480,13 +480,13 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * Sends the viewport information for the given editor if it is currently visible.
    *
    * @param user the local user
-   * @param path the path of the editor
+   * @param file the file for the editor
    * @param editor the editor to send the viewport for
    * @param visibleFilePaths the paths of all currently visible editors
    */
   private void sendViewPortInformation(
       @NotNull User user,
-      @NotNull SPath path,
+      @NotNull IFile file,
       @NotNull Editor editor,
       @NotNull Set<String> visibleFilePaths) {
 
@@ -495,7 +495,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     if (fileForEditor == null) {
       log.warn(
           "Encountered editor without valid virtual file representation - path held in editor pool: "
-              + path);
+              + file);
 
       return;
     }
@@ -503,7 +503,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     if (!visibleFilePaths.contains(fileForEditor.getPath())) {
       log.debug(
           "Ignoring "
-              + path
+              + file
               + " while sending viewport awareness information as the editor is not currently visible.");
 
       return;
@@ -514,7 +514,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     int viewPortLength = localViewPort.getNumberOfLines();
 
     ViewportActivity setViewPort =
-        new ViewportActivity(user, viewPortStartLine, viewPortLength, path);
+        new ViewportActivity(user, viewPortStartLine, viewPortLength, file);
 
     fireActivity(setViewPort);
   }
@@ -629,7 +629,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
         (path, editor) -> {
           sendEditorOpenInformation(localUser, path.getFile());
 
-          sendViewPortInformation(localUser, path, editor, selectedFiles);
+          sendViewPortInformation(localUser, path.getFile(), editor, selectedFiles);
 
           sendSelectionInformation(localUser, path.getFile(), editor);
         });
@@ -929,7 +929,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * outside the editor package. If you still need to access this method, please consider whether
    * your class should rather be located in the editor package.
    */
-  public void generateViewport(SPath path, LineRange viewport) {
+  public void generateViewport(IFile file, LineRange viewport) {
     if (session == null) {
       log.warn("SharedEditorListener not correctly unregistered!");
       return;
@@ -937,7 +937,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     fireActivity(
         new ViewportActivity(
-            session.getLocalUser(), viewport.getStartLine(), viewport.getNumberOfLines(), path));
+            session.getLocalUser(), viewport.getStartLine(), viewport.getNumberOfLines(), file));
   }
 
   /**

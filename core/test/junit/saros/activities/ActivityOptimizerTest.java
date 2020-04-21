@@ -88,21 +88,21 @@ public class ActivityOptimizerTest {
 
     // --------------------------------------------------------------------------------
 
-    ViewportActivity vpChange0 = new ViewportActivity(alice, 0, 1, new SPath(fooFooFile));
+    ViewportActivity vpChange0 = new ViewportActivity(alice, 0, 1, fooFooFile);
 
-    ViewportActivity vpChange1 = new ViewportActivity(alice, 1, 1, new SPath(fooFooFile));
+    ViewportActivity vpChange1 = new ViewportActivity(alice, 1, 1, fooFooFile);
 
-    ViewportActivity vpChange2 = new ViewportActivity(alice, 0, 1, new SPath(fooBarFile));
+    ViewportActivity vpChange2 = new ViewportActivity(alice, 0, 1, fooBarFile);
 
-    ViewportActivity vpChange3 = new ViewportActivity(alice, 1, 1, new SPath(fooBarFile));
+    ViewportActivity vpChange3 = new ViewportActivity(alice, 1, 1, fooBarFile);
 
-    ViewportActivity vpChange4 = new ViewportActivity(alice, 0, 1, new SPath(barFooFile));
+    ViewportActivity vpChange4 = new ViewportActivity(alice, 0, 1, barFooFile);
 
-    ViewportActivity vpChange5 = new ViewportActivity(alice, 1, 1, new SPath(barFooFile));
+    ViewportActivity vpChange5 = new ViewportActivity(alice, 1, 1, barFooFile);
 
-    ViewportActivity vpChange6 = new ViewportActivity(alice, 0, 1, new SPath(barBarFile));
+    ViewportActivity vpChange6 = new ViewportActivity(alice, 0, 1, barBarFile);
 
-    ViewportActivity vpChange7 = new ViewportActivity(alice, 1, 1, new SPath(barBarFile));
+    ViewportActivity vpChange7 = new ViewportActivity(alice, 1, 1, barBarFile);
 
     List<IActivity> activities = new ArrayList<>();
 

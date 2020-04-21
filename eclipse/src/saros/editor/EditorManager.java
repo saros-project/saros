@@ -294,7 +294,7 @@ public class EditorManager implements IEditorManager {
                     localUser,
                     localViewport.getStartLine(),
                     localViewport.getNumberOfLines(),
-                    locallyActiveEditor));
+                    locallyActiveEditor.getFile()));
           } else {
             log.warn("No viewport for locallyActivateEditor: " + locallyActiveEditor);
           }
@@ -544,7 +544,10 @@ public class EditorManager implements IEditorManager {
 
     ViewportActivity activity =
         new ViewportActivity(
-            session.getLocalUser(), viewport.getStartLine(), viewport.getNumberOfLines(), path);
+            session.getLocalUser(),
+            viewport.getStartLine(),
+            viewport.getNumberOfLines(),
+            path.getFile());
 
     activityDelayer.fireActivity(activity);
   }
