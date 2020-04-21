@@ -3,7 +3,7 @@ name: STF Tests
 on:
   push:
     branches:
-      - 'pr/stf/*'
+      - 'pr/stf/**'
       - 'master'
 
 jobs:
