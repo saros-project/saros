@@ -1,5 +1,6 @@
 package saros.concurrent.watchdog;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -10,7 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
 import saros.activities.ChecksumErrorActivity;
@@ -72,7 +72,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
 
   private final IEditorManager editorManager;
 
-  private final Set<SPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<SPath>();
+  private final Set<IFile> filesWithWrongChecksums = new CopyOnWriteArraySet<>();
 
   private final RemoteProgressManager remoteProgressManager;
 
@@ -132,15 +132,18 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
     session.removeActivityConsumer(consumer);
     session.removeActivityProducer(this);
 
-    pathsWithWrongChecksums.clear();
+    filesWithWrongChecksums.clear();
 
     // abort running recoveries
     cancelRecovery.set(true);
   }
 
-  /** Returns the set of files for which the ConsistencyWatchdog has identified an inconsistency */
-  public Set<SPath> getPathsWithWrongChecksums() {
-    return new HashSet<SPath>(pathsWithWrongChecksums);
+  /**
+   * Returns a copy of the set of files for which the ConsistencyWatchdog has identified an
+   * inconsistency
+   */
+  public Set<IFile> getPathsWithWrongChecksums() {
+    return new HashSet<>(filesWithWrongChecksums);
   }
 
   /**
@@ -190,8 +193,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
     try {
       cancelRecovery.set(false);
 
-      final List<IFile> pathsOfHandledFiles =
-          pathsWithWrongChecksums.stream().map(SPath::getFile).collect(Collectors.toList());
+      final List<IFile> pathsOfHandledFiles = new ArrayList<>(filesWithWrongChecksums);
 
       monitor.beginTask("Consistency recovery", pathsOfHandledFiles.size());
 
@@ -255,9 +257,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
 
   private boolean isInconsistent(ChecksumActivity checksum) {
 
-    final SPath path = checksum.getPath();
+    final IFile file = checksum.getResource();
 
-    final boolean existsFileLocally = path.getFile().exists();
+    final boolean existsFileLocally = file.exists();
 
     if (!checksum.existsFile() && existsFileLocally) {
       /*
@@ -266,7 +268,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
        * inconsistency
        */
       log.debug(
-          "Inconsistency detected -> resource found that does not exist on host side: " + path);
+          "Inconsistency detected -> resource found that does not exist on host side: " + file);
 
       return true;
     }
@@ -277,21 +279,21 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
        * it, it is an inconsistency as well
        */
       log.debug(
-          "Inconsistency detected -> no resource found that does exist on host side: " + path);
+          "Inconsistency detected -> no resource found that does exist on host side: " + file);
 
       return true;
     }
 
     if (!checksum.existsFile() && !existsFileLocally) {
-      log.debug("Ignoring checksum activity for file that does not exist on both sides: " + path);
+      log.debug("Ignoring checksum activity for file that does not exist on both sides: " + file);
 
       return false;
     }
 
-    final String normalizedEditorContent = editorManager.getNormalizedContent(path);
+    final String normalizedEditorContent = editorManager.getNormalizedContent(new SPath(file));
 
     if (normalizedEditorContent == null) {
-      log.debug("Inconsistency detected -> no editor content found for resource: " + path);
+      log.debug("Inconsistency detected -> no editor content found for resource: " + file);
 
       return true;
     }
@@ -302,7 +304,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
       log.debug(
           String.format(
               "Inconsistency detected -> %s L(%d %s %d) H(%x %s %x)",
-              path.toString(),
+              file.toString(),
               normalizedEditorContent.length(),
               normalizedEditorContent.length() == checksum.getLength() ? "==" : "!=",
               checksum.getLength(),
@@ -328,15 +330,15 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
     boolean changed;
 
     if (isInconsistent(checksumActivity)) {
-      changed = pathsWithWrongChecksums.add(checksumActivity.getPath());
+      changed = filesWithWrongChecksums.add(checksumActivity.getResource());
     } else {
-      changed = pathsWithWrongChecksums.remove(checksumActivity.getPath());
+      changed = filesWithWrongChecksums.remove(checksumActivity.getResource());
     }
 
     if (!changed) return;
 
     // Update InconsistencyToResolve observable
-    if (pathsWithWrongChecksums.isEmpty()) {
+    if (filesWithWrongChecksums.isEmpty()) {
       if (inconsistencyToResolve.getValue()) {
         log.info("All Inconsistencies are resolved");
       }
