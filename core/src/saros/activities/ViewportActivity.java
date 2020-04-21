@@ -16,11 +16,11 @@ public class ViewportActivity extends AbstractResourceActivity {
   @XStreamAsAttribute
   protected final int numberOfLines;
 
-  public ViewportActivity(User source, int startLine, int numberOfLines, SPath path) {
+  public ViewportActivity(User source, int startLine, int numberOfLines, IFile file) {
 
-    super(source, path);
+    super(source, new SPath(file));
 
-    if (path == null) throw new IllegalArgumentException("path must not be null");
+    if (file == null) throw new IllegalArgumentException("path must not be null");
 
     this.startLine = Math.max(0, startLine);
     this.numberOfLines = Math.max(0, numberOfLines);

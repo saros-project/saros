@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
 import saros.editor.text.LineRange;
+import saros.filesystem.IFile;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorAPI;
 import saros.intellij.editor.EditorManager;
@@ -62,7 +63,7 @@ public class LocalViewPortChangeHandler implements IProjectEventHandler {
    * Generates a ViewPortActivity for the viewport change represented by the given activities. The
    * used line range is calculated using logical positions.
    *
-   * <p>Calls {@link EditorManager#generateViewport(SPath, LineRange)} to create and dispatch the
+   * <p>Calls {@link EditorManager#generateViewport(IFile, LineRange)} to create and dispatch the
    * activity.
    *
    * <p>This method relies on the EditorPool to filter editor events.
@@ -110,7 +111,7 @@ public class LocalViewPortChangeHandler implements IProjectEventHandler {
 
     LineRange newVisibleLineRange = EditorAPI.getLocalViewPortRange(editor, newVisibleRectangle);
 
-    editorManager.generateViewport(path, newVisibleLineRange);
+    editorManager.generateViewport(path.getFile(), newVisibleLineRange);
   }
 
   /**

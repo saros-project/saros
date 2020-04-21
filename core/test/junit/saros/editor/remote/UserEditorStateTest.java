@@ -94,7 +94,7 @@ public class UserEditorStateTest {
     // Selection values were chosen at "random"
     TextSelection selection = new TextSelection(new TextPosition(5, 15), new TextPosition(20, 1));
     select(fileA, selection);
-    view(new SPath(fileA), 10, 30);
+    view(fileA, 10, 30);
 
     assertFalse(
         "user state should not exist after awareness information " + "on non-activated editor",
@@ -129,14 +129,14 @@ public class UserEditorStateTest {
   @Test
   public void testUpdateViewports() {
     activate(fileA);
-    view(new SPath(fileA), 5, 50);
+    view(fileA, 5, 50);
 
     LineRange v = state.getEditorState(new SPath(fileA)).getViewport();
 
     assertEquals("viewport offset should be set", 5, v.getStartLine());
     assertEquals("viewport length should be set", 50, v.getNumberOfLines());
 
-    view(new SPath(fileA), 10, 45);
+    view(fileA, 10, 45);
 
     v = state.getEditorState(new SPath(fileA)).getViewport();
 
@@ -179,11 +179,11 @@ public class UserEditorStateTest {
     // Selection values were chosen at "random"
     TextSelection selectionA = new TextSelection(new TextPosition(1, 0), new TextPosition(2, 3));
     select(fileA, selectionA);
-    view(new SPath(fileA), 3, 4);
+    view(fileA, 3, 4);
 
     TextSelection selectionB = new TextSelection(new TextPosition(5, 4), new TextPosition(6, 1));
     select(fileB, selectionB);
-    view(new SPath(fileB), 7, 8);
+    view(fileB, 7, 8);
 
     EditorState stateA = state.getEditorState(new SPath(fileA));
     TextSelection selectionStateA = stateA.getSelection();
@@ -214,8 +214,8 @@ public class UserEditorStateTest {
     state.consumer.exec(new EditorActivity(source, Type.ACTIVATED, file));
   }
 
-  private void view(SPath path, int start, int length) {
-    state.consumer.exec(new ViewportActivity(source, start, length, path));
+  private void view(IFile file, int start, int length) {
+    state.consumer.exec(new ViewportActivity(source, start, length, file));
   }
 
   private void select(IFile file, TextSelection selection) {
