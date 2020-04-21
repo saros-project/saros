@@ -3,6 +3,7 @@ package saros.editor.remote;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import saros.activities.IActivity;
 import saros.activities.SPath;
 import saros.annotations.Component;
@@ -115,7 +116,7 @@ public class UserEditorStateManager implements IActivityConsumer, Startable {
   public Set<SPath> getOpenEditors() {
     Set<SPath> result = new HashSet<SPath>();
     for (UserEditorState state : userEditorStates.values()) {
-      result.addAll(state.getOpenEditors());
+      result.addAll(state.getOpenEditors().stream().map(SPath::new).collect(Collectors.toSet()));
     }
     return result;
   }
