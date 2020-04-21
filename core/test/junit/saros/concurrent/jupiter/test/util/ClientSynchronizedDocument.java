@@ -2,12 +2,14 @@ package saros.concurrent.jupiter.test.util;
 
 import org.apache.log4j.Logger;
 import saros.activities.JupiterActivity;
+import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.Timestamp;
 import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.session.User;
+import saros.test.mocks.SarosMocks;
 
 /**
  * test document to simulate the client site.
@@ -25,6 +27,8 @@ public class ClientSynchronizedDocument implements NetworkEventHandler, Document
   private User server;
   private NetworkSimulator connection;
 
+  private final SPath pathMock;
+
   public ClientSynchronizedDocument(
       User server, String content, NetworkSimulator connection, User user) {
     this.server = server;
@@ -32,6 +36,8 @@ public class ClientSynchronizedDocument implements NetworkEventHandler, Document
     this.algorithm = new Jupiter(true);
     this.connection = connection;
     this.user = user;
+
+    this.pathMock = SarosMocks.mockResourceBackedSPath();
   }
 
   @Override
@@ -75,7 +81,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler, Document
     doc.execOperation(op);
 
     /* 2. transform operation. */
-    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, user, null);
+    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, user, pathMock);
 
     /* 3. send operation. */
     connection.sendOperation(new NetworkRequest(jupiterActivity, remoteUser, delay));

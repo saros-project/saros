@@ -2,11 +2,13 @@ package saros.concurrent.jupiter.test.util;
 
 import org.apache.log4j.Logger;
 import saros.activities.JupiterActivity;
+import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.session.User;
+import saros.test.mocks.SarosMocks;
 
 /**
  * This proxy class on server represent the server side of the two-way jupiter protocol.
@@ -21,10 +23,14 @@ public class ProxySynchronizedQueue {
   private NetworkSimulator connection;
   private User user;
 
+  private final SPath pathMock;
+
   public ProxySynchronizedQueue(User user, NetworkSimulator connection) {
     this.user = user;
     this.algorithm = new Jupiter(false);
     this.connection = connection;
+
+    this.pathMock = SarosMocks.mockResourceBackedSPath();
   }
 
   public User getUser() {
@@ -46,7 +52,7 @@ public class ProxySynchronizedQueue {
   }
 
   public void sendOperation(Operation op) {
-    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, this.user, null);
+    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, this.user, pathMock);
     connection.sendOperation(new NetworkRequest(jupiterActivity, user, -1));
   }
 

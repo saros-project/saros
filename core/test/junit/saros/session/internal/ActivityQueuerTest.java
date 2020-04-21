@@ -19,7 +19,6 @@ import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
 import saros.activities.JupiterActivity;
 import saros.activities.NOPActivity;
-import saros.activities.SPath;
 import saros.activities.StartFollowingActivity;
 import saros.concurrent.jupiter.internal.JupiterVectorTime;
 import saros.concurrent.jupiter.internal.text.NoOperation;
@@ -239,17 +238,11 @@ public class ActivityQueuerTest {
 
     final IActivity fooJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0),
-            new NoOperation(),
-            ALICE,
-            new SPath(FOO_FILE_SHARED_PROJECT));
+            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, FOO_FILE_SHARED_PROJECT);
 
     final IActivity barJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0),
-            new NoOperation(),
-            ALICE,
-            new SPath(BAR_FILE_SHARED_PROJECT));
+            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, BAR_FILE_SHARED_PROJECT);
 
     List<IActivity> activities;
 
@@ -347,17 +340,11 @@ public class ActivityQueuerTest {
 
     final IActivity aliceJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0),
-            new NoOperation(),
-            ALICE,
-            new SPath(FOO_FILE_SHARED_PROJECT));
+            new JupiterVectorTime(0, 0), new NoOperation(), ALICE, FOO_FILE_SHARED_PROJECT);
 
     final IActivity bobJupiterADO =
         new JupiterActivity(
-            new JupiterVectorTime(0, 0),
-            new NoOperation(),
-            BOB,
-            new SPath(FOO_FILE_SHARED_PROJECT));
+            new JupiterVectorTime(0, 0), new NoOperation(), BOB, FOO_FILE_SHARED_PROJECT);
 
     activityQueuer = new ActivityQueuer();
     activityQueuer.enableQueuing(SHARED_PROJECT);
@@ -387,8 +374,7 @@ public class ActivityQueuerTest {
   }
 
   private JupiterActivity createJupiterActivity(IFile file) {
-    return new JupiterActivity(
-        new JupiterVectorTime(0, 0), new NoOperation(), BOB, new SPath(file));
+    return new JupiterActivity(new JupiterVectorTime(0, 0), new NoOperation(), BOB, file);
   }
 
   private void assertListsAreEqual(List<IActivity> expected, List<IActivity> actual) {
