@@ -38,7 +38,8 @@ public class ConcurrentDocumentClient implements Startable {
     this.sarosSession = sarosSession;
     this.jupiterClient = new JupiterClient(sarosSession);
 
-    this.resourceActivityFilter = new ResourceActivityFilter(sarosSession, this::reset);
+    this.resourceActivityFilter =
+        new ResourceActivityFilter(sarosSession, file -> reset(new SPath(file)));
   }
 
   @Override

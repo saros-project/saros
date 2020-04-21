@@ -56,10 +56,10 @@ public class ConcurrentDocumentServer implements Startable {
     this.sarosSession = sarosSession;
     this.server = new JupiterServer(sarosSession);
 
-    Consumer<SPath> deletedFileHandler =
-        resource -> {
-          log.debug("Resetting jupiter server for " + resource);
-          server.removePath(resource.getFile());
+    Consumer<IFile> deletedFileHandler =
+        file -> {
+          log.debug("Resetting jupiter server for " + file);
+          server.removePath(file);
         };
 
     this.resourceActivityFilter = new ResourceActivityFilter(sarosSession, deletedFileHandler);

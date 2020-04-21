@@ -1,5 +1,7 @@
 package saros.concurrent.management;
 
+import static saros.filesystem.IResource.Type.FILE;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +15,9 @@ import saros.activities.EditorActivity;
 import saros.activities.FileActivity;
 import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
-import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.filesystem.IProject;
+import saros.filesystem.IResource;
 import saros.session.AbstractActivityConsumer;
 import saros.session.IActivityConsumer;
 import saros.session.IActivityConsumer.Priority;
@@ -29,7 +32,7 @@ class ResourceActivityFilter {
   private final ISarosSession sarosSession;
 
   /** Method passed by the constructor caller that can be used to react to file deletions. */
-  private final Consumer<SPath> fileDeletionHandler;
+  private final Consumer<IFile> fileDeletionHandler;
 
   /**
    * A map of shared files that were deleted during the session onto the pending acknowledgments
@@ -44,7 +47,7 @@ class ResourceActivityFilter {
    * when we receive the content change for a new file is received before the file creation. Such
    * activities will be dropped, leading to inconsistencies.
    */
-  private final Map<SPath, List<User>> deletedFileFilter;
+  private final Map<IFile, List<User>> deletedFileFilter;
 
   /** Activity consumer processing received deletion acknowledgments. */
   private final IActivityConsumer activityConsumer =
@@ -52,7 +55,7 @@ class ResourceActivityFilter {
         @Override
         public void receive(DeletionAcknowledgmentActivity deletionAcknowledgmentActivity) {
           User source = deletionAcknowledgmentActivity.getSource();
-          SPath file = deletionAcknowledgmentActivity.getPath();
+          IFile file = deletionAcknowledgmentActivity.getResource();
 
           List<User> remainingUsers = deletedFileFilter.get(file);
 
@@ -96,9 +99,9 @@ class ResourceActivityFilter {
       new ISessionListener() {
         @Override
         public void userLeft(User user) {
-          Iterator<Entry<SPath, List<User>>> iterator = deletedFileFilter.entrySet().iterator();
+          Iterator<Entry<IFile, List<User>>> iterator = deletedFileFilter.entrySet().iterator();
           while (iterator.hasNext()) {
-            Entry<SPath, List<User>> entry = iterator.next();
+            Entry<IFile, List<User>> entry = iterator.next();
 
             List<User> remainingUsers = entry.getValue();
             remainingUsers.remove(user);
@@ -116,9 +119,9 @@ class ResourceActivityFilter {
 
         @Override
         public void projectRemoved(IProject project) {
-          Iterator<Entry<SPath, List<User>>> iterator = deletedFileFilter.entrySet().iterator();
+          Iterator<Entry<IFile, List<User>>> iterator = deletedFileFilter.entrySet().iterator();
           while (iterator.hasNext()) {
-            SPath file = iterator.next().getKey();
+            IFile file = iterator.next().getKey();
 
             if (file.getProject().equals(project)) {
               log.debug(
@@ -139,7 +142,7 @@ class ResourceActivityFilter {
    * @param sarosSession the current saros session
    * @param fileDeletionHandler method that is called every time a file deletion is detected
    */
-  ResourceActivityFilter(ISarosSession sarosSession, Consumer<SPath> fileDeletionHandler) {
+  ResourceActivityFilter(ISarosSession sarosSession, Consumer<IFile> fileDeletionHandler) {
     this.sarosSession = sarosSession;
     this.fileDeletionHandler = fileDeletionHandler;
 
@@ -168,14 +171,14 @@ class ResourceActivityFilter {
 
     FileActivity fileActivity = (FileActivity) activity;
 
-    SPath removedFile;
+    IFile removedFile;
     if (fileActivity.getType() == FileActivity.Type.REMOVED) {
-      removedFile = fileActivity.getPath();
+      removedFile = fileActivity.getResource();
 
     } else if (fileActivity.getType() == FileActivity.Type.MOVED
-        && !fileActivity.getPath().equals(fileActivity.getOldPath())) {
+        && !fileActivity.getResource().equals(fileActivity.getOldResource())) {
 
-      removedFile = fileActivity.getOldPath();
+      removedFile = fileActivity.getOldResource();
 
     } else {
       return;
@@ -219,7 +222,7 @@ class ResourceActivityFilter {
     if (fileActivity.getType() == FileActivity.Type.MOVED
         || fileActivity.getType() == FileActivity.Type.CREATED) {
 
-      SPath addedFile = fileActivity.getPath();
+      IFile addedFile = fileActivity.getResource();
 
       if (deletedFileFilter.containsKey(addedFile)) {
         log.debug("Removing activity filter for re-created file " + addedFile);
@@ -260,13 +263,15 @@ class ResourceActivityFilter {
       return false;
     }
 
-    SPath path = ((IResourceActivity) activity).getPath();
+    IResource resource = ((IResourceActivity) activity).getResource();
 
-    if (path == null) {
+    if (resource == null || resource.getType() != FILE) {
       return false;
     }
 
-    boolean pathIsFiltered = deletedFileFilter.containsKey(path);
+    IFile file = (IFile) resource;
+
+    boolean pathIsFiltered = deletedFileFilter.containsKey(file);
 
     if (pathIsFiltered) {
       if (activity instanceof ChecksumActivity) {
