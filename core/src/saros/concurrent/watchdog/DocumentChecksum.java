@@ -1,6 +1,6 @@
 package saros.concurrent.watchdog;
 
-import saros.activities.SPath;
+import saros.filesystem.IFile;
 
 /**
  * Represents a checksum of a document in the workspace. It consists of the document's
@@ -14,7 +14,8 @@ public class DocumentChecksum {
    */
   public static final int NOT_AVAILABLE = -1;
 
-  private SPath path;
+  private final IFile file;
+
   private int length;
   private int hash;
   private boolean dirty;
@@ -22,20 +23,20 @@ public class DocumentChecksum {
   /**
    * Creates a new DocumentChecksum.
    *
-   * @param path the document's project-relative path
+   * @param file the document's file
    */
-  public DocumentChecksum(SPath path) {
-    this.path = path;
+  public DocumentChecksum(IFile file) {
+    this.file = file;
     this.dirty = true;
   }
 
   /**
-   * Returns the project-relative path of the checksum's associated document.
+   * Returns the file of the checksum's associated document.
    *
-   * @return document path
+   * @return document file
    */
-  public SPath getPath() {
-    return path;
+  public IFile getFile() {
+    return file;
   }
 
   /**
@@ -113,6 +114,6 @@ public class DocumentChecksum {
 
   @Override
   public String toString() {
-    return path.toString() + " [" + this.length + "," + this.hash + "]";
+    return file + " [" + this.length + "," + this.hash + "]";
   }
 }

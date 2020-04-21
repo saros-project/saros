@@ -238,7 +238,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
 
     DocumentChecksum checksum = documentChecksums.get(docPath);
     if (checksum == null) {
-      checksum = new DocumentChecksum(docPath);
+      checksum = new DocumentChecksum(docPath.getFile());
       documentChecksums.put(docPath, checksum);
     }
 
@@ -264,22 +264,23 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
       return;
     }
 
-    String normalizedEditorContent = editorManager.getNormalizedContent(checksum.getPath());
+    String normalizedEditorContent =
+        editorManager.getNormalizedContent(new SPath(checksum.getFile()));
 
     if (normalizedEditorContent == null) {
-      if (localEditors.contains(checksum.getPath())) {
+      if (localEditors.contains(new SPath(checksum.getFile()))) {
         log.error(
             "EditorManager is in an inconsistent state. "
                 + "It is reporting a locally open editor but no"
                 + " document could be found in the underlying file system: "
                 + checksum);
       }
-      if (!remoteEditors.contains(checksum.getPath())) {
+      if (!remoteEditors.contains(new SPath(checksum.getFile()))) {
         /*
          * Since session participants do not report this document as
          * open, they are right (and our EditorPool might be confused)
          */
-        documentChecksums.remove(checksum.getPath());
+        documentChecksums.remove(new SPath(checksum.getFile()));
         return;
       }
     }
@@ -295,7 +296,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     ChecksumActivity checksumActivity =
         new ChecksumActivity(
             session.getLocalUser(),
-            checksum.getPath().getFile(),
+            checksum.getFile(),
             checksum.getHash(),
             checksum.getLength(),
             null);
