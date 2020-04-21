@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
 import saros.activities.SPath;
@@ -17,6 +18,7 @@ import saros.annotations.Component;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.remote.UserEditorStateManager;
+import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.AbstractActivityProducer;
 import saros.session.ISarosSession;
@@ -49,8 +51,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
   private final StopManager stopManager;
   private final UISynchronizer synchronizer;
 
-  private final Map<SPath, DocumentChecksum> documentChecksums =
-      new HashMap<SPath, DocumentChecksum>();
+  private final Map<IFile, DocumentChecksum> documentChecksums = new HashMap<>();
   private ScheduledThreadPoolExecutor checksumCalculationExecutor;
   private Future<?> checksumCalculationFuture;
   private boolean blocked;
@@ -89,7 +90,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
          */
         @Override
         public void textEdited(TextEditActivity textEdit) {
-          DocumentChecksum checksum = documentChecksums.get(textEdit.getPath());
+          DocumentChecksum checksum = documentChecksums.get(textEdit.getResource());
 
           if (checksum != null) checksum.markDirty();
         }
@@ -202,10 +203,17 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
   }
 
   private void calculateChecksums() {
-    Set<SPath> localEditors = editorManager.getOpenEditors();
-    Set<SPath> remoteEditors = userEditorStateManager.getOpenEditors();
+    Set<IFile> localEditors =
+        editorManager.getOpenEditors().stream().map(SPath::getFile).collect(Collectors.toSet());
 
-    Set<SPath> allEditors = new HashSet<SPath>();
+    Set<IFile> remoteEditors =
+        userEditorStateManager
+            .getOpenEditors()
+            .stream()
+            .map(SPath::getFile)
+            .collect(Collectors.toSet());
+
+    Set<IFile> allEditors = new HashSet<>();
     allEditors.addAll(localEditors);
     allEditors.addAll(remoteEditors);
 
@@ -214,10 +222,10 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
      * cheksum calculation cycle.
      */
 
-    Iterator<Entry<SPath, DocumentChecksum>> it = documentChecksums.entrySet().iterator();
+    Iterator<Entry<IFile, DocumentChecksum>> it = documentChecksums.entrySet().iterator();
 
     while (it.hasNext()) {
-      Entry<SPath, DocumentChecksum> entry = it.next();
+      Entry<IFile, DocumentChecksum> entry = it.next();
 
       if (!allEditors.contains(entry.getKey())) {
         it.remove();
@@ -228,29 +236,29 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
      * Update or create checksums for all currently open documents.
      */
 
-    for (SPath docPath : allEditors) {
-      updateChecksum(docPath, localEditors, remoteEditors);
-      broadcastChecksum(docPath);
+    for (IFile file : allEditors) {
+      updateChecksum(file, localEditors, remoteEditors);
+      broadcastChecksum(file);
     }
   }
 
-  private void updateChecksum(SPath docPath, Set<SPath> localEditors, Set<SPath> remoteEditors) {
+  private void updateChecksum(IFile file, Set<IFile> localEditors, Set<IFile> remoteEditors) {
 
-    DocumentChecksum checksum = documentChecksums.get(docPath);
+    DocumentChecksum checksum = documentChecksums.get(file);
     if (checksum == null) {
-      checksum = new DocumentChecksum(docPath.getFile());
-      documentChecksums.put(docPath, checksum);
+      checksum = new DocumentChecksum(file);
+      documentChecksums.put(file, checksum);
     }
 
     /*
      * Ensures that the watchdog server doesn't use outdated checksums for
      * files that no longer exist locally.
      */
-    if (checksum.getHash() != DocumentChecksum.NOT_AVAILABLE && !docPath.getFile().exists()) {
+    if (checksum.getHash() != DocumentChecksum.NOT_AVAILABLE && !file.exists()) {
 
       log.debug(
           "Updating checksum for "
-              + docPath
+              + file
               + " to correctly "
               + "represent that the file no longer exists locally: "
               + checksum);
@@ -268,19 +276,19 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
         editorManager.getNormalizedContent(new SPath(checksum.getFile()));
 
     if (normalizedEditorContent == null) {
-      if (localEditors.contains(new SPath(checksum.getFile()))) {
+      if (localEditors.contains(checksum.getFile())) {
         log.error(
             "EditorManager is in an inconsistent state. "
                 + "It is reporting a locally open editor but no"
                 + " document could be found in the underlying file system: "
                 + checksum);
       }
-      if (!remoteEditors.contains(new SPath(checksum.getFile()))) {
+      if (!remoteEditors.contains(checksum.getFile())) {
         /*
          * Since session participants do not report this document as
          * open, they are right (and our EditorPool might be confused)
          */
-        documentChecksums.remove(new SPath(checksum.getFile()));
+        documentChecksums.remove(checksum.getFile());
         return;
       }
     }
@@ -288,9 +296,9 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     checksum.update(normalizedEditorContent);
   }
 
-  private void broadcastChecksum(SPath docPath) {
+  private void broadcastChecksum(IFile file) {
 
-    DocumentChecksum checksum = documentChecksums.get(docPath);
+    DocumentChecksum checksum = documentChecksums.get(file);
     if (checksum == null) return;
 
     ChecksumActivity checksumActivity =
