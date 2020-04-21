@@ -93,7 +93,7 @@ public class UserEditorStateTest {
 
     // Selection values were chosen at "random"
     TextSelection selection = new TextSelection(new TextPosition(5, 15), new TextPosition(20, 1));
-    select(new SPath(fileA), selection);
+    select(fileA, selection);
     view(new SPath(fileA), 10, 30);
 
     assertFalse(
@@ -112,14 +112,14 @@ public class UserEditorStateTest {
     activate(fileA);
 
     TextSelection selection1 = new TextSelection(new TextPosition(5, 3), new TextPosition(8, 15));
-    select(new SPath(fileA), selection1);
+    select(fileA, selection1);
 
     TextSelection stateSelection = state.getEditorState(new SPath(fileA)).getSelection();
 
     assertEquals("selection should be set", selection1, stateSelection);
 
     TextSelection selection2 = new TextSelection(new TextPosition(0, 7), new TextPosition(34, 15));
-    select(new SPath(fileA), selection2);
+    select(fileA, selection2);
 
     stateSelection = state.getEditorState(new SPath(fileA)).getSelection();
 
@@ -178,11 +178,11 @@ public class UserEditorStateTest {
 
     // Selection values were chosen at "random"
     TextSelection selectionA = new TextSelection(new TextPosition(1, 0), new TextPosition(2, 3));
-    select(new SPath(fileA), selectionA);
+    select(fileA, selectionA);
     view(new SPath(fileA), 3, 4);
 
     TextSelection selectionB = new TextSelection(new TextPosition(5, 4), new TextPosition(6, 1));
-    select(new SPath(fileB), selectionB);
+    select(fileB, selectionB);
     view(new SPath(fileB), 7, 8);
 
     EditorState stateA = state.getEditorState(new SPath(fileA));
@@ -218,7 +218,7 @@ public class UserEditorStateTest {
     state.consumer.exec(new ViewportActivity(source, start, length, path));
   }
 
-  private void select(SPath path, TextSelection selection) {
-    state.consumer.exec(new TextSelectionActivity(source, selection, path));
+  private void select(IFile file, TextSelection selection) {
+    state.consumer.exec(new TextSelectionActivity(source, selection, file));
   }
 }

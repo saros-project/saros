@@ -301,7 +301,8 @@ public class EditorManager implements IEditorManager {
 
           if (localSelection != null) {
             activityDelayer.fireActivity(
-                new TextSelectionActivity(localUser, localSelection, locallyActiveEditor));
+                new TextSelectionActivity(
+                    localUser, localSelection, locallyActiveEditor.getFile()));
 
           } else {
             log.warn("No selection for locallyActivateEditor: " + locallyActiveEditor);
@@ -567,7 +568,7 @@ public class EditorManager implements IEditorManager {
     if (path.equals(locallyActiveEditor)) localSelection = newSelection;
 
     activityDelayer.fireActivity(
-        new TextSelectionActivity(session.getLocalUser(), newSelection, path));
+        new TextSelectionActivity(session.getLocalUser(), newSelection, path.getFile()));
   }
 
   /**

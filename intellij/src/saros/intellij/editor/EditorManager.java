@@ -441,7 +441,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
                     sendViewPortInformation(localUser, path, editor, visibleFilePaths);
 
-                    sendSelectionInformation(localUser, path, editor);
+                    sendSelectionInformation(localUser, path.getFile(), editor);
                   });
 
           sendActiveEditorInformation(localUser, project);
@@ -454,20 +454,20 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * the path for the editor.
    *
    * <p><b>NOTE:</b> This should only be used to transfer pre-existing selection. To notify other
-   * participants about new selections, {@link #generateSelection(SPath, SelectionEvent)} should be
+   * participants about new selections, {@link #generateSelection(IFile, SelectionEvent)} should be
    * used instead.
    *
    * <p><b>NOTE:</b> This class is meant for internal use only and should generally not be used
    * outside the editor package. If you still need to access this method, please consider whether
    * your class should rather be located in the editor package.
    *
-   * @param path the path representing the given editor
+   * @param file the file for the given editor
    * @param editor the editor to send the selection for
    */
-  public void sendExistingSelection(@NotNull SPath path, @NotNull Editor editor) {
+  public void sendExistingSelection(@NotNull IFile file, @NotNull Editor editor) {
     User localUser = session.getLocalUser();
 
-    sendSelectionInformation(localUser, path, editor);
+    sendSelectionInformation(localUser, file, editor);
   }
 
   private void sendEditorOpenInformation(@NotNull User user, @Nullable IFile file) {
@@ -520,11 +520,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   private void sendSelectionInformation(
-      @NotNull User user, @NotNull SPath path, @NotNull Editor editor) {
+      @NotNull User user, @NotNull IFile file, @NotNull Editor editor) {
 
     TextSelection selection = EditorAPI.getSelection(editor);
 
-    TextSelectionActivity setSelection = new TextSelectionActivity(user, selection, path);
+    TextSelectionActivity setSelection = new TextSelectionActivity(user, selection, file);
 
     fireActivity(setSelection);
   }
@@ -631,7 +631,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           sendViewPortInformation(localUser, path, editor, selectedFiles);
 
-          sendSelectionInformation(localUser, path, editor);
+          sendSelectionInformation(localUser, path.getFile(), editor);
         });
 
     sendActiveEditorInformation(localUser, intellijProject);
@@ -906,7 +906,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    * your class should rather be located in the editor package.
    */
   // TODO handle TextRange.EMPTY_RANGE separately? Could represent no valid selection for editor
-  public void generateSelection(SPath path, SelectionEvent newSelection) {
+  public void generateSelection(IFile file, SelectionEvent newSelection) {
     TextRange newSelectionRange = newSelection.getNewRange();
 
     Editor editor = newSelection.getEditor();
@@ -918,7 +918,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       TextSelection selection =
           EditorAPI.calculateSelectionPosition(editor, startOffset, endOffset);
 
-      fireActivity(new TextSelectionActivity(session.getLocalUser(), selection, path));
+      fireActivity(new TextSelectionActivity(session.getLocalUser(), selection, file));
     }
   }
 
