@@ -9,6 +9,10 @@ import java.util.Optional;
 import org.easymock.EasyMock;
 import org.powermock.api.easymock.PowerMock;
 import saros.activities.SPath;
+import saros.filesystem.IFile;
+import saros.filesystem.IFolder;
+import saros.filesystem.IPath;
+import saros.filesystem.IProject;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
@@ -66,6 +70,46 @@ public class SarosMocks {
     PowerMock.replay(path);
 
     return path;
+  }
+
+  /**
+   * Creates a mock <code>SPath</code> object that is backed by mocked resources.
+   *
+   * <p>Allows to convert from <code>SPath</code> to <code>IFile</code> or <code>IFolder</code> and
+   * back. As an example for a valid call chain:
+   *
+   * <pre>
+   *   SPath pathMock = mockResourceBackedSPath();
+   *
+   *   IFile fileMock = pathMock.getFile();
+   *
+   *   SPath otherPathMock = new SPath(fileMock);
+   *
+   *   assert pathMock.equals(otherPathMock);
+   * </pre>
+   *
+   * @return a mock <code>SPath</code> object that is backed by mocked resources
+   */
+  public static SPath mockResourceBackedSPath() {
+    IProject projectMock = EasyMock.createNiceMock(IProject.class);
+    IPath pathMock = EasyMock.createNiceMock(IPath.class);
+    IFile fileMock = EasyMock.createNiceMock(IFile.class);
+    IFolder folderMock = EasyMock.createNiceMock(IFolder.class);
+
+    EasyMock.expect(projectMock.getFile(pathMock)).andStubReturn(fileMock);
+    EasyMock.expect(projectMock.getFolder(pathMock)).andStubReturn(folderMock);
+
+    EasyMock.expect(pathMock.isAbsolute()).andStubReturn(false);
+
+    EasyMock.expect(fileMock.getProject()).andStubReturn(projectMock);
+    EasyMock.expect(fileMock.getProjectRelativePath()).andStubReturn(pathMock);
+
+    EasyMock.expect(folderMock.getProject()).andStubReturn(projectMock);
+    EasyMock.expect(folderMock.getProjectRelativePath()).andStubReturn(pathMock);
+
+    EasyMock.replay(projectMock, pathMock, fileMock, folderMock);
+
+    return new SPath(projectMock, pathMock);
   }
 
   /**
