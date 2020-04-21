@@ -222,7 +222,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
      * side can verify the recovered file.
      */
 
-    DocumentChecksum checksum = new DocumentChecksum(path);
+    DocumentChecksum checksum = new DocumentChecksum(file);
 
     String normalizedText = editorManager.getNormalizedContent(path);
 
