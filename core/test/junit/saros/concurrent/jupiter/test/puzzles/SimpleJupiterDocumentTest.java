@@ -12,6 +12,7 @@ import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.concurrent.jupiter.test.util.Document;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
+import saros.filesystem.IFile;
 import saros.session.User;
 import saros.test.mocks.SarosMocks;
 
@@ -21,11 +22,11 @@ import saros.test.mocks.SarosMocks;
  */
 public class SimpleJupiterDocumentTest extends JupiterTestCase {
 
-  private SPath pathMock;
+  private IFile fileMock;
 
   @Before
   public void setUp() {
-    pathMock = SarosMocks.mockResourceBackedSPath();
+    fileMock = SarosMocks.mockFile();
   }
 
   /** simple test to generate local operations and compute the JupiterActivities for other sides. */
@@ -33,7 +34,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
   public void testExecuteLocalOperations() {
     Algorithm algo = new Jupiter(true);
 
-    Document doc = new Document("abc", pathMock.getFile());
+    Document doc = new Document("abc", fileMock);
     assertEquals("abc", doc.getDocument());
 
     /* insert one char. */
@@ -43,7 +44,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
 
     User user = JupiterTestCase.createUser("user");
 
-    JupiterActivity jupiterActivity = algo.generateJupiterActivity(op, user, pathMock);
+    JupiterActivity jupiterActivity = algo.generateJupiterActivity(op, user, new SPath(fileMock));
     assertEquals(jupiterActivity.getOperation(), op);
 
     /* insert one short string. */
@@ -51,7 +52,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
     doc.execOperation(op);
     assertEquals("abinsertdc", doc.getDocument());
 
-    jupiterActivity = algo.generateJupiterActivity(op, user, pathMock);
+    jupiterActivity = algo.generateJupiterActivity(op, user, new SPath(fileMock));
     System.out.println(jupiterActivity.getOperation().toString());
   }
 }

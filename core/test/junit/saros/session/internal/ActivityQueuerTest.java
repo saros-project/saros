@@ -24,7 +24,6 @@ import saros.concurrent.jupiter.internal.JupiterVectorTime;
 import saros.concurrent.jupiter.internal.text.NoOperation;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
-import saros.filesystem.IPath;
 import saros.filesystem.IProject;
 import saros.net.xmpp.JID;
 import saros.session.User;
@@ -49,47 +48,23 @@ public class ActivityQueuerTest {
     SHARED_PROJECT = EasyMock.createMock(IProject.class);
     NOT_SHARED_PROJECT = EasyMock.createMock(IProject.class);
 
-    IPath fooPath = EasyMock.createMock(IPath.class);
-    EasyMock.expect(fooPath.isAbsolute()).andStubReturn(false);
-
-    IPath barPath = EasyMock.createMock(IPath.class);
-    EasyMock.expect(barPath.isAbsolute()).andStubReturn(false);
-
-    IPath notSharedPath = EasyMock.createMock(IPath.class);
-    EasyMock.expect(notSharedPath.isAbsolute()).andStubReturn(false);
-
-    EasyMock.replay(fooPath, barPath, notSharedPath);
-
     FOO_FILE_SHARED_PROJECT = EasyMock.createNiceMock(IFile.class);
     EasyMock.expect(FOO_FILE_SHARED_PROJECT.getProject()).andStubReturn(SHARED_PROJECT);
-    EasyMock.expect(FOO_FILE_SHARED_PROJECT.getProjectRelativePath()).andStubReturn(fooPath);
 
     BAR_FILE_SHARED_PROJECT = EasyMock.createNiceMock(IFile.class);
     EasyMock.expect(BAR_FILE_SHARED_PROJECT.getProject()).andStubReturn(SHARED_PROJECT);
-    EasyMock.expect(BAR_FILE_SHARED_PROJECT.getProjectRelativePath()).andStubReturn(barPath);
 
     FILE_OF_NOT_SHARED_PROJECT = EasyMock.createNiceMock(IFile.class);
     EasyMock.expect(FILE_OF_NOT_SHARED_PROJECT.getProject()).andStubReturn(NOT_SHARED_PROJECT);
-    EasyMock.expect(FILE_OF_NOT_SHARED_PROJECT.getProjectRelativePath())
-        .andStubReturn(notSharedPath);
 
     FOLDER_OF_NOT_SHARED_PROJECT = EasyMock.createNiceMock(IFolder.class);
     EasyMock.expect(FOLDER_OF_NOT_SHARED_PROJECT.getProject()).andStubReturn(NOT_SHARED_PROJECT);
-    EasyMock.expect(FOLDER_OF_NOT_SHARED_PROJECT.getProjectRelativePath())
-        .andStubReturn(notSharedPath);
 
     EasyMock.replay(
         FOO_FILE_SHARED_PROJECT,
         BAR_FILE_SHARED_PROJECT,
         FILE_OF_NOT_SHARED_PROJECT,
         FOLDER_OF_NOT_SHARED_PROJECT);
-
-    EasyMock.expect(SHARED_PROJECT.getFile(fooPath)).andStubReturn(FOO_FILE_SHARED_PROJECT);
-    EasyMock.expect(SHARED_PROJECT.getFile(barPath)).andStubReturn(BAR_FILE_SHARED_PROJECT);
-    EasyMock.expect(NOT_SHARED_PROJECT.getFile(notSharedPath))
-        .andStubReturn(FILE_OF_NOT_SHARED_PROJECT);
-    EasyMock.expect(NOT_SHARED_PROJECT.getFolder(notSharedPath))
-        .andStubReturn(FOLDER_OF_NOT_SHARED_PROJECT);
 
     EasyMock.replay(SHARED_PROJECT, NOT_SHARED_PROJECT);
   }

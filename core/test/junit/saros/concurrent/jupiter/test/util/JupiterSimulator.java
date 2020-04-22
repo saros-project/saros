@@ -1,10 +1,5 @@
 package saros.concurrent.jupiter.test.util;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -16,9 +11,8 @@ import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.filesystem.IFile;
-import saros.filesystem.IPath;
-import saros.filesystem.IProject;
 import saros.session.User;
+import saros.test.mocks.SarosMocks;
 
 public class JupiterSimulator {
 
@@ -30,17 +24,7 @@ public class JupiterSimulator {
 
   public JupiterSimulator(String document) {
 
-    IPath path = new PathFake("test");
-
-    IProject project = createMock(IProject.class);
-    IFile file = createNiceMock(IFile.class);
-
-    expect(project.getFile(path)).andStubReturn(file);
-
-    expect(file.getProject()).andStubReturn(project);
-    expect(file.getProjectRelativePath()).andStubReturn(path);
-
-    replay(project, file);
+    IFile file = SarosMocks.mockFile();
 
     client = new Peer(new Jupiter(true), document, file);
     server = new Peer(new Jupiter(false), document, file);

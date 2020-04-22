@@ -1,6 +1,5 @@
 package saros.editor.remote;
 
-import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -20,10 +19,8 @@ import saros.editor.text.LineRange;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
-import saros.filesystem.IPath;
-import saros.filesystem.IPathFactory;
-import saros.filesystem.IProject;
 import saros.session.User;
+import saros.test.mocks.SarosMocks;
 
 public class UserEditorStateTest {
 
@@ -38,40 +35,12 @@ public class UserEditorStateTest {
   @BeforeClass
   public static void prepare() {
     /* Mocks */
-    IPathFactory pathFactory = EasyMock.createMock(IPathFactory.class);
-    IPath pathMockA = mockPath("/foo/src/Main.java", pathFactory);
-    IPath pathMockB = mockPath("/foo/src/Second.java", pathFactory);
 
-    IProject project = EasyMock.createNiceMock(IProject.class);
-
-    fileA = EasyMock.createNiceMock(IFile.class);
-    EasyMock.expect(fileA.getProject()).andStubReturn(project);
-    EasyMock.expect(fileA.getProjectRelativePath()).andStubReturn(pathMockA);
-
-    fileB = EasyMock.createNiceMock(IFile.class);
-    EasyMock.expect(fileB.getProject()).andStubReturn(project);
-    EasyMock.expect(fileB.getProjectRelativePath()).andStubReturn(pathMockB);
-
-    EasyMock.expect(project.getFile(pathMockA)).andStubReturn(fileA);
-    EasyMock.expect(project.getFile(pathMockB)).andStubReturn(fileB);
-
-    EasyMock.replay(pathFactory, project, fileA, fileB);
+    fileA = SarosMocks.mockFile();
+    fileB = SarosMocks.mockFile();
 
     source = EasyMock.createMock(User.class);
     EasyMock.replay(source);
-  }
-
-  private static IPath mockPath(String filename, IPathFactory pathFactory) {
-    IPath mock = EasyMock.createMock(IPath.class);
-    expect(mock.isAbsolute()).andStubReturn(false);
-    expect(mock.toPortableString()).andStubReturn(filename);
-
-    expect(pathFactory.fromPath(mock)).andStubReturn(filename);
-    expect(pathFactory.fromString(filename)).andStubReturn(mock);
-
-    EasyMock.replay(mock);
-
-    return mock;
   }
 
   @Before

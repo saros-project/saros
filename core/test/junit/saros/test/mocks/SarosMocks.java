@@ -2,6 +2,7 @@ package saros.test.mocks;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
@@ -10,9 +11,9 @@ import org.easymock.EasyMock;
 import org.powermock.api.easymock.PowerMock;
 import saros.activities.SPath;
 import saros.filesystem.IFile;
-import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
 import saros.filesystem.IProject;
+import saros.filesystem.IResource;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
@@ -73,43 +74,29 @@ public class SarosMocks {
   }
 
   /**
-   * Creates a mock <code>SPath</code> object that is backed by mocked resources.
+   * Creates a mock <code>IFile</code> object that is backed by a mocked project and path object.
    *
-   * <p>Allows to convert from <code>SPath</code> to <code>IFile</code> or <code>IFolder</code> and
-   * back. As an example for a valid call chain:
+   * <p>Allows to request the file from the project using the project relative path requested from
+   * the file. This behavior is necessary in order to be able use the mock file in the constructor
+   * {@link SPath#SPath(IResource)}.
    *
-   * <pre>
-   *   SPath pathMock = mockResourceBackedSPath();
-   *
-   *   IFile fileMock = pathMock.getFile();
-   *
-   *   SPath otherPathMock = new SPath(fileMock);
-   *
-   *   assert pathMock.equals(otherPathMock);
-   * </pre>
-   *
-   * @return a mock <code>SPath</code> object that is backed by mocked resources
+   * @return a mock <code>IFile</code> object that is backed by a mocked project and path object
    */
-  public static SPath mockResourceBackedSPath() {
-    IProject projectMock = EasyMock.createNiceMock(IProject.class);
-    IPath pathMock = EasyMock.createNiceMock(IPath.class);
-    IFile fileMock = EasyMock.createNiceMock(IFile.class);
-    IFolder folderMock = EasyMock.createNiceMock(IFolder.class);
+  public static IFile mockFile() {
+    IProject projectMock = createNiceMock(IProject.class);
+    IPath pathMock = createNiceMock(IPath.class);
+    IFile fileMock = createNiceMock(IFile.class);
 
-    EasyMock.expect(projectMock.getFile(pathMock)).andStubReturn(fileMock);
-    EasyMock.expect(projectMock.getFolder(pathMock)).andStubReturn(folderMock);
+    expect(projectMock.getFile(pathMock)).andStubReturn(fileMock);
 
-    EasyMock.expect(pathMock.isAbsolute()).andStubReturn(false);
+    expect(pathMock.isAbsolute()).andStubReturn(false);
 
-    EasyMock.expect(fileMock.getProject()).andStubReturn(projectMock);
-    EasyMock.expect(fileMock.getProjectRelativePath()).andStubReturn(pathMock);
+    expect(fileMock.getProject()).andStubReturn(projectMock);
+    expect(fileMock.getProjectRelativePath()).andStubReturn(pathMock);
 
-    EasyMock.expect(folderMock.getProject()).andStubReturn(projectMock);
-    EasyMock.expect(folderMock.getProjectRelativePath()).andStubReturn(pathMock);
+    replay(projectMock, pathMock, fileMock);
 
-    EasyMock.replay(projectMock, pathMock, fileMock, folderMock);
-
-    return new SPath(projectMock, pathMock);
+    return fileMock;
   }
 
   /**
