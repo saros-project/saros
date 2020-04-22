@@ -2,6 +2,7 @@ package saros.net.xmpp.filetransfer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -120,6 +121,34 @@ public class XMPPFileTransferManager {
     } catch (XMPPException e) {
       throw new IOException("File send to " + remoteJID + " failed.", e);
     }
+  }
+
+  /**
+   * Start a file stream with a contact.
+   *
+   * <p>This method will return while the transfer negotiation is processing. Use {@link
+   * XMPPFileTransfer#waitForTransferStart(java.util.function.BooleanSupplier)} to wait till the
+   * negotiation is done.
+   *
+   * @param remoteJID fully qualified JID of remote
+   * @param streamName identifier of the stream
+   * @param inputStream InputStream to send data from
+   * @return {@link XMPPFileTransfer} providing information about the transfer
+   * @throws IllegalArgumentException if provided JID is not fully qualified
+   * @throws IOException if no connection is available or XMPP related error
+   */
+  public XMPPFileTransfer streamSendStart(JID remoteJID, String streamName, InputStream inputStream)
+      throws IllegalArgumentException, IOException {
+    if (remoteJID == null || remoteJID.isBareJID())
+      throw new IllegalArgumentException("No valid remoteJID provided: " + remoteJID);
+
+    FileTransferManager currentManager = smackTransferManager.get();
+    if (currentManager == null) throw new IOException("No XMPP connection.");
+
+    OutgoingFileTransfer transfer = currentManager.createOutgoingFileTransfer(remoteJID.getRAW());
+    transfer.sendStream(inputStream, streamName, 0, streamName);
+
+    return new XMPPFileTransfer(transfer);
   }
 
   /**
