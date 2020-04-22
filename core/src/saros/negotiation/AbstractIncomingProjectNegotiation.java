@@ -29,7 +29,7 @@ import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -69,7 +69,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
       final IWorkspace workspace, //
       final IChecksumCache checksumCache, //
-      final XMPPConnectionService connectionService, //
+      final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
       final IReceiver receiver //
       ) {
@@ -80,7 +80,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
         session,
         workspace,
         checksumCache,
-        connectionService,
+        fileTransferManager,
         transmitter,
         receiver);
 
@@ -213,7 +213,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
           "not connected to a XMPP server", CancelOption.DO_NOT_NOTIFY_PEER);
 
     transferListener = new TransferListener(TRANSFER_ID_PREFIX + getID());
-    fileTransferManager.addFileTransferListener(transferListener);
+    fileTransferManager.getSmackTransferManager().addFileTransferListener(transferListener);
   }
 
   /**
@@ -248,7 +248,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
     for (IProject project : projectMapping.values()) session.disableQueuing(project);
 
     if (fileTransferManager != null)
-      fileTransferManager.removeFileTransferListener(transferListener);
+      fileTransferManager.getSmackTransferManager().removeFileTransferListener(transferListener);
 
     deleteCollectors();
     monitor.done();

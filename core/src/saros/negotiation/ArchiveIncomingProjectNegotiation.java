@@ -21,7 +21,7 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -44,7 +44,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
       final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
       final IWorkspace workspace, //
       final IChecksumCache checksumCache, //
-      final XMPPConnectionService connectionService, //
+      final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
       final IReceiver receiver //
       ) {
@@ -57,7 +57,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
         fileReplacementInProgressObservable,
         workspace,
         checksumCache,
-        connectionService,
+        fileTransferManager,
         transmitter,
         receiver);
   }

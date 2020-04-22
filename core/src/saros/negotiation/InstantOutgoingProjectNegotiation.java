@@ -31,7 +31,7 @@ import saros.negotiation.stream.OutgoingStreamProtocol;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.User;
@@ -68,7 +68,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
       final IEditorManager editorManager, //
       final IWorkspace workspace, //
       final IChecksumCache checksumCache, //
-      final XMPPConnectionService connectionService, //
+      final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
       final IReceiver receiver, //
       final AdditionalProjectDataFactory additionalProjectDataFactory //
@@ -81,7 +81,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
         editorManager,
         workspace,
         checksumCache,
-        connectionService,
+        fileTransferManager,
         transmitter,
         receiver,
         additionalProjectDataFactory);
@@ -141,7 +141,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     monitor.beginTask(message, transferList.size());
 
     String userID = getPeer().toString();
-    OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(userID);
+    OutgoingFileTransfer transfer =
+        fileTransferManager.getSmackTransferManager().createOutgoingFileTransfer(userID);
 
     long writtenBytes = 0;
     try (PipedInputStream in = new PipedInputStream();

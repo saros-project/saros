@@ -121,4 +121,13 @@ public class XMPPFileTransferManager {
       throw new IOException("File send to " + remoteJID + " failed.", e);
     }
   }
+
+  /**
+   * Transition method.
+   *
+   * @return
+   */
+  public FileTransferManager getSmackTransferManager() {
+    return smackTransferManager.get();
+  }
 }

@@ -10,8 +10,8 @@ import saros.net.IConnectionManager;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.XMPPContactsService;
+import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -22,9 +22,7 @@ import saros.versioning.VersionManager;
 public final class NegotiationFactory {
   private final VersionManager versionManager;
   private final SessionNegotiationHookManager hookManager;
-
-  // TODO remove, do not use Smack Filetransfer
-  private final XMPPConnectionService connectionService;
+  private final XMPPFileTransferManager fileTransferManager;
 
   /** This is unneeded here if the Factory gets called directly with Contact objects. */
   private final XMPPContactsService contactsService;
@@ -46,7 +44,7 @@ public final class NegotiationFactory {
       FileReplacementInProgressObservable fileReplacementInProgressObservable,
       IWorkspace workspace,
       IChecksumCache checksumCache,
-      XMPPConnectionService connectionService,
+      XMPPFileTransferManager transferManager,
       IConnectionManager connectionManager,
       ITransmitter transmitter,
       IReceiver receiver,
@@ -66,7 +64,7 @@ public final class NegotiationFactory {
     this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     this.workspace = workspace;
     this.checksumCache = checksumCache;
-    this.connectionService = connectionService;
+    this.fileTransferManager = transferManager;
     this.connectionManager = connectionManager;
     this.transmitter = transmitter;
     this.receiver = receiver;
@@ -128,7 +126,7 @@ public final class NegotiationFactory {
             context.getComponent(IEditorManager.class),
             workspace,
             checksumCache,
-            connectionService,
+            fileTransferManager,
             transmitter,
             receiver,
             additionalProjectDataFactory);
@@ -141,7 +139,7 @@ public final class NegotiationFactory {
             context.getComponent(IEditorManager.class),
             workspace,
             checksumCache,
-            connectionService,
+            fileTransferManager,
             transmitter,
             receiver,
             additionalProjectDataFactory);
@@ -168,7 +166,7 @@ public final class NegotiationFactory {
             fileReplacementInProgressObservable,
             workspace,
             checksumCache,
-            connectionService,
+            fileTransferManager,
             transmitter,
             receiver);
       case INSTANT:
@@ -181,7 +179,7 @@ public final class NegotiationFactory {
             fileReplacementInProgressObservable,
             workspace,
             checksumCache,
-            connectionService,
+            fileTransferManager,
             transmitter,
             receiver);
       default:
