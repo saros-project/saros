@@ -11,8 +11,6 @@ import org.junit.Test;
 import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
-import saros.filesystem.IPath;
-import saros.filesystem.IProject;
 import saros.net.xmpp.JID;
 import saros.session.User;
 
@@ -30,39 +28,10 @@ public class ActivityOptimizerTest {
 
   @Before
   public void setup() {
-
-    IProject fooProject = EasyMock.createNiceMock(IProject.class);
-    IProject barProject = EasyMock.createNiceMock(IProject.class);
-
-    IPath fooPath = EasyMock.createNiceMock(IPath.class);
-    IPath barPath = EasyMock.createNiceMock(IPath.class);
-
-    EasyMock.expect(fooPath.isAbsolute()).andStubReturn(false);
-    EasyMock.expect(barPath.isAbsolute()).andStubReturn(false);
-
     fooFooFile = EasyMock.createNiceMock(IFile.class);
     fooBarFile = EasyMock.createNiceMock(IFile.class);
     barFooFile = EasyMock.createNiceMock(IFile.class);
     barBarFile = EasyMock.createNiceMock(IFile.class);
-
-    EasyMock.expect(fooFooFile.getProject()).andStubReturn(fooProject);
-    EasyMock.expect(fooFooFile.getProjectRelativePath()).andStubReturn(fooPath);
-    EasyMock.expect(fooProject.getFile(fooPath)).andStubReturn(fooFooFile);
-
-    EasyMock.expect(fooBarFile.getProject()).andStubReturn(fooProject);
-    EasyMock.expect(fooBarFile.getProjectRelativePath()).andStubReturn(barPath);
-    EasyMock.expect(fooProject.getFile(barPath)).andStubReturn(fooBarFile);
-
-    EasyMock.expect(barFooFile.getProject()).andStubReturn(barProject);
-    EasyMock.expect(barFooFile.getProjectRelativePath()).andStubReturn(fooPath);
-    EasyMock.expect(barProject.getFile(fooPath)).andStubReturn(barFooFile);
-
-    EasyMock.expect(barBarFile.getProject()).andStubReturn(barProject);
-    EasyMock.expect(barBarFile.getProjectRelativePath()).andStubReturn(barPath);
-    EasyMock.expect(barProject.getFile(barPath)).andStubReturn(barBarFile);
-
-    EasyMock.replay(
-        fooProject, barProject, fooPath, barPath, fooFooFile, fooBarFile, barFooFile, barBarFile);
   }
 
   @Test

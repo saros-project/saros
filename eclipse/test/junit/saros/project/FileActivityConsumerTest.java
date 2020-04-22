@@ -24,8 +24,6 @@ import saros.activities.FileActivity;
 import saros.activities.FileActivity.Purpose;
 import saros.activities.FileActivity.Type;
 import saros.filesystem.EclipseFileImpl;
-import saros.filesystem.IPath;
-import saros.filesystem.IProject;
 import saros.net.xmpp.JID;
 import saros.session.User;
 
@@ -67,9 +65,6 @@ public class FileActivityConsumerTest {
 
     // set up eclipse resource mock
     file = createMock(IFile.class);
-
-    IPath path = createNiceMock(IPath.class);
-    IProject project = createNiceMock(IProject.class);
     eclipseFileWrapper = createNiceMock(EclipseFileImpl.class);
 
     expect(file.getContents()).andStubReturn(new ByteArrayInputStream(FILE_CONTENT));
@@ -78,15 +73,8 @@ public class FileActivityConsumerTest {
     expect(file.getType()).andStubReturn(org.eclipse.core.resources.IResource.FILE);
     expect(file.getAdapter(IFile.class)).andStubReturn(file);
 
-    replay(path);
-
-    expect(project.getFile(path)).andStubReturn(eclipseFileWrapper);
-    replay(project);
-
     // set up saros resource wrapper mocks
     expect(eclipseFileWrapper.getDelegate()).andStubReturn(file);
-    expect(eclipseFileWrapper.getProject()).andStubReturn(project);
-    expect(eclipseFileWrapper.getProjectRelativePath()).andStubReturn(path);
     replay(eclipseFileWrapper);
   }
 

@@ -7,6 +7,7 @@ import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
+import saros.filesystem.IFile;
 import saros.session.User;
 import saros.test.mocks.SarosMocks;
 
@@ -23,14 +24,14 @@ public class ProxySynchronizedQueue {
   private NetworkSimulator connection;
   private User user;
 
-  private final SPath pathMock;
+  private final IFile fileMock;
 
   public ProxySynchronizedQueue(User user, NetworkSimulator connection) {
     this.user = user;
     this.algorithm = new Jupiter(false);
     this.connection = connection;
 
-    this.pathMock = SarosMocks.mockResourceBackedSPath();
+    this.fileMock = SarosMocks.mockFile();
   }
 
   public User getUser() {
@@ -52,7 +53,8 @@ public class ProxySynchronizedQueue {
   }
 
   public void sendOperation(Operation op) {
-    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, this.user, pathMock);
+    JupiterActivity jupiterActivity =
+        algorithm.generateJupiterActivity(op, this.user, new SPath(fileMock));
     connection.sendOperation(new NetworkRequest(jupiterActivity, user, -1));
   }
 

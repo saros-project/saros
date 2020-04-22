@@ -11,7 +11,6 @@ import saros.concurrent.jupiter.internal.Jupiter;
 import saros.concurrent.jupiter.test.util.Document.JupiterDocumentListener;
 import saros.net.xmpp.JID;
 import saros.session.User;
-import saros.test.mocks.SarosMocks;
 
 public class TwoWayJupiterServerDocument implements NetworkEventHandler, DocumentTestChecker {
 
@@ -25,14 +24,10 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler, Documen
 
   private NetworkSimulator connection;
 
-  private final SPath pathMock;
-
   public TwoWayJupiterServerDocument(String content, NetworkSimulator con) {
     this.doc = new Document(content, con.file);
     this.algorithm = new Jupiter(false);
     this.connection = con;
-
-    this.pathMock = SarosMocks.mockResourceBackedSPath();
   }
 
   @Override
@@ -71,7 +66,8 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler, Documen
     /* 1. execute locally */
     doc.execOperation(op);
     /* 2. transform operation. */
-    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, server, pathMock);
+    JupiterActivity jupiterActivity =
+        algorithm.generateJupiterActivity(op, server, new SPath(connection.file));
     /* sent to client */
     connection.sendOperation(new NetworkRequest(jupiterActivity, user, delay));
   }

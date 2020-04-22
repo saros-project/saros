@@ -11,16 +11,15 @@ import static saros.test.util.OperationHelper.T;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.text.SplitOperation;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
 import saros.filesystem.IFile;
 import saros.session.User;
-import saros.test.mocks.SarosMocks;
 
 /**
  * Tests the logic that combines the contained operations if possible when creating text activities
@@ -36,9 +35,7 @@ public class SplitOperationTest {
 
   @Before
   public void setUp() {
-    SPath path = SarosMocks.mockResourceBackedSPath();
-
-    file = path.getFile();
+    file = EasyMock.createNiceMock(IFile.class);
   }
 
   @Test

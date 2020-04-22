@@ -8,6 +8,7 @@ import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.Timestamp;
 import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
+import saros.filesystem.IFile;
 import saros.session.User;
 import saros.test.mocks.SarosMocks;
 
@@ -27,7 +28,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler, Document
   private User server;
   private NetworkSimulator connection;
 
-  private final SPath pathMock;
+  private final IFile fileMock;
 
   public ClientSynchronizedDocument(
       User server, String content, NetworkSimulator connection, User user) {
@@ -37,7 +38,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler, Document
     this.connection = connection;
     this.user = user;
 
-    this.pathMock = SarosMocks.mockResourceBackedSPath();
+    this.fileMock = SarosMocks.mockFile();
   }
 
   @Override
@@ -81,7 +82,8 @@ public class ClientSynchronizedDocument implements NetworkEventHandler, Document
     doc.execOperation(op);
 
     /* 2. transform operation. */
-    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, user, pathMock);
+    JupiterActivity jupiterActivity =
+        algorithm.generateJupiterActivity(op, user, new SPath(fileMock));
 
     /* 3. send operation. */
     connection.sendOperation(new NetworkRequest(jupiterActivity, remoteUser, delay));

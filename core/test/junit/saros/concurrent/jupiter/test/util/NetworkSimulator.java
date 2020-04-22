@@ -2,7 +2,6 @@ package saros.concurrent.jupiter.test.util;
 
 import java.util.HashMap;
 import java.util.PriorityQueue;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.session.User;
 import saros.test.mocks.SarosMocks;
@@ -23,9 +22,7 @@ public class NetworkSimulator {
   protected int presentTime = -1;
 
   public NetworkSimulator() {
-    SPath mockedPath = SarosMocks.mockResourceBackedSPath();
-
-    file = mockedPath.getFile();
+    file = SarosMocks.mockFile();
 
     clients = new HashMap<User, NetworkEventHandler>();
   }
