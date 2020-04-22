@@ -6,15 +6,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import saros.Saros;
-import saros.net.xmpp.JID;
+import saros.net.xmpp.filetransfer.XMPPFileTransferRequest;
 
 /**
- * This job is intended to be used with a pending incoming {@linkplain FileTransferRequest XMPP file
- * transfer request}. It will accept the request and monitor the status of the file transfer
- * process.
+ * This job is intended to be used with a incoming {@linkplain XMPPFileTransferRequest}. It will
+ * accept the request and monitor the status of the file transfer process.
  *
  * <p>This job supports cancellation.
  */
@@ -22,12 +19,11 @@ public final class IncomingFileTransferJob extends FileTransferJob {
 
   private static final Logger log = Logger.getLogger(IncomingFileTransferJob.class);
 
-  private final FileTransferRequest request;
+  private final XMPPFileTransferRequest request;
   private final File file;
 
-  public IncomingFileTransferJob(FileTransferRequest request, File file, JID jid) {
-
-    super("File Transfer", jid);
+  public IncomingFileTransferJob(XMPPFileTransferRequest request, File file) {
+    super("File Transfer", request.getContact().getBareJid());
     setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
     this.request = request;
     this.file = file;
@@ -36,19 +32,13 @@ public final class IncomingFileTransferJob extends FileTransferJob {
   @Override
   protected IStatus run(IProgressMonitor monitor) {
     monitor.beginTask("Receiving file " + request.getFileName(), 100);
-    IncomingFileTransfer transfer = request.accept();
 
     try {
-      transfer.recieveFile(file);
-
-      return monitorTransfer(transfer, monitor);
-    } catch (RuntimeException e) {
-      log.error("internal error in file transfer", e);
-      throw e;
+      return monitorTransfer(request.acceptFile(file).getSmackTransfer(), monitor);
     } catch (Exception e) {
       log.error("file transfer failed: " + jid, e);
 
-      return new Status(IStatus.ERROR, Saros.PLUGIN_ID, "file transfer failed", e);
+      return new Status(IStatus.ERROR, Saros.PLUGIN_ID, "File transfer failed.", e);
     } finally {
       monitor.done();
     }

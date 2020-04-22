@@ -34,6 +34,7 @@ import saros.synchronize.UISynchronizer;
 import saros.synchronize.internal.EclipseSWTSynchronizer;
 import saros.ui.eventhandler.ConnectingFailureHandler;
 import saros.ui.eventhandler.HostLeftAloneInSessionHandler;
+import saros.ui.eventhandler.IncomingFileTransferHandler;
 import saros.ui.eventhandler.JoinSessionRejectedHandler;
 import saros.ui.eventhandler.NegotiationHandler;
 import saros.ui.eventhandler.SessionViewOpener;
@@ -71,6 +72,7 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
       Component.create(UserStatusChangeHandler.class),
       Component.create(XMPPAuthorizationHandler.class),
       Component.create(ConnectingFailureHandler.class),
+      Component.create(IncomingFileTransferHandler.class),
       // UI handlers Saros Server Access
       Component.create(JoinSessionRejectedHandler.class),
 
