@@ -50,6 +50,33 @@ Possible alerts are: `primary`, `secondary`, `success`, `danger`, `warning`, `in
 
 If you want to inspect or change the corresponding code see `docs/_plugins/alert.rb`.
 
+## Write Accordions
+
+In order to write an (Bootstrap) [accordion](https://getbootstrap.com/docs/4.0/components/collapse/#accordion-example) like:
+
+{% accordion example-accordion-id %}
+{% collapsible Entry h5 %}
+Content
+{% endcollapsible %}
+{% collapsible ### Entry h3 %}
+Content
+{% endcollapsible %}
+{% endaccordion %}
+
+you have to use our custom `accordion` and `collapsible` [Jekyll Tag Block](https://jekyllrb.com/docs/plugins/tags/#tag-blocks).
+```markdown
+{{ "{% accordion example-accordion-id " }}%}
+{{ "{% collapsible Entry h5" }}%}
+Content
+{{ "{% endcollapsible " }}%}
+{{ "{% collapsible ### Entry h3" }}%}
+Content
+{{ "{% endcollapsible " }}%}
+{{ "{% endaccordion " }}%}
+```
+
+The `collapsible` entry uses a default heading of h5. If you need another heading define it in markdown (as in `### Entry h3`).
+If you want to inspect or change the corresponding code see `docs/_plugins/accordion.rb` and `docs/_plugins/collapsible.rb`.
 
 ## Write IDE Specific Documentation
 Use the following tags if you want to embed an IDE specific part into a documentation or want to provide IDE specific versions of a page.
