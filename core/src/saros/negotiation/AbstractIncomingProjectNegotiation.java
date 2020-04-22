@@ -7,10 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smackx.filetransfer.FileTransferListener;
-import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import saros.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import saros.communication.extensions.StartActivityQueuingRequest;
 import saros.communication.extensions.StartActivityQueuingResponse;
@@ -30,6 +29,7 @@ import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
 import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
+import saros.net.xmpp.filetransfer.XMPPFileTransferRequest;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -57,8 +57,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
 
   private PacketCollector startActivityQueuingRequestCollector;
 
-  /** used to handle file transmissions * */
-  protected TransferListener transferListener = null;
+  protected Future<XMPPFileTransferRequest> expectedTransfer;
 
   public AbstractIncomingProjectNegotiation(
       final JID peer, //
@@ -212,8 +211,7 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
       throw new LocalCancellationException(
           "not connected to a XMPP server", CancelOption.DO_NOT_NOTIFY_PEER);
 
-    transferListener = new TransferListener(TRANSFER_ID_PREFIX + getID());
-    fileTransferManager.getSmackTransferManager().addFileTransferListener(transferListener);
+    expectedTransfer = fileTransferManager.addExpectedTransferRequest(TRANSFER_ID_PREFIX + getID());
   }
 
   /**
@@ -247,8 +245,8 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
      */
     for (IProject project : projectMapping.values()) session.disableQueuing(project);
 
-    if (fileTransferManager != null)
-      fileTransferManager.getSmackTransferManager().removeFileTransferListener(transferListener);
+    // only needed for error cases
+    if (expectedTransfer != null) expectedTransfer.cancel(false);
 
     deleteCollectors();
     monitor.done();
@@ -503,49 +501,5 @@ public abstract class AbstractIncomingProjectNegotiation extends ProjectNegotiat
   @Override
   public String toString() {
     return "IPN [remote side: " + getPeer() + "]";
-  }
-
-  /**
-   * Checks continuously, if the host started a FileTransferRequest. Returns when a request was
-   * received.
-   *
-   * @throws SarosCancellationException on user cancellation
-   */
-  protected void awaitTransferRequest() throws SarosCancellationException {
-    log.debug(this + ": waiting for incoming transfer request");
-    try {
-      while (!transferListener.hasReceived()) {
-        checkCancellation(CancelOption.NOTIFY_PEER);
-        Thread.sleep(200);
-      }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new LocalCancellationException();
-    }
-  }
-
-  /** Listens to FileTransferRequests and checks if they meet the provided description. */
-  protected static class TransferListener implements FileTransferListener {
-    private String description;
-    private volatile FileTransferRequest request;
-
-    public TransferListener(String description) {
-      this.description = description;
-    }
-
-    @Override
-    public void fileTransferRequest(FileTransferRequest request) {
-      if (request.getDescription().equals(description)) {
-        this.request = request;
-      }
-    }
-
-    public boolean hasReceived() {
-      return this.request != null;
-    }
-
-    public FileTransferRequest getRequest() {
-      return this.request;
-    }
   }
 }

@@ -3,6 +3,10 @@ package saros.net.xmpp.filetransfer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -12,7 +16,6 @@ import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
-import saros.negotiation.ProjectNegotiation;
 import saros.net.ConnectionState;
 import saros.net.xmpp.IConnectionListener;
 import saros.net.xmpp.JID;
@@ -20,11 +23,31 @@ import saros.net.xmpp.XMPPConnectionService;
 import saros.net.xmpp.contact.XMPPContact;
 import saros.net.xmpp.contact.XMPPContactsService;
 
-/** This Component handles file transfers with other XMPP contacts. */
+/**
+ * This Component handles file transfers with other XMPP contacts.
+ *
+ * <p><b>Incoming</b> file transfers:
+ *
+ * <ul>
+ *   <li>can be noted in advance with an matching identifier via {@link
+ *       #addExpectedTransferRequest(String)} returning a future object, completed on actual
+ *       transfer arrival
+ *   <li>otherwise when no match is found handled by a default handler which has to be set via
+ *       {@link #setDefaultHandler(Consumer)}
+ *   <li>or otherwise get rejected
+ * </ul>
+ *
+ * <p><b>Outgoing</b> file transfers are possible for Files using {@link #fileSendStart(JID, File,
+ * String)} or InputStreams using {@link #streamSendStart(JID, String, InputStream)}.
+ */
 public class XMPPFileTransferManager {
   private static final int GLOBAL_SMACK_RESPONSE_TIMEOUT = (int) TimeUnit.MINUTES.toMillis(5);
 
   private static final Logger log = Logger.getLogger(FileTransferManager.class);
+
+  /** Mapping identifiers of expected transfers with consuming CompletableFuture. */
+  private final ConcurrentMap<String, CompletableFuture<XMPPFileTransferRequest>>
+      expectedTransfers = new ConcurrentHashMap<>();
 
   private final AtomicReference<Consumer<XMPPFileTransferRequest>> defaultTransferHandler =
       new AtomicReference<>();
@@ -42,11 +65,22 @@ public class XMPPFileTransferManager {
           }
 
           String identifier = request.getDescription();
-          log.info("received transfer request: " + identifier + " by " + contact);
+          log.info(
+              "received transfer request, name: "
+                  + request.getFileName()
+                  + ", identifier: "
+                  + identifier
+                  + " by "
+                  + contact);
 
-          // TODO use different handling for negotiation
-          if (identifier != null && identifier.startsWith(ProjectNegotiation.TRANSFER_ID_PREFIX))
-            return;
+          if (identifier != null) {
+            CompletableFuture<XMPPFileTransferRequest> future =
+                expectedTransfers.remove(identifier);
+            if (future != null) {
+              future.complete(new XMPPFileTransferRequest(contact, request));
+              return;
+            }
+          }
 
           Consumer<XMPPFileTransferRequest> defaultListener = defaultTransferHandler.get();
           if (defaultListener == null) {
@@ -89,6 +123,26 @@ public class XMPPFileTransferManager {
    */
   public void setDefaultHandler(Consumer<XMPPFileTransferRequest> defaultHandler) {
     defaultTransferHandler.set(defaultHandler);
+  }
+
+  /**
+   * Add a expected transfer mapped by a identifier. This method returns a Future providing the
+   * expected transfer when available.
+   *
+   * <p>Mappings are removed if a transfer was received, otherwise need to be canceled via {@link
+   * Future#cancel(boolean)}.
+   *
+   * @param identifier identifier to match a transfer
+   * @return Future providing {@link XMPPFileTransferRequest}
+   */
+  public Future<XMPPFileTransferRequest> addExpectedTransferRequest(String identifier) {
+    CompletableFuture<XMPPFileTransferRequest> future = new CompletableFuture<>();
+
+    // removes the transfer on cancel / complete
+    future.whenComplete((request, exception) -> expectedTransfers.remove(identifier));
+
+    expectedTransfers.put(identifier, future);
+    return future;
   }
 
   /**
@@ -149,14 +203,5 @@ public class XMPPFileTransferManager {
     transfer.sendStream(inputStream, streamName, 0, streamName);
 
     return new XMPPFileTransfer(transfer);
-  }
-
-  /**
-   * Transition method.
-   *
-   * @return
-   */
-  public FileTransferManager getSmackTransferManager() {
-    return smackTransferManager.get();
   }
 }
