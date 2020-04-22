@@ -2,10 +2,8 @@ package saros.negotiation;
 
 import java.io.IOException;
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
-import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import saros.communication.extensions.CancelProjectNegotiationExtension;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.RemoteCancellationException;
@@ -19,7 +17,7 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 
@@ -55,11 +53,7 @@ public abstract class ProjectNegotiation extends Negotiation {
 
   protected final IChecksumCache checksumCache;
 
-  /**
-   * The file transfer manager can be <code>null</code> if no connection was established or was lost
-   * when the class was instantiated.
-   */
-  protected FileTransferManager fileTransferManager;
+  protected final XMPPFileTransferManager fileTransferManager;
 
   public ProjectNegotiation(
       final String id,
@@ -68,7 +62,7 @@ public abstract class ProjectNegotiation extends Negotiation {
       final ISarosSession session,
       final IWorkspace workspace,
       final IChecksumCache checksumCache,
-      final XMPPConnectionService connectionService,
+      final XMPPFileTransferManager fileTransferManager,
       final ITransmitter transmitter,
       final IReceiver receiver) {
     super(id, peer, transmitter, receiver);
@@ -79,9 +73,7 @@ public abstract class ProjectNegotiation extends Negotiation {
 
     this.workspace = workspace;
     this.checksumCache = checksumCache;
-    Connection connection = connectionService.getConnection();
-
-    if (connection != null) fileTransferManager = new FileTransferManager(connection);
+    this.fileTransferManager = fileTransferManager;
   }
 
   /**

@@ -25,7 +25,7 @@ import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.PacketCollector;
 import saros.net.xmpp.JID;
-import saros.net.xmpp.XMPPConnectionService;
+import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
 import saros.session.SessionEndReason;
@@ -62,7 +62,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
       final IEditorManager editorManager, //
       final IWorkspace workspace, //
       final IChecksumCache checksumCache, //
-      final XMPPConnectionService connectionService, //
+      final XMPPFileTransferManager fileTransferManager, //
       final ITransmitter transmitter, //
       final IReceiver receiver, //
       final AdditionalProjectDataFactory additionalProjectDataFactory //
@@ -74,7 +74,7 @@ public abstract class AbstractOutgoingProjectNegotiation extends ProjectNegotiat
         session,
         workspace,
         checksumCache,
-        connectionService,
+        fileTransferManager,
         transmitter,
         receiver);
 
