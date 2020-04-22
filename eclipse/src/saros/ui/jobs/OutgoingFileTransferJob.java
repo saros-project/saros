@@ -1,83 +1,65 @@
 package saros.ui.jobs;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.function.BooleanSupplier;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import saros.Saros;
+import saros.SarosPluginContext;
 import saros.net.util.XMPPUtils;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.filetransfer.XMPPFileTransfer;
+import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
+import saros.repackaged.picocontainer.annotations.Inject;
 
 /**
- * This job is intended to be used with a pending outgoing {@linkplain FileTransferRequest XMPP file
- * transfer}. It will start the file transfer and monitor the status of the process.
+ * This job will start a file transfer and monitor the status of the process.
  *
  * <p>This job supports cancellation.
  */
 public final class OutgoingFileTransferJob extends FileTransferJob {
-
   private static final Logger log = Logger.getLogger(OutgoingFileTransferJob.class);
 
-  private final OutgoingFileTransfer transfer;
+  @Inject private XMPPFileTransferManager transferManager;
   private final File file;
 
-  public OutgoingFileTransferJob(OutgoingFileTransfer transfer, File file, JID jid) {
+  public OutgoingFileTransferJob(JID jid, File file) {
     super("File Transfer", jid);
     setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
-    this.transfer = transfer;
     this.file = file;
+
+    SarosPluginContext.initComponent(this);
   }
 
   @Override
   protected IStatus run(IProgressMonitor monitor) {
-
-    String nickname = XMPPUtils.getNickname(null, jid, jid.getBase());
-
     try {
-      transfer.sendFile(file, file.getName());
-
       monitor.beginTask(
-          "Waiting for " + nickname + " to accept the file transfer...", IProgressMonitor.UNKNOWN);
+          "Waiting for "
+              + XMPPUtils.getNickname(null, jid, jid.getBase())
+              + " to accept the file transfer...",
+          IProgressMonitor.UNKNOWN);
 
-      while (!transfer.isDone()) {
-        if (monitor.isCanceled()) break;
+      XMPPFileTransfer transfer = transferManager.fileSendStart(jid, file, null);
+      BooleanSupplier checkLocalCancel = () -> monitor.isCanceled();
+      transfer.waitForTransferStart(checkLocalCancel);
 
-        boolean proceed = true;
-
-        if (transfer.getStatus()
-            == org.jivesoftware.smackx.filetransfer.FileTransfer.Status.negotiating_transfer)
-          proceed = false;
-
-        if (transfer.getStatus()
-            == org.jivesoftware.smackx.filetransfer.FileTransfer.Status.initial) proceed = false;
-
-        if (proceed) break;
-
-        try {
-          Thread.sleep(200);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          transfer.cancel();
-          break;
-        }
+      if (checkLocalCancel.getAsBoolean()) {
+        log.info("Monitor canceled locally.");
+        return Status.OK_STATUS;
       }
 
       monitor.done();
+
       monitor.beginTask("Sending file " + file.getName(), 100);
-
-      return monitorTransfer(transfer, monitor);
-    } catch (RuntimeException e) {
-      log.error("internal error in file transfer", e);
-      throw e;
-    } catch (XMPPException e) {
+      return monitorTransfer(transfer.getSmackTransfer(), monitor);
+    } catch (IllegalArgumentException | IOException e) {
       log.error("file transfer failed: " + jid, e);
-
-      return new Status(IStatus.ERROR, Saros.PLUGIN_ID, "file transfer failed", e);
+      return new Status(IStatus.ERROR, Saros.PLUGIN_ID, e.getMessage(), e);
     } finally {
       monitor.done();
     }

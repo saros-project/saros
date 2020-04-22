@@ -21,7 +21,6 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import saros.SarosPluginContext;
 import saros.negotiation.ProjectNegotiation;
 import saros.net.ConnectionState;
@@ -55,11 +54,6 @@ public class SendFileAction extends Action implements Disposable {
   public static final String ACTION_ID = SendFileAction.class.getName();
 
   private static final Logger log = Logger.getLogger(SendFileAction.class);
-
-  // static smack ****
-  static {
-    OutgoingFileTransfer.setResponseTimeout(5 * 60 * 1000);
-  }
 
   private FileTransferListener fileTransferListener =
       new FileTransferListener() {
@@ -159,13 +153,7 @@ public class SendFileAction extends Action implements Disposable {
     final File file = new File(filename);
     if (file.isDirectory()) return;
 
-    // connection changes are executed while the dialog is open !
-    if (fileTransferManager == null) return;
-
-    final OutgoingFileTransfer transfer =
-        fileTransferManager.createOutgoingFileTransfer(jid.getRAW());
-
-    Job job = new OutgoingFileTransferJob(transfer, file, jid);
+    Job job = new OutgoingFileTransferJob(jid, file);
     job.setUser(true);
     job.schedule();
   }
