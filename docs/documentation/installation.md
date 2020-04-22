@@ -2,23 +2,31 @@
 title: Install Saros
 ---
 
-{% capture eclipse %}
+Here you will find a guide **on how to install Saros**
+see the [getting started](getting-started.md) guide if
+you want to know how to set up Saros.
 
 ## Prerequisites
 
-*   Saros requires **Java SE 8** or higher
-*   Saros is developed and tested using **Eclipse 4.8**, but it
-    should work on any newer version without problems.
-    *   [Download Eclipse](http://www.eclipse.org/downloads/)
-*   Saros ought to run on all platforms that can execute Eclipse
-    cleanly. 
-*   If you want to try Saros, you may use our public XMPP/Jabber server
-    `saros-con.imp.fu-berlin.de`. However, if you want to use Saros for
-    commercial purposes, we recommend
-    [setting up your own XMPP server](setup-xmpp.md) for maximum
-    control over all exchanged data.
+{% capture eclipse %}
+
+Saros/E requires
+*  `JDK 8` or newer
+*  `Eclipse 4.8` or newer (download [here](http://www.eclipse.org/downloads/))
+
+{% endcapture %}
+{% capture intellij %}
+
+Saros/I requires
+ - `JDK 8` or newer
+ - `IntelliJ 2018.2.7` or newer (download [here](https://www.jetbrains.com/idea/download/))
+
+{% endcapture %}
+{% include ide-tabs.html eclipse=eclipse intellij=intellij %}
 
 ## Installation Steps
+
+{% capture eclipse %}
 
 ### Via Eclipse Marketplace
 
@@ -53,28 +61,11 @@ or from within Eclipse:
     Eclipse installation.
 3.  Restart Eclipse.
 
-## Good to Know
-
-*   Please note that Saros requires higher bandwidth and lower latency
-    than normal chatting, so public chat servers might be too slow for
-    smooth operation of Saros.
-
 {% endcapture %}
-
-
 {% capture intellij %}
-
 This is still an alpha release of Saros/I, so expect it to be a bit rough around the edges. Before using the plugin for the first time, please have a look at the page [Getting Started with Saros/I](getting-started.html?tab=intellij) and read the [disclaimer](getting-started.html?tab=intellij#disclaimer) and the current [restrictions of the plugin](getting-started.html?tab=intellij#restrictions).
 
-## Prerequisites
-
-Saros/I requires
- - `JDK 8` or newer
- - `IntelliJ 2018.2.7` or newer
-
 Saros/I can be installed from the JetBrains plugin repository or from disk.
-
-## Installation Steps
 
 ### From the Plugin Repository
 
@@ -104,3 +95,9 @@ The zip file containing the plugin can be downloaded from our [release page](htt
 {% endcapture %}
 
 {% include ide-tabs.html eclipse=eclipse intellij=intellij %}
+
+## Good to Know
+
+*   Please note that Saros requires higher bandwidth and lower latency
+    than normal chatting, so public chat servers might be too slow for
+    smooth operation of Saros.
