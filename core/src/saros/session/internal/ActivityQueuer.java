@@ -19,12 +19,12 @@ public class ActivityQueuer {
 
   private static class ProjectQueue {
     private final IProject project;
-    private final List<IResourceActivity> buffer;
+    private final List<IResourceActivity<? extends IResource>> buffer;
     private int readyToFlush;
 
     private ProjectQueue(IProject project) {
       this.project = project;
-      buffer = new ArrayList<IResourceActivity>();
+      buffer = new ArrayList<>();
       readyToFlush = 1;
     }
   }
@@ -135,7 +135,8 @@ public class ActivityQueuer {
     for (final IActivity activity : activities) {
       if (activity instanceof IResourceActivity) {
 
-        IResourceActivity resourceActivity = (IResourceActivity) activity;
+        IResourceActivity<? extends IResource> resourceActivity =
+            (IResourceActivity<? extends IResource>) activity;
 
         IResource resource = resourceActivity.getResource();
 
@@ -177,7 +178,7 @@ public class ActivityQueuer {
 
       final Map<IFile, List<User>> editorActivities = new HashMap<>();
 
-      for (final IResourceActivity resourceActivity : projectQueue.buffer) {
+      for (final IResourceActivity<? extends IResource> resourceActivity : projectQueue.buffer) {
 
         // path cannot be null, see for-loop below
         final IResource resource = resourceActivity.getResource();

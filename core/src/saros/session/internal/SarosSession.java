@@ -158,7 +158,7 @@ public final class SarosSession implements ISarosSession {
         public void execute(IActivity activity) {
           // Filters out resource activities for projects whose activity execution is disabled
           if (activity instanceof IResourceActivity) {
-            IResource resource = ((IResourceActivity) activity).getResource();
+            IResource resource = ((IResourceActivity<? extends IResource>) activity).getResource();
 
             if (resource != null && filteredProjects.contains(resource.getProject())) {
               log.debug("Dropped activity for resource of filtered project: " + activity);
