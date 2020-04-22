@@ -162,7 +162,7 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
     try {
       XMPPFileTransfer transfer = expectedTransfer.get().acceptFile(archiveFile);
 
-      monitorFileTransfer(transfer.getSmackTransfer(), monitor);
+      monitorFileTransfer(transfer, monitor);
       transferFailed = false;
     } catch (InterruptedException | ExecutionException e) {
       throw new IOException(e.getMessage(), e.getCause());

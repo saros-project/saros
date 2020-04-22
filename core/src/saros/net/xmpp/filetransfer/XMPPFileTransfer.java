@@ -26,15 +26,6 @@ public class XMPPFileTransfer {
   }
 
   /**
-   * Transition method.
-   *
-   * @return
-   */
-  public FileTransfer getSmackTransfer() {
-    return transfer;
-  }
-
-  /**
    * Get {@link Status} of current transfer.
    *
    * @return {@link Status} of current transfer
