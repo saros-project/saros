@@ -14,8 +14,6 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.log4j.Logger;
-import org.jivesoftware.smackx.filetransfer.FileTransfer;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import saros.activities.SPath;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
@@ -31,6 +29,7 @@ import saros.negotiation.stream.OutgoingStreamProtocol;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.filetransfer.XMPPFileTransfer;
 import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -140,18 +139,16 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     String message = "Sending files to " + getPeer().getName() + "...";
     monitor.beginTask(message, transferList.size());
 
-    String userID = getPeer().toString();
-    OutgoingFileTransfer transfer =
-        fileTransferManager.getSmackTransferManager().createOutgoingFileTransfer(userID);
-
     long writtenBytes = 0;
     try (PipedInputStream in = new PipedInputStream();
         CountingOutputStream out = new CountingOutputStream(new PipedOutputStream(in)); ) {
-      /* id in description needed to bypass SendFileAction handler */
-      String streamName = TRANSFER_ID_PREFIX + getID();
-      transfer.sendStream(in, streamName, 0, streamName);
 
-      awaitNegotation(transfer, monitor);
+      monitor.subTask("waiting for client to accept file transfer");
+      XMPPFileTransfer transfer =
+          fileTransferManager.streamSendStart(getPeer(), TRANSFER_ID_PREFIX + getID(), in);
+      transfer.waitForTransferStart(monitor::isCanceled);
+
+      checkCancellation(CancelOption.NOTIFY_PEER);
 
       OutgoingStreamProtocol osp = new OutgoingStreamProtocol(out, projects, monitor);
       sendProjectConfigFiles(osp);
@@ -260,20 +257,6 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     if (transferList.contains(file) && !transmittedFiles.contains(file)) {
       osp.streamFile(file);
       transmittedFiles.add(file);
-    }
-  }
-
-  private void awaitNegotation(OutgoingFileTransfer transfer, IProgressMonitor monitor)
-      throws SarosCancellationException {
-    while (transfer.getStatus() != FileTransfer.Status.in_progress) {
-      monitor.subTask("waiting for client to accept file transfer");
-      try {
-        checkCancellation(CancelOption.NOTIFY_PEER);
-        Thread.sleep(200);
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        throw new LocalCancellationException();
-      }
     }
   }
 }
