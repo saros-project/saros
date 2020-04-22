@@ -10,20 +10,20 @@ function selectTabs(classToActivate, updateUrl = true) {
     var panesToDeactivate = document.getElementsByClassName('tab-pane');
 
     for (const e of panesToDeactivate) {
-        e.classList.remove('active-tab');
+        e.classList.remove('active');
         e.classList.remove('show');
     }
 
     var tabsToDeactivate = document.getElementsByClassName('nav-tab-link');
 
     for (const t of tabsToDeactivate) {
-        t.classList.remove('active-tab');
+        t.classList.remove('active');
     }
 
     var elementsToActivate = document.getElementsByClassName(normalizedClassToActivate)
 
     for (const e of elementsToActivate) {
-        e.classList.add('active-tab');
+        e.classList.add('active');
         if (e.nodeName === "DIV")
             e.classList.add('show');
     }
