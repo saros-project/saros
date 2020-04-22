@@ -34,7 +34,7 @@ public final class IncomingFileTransferJob extends FileTransferJob {
     monitor.beginTask("Receiving file " + request.getFileName(), 100);
 
     try {
-      return monitorTransfer(request.acceptFile(file).getSmackTransfer(), monitor);
+      return monitorTransfer(request.acceptFile(file), monitor);
     } catch (Exception e) {
       log.error("file transfer failed: " + jid, e);
 

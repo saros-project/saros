@@ -204,7 +204,7 @@ public class ArchiveOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
     XMPPFileTransfer transfer =
         fileTransferManager.fileSendStart(remoteContact, archive, transferID);
-    monitorFileTransfer(transfer.getSmackTransfer(), monitor);
+    monitorFileTransfer(transfer, monitor);
 
     monitor.done();
 

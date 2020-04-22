@@ -56,7 +56,7 @@ public final class OutgoingFileTransferJob extends FileTransferJob {
       monitor.done();
 
       monitor.beginTask("Sending file " + file.getName(), 100);
-      return monitorTransfer(transfer.getSmackTransfer(), monitor);
+      return monitorTransfer(transfer, monitor);
     } catch (IllegalArgumentException | IOException e) {
       log.error("file transfer failed: " + jid, e);
       return new Status(IStatus.ERROR, Saros.PLUGIN_ID, e.getMessage(), e);

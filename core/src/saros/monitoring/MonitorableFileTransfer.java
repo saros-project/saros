@@ -1,9 +1,7 @@
 package saros.monitoring;
 
-import org.jivesoftware.smackx.filetransfer.FileTransfer;
-import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import saros.net.xmpp.filetransfer.XMPPFileTransfer;
+import saros.net.xmpp.filetransfer.XMPPFileTransfer.Status;
 import saros.util.CoreUtils;
 
 public class MonitorableFileTransfer {
@@ -11,8 +9,8 @@ public class MonitorableFileTransfer {
 
   private static final long SAMPLE_DELTA = 1000;
 
-  private FileTransfer transfer;
-  private IProgressMonitor monitor;
+  private final XMPPFileTransfer transfer;
+  private final IProgressMonitor monitor;
 
   public enum TransferStatus {
     OK,
@@ -21,13 +19,10 @@ public class MonitorableFileTransfer {
   }
 
   /**
-   * @param transfer A {@link FileTransfer} with an already negotiated stream (e.g. through {@link
-   *     OutgoingFileTransfer#sendFile(java.io.File, String) transfer.sendFile()} or {@link
-   *     IncomingFileTransfer#recieveFile() transfer.receiveFile()}).
+   * @param transfer A {@link XMPPFileTransfer} with an already negotiated stream.
    * @param monitor can be <code>null</code>
    */
-  public MonitorableFileTransfer(FileTransfer transfer, IProgressMonitor monitor) {
-
+  public MonitorableFileTransfer(XMPPFileTransfer transfer, IProgressMonitor monitor) {
     this.transfer = transfer;
 
     if (monitor == null) this.monitor = new NullProgressMonitor();
@@ -111,13 +106,15 @@ public class MonitorableFileTransfer {
     }
 
     Status status = transfer.getStatus();
-
-    if (status.equals(Status.complete)) {
-      if (transfer.getAmountWritten() < fileSize) return TransferStatus.CANCEL;
-      else return TransferStatus.OK;
+    if (status == Status.COMPLETED) {
+      if (transfer.getAmountWritten() < fileSize) {
+        return TransferStatus.CANCEL;
+      } else {
+        return TransferStatus.OK;
+      }
     }
 
-    if (status.equals(Status.error)) return TransferStatus.ERROR;
+    if (status == Status.ERROR) return TransferStatus.ERROR;
 
     // either canceled or refused
     return TransferStatus.CANCEL;

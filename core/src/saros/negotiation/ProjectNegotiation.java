@@ -17,6 +17,7 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.filetransfer.XMPPFileTransfer;
 import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.session.ISarosSession;
 import saros.session.ISarosSessionManager;
@@ -120,7 +121,7 @@ public abstract class ProjectNegotiation extends Negotiation {
    *     side, see also {@link LocalCancellationException} and {@link RemoteCancellationException}
    * @throws IOException if an I/O error occurred
    */
-  protected void monitorFileTransfer(FileTransfer transfer, IProgressMonitor monitor)
+  protected void monitorFileTransfer(XMPPFileTransfer transfer, IProgressMonitor monitor)
       throws SarosCancellationException, IOException {
 
     MonitorableFileTransfer mtf = new MonitorableFileTransfer(transfer, monitor);
@@ -129,15 +130,13 @@ public abstract class ProjectNegotiation extends Negotiation {
     // some information can be directly read from the returned status
     if (transferStatus.equals(TransferStatus.OK)) return;
 
-    if (transferStatus.equals(TransferStatus.ERROR)) {
-      FileTransfer.Error error = transfer.getError();
-      throw new IOException(
-          error == null ? "unknown SMACK Filetransfer API error" : error.getMessage(),
-          transfer.getException());
+    IOException exception = transfer.getException().orElse(null);
+    if (exception != null) {
+      throw exception;
     }
 
     // other information needs to be read from the transfer object
-    if (transfer.getStatus().equals(FileTransfer.Status.cancelled) && monitor.isCanceled())
+    if (transfer.getStatus() == XMPPFileTransfer.Status.CANCELED && monitor.isCanceled())
       throw new LocalCancellationException();
 
     throw new RemoteCancellationException(null);
