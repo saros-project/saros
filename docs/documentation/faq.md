@@ -2,14 +2,15 @@
 title: Frequently Asked Questions
 ---
 
-This page lists common questions about Saros. If your question is not
-answered here you should look around the
-[Support](../support/) area. There you will
-find more information that may help you.
+This page lists common questions about Saros and known issues. If your question is not
+answered here you should look around the [Contact](/contact) area.
+There you will find more information that may help you.
 
 ## General
 
-### Why is the software called Saros?
+{% accordion general %}
+
+{% collapsible Why is the software called Saros? %}
 
 A [Saros cycle is an eclipse
 cycle](http://en.wikipedia.org/wiki/Saros_cycle), i.e. after one Saros
@@ -19,7 +20,11 @@ make a nice name for an Eclipse plug-in about Pair Programming, where
 driver and observer cycle their roles while revolving around code of
 interest.
 
-### How does Saros compare to other collaborative real-time editing tools?
+{% endcollapsible %}
+{% collapsible Is Saros language dependent or which languages does Saros support? %}
+No, Saros is not language-dependent as it works on a character-level.
+{% endcollapsible %}
+{% collapsible How does Saros compare to other collaborative real-time editing tools? %}
 
 These tables compare known alternatives to Saros.
 
@@ -52,8 +57,9 @@ In the following we are using these definitions:
 |Gobby        |Win, Linux, Mac OS  |Open-Source |Yes         |
 |SubEthaEdit  |Mac OS              |Open-Source |Yes         |
 
+{% endcollapsible %}
 
-### How does Saros compare to screen sharing (e.g. VNC)?
+{% collapsible How does Saros compare to screen sharing (e.g. VNC)? %}
 
 **Advantages**:
 
@@ -77,18 +83,21 @@ In the following we are using these definitions:
 -   Saros requires each participant to have an Eclipse
     installation setup.
 
-### How many users does Saros support?
+{% endcollapsible %}
+{% collapsible How many users does Saros support? %}
 
-Saros supports up to 5 users. However, this is not a hard limit. But the
-sixth and seventh and n-th user will get the same gray-ish color.
+Saros supports up to 5 users (currently restricted to 2 users in IntelliJ).
+However, this is not a hard limit. But the sixth and seventh and n-th user will get the same gray-ish color.
 
-### On which operating systems does Saros work?
+{% endcollapsible %}
+{% collapsible On which operating systems does Saros work? %}
 
 In theory, the same version of Saros will run on any platform for which
-there is a version of Eclipse. We generally perform our testing on
+there is a version of Eclipse/IntelliJ. We generally perform our testing on
 multiple flavours of Windows, Linux and Mac OS X.
 
-### I'm working with a version control system, can I use Saros?
+{% endcollapsible %}
+{% collapsible I'm working with a version control system, can I use Saros? %}
 
 **SVN:** Yes, you can. In theory, there should be no problems since so
 called *derived files* are not shared by Saros. Usually, the
@@ -127,10 +136,37 @@ my-project  <-- you shouldn't share this one
 ├── test
 └── readme.html
 ```
+{% endcollapsible %}
+{% collapsible Where can I find the Saros log files? %}
+{% capture eclipse %}
+
+You can find the Saros related logs in your eclipse workspace. The current
+workspace directory is shown if you open `"Switch Workspace" > "Other..."`.
+
+* IDE logs - `<workspace>/.metadata/.log`
+* Saros logs - `<workspace>/.metadata/.plugins/saros.eclipse/log/<date>/*.log`
+
+{% endcapture %}
+{% capture intellij %}
+
+By default, the directory `.IdeaXXXXXXXX` is located in the user directory. The exact directory name is determined by your IntelliJ version, e.g. `.IdeaIC2019.1` for IntelliJ IDEA 2019.1.
+More information about the location of the directory is given here: https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
+* IDE logs - `~/.IdeaXXXXXXXX/system/log/idea.log*`
+* Saros logs - `~/.IdeaXXXXXXXX/system/log/SarosLogs/*.log`
+
+{% endcapture %}
+{% include ide-tabs.html eclipse=eclipse intellij=intellij %}
+
+Before attaching any log files, please **make sure to redact any private information** that you do not wish to make publicly available.
+
+{% endcollapsible %}
+{% endaccordion %}
+
 
 ## Network Issues
 
-### How much bandwidth do you need to run Saros?
+{% accordion network %}
+{% collapsible How much bandwidth do you need to run Saros? %}
 
 The real bandwidth problem is usually not during a Saros session, but
 rather with the project synchronization needed for starting one, which
@@ -138,7 +174,8 @@ may take quite long (many minutes) for larger projects over a
 low-bandwidth connection. Make sure all participants have local copies
 of the project that are not too different before the session starts.
 
-### Does Saros work between two home users? Or through two firewalls?
+{% endcollapsible %}
+{% collapsible Does Saros work between two home users? Or through two firewalls? %}
 
 Home users (using DSL) and most corporate networks employ
 [NAT](http://en.wikipedia.org/wiki/Network_address_translation).
@@ -149,7 +186,7 @@ So how can two Saros users that both sit behind a NAT create a joint
 Saros session?
 
 -   Saros uses an [XMPP](http://en.wikipedia.org/wiki/XMPP) server to
-    get in contact with the other participant(s). Companies can [run their own XMPP server](setup-xmpp.md)
+    get in contact with the other participant(s). Companies can [run their own XMPP server](how-tos/setup-xmpp.md)
     for maximum privacy; home users can use almost any public XMPP server.
 -   Throughout the session (if possible) Saros uses
     [Socks5](http://en.wikipedia.org/wiki/SOCKS) connections (direct
@@ -159,16 +196,139 @@ Saros session?
     to improve chances of direct connections. (see Saros
     network preferences)
 
-### How to use a Google account / Google Talk service with Saros?
+{% endcollapsible %}
+{% collapsible I keep getting Mediated Socks5 or slower IBB connections. What am I doing wrong? %}
 
-We don't recommend to use you Google account for XMPP anymore, since
-Google has dropped Google Talk XMPP support with the introduction of
-Google Hangouts.
+### Troubleshooting Socks5 Bytestream Establishment
 
-### Is Saros language dependent or which languages does Saros support?
+If you keep getting Mediated Socks5 Bytestreams or In-Band Bytestreams,
+other peers cannot connect to you directly (cannot create a TCP
+connection to you). What can you do to improve chances?
 
-No, Saros is not language-dependent as it works on a character-level.
+*   Your default Socks5 proxy port (7777) might be in conflict. You can
+    change the Socks5 proxy port in the Saros network preferences.
+*   Your firewall might block connection requests for/from Saros. You
+    can configure your firewall to allow Saros (Eclipse, Java)
+    communication.
+*   If you are connected through a Universal Plug and Play compatible
+    gateway device, you can enable Saros to perform a port mapping for
+    the computer it is running on and make it reachable from
+    the outside. The UPnP option can be enabled in Saros
+    network preferences. If your gateway device is not found, it might
+    require enabling UPnP support as well.
+*   If your gateway is not UPnP compatible, it may be possible to
+    manually configure a port mapping for the Socks5 proxy port and your
+    private IP to be reachable from the outside. Consult your
+    gateway (e.g. Router) manual for port mapping or sometimes labelled
+    virtual servers.
 
-------------------------------------------------------------------------
+### What Might Stop You From Using Socks5
 
-In case of problems see [troubleshooting](troubleshooting.md).
+Some factors might prevent you from using S5B. Lets have a quick look at
+the S5B protocol when you want connect a buddy.
+
+*   Your Saros requests your connected XMPP server for an
+    available proxy.
+*   Your Saros detects its local and global network addresses.
+*   Your Saros sends the list of your addresses and the proxy address
+    (if any) to your buddy's Saros.
+*   Your buddy's Saros attempts to create a TCP connection to any of the
+    addresses you provided.
+    *   If your buddy connected to one of your addresses, you'll get a
+        direct S5B connection.
+    *   If your buddy couldn't connect to your addresses but to a proxy
+        and so does your Saros, you will get a mediated S5B connection.
+    *   Otherwise the S5B connection fails.
+
+Saros actually attempts the S5B creation in both directions, so both
+sides attempts to connect each other. This improves chances of one peer
+connect to the other one. You can check your contact list to see which
+bytestream type is established between you and a contact (if any).
+
+For further information check out data connections in Saros on our network layer page.
+**Important:** The page may be quite outdated as it is part of our legacy documentation and has not been migrated to our new documentation.
+It can be found [here](https://saros-project.github.io/legacy_docs/networklayer.html#Data%20connections%20in%20Saros).
+{% endcollapsible %}
+{% collapsible Why is updating Saros over the Eclipse Update mechanism so slow? %}
+
+We think it is basically a problem with Eclipse, which keeps checking
+for updates to all plug-ins that you have installed. To work around this
+problem, uncheck "Contact all update sites during install to find
+required software" in Eclipse's installation dialog.
+{% endcollapsible %}
+{% collapsible I can not connect with my jabber account. %}
+
+Go to Eclipse -&gt; Saros -&gt; Preferences -&gt; General -&gt; Network
+Connections and make sure, that there are no proxy settings checked.
+
+{% endcollapsible %}
+{% collapsible I cannot access public servers from my location. Can I still use Saros over the local network somehow? %}
+
+Yes. See the [Installation and setup page](setup-xmpp.md) for
+information on setting up your own local XMPP server.
+{% endcollapsible %}
+{% collapsible The updates I'm getting from others in the session seem to arrive slowly. %}
+
+All edits go through a server. Because it can be used with a public
+server, Saros attempts to be courteous and sends edits out in intervals
+(a few hundred milliseconds), so the server is not overloaded. However,
+everyone in your session can reduce this interval in order to remove the
+perceived latency. Just go the Saros advanced preferences and enter a
+lower value in the box labelled "Interval (in milliseconds) between
+outgoing edits to peers".
+
+{% endcollapsible %}
+{% endaccordion %}
+
+## Known Issues
+
+The following issues are general issues that arise from
+the general approach of Saros.
+
+If you are searching for
+bugs look into our [issue tracker](https://github.com/saros-project/saros/issues).
+
+{% accordion known-issues %}
+{% collapsible About Data Transfer %}
+
+*   Transferring large amounts of data during session initiation
+    (project synchronization) can take a lot of time. Do as much of the
+    synchronization via your version control repository as you can to
+    keep session initiation fast by using "copy of existing project"
+    when accepting a session invitation.
+
+*   Refactoring operations can produce a huge number of events to be
+    transfered by Saros, which may take very long and can thus be
+    confusing for participants.
+
+*   In particular, on-the-fly refactorings such as 'rename' perform one
+    such (possibly large) set of operations for each keypress. It is
+    wise to avoid these operations.
+
+{% endcollapsible %}
+{% collapsible Making Your Session Mates Aware of Your Actions %}
+
+*   Be aware that Saros transfers only the text editor pane. When you
+    use other elements of Eclipse, e.g. structure browsers or the HTML
+    browser, your session mates cannot automatically see this. Thus,
+    talking aloud about the things that you are doing there is probably
+    required to make them aware of your actions.
+
+{% endcollapsible %}
+{% collapsible Eclipse Editor Technicalities %}
+
+*   You and your session mates should use the same editor settings
+    regarding formatting and encoding; in particular regarding TAB
+    width, TAB/spaces handling and character encoding.
+
+{% endcollapsible%}
+{% collapsible About Eclipse Plugins %}
+
+*   If you are sharing a project which is managed by a source code
+    management system such as Subversion, make sure that all
+    participants have compatible versions of the SCM plugins installed.
+    Otherwise Saros might corrupt the version information or transfer
+    revision data unnecessarily.
+
+{% endcollapsible %}
+{% endaccordion %}
