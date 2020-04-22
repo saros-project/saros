@@ -19,6 +19,7 @@ import saros.activities.IActivity;
 import saros.activities.IResourceActivity;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
+import saros.filesystem.IResource;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.repackaged.picocontainer.Startable;
@@ -219,7 +220,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     assert delta.getResource() instanceof IWorkspaceRoot;
 
-    final List<IResourceActivity> resourceActivities = new ArrayList<IResourceActivity>();
+    final List<IResourceActivity<? extends IResource>> resourceActivities = new ArrayList<>();
 
     for (IResourceDelta projectDelta : delta.getAffectedChildren()) {
 

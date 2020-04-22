@@ -263,7 +263,7 @@ class ResourceActivityFilter {
       return false;
     }
 
-    IResource resource = ((IResourceActivity) activity).getResource();
+    IResource resource = ((IResourceActivity<? extends IResource>) activity).getResource();
 
     if (resource == null || resource.getType() != FILE) {
       return false;

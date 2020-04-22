@@ -400,11 +400,13 @@ public class ActivityHandlerTest {
           .anyTimes();
 
       if (activity instanceof FolderDeletedActivity || activity instanceof FolderCreatedActivity) {
-        EasyMock.expect(((IResourceActivity) activity).getResource()).andStubReturn(folder);
+        //noinspection unchecked
+        EasyMock.expect(((IResourceActivity<IFolder>) activity).getResource())
+            .andStubReturn(folder);
 
       } else if (activity instanceof IResourceActivity) {
-
-        EasyMock.expect(((IResourceActivity) activity).getResource()).andStubReturn(file);
+        //noinspection unchecked
+        EasyMock.expect(((IResourceActivity<IFile>) activity).getResource()).andStubReturn(file);
       }
       EasyMock.replay(activity);
     }

@@ -41,8 +41,8 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
   private final ISarosSession session;
 
-  private List<IResourceActivity> resourceActivities =
-      new ArrayList<IResourceActivity>(CAPACITY_THRESHOLD);
+  private List<IResourceActivity<? extends saros.filesystem.IResource>> resourceActivities =
+      new ArrayList<>(CAPACITY_THRESHOLD);
 
   public ProjectDeltaVisitor(ISarosSession session, EditorManager editorManager) {
     this.session = session;
@@ -50,13 +50,13 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     this.user = session.getLocalUser();
   }
 
-  public List<IResourceActivity> getActivities() {
+  public List<IResourceActivity<? extends saros.filesystem.IResource>> getActivities() {
     return sort(resourceActivities);
   }
 
   public void reset() {
     if (resourceActivities.size() > CAPACITY_THRESHOLD) {
-      resourceActivities = new ArrayList<IResourceActivity>(CAPACITY_THRESHOLD);
+      resourceActivities = new ArrayList<>(CAPACITY_THRESHOLD);
     } else {
       resourceActivities.clear();
     }
@@ -286,7 +286,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
   }
 
-  private void addActivity(IResourceActivity activity) {
+  private void addActivity(IResourceActivity<? extends saros.filesystem.IResource> activity) {
     resourceActivities.add(activity);
   }
 
@@ -325,20 +325,25 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
    * Sorts the given resource activities, ensuring that folders are always created before files and
    * files are always deleted before folders.
    */
-  private static List<IResourceActivity> sort(final List<IResourceActivity> resourceActivities) {
+  private static List<IResourceActivity<? extends saros.filesystem.IResource>> sort(
+      final List<IResourceActivity<? extends saros.filesystem.IResource>> resourceActivities) {
     /*
      * haferburg: Sorting is not necessary, because activities are already
      * sorted enough (activity on parent comes before activity on child).
      * All we need to do is make sure that folders are created first and
      * deleted last. The sorting stuff was introduced with 1742 (1688).
      */
-    List<IResourceActivity> fileActivities = new ArrayList<IResourceActivity>();
-    List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
-    List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
-    List<IResourceActivity> otherActivities = new ArrayList<IResourceActivity>();
+    List<IResourceActivity<? extends saros.filesystem.IResource>> fileActivities =
+        new ArrayList<>();
+    List<IResourceActivity<? extends saros.filesystem.IResource>> folderCreateActivities =
+        new ArrayList<>();
+    List<IResourceActivity<? extends saros.filesystem.IResource>> folderRemoveActivities =
+        new ArrayList<>();
+    List<IResourceActivity<? extends saros.filesystem.IResource>> otherActivities =
+        new ArrayList<>();
 
     // Split all collectedActivities.
-    for (IResourceActivity activity : resourceActivities) {
+    for (IResourceActivity<? extends saros.filesystem.IResource> activity : resourceActivities) {
       if (activity instanceof FileActivity) {
         fileActivities.add(activity);
       } else if (activity instanceof FolderCreatedActivity) {
@@ -351,7 +356,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     // Add activities to the result.
-    List<IResourceActivity> result = new ArrayList<IResourceActivity>();
+    List<IResourceActivity<? extends saros.filesystem.IResource>> result = new ArrayList<>();
     result.addAll(folderCreateActivities);
     result.addAll(fileActivities);
     result.addAll(folderRemoveActivities);

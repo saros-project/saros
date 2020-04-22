@@ -15,6 +15,7 @@ import saros.activities.QueueItem;
 import saros.concurrent.management.ConcurrentDocumentClient;
 import saros.concurrent.management.ConcurrentDocumentServer;
 import saros.concurrent.management.TransformationResult;
+import saros.filesystem.IResource;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.IActivityHandlerCallback;
 import saros.session.ISarosSession;
@@ -189,7 +190,8 @@ public final class ActivityHandler implements Startable {
      */
     List<User> recipients = new ArrayList<User>();
     if (item.activity instanceof IResourceActivity) {
-      IResourceActivity activity = (IResourceActivity) item.activity;
+      IResourceActivity<? extends IResource> activity =
+          (IResourceActivity<? extends IResource>) item.activity;
       /*
        * HACK: IResourceActivities with null as path will be treated as
        * not being resource related as we can't decide whether to send
