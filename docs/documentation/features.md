@@ -45,8 +45,12 @@ where (file/region) and who just changed what.
 The Follow-Mode allows you to continuously observe all navigation and
 editing activities of your team members.
 
+See [here](how-tos/follow-mode.md) how to use it.
+
 ## Inconsistency Detection
 
 Saros frequently checks if your copy became out of sync with the host's
 copy. In that case, Saros allows you to easily recover from this
 inconsistency.
+
+See [here](how-tos/resolve-desynchronization.md) how to use it.

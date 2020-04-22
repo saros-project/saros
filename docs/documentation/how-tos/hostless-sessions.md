@@ -1,8 +1,12 @@
 ---
-title: Saros-Server
+title: Hostless Sessions
 ---
 
-**Note**: This is an *alpha* feature and not intended for general use yet. However please feel free to play around and give some initial feedback. Contributors to the Saros-Server project are very welcome and might want to take a look at [contribution wiki](../contribute/saros-server.md) for further information.
+{% alert warning %}
+## Note
+
+This is an *alpha* feature and not intended for general use yet. However please feel free to play around and give some initial feedback. Contributors to the Saros-Server project are very welcome and might want to take a look at [contribution wiki](/contribute/saros-server.html) for further information.
+{% endalert %}
 
 ## Use-case
 

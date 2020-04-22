@@ -1,5 +1,5 @@
 ---
-title: Setup Your Own XMPP Server
+title: Setup XMPP Server
 ---
 
 If you are an experienced user or if you want to use Saros in your
@@ -22,26 +22,6 @@ In order to use Saros you need to configure an XMPP/Jabber account.
     recommend [OpenFire](https://www.igniterealtime.org/projects/openfire/index.jsp) (others
     such as [ejabberd](https://www.process-one.net/en/ejabberd/) should
     be suitable as well)
-
-### Suitable Jabber Servers
-
-*   The following public Jabber servers have been tested to **work
-    reliably with no known problems**:
-    *   [jabber.org](https://www.jabber.org/) - [In-Band
-        Registration](https://xmpp.org/extensions/xep-0077.html) disabled,
-        thus you need to
-        visit [register.jabber.org](https://register.jabber.org/) to
-        create an account.
-*   The following public Jabber servers **have known minor issues**, but
-    should work in general:
-    *   [jabber.no](https://www.jabber.no/) - [In-Band Bytestream file
-        transfers](https://xmpp.org/extensions/xep-0047.html) are
-        incompatible with our [XMPP API
-        Smack](https://www.igniterealtime.org/projects/smack/), thus if
-        you do not have a P2P connection Saros will not work.
-    *   [jabber.cc](https://www.jabber.cc/) - Outdated certificates and
-        frequent out-takes
-*   [List of other public servers](https://xmpp.org/services/)
 
 ## eJabberD (Linux)
 
