@@ -2,6 +2,7 @@ package saros.net.xmpp.filetransfer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
@@ -10,7 +11,8 @@ import saros.net.xmpp.contact.XMPPContact;
 /**
  * Class describing an incoming file transfer request.
  *
- * <p>Use {@link #acceptFile(File)} to start transfer or {@link #reject()} to cancel.
+ * <p>Use {@link #acceptFile(File)} or {@link #acceptStream()} to start transfer or {@link
+ * #reject()} to cancel.
  */
 public class XMPPFileTransferRequest {
   private final XMPPContact contact;
@@ -33,6 +35,21 @@ public class XMPPFileTransferRequest {
       IncomingFileTransfer transfer = request.accept();
       transfer.recieveFile(file);
       return new XMPPFileTransfer(transfer);
+    } catch (XMPPException e) {
+      throw new IOException(e);
+    }
+  }
+
+  /**
+   * Accept a incoming file transmission and returns a InputStream with the received data.
+   *
+   * @return InputStream providing transmitted data
+   * @throws IOException if transmission fails
+   */
+  public InputStream acceptStream() throws IOException {
+    try {
+      IncomingFileTransfer transfer = request.accept();
+      return transfer.recieveFile();
     } catch (XMPPException e) {
       throw new IOException(e);
     }

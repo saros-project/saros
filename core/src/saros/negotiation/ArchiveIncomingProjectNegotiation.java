@@ -6,9 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
@@ -21,6 +20,7 @@ import saros.negotiation.NegotiationTools.CancelOption;
 import saros.net.IReceiver;
 import saros.net.ITransmitter;
 import saros.net.xmpp.JID;
+import saros.net.xmpp.filetransfer.XMPPFileTransfer;
 import saros.net.xmpp.filetransfer.XMPPFileTransferManager;
 import saros.observables.FileReplacementInProgressObservable;
 import saros.session.ISarosSession;
@@ -73,22 +73,20 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
 
     // the host do not send an archive if we do not need any files
     if (filesMissing) {
-      receiveAndUnpackArchive(projectMapping, transferListener, monitor);
+      receiveAndUnpackArchive(projectMapping, monitor);
     }
   }
 
   /** Receives the archive with all missing files and unpacks it. */
   private void receiveAndUnpackArchive(
-      final Map<String, IProject> localProjectMapping,
-      final TransferListener archiveTransferListener,
-      final IProgressMonitor monitor)
+      final Map<String, IProject> localProjectMapping, final IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     // waiting for the big archive to come in
 
     monitor.beginTask(null, 100);
 
-    File archiveFile = receiveArchive(archiveTransferListener, new SubProgressMonitor(monitor, 50));
+    File archiveFile = receiveArchive(new SubProgressMonitor(monitor, 50));
 
     /*
      * FIXME at this point it makes no sense to report the cancellation to
@@ -146,32 +144,27 @@ public class ArchiveIncomingProjectNegotiation extends AbstractIncomingProjectNe
     // TODO: now add the checksums into the cache
   }
 
-  private File receiveArchive(TransferListener archiveTransferListener, IProgressMonitor monitor)
+  private File receiveArchive(IProgressMonitor monitor)
       throws IOException, SarosCancellationException {
 
     monitor.beginTask("Receiving archive file...", 100);
     log.debug("waiting for incoming archive stream request");
 
     monitor.subTask("Host is compressing project files. Waiting for the archive file...");
-
-    awaitTransferRequest();
-
+    monitor.waitForCompletion(expectedTransfer);
     monitor.subTask("Receiving archive file...");
-
     log.debug(this + " : receiving archive");
-
-    IncomingFileTransfer transfer = archiveTransferListener.getRequest().accept();
 
     File archiveFile = File.createTempFile("saros_archive_" + System.currentTimeMillis(), null);
 
     boolean transferFailed = true;
 
     try {
-      transfer.recieveFile(archiveFile);
+      XMPPFileTransfer transfer = expectedTransfer.get().acceptFile(archiveFile);
 
-      monitorFileTransfer(transfer, monitor);
+      monitorFileTransfer(transfer.getSmackTransfer(), monitor);
       transferFailed = false;
-    } catch (XMPPException e) {
+    } catch (InterruptedException | ExecutionException e) {
       throw new IOException(e.getMessage(), e.getCause());
     } finally {
       if (transferFailed && !archiveFile.delete()) {
