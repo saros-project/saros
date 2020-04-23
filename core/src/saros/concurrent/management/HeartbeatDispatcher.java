@@ -5,7 +5,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.concurrent.jupiter.internal.text.NoOperation;
@@ -84,7 +83,7 @@ public class HeartbeatDispatcher extends AbstractActivityProducer implements Sta
       final Algorithm jupiterAlgorithm = entry.getValue();
 
       final JupiterActivity heartbeat =
-          jupiterAlgorithm.generateJupiterActivity(new NoOperation(), localUser, new SPath(file));
+          jupiterAlgorithm.generateJupiterActivity(new NoOperation(), localUser, file);
 
       fireActivity(heartbeat);
     }

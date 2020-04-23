@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import saros.activities.ChecksumActivity;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
@@ -60,8 +59,7 @@ public class JupiterClient {
     IFile file = textEdit.getResource();
 
     return get(file)
-        .generateJupiterActivity(
-            textEdit.toOperation(), sarosSession.getLocalUser(), new SPath(file));
+        .generateJupiterActivity(textEdit.toOperation(), sarosSession.getLocalUser(), file);
   }
 
   /**

@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.Timestamp;
 import saros.concurrent.jupiter.TransformationException;
@@ -76,8 +75,7 @@ public class JupiterDocumentServer {
 
       final Jupiter remoteProxy = entry.getValue();
 
-      final JupiterActivity transformed =
-          remoteProxy.generateJupiterActivity(op, source, new SPath(file));
+      final JupiterActivity transformed = remoteProxy.generateJupiterActivity(op, source, file);
 
       result.put(user, transformed);
     }

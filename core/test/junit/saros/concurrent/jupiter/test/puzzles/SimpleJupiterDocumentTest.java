@@ -6,7 +6,6 @@ import static saros.test.util.OperationHelper.I;
 import org.junit.Before;
 import org.junit.Test;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.Jupiter;
@@ -44,7 +43,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
 
     User user = JupiterTestCase.createUser("user");
 
-    JupiterActivity jupiterActivity = algo.generateJupiterActivity(op, user, new SPath(fileMock));
+    JupiterActivity jupiterActivity = algo.generateJupiterActivity(op, user, fileMock);
     assertEquals(jupiterActivity.getOperation(), op);
 
     /* insert one short string. */
@@ -52,7 +51,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
     doc.execOperation(op);
     assertEquals("abinsertdc", doc.getDocument());
 
-    jupiterActivity = algo.generateJupiterActivity(op, user, new SPath(fileMock));
+    jupiterActivity = algo.generateJupiterActivity(op, user, fileMock);
     System.out.println(jupiterActivity.getOperation().toString());
   }
 }
