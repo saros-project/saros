@@ -1106,12 +1106,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
           Set<IFile> editorFiles = new HashSet<>(editorPool.getFiles());
 
           if (userEditorStateManager != null) {
-            editorFiles.addAll(
-                userEditorStateManager
-                    .getOpenEditors()
-                    .stream()
-                    .map(SPath::getFile)
-                    .collect(Collectors.toSet()));
+            editorFiles.addAll(userEditorStateManager.getOpenEditors());
           }
 
           for (IFile editorFile : editorFiles) {

@@ -1489,12 +1489,7 @@ public class EditorManager implements IEditorManager {
              */
             if (userEditorStateManager == null) return;
 
-            final Set<saros.filesystem.IFile> editorPaths =
-                userEditorStateManager
-                    .getOpenEditors()
-                    .stream()
-                    .map(SPath::getFile)
-                    .collect(Collectors.toSet());
+            final Set<saros.filesystem.IFile> editorPaths = userEditorStateManager.getOpenEditors();
 
             editorPaths.addAll(openEditorPaths);
 

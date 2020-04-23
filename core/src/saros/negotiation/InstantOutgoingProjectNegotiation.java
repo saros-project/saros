@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.stream.Collectors;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.log4j.Logger;
 import saros.activities.SPath;
@@ -95,7 +96,13 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
     /* get all opened editors */
     editorManager.addSharedEditorListener(listener);
-    Set<SPath> openEditors = session.getComponent(UserEditorStateManager.class).getOpenEditors();
+    Set<SPath> openEditors =
+        session
+            .getComponent(UserEditorStateManager.class)
+            .getOpenEditors()
+            .stream()
+            .map(SPath::new)
+            .collect(Collectors.toSet());
     for (SPath remoteOpenFile : openEditors) fileOpened(remoteOpenFile.getFile());
     for (SPath localOpenFile : editorManager.getOpenEditors()) fileOpened(localOpenFile.getFile());
   }

@@ -206,12 +206,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     Set<IFile> localEditors =
         editorManager.getOpenEditors().stream().map(SPath::getFile).collect(Collectors.toSet());
 
-    Set<IFile> remoteEditors =
-        userEditorStateManager
-            .getOpenEditors()
-            .stream()
-            .map(SPath::getFile)
-            .collect(Collectors.toSet());
+    Set<IFile> remoteEditors = userEditorStateManager.getOpenEditors();
 
     Set<IFile> allEditors = new HashSet<>();
     allEditors.addAll(localEditors);

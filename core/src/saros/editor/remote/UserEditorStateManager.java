@@ -3,10 +3,9 @@ package saros.editor.remote;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import saros.activities.IActivity;
-import saros.activities.SPath;
 import saros.annotations.Component;
+import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
 import saros.session.IActivityConsumer;
 import saros.session.ISarosSession;
@@ -107,16 +106,16 @@ public class UserEditorStateManager implements IActivityConsumer, Startable {
   }
 
   /**
-   * Returns all paths representing the editors which are currently opened by the remote users of
+   * Returns all files representing the editors which are currently opened by the remote users of
    * the running session (i.e. not our own).
    *
-   * @return A set containing the paths corresponding to all open editors. If no editors are opened
+   * @return A set containing the files corresponding to all open editors. If no editors are opened
    *     an empty set is being returned.
    */
-  public Set<SPath> getOpenEditors() {
-    Set<SPath> result = new HashSet<SPath>();
+  public Set<IFile> getOpenEditors() {
+    Set<IFile> result = new HashSet<>();
     for (UserEditorState state : userEditorStates.values()) {
-      result.addAll(state.getOpenEditors().stream().map(SPath::new).collect(Collectors.toSet()));
+      result.addAll(state.getOpenEditors());
     }
     return result;
   }
