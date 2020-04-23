@@ -9,10 +9,8 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.annotations.Component;
 import saros.editor.IEditorManager;
@@ -203,8 +201,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
   }
 
   private void calculateChecksums() {
-    Set<IFile> localEditors =
-        editorManager.getOpenEditors().stream().map(SPath::getFile).collect(Collectors.toSet());
+    Set<IFile> localEditors = editorManager.getOpenEditors();
 
     Set<IFile> remoteEditors = userEditorStateManager.getOpenEditors();
 
@@ -267,8 +264,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
       return;
     }
 
-    String normalizedEditorContent =
-        editorManager.getNormalizedContent(new SPath(checksum.getFile()));
+    String normalizedEditorContent = editorManager.getNormalizedContent(checksum.getFile());
 
     if (normalizedEditorContent == null) {
       if (localEditors.contains(checksum.getFile())) {

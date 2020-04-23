@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.log4j.Logger;
-import saros.activities.SPath;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.remote.UserEditorStateManager;
@@ -97,7 +96,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     editorManager.addSharedEditorListener(listener);
     Set<IFile> openEditors = session.getComponent(UserEditorStateManager.class).getOpenEditors();
     for (IFile remoteOpenFile : openEditors) fileOpened(remoteOpenFile);
-    for (SPath localOpenFile : editorManager.getOpenEditors()) fileOpened(localOpenFile.getFile());
+    for (IFile localOpenFile : editorManager.getOpenEditors()) fileOpened(localOpenFile);
   }
 
   @Override

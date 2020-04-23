@@ -1,9 +1,9 @@
 package saros.editor;
 
 import java.util.Set;
-import saros.activities.SPath;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.session.User;
 import saros.util.LineSeparatorNormalizationUtil;
@@ -13,9 +13,9 @@ import saros.util.LineSeparatorNormalizationUtil;
  * session. In this context, <i>editor</i> refers to an open text file displayed to the user for
  * viewing and editing.
  *
- * <p>Editors are referred to by {@link SPath paths} to the files they are associated with. Whenever
+ * <p>Editors are referred to by the {@link IFile files} they are associated with. Whenever
  * possible, {@link IEditorManager} will make it transparent to the caller whether there is actually
- * an open editor for the file; for instance, {@link #getContent(SPath)} automatically falls back to
+ * an open editor for the file; for instance, {@link #getContent(IFile)} automatically falls back to
  * retrieving the content directly from the file instead of from the editor.
  *
  * <p>{@link IEditorManager} tracks locally open editors. Changes to local editors (such as editors
@@ -29,20 +29,20 @@ import saros.util.LineSeparatorNormalizationUtil;
 public interface IEditorManager {
 
   /**
-   * Open the editor window of given {@link SPath}.
+   * Open the editor window of given {@link IFile}.
    *
-   * @param path Path of the Editor to open.
+   * @param file file of the editor to open.
    * @param activate Determines whether the newly opened editor should get the focus or should be
    *     opened in the background.
    */
-  void openEditor(SPath path, boolean activate);
+  void openEditor(IFile file, boolean activate);
 
   /**
-   * Returns the paths of all shared files for which an editor is currently open locally.
+   * Returns all shared files for which an editor is currently open locally.
    *
-   * @return paths of locally open shared files
+   * @return all shared files for which an editor is currently open locally
    */
-  Set<SPath> getOpenEditors();
+  Set<IFile> getOpenEditors();
 
   /**
    * Returns the text content of the local document associated with the specified file.
@@ -50,24 +50,24 @@ public interface IEditorManager {
    * <p>The document content is the content that is displayed when the file is opened in a text
    * editor.
    *
-   * @param path path of the file whose content should be returned
+   * @param file the file whose content should be returned
    * @return the text content of the matching local document or <code>null</code> if the file does
    *     not exist or no document could be obtained for the file
    */
-  String getContent(SPath path);
+  String getContent(IFile file);
 
   /**
-   * Returns the normalized result of {@link #getContent(SPath)}.
+   * Returns the normalized result of {@link #getContent(IFile)}.
    *
    * <p>Normalized text only contains Unix line separators.
    *
-   * @param path path of the file whose content should be returned
+   * @param file the file whose content should be returned
    * @return the normalized text content of the matching local document or <code>null</code> if the
    *     file does not exist or no document could be obtained for the file
-   * @see #getContent(SPath)
+   * @see #getContent(IFile)
    * @see LineSeparatorNormalizationUtil
    */
-  String getNormalizedContent(SPath path);
+  String getNormalizedContent(IFile file);
 
   /**
    * Saves the local editors of all shared files belonging to the given project. If <code>null
@@ -79,21 +79,21 @@ public interface IEditorManager {
   void saveEditors(IProject project);
 
   /**
-   * Close the editor of given {@link SPath}.
+   * Close the editor of given {@link IFile}.
    *
-   * @param path Path of the file of which the editor should be closed
+   * @param file the file of which the editor should be closed
    */
-  void closeEditor(SPath path);
+  void closeEditor(IFile file);
 
   /**
    * Adjusts viewport. Focus is set on the center of the range, but priority is given to selected
    * lines. Either range or selection can be <code>null</code>, but not both.
    *
-   * @param path Path of the open Editor
+   * @param file the file for the open Editor
    * @param range viewport of the followed user. Can be <code>null</code>.
    * @param selection text selection of the followed user. Can be <code>null</code>.
    */
-  void adjustViewport(SPath path, LineRange range, TextSelection selection);
+  void adjustViewport(IFile file, LineRange range, TextSelection selection);
 
   /**
    * Locally opens the editor that the User {@code target} has currently open, adjusts the viewport,
