@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.intellij.editor.LocalEditorHandler;
 import saros.intellij.editor.annotations.AnnotationManager;
@@ -68,13 +67,11 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
   private void setUpOpenedEditor(@NotNull VirtualFile virtualFile) {
     Editor editor = localEditorHandler.openEditor(project, virtualFile, false);
 
-    SPath sPath = VirtualFileConverter.convertToSPath(project, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (sPath == null || editor == null) {
+    if (file == null || editor == null) {
       return;
     }
-
-    IFile file = sPath.getFile();
 
     if (sarosSession.isShared(file)) {
       annotationManager.applyStoredAnnotations(file, editor);
@@ -88,13 +85,11 @@ public class AnnotationUpdater extends AbstractLocalEditorStatusChangeHandler {
    * @see FileEditorManagerListener.Before#beforeFileClosed(FileEditorManager, VirtualFile)
    */
   private void cleanUpAnnotations(@NotNull VirtualFile virtualFile) {
-    SPath sPath = VirtualFileConverter.convertToSPath(project, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (sPath == null) {
+    if (file == null) {
       return;
     }
-
-    IFile file = sPath.getFile();
 
     if (sarosSession.isShared(file)) {
       annotationManager.updateAnnotationStore(file);
