@@ -7,11 +7,11 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import saros.activities.SPath;
 import saros.awareness.AwarenessInformationCollector;
 import saros.editor.EditorManager;
 import saros.editor.remote.EditorState;
 import saros.editor.remote.UserEditorStateManager;
+import saros.filesystem.IFile;
 import saros.session.User;
 import saros.ui.model.TreeElement;
 
@@ -101,7 +101,7 @@ public class AwarenessInformationTreeElement extends TreeElement {
       return details;
     }
 
-    SPath activeFile = activeEditor.getPath();
+    IFile activeFile = activeEditor.getPath().getFile();
     if (activeFile != null) {
       /*
        * path.getProjectRelativePath() could be too long, sometimes the
@@ -112,7 +112,7 @@ public class AwarenessInformationTreeElement extends TreeElement {
       details.add(
           activeFile.getProject().getName()
               + ": "
-              + activeFile.getFile().getProjectRelativePath().toString());
+              + activeFile.getProjectRelativePath().toString());
     }
 
     return details;
