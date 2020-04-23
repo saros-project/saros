@@ -20,7 +20,7 @@ public class ViewportActivity extends AbstractResourceActivity<IFile> {
 
     super(source, file);
 
-    if (file == null) throw new IllegalArgumentException("path must not be null");
+    if (file == null) throw new IllegalArgumentException("file must not be null");
 
     this.startLine = Math.max(0, startLine);
     this.numberOfLines = Math.max(0, numberOfLines);
@@ -75,7 +75,7 @@ public class ViewportActivity extends AbstractResourceActivity<IFile> {
 
   @Override
   public String toString() {
-    return "ViewportActivity(path: "
+    return "ViewportActivity(file: "
         + getResource()
         + ", range: ("
         + startLine

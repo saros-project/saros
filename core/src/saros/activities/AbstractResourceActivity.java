@@ -22,11 +22,11 @@ public abstract class AbstractResourceActivity<T extends IResource> extends Abst
   @Override
   public boolean isValid() {
     /*
-     * TODO path must never be null for IResourceActivities. Add a
+     * TODO file must never be null for IResourceActivities. Add a
      * StatusActivity for informing remote users that no shared resource is
      * active anymore.
      */
-    return super.isValid() /* && (path != null) */;
+    return super.isValid();
   }
 
   public T getResource() {

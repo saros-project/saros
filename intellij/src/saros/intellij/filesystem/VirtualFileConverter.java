@@ -73,7 +73,7 @@ public class VirtualFileConverter {
    * @param virtualFile file to get the <code>IResource</code> for
    * @param project module the file belongs to
    * @return an <code>IResource</code> for the given file or <code>null</code> if the given file
-   *     does not exist, does not belong to the passed module, or the relative path path between the
+   *     does not exist, does not belong to the passed module, or the relative path between the
    *     module root and the file could not be constructed
    */
   @Nullable

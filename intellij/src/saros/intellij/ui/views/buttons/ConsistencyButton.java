@@ -47,7 +47,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
           setEnabled(false);
 
           final Set<IFile> files =
-              sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums();
+              sessionInconsistencyState.watchdogClient.getFilesWithWrongChecksums();
 
           String inconsistentFiles = createConfirmationMessage(files);
 
@@ -127,7 +127,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
 
           @Override
           public void actionPerformed(ActionEvent actionEvent) {
-            setInconsistent(!watchdogClient.getPathsWithWrongChecksums().isEmpty());
+            setInconsistent(!watchdogClient.getFilesWithWrongChecksums().isEmpty());
           }
         };
 
@@ -200,7 +200,7 @@ public class ConsistencyButton extends AbstractSessionToolbarButton {
       previouslyInConsistentState = false;
     }
 
-    final Set<IFile> files = sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums();
+    final Set<IFile> files = sessionInconsistencyState.watchdogClient.getFilesWithWrongChecksums();
 
     final String inconsistentFilesMessage = createInconsistentFilesMessage(files);
 

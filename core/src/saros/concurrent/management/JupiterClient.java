@@ -12,7 +12,7 @@ import saros.concurrent.jupiter.internal.Jupiter;
 import saros.filesystem.IFile;
 import saros.session.ISarosSession;
 
-/** A JupiterClient manages Jupiter client docs for a single user with several paths */
+/** A JupiterClient manages Jupiter client docs for a single user with several files. */
 public class JupiterClient {
 
   protected ISarosSession sarosSession;

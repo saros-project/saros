@@ -58,7 +58,7 @@ public class ConcurrentDocumentServer implements Startable {
     Consumer<IFile> deletedFileHandler =
         file -> {
           log.debug("Resetting jupiter server for " + file);
-          server.removePath(file);
+          server.removeFile(file);
         };
 
     this.resourceActivityFilter = new ResourceActivityFilter(sarosSession, deletedFileHandler);
@@ -158,7 +158,7 @@ public class ConcurrentDocumentServer implements Startable {
   }
 
   /**
-   * Resets the JupiterServer for the given combination and path and user.
+   * Resets the JupiterServer for the given combination and file and user.
    *
    * <p>When this is called on the host, a call to {@link ConcurrentDocumentClient#reset(IFile)}
    * should be executed at the same time on the side of the given user.
@@ -169,7 +169,7 @@ public class ConcurrentDocumentServer implements Startable {
 
     assert sarosSession.isHost();
 
-    log.debug("resetting jupiter server for user: " + user + ", path: " + file);
+    log.debug("resetting jupiter server for user: " + user + ", file: " + file);
 
     server.reset(file, user);
   }

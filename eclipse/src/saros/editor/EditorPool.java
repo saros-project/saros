@@ -56,7 +56,7 @@ final class EditorPool {
   private final StoppableDocumentListener documentListener;
 
   /**
-   * The editorParts-map will return all EditorParts associated with a given SPath. This can be
+   * The editorParts-map will return all EditorParts associated with a given file. This can be
    * potentially many because a IFile (which can be identified using a IPath) can be opened in
    * multiple editors.
    */
@@ -243,8 +243,7 @@ final class EditorPool {
   }
 
   /**
-   * Returns all IEditorParts which have been added to this pool which display a file using the
-   * given path.
+   * Returns all IEditorParts which have been added to this pool which display the given file.
    *
    * @param file file of the Editor
    * @return set of relating IEditorPart

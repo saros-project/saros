@@ -13,9 +13,9 @@ import saros.session.ISarosSession;
 import saros.session.User;
 
 /**
- * A JupiterServer manages Jupiter server instances for a number of users AND number of paths.
+ * A JupiterServer manages Jupiter server instances for a number of users AND number of files.
  *
- * <p>(in contrast to a JupiterDocumentServer which only handles a single path)
+ * <p>(in contrast to a JupiterDocumentServer which only handles a single file)
  */
 public class JupiterServer {
 
@@ -34,8 +34,8 @@ public class JupiterServer {
     this.sarosSession = sarosSession;
   }
 
-  public synchronized void removePath(final IFile path) {
-    concurrentDocuments.remove(path);
+  public synchronized void removeFile(final IFile file) {
+    concurrentDocuments.remove(file);
   }
 
   public synchronized void addUser(final User user) {
@@ -54,8 +54,8 @@ public class JupiterServer {
   }
 
   /**
-   * Retrieves the JupiterDocumentServer for a given path. If no JupiterDocumentServer exists for
-   * this path, a new one is created and returned afterwards.
+   * Retrieves the JupiterDocumentServer for a given file. If no JupiterDocumentServer exists for
+   * this file, a new one is created and returned afterwards.
    *
    * @host
    */

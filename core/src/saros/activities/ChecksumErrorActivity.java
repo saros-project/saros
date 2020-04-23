@@ -110,7 +110,7 @@ public class ChecksumErrorActivity extends AbstractActivity implements ITargeted
         + getSource()
         + ", target: "
         + target
-        + ", paths: "
+        + ", files: "
         + getFiles()
         + ", recoveryID: "
         + recoveryID

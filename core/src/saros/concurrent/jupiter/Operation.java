@@ -17,7 +17,7 @@ public interface Operation {
 
   /**
    * Returns a sequence of {@link TextEditActivity}s which represent this operation if applied in
-   * order to the editor denoted by the given path by the user identified by the given source.
+   * order to the editor denoted by the given file by the user identified by the given source.
    */
   List<TextEditActivity> toTextEdit(IFile file, User source);
 

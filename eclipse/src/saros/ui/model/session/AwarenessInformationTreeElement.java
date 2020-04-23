@@ -104,7 +104,7 @@ public class AwarenessInformationTreeElement extends TreeElement {
     IFile activeFile = activeEditor.getFile();
     if (activeFile != null) {
       /*
-       * path.getProjectRelativePath() could be too long, sometimes the
+       * file.getProjectRelativePath() could be too long, sometimes the
        * name would be enough...
        *
        * TODO: make this configurable?

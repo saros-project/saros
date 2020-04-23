@@ -35,13 +35,10 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
   private static final Logger log = Logger.getLogger(RemoteWriteAccessManager.class);
 
-  /** stores users and their opened files (identified by their path) */
+  /** stores users and their opened files */
   private final Map<IFile, Set<User>> editorStates = new HashMap<>();
 
-  /**
-   * stores files (identified by their path) connected by at least user with {@link
-   * Permission#WRITE_ACCESS}
-   */
+  /** stores files connected by at least user with {@link Permission#WRITE_ACCESS} */
   private final Set<IFile> connectedUserWithWriteAccessFiles = new HashSet<>();
 
   private final ISarosSession sarosSession;
@@ -58,7 +55,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
     IFile file = editorActivity.getResource();
     if (file == null) {
       /*
-       * sPath == null means that the user has no active editor any more.
+       * file == null means that the user has no active editor any more.
        */
       return;
     }
@@ -93,7 +90,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
         }
 
         /**
-         * This method takes care of maintaining correct state of class-internal tables with paths
+         * This method takes care of maintaining correct state of class-internal tables with files
          * of connected documents, if the permission of a user changes.
          */
         @Override
@@ -123,8 +120,8 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
   }
 
   /**
-   * Connects a document under the given path as a reaction on a remote Activity of a user with
-   * {@link Permission#WRITE_ACCESS} (e.g. Activate Editor).
+   * Connects a document for the given file as a reaction on a remote Activity of a user with {@link
+   * Permission#WRITE_ACCESS} (e.g. Activate Editor).
    */
   private void connectDocumentProvider(IFile fileWrapper) {
 
@@ -144,7 +141,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
   }
 
   /**
-   * Disconnects a document under the given path as a reaction on a remote Activity of a user with
+   * Disconnects a document for the given file as a reaction on a remote Activity of a user with
    * {@link Permission#WRITE_ACCESS} (e.g. Close Editor)
    */
   private void disconnectDocumentProvider(final IFile fileWrapper) {
@@ -158,9 +155,8 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
   }
 
   /**
-   * Updates the state of the document provider of a document under the given path. This method
-   * looks if this document is already connected, and whether it needs to get connected/disconnected
-   * now.
+   * Updates the state of the document provider of a document for the given file. This method looks
+   * if this document is already connected, and whether it needs to get connected/disconnected now.
    */
   private void updateConnectionState(final IFile file) {
 

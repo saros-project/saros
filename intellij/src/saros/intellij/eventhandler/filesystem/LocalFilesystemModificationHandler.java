@@ -433,7 +433,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
               (IFolder) VirtualFileConverter.convertToResource(project, fileOrDir);
 
           if (childFolder == null) {
-            log.debug("Skipping deleted folder as no SPath could be obtained " + fileOrDir);
+            log.debug("Skipping deleted folder as no IFile could be obtained " + fileOrDir);
 
             return true;
           }
@@ -572,10 +572,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldFolderWrapper != null && session.isShared(oldFolderWrapper);
-    boolean newPathIsShared = newParentWrapper != null && session.isShared(newParentWrapper);
+    boolean oldFileIsShared = oldFolderWrapper != null && session.isShared(oldFolderWrapper);
+    boolean newFileIsShared = newParentWrapper != null && session.isShared(newParentWrapper);
 
-    if (!oldPathIsShared && !newPathIsShared) {
+    if (!oldFileIsShared && !newFileIsShared) {
       if (log.isTraceEnabled()) {
         log.trace(
             "Ignoring non-shared folder move - folder: "
@@ -588,7 +588,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
       return;
 
-    } else if (oldPathIsShared && isContentRootDirectory(oldFile)) {
+    } else if (oldFileIsShared && isContentRootDirectory(oldFile)) {
       if (log.isTraceEnabled()) {
         log.trace("Ignoring move of content root " + oldFolderWrapper);
       }
@@ -620,7 +620,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
             return true;
           }
 
-          if (newPathIsShared) {
+          if (newFileIsShared) {
             IFolder newFolder =
                 newParentWrapper
                     .getProject()
@@ -635,7 +635,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
             dispatchActivity(newFolderCreatedActivity);
           }
 
-          if (oldPathIsShared) {
+          if (oldFileIsShared) {
             IFolder oldFolder =
                 oldFolderWrapper
                     .getProject()
@@ -742,10 +742,10 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     User user = session.getLocalUser();
 
-    boolean oldPathIsShared = oldFileWrapper != null && session.isShared(oldFileWrapper);
-    boolean newPathIsShared = newParentWrapper != null && session.isShared(newParentWrapper);
+    boolean oldFileIsShared = oldFileWrapper != null && session.isShared(oldFileWrapper);
+    boolean newFileIsShared = newParentWrapper != null && session.isShared(newParentWrapper);
 
-    if (newPathIsShared) {
+    if (newFileIsShared) {
       Module targetModule =
           FilesystemRunner.runReadAction(
               () -> ModuleUtil.findModuleForFile(newBaseParent, project));
@@ -782,7 +782,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     IActivity activity;
 
-    if (oldPathIsShared && newPathIsShared) {
+    if (oldFileIsShared && newFileIsShared) {
       // moved file inside shared modules
       IFile newFileWrapper =
           newParentWrapper
@@ -802,7 +802,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
       updateMovedFileState(oldFileWrapper, newFileWrapper);
       cleanUpBackgroundEditorPool(oldFileWrapper);
 
-    } else if (newPathIsShared) {
+    } else if (newFileIsShared) {
       // moved file into shared module
       byte[] fileContent = getContent(oldFile);
 
@@ -825,7 +825,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
         setUpMovedEditorState(oldFile, newFileWrapper);
       }
 
-    } else if (oldPathIsShared) {
+    } else if (oldFileIsShared) {
       // moved file out of shared module
       activity =
           new FileActivity(
@@ -851,14 +851,14 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
 
     dispatchActivity(activity);
 
-    if (oldPathIsShared && isOpenInTextEditor) {
+    if (oldFileIsShared && isOpenInTextEditor) {
       EditorActivity closeOldEditorActivity =
           new EditorActivity(user, EditorActivity.Type.CLOSED, oldFileWrapper);
 
       dispatchActivity(closeOldEditorActivity);
     }
 
-    if (newPathIsShared && isOpenInTextEditor) {
+    if (newFileIsShared && isOpenInTextEditor) {
       IFile newFileWrapper =
           newParentWrapper
               .getProject()

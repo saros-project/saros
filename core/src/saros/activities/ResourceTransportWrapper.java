@@ -6,7 +6,7 @@ import saros.filesystem.IResource;
 import saros.misc.xstream.ResourceTransportWrapperConverter;
 
 /**
- * A wrapper for <code>IResource</code> objects
+ * A wrapper for <code>IResource</code> objects.
  *
  * <p>The wrapper offers the capabilities to marshal and unmarshal the contained resource for
  * transport.

@@ -12,7 +12,7 @@ public class FolderCreatedActivity extends AbstractResourceActivity<IFolder>
   public FolderCreatedActivity(final User source, final IFolder folder) {
     super(source, folder);
 
-    if (folder == null) throw new IllegalArgumentException("path must not be null");
+    if (folder == null) throw new IllegalArgumentException("folder must not be null");
   }
 
   @Override
@@ -27,6 +27,6 @@ public class FolderCreatedActivity extends AbstractResourceActivity<IFolder>
 
   @Override
   public String toString() {
-    return "FolderCreatedActivity [path=" + getResource() + "]";
+    return "FolderCreatedActivity [folder=" + getResource() + "]";
   }
 }

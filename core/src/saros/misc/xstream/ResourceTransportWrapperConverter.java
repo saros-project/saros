@@ -82,7 +82,8 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
     Type type = resource.getType();
 
     if (type != Type.FILE && type != Type.FOLDER) {
-      throw new IllegalStateException("Illegal resource type " + type);
+      throw new IllegalStateException(
+          "Illegal resource type " + type + " for resource " + resource);
     }
 
     String t = type.name();
@@ -101,7 +102,7 @@ public class ResourceTransportWrapperConverter implements Converter, Startable {
 
     IProject project = session.getProject(i);
     if (project == null) {
-      log.error("Could not create SPath because there is no shared project for id '" + i + "'");
+      log.error("Could not create resource because there is no shared project for id '" + i + "'");
       return null;
     }
 

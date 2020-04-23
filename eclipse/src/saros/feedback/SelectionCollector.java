@@ -104,7 +104,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
 
             /*
              * only proceed if selection was not made by the editor himself
-             * and the edit occurs within this selection (path and range).
+             * and the edit occurs within this selection (file and range).
              * If so, increment the gesture count and break. To prevent
              * multiple indicated gestures set the flag gestured to true.
              * This will prevent multiple possible gestures from just a

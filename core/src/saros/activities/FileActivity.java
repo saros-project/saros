@@ -47,11 +47,9 @@ public class FileActivity extends AbstractResourceActivity<IFile>
    *     {@link Type#MOVED}), file to remove (if {@link Type#REMOVED}); never <code>null</code>
    * @param oldFile if type is {@link Type#MOVED}, the file handle representing from where the file
    *     was moved (<code>null</code> otherwise)
-   * @param content content of the file denoted by the path (only valid for {@link Type#CREATED} and
-   *     {@link Type#MOVED})
-   * @param encoding the encoding the content is encoded with or <code>null</code> if (and only if)
-   *     the type is {@link Type#MOVED} and the content is <code>null</code> or the type is {@link
-   *     Type#REMOVED}
+   * @param content content of the file (only valid for {@link Type#CREATED} and {@link Type#MOVED})
+   * @param encoding the encoding for the file or <code>null</code> if (and only if) the type is
+   *     {@link Type#MOVED} and the content is <code>null</code> or the type is {@link Type#REMOVED}
    */
   public FileActivity(
       User source,
@@ -66,7 +64,7 @@ public class FileActivity extends AbstractResourceActivity<IFile>
 
     if (type == null) throw new IllegalArgumentException("type must not be null");
     if (purpose == null) throw new IllegalArgumentException("purpose must not be null");
-    if (newFile == null) throw new IllegalArgumentException("newPath must not be null");
+    if (newFile == null) throw new IllegalArgumentException("newFile must not be null");
 
     switch (type) {
       case CREATED:
@@ -104,7 +102,7 @@ public class FileActivity extends AbstractResourceActivity<IFile>
 
   @Override
   public boolean isValid() {
-    /* oldPath == null is only unexpected for Type.MOVED */
+    /* oldFileWrapper == null is only unexpected for Type.MOVED */
     return super.isValid()
         && (getResource() != null)
         && (oldFileWrapper != null || type != Type.MOVED);
@@ -133,9 +131,9 @@ public class FileActivity extends AbstractResourceActivity<IFile>
 
   @Override
   public String toString() {
-    return "FileActivity [dst:path="
+    return "FileActivity [dst:file="
         + getResource()
-        + ", src:path="
+        + ", src:file="
         + (oldFileWrapper == null ? "N/A" : oldFileWrapper.getResource())
         + ", type="
         + type

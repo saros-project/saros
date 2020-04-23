@@ -180,7 +180,7 @@ public class ActivityQueuer {
 
       for (final IResourceActivity<? extends IResource> resourceActivity : projectQueue.buffer) {
 
-        // path cannot be null, see for-loop below
+        // resource cannot be null, see for-loop below
         final IResource resource = resourceActivity.getResource();
         final User source = resourceActivity.getSource();
 

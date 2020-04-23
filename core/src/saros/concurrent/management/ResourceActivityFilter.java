@@ -158,7 +158,7 @@ class ResourceActivityFilter {
    * <p>Does nothing if the passed activity is not a {@link FileActivity} or does not have the type
    * {@link FileActivity.Type#REMOVED} or {@link FileActivity.Type#MOVED}.
    *
-   * <p>Ignores file move activities where the origin and destination path is the same.
+   * <p>Ignores file move activities where the origin and destination is the same.
    *
    * @param activity the activity to handle
    * @see #deletedFileFilter
@@ -271,9 +271,9 @@ class ResourceActivityFilter {
 
     IFile file = (IFile) resource;
 
-    boolean pathIsFiltered = deletedFileFilter.containsKey(file);
+    boolean fileIsFiltered = deletedFileFilter.containsKey(file);
 
-    if (pathIsFiltered) {
+    if (fileIsFiltered) {
       if (activity instanceof ChecksumActivity) {
         ChecksumActivity checksumActivity = (ChecksumActivity) activity;
 
@@ -287,7 +287,7 @@ class ResourceActivityFilter {
       }
     }
 
-    return pathIsFiltered;
+    return fileIsFiltered;
   }
 
   /** Initializes all contained components. */

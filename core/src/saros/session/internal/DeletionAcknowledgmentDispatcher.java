@@ -58,7 +58,7 @@ public class DeletionAcknowledgmentDispatcher extends AbstractActivityProducer
    * <p>Activities that contain file deletions are {@link FileActivity file activities} of the type
    * {@link Type#REMOVED} or {@link Type#MOVED}.
    *
-   * <p>Ignores file move activities where the origin and destination path is the same.
+   * <p>Ignores file move activities where the origin and destination is the same.
    *
    * @param fileActivity the file activity to check and acknowledge if applicable
    */

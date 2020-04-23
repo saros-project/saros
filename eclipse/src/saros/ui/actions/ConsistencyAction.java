@@ -203,7 +203,7 @@ public class ConsistencyAction extends Action implements Disposable {
           }
         });
 
-    final Set<IFile> files = watchdogClient.getPathsWithWrongChecksums();
+    final Set<IFile> files = watchdogClient.getFilesWithWrongChecksums();
 
     SWTUtils.runSafeSWTAsync(
         log,
@@ -258,7 +258,7 @@ public class ConsistencyAction extends Action implements Disposable {
 
     Shell shell = SWTUtils.getShell();
 
-    final Set<IFile> files = watchdogClient.getPathsWithWrongChecksums();
+    final Set<IFile> files = watchdogClient.getFilesWithWrongChecksums();
 
     String pluginID = Saros.PLUGIN_ID;
 
