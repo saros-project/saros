@@ -12,7 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.stream.Collectors;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.log4j.Logger;
 import saros.activities.SPath;
@@ -44,10 +43,10 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   private static final Logger log = Logger.getLogger(InstantOutgoingProjectNegotiation.class);
 
   /** used as LIFO queue * */
-  private final Deque<SPath> openedFiles = new LinkedBlockingDeque<SPath>();
+  private final Deque<IFile> openedFiles = new LinkedBlockingDeque<>();
 
-  private Set<SPath> transferList;
-  private Set<SPath> transmittedFiles;
+  private Set<IFile> transferList;
+  private Set<IFile> transmittedFiles;
 
   /** receive open editors to prioritize these files * */
   private final ISharedEditorListener listener =
@@ -96,14 +95,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
     /* get all opened editors */
     editorManager.addSharedEditorListener(listener);
-    Set<SPath> openEditors =
-        session
-            .getComponent(UserEditorStateManager.class)
-            .getOpenEditors()
-            .stream()
-            .map(SPath::new)
-            .collect(Collectors.toSet());
-    for (SPath remoteOpenFile : openEditors) fileOpened(remoteOpenFile.getFile());
+    Set<IFile> openEditors = session.getComponent(UserEditorStateManager.class).getOpenEditors();
+    for (IFile remoteOpenFile : openEditors) fileOpened(remoteOpenFile);
     for (SPath localOpenFile : editorManager.getOpenEditors()) fileOpened(localOpenFile.getFile());
   }
 
@@ -133,7 +126,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     }
 
     createTransferList(fileLists, fileCount);
-    transmittedFiles = new HashSet<SPath>(fileCount * 2);
+    transmittedFiles = new HashSet<>(fileCount * 2);
   }
 
   @Override
@@ -195,20 +188,20 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   }
 
   private void createTransferList(List<FileList> fileLists, int fileCount) {
-    List<SPath> files = new ArrayList<SPath>(fileCount);
+    List<IFile> files = new ArrayList<>(fileCount);
     for (final FileList list : fileLists) {
       IProject project = projects.getProject(list.getProjectID());
       for (String file : list.getPaths()) {
-        files.add(new SPath(project.getFile(file)));
+        files.add(project.getFile(file));
       }
     }
 
     /* sort hierarchy based, top files are seen first in project explorer */
     Collections.sort(
         files,
-        new Comparator<SPath>() {
+        new Comparator<IFile>() {
           @Override
-          public int compare(SPath a, SPath b) {
+          public int compare(IFile a, IFile b) {
             int lenA = a.getProjectRelativePath().segmentCount();
             int lenB = b.getProjectRelativePath().segmentCount();
             return Integer.valueOf(lenA).compareTo(Integer.valueOf(lenB));
@@ -216,12 +209,12 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
         });
 
     /* LinkedHashSet for fast lookup while keeping sort order */
-    transferList = new LinkedHashSet<SPath>(files);
+    transferList = new LinkedHashSet<>(files);
   }
 
   private void fileOpened(IFile file) {
     if (file != null) {
-      openedFiles.addFirst(new SPath(file));
+      openedFiles.addFirst(file);
       log.debug(this + ": added " + file + " to open files queue");
     }
   }
@@ -240,7 +233,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
     for (String string : eclipseProjFiles) {
       for (IProject project : projects) {
-        SPath file = new SPath(project.getFile(string));
+        IFile file = project.getFile(string);
         sendIfRequired(osp, file);
       }
     }
@@ -248,9 +241,9 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
 
   private void sendRemainingPreferOpenedFirst(OutgoingStreamProtocol osp)
       throws IOException, LocalCancellationException {
-    for (SPath file : transferList) {
+    for (IFile file : transferList) {
       while (!openedFiles.isEmpty()) {
-        SPath openFile = openedFiles.poll();
+        IFile openFile = openedFiles.poll();
         /* open files could be changed meanwhile */
         editorManager.saveEditors(openFile.getProject());
         sendIfRequired(osp, openFile);
@@ -260,10 +253,10 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     }
   }
 
-  private void sendIfRequired(OutgoingStreamProtocol osp, SPath file)
+  private void sendIfRequired(OutgoingStreamProtocol osp, IFile file)
       throws IOException, LocalCancellationException {
     if (transferList.contains(file) && !transmittedFiles.contains(file)) {
-      osp.streamFile(file.getFile());
+      osp.streamFile(file);
       transmittedFiles.add(file);
     }
   }
