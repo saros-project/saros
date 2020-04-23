@@ -203,7 +203,7 @@ public class EditorManager implements IEditorManager {
 
           TextSelection textSelection = activity.getSelection();
 
-          for (IEditorPart editorPart : editorPool.getEditors(new SPath(file))) {
+          for (IEditorPart editorPart : editorPool.getEditors(file)) {
             locationAnnotationManager.setSelection(editorPart, textSelection, user);
           }
 
@@ -221,7 +221,7 @@ public class EditorManager implements IEditorManager {
 
           LineRange lineRange = new LineRange(activity.getStartLine(), activity.getNumberOfLines());
 
-          for (IEditorPart editorPart : editorPool.getEditors(new SPath(file))) {
+          for (IEditorPart editorPart : editorPool.getEditors(file)) {
             locationAnnotationManager.setViewportForUser(source, editorPart, lineRange);
           }
         }
@@ -693,7 +693,7 @@ public class EditorManager implements IEditorManager {
       case CLOSED:
         editorListenerDispatch.editorClosed(sender, new SPath(file));
 
-        for (final IEditorPart editorPart : editorPool.getEditors(new SPath(file))) {
+        for (final IEditorPart editorPart : editorPool.getEditors(file)) {
           locationAnnotationManager.clearSelectionForUser(sender, editorPart);
         }
         break;
@@ -776,7 +776,7 @@ public class EditorManager implements IEditorManager {
      * TODO Performance optimization in case of batch operation might make
      * sense. Problem: How to recognize batch operations?
      */
-    for (IEditorPart editorPart : editorPool.getEditors(new SPath(fileWrapper))) {
+    for (IEditorPart editorPart : editorPool.getEditors(fileWrapper)) {
       ITextViewer viewer = EditorAPI.getViewer(editorPart);
       if (viewer == null) {
         // No text viewer for the editorPart found.
@@ -809,7 +809,7 @@ public class EditorManager implements IEditorManager {
         new Runnable() {
           @Override
           public void run() {
-            for (IEditorPart editorPart : editorPool.getEditors(path)) {
+            for (IEditorPart editorPart : editorPool.getEditors(path.getFile())) {
               adjustViewport(editorPart, range, selection);
             }
           }
@@ -839,7 +839,7 @@ public class EditorManager implements IEditorManager {
         new Runnable() {
           @Override
           public void run() {
-            for (IEditorPart part : editorPool.getEditors(new SPath(file))) {
+            for (IEditorPart part : editorPool.getEditors(file)) {
               EditorAPI.closeEditor(part, save);
             }
           }
@@ -965,11 +965,11 @@ public class EditorManager implements IEditorManager {
 
       // Pretend as if the editor was closed locally (but use the old part
       // before the move happened) and then simulate it being opened again
-      SPath path = editorPool.getPath(editorPart);
-      if (path == null) {
+      saros.filesystem.IFile file = editorPool.getFile(editorPart);
+      if (file == null) {
         log.warn("Editor was managed but path could not be found: " + editorPart);
       } else {
-        partClosedOfPath(editorPart, path.getFile());
+        partClosedOfPath(editorPart, file);
       }
 
       partOpened(editorPart);
@@ -1035,7 +1035,7 @@ public class EditorManager implements IEditorManager {
   // FIXME thread access (used by ProjectDeltaVisitor which might NOT run from
   // the SWT Thread
   public boolean isOpened(saros.filesystem.IFile file) {
-    return editorPool.getEditors(new SPath(file)).size() > 0;
+    return editorPool.getEditors(file).size() > 0;
   }
 
   /**
@@ -1131,7 +1131,7 @@ public class EditorManager implements IEditorManager {
 
     int length = text.length();
 
-    for (IEditorPart editorPart : editorPool.getEditors(new SPath(file))) {
+    for (IEditorPart editorPart : editorPool.getEditors(file)) {
 
       if (editorPart instanceof ITextEditor) {
         ITextEditor textEditor = (ITextEditor) editorPart;

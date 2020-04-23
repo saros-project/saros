@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextViewer;
@@ -20,7 +19,6 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 import org.eclipse.ui.texteditor.ITextEditor;
-import saros.activities.SPath;
 import saros.editor.internal.EditorAPI;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.session.User.Permission;
@@ -62,7 +60,7 @@ final class EditorPool {
    * potentially many because a IFile (which can be identified using a IPath) can be opened in
    * multiple editors.
    */
-  private Map<SPath, Set<IEditorPart>> editorParts = new HashMap<SPath, Set<IEditorPart>>();
+  private Map<saros.filesystem.IFile, Set<IEditorPart>> editorParts = new HashMap<>();
 
   /**
    * The editorInputMap contains all IEditorParts which are managed by the EditorPool and stores the
@@ -146,13 +144,13 @@ final class EditorPool {
     dirtyStateListener.register(documentProvider, input);
     documentProvider.getDocument(input).addDocumentListener(documentListener);
 
-    final SPath path = new SPath(ResourceAdapterFactory.create(file));
+    final saros.filesystem.IFile wrappedFile = ResourceAdapterFactory.create(file);
 
-    Set<IEditorPart> parts = editorParts.get(path);
+    Set<IEditorPart> parts = editorParts.get(wrappedFile);
 
     if (parts == null) {
       parts = new HashSet<IEditorPart>();
-      editorParts.put(path, parts);
+      editorParts.put(wrappedFile, parts);
     }
 
     editorInputMap.put(editorPart, new EditorPartInputReferences(input, file));
@@ -176,15 +174,15 @@ final class EditorPool {
   }
 
   /**
-   * Returns the {@linkplain SPath path} for the corresponding editor.
+   * Returns the {@linkplain saros.filesystem.IFile file} for the corresponding editor.
    *
-   * @return the path for the corresponding editor or <code>null</code> if the editor is not managed
+   * @return the file for the corresponding editor or <code>null</code> if the editor is not managed
    *     by this pool
    */
-  public SPath getPath(final IEditorPart editorPart) {
+  public saros.filesystem.IFile getFile(final IEditorPart editorPart) {
     if (!isManaged(editorPart)) return null;
 
-    for (final Entry<SPath, Set<IEditorPart>> entry : editorParts.entrySet()) {
+    for (final Entry<saros.filesystem.IFile, Set<IEditorPart>> entry : editorParts.entrySet()) {
 
       if (entry.getValue().contains(editorPart)) return entry.getKey();
     }
@@ -239,22 +237,22 @@ final class EditorPool {
 
     editorManager.disconnect(file);
 
-    final SPath path = new SPath(ResourceAdapterFactory.create(file));
+    final saros.filesystem.IFile wrappedFile = ResourceAdapterFactory.create(file);
 
-    editorParts.get(path).remove(editorPart);
+    editorParts.get(wrappedFile).remove(editorPart);
   }
 
   /**
    * Returns all IEditorParts which have been added to this pool which display a file using the
    * given path.
    *
-   * @param path {@link IPath} of the Editor
+   * @param file file of the Editor
    * @return set of relating IEditorPart
    */
-  public Set<IEditorPart> getEditors(final SPath path) {
+  public Set<IEditorPart> getEditors(final saros.filesystem.IFile file) {
     final HashSet<IEditorPart> result = new HashSet<IEditorPart>();
 
-    if (editorParts.containsKey(path)) result.addAll(editorParts.get(path));
+    if (editorParts.containsKey(file)) result.addAll(editorParts.get(file));
 
     return result;
   }
