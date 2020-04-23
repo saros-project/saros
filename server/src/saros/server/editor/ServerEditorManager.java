@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.log4j.Logger;
 import saros.activities.SPath;
@@ -20,7 +21,6 @@ import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IProject;
-import saros.filesystem.IResource;
 import saros.session.User;
 import saros.util.LineSeparatorNormalizationUtil;
 
@@ -29,13 +29,13 @@ public class ServerEditorManager implements IEditorManager {
 
   private static final Logger log = Logger.getLogger(ServerEditorManager.class);
 
-  private Map<SPath, Editor> openEditors = Collections.synchronizedMap(new LRUMap<>(10));
+  private Map<IFile, Editor> openEditors = Collections.synchronizedMap(new LRUMap<>(10));
   private List<ISharedEditorListener> listeners = new CopyOnWriteArrayList<>();
 
   @Override
   public void openEditor(SPath path, boolean activate) {
     try {
-      getOrCreateEditor(path);
+      getOrCreateEditor(path.getFile());
     } catch (IOException e) {
       log.warn("Could not open editor for " + path);
     }
@@ -43,13 +43,13 @@ public class ServerEditorManager implements IEditorManager {
 
   @Override
   public Set<SPath> getOpenEditors() {
-    return openEditors.keySet();
+    return openEditors.keySet().stream().map(SPath::new).collect(Collectors.toSet());
   }
 
   @Override
   public String getContent(SPath path) {
     try {
-      return getOrCreateEditor(path).getContent();
+      return getOrCreateEditor(path.getFile()).getContent();
     } catch (IOException e) {
       return null;
     }
@@ -96,28 +96,22 @@ public class ServerEditorManager implements IEditorManager {
   }
 
   /**
-   * Get an existing or create a new Editor for a given path. May remove the least recently used
+   * Get an existing or create a new Editor for a given file. May remove the least recently used
    * Editor to free memory.
    *
-   * @param path of the file to open
+   * @param file of the file to open
    * @return Editor of the file
    * @throws IOException
    */
-  private Editor getOrCreateEditor(SPath path) throws IOException {
-    Editor editor = openEditors.get(path);
+  private Editor getOrCreateEditor(IFile file) throws IOException {
+    Editor editor = openEditors.get(file);
     if (editor == null) {
-      IResource resource = path.getResource();
-      if (resource == null) {
-        throw new NoSuchFileException(path.toString());
-      }
-
-      IFile file = resource.adaptTo(IFile.class);
-      if (file == null) {
-        throw new IOException("Not a file: " + path);
+      if (!file.exists()) {
+        throw new NoSuchFileException(file.toString());
       }
 
       editor = new Editor(file);
-      openEditors.put(path, editor);
+      openEditors.put(file, editor);
     }
     return editor;
   }
@@ -130,7 +124,7 @@ public class ServerEditorManager implements IEditorManager {
   public void applyTextEdit(TextEditActivity activity) {
     IFile file = activity.getResource();
     try {
-      Editor editor = getOrCreateEditor(new SPath(file));
+      Editor editor = getOrCreateEditor(file);
       editor.applyTextEdit(activity);
       editor.save();
       for (ISharedEditorListener listener : listeners) {
@@ -142,19 +136,19 @@ public class ServerEditorManager implements IEditorManager {
   }
 
   /**
-   * Updates the mapping of an open editor to a new file path
+   * Updates the mapping of an open editor to a new file.
    *
-   * @param oldPath the old file path
-   * @param newPath the new file path
+   * @param oldFile the old file
+   * @param newFile the new file
    */
-  public void updateMapping(SPath oldPath, SPath newPath) {
-    Editor oldEditor = openEditors.remove(oldPath);
-    openEditors.put(newPath, oldEditor);
+  public void updateMapping(IFile oldFile, IFile newFile) {
+    Editor oldEditor = openEditors.remove(oldFile);
+    openEditors.put(newFile, oldEditor);
   }
 
   @Override
   public void closeEditor(SPath path) {
-    openEditors.remove(path);
+    openEditors.remove(path.getFile());
   }
 
   /**
@@ -164,15 +158,15 @@ public class ServerEditorManager implements IEditorManager {
    */
   public void closeEditorsInFolder(IFolder folder) {
     synchronized (openEditors) {
-      Set<SPath> keys = openEditors.keySet();
-      Set<SPath> invalidKeys = new HashSet<>();
-      for (SPath path : keys) {
-        if (folder.getFullPath().isPrefixOf(path.getFullPath())) {
-          invalidKeys.add(path);
+      Set<IFile> keys = openEditors.keySet();
+      Set<IFile> invalidKeys = new HashSet<>();
+      for (IFile file : keys) {
+        if (folder.getFullPath().isPrefixOf(file.getFullPath())) {
+          invalidKeys.add(file);
         }
       }
-      for (SPath path : invalidKeys) {
-        closeEditor(path);
+      for (IFile file : invalidKeys) {
+        closeEditor(new SPath(file));
       }
     }
   }
