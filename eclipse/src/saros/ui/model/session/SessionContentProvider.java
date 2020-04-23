@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jface.viewers.Viewer;
 import saros.SarosPluginContext;
-import saros.activities.SPath;
 import saros.awareness.AwarenessInformationCollector;
 import saros.editor.EditorManager;
 import saros.editor.FollowModeManager;
 import saros.editor.IFollowModeListener;
 import saros.editor.ISharedEditorListener;
+import saros.filesystem.IFile;
 import saros.net.xmpp.contact.IContactsUpdate;
 import saros.net.xmpp.contact.IContactsUpdate.UpdateType;
 import saros.net.xmpp.contact.XMPPContactsService;
@@ -81,7 +81,7 @@ public class SessionContentProvider extends TreeContentProvider {
   private final ISharedEditorListener sharedEditorListener =
       new ISharedEditorListener() {
         @Override
-        public void editorActivated(final User user, SPath filePath) {
+        public void editorActivated(final User user, IFile file) {
           SWTUtils.runSafeSWTAsync(
               null,
               new Runnable() {

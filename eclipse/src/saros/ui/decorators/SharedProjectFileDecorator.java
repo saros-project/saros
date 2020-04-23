@@ -21,11 +21,11 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import saros.SarosPluginContext;
-import saros.activities.SPath;
 import saros.annotations.Component;
 import saros.editor.EditorManager;
 import saros.editor.ISharedEditorListener;
 import saros.editor.annotations.SarosAnnotation;
+import saros.filesystem.IFile;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.repackaged.picocontainer.annotations.Inject;
 import saros.session.ISarosSession;
@@ -136,22 +136,22 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
       new ISharedEditorListener() {
 
         @Override
-        public void editorActivated(User user, SPath filePath) {
+        public void editorActivated(User user, IFile file) {
           Set<IResource> oldResources = null;
 
           if (user.isLocal()) return;
 
           if (log.isTraceEnabled())
-            log.trace("remote user: " + user + " activated an editor -> " + filePath);
+            log.trace("remote user: " + user + " activated an editor -> " + file);
 
           oldResources = activeEditorResources.remove(user);
 
-          if (filePath != null) {
+          if (file != null) {
 
-            IResource resource = ResourceAdapterFactory.convertBack(filePath.getResource());
+            IResource resource = ResourceAdapterFactory.convertBack(file);
 
             if (resource != null) activeEditorResources.put(user, getResources(resource));
-            else log.warn("resource for editor " + filePath + " does not exist locally");
+            else log.warn("resource for editor " + file + " does not exist locally");
           }
 
           updateImageDescriptorMapping();

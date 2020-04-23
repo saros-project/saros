@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.activities.TextSelectionActivity;
 import saros.annotations.Component;
@@ -131,10 +130,10 @@ public class SelectionCollector extends AbstractStatisticCollector {
         }
 
         @Override
-        public void editorActivated(User user, SPath filePath) {
+        public void editorActivated(User user, IFile file) {
           if (user.equals(sarosSession.getLocalUser()))
             // Remember which editor the local user has open.
-            localFile = filePath.getFile();
+            localFile = file;
         }
 
         /**
