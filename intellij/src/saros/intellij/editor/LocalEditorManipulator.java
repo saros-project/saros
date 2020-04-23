@@ -9,7 +9,6 @@ import java.nio.charset.Charset;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.activities.SPath;
 import saros.editor.IEditorManager;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
@@ -142,7 +141,7 @@ public class LocalEditorManipulator {
    *     null</code>
    * @param selection text selection of the followed user; can be <code>null</code> if range is not
    *     <code>null</code>
-   * @see IEditorManager#adjustViewport(SPath, LineRange, TextSelection)
+   * @see IEditorManager#adjustViewport(IFile, LineRange, TextSelection)
    */
   public void adjustViewport(
       @NotNull Editor editor, @Nullable LineRange range, @Nullable TextSelection selection) {

@@ -7,7 +7,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import saros.activities.EditorActivity;
 import saros.activities.IActivity;
-import saros.activities.SPath;
 import saros.activities.StartFollowingActivity;
 import saros.activities.StopFollowingActivity;
 import saros.activities.TextSelectionActivity;
@@ -149,7 +148,7 @@ public class FollowModeManager implements Startable {
               // path == null means there is no open editor left
               if (file != null) {
                 // open editor, but don't change focus
-                editorManager.openEditor(new SPath(file), false);
+                editorManager.openEditor(file, false);
               } else {
                 // the follow mode is "paused"
               }
@@ -165,16 +164,14 @@ public class FollowModeManager implements Startable {
         public void receive(ViewportActivity activity) {
           LineRange range = new LineRange(activity.getStartLine(), activity.getNumberOfLines());
 
-          editorManager.adjustViewport(
-              new SPath(activity.getResource()), range, followeeSelection());
+          editorManager.adjustViewport(activity.getResource(), range, followeeSelection());
         }
 
         @Override
         public void receive(TextSelectionActivity activity) {
           TextSelection selection = activity.getSelection();
 
-          editorManager.adjustViewport(
-              new SPath(activity.getResource()), followeeRange(), selection);
+          editorManager.adjustViewport(activity.getResource(), followeeRange(), selection);
         }
       };
 

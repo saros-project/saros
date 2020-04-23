@@ -98,7 +98,7 @@ public class EditorAPI {
   private static boolean warnOnceExternalEditor = true;
 
   /**
-   * Opens the editor with given path. Needs to be called from an UI thread.
+   * Opens the editor for the given file. Needs to be called from an UI thread.
    *
    * @param activate <code>true</code>, if editor should get focus, otherwise <code>false</code>
    * @return the opened editor or <code>null</code> if the editor couldn't be opened.
@@ -681,10 +681,10 @@ public class EditorAPI {
   }
 
   /**
-   * @return the path of the file the given editor is displaying or null if the given editor is not
-   *     showing a file or the file is not referenced via a path in the project.
+   * @return the file the given editor is displaying or null if the given editor is not showing a
+   *     file or the file is not referenced via a path in the project.
    */
-  public static saros.filesystem.IFile getEditorPath(IEditorPart editorPart) {
+  public static saros.filesystem.IFile getEditorFile(IEditorPart editorPart) {
     IFile resource = getEditorResource(editorPart).getAdapter(IFile.class);
 
     return (resource == null) ? null : ResourceAdapterFactory.create(resource);

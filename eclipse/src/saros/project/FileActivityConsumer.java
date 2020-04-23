@@ -10,7 +10,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import saros.activities.FileActivity;
 import saros.activities.IActivity;
-import saros.activities.SPath;
 import saros.editor.EditorManager;
 import saros.filesystem.ResourceAdapterFactory;
 import saros.repackaged.picocontainer.Startable;
@@ -112,7 +111,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
 
     boolean editorWasOpen = editorManager.isOpenEditor(file);
 
-    if (editorWasOpen) editorManager.closeEditor(new SPath(file));
+    if (editorWasOpen) editorManager.closeEditor(file);
 
     FileActivity.Type type = activity.getType();
 
@@ -131,8 +130,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
       session.getConcurrentDocumentClient().reset(file);
     }
 
-    if (editorWasOpen && type != FileActivity.Type.REMOVED)
-      editorManager.openEditor(new SPath(file), true);
+    if (editorWasOpen && type != FileActivity.Type.REMOVED) editorManager.openEditor(file, true);
   }
 
   private void handleFileMove(FileActivity activity)

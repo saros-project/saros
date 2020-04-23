@@ -33,7 +33,6 @@ import saros.activities.FileActivity.Type;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.filesystem.IPath;
@@ -1044,7 +1043,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param createdFile the created file
    */
   private void setUpCreatedFileState(@NotNull IFile createdFile) {
-    editorManager.openEditor(new SPath(createdFile), false);
+    editorManager.openEditor(createdFile, false);
   }
 
   /**

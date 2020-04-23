@@ -7,7 +7,6 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import org.apache.log4j.Logger;
 import saros.activities.FileActivity;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.repackaged.picocontainer.Startable;
 import saros.server.editor.ServerEditorManager;
@@ -121,7 +120,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
 
   private void executeFileRemoval(FileActivity activity) throws IOException {
     IFile file = activity.getResource();
-    editorManager.closeEditor(new SPath(file));
+    editorManager.closeEditor(file);
     file.delete();
   }
 }

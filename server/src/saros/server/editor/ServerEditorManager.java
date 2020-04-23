@@ -8,10 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.log4j.Logger;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.editor.IEditorManager;
 import saros.editor.ISharedEditorListener;
@@ -33,31 +31,31 @@ public class ServerEditorManager implements IEditorManager {
   private List<ISharedEditorListener> listeners = new CopyOnWriteArrayList<>();
 
   @Override
-  public void openEditor(SPath path, boolean activate) {
+  public void openEditor(IFile file, boolean activate) {
     try {
-      getOrCreateEditor(path.getFile());
+      getOrCreateEditor(file);
     } catch (IOException e) {
-      log.warn("Could not open editor for " + path);
+      log.warn("Could not open editor for " + file);
     }
   }
 
   @Override
-  public Set<SPath> getOpenEditors() {
-    return openEditors.keySet().stream().map(SPath::new).collect(Collectors.toSet());
+  public Set<IFile> getOpenEditors() {
+    return openEditors.keySet();
   }
 
   @Override
-  public String getContent(SPath path) {
+  public String getContent(IFile file) {
     try {
-      return getOrCreateEditor(path.getFile()).getContent();
+      return getOrCreateEditor(file).getContent();
     } catch (IOException e) {
       return null;
     }
   }
 
   @Override
-  public String getNormalizedContent(SPath path) {
-    String content = getContent(path);
+  public String getNormalizedContent(IFile file) {
+    String content = getContent(file);
 
     if (content == null) {
       return null;
@@ -76,7 +74,7 @@ public class ServerEditorManager implements IEditorManager {
   }
 
   @Override
-  public void adjustViewport(SPath path, LineRange range, TextSelection selection) {
+  public void adjustViewport(IFile file, LineRange range, TextSelection selection) {
     throw new UnsupportedOperationException();
   }
 
@@ -147,14 +145,14 @@ public class ServerEditorManager implements IEditorManager {
   }
 
   @Override
-  public void closeEditor(SPath path) {
-    openEditors.remove(path.getFile());
+  public void closeEditor(IFile file) {
+    openEditors.remove(file);
   }
 
   /**
    * Close all editors of files in a specific folder. Helpful if a folder gets deleted.
    *
-   * @param folder path of the folder
+   * @param folder the folder
    */
   public void closeEditorsInFolder(IFolder folder) {
     synchronized (openEditors) {
@@ -166,7 +164,7 @@ public class ServerEditorManager implements IEditorManager {
         }
       }
       for (IFile file : invalidKeys) {
-        closeEditor(new SPath(file));
+        closeEditor(file);
       }
     }
   }

@@ -16,14 +16,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import saros.activities.EditorActivity;
 import saros.activities.EditorActivity.Type;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
@@ -754,21 +752,21 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   @Override
-  public Set<SPath> getOpenEditors() {
-    return editorPool.getFiles().stream().map(SPath::new).collect(Collectors.toSet());
+  public Set<IFile> getOpenEditors() {
+    return editorPool.getFiles();
   }
 
   @Override
-  public String getContent(final SPath path) {
+  public String getContent(final IFile file) {
     return FilesystemRunner.runReadAction(
         () -> {
-          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path.getFile());
+          VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
           if (virtualFile == null || !virtualFile.exists() || virtualFile.isDirectory()) {
 
             log.warn(
                 "Could not retrieve content of "
-                    + path
+                    + file
                     + " as a matching VirtualFile could not be found,"
                     + " does not exist, or is a directory");
 
@@ -782,9 +780,9 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   @Override
-  public String getNormalizedContent(SPath path) {
+  public String getNormalizedContent(IFile file) {
     // Intellij editor content is already normalized
-    return getContent(path);
+    return getContent(file);
   }
 
   @Override
@@ -864,7 +862,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   /**
-   * Fires an EditorActivity.Type.CLOSED event for the given path and notifies the local
+   * Fires an EditorActivity.Type.CLOSED event for the given file and notifies the local
    * EditorListenerDispatcher.
    *
    * @param file the closed file
@@ -1119,49 +1117,49 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
   }
 
   @Override
-  public void openEditor(final SPath path, final boolean activate) {
-    executeInUIThreadSynchronous(() -> localEditorManipulator.openEditor(path.getFile(), activate));
+  public void openEditor(final IFile file, final boolean activate) {
+    executeInUIThreadSynchronous(() -> localEditorManipulator.openEditor(file, activate));
   }
 
   @Override
-  public void closeEditor(final SPath path) {
-    executeInUIThreadSynchronous(() -> localEditorManipulator.closeEditor(path.getFile()));
+  public void closeEditor(final IFile file) {
+    executeInUIThreadSynchronous(() -> localEditorManipulator.closeEditor(file));
   }
 
   /**
    * {@inheritDoc}
    *
-   * <p>Only adjusts the viewport directly if the editor for the path is currently open. Otherwise,
+   * <p>Only adjusts the viewport directly if the editor for the file is currently open. Otherwise,
    * the viewport adjustment will be queued until the editor is selected/opened the next time, at
    * which point the viewport will be adjusted. If multiple adjustment requests are done while the
    * editor is not currently visible, only the last one will be applied to the editor once it is
    * selected/opened.
    *
-   * @param path {@inheritDoc}
+   * @param file {@inheritDoc}
    * @param range {@inheritDoc}
    * @param selection {@inheritDoc}
    * @see LocalEditorManipulator#adjustViewport(Editor, LineRange, TextSelection)
    */
   @Override
   public void adjustViewport(
-      @NotNull final SPath path,
+      @NotNull final IFile file,
       @Nullable final LineRange range,
       @Nullable final TextSelection selection) {
 
     Set<String> visibleFilePaths = new HashSet<>();
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
     for (VirtualFile virtualFile : ProjectAPI.getSelectedFiles(project)) {
       visibleFilePaths.add(virtualFile.getPath());
     }
 
-    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(path.getFile());
+    VirtualFile passedFile = VirtualFileConverter.convertToVirtualFile(file);
 
     if (passedFile == null) {
       log.warn(
           "Ignoring request to adjust viewport as no valid VirtualFile could be found for "
-              + path
+              + file
               + " - given range: "
               + range
               + ", given selection: "
@@ -1170,7 +1168,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
       return;
     }
 
-    Editor editor = editorPool.getEditor(path.getFile());
+    Editor editor = editorPool.getEditor(file);
 
     if (!visibleFilePaths.contains(passedFile.getPath())) {
       ViewportAdjustmentExecutor.queueViewPortChange(
@@ -1182,7 +1180,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
     if (editor == null) {
       log.warn(
           "Failed to adjust viewport for "
-              + path
+              + file
               + " as it is not known to the editor pool even though it is currently open");
 
       return;
@@ -1197,12 +1195,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *
    * <p><b>NOTE:</b> This method should only be used when adding editors for files that are not yet
    * part of the session scope. This can be the case when an open file is moved into the session
-   * scope. If the file is already part of the session scope, {@link #openEditor(SPath, boolean)}}
+   * scope. If the file is already part of the session scope, {@link #openEditor(IFile, boolean)}}
    * should be used instead as it ensures that the right editor for the file is used.
    *
    * @param file the file to add to the editor pool
    * @param editor the editor representing the given file
-   * @see #openEditor(SPath, boolean)
+   * @see #openEditor(IFile, boolean)
    * @see #startEditor(Editor)
    */
   public void addEditorMapping(@NotNull IFile file, @NotNull Editor editor) {

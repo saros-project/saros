@@ -15,7 +15,6 @@ import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
 import saros.activities.ChecksumErrorActivity;
 import saros.activities.FileActivity;
-import saros.activities.SPath;
 import saros.annotations.Component;
 import saros.editor.IEditorManager;
 import saros.filesystem.IFile;
@@ -290,7 +289,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer implemen
       return false;
     }
 
-    final String normalizedEditorContent = editorManager.getNormalizedContent(new SPath(file));
+    final String normalizedEditorContent = editorManager.getNormalizedContent(file);
 
     if (normalizedEditorContent == null) {
       log.debug("Inconsistency detected -> no editor content found for resource: " + file);

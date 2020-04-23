@@ -9,7 +9,6 @@ import saros.activities.ChecksumActivity;
 import saros.activities.ChecksumErrorActivity;
 import saros.activities.FileActivity.Purpose;
 import saros.activities.FileActivity.Type;
-import saros.activities.SPath;
 import saros.activities.TargetedFileActivity;
 import saros.annotations.Component;
 import saros.concurrent.management.ConcurrentDocumentServer;
@@ -164,9 +163,6 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
    * remove it).
    */
   private void recoverFile(final User from, final IFile file) {
-
-    SPath path = new SPath(file);
-
     // Reset jupiter
     concurrentDocumentServer.reset(from, file);
 
@@ -200,7 +196,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
     String text;
 
     try {
-      text = editorManager.getContent(path);
+      text = editorManager.getContent(file);
 
       if (text == null) {
         log.error("could retrieve content of file: " + file);
@@ -224,7 +220,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
     DocumentChecksum checksum = new DocumentChecksum(file);
 
-    String normalizedText = editorManager.getNormalizedContent(path);
+    String normalizedText = editorManager.getNormalizedContent(file);
 
     checksum.update(normalizedText);
 
