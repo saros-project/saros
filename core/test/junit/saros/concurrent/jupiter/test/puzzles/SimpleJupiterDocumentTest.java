@@ -3,6 +3,7 @@ package saros.concurrent.jupiter.test.puzzles;
 import static org.junit.Assert.assertEquals;
 import static saros.test.util.OperationHelper.I;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import saros.activities.JupiterActivity;
@@ -13,7 +14,6 @@ import saros.concurrent.jupiter.test.util.Document;
 import saros.concurrent.jupiter.test.util.JupiterTestCase;
 import saros.filesystem.IFile;
 import saros.session.User;
-import saros.test.mocks.SarosMocks;
 
 /**
  * This test class represents the local execution of document changes and appropriate jupiter
@@ -25,7 +25,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
 
   @Before
   public void setUp() {
-    fileMock = SarosMocks.mockFile();
+    fileMock = EasyMock.createNiceMock(IFile.class);
   }
 
   /** simple test to generate local operations and compute the JupiterActivities for other sides. */

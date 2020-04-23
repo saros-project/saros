@@ -19,7 +19,6 @@ import saros.editor.text.TextPosition;
 import saros.editor.text.TextSelection;
 import saros.filesystem.IFile;
 import saros.session.User;
-import saros.test.mocks.SarosMocks;
 
 public class UserEditorStateTest {
 
@@ -34,9 +33,8 @@ public class UserEditorStateTest {
   @BeforeClass
   public static void prepare() {
     /* Mocks */
-
-    fileA = SarosMocks.mockFile();
-    fileB = SarosMocks.mockFile();
+    fileA = EasyMock.createNiceMock(IFile.class);
+    fileB = EasyMock.createNiceMock(IFile.class);
 
     source = EasyMock.createMock(User.class);
     EasyMock.replay(source);

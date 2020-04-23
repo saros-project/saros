@@ -3,6 +3,7 @@ package saros.concurrent.jupiter.test.util;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import saros.activities.JupiterActivity;
 import saros.concurrent.jupiter.Algorithm;
@@ -11,7 +12,6 @@ import saros.concurrent.jupiter.TransformationException;
 import saros.concurrent.jupiter.internal.Jupiter;
 import saros.filesystem.IFile;
 import saros.session.User;
-import saros.test.mocks.SarosMocks;
 
 public class JupiterSimulator {
 
@@ -22,8 +22,7 @@ public class JupiterSimulator {
   public Peer server;
 
   public JupiterSimulator(String document) {
-
-    IFile file = SarosMocks.mockFile();
+    IFile file = EasyMock.createNiceMock(IFile.class);
 
     client = new Peer(new Jupiter(true), document, file);
     server = new Peer(new Jupiter(false), document, file);
