@@ -1,7 +1,5 @@
 package saros.concurrent.undo;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static saros.test.util.OperationHelper.D;
 import static saros.test.util.OperationHelper.I;
@@ -14,14 +12,11 @@ import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.internal.text.NoOperation;
 import saros.concurrent.undo.OperationHistory.Type;
 import saros.filesystem.IFile;
-import saros.filesystem.IProject;
 
 /** testing TextOperationHistory and UndoManager */
 public class UndoTest {
 
   // private static final Logger log = Logger.getLogger(UndoTest.class);
-
-  protected IProject project;
 
   private IFile file1;
   private IFile file2;
@@ -31,8 +26,6 @@ public class UndoTest {
 
   @Before
   public void setUp() {
-    project = createMock(IProject.class);
-    replay(project);
     undoManager = new UndoManager();
     history = undoManager.getHistory();
 
