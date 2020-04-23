@@ -116,7 +116,7 @@ public class FileActivityExecutor extends AbstractActivityConsumer implements St
     oldFile.delete();
 
     // only update if all previous operations are successful
-    editorManager.updateMapping(new SPath(oldFile), new SPath(newFile));
+    editorManager.updateMapping(oldFile, newFile);
   }
 
   private void executeFileRemoval(FileActivity activity) throws IOException {
