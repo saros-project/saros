@@ -1,34 +1,34 @@
 package saros.editor.remote;
 
-import saros.activities.SPath;
 import saros.editor.text.LineRange;
 import saros.editor.text.TextSelection;
+import saros.filesystem.IFile;
 
 /** Represents the current status of an editor. */
 public class EditorState {
 
-  private final SPath path;
+  private final IFile file;
 
   private TextSelection selection;
 
   private LineRange viewport;
 
-  EditorState(SPath path) {
-    this.path = path;
+  EditorState(IFile file) {
+    this.file = file;
   }
 
-  EditorState(SPath path, LineRange viewport, TextSelection selection) {
-    this.path = path;
+  EditorState(IFile file, LineRange viewport, TextSelection selection) {
+    this.file = file;
     this.viewport = viewport;
     this.selection = selection;
   }
 
   /**
-   * Returns the path of the file of which is the content is displayed in the editor described by
-   * this state object.
+   * Returns the file of which is the content is displayed in the editor described by this state
+   * object.
    */
-  public SPath getPath() {
-    return path;
+  public IFile getFile() {
+    return file;
   }
 
   /**

@@ -1018,8 +1018,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     executeInUIThreadSynchronous(
         () -> {
-          Editor newEditor =
-              localEditorManipulator.openEditor(remoteActiveEditor.getPath().getFile(), true);
+          Editor newEditor = localEditorManipulator.openEditor(remoteActiveEditor.getFile(), true);
 
           if (newEditor == null) {
             return;
