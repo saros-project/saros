@@ -48,38 +48,38 @@ public class LocalEditorManipulator {
   }
 
   /**
-   * Opens an editor for the passed virtualFile.
+   * Opens an editor for the passed file.
    *
    * <p>If the editor is a text editor, it is also added to the pool of currently open editors and
    * {@link EditorManager#startEditor(Editor)} is called with it.
    *
    * <p><b>Note:</b> This does only work for shared resources.
    *
-   * @param path path of the file to open
+   * @param file the file to open
    * @param activate activate editor after opening
-   * @return the editor for the given path, or <code>null</code> if the file does not exist or is
+   * @return the editor for the given file, or <code>null</code> if the file does not exist or is
    *     not shared or can not be represented by a text editor
    */
-  public Editor openEditor(@NotNull SPath path, boolean activate) {
-    if (!sarosSession.isShared(path.getResource())) {
-      log.warn("Ignored open editor request for path " + path + " as it is not shared");
+  public Editor openEditor(@NotNull IFile file, boolean activate) {
+    if (!sarosSession.isShared(file)) {
+      log.warn("Ignored open editor request for file " + file + " as it is not shared");
 
       return null;
     }
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
     if (virtualFile == null || !virtualFile.exists()) {
       log.warn(
-          "Could not open Editor for path "
-              + path
+          "Could not open Editor for file "
+              + file
               + " as a "
               + "matching VirtualFile does not exist or could not be found");
 
       return null;
     }
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
     Editor editor = ProjectAPI.openEditor(project, virtualFile, activate);
 
@@ -90,7 +90,7 @@ public class LocalEditorManipulator {
     }
 
     manager.startEditor(editor);
-    editorPool.add(path.getFile(), editor);
+    editorPool.add(file, editor);
 
     log.debug("Opened Editor " + editor + " for file " + virtualFile);
 
@@ -98,28 +98,28 @@ public class LocalEditorManipulator {
   }
 
   /**
-   * Closes the editor under the given path.
+   * Closes the editor for the given file.
    *
-   * @param path the path of the file for which to close the editor
+   * @param file the file for which to close the editor
    */
-  public void closeEditor(SPath path) {
-    editorPool.removeEditor(path.getFile());
+  public void closeEditor(IFile file) {
+    editorPool.removeEditor(file);
 
-    log.debug("Removed editor for path " + path + " from EditorPool");
+    log.debug("Removed editor for file " + file + " from EditorPool");
 
-    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(path);
+    VirtualFile virtualFile = VirtualFileConverter.convertToVirtualFile(file);
 
     if (virtualFile == null || !virtualFile.exists()) {
       log.warn(
-          "Could not close Editor for path "
-              + path
+          "Could not close Editor for file "
+              + file
               + " as a "
               + "matching VirtualFile does not exist or could not be found");
 
       return;
     }
 
-    Project project = path.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
+    Project project = file.getProject().adaptTo(IntelliJProjectImpl.class).getModule().getProject();
 
     if (ProjectAPI.isOpen(project, virtualFile)) {
       ProjectAPI.closeEditor(project, virtualFile);
