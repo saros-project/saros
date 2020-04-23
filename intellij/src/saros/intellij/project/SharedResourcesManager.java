@@ -387,6 +387,6 @@ public class SharedResourcesManager implements Startable {
    * @param deletedFile the deleted file
    */
   private void cleanUpBackgroundEditorPool(@NotNull IFile deletedFile) {
-    editorManager.removeBackgroundEditorForPath(new SPath(deletedFile));
+    editorManager.removeBackgroundEditorForFile(deletedFile);
   }
 }

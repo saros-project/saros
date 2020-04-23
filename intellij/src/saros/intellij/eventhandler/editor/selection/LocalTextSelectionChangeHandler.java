@@ -4,7 +4,6 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.editor.event.SelectionListener;
 import org.jetbrains.annotations.NotNull;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.IProjectEventHandler;
@@ -67,10 +66,10 @@ public class LocalTextSelectionChangeHandler implements IProjectEventHandler {
   private void generateSelectionActivity(@NotNull SelectionEvent event) {
     assert enabled : "the selection changed listener was triggered while it was disabled";
 
-    SPath path = editorManager.getFileForOpenEditor(event.getEditor().getDocument());
+    IFile file = editorManager.getFileForOpenEditor(event.getEditor().getDocument());
 
-    if (path != null) {
-      editorManager.generateSelection(path.getFile(), event);
+    if (file != null) {
+      editorManager.generateSelection(file, event);
     }
   }
 

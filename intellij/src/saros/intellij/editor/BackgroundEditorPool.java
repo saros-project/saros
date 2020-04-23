@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import saros.activities.SPath;
+import saros.filesystem.IFile;
 
 /**
  * Editor pool for background editors. The pool uses an LRU cache to avoid having to many background
@@ -43,7 +43,7 @@ public class BackgroundEditorPool implements Disposable {
   /** The capacity for the LRU cache. */
   private static final int CAPACITY = 20;
 
-  private final Map<SPath, Editor> backgroundEditors;
+  private final Map<IFile, Editor> backgroundEditors;
 
   private final MessageBusConnection messageBusConnection;
 
@@ -93,21 +93,21 @@ public class BackgroundEditorPool implements Disposable {
    * <p>To open user-visible editors, use {@link ProjectAPI#openEditor(Project, VirtualFile,
    * boolean)} instead.
    *
-   * @param path the path for the document
+   * @param file the file for the document
    * @param document the document to open a background editor for.
    * @return a background editor for hte given document
    * @see ProjectAPI#createBackgroundEditor(Document)
    */
   @NotNull
-  synchronized Editor getBackgroundEditor(@NotNull SPath path, @NotNull Document document) {
-    if (backgroundEditors.containsKey(path)) {
-      return backgroundEditors.get(path);
+  synchronized Editor getBackgroundEditor(@NotNull IFile file, @NotNull Document document) {
+    if (backgroundEditors.containsKey(file)) {
+      return backgroundEditors.get(file);
     }
 
     Editor backgroundEditor = ProjectAPI.createBackgroundEditor(document);
     log.debug("Created background editor for " + backgroundEditor.getDocument());
 
-    backgroundEditors.put(path, backgroundEditor);
+    backgroundEditors.put(file, backgroundEditor);
 
     return backgroundEditor;
   }
@@ -117,7 +117,7 @@ public class BackgroundEditorPool implements Disposable {
    *
    * @param file the file whose background editor to release
    */
-  synchronized void dropBackgroundEditor(@NotNull SPath file) {
+  synchronized void dropBackgroundEditor(@NotNull IFile file) {
     if (!backgroundEditors.containsKey(file)) {
       return;
     }
@@ -172,7 +172,7 @@ public class BackgroundEditorPool implements Disposable {
    * @see LinkedHashMap#removeEldestEntry(Map.Entry)
    */
   @SuppressWarnings("serial")
-  private static class LRUCache extends LinkedHashMap<SPath, Editor> {
+  private static class LRUCache extends LinkedHashMap<IFile, Editor> {
     /** The load factor for the LRU cache. */
     private static final float LOAD_FACTOR = 0.75f;
 
@@ -191,15 +191,15 @@ public class BackgroundEditorPool implements Disposable {
     }
 
     @Override
-    protected boolean removeEldestEntry(Entry<SPath, Editor> eldest) {
+    protected boolean removeEldestEntry(Entry<IFile, Editor> eldest) {
       if (size() >= capacity) {
         Editor editor = eldest.getValue();
 
         releaseBackgroundEditor(editor);
 
-        SPath path = eldest.getKey();
+        IFile file = eldest.getKey();
         Document document = editor.getDocument();
-        log.debug("Evicting least recently used entry from cache: " + path + " - " + document);
+        log.debug("Evicting least recently used entry from cache: " + file + " - " + document);
 
         return true;
       }

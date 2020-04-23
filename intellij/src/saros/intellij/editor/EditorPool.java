@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.activities.SPath;
+import saros.filesystem.IFile;
 
 /**
- * The Intellij editor pool. It is used to store a mapping of <code>SPath</code>s onto <code>Editor
+ * The Intellij editor pool. It is used to store a mapping of <code>IFile</code>s onto <code>Editor
  * </code>s for all shared files that are open locally.
  */
 class EditorPool {
-  private final Map<SPath, Editor> editors;
+  private final Map<IFile, Editor> editors;
   private final BackgroundEditorPool backgroundEditorPool;
 
   EditorPool(BackgroundEditorPool backgroundEditorPool) {
@@ -26,15 +26,15 @@ class EditorPool {
   }
 
   /**
-   * Adds the given <code>SPath</code> <code>Editor</code> mapping to the editor pool.
+   * Adds the given <code>IFile</code> <code>Editor</code> mapping to the editor pool.
    *
    * <p>Also closes any existing background editors for the file as they are no longer needed.
    *
-   * @param file the path for the file
+   * @param file the file
    * @param editor the editor for the file
    * @see BackgroundEditorPool
    */
-  void add(@NotNull SPath file, @NotNull Editor editor) {
+  void add(@NotNull IFile file, @NotNull Editor editor) {
 
     editors.put(file, editor);
 
@@ -42,28 +42,28 @@ class EditorPool {
   }
 
   /**
-   * Removes the given path from the editor pool.
+   * Removes the given file from the editor pool.
    *
-   * @param file the path that is removed from the editor pool
+   * @param file the file that is removed from the editor pool
    */
-  void removeEditor(@NotNull SPath file) {
+  void removeEditor(@NotNull IFile file) {
 
     editors.remove(file);
   }
 
   /**
-   * Replaces the path of the editor pool mapping for the old path with the new path. Does nothing
-   * if the editor pool does not contain a mapping for the given old path.
+   * Replaces the file of the editor pool mapping for the old file with the new file. Does nothing
+   * if the editor pool does not contain a mapping for the given old file.
    *
-   * @param oldPath the old path
-   * @param newPath the new path
+   * @param oldFile the old file
+   * @param newFile the new file
    */
-  void replacePath(@NotNull SPath oldPath, @NotNull SPath newPath) {
+  void replaceFile(@NotNull IFile oldFile, @NotNull IFile newFile) {
 
-    Editor editor = editors.remove(oldPath);
+    Editor editor = editors.remove(oldFile);
 
     if (editor != null) {
-      editors.put(newPath, editor);
+      editors.put(newFile, editor);
     }
   }
 
@@ -82,14 +82,14 @@ class EditorPool {
   }
 
   /**
-   * Returns the <code>Document</code> for the given path.
+   * Returns the <code>Document</code> for the given file.
    *
-   * @param file the <code>SPath</code> to get the document for
-   * @return the <code>Document</code> for the given path or <code>null</code> if the given path is
+   * @param file the <code>IFile</code> to get the document for
+   * @return the <code>Document</code> for the given file or <code>null</code> if the given file is
    *     not contained in the editor pool
    */
   @Nullable
-  Document getDocument(@NotNull SPath file) {
+  Document getDocument(@NotNull IFile file) {
 
     Editor editor = editors.get(file);
 
@@ -97,29 +97,29 @@ class EditorPool {
   }
 
   /**
-   * Returns the <code>Editor</code> for the given path.
+   * Returns the <code>Editor</code> for the given file.
    *
-   * @param file the <code>SPath</code> to get the editor for
-   * @return the <code>Editor</code> for the given path or <code>null</code> if the given path is
+   * @param file the <code>IFile</code> to get the editor for
+   * @return the <code>Editor</code> for the given file or <code>null</code> if the given file is
    *     not contained in the editor pool
    */
   @Nullable
-  Editor getEditor(@NotNull SPath file) {
+  Editor getEditor(@NotNull IFile file) {
 
     return editors.get(file);
   }
 
   /**
-   * Returns the <code>SPath</code> for the given document.
+   * Returns the <code>IFile</code> for the given document.
    *
-   * @param doc the <code>Document</code> to get the path for
-   * @return the <code>SPath</code> for the given document or <code>null</code> if no matching path
+   * @param doc the <code>Document</code> to get the file for
+   * @return the <code>IFile</code> for the given document or <code>null</code> if no matching file
    *     could be found in the editor pool
    */
   @Nullable
-  SPath getFile(@Nullable Document doc) {
+  IFile getFile(@Nullable Document doc) {
 
-    for (Map.Entry<SPath, Editor> entry : editors.entrySet()) {
+    for (Map.Entry<IFile, Editor> entry : editors.entrySet()) {
       if (entry.getValue().getDocument().equals(doc)) {
         return entry.getKey();
       }
@@ -139,12 +139,12 @@ class EditorPool {
   }
 
   /**
-   * Returns all paths contained in the editor pool.
+   * Returns all files contained in the editor pool.
    *
-   * @return all paths contained in the editor pool
+   * @return all files contained in the editor pool
    */
   @NotNull
-  Set<SPath> getFiles() {
+  Set<IFile> getFiles() {
     return editors.keySet();
   }
 
@@ -155,7 +155,7 @@ class EditorPool {
    * @return an unmodifiable representation of the held editor mapping
    */
   @NotNull
-  Map<SPath, Editor> getMapping() {
+  Map<IFile, Editor> getMapping() {
     return Collections.unmodifiableMap(editors);
   }
 
