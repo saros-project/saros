@@ -256,7 +256,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   private void sendIfRequired(OutgoingStreamProtocol osp, SPath file)
       throws IOException, LocalCancellationException {
     if (transferList.contains(file) && !transmittedFiles.contains(file)) {
-      osp.streamFile(file);
+      osp.streamFile(file.getFile());
       transmittedFiles.add(file);
     }
   }

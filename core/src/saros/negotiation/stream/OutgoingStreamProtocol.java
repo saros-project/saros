@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.apache.log4j.Logger;
-import saros.activities.SPath;
 import saros.exceptions.LocalCancellationException;
 import saros.filesystem.IFile;
 import saros.monitoring.IProgressMonitor;
@@ -39,16 +38,14 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
    * @throws IOException if any file or stream operation fails
    * @throws LocalCancellationException on local user cancellation
    */
-  public void streamFile(SPath file) throws IOException, LocalCancellationException {
-    String message = "sending " + displayName(file.getFile());
+  public void streamFile(IFile file) throws IOException, LocalCancellationException {
+    String message = "sending " + displayName(file);
     log.debug(message);
     monitor.subTask(message);
 
-    IFile fileHandle = file.getFile();
+    writeHeader(file, file.getSize());
 
-    writeHeader(file, fileHandle.getSize());
-
-    try (InputStream fileIn = fileHandle.getContents()) {
+    try (InputStream fileIn = file.getContents()) {
       int readBytes = 0;
       /* buffer the file content and send to stream */
       while (readBytes != -1) {
@@ -64,7 +61,7 @@ public class OutgoingStreamProtocol extends AbstractStreamProtocol {
     monitor.worked(1);
   }
 
-  private void writeHeader(SPath file, long fileSize) throws IOException {
+  private void writeHeader(IFile file, long fileSize) throws IOException {
     String projectID = projectSharingData.getProjectID(file.getProject());
     String fileName = file.getProjectRelativePath().toPortableString();
 
