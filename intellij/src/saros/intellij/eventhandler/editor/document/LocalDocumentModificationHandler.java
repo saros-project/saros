@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.session.ISarosSession;
 
@@ -41,16 +42,17 @@ public class LocalDocumentModificationHandler extends AbstractLocalDocumentModif
   private void generateTextEditActivity(@NotNull DocumentEvent event) {
     Document document = event.getDocument();
 
-    SPath path = getSPath(document);
+    IFile file = getFile(document);
 
-    if (path == null) {
+    if (file == null) {
       return;
     }
 
     String newText = event.getNewFragment().toString();
     String replacedText = event.getOldFragment().toString();
 
-    editorManager.generateTextEdit(event.getOffset(), newText, replacedText, path, document);
+    editorManager.generateTextEdit(
+        event.getOffset(), newText, replacedText, new SPath(file), document);
   }
 
   @Override

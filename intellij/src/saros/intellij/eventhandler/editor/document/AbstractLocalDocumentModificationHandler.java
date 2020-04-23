@@ -7,7 +7,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import saros.activities.SPath;
+import saros.filesystem.IFile;
 import saros.intellij.editor.DocumentAPI;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.eventhandler.IProjectEventHandler;
@@ -107,11 +109,12 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
    *     resources represented by the given document is not shared
    * @see VirtualFileConverter#convertToSPath(Project,VirtualFile)
    */
-  final SPath getSPath(@NotNull Document document) {
+  @Nullable
+  final IFile getFile(@NotNull Document document) {
     SPath path = editorManager.getFileForOpenEditor(document);
 
     if (path != null) {
-      return path;
+      return path.getFile();
     }
 
     VirtualFile virtualFile = DocumentAPI.getVirtualFile(document);
@@ -128,9 +131,9 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
       return null;
     }
 
-    path = VirtualFileConverter.convertToSPath(project, virtualFile);
+    IFile file = (IFile) VirtualFileConverter.convertToResource(project, virtualFile);
 
-    if (path == null || !sarosSession.isShared(path.getResource())) {
+    if (file == null || !sarosSession.isShared(file)) {
       if (log.isTraceEnabled()) {
         log.trace("Ignoring Event for document " + document + " - document is not shared");
       }
@@ -138,6 +141,6 @@ public abstract class AbstractLocalDocumentModificationHandler implements IProje
       return null;
     }
 
-    return path;
+    return file;
   }
 }
