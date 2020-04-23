@@ -1018,7 +1018,8 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
     executeInUIThreadSynchronous(
         () -> {
-          Editor newEditor = localEditorManipulator.openEditor(remoteActiveEditor.getPath(), true);
+          Editor newEditor =
+              localEditorManipulator.openEditor(remoteActiveEditor.getPath().getFile(), true);
 
           if (newEditor == null) {
             return;
@@ -1123,12 +1124,12 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
   @Override
   public void openEditor(final SPath path, final boolean activate) {
-    executeInUIThreadSynchronous(() -> localEditorManipulator.openEditor(path, activate));
+    executeInUIThreadSynchronous(() -> localEditorManipulator.openEditor(path.getFile(), activate));
   }
 
   @Override
   public void closeEditor(final SPath path) {
-    executeInUIThreadSynchronous(() -> localEditorManipulator.closeEditor(path));
+    executeInUIThreadSynchronous(() -> localEditorManipulator.closeEditor(path.getFile()));
   }
 
   /**

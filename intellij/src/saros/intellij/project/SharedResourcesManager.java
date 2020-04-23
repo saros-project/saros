@@ -13,7 +13,6 @@ import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IActivity;
 import saros.activities.IFileSystemModificationActivity;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.filesystem.IFolder;
 import saros.intellij.context.SharedIDEContext;
@@ -217,7 +216,7 @@ public class SharedResourcesManager implements Startable {
       selectedEditorStateSnapshot = selectedEditorStateSnapshotFactory.capturedState();
     }
 
-    localEditorManipulator.closeEditor(new SPath(oldFile));
+    localEditorManipulator.closeEditor(oldFile);
 
     cleanUpBackgroundEditorPool(oldFile);
 
@@ -246,7 +245,7 @@ public class SharedResourcesManager implements Startable {
       newFile.setCharset(charset);
 
       if (fileOpen) {
-        localEditorManipulator.openEditor(new SPath(newFile), false);
+        localEditorManipulator.openEditor(newFile, false);
 
         try {
           selectedEditorStateSnapshot.replaceSelectedFile(oldFile, newFile);
@@ -275,7 +274,7 @@ public class SharedResourcesManager implements Startable {
     }
 
     if (localEditorHandler.isOpenEditor(file)) {
-      localEditorManipulator.closeEditor(new SPath(file));
+      localEditorManipulator.closeEditor(file);
     }
 
     cleanUpBackgroundEditorPool(file);
