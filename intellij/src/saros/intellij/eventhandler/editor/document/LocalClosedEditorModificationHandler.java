@@ -5,7 +5,6 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import saros.activities.SPath;
 import saros.filesystem.IFile;
 import saros.intellij.editor.EditorManager;
 import saros.intellij.editor.ProjectAPI;
@@ -51,9 +50,9 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
   private void cleanUpAnnotations(@NotNull DocumentEvent event) {
     Document document = event.getDocument();
 
-    SPath path = getSPath(document);
+    IFile file = getFile(document);
 
-    if (path == null) {
+    if (file == null) {
       return;
     }
 
@@ -62,7 +61,6 @@ public class LocalClosedEditorModificationHandler extends AbstractLocalDocumentM
     String replacedText = event.getOldFragment().toString();
 
     if (!ProjectAPI.isOpen(project, document)) {
-      IFile file = path.getFile();
 
       int replacedTextLength = replacedText.length();
       if (replacedTextLength > 0) {
