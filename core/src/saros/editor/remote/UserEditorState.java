@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import saros.activities.EditorActivity;
-import saros.activities.SPath;
 import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
 import saros.editor.text.LineRange;
@@ -83,7 +82,7 @@ public class UserEditorState {
   private synchronized EditorState updateEditorState(IFile file) {
     EditorState result = openEditors.get(file);
     if (result == null) {
-      result = new EditorState(new SPath(file));
+      result = new EditorState(file);
       openEditors.put(file, result);
     }
     return result;
@@ -97,7 +96,7 @@ public class UserEditorState {
 
       // Create new or reinsert at the end of the Map
       if (activeEditor == null) {
-        activeEditor = new EditorState(new SPath(file));
+        activeEditor = new EditorState(file);
       } else {
         openEditors.remove(file);
       }
@@ -139,7 +138,7 @@ public class UserEditorState {
       return null;
     }
 
-    return new EditorState(result.getPath(), result.getViewport(), result.getSelection());
+    return new EditorState(result.getFile(), result.getViewport(), result.getSelection());
   }
 
   /**
@@ -152,6 +151,6 @@ public class UserEditorState {
     if (activeEditor == null) return null;
 
     return new EditorState(
-        activeEditor.getPath(), activeEditor.getViewport(), activeEditor.getSelection());
+        activeEditor.getFile(), activeEditor.getViewport(), activeEditor.getSelection());
   }
 }

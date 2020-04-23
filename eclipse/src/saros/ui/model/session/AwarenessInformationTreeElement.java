@@ -101,7 +101,7 @@ public class AwarenessInformationTreeElement extends TreeElement {
       return details;
     }
 
-    IFile activeFile = activeEditor.getPath().getFile();
+    IFile activeFile = activeEditor.getFile();
     if (activeFile != null) {
       /*
        * path.getProjectRelativePath() could be too long, sometimes the

@@ -12,7 +12,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import saros.activities.EditorActivity;
 import saros.activities.EditorActivity.Type;
-import saros.activities.SPath;
 import saros.activities.TextSelectionActivity;
 import saros.activities.ViewportActivity;
 import saros.editor.text.LineRange;
@@ -120,16 +119,12 @@ public class UserEditorStateTest {
     assertEquals("both activated editors should be open", 2, state.getOpenEditors().size());
 
     assertEquals(
-        "last activated editor should be active",
-        new SPath(fileB),
-        state.getActiveEditorState().getPath());
+        "last activated editor should be active", fileB, state.getActiveEditorState().getFile());
 
     activate(fileA);
 
     assertEquals(
-        "last activated editor should be active",
-        new SPath(fileA),
-        state.getActiveEditorState().getPath());
+        "last activated editor should be active", fileA, state.getActiveEditorState().getFile());
 
     close(fileA);
 

@@ -84,7 +84,8 @@ public class FollowModeManager implements Startable {
 
           EditorState remoteActiveEditor = followeeEditor();
 
-          if (remoteActiveEditor != null && !remoteActiveEditor.getPath().equals(filePath)) {
+          if (remoteActiveEditor != null
+              && !remoteActiveEditor.getFile().equals(filePath.getFile())) {
 
             dropFollowModeState();
             notifyStopped(reason);
@@ -99,7 +100,8 @@ public class FollowModeManager implements Startable {
 
           EditorState remoteActiveEditor = followeeEditor();
 
-          if (remoteActiveEditor != null && remoteActiveEditor.getPath().equals(filePath)) {
+          if (remoteActiveEditor != null
+              && remoteActiveEditor.getFile().equals(filePath.getFile())) {
 
             dropFollowModeState();
             notifyStopped(reason);

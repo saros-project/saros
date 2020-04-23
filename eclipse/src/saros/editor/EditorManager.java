@@ -1529,7 +1529,7 @@ public class EditorManager implements IEditorManager {
       return;
     }
 
-    final saros.filesystem.IFile file = activeEditor.getPath().getFile();
+    final saros.filesystem.IFile file = activeEditor.getFile();
     final LineRange viewport = activeEditor.getViewport();
     final TextSelection selection = activeEditor.getSelection();
 
