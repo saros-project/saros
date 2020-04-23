@@ -116,7 +116,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
               editorListenerDispatch.editorClosed(user, new SPath(file));
               break;
             case SAVED:
-              localEditorHandler.saveDocument(new SPath(file));
+              localEditorHandler.saveDocument(file);
               break;
             default:
               log.warn("Unexpected type: " + editorActivity.getType());
@@ -802,10 +802,10 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    *
    * @param path the path for the document to save
    * @see Document
-   * @see LocalEditorHandler#saveDocument(SPath)
+   * @see LocalEditorHandler#saveDocument(IFile)
    */
   private void saveDocument(SPath path) {
-    localEditorHandler.saveDocument(path);
+    localEditorHandler.saveDocument(path.getFile());
   }
 
   public void removeAllEditorsForPath(IFile file) {
