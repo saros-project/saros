@@ -1,9 +1,9 @@
 package saros.editor;
 
 import java.util.concurrent.CopyOnWriteArrayList;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.activities.TextSelectionActivity;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /** {@link ISharedEditorListener} which can dispatch events to multiple listeners. */
@@ -32,13 +32,13 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
   }
 
   @Override
-  public void editorActivated(User user, SPath filePath) {
-    for (ISharedEditorListener listener : editorListeners) listener.editorActivated(user, filePath);
+  public void editorActivated(User user, IFile file) {
+    for (ISharedEditorListener listener : editorListeners) listener.editorActivated(user, file);
   }
 
   @Override
-  public void editorClosed(User user, SPath filePath) {
-    for (ISharedEditorListener listener : editorListeners) listener.editorClosed(user, filePath);
+  public void editorClosed(User user, IFile file) {
+    for (ISharedEditorListener listener : editorListeners) listener.editorClosed(user, file);
   }
 
   @Override

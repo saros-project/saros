@@ -21,6 +21,7 @@ import saros.editor.remote.UserEditorStateManager;
 import saros.exceptions.LocalCancellationException;
 import saros.exceptions.SarosCancellationException;
 import saros.filesystem.IChecksumCache;
+import saros.filesystem.IFile;
 import saros.filesystem.IProject;
 import saros.filesystem.IWorkspace;
 import saros.monitoring.IProgressMonitor;
@@ -51,7 +52,7 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
   private final ISharedEditorListener listener =
       new ISharedEditorListener() {
         @Override
-        public void editorActivated(User user, SPath file) {
+        public void editorActivated(User user, IFile file) {
           fileOpened(file);
         }
       };
@@ -95,8 +96,8 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     /* get all opened editors */
     editorManager.addSharedEditorListener(listener);
     Set<SPath> openEditors = session.getComponent(UserEditorStateManager.class).getOpenEditors();
-    for (SPath remoteOpenFile : openEditors) fileOpened(remoteOpenFile);
-    for (SPath localOpenFile : editorManager.getOpenEditors()) fileOpened(localOpenFile);
+    for (SPath remoteOpenFile : openEditors) fileOpened(remoteOpenFile.getFile());
+    for (SPath localOpenFile : editorManager.getOpenEditors()) fileOpened(localOpenFile.getFile());
   }
 
   @Override
@@ -211,9 +212,9 @@ public class InstantOutgoingProjectNegotiation extends AbstractOutgoingProjectNe
     transferList = new LinkedHashSet<SPath>(files);
   }
 
-  private void fileOpened(SPath file) {
+  private void fileOpened(IFile file) {
     if (file != null) {
-      openedFiles.addFirst(file);
+      openedFiles.addFirst(new SPath(file));
       log.debug(this + ": added " + file + " to open files queue");
     }
   }

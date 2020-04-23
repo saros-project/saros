@@ -109,11 +109,11 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
 
           switch (editorActivity.getType()) {
             case ACTIVATED:
-              editorListenerDispatch.editorActivated(user, new SPath(file));
+              editorListenerDispatch.editorActivated(user, file);
               break;
 
             case CLOSED:
-              editorListenerDispatch.editorClosed(user, new SPath(file));
+              editorListenerDispatch.editorClosed(user, file);
               break;
             case SAVED:
               localEditorHandler.saveDocument(file);
@@ -854,8 +854,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   void generateEditorActivated(IFile file) {
     if (file == null || session.isShared(file)) {
-      editorListenerDispatch.editorActivated(
-          session.getLocalUser(), file != null ? new SPath(file) : null);
+      editorListenerDispatch.editorActivated(session.getLocalUser(), file);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.ACTIVATED, file));
 
@@ -872,7 +871,7 @@ public class EditorManager extends AbstractActivityProducer implements IEditorMa
    */
   void generateEditorClosed(@NotNull IFile file) {
     if (session.isShared(file)) {
-      editorListenerDispatch.editorClosed(session.getLocalUser(), new SPath(file));
+      editorListenerDispatch.editorClosed(session.getLocalUser(), file);
 
       fireActivity(new EditorActivity(session.getLocalUser(), EditorActivity.Type.CLOSED, file));
     }

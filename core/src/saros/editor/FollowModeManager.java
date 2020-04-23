@@ -77,15 +77,14 @@ public class FollowModeManager implements Startable {
   private ISharedEditorListener stopFollowingOnOwnActions =
       new ISharedEditorListener() {
         @Override
-        public void editorActivated(User user, SPath filePath) {
+        public void editorActivated(User user, IFile file) {
           if (!user.equals(localUser) || !isFollowing()) return;
 
           Reason reason = Reason.FOLLOWER_CLOSED_OR_SWITCHED_EDITOR;
 
           EditorState remoteActiveEditor = followeeEditor();
 
-          if (remoteActiveEditor != null
-              && !remoteActiveEditor.getFile().equals(filePath.getFile())) {
+          if (remoteActiveEditor != null && !remoteActiveEditor.getFile().equals(file)) {
 
             dropFollowModeState();
             notifyStopped(reason);
@@ -93,15 +92,14 @@ public class FollowModeManager implements Startable {
         }
 
         @Override
-        public void editorClosed(User user, SPath filePath) {
+        public void editorClosed(User user, IFile file) {
           if (!user.equals(localUser) || !isFollowing()) return;
 
           Reason reason = Reason.FOLLOWER_CLOSED_EDITOR;
 
           EditorState remoteActiveEditor = followeeEditor();
 
-          if (remoteActiveEditor != null
-              && remoteActiveEditor.getFile().equals(filePath.getFile())) {
+          if (remoteActiveEditor != null && remoteActiveEditor.getFile().equals(file)) {
 
             dropFollowModeState();
             notifyStopped(reason);

@@ -508,8 +508,7 @@ public class EditorManager implements IEditorManager {
 
     if (file != null && session.isShared(file)) openEditorPaths.add(file);
 
-    editorListenerDispatch.editorActivated(
-        session.getLocalUser(), file == null ? null : new SPath(file));
+    editorListenerDispatch.editorActivated(session.getLocalUser(), file);
 
     activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.ACTIVATED, file));
   }
@@ -676,7 +675,7 @@ public class EditorManager implements IEditorManager {
     saros.filesystem.IFile file = editorActivity.getResource();
     switch (editorActivity.getType()) {
       case ACTIVATED:
-        editorListenerDispatch.editorActivated(sender, new SPath(file));
+        editorListenerDispatch.editorActivated(sender, file);
 
         // #2707089 We must clear annotations from shared editors that are
         // not commonly viewed
@@ -691,7 +690,7 @@ public class EditorManager implements IEditorManager {
         }
         break;
       case CLOSED:
-        editorListenerDispatch.editorClosed(sender, new SPath(file));
+        editorListenerDispatch.editorClosed(sender, file);
 
         for (final IEditorPart editorPart : editorPool.getEditors(file)) {
           locationAnnotationManager.clearSelectionForUser(sender, editorPart);
@@ -1011,7 +1010,7 @@ public class EditorManager implements IEditorManager {
     if (viewer instanceof ISourceViewer)
       customAnnotationManager.uninstallPainter((ISourceViewer) viewer, false);
 
-    editorListenerDispatch.editorClosed(session.getLocalUser(), new SPath(file));
+    editorListenerDispatch.editorClosed(session.getLocalUser(), file);
 
     activityDelayer.fireActivity(new EditorActivity(session.getLocalUser(), Type.CLOSED, file));
 

@@ -23,7 +23,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import saros.activities.IActivity;
-import saros.activities.SPath;
 import saros.activities.TextEditActivity;
 import saros.annotations.Component;
 import saros.concurrent.jupiter.InclusionTransformation;
@@ -264,27 +263,23 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
       new ISharedEditorListener() {
 
         @Override
-        public void editorActivated(User user, SPath newActiveEditor) {
-          IFile newActiveFile = newActiveEditor.getFile();
-
-          if (!user.isLocal() || Objects.equals(currentActiveEditor, newActiveFile)) return;
+        public void editorActivated(User user, IFile newActiveEditor) {
+          if (!user.isLocal() || Objects.equals(currentActiveEditor, newActiveEditor)) return;
 
           updateCurrentLocalAtomicOperation(null);
           storeCurrentLocalOperation();
-          currentActiveEditor = newActiveFile;
+          currentActiveEditor = newActiveEditor;
         }
 
         @Override
-        public void editorClosed(User user, SPath closedEditor) {
-          IFile closedFile = closedEditor.getFile();
-
-          if (Objects.equals(currentActiveEditor, closedFile)) {
+        public void editorClosed(User user, IFile closedEditor) {
+          if (Objects.equals(currentActiveEditor, closedEditor)) {
             updateCurrentLocalAtomicOperation(null);
             storeCurrentLocalOperation();
             currentActiveEditor = null;
           }
 
-          undoHistory.clearEditorHistory(closedFile);
+          undoHistory.clearEditorHistory(closedEditor);
         }
       };
 
