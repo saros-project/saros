@@ -28,7 +28,6 @@ import javax.swing.undo.CannotUndoException;
 import org.apache.log4j.Logger;
 import saros.activities.ChecksumActivity;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.InclusionTransformation;
 import saros.concurrent.jupiter.Operation;
@@ -38,6 +37,7 @@ import saros.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
 import saros.concurrent.jupiter.internal.text.NoOperation;
 import saros.concurrent.jupiter.internal.text.TimestampOperation;
 import saros.editor.text.TextPosition;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 /** This class implements the client-side core of the Jupiter control algorithm. */
@@ -77,11 +77,10 @@ public class Jupiter implements Algorithm {
   }
 
   @Override
-  public JupiterActivity generateJupiterActivity(Operation op, User source, SPath editor) {
+  public JupiterActivity generateJupiterActivity(Operation op, User source, IFile file) {
 
     // send(op, myMsgs, otherMsgs);
-    JupiterActivity jupiterActivity =
-        new JupiterActivity(this.vectorTime, op, source, editor.getFile());
+    JupiterActivity jupiterActivity = new JupiterActivity(this.vectorTime, op, source, file);
 
     // add(op, myMsgs) to outgoing;
     this.ackJupiterActivityList.add(
@@ -288,7 +287,7 @@ public class Jupiter implements Algorithm {
    *
    * @valueObject Instances of this class should be treated as value objects and should be treated
    *     as immutable.
-   * @see Jupiter#generateJupiterActivity(Operation, User, SPath)
+   * @see Jupiter#generateJupiterActivity(Operation, User, IFile)
    * @see Jupiter#receiveJupiterActivity(JupiterActivity)
    */
   protected static class OperationWrapper {

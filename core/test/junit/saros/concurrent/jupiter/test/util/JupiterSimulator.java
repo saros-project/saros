@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
@@ -53,8 +52,7 @@ public class JupiterSimulator {
 
       User user = JupiterTestCase.createUser("DUMMY");
 
-      JupiterActivity jupiterActivity =
-          algorithm.generateJupiterActivity(operation, user, new SPath(file));
+      JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(operation, user, file);
 
       if (this == client) {
         server.inQueue.add(jupiterActivity);

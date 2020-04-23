@@ -1,8 +1,8 @@
 package saros.concurrent.jupiter;
 
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.editor.text.TextPosition;
+import saros.filesystem.IFile;
 import saros.session.User;
 
 public interface Algorithm {
@@ -20,11 +20,11 @@ public interface Algorithm {
    *
    * @param op the operation for which a JupiterActivity should be generated
    * @param user The user who created this activity.
-   * @param editor the SPath for which this activity is to be created.
+   * @param file the file for which this activity is to be created.
    * @return the generated JupiterActivity
    * @see JupiterActivity
    */
-  JupiterActivity generateJupiterActivity(Operation op, User user, SPath editor);
+  JupiterActivity generateJupiterActivity(Operation op, User user, IFile file);
 
   /**
    * Receives a JupiterActivity from a remote site. The JupiterActivity must be transformed and the

@@ -2,7 +2,6 @@ package saros.concurrent.jupiter.test.util;
 
 import org.apache.log4j.Logger;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.Timestamp;
@@ -67,7 +66,7 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler, Documen
     doc.execOperation(op);
     /* 2. transform operation. */
     JupiterActivity jupiterActivity =
-        algorithm.generateJupiterActivity(op, server, new SPath(connection.file));
+        algorithm.generateJupiterActivity(op, server, connection.file);
     /* sent to client */
     connection.sendOperation(new NetworkRequest(jupiterActivity, user, delay));
   }

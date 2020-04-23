@@ -2,7 +2,6 @@ package saros.concurrent.jupiter.test.util;
 
 import org.apache.log4j.Logger;
 import saros.activities.JupiterActivity;
-import saros.activities.SPath;
 import saros.concurrent.jupiter.Algorithm;
 import saros.concurrent.jupiter.Operation;
 import saros.concurrent.jupiter.TransformationException;
@@ -53,8 +52,7 @@ public class ProxySynchronizedQueue {
   }
 
   public void sendOperation(Operation op) {
-    JupiterActivity jupiterActivity =
-        algorithm.generateJupiterActivity(op, this.user, new SPath(fileMock));
+    JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op, this.user, fileMock);
     connection.sendOperation(new NetworkRequest(jupiterActivity, user, -1));
   }
 
