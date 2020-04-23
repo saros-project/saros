@@ -108,9 +108,9 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
      * flushed and so replacing the file on disk will have NO impact on the
      * actual content !
      */
-    editorManager.saveLazy(new SPath(file));
+    editorManager.saveLazy(file);
 
-    boolean editorWasOpen = editorManager.isOpenEditor(new SPath(file));
+    boolean editorWasOpen = editorManager.isOpenEditor(file);
 
     if (editorWasOpen) editorManager.closeEditor(new SPath(file));
 
@@ -154,7 +154,7 @@ public class FileActivityConsumer extends AbstractActivityConsumer implements St
   private void handleFileDeletion(FileActivity activity) throws CoreException {
     saros.filesystem.IFile fileWrapper = activity.getResource();
 
-    editorManager.closeEditor(new SPath(fileWrapper), false);
+    editorManager.closeEditor(fileWrapper, false);
 
     final IFile file = toEclipseIFile(fileWrapper);
 

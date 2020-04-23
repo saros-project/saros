@@ -16,7 +16,6 @@ import saros.activities.FileActivity.Type;
 import saros.activities.FolderCreatedActivity;
 import saros.activities.FolderDeletedActivity;
 import saros.activities.IResourceActivity;
-import saros.activities.SPath;
 import saros.editor.EditorManager;
 import saros.filesystem.IFolder;
 import saros.filesystem.ResourceAdapterFactory;
@@ -240,7 +239,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     if (resource instanceof IFile) {
       saros.filesystem.IFile removedFile = (saros.filesystem.IFile) removedResource;
 
-      editorManager.closeEditor(new SPath(removedFile), false);
+      editorManager.closeEditor(removedFile, false);
 
       addActivity(
           new FileActivity(user, Type.REMOVED, Purpose.ACTIVITY, removedFile, null, null, null));
@@ -271,7 +270,7 @@ final class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     if (!session.isShared(wrappedFile)) return;
 
-    if (editorManager.isOpened(new SPath(wrappedFile)) || editorManager.isManaged(file)) return;
+    if (editorManager.isOpened(wrappedFile) || editorManager.isManaged(file)) return;
 
     byte[] content = FileUtils.getLocalFileContent(file);
     String charset = FileUtils.getLocalFileCharset(file);
