@@ -7,7 +7,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import saros.activities.SPath;
 import saros.filesystem.IProject;
 import saros.filesystem.IResource;
 import saros.intellij.runtime.FilesystemRunner;
@@ -22,25 +21,6 @@ public class VirtualFileConverter {
 
   private VirtualFileConverter() {
     // NOP
-  }
-
-  /**
-   * Returns an <code>SPath</code> representing the given file. Uses the given project to try to
-   * obtain a valid module for the given file.
-   *
-   * @param project the project to use for the conversion
-   * @param virtualFile file to get the <code>SPath</code> for
-   * @return an <code>SPath</code> representing the given file or <code>null</code> if given file
-   *     does not exist, no module could be found for the file or the found module can not be shared
-   *     through saros, or the relative path between the module root and the file could not be
-   *     constructed
-   */
-  @Nullable
-  public static SPath convertToSPath(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-
-    IResource resource = convertToResource(project, virtualFile);
-
-    return resource == null ? null : new SPath(resource);
   }
 
   /**
@@ -103,26 +83,6 @@ public class VirtualFileConverter {
     IntelliJProjectImpl wrappedModule = project.adaptTo(IntelliJProjectImpl.class);
 
     return wrappedModule.getResource(virtualFile);
-  }
-
-  /**
-   * Returns a <code>VirtualFile</code> for the given resource.
-   *
-   * @param path the SPath representing the resource to get a VirtualFile for
-   * @return a VirtualFile for the given resource or <code>null</code> if the given resource does
-   *     not exists in the VFS snapshot, is ignored, or belongs to a sub-module
-   * @see IntelliJResourceImpl#isIgnored()
-   */
-  @Nullable
-  public static VirtualFile convertToVirtualFile(@NotNull SPath path) {
-
-    IResource resource = path.getResource();
-
-    if (resource == null) {
-      return null;
-    }
-
-    return convertToVirtualFile(resource);
   }
 
   /**
