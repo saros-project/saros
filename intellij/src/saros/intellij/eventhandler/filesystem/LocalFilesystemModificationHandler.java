@@ -1053,7 +1053,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param deletedFile the deleted file
    */
   private void cleanUpDeletedFileState(@NotNull IFile deletedFile) {
-    editorManager.removeAllEditorsForPath(deletedFile);
+    editorManager.removeAllEditorsForFile(deletedFile);
 
     annotationManager.removeAnnotations(deletedFile);
   }
@@ -1074,7 +1074,7 @@ public class LocalFilesystemModificationHandler extends AbstractActivityProducer
    * @param newFile the new location/version of the file
    */
   private void updateMovedFileState(@NotNull IFile oldFile, @NotNull IFile newFile) {
-    editorManager.replaceAllEditorsForPath(oldFile, newFile);
+    editorManager.replaceAllEditorsForFile(oldFile, newFile);
 
     annotationManager.updateAnnotationPath(oldFile, newFile);
   }
